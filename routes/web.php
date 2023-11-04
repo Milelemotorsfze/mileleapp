@@ -517,9 +517,9 @@ Route::get('/d', function () {
         Route::get('/proforma_invoice/{callId}', 'proforma_invoice')->name('qoutation.proforma_invoice');
         Route::get('/get-model-lines/addon-booking/{brandId}/{type}', 'getaddonModels')->name('quotation.getaddonmodel');
         Route::get('/get-model-descriptions/addon-booking/{modelLineId}/{type}', 'getaddonModelDescriptions')->name('quotation.getmodeldescription');
-        Route::get('/get-booking-accessories/{addonId?}/{brandId?}/{modelLineId?}', 'getbookingAccessories')->name('booking.getbookingAccessories');
-        Route::get('/get-booking-spare-parts/{addonId?}/{brandId?}/{modelLineId?}/{ModelDescriptionId?}', 'getbookingSpareParts')->name('booking.getbookingSpareParts');
-        Route::get('/get-booking-kits/{addonId?}/{brandId?}/{modelLineId?}/{ModelDescriptionId?}', 'getbookingKits')->name('booking.getbookingKits');
+        Route::get('/get-booking-accessories/{addonId}/{brandId}/{modelLineId}', 'getbookingAccessories')->name('booking.getbookingAccessories');
+        Route::get('/get-booking-spare-parts/{addonId}/{brandId}/{modelLineId}/{ModelDescriptionId}', 'getbookingSpareParts')->name('booking.getbookingSpareParts');
+        Route::get('/get-booking-kits/{addonId}/{brandId}/{modelLineId}/{ModelDescriptionId}', 'getbookingKits')->name('booking.getbookingKits');
     });
     // ApprovalAwaitingController
     Route::controller(ApprovalAwaitingController::class)->group(function(){
