@@ -110,7 +110,7 @@
                         @foreach($approvedPfiItems as $value => $approvedPfiItem)
                             <div class="d-flex">
                                 <div class="col-lg-12">
-                                    <div class="row mt-2">
+                                    <div class="row mt-2" id="approved-row-{{$approvedPfiItem->id}}">
                                         <div class="col-lg-3 col-md-6">
                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
                                             <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->masterModel->model ?? '' }}" readonly class="form-control mb-2">
@@ -129,8 +129,7 @@
                                         </div>
                                         <div class="col-lg-2 col-md-2">
                                             <label class="form-label d-lg-none d-xl-none d-xxl-none"></label>
-                                            <button type="button" class="btn btn-danger btn-sm remove" data-id="{{ $approvedPfiItem->id }}"
-                                                    data-action="REMOVE" >
+                                            <button type="button" class="btn btn-danger btn-sm remove" onclick="removepfi({{ $approvedPfiItem->id }})"  >
                                                Remove
                                             </button>
                                         </div>
@@ -139,14 +138,17 @@
                             </div>
                         @endforeach
                     @endif
+                    <div id="approved">
+
+                    </div>
                 </div>
                     <div class="row">
-                        @if($pendingPfiItems->count() > 0)
+{{--                        @if($pendingPfiItems->count() > 0)--}}
                             <p class="fw-bold font-size-16 mt-3">Approved Inventory</p>
                             @foreach($pendingPfiItems as $value => $pendingPfiItem)
                                 <div class="d-flex">
                                     <div class="col-lg-12">
-                                        <div class="row mt-2">
+                                        <div class="row mt-2" id="pending-row-{{$pendingPfiItem->id}}">
                                             <div class="col-lg-3 col-md-3">
                                                 <label class="form-label d-block d-sm-none">Model</label>
                                                 <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->masterModel->model ?? ''}}" readonly class="form-control mb-2">
@@ -164,8 +166,7 @@
                                                 <input type="text" value="{{ $pendingPfiItem->quantity }}" readonly class="form-control mb-3">
                                             </div>
                                             <div class="col-lg-2 col-md-2">
-                                                <button type="button" class="btn btn-info btn-sm add-now" data-id="{{ $pendingPfiItem->id }}"
-                                                        data-action="ADD">
+                                                <button type="button" class="btn btn-info btn-sm add-now" onclick="addpfi({{ $pendingPfiItem->id }})" >
                                                     Add Pfi
                                                 </button>
                                             </div>
@@ -173,7 +174,10 @@
                                     </div>
                                 </div>
                             @endforeach
-                        @endif
+{{--                        @endif--}}
+                        <div id="pending">
+
+                        </div>
                     </div>
                 <br>
                 <form action="{{ route('pfi.store') }}" id="form-create" method="POST" enctype="multipart/form-data">
@@ -218,18 +222,36 @@
                         </div>
                         <br>
                         <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
-                        @if($approvedPfiItems->count() > 0)
                             <div class="col-12 text-center">
-                                <button type="submit" class="btn btn-primary btn-submit">Finish</button>
+                                <button type="submit" class="btn btn-primary btn-submit" id="create-pfi">Finish</button>
                             </div>
-                        @endif
                     </form>
             </div>
         @endif
         @endcan
+    <input type="hidden" value="" id="added-pfi-count">
+
 @endsection
 @push('scripts')
     <script>
+        $('form').on('submit', function(e){
+            let addedPfiCount = $('#added-pfi-count').val();
+            if(addedPfiCount <= 0) {
+                e.preventDefault();
+                alertify.confirm('Atleast One Variant item is Mandatory in PFI.').set({title:"Alert !"})
+            }else {
+                if($("#form-create").valid()) {
+                    $('#form-create').submit();
+                }else{
+                    e.preventDefault();
+                }
+
+            }
+        });
+
+        var itemCount = '{{ $approvedPfiItems->count() }}';
+        $('#added-pfi-count').val(itemCount);
+
         const fileInputLicense = document.querySelector("#file");
         const previewFile = document.querySelector("#file-preview");
         fileInputLicense.addEventListener("change", function(event) {
@@ -246,31 +268,73 @@
                     previewFile.appendChild(iframe);
                 }
         });
-       $('.remove').on('click',function(){
-           let id = $(this).attr('data-id');
-           let action = $(this).attr('data-action');
-           pfi(id, action);
-       })
-       $('.add-now').on('click',function(){
-           let id = $(this).attr('data-id');
-           let action = $(this).attr('data-action');
-           pfi(id, action);
-       })
-       function pfi(id, action) {
-           let url = '{{ route('add_pfi') }}';
-           $.ajax({
-               type: "GET",
-               url: url,
-               dataType: "json",
-               data: {
-                   id: id,
-                   action: action,
-               },
-               success:function () {
-                   location.reload();
-               }
-           });
-       }
+        function addpfi(id) {
+            let action = 'ADD';
+            let url = '{{ route('add_pfi') }}';
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    id: id,
+                    action: action
+                },
+                success:function (response) {
+                    // location.reload();
+                    // console.log(response);
+                    var itemsCount = response.approvedItems;
+                    $('#added-pfi-count').val(itemsCount);
+
+                    $('#pending-row-'+id).remove();
+                    $('#approved').append('<div class="row mt-2" id="approved-row-'+ response.id+'"><div class="col-lg-3 col-md-6"> <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label> ' +
+                        '<input type="text" value="'+ response.letter_of_indent_item.master_model.model +'" readonly class="form-control mb-2"> </div>' +
+                        '<div class="col-lg-2 col-md-2"> <label class="form-label d-block d-sm-none">SFX</label> ' +
+                        '<input type="text" value="'+ response.letter_of_indent_item.master_model.sfx +'" readonly class="form-control mb-2">' +
+                        ' </div> <div class="col-lg-3 col-md-3"> <label class="form-label d-block d-sm-none">Variant</label> ' +
+                        '<input type="text" value="'+ response.letter_of_indent_item.master_model.variant.name +'" readonly class="form-control"> ' +
+                        '</div> <div class="col-lg-2 col-md-2"> <label class="form-label d-block d-sm-none">Quantity</label>'+
+                        '<input type="text" value="'+ response.quantity +'" readonly class="form-control mb-3"> </div>'+
+                        '<div class="col-lg-2 col-md-2"> ' +
+                        '<button type="button" class="btn btn-danger btn-sm remove" onclick="removepfi('+ response.id +')" >Remove </button></div></div>'
+                    );
+                }
+            });
+        }
+        function removepfi(id) {
+                let action = 'REMOVE';
+                let url = '{{ route('add_pfi') }}';
+
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        id: id,
+                        action: action
+                    },
+                    success:function (response) {
+
+                        var itemsCount = response.approvedItems;
+                        $('#added-pfi-count').val(itemsCount);
+
+                        $('#approved-row-'+id).remove();
+                        $('#pending').append(' <div class="row mt-2" id="pending-row-'+ response.id+'"><div class="col-lg-3 col-md-6">' +
+                            ' <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label> ' +
+                            '<input type="text" value="'+ response.letter_of_indent_item.master_model.model +'" readonly class="form-control mb-2"> </div>' +
+                            '<div class="col-lg-2 col-md-2"> <label class="form-label d-block d-sm-none">SFX</label> ' +
+                            '<input type="text" value="'+ response.letter_of_indent_item.master_model.sfx +'" readonly class="form-control mb-2">' +
+                            ' </div> <div class="col-lg-3 col-md-3"> <label class="form-label d-block d-sm-none">Variant</label> ' +
+                            '<input type="text" value="'+ response.letter_of_indent_item.master_model.variant.name +'" readonly class="form-control"> ' +
+                            '</div> <div class="col-lg-2 col-md-2"> <label class="form-label d-block d-sm-none">Quantity</label>'+
+                            '<input type="text" value="'+ response.quantity +'" readonly class="form-control mb-3"> </div>'+
+                            '<div class="col-lg-2 col-md-2"> ' +
+                            '<button type="button" class="btn btn-info btn-sm add-now" onclick="addpfi('+ response.id +')" >Add Pfi </button> </div></div>'
+                        );
+                    }
+                });
+
+        }
+
         $('#pfi_reference_number').keyup(function(){
 
                 $.ajax({
