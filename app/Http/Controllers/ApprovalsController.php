@@ -781,4 +781,52 @@ class ApprovalsController extends Controller
         $incident->save();
         return response()->json(['message' => 'Incident Approved successfully']);
     }
+    public function inspectionedit($id)
+    {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open the Approval Page For Approval";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+    $inspection = Inspection::find($id);
+    $vehicle = Vehicles::find($inspection->vehicle_id);
+    $grnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN')->pluck('vehicle_picture_link')->first();
+    $secgrnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN-2')->pluck('vehicle_picture_link')->first();
+    $gdnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GDN')->pluck('vehicle_picture_link')->first();
+    $secgdnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GDN-2')->pluck('vehicle_picture_link')->first();
+    $PDIpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Incident')->pluck('vehicle_picture_link')->first();
+    $modificationpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Modification')->pluck('vehicle_picture_link')->first();
+    $Incidentpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'PDI')->pluck('vehicle_picture_link')->first();
+    $enginevalue = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'engine')->pluck('new_value')->first();
+    $vinvalue = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'vin')->pluck('new_value')->first();
+    $int_colourvalue = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'int_colour')->pluck('new_value')->first();
+    $ex_colourevalue = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'ex_colour')->pluck('new_value')->first();
+    $extra_featuresvalue = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'extra_features')->pluck('new_value')->first();
+    $variantChange = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'Variant Change')->whereIn('status', ['Pending', 'Reinspection'])->pluck('new_value')->first();
+    $int_colours = ColorCode::where('belong_to', 'int')->get();
+    $ext_colours = ColorCode::where('belong_to', 'ex')->get();
+    if($variantChange){
+        $changevariant = Varaint::where('id', $variantChange)->first();
+    }
+    else{
+        $changevariant = null;
+    }
+    $variantnew = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'New Variant')->where('status', 'Pending')->pluck('new_value')->first();
+    if($variantnew){
+        $newvariant = VariantRequest::where('id', $variantnew)->first();   
+    }
+    else{
+        $newvariant = null;
+    } 
+    $Incident = Incident::where('inspection_id', $id)->first();
+    $variant = Varaint::find($vehicle->varaints_id);
+    $brand = Brand::find($variant->brands_id);
+    $model_line = MasterModelLines::find($variant->master_model_lines_id);
+    $intColor = ColorCode::find($vehicle->int_colour);
+    $extColor = ColorCode::find($vehicle->ex_colour);
+    $variantsall = Varaint::where('master_model_lines_id', $variant->master_model_lines_id)->where('brands_id', $variant->brands_id)->get();
+    $extraItems = DB::table('vehicles_extra_items')
+        ->where('vehicle_id', $inspection->vehicle_id)
+        ->get(['item_name', 'qty']);
+    return view('inspection.editvehicleshow', compact('variantsall','ext_colours','int_colours','Incidentpicturelink','modificationpicturelink','PDIpicturelink', 'secgdnpicturelink', 'gdnpicturelink', 'secgrnpicturelink', 'grnpicturelink', 'extraItems','newvariant','changevariant', 'inspection', 'vehicle', 'variant', 'brand', 'model_line', 'intColor', 'extColor','Incident', 'enginevalue', 'vinvalue', 'int_colourvalue', 'ex_colourevalue', 'extra_featuresvalue'));
+    }
 }

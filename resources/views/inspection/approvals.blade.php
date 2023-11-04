@@ -564,7 +564,7 @@
         });
 });
     </script>
-    @php
+  @php
   $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-approve');
   @endphp
   @if ($hasPermission)  
@@ -981,6 +981,204 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
         });
     });
 </script>
+@else
+<script>
+  $(document).ready(function () {
+    var table1 = $('#dtBasicExample1').DataTable();
+    $('#dtBasicExample1 tbody').on('dblclick', 'tr', function () {
+      var data = table1.row(this).data();
+      var vehicleId = data.id;
+      var stage = data.stage;
+      $('#inspection_id').val(vehicleId);
+      if (stage === 'Routine') {
+        $.ajax({
+      url: '/routine-inspection/' + vehicleId,
+      method: 'GET',
+      success: function (response) {
+        var additionalInfo = response.additionalInfo;
+        var routineInspectionData = response.routineInspectionData;
+        var incidentData = response.incidentData;
+        var assetUrl = "{{ asset('qc/') }}/";
+        if(incidentData){
+        $('#incidentDataSection').show();
+        $('#incidentImages').show();
+        $('#reason').text(incidentData.reason);
+        $('#drivenBy').text(incidentData.driven_by);
+        $('#detail').text(incidentData.detail);
+        $('#narration').text(incidentData.narration);
+        $('#type').text(incidentData.type);
+        $('#responsivity').text(incidentData.responsivity);
+        $('#incidentImages').attr('src', assetUrl + incidentData.file_path);
+        console.log(incidentData.file_path);
+        }else{
+          $('#incidentDataSection').hide();
+          $('#incidentImages').hide();
+        }
+        $('#modelLine').text(additionalInfo.model_line);
+        $('#vin').text(additionalInfo.vin);
+        $('#intColour').text(additionalInfo.int_colour);
+        $('#extColour').text(additionalInfo.ext_colour);
+        $('#location').text(additionalInfo.location);
+        $('#model_year').text(additionalInfo.my);
+        var tableHtml = '<table class="table table-bordered"><thead><tr><th>Check Items</th><th>Spec</th><th>Condition</th><th>Remarks</th></tr></thead><tbody>';
+        routineInspectionData.forEach(function (row) {
+          tableHtml += `<tr>
+  <td class="text-left">${row.check_items !== null ? row.check_items : ''}</td>
+  <td>${row.spec !== null ? row.spec : ''}</td>
+  <td>${row.condition !== null ? row.condition : ''}</td>
+  <td>${row.remarks !== null ? row.remarks : ''}</td>
+</tr>`;
+        });
+        tableHtml += '</tbody></table>';
+        $('#routineInspectionDetails').html(tableHtml);
+        $('#routineModal').modal('show');
+      },
+      error: function (error) {
+        console.error('Error fetching routine inspection details:', error);
+      }
+    });
+  }  else if (stage === 'PDI') {
+    $.ajax({
+      url: '/pdi-inspection/' + vehicleId,
+      method: 'GET',
+      success: function (response) { 
+        var additionalInfo = response.additionalInfo;
+        var PdiInspectionData = response.PdiInspectionData;
+        var grnpicturelink = response.grnpicturelink;
+        var secgrnpicturelink = response.secgrnpicturelink;
+        var PDIpicturelink = response.PDIpicturelink;
+        var modificationpicturelink = response.modificationpicturelink;
+        var Incidentpicturelink = response.Incidentpicturelink;
+        var remarks = response.remarks;
+        var buttonContainerHtml = '';
+      if (grnpicturelink) {
+        buttonContainerHtml += `<a class="btn btn-sm btn-primary" href="${grnpicturelink}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> GRN Pictures</a>&nbsp;&nbsp;`;
+      }
+      if (secgrnpicturelink) {
+        buttonContainerHtml += `<a class="btn btn-sm btn-primary" href="${secgrnpicturelink}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> GRN-2 Pictures</a>&nbsp;&nbsp;`;
+      }
+      if (PDIpicturelink) {
+        buttonContainerHtml += `<a class="btn btn-sm btn-primary" href="${PDIpicturelink}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> PDI Pictures</a>&nbsp;&nbsp;`;
+      }
+      if (modificationpicturelink) {
+        buttonContainerHtml += `<a class="btn btn-sm btn-primary" href="${modificationpicturelink}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> Modification Pictures</a>&nbsp;&nbsp;`;
+      }
+      if (Incidentpicturelink) {
+        buttonContainerHtml += `<a class="btn btn-sm btn-primary" href="${Incidentpicturelink}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> Incident Pictures</a>`;
+      }
+      if (response.incidentDetails) {
+  var incidentHtml = `
+    <h5>Incident Report</h5>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Incident Type</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.type ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Narration Of Accident / Damage</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.narration ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Damage Details</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.detail ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Driven By</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.driven_by ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Responsibility for Recover the Damages</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.responsivity ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Reason</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.reason ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="row">
+          <div class="col-md-12">
+            ${response.incidentDetails.file_path ? 
+              `<img src="{{ asset('qc/') }}/${response.incidentDetails.file_path}" alt="Incident Image">` : 
+              'No image available'}
+          </div>
+        </div>
+      </div>
+    <br>`;
+  $('#incidentContainer').html(incidentHtml);
+  var approvedPdiButton = '<button type="button" class="btn btn-warning" onclick="approvedincidentsonly()">Approved Incident Only</button>';
+        $('#incidentapp').html(approvedPdiButton);
+    } else {
+        $('#incidentapp').hide();
+    }
+        $('#modelLinepdi').text(additionalInfo.model_line);
+        $('#vinpdi').text(additionalInfo.vin);
+        $('#intColourpdi').text(additionalInfo.int_colour);
+        $('#extColourpdi').text(additionalInfo.ext_colour);
+        $('#locationpdi').text(additionalInfo.location);
+        $('#model_yearpdi').text(additionalInfo.my);
+        $('#pdiremarks').text(remarks.remark);
+        var tableHtml = '<table class="table table-bordered"><thead><tr><th>Check List Items</th><th>Receving</th><th>Delivery</th></tr></thead><tbody>';
+        PdiInspectionData.forEach(function (row) {
+          tableHtml += `<tr>
+  <td class="text-left">${row.checking_item !== null ? row.checking_item : ''}</td>
+  <td>${row.reciving !== null ? row.reciving : ''}</td>
+  <td>${row.status !== null ? row.status : ''}</td>
+</tr>`;
+        });
+        tableHtml += '</tbody></table>';
+        $('#pdiInspectionDetails').html(tableHtml);
+        $('#buttonContainer').html(buttonContainerHtml);
+        $('#pdiModal').modal('show');
+      },
+      error: function (error) {
+        console.error('Error fetching routine inspection details:', error);
+      }
+    });
+  }
+  else {
+    var url = "{{ route('inspectionedit.edit', ['id' => ':id']) }}";
+      url = url.replace(':id', vehicleId);
+      window.location.href = url;
+  }
+    });
+  });
+  </script>
     @endif
     @else
         @php

@@ -208,8 +208,6 @@
                    }).set({title:"Can't Remove Brand And Model Lines"})
                 }
 
-
-
         })
 
         $("#add").on("click", function ()

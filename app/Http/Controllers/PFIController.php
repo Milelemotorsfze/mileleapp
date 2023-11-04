@@ -10,6 +10,7 @@ use App\Models\LOIItemPurchaseOrder;
 use App\Models\PFI;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -63,7 +64,9 @@ class PFIController extends Controller
     }
     public function addPFI(Request $request)
     {
-        $approevdLOI = ApprovedLetterOfIndentItem::findOrFail($request->id);
+        $approevdLOI = ApprovedLetterOfIndentItem::with('letterOfIndentItem.masterModel.variant')
+                                    ->findOrFail($request->id);
+
         if($request->action == 'REMOVE') {
             if($request->pfi_id) {
                 $approevdLOI->pfi_id = NULL;
@@ -80,7 +83,22 @@ class PFIController extends Controller
 
         $approevdLOI->save();
 
-        return response(true);
+        if($request->pfi_id) {
+            $approvedItemCount = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $approevdLOI->letter_of_indent_id)
+                ->where('pfi_id', $request->pfi_id)
+                ->where('is_pfi_created', true)
+                ->count();
+        }else{
+            $approvedItemCount = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $approevdLOI->letter_of_indent_id)
+                ->whereNull('pfi_id')
+                ->where('is_pfi_created', true)
+                ->count();
+        }
+
+        $approevdLOI['approvedItems'] = $approvedItemCount;
+
+
+        return response($approevdLOI);
     }
     /**
      * Store a newly created resource in storage.
