@@ -85,11 +85,7 @@
                         </div>
                     </div>
                 </div>
-                    <?php
-                        $addAction = "ADD";
-                        $removeAction = "REMOVE";
-                        ?>
-                <div class="row" id="approved">
+                <div class="row">
                     @if($pendingPfiItems->count() > 0 || $approvedPfiItems->count() > 0)
                         <div class="d-flex d-none d-lg-block d-xl-block d-xxl-block">
                             <div class="col-lg-12">
@@ -142,12 +138,9 @@
                             </div>
                         @endforeach
                     @endif
-{{--                    <div class="d-flex">--}}
-{{--                        <div class="col-lg-12">--}}
-{{--                            <div class="row mt-2" >--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
+                    <div id="approved">
+
+                    </div>
                 </div>
                 <div class="row">
 {{--                    @if($pendingPfiItems->count() > 0)--}}
@@ -183,13 +176,8 @@
                         @endforeach
 {{--                    @endif--}}
                 </div>
-                    <div class="row" id="pending">
-{{--                        <div class="d-flex">--}}
-{{--                            <div class="col-lg-12">--}}
-{{--                                <div class="row mt-2" id="pending">--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
+                    <div id="pending">
+
                     </div>
                 <br>
                 <form action="{{ route('pfi.update', $pfi->id) }}" id="form-create" method="POST" enctype="multipart/form-data">
@@ -247,6 +235,8 @@
 @endsection
 @push('scripts')
     <script>
+        var itemCount = '{{ $approvedPfiItems->count() }}';
+        $('#added-pfi-count').val(itemCount);
         const fileInputLicense = document.querySelector("#file");
         const previewFile = document.querySelector("#file-preview");
         fileInputLicense.addEventListener("change", function(event) {
@@ -312,8 +302,7 @@
             });
         }
         function removepfi(id) {
-           let addedPfiCount = $('#added-pfi-count').val();
-           console.log(addedPfiCount);
+            let addedPfiCount = $('#added-pfi-count').val();
             let action = 'REMOVE';
 
             if(addedPfiCount > 1) {
@@ -328,8 +317,6 @@
                         pfi_id: '{{ $pfi->id }}'
                     },
                     success:function (response) {
-                        // location.reload();
-                        // console.log(response);
                         var itemsCount = response.approvedItems;
                         $('#added-pfi-count').val(itemsCount);
 
@@ -348,7 +335,7 @@
                         );
                     }
                 });
-            }else{
+           }else{
                 alertify.confirm('Atleast One Variant item is Mandatory in PFI.You can not delete item.').set({title:"Alert !"})
             }
 
