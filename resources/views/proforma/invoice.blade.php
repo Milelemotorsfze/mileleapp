@@ -636,8 +636,12 @@
 	<div id="shippingContent" class="contentveh">
         <hr>
         <br>
-{{--        <div class="card">--}}
-{{--            <div class="card-body">--}}
+        <div class="card">
+            <div class="card-header">
+                    <button type="button" class="btn btn-outline-warning float-end" id="directadding-button">Directly Adding Into Quotation</button>
+            </div>
+
+            <div class="card-body">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="table-responsive">
@@ -649,7 +653,7 @@
                                     <th>Addon Name</th>
                                     <th>Description</th>
                                     <th>Price</th>
-                                    <th style="width:30px;">Add Into Qoutation</th>
+                                    <th style="width:30px;">Add Into Quotation</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -661,15 +665,18 @@
                                         <td>{{ $shipping->name }}</td>
                                         <td>{{ $shipping->description  }}</td>
                                         <td>{{ $shipping->price }}</td>
-                                        <td><button class="add-button circle-button" data-shipping-id="{{ $shipping->id }}">Add</button></td>
+                                        <td>
+                                            <button class="add-button circle-button" data-button-type="Shipping"
+                                                    data-shipping-id="{{ $shipping->id }}"></button>
+                                        </td>
                                         </tr>
                                 @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </div>
-{{--                </div>--}}
-{{--            </div>--}}
+                </div>
+            </div>
         </div>
 
 	</div>
@@ -695,7 +702,7 @@
     </script>
 <script>
         $(document).ready(function() {
-            $('#shipping-table').DataTable();
+           var shippingTable = $('#shipping-table').DataTable();
             $('#brand').select2();
             $('#model_line').select2();
             $('#variant').select2();
@@ -909,7 +916,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
         {
             targets: -1,
             data: null,
-            defaultContent: '<button class="circle-buttonr remove-button">Remove</button>'
+            defaultContent: '<button class="circle-buttonr remove-button" >Remove</button>'
         },
         {
             targets: -2,
@@ -929,11 +936,18 @@ var secondTable = $('#dtBasicExample2').DataTable({
     targets: -6,
     data: null,
     render: function (data, type, row) {
-        var brand = row[3];
-        var modelDescription = row[5];
-        var interiorColor = row[8];
-        var exteriorColor = row[9];
-        var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
+
+        var combinedValue = "";
+        if(row['button_type'] == 'Vehicle') {
+            var brand = row[3];
+            var modelDescription = row[5];
+            var interiorColor = row[8];
+            var exteriorColor = row[9];
+            var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
+        }else if(row['button_type'] == 'Shipping') {
+            combinedValue = row[2]+', '+row[3];
+        }
+
         return '<input type="text" class="combined-value-editable form-control" value="' + combinedValue + '"/>';
     }
     },
@@ -941,25 +955,50 @@ var secondTable = $('#dtBasicExample2').DataTable({
                 targets: -5,
                 data: null,
                 render: function (data, type, row) {
-                    var variant = row[6];
-                    return variant;
+                    var code = "";
+                    if(row['button_type'] == 'Vehicle') {
+                        var code = row[6];
+                    }else if(row['button_type'] == 'Shipping') {
+                        var code = row[1];
+                    }
+
+                    return code;
                 }
             },
             {
         targets: -4,
         data: null,
         render: function (data, type, row) {
-            var price = row[10];
+            var price = "";
+            if(row['button_type'] == 'Vehicle') {
+                var price = row[10];
+            }else if(row['button_type'] == 'Shipping') {
+                var price = row[4];
+            }
             return '<input type="text" class="price-editable form-control" value="' + price + '"/>';
         }
     }
     ]
     });
-    $('#dtBasicExample2 tbody').on('click', '.remove-button', function() {
-        var row = secondTable.row($(this).parents('tr'));
-        var rowData = row.data();
-        var vehicleIdToRemove = rowData[0];
-        moveRowToFirstTable(vehicleIdToRemove);
+    $('#dtBasicExample2 tbody').on('click', '.remove-button', function(e) {
+        // var row = secondTable.row($(this).parents('tr'));
+        let row = secondTable.row(e.target.closest('tr')).data();
+        // var row = $(this).closest('tr');
+        if(row['button_type'] == 'Shipping'){
+            var table = $('#shipping-table').DataTable();
+            table.row.add(['2', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping" data-shipping-id="{{ $shipping->id }}"></button>']).draw();
+        }else if(row['button_type'] == 'Vehicle'){
+            var table = $('#dtBasicExample1').DataTable();
+
+        }
+
+        var index = $(this).closest('tr').index();
+        secondTable.row(index).remove().draw();
+        resetSerialNumber(table);
+        // alert("inside romove function");
+        // var rowData = row.data();
+        // var vehicleIdToRemove = rowData[0];
+        // moveRowToFirstTable(vehicleIdToRemove);
     });
     function moveRowToFirstTable(vehicleId) {
         var firstTable = $('#dtBasicExample1').DataTable();
@@ -967,16 +1006,19 @@ var secondTable = $('#dtBasicExample2').DataTable({
         var secondTableRow = secondTable.rows().indexes().filter(function(value, index) {
             return secondTable.cell(value, 0).data() == vehicleId;
         });
-
+        // console.log(secondTableRow.length);
         if (secondTableRow.length > 0) {
+            console.log("inside removal");
+
             var rowData = secondTable.row(secondTableRow).data();
             firstTable.row.add(rowData).draw();
             secondTable.row(secondTableRow).remove().draw();
         }
+
     }
     $('#submit-button').on('click', function() {
         var selectedData = [];
-    secondTable.rows().every(function() {
+        secondTable.rows().every(function() {
         var data = this.data();
         var vehicleId = data[0];
         var selectedDays = $(this.node()).find('.days-dropdown').val();
@@ -1013,31 +1055,45 @@ var secondTable = $('#dtBasicExample2').DataTable({
         }
     });
     });
-    $(document).on('click', '.remove-button', function() {
-        var row = $(this).closest('tr');
-        var rowData = [];
-        row.find('td').each(function() {
-            rowData.push($(this).text());
-        });
-        moveRowToFirstTable(rowData);
-    });
+    // $(document).on('click', '.remove-button', function() {
+    //     var row = $(this).closest('tr');
+    //     var rowData = [];
+    //     row.find('td').each(function() {
+    //         rowData.push($(this).text());
+    //     });
+    //     moveRowToFirstTable(rowData);
+    // });
+
     $(document).on('click', '.add-button', function() {
         var vehicleId = $(this).data('vehicle-id');
         console.log('Add button clicked for vehicle ID:', vehicleId);
         var rowData = [];
+        var buttonType = $(this).data('button-type');
+
         var row = $(this).closest('tr');
-        console.log(row);
+        rowData['button_type'] = buttonType;
         row.find('td').each(function() {
             rowData.push($(this).text());
         });
-        // pass the type(which table click inside to datatable => inside rendering chcek the row type value then add the data)
+
+        // pass the type(which table click inside to datatable => inside rendering check the row type value then add the data)
         var secondTable = $('#dtBasicExample2').DataTable();
         secondTable.row.add(rowData).draw();
-        var firstTable = $('#dtBasicExample1').DataTable();
-        firstTable.row(row).remove().draw();
-        var shippingTable = $('#shipping-table').DataTable();
-        shippingTable.row(row).remove().draw();
+
+        if(buttonType == 'Shipping') {
+            var table = shippingTable;
+
+        }else if(buttonType == 'Vehicle') {
+            var table = $('#dtBasicExample1').DataTable();
+        }
+        table.row(row).remove().draw();
+        resetSerialNumber(table);
     });
+    function resetSerialNumber(table) {
+        table.$('tbody tr').each(function(i){
+            $($(this).find('td')[0]).html(i+1);
+        });
+    }
     $('#search-button').on('click', function() {
         var variantId = $('#variant').val();
         var interiorColorId = $('#interior_color').val();
@@ -1065,7 +1121,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
             url: url,
             success: function(response) {
                 var data = response.map(function(vehicle) {
-                    var addButton = '<button class="add-button" data-vehicle-id="' + vehicle.id + '">Add</button>';
+                    var addButton = '<button class="add-button" data-button-type="Vehicle" data-vehicle-id="' + vehicle.id + '">Add</button>';
                     return [
                         vehicle.id,
                         vehicle.grn_status,
@@ -1101,7 +1157,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
                         {
                             title: 'Actions',
                             render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-vehicle-id="' + row[0] + '"></div>';
+                                return '<div class="circle-button add-button" data-button-type="Vehicle" data-vehicle-id="' + row[0] + '"></div>';
                             }
                         }
                     ]
