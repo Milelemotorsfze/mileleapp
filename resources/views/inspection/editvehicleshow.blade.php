@@ -260,6 +260,14 @@
             </div>
             
           </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="extra_features" class="form-label">Remarks:</label>
+            </div>
+            <div class="col-md-8">
+            <textarea class="form-control" id="remark" name="remark">{{ $inspection->remark ? htmlspecialchars(strip_tags($inspection->remark)) : '' }}</textarea>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -369,9 +377,9 @@
 @endif
 @if($inspection->stage != "Incident")
 @if(!$changevariant && !$newvariant)
-<div class="button-containerinner">
+<!-- <div class="button-containerinner">
             <a class="btn btn-sm btn-primary" href="#" onclick="Newvariant('{{ $inspection->id }}')">Add Or Change Variant</a>
-            </div>
+            </div> -->
             <br>
 @endif
 <hr>
@@ -1287,14 +1295,6 @@
         </div>
     </div>
           </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="remark" class="form-label">Remarks:</label>
-            </div>
-            <div class="col-md-8">
-              <textarea class="form-control" id="editor"></textarea>
-            </div>
-          </div>
         </div>
         <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -1381,26 +1381,6 @@
 </div>
 </div>
 @endif
-<hr>
-<form id="approveForm" action="{{ route('approveInspection') }}" method="POST">
-    @csrf
-    <input type="hidden" name="inspection_id" value="{{ $inspection->id }}">
-    <input type="hidden" id="buttonValue" name="buttonValue" value="">
-    <div class="form-group">
-        <h5>Manager Remarks</h5>
-        <textarea id="process_remarks" name="process_remarks" class="form-control" rows="4" placeholder="Enter Manager Remarks"></textarea>
-    </div>
-</form>
-<a style="float: right;" class="btn btn-success" onclick="setButtonValue('approve')">
-    <i class="fa fa-check" aria-hidden="true"></i> Approve Inspection
-</a>
-@if($inspection->stage != "Incident")
-@if($inspection->status == "Pending")
-<a style="float: right; margin-right: 10px;" class="btn btn-danger" onclick="setButtonValue('reinspect')">
-    <i class="fa fa-times" aria-hidden="true"></i> Re Inspection
-</a>
-@endif
-@endif
 </br>
 </div>
 @endsection
@@ -1435,11 +1415,12 @@ function incidentreport(InspectionId) {
 <script>
 function saveinspectiondetails() {
     var engine = $('#engine').val();
-    var ins  ection_id = $('#inspection_id').val();
+    var inspection_id = $('#inspection_id').val();
     var vin = $('#vin').val();
     var int_colour = $('#int_colour').val();
     var ex_colour = $('#ex_colour').val();
     var extra_features = $('#extra_features').val();
+    var remark = $('#remark').val();
     var csrfToken = $('meta[name="csrf-token"]').attr('content');
     var data = {
         engine: engine,
@@ -1448,6 +1429,7 @@ function saveinspectiondetails() {
         ex_colour: ex_colour,
         inspection_id: inspection_id,
         extra_features: extra_features,
+        remark: remark,
         _token: csrfToken
     };
     $.ajax({
@@ -1475,8 +1457,6 @@ function saveextraitems() {
         var qtyInput = $('[name="' + itemName + '_qty"]');
         var qty = qtyInput.val();
         var isChecked = $(this).is(':checked');
-        
-        // Include data for both checked and unchecked items
         dataToSend[itemName] = { checked: isChecked, qty: qty };
     });
     console.log(dataToSend);
@@ -1519,7 +1499,10 @@ function saveincidents() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
             success: function(response) {
-                console.log(response);
+                alertify.success('Incident Update successfully');
+                setTimeout(function() {
+            window.location.reload();
+        }, 500);
             },
             error: function(error) {
                 console.error(error);

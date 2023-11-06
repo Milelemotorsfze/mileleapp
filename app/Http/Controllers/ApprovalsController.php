@@ -242,7 +242,11 @@ class ApprovalsController extends Controller
         $int_colour = $request->input('int_colour');
         $ex_colour = $request->input('ex_colour');
         $extra_features = $request->input('extra_features');
+        $remarking = $request->input('remark');
         $inspection = Inspection::find($inspection_id);
+        $inspection->status = "Pending";
+        $inspection->remark = $remarking;
+        $inspection->save();
         $vehicle = Vehicles::find($inspection->vehicle_id);
         $commonData = [
             'status' => 'Pending',
@@ -261,7 +265,12 @@ class ApprovalsController extends Controller
                 array_merge(['vehicle_id' => $inspection->vehicle_id, 'old_value' => $vehicle->int_colour, 'new_value' => $int_colour], $commonData)
             );
         }
-    
+        if ($engine !== null) {
+            VehicleApprovalRequests::updateOrInsert(
+                ['inspection_id' => $inspection_id, 'field' => 'engine'],
+                array_merge(['vehicle_id' => $inspection->vehicle_id, 'old_value' => $vehicle->engine, 'new_value' => $engine], $commonData)
+            );
+        }
         if ($ex_colour !== null) {
             VehicleApprovalRequests::updateOrInsert(
                 ['inspection_id' => $inspection_id, 'field' => 'ex_colour'],
@@ -308,17 +317,22 @@ class ApprovalsController extends Controller
     
         return response()->json(['message' => 'Data saved successfully']);
     }    
-    public function updateincident(Request $request) {
+    public function updateincident(Request $request) 
+    {
         $useractivities =  New UserActivities();
         $useractivities->activity = "Update the Incident";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        $canvasImageDataURL = $request->input('canvas_image');
-        $canvasImageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $canvasImageDataURL));
-        $filename = 'canvas_image_' . uniqid() . '.png';
-        $directory = public_path('qc');
-        File::makeDirectory($directory, $mode = 0777, true, true);
-        File::put($directory . '/' . $filename, $canvasImageData);
+        $canvasImageDataURL = $request->input('canvas_image'); 
+        if($canvasImageDataURL != null)
+        {
+            $canvasImageDataURL = $request->input('canvas_image'); 
+            $canvasImageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $canvasImageDataURL));
+            $filename = 'canvas_image_' . uniqid() . '.png';
+            $directory = public_path('qc');
+            File::makeDirectory($directory, $mode = 0777, true, true);
+            File::put($directory . '/' . $filename, $canvasImageData); 
+        }
         $incidentType = $request->input('incidentType');
         $narration = $request->input('narration');
         $damageDetails = $request->input('damageDetails');
@@ -334,7 +348,10 @@ class ApprovalsController extends Controller
         $incident->responsivity = $request->input('responsibility');
         $reasons = $request->input('reasons', []);
         $incident->reason = implode(',', $reasons);
+        if($canvasImageDataURL != null)
+        {
         $incident->file_path = $filename;
+        }
         $incident->save();
         return response()->json(['message' => 'Data saved successfully']);
     }
@@ -666,6 +683,7 @@ class ApprovalsController extends Controller
             'routineInspectionData' => $routineInspectionData,
             'additionalInfo' => $additionalInfo,
             'incidentData' => $incidentData,
+            'inspection' => $inspection->id,
         ]);
     }
     public function approvalsrotein(Request $request)
@@ -828,5 +846,81 @@ class ApprovalsController extends Controller
         ->where('vehicle_id', $inspection->vehicle_id)
         ->get(['item_name', 'qty']);
     return view('inspection.editvehicleshow', compact('variantsall','ext_colours','int_colours','Incidentpicturelink','modificationpicturelink','PDIpicturelink', 'secgdnpicturelink', 'gdnpicturelink', 'secgrnpicturelink', 'grnpicturelink', 'extraItems','newvariant','changevariant', 'inspection', 'vehicle', 'variant', 'brand', 'model_line', 'intColor', 'extColor','Incident', 'enginevalue', 'vinvalue', 'int_colourvalue', 'ex_colourevalue', 'extra_featuresvalue'));
+    }
+    public function updateRoutineInspection(Request $request)
+    {
+        $validatedData = $request->validate([
+            'updatedData' => 'required|array',
+        ]);
+        $updatedData = $validatedData['updatedData'];
+        $inspectionid = $request->input('inspectionid');
+        $incidentData = $request->input('incidentData');
+        $inspection = Inspection::where('id', $inspectionid)->first();
+        if ($inspection) {
+            $inspection->status = "Pending";
+            $inspection->save();
+        }
+        foreach ($updatedData as $data) {
+            $routineInspection = RoutineInspection::where('check_items', $data['check_items'])->where('inspection_id', $inspectionid)->first();
+            info($routineInspection);
+            if ($routineInspection) {
+                $routineInspection->condition = $data['condition'];
+                $routineInspection->remarks = $data['remarks'];
+                $routineInspection->save();
+            }
+        }
+        info($incidentData);
+        if (!empty($incidentData)) {
+            $incident = Incident::where('inspection_id', $inspectionid)->first();
+            if ($incident) {
+                $incident->update([
+                    'type' => $incidentData['type'],
+                    'narration' => $incidentData['narration'],
+                    'detail' => $incidentData['detail'],
+                    'driven_by' => $incidentData['driven_by'],
+                    'responsivity' => $incidentData['responsivity'],
+                    'reason' => $incidentData['reason'],
+                    'status' => 'Pending',
+                ]);
+            }
+        }        
+        return response()->json(['message' => 'Routine inspection data updated successfully']);
+    }
+    public function updatepdiInspectionedit(Request $request)
+    {
+        $validatedData = $request->validate([
+            'updatedData' => 'required|array',
+        ]);
+        $updatedData = $validatedData['updatedData'];
+        $inspectionid = $request->input('inspectionid');
+        $inspection = Inspection::where('id', $inspectionid)->first();
+        if ($inspection) {
+            $inspection->remark = $updatedData['remarks']['remark'];
+            $inspection->status = "Pending";
+            $inspection->save();
+        }
+        foreach ($updatedData['PDIInspectionData'] as $data) {
+            $pdiInspection = Pdi::where('checking_item', $data['checking_item'])
+                ->where('inspection_id', $inspectionid)
+                ->first();
+            if ($pdiInspection) {
+                $pdiInspection->status = $data['status'];
+                $pdiInspection->save();
+            }
+        }
+        if (isset($updatedData['incidentData'])) {
+            $incident = Incident::where('inspection_id', $inspectionid)->first();
+            if ($incident) {
+                $incident->type = $updatedData['incidentData']['type'];
+                $incident->narration = $updatedData['incidentData']['narration'];
+                $incident->detail = $updatedData['incidentData']['detail'];
+                $incident->driven_by = $updatedData['incidentData']['driven_by'];
+                $incident->responsivity = $updatedData['incidentData']['responsivity'];
+                $incident->reason = $updatedData['incidentData']['reason'];
+                $incident->status = "Pending";
+                $incident->save();
+            }
+        }
+        return response()->json(['message' => 'Routine inspection data updated successfully']);
     }
 }
