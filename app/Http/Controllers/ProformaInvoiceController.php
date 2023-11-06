@@ -10,6 +10,7 @@ use App\Models\AddonDescription;
 use App\Models\MasterModelLines;
 use App\Models\MasterModelDescription;
 use App\Models\AddonDetails;
+use App\Models\SupplierAddons;
 class ProformaInvoiceController extends Controller {
     public function proforma_invoice($callId) {
         $brands = Brand::all();
@@ -85,7 +86,34 @@ class ProformaInvoiceController extends Controller {
                 });
             }
         }
-        $accessories = $accessories->with('AddonDescription.Addon')->get();
+        $accessories = $accessories->with('AddonDescription.Addon','AddonTypes.brands','SellingPrice', 'PendingSellingPrice')->get();
+        foreach($accessories as $addon) {
+            $price = $totalPrice = '';
+            if($addon->addon_type_name == 'P' OR $addon->addon_type_name == 'SP') {
+                $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+                $addon->LeastPurchasePrices = $price;
+            }
+            else if($addon->addon_type_name == 'K') {
+                $supplierAddonDetails = [];
+                $supplierAddonDetails = AddonDetails::where('id',$addon->id)->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription')->first();
+                $totalPrice = 0;
+                $totalPriceTrue = 'yes';
+                foreach($supplierAddonDetails->KitItems as $oneItem) {
+                    if($oneItem->kit_item_total_purchase_price != 0) {
+                        $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
+                    }
+                    else {
+                        $totalPriceTrue = 'no';
+                    }
+                }
+                if($totalPriceTrue == 'yes' && $totalPrice != 0) {
+                    $addon->LeastPurchasePrices = $totalPrice;
+                }
+                else {
+                    $addon->LeastPurchasePrices = '';
+                }
+            }
+        }
         return response()->json($accessories);
     }
     public function getbookingSpareParts($addonId, $brandId, $modelLineId, $ModelDescriptionId) {
