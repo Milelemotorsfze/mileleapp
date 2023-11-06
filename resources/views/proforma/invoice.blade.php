@@ -385,8 +385,8 @@
 					<div class="col">
 						<button type="button" class="btn btn-primary" id="search-button">Search</button>
 					</div>
-					<div class="col">
-						<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>
+					<div class="col " id="quotation-direct-add-vehicle-button">
+{{--						<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>--}}
 					</div>
 				</div>
 			</div>
@@ -410,7 +410,7 @@
 								<th>Interior Color</th>
 								<th>Exterior Color</th>
 								<th>Price</th>
-								<th style="width:30px;">Add Into Qoutation</th>
+								<th style="width:30px;">Add Into Quotation</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -639,7 +639,7 @@
         <br>
         <div class="card">
             <div class="card-header">
-                    <button type="button" class="btn btn-outline-warning float-end" id="directadding-button">Directly Adding Into Quotation</button>
+                <h4>Available Shipping Charges</h4>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -661,7 +661,7 @@
                                     @foreach($shippings as $shipping)
                                         <tr>
                                         <td>{{ ++$i }}</td>
-                                        <td></td>
+                                        <td>{{ $shipping->code }} </td>
                                         <td>{{ $shipping->name }}</td>
                                         <td>{{ $shipping->description  }}</td>
                                         <td>{{ $shipping->price }}</td>
@@ -684,7 +684,7 @@
         <br>
         <div class="card">
             <div class="card-header">
-                <button type="button" class="btn btn-outline-warning float-end" id="directadding-button">Directly Adding Into Quotation</button>
+                <h4>Available Shipping Documents</h4>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -729,7 +729,7 @@
         <br>
         <div class="card">
             <div class="card-header">
-                <button type="button" class="btn btn-outline-warning float-end" id="directadding-button">Directly Adding Into Quotation</button>
+                <h4>Available Certifications</h4>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -774,7 +774,7 @@
         <br>
         <div class="card">
             <div class="card-header">
-                <button type="button" class="btn btn-outline-warning float-end" id="directadding-button">Directly Adding Into Quotation</button>
+                <h4>Available Other Documents</h4>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -1260,7 +1260,13 @@ var secondTable = $('#dtBasicExample2').DataTable({
         var variantId = $('#variant').val();
         var interiorColorId = $('#interior_color').val();
         var exteriorColorId = $('#exterior_color').val();
+        var table = $("#dtBasicExample1").DataTable();
 
+        var rowCount = table.data().count();
+        alert(rowCount);
+        if(rowCount <= 0){
+            $('#quotation-direct-add-vehicle-button').append('<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>')
+        }
         if (!variantId) {
             alert("Please select a variant before searching.");
             return;
