@@ -470,13 +470,13 @@
 								<th>ID</th>
 								<th>Accessory Name</th>
 								<th>Accessory Code</th>
-								<th>Brand</th>
-								<th>Model Line</th>
+								<th>Brand/Model Line</th>
+								<!-- <th>Model Line</th> -->
 								<th>Additional Remarks</th>
 								<th>Fixing Charge</th>
 								<!-- <th>Least Purchase Price(AED)</th> -->
 								<th>Selling Price(AED)</th>
-								<th style="width:30px;">Add Into Qoutation</th>
+								<th style="width:30px;">Add Into Quotation</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -542,15 +542,17 @@
 								<th>ID</th>
 								<th>Spare Part Name</th>
 								<th>Spare Part Code</th>
-								<th>Brand/Model Line</th>
-								<th>Model Line</th>
-                                <th>Model Description</th>
-                                <th>Model Year</th>
+								<th>Brand</th>
+								<th>Model Line/Model Description/Model Year</th>
+                                <th>Part Numbers</th>
+								<!-- <th>Model Line</th>
+                                <th>Model Description</th> -->
+                                <!-- <th>Model Year</th> -->
 								<th>Additional Remarks</th>
 								<th>Fixing Charge</th>
 								<!-- <th>Least Purchase Price(AED)</th> -->
 								<th>Selling Price(AED)</th>
-								<th style="width:30px;">Add Into Qoutation</th>
+								<th style="width:30px;">Add Into Quotation</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -616,14 +618,15 @@
 								<th>ID</th>
 								<th>Kit Name</th>
 								<th>Kit Code</th>
-								<th>Brand</th>
-								<th>Model Line</th>
-                                <th>Model Description</th>
+								<th>Brand/Model Line/Model Description</th>
+                                <th>Items/ Quantity</th>
+								<!-- <th>Model Line</th>
+                                <th>Model Description</th> -->
 								<th>Additional Remarks</th>
 								<th>Fixing Charge</th>
 								<!-- <th>Least Purchase Price(AED)</th> -->
 								<th>Selling Price(AED)</th>
-								<th style="width:30px;">Add Into Qoutation</th>
+								<th style="width:30px;">Add Into Quotation</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -1113,6 +1116,10 @@ var secondTable = $('#dtBasicExample2').DataTable({
         var addonId = $('#accessories_addon').val();
         var brandId = $('#accessories_brand').val();
         var modelLineId = $('#accessories_model_line').val();
+        if (!addonId || !brandId || !modelLineId) {
+            alert("Please select all the filters before searching.");
+            return;
+        }
         var url = '{{ route('booking.getbookingAccessories', ['addonId', 'brandId', 'modelLineId']) }}';
         if (addonId) {
             url = url.replace('addonId', addonId);
@@ -1137,7 +1144,6 @@ var secondTable = $('#dtBasicExample2').DataTable({
             success: function(response) {
                 var slNo = 0;
                 var data = response.map(function(accessory) { 
-                    // console.log(accessory);
                     slNo = slNo + 1;
                     var addButton = '<button class="accessory-add-button" data-accessory-id="' + accessory.id + '">Add</button>';
                     if(accessory.addon_description.description != null) {
@@ -1150,15 +1156,32 @@ var secondTable = $('#dtBasicExample2').DataTable({
                         var accessoryBrand = 'All Brands'
                     }
                     else {
-                        console.log(accessory.addon_types);
-                        // var size = 0;
-                        // size = (accessory.addon_types).length;
-                        // for(var i=0; i < size; i++) {
-                        //     if(accessory.addon_types[i].brand_id == brandId) {
-                        //         console.log(accessory.addon_types.brands.brand_name);
-                        //         var accessoryBrand = '';
-                        //     }
-                        // }
+                        var size = 0;
+                        size = (accessory.brandModelLine).length;
+                        if(size > 0) {
+                            var accessoryBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Brand</th><th style="border: 1px solid #c4c4d4">Model Line</th></tr></thead><tbody>';
+                            for(var i=0; i < size; i++) {
+                                accessoryBrand = accessoryBrand +'<tr><td style="border: 1px solid #c4c4d4">'+accessory.brandModelLine[i].brands.brand_name+'</td>';
+                                if(accessory.brandModelLine[i].is_all_model_lines == 'yes') {
+                                    accessoryBrand = accessoryBrand +'<td style="border: 1px solid #c4c4d4">All Model Lines</td>';
+                                }
+                                else {
+                                    accessoryBrand = accessoryBrand +'<td style="border: 1px solid #c4c4d4">';
+                                    var modelLineSize = 0;
+                                    modelLineSize = (accessory.brandModelLine[i].ModelLine).length;
+                                    if(modelLineSize > 0) {
+                                        accessoryBrand = accessoryBrand + '<table><tbody>';
+                                        for(var j=0; j < modelLineSize; j++) {
+                                            accessoryBrand = accessoryBrand + '<tr><td>'+ accessory.brandModelLine[i].ModelLine[j].model_lines.model_line +'</td></tr>';
+                                        }
+                                        accessoryBrand = accessoryBrand + '</tbody></table>';                                      
+                                    }
+                                    accessoryBrand = accessoryBrand +'</td>';
+                                }
+                                accessoryBrand = accessoryBrand +'</tr>';
+                            }
+                            accessoryBrand = accessoryBrand +'</tbody></table>';
+                        }
                     }
                     if(accessory.additional_remarks != null) {
                         var accessoryAdditionalRemarks = '';
@@ -1214,7 +1237,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
                         // { title: 'Least Purchase Price(AED)'}
                         { title: 'Selling Price(AED)'},
                         {
-                            title: 'Actions',
+                            title: 'Add Into Quotation',
                             render: function(data, type, row) {
                                 return '<div class="circle-button accessory-add-button" data-accessory-id="' + row[0] + '"></div>';
                             }
@@ -1229,6 +1252,10 @@ var secondTable = $('#dtBasicExample2').DataTable({
         var brandId = $('#spare_parts_brand').val();
         var modelLineId = $('#spare_parts_model_line').val();
         var ModelDescriptionId = $('#spare_parts_model_description').val();
+        if (!addonId || !brandId || !modelLineId || !ModelDescriptionId) {
+            alert("Please select all the filters before searching.");
+            return;
+        }
         var url = '{{ route('booking.getbookingSpareParts', ['addonId', 'brandId', 'modelLineId', 'ModelDescriptionId']) }}';
         if (addonId) {
             url = url.replace('addonId', addonId);
@@ -1256,14 +1283,99 @@ var secondTable = $('#dtBasicExample2').DataTable({
             type: 'GET',
             url: url,
             success: function(response) {
-                var data = response.map(function(sparepart) {
-                    var addButton = '<button class="sparepart-add-button" data-sparepart-id="' + sparepart.id + '">Add</button>';
+                var slNo = 0;
+                var data = response.map(function(sparePart) { 
+                    slNo = slNo + 1;
+                    var addButton = '<button class="sparepart-add-button" data-sparepart-id="' + sparePart.id + '">Add</button>';
+                    if(sparePart.addon_description.description != null) {
+                       var sparePartName = sparePart.addon_description.addon.name + ' - ' + sparePart.addon_description.description;
+                    } 
+                    else {
+                        var sparePartName = sparePart.addon_description.addon.name;
+                    }
+                    if(sparePart.is_all_brands == 'no') {
+                        var sparePartBrandName = sparePart.brandModelLine[0].brands.brand_name;
+                        var sparePartBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Model Line</th><th style="border: 1px solid #c4c4d4">Model Description</th><th style="border: 1px solid #c4c4d4">Model year</th></tr></thead><tbody>';
+                        var modelLineSize = 0;
+                        modelLineSize = (sparePart.brandModelLine[0].ModelLine).length;
+                        if(modelLineSize > 0) {
+                            for(var j=0; j < modelLineSize; j++) {
+                                sparePartBrand = sparePartBrand +'<tr><td style="border: 1px solid #c4c4d4">'+sparePart.brandModelLine[0].ModelLine[j].model_lines.model_line+'</td><td style="border: 1px solid #c4c4d4">';
+                                var modelDescSize = 0;
+                                modelDescSize = (sparePart.brandModelLine[0].ModelLine[j].allDes).length;
+                                if(modelDescSize > 0) {
+                                    sparePartBrand = sparePartBrand +'<table><tbody>';
+                                    for(var i=0; i < modelDescSize; i++) {
+                                        sparePartBrand = sparePartBrand +'<tr><td>';
+                                        if(i != 0) {
+                                            sparePartBrand = sparePartBrand +'<br style="line-height: 3px">';
+                                        }
+                                        sparePartBrand = sparePartBrand +sparePart.brandModelLine[0].ModelLine[j].allDes[i].model_description+'</td></tr>';
+                                    }
+                                    sparePartBrand = sparePartBrand +'</tbody></table>';
+                                }
+                                sparePartBrand = sparePartBrand +'</td><td style="border: 1px solid #c4c4d4">'+sparePart.brandModelLine[0].ModelLine[j].model_year_start;
+                                if(sparePart.brandModelLine[0].ModelLine[j].model_year_end != null) {
+                                    sparePartBrand = sparePartBrand +' - '+sparePart.brandModelLine[0].ModelLine[j].model_year_end;
+                                }
+                                sparePartBrand = sparePartBrand +'</td></tr>';
+                            }                          
+                        }
+                        sparePartBrand = sparePartBrand +'</tbody></table>';
+                    }
+                    var sparePartNumber = '';
+                    var partNumbersSize = 0;
+                    partNumbersSize = (sparePart.part_numbers).length;
+                    if(partNumbersSize > 0) {
+                        for(var k=0; k < modelLineSize; k++) {
+                            if(sparePart.part_numbers[k]) {
+                                if(k != 0) {
+                                    sparePartNumber = sparePartNumber + '<br>';
+                                }
+                                sparePartNumber = sparePart.part_numbers[k].part_number;
+                            }
+                        }
+                    }
+                    if(sparePart.additional_remarks != null) {
+                        var sparePartAdditionalRemarks = '';
+                    }
+                    else {
+                        var sparePartAdditionalRemarks = sparePart.additional_remarks;
+                    }
+                    if(sparePart.fixing_charges_included == 'yes') {
+                        var sparePartFixingCharge = 'Included';
+                    }
+                    else {
+                        var sparePartFixingCharge = sparePart.fixing_charge_amount + ' AED';
+                    }
+                    if(sparePart.selling_price != null) {
+                        if(sparePart.selling_price.selling_price != '0.00' || sparePart.selling_price.selling_price != null) {
+                            var sparePartSellingPrice = sparePart.selling_price.selling_price;
+                        }
+                    }
+                    else if(sparePart.pending_selling_price != null) {
+                        if(sparePart.pending_selling_price != null) {
+                            if(sparePart.pending_selling_price != '0.00' || sparePart.pending_selling_price.selling_price != null) {
+                                var sparePartSellingPrice = sparePart.pending_selling_price.selling_price + ' (Approval Awaiting)';
+                            }
+                        }
+                    }
+                    else {
+                        var sparePartSellingPrice = 'Not Added';
+                    }
                     return [
-                        sparepart.id,
-                        sparepart.addon_id,
-                        sparepart.addon_code,
-                        addButton
-                    ];
+                            slNo,
+                            sparePartName,
+                            sparePart.addon_code,
+                            sparePartBrandName,
+                            sparePartBrand,
+                            sparePartNumber,
+                            sparePartAdditionalRemarks,
+                            sparePartFixingCharge,
+                            // sparePart.LeastPurchasePrices.purchase_price_aed,
+                            sparePartSellingPrice,
+                            addButton,
+                        ];
                 });
                 if ($.fn.dataTable.isDataTable('#dtBasicExample3')) {
                     $('#dtBasicExample3').DataTable().destroy();
@@ -1274,8 +1386,15 @@ var secondTable = $('#dtBasicExample2').DataTable({
                         { title: 'ID' },
                         { title: 'Spare Part Name' },
                         { title: 'Spare Part Code' },
+                        { title: 'Brand' },
+                        { title: 'Model Lines/Model Description/Model Year' },
+                        { title: 'Part Numbers' },
+                        { title: 'Additional Remarks' },
+                        { title: 'Fixing Charge'},
+                        // { title: 'Least Purchase Price(AED)'}
+                        { title: 'Selling Price(AED)'},
                         {
-                            title: 'Actions',
+                            title: 'Add Into Quotation',
                             render: function(data, type, row) {
                                 return '<div class="circle-button sparepart-add-button" data-sparepart-id="' + row[0] + '"></div>';
                             }
@@ -1290,6 +1409,10 @@ var secondTable = $('#dtBasicExample2').DataTable({
         var brandId = $('#kit_brand').val();
         var modelLineId = $('#kit_model_line').val();
         var ModelDescriptionId = $('#kits_model_description').val();
+        if (!addonId || !brandId || !modelLineId || !ModelDescriptionId) {
+            alert("Please select all the filters before searching.");
+            return;
+        }
         var url = '{{ route('booking.getbookingKits', ['addonId', 'brandId', 'modelLineId', 'ModelDescriptionId']) }}';
         if (addonId) {
             url = url.replace('addonId', addonId);
@@ -1316,15 +1439,123 @@ var secondTable = $('#dtBasicExample2').DataTable({
         $.ajax({
             type: 'GET',
             url: url,
-            success: function(response) {  console.log(response);
-                var data = response.map(function(kit) {
+            // success: function(response) {  console.log(response);
+            //     var data = response.map(function(kit) {
+            //         var addButton = '<button class="kit-add-button" data-kit-id="' + kit.id + '">Add</button>';
+            //         return [
+            //             kit.id,
+            //             kit.addon_id,
+            //             kit.addon_code,
+            //             addButton
+            //         ];
+            //     });
+            //     if ($.fn.dataTable.isDataTable('#dtBasicExample4')) {
+            //         $('#dtBasicExample4').DataTable().destroy();
+            //     }
+            //     $('#dtBasicExample4').DataTable({
+            //         data: data,
+            //         columns: [
+            //             { title: 'ID' },
+            //             { title: 'Kit Name' },
+            //             { title: 'Kit Code' },
+            //             {
+            //                 title: 'Actions',
+            //                 render: function(data, type, row) {
+            //                     return '<div class="circle-button kit-add-button" data-kit-id="' + row[0] + '"></div>';
+            //                 }
+            //             }
+            //         ]
+            //     });
+            // }
+            success: function(response) {
+                var slNo = 0;
+                var data = response.map(function(kit) { 
+                    slNo = slNo + 1;
                     var addButton = '<button class="kit-add-button" data-kit-id="' + kit.id + '">Add</button>';
+                    var kitName = '';
+                    if(kit.addon_name.name != null) {
+                       kitName = kit.addon_name.name;
+                    }
+                    if(kit.is_all_brands == 'no') {
+                        var kitBrandName = kit.brandModelLine[0].brands.brand_name;
+                        var kitBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Model Line</th><th style="border: 1px solid #c4c4d4">Model Description</th></thead><tbody>';
+                        var modelLineSize = 0;
+                        modelLineSize = (kit.brandModelLine[0].ModelLine).length;
+                        if(modelLineSize > 0) {
+                            for(var j=0; j < modelLineSize; j++) {
+                                kitBrand = kitBrand +'<tr><td style="border: 1px solid #c4c4d4">'+kit.brandModelLine[0].ModelLine[j].model_lines.model_line+'</td><td style="border: 1px solid #c4c4d4">';
+                                var modelDescSize = 0;
+                                modelDescSize = (kit.brandModelLine[0].ModelLine[j].allDes).length;
+                                if(modelDescSize > 0) {
+                                    kitBrand = kitBrand +'<table><tbody>';
+                                    for(var i=0; i < modelDescSize; i++) {
+                                        kitBrand = kitBrand +'<tr><td>';
+                                        if(i != 0) {
+                                            kitBrand = kitBrand +'<br style="line-height: 3px">';
+                                        }
+                                        kitBrand = kitBrand +kit.brandModelLine[0].ModelLine[j].allDes[i].model_description+'</td></tr>';
+                                    }
+                                    kitBrand = kitBrand +'</tbody></table>';
+                                }
+                                kitBrand = kitBrand +'</td></tr>';
+                            }                          
+                        }
+                        kitBrand = kitBrand +'</tbody></table>';
+                    }
+                    var kitItems = '';
+                    var itemCount = (kit.kit_items).length;
+                    if(itemCount > 0) {
+                        kitItems = kitItems + '<table><thead><tr><th style="border: 1px solid #c4c4d4">Item</th><th style="border: 1px solid #c4c4d4">Quantity</th></thead><tbody>'
+                        for(var l=0; l<itemCount; l++) {
+                            kitItems = kitItems + '<tr><td style="border: 1px solid #c4c4d4">'+kit.kit_items[l].item.addon.name;
+                            if(kit.kit_items[l].addon.addon_description.description != null) {
+                                kitItems = kitItems + ' - '+kit.kit_items[l].addon.addon_description.description;
+                            }
+                            kitItems = kitItems +'</td><td style="border: 1px solid #c4c4d4">'+kit.kit_items[l].quantity+'</td></tr>'
+                        }
+                        kitItems = kitItems + '</tbody></table>'
+                    }
+                    console.log(kit);
+                    if(kit.additional_remarks != null) {
+                        var kitAdditionalRemarks = '';
+                    }
+                    else {
+                        var kitAdditionalRemarks = kit.additional_remarks;
+                    }
+                    if(kit.fixing_charges_included == 'yes') {
+                        var kitFixingCharge = 'Included';
+                    }
+                    else {
+                        var kitFixingCharge = kit.fixing_charge_amount + ' AED';
+                    }
+                    if(kit.selling_price != null) {
+                        if(kit.selling_price.selling_price != '0.00' || kit.selling_price.selling_price != null) {
+                            var kitSellingPrice = kit.selling_price.selling_price;
+                        }
+                    }
+                    else if(kit.pending_selling_price != null) {
+                        if(kit.pending_selling_price != null) {
+                            if(kit.pending_selling_price != '0.00' || kit.pending_selling_price.selling_price != null) {
+                                var kitSellingPrice = kit.pending_selling_price.selling_price + ' (Approval Awaiting)';
+                            }
+                        }
+                    }
+                    else {
+                        var kitSellingPrice = 'Not Added';
+                    }
                     return [
-                        kit.id,
-                        kit.addon_id,
-                        kit.addon_code,
-                        addButton
-                    ];
+                            slNo,
+                            kitName,
+                            kit.addon_code,
+                            kitBrandName,
+                            kitBrand,
+                            kitItems,
+                            // kitAdditionalRemarks,
+                            // kitFixingCharge,
+                            // // kit.LeastPurchasePrices.purchase_price_aed,
+                            kitSellingPrice,
+                            addButton,
+                        ];
                 });
                 if ($.fn.dataTable.isDataTable('#dtBasicExample4')) {
                     $('#dtBasicExample4').DataTable().destroy();
@@ -1335,8 +1566,15 @@ var secondTable = $('#dtBasicExample2').DataTable({
                         { title: 'ID' },
                         { title: 'Kit Name' },
                         { title: 'Kit Code' },
+                        { title: 'Brand' },
+                        { title: 'Model Lines/Model Description' },
+                        { title: 'Items/ Quantity'},
+                        // { title: 'Additional Remarks' },
+                        // { title: 'Fixing Charge'},
+                        // // { title: 'Least Purchase Price(AED)'}
+                        { title: 'Selling Price(AED)'},
                         {
-                            title: 'Actions',
+                            title: 'Add Into Quotation',
                             render: function(data, type, row) {
                                 return '<div class="circle-button kit-add-button" data-kit-id="' + row[0] + '"></div>';
                             }
