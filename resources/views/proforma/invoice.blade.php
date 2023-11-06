@@ -1124,7 +1124,11 @@ var secondTable = $('#dtBasicExample2').DataTable({
             var table = $('#shipping-table').DataTable();
             table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping" ></button>']).draw();
         }else if(row['button_type'] == 'Vehicle'){
+
             var table = $('#dtBasicExample1').DataTable();
+            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
+                '<button class="add-button circle-button" data-button-type="Vehicle" ></button>']).draw();
+
         } else if(row['button_type'] == 'Shipping-Document'){
             var table = shippingDocumentTable;
             table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping-Document" ></button>']).draw();
