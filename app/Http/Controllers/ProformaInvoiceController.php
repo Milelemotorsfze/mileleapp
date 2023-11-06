@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OtherLogisticsCharges;
 use App\Models\Shipping;
+use App\Models\ShippingCertification;
+use App\Models\ShippingDocuments;
 use Illuminate\Http\Request;
 use App\Models\Calls;
 use App\Models\Brand;
@@ -40,8 +43,12 @@ class ProformaInvoiceController extends Controller {
             });
         })->get();
         $shippings = Shipping::all();
-        return view('proforma.invoice', compact('callDetails', 'brands','assessoriesDesc','sparePartsDesc','kitsDesc','accessoriesBrands','sparePartsBrands',
-        'kitsBrands','shippings'));
+        $shippingDocuments = ShippingDocuments::all();
+        $certifications = ShippingCertification::all();
+        $otherDocuments = OtherLogisticsCharges::all();
+        return view('proforma.invoice', compact('callDetails', 'brands','assessoriesDesc',
+            'sparePartsDesc','kitsDesc','accessoriesBrands','sparePartsBrands', 'kitsBrands','shippings','certifications',
+           'otherDocuments', 'shippingDocuments'));
     }
     public function getaddonModels(Request $request, $brandId, $type) {
         $modelLines = MasterModelLines::where('brand_id', $brandId)
