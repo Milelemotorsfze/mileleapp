@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class BlForm extends Model
 {
     use HasFactory;
-    protected $table = 'warehouse';
+    protected $table = 'bl_form';
 }
