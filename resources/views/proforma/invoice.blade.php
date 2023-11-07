@@ -341,6 +341,7 @@
             <input type="radio" id="showOthers" name="contentType">
             <label for="showOthers">Add Other</label>
         </div>
+
 	</div>
 	<div id="vehiclesContent" class="contentveh">
 		<hr>
@@ -384,8 +385,8 @@
 					<div class="col">
 						<button type="button" class="btn btn-primary" id="search-button">Search</button>
 					</div>
-					<div class="col">
-						<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>
+					<div class="col " id="quotation-direct-add-vehicle-button">
+{{--						<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>--}}
 					</div>
 				</div>
 			</div>
@@ -409,7 +410,7 @@
 								<th>Interior Color</th>
 								<th>Exterior Color</th>
 								<th>Price</th>
-								<th style="width:30px;">Add Into Qoutation</th>
+								<th style="width:30px;">Add Into Quotation</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -470,13 +471,13 @@
 								<th>ID</th>
 								<th>Accessory Name</th>
 								<th>Accessory Code</th>
-								<th>Brand</th>
-								<th>Model Line</th>
+								<th>Brand/Model Line</th>
+								<!-- <th>Model Line</th> -->
 								<th>Additional Remarks</th>
 								<th>Fixing Charge</th>
 								<!-- <th>Least Purchase Price(AED)</th> -->
 								<th>Selling Price(AED)</th>
-								<th style="width:30px;">Add Into Qoutation</th>
+								<th style="width:30px;">Add Into Quotation</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -542,15 +543,17 @@
 								<th>ID</th>
 								<th>Spare Part Name</th>
 								<th>Spare Part Code</th>
-								<th>Brand/Model Line</th>
-								<th>Model Line</th>
-                                <th>Model Description</th>
-                                <th>Model Year</th>
+								<th>Brand</th>
+								<th>Model Line/Model Description/Model Year</th>
+                                <th>Part Numbers</th>
+								<!-- <th>Model Line</th>
+                                <th>Model Description</th> -->
+                                <!-- <th>Model Year</th> -->
 								<th>Additional Remarks</th>
 								<th>Fixing Charge</th>
 								<!-- <th>Least Purchase Price(AED)</th> -->
 								<th>Selling Price(AED)</th>
-								<th style="width:30px;">Add Into Qoutation</th>
+								<th style="width:30px;">Add Into Quotation</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -616,14 +619,15 @@
 								<th>ID</th>
 								<th>Kit Name</th>
 								<th>Kit Code</th>
-								<th>Brand</th>
-								<th>Model Line</th>
-                                <th>Model Description</th>
+								<th>Brand/Model Line/Model Description</th>
+                                <th>Items/ Quantity</th>
+								<!-- <th>Model Line</th>
+                                <th>Model Description</th> -->
 								<th>Additional Remarks</th>
 								<th>Fixing Charge</th>
 								<!-- <th>Least Purchase Price(AED)</th> -->
 								<th>Selling Price(AED)</th>
-								<th style="width:30px;">Add Into Qoutation</th>
+								<th style="width:30px;">Add Into Quotation</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -638,9 +642,8 @@
         <br>
         <div class="card">
             <div class="card-header">
-                    <button type="button" class="btn btn-outline-warning float-end" id="directadding-button">Directly Adding Into Quotation</button>
+                <h4>Available Shipping Charges</h4>
             </div>
-
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-12">
@@ -661,13 +664,12 @@
                                     @foreach($shippings as $shipping)
                                         <tr>
                                         <td>{{ ++$i }}</td>
-                                        <td></td>
+                                        <td>{{ $shipping->code }} </td>
                                         <td>{{ $shipping->name }}</td>
                                         <td>{{ $shipping->description  }}</td>
                                         <td>{{ $shipping->price }}</td>
                                         <td>
-                                            <button class="add-button circle-button" data-button-type="Shipping"
-                                                    data-shipping-id="{{ $shipping->id }}"></button>
+                                            <button class="add-button circle-button" data-button-type="Shipping"></button>
                                         </td>
                                         </tr>
                                 @endforeach
@@ -680,9 +682,142 @@
         </div>
 
 	</div>
-	<div id="certificatesContent" class="contentveh">
-		waqar5
-	</div>
+	<div id="shippingDocumentContent" class="contentveh">
+        <hr>
+        <br>
+        <div class="card">
+            <div class="card-header">
+                <h4>Available Shipping Documents</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table id="shipping-document-table" class="table table-striped table-editable table-edits table">
+                                <thead class="bg-soft-secondary">
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Code</th>
+                                    <th>Addon Name</th>
+                                    <th>Description</th>
+                                    <th>Price</th>
+                                    <th style="width:30px;">Add Into Quotation</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <div hidden>{{$i=0;}}
+                                    @foreach($shippingDocuments as $shippingDocument)
+                                        <tr>
+                                            <td>{{ ++$i }}</td>
+                                            <td>{{ $shippingDocument->code }}</td>
+                                            <td>{{ $shippingDocument->name }}</td>
+                                            <td>{{ $shippingDocument->description  }}</td>
+                                            <td>{{ $shippingDocument->price }}</td>
+                                            <td>
+                                                <button class="add-button circle-button" data-button-type="Shipping-Document"></button>
+                                            </td>
+                                        </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="certificateContent" class="contentveh">
+        <hr>
+        <br>
+        <div class="card">
+            <div class="card-header">
+                <h4>Available Certifications</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table id="certification-table" class="table table-striped table-editable table-edits table">
+                                <thead class="bg-soft-secondary">
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Code</th>
+                                    <th>Addon Name</th>
+                                    <th>Description</th>
+                                    <th>Price</th>
+                                    <th style="width:30px;">Add Into Quotation</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <div hidden>{{$i=0;}}
+                                    @foreach($certifications as $certification)
+                                        <tr>
+                                            <td>{{ ++$i }}</td>
+                                            <td>{{ $certification->code }}</td>
+                                            <td>{{ $certification->name }}</td>
+                                            <td>{{ $certification->description  }}</td>
+                                            <td>{{ $certification->price }}</td>
+                                            <td>
+                                                <button class="add-button circle-button" data-button-type="Certification"></button>
+                                            </td>
+                                        </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="otherContent" class="contentveh">
+        <hr>
+        <br>
+        <div class="card">
+            <div class="card-header">
+                <h4>Available Other Documents</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table id="other-document-table" class="table table-striped table-editable table-edits table">
+                                <thead class="bg-soft-secondary">
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Code</th>
+                                    <th>Addon Name</th>
+                                    <th>Description</th>
+                                    <th>Price</th>
+                                    <th style="width:30px;">Add Into Quotation</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <div hidden>{{$i=0;}}
+                                    @foreach($otherDocuments as $otherDocument)
+                                        <tr>
+                                            <td>{{ ++$i }}</td>
+                                            <td>{{ $otherDocument->code }}</td>
+                                            <td>{{ $otherDocument->name }}</td>
+                                            <td>{{ $otherDocument->description  }}</td>
+                                            <td>{{ $otherDocument->price }}</td>
+                                            <td>
+                                                <button class="add-button circle-button" data-button-type="Other"></button>
+                                            </td>
+                                        </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
 @endsection
 @push('scripts')
@@ -702,7 +837,11 @@
     </script>
 <script>
         $(document).ready(function() {
-           var shippingTable = $('#shipping-table').DataTable();
+            var shippingTable = $('#shipping-table').DataTable();
+            var shippingDocumentTable = $('#shipping-document-table').DataTable();
+            var certificationTable = $('#certification-table').DataTable();
+            var otherTable = $('#other-document-table').DataTable();
+
             $('#brand').select2();
             $('#model_line').select2();
             $('#variant').select2();
@@ -944,7 +1083,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
             var interiorColor = row[8];
             var exteriorColor = row[9];
             var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
-        }else if(row['button_type'] == 'Shipping') {
+        }else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
             combinedValue = row[2]+', '+row[3];
         }
 
@@ -958,7 +1097,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
                     var code = "";
                     if(row['button_type'] == 'Vehicle') {
                         var code = row[6];
-                    }else if(row['button_type'] == 'Shipping') {
+                    }else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
                         var code = row[1];
                     }
 
@@ -972,7 +1111,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
             var price = "";
             if(row['button_type'] == 'Vehicle') {
                 var price = row[10];
-            }else if(row['button_type'] == 'Shipping') {
+            }else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
                 var price = row[4];
             }
             return '<input type="text" class="price-editable form-control" value="' + price + '"/>';
@@ -986,10 +1125,22 @@ var secondTable = $('#dtBasicExample2').DataTable({
         // var row = $(this).closest('tr');
         if(row['button_type'] == 'Shipping'){
             var table = $('#shipping-table').DataTable();
-            table.row.add(['2', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping" data-shipping-id="{{ $shipping->id }}"></button>']).draw();
+            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping" ></button>']).draw();
         }else if(row['button_type'] == 'Vehicle'){
-            var table = $('#dtBasicExample1').DataTable();
 
+            var table = $('#dtBasicExample1').DataTable();
+            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
+                '<button class="add-button circle-button" data-button-type="Vehicle" ></button>']).draw();
+
+        } else if(row['button_type'] == 'Shipping-Document'){
+            var table = shippingDocumentTable;
+            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping-Document" ></button>']).draw();
+        }else if(row['button_type'] == 'Certification') {
+            var table = certificationTable;
+            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Certification" ></button>']).draw();
+        }else if(row['button_type'] == 'Other') {
+            var table = otherTable;
+            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Other" ></button>']).draw();
         }
 
         var index = $(this).closest('tr').index();
@@ -1076,15 +1227,29 @@ var secondTable = $('#dtBasicExample2').DataTable({
             rowData.push($(this).text());
         });
 
-        // pass the type(which table click inside to datatable => inside rendering check the row type value then add the data)
         var secondTable = $('#dtBasicExample2').DataTable();
         secondTable.row.add(rowData).draw();
 
         if(buttonType == 'Shipping') {
+
             var table = shippingTable;
 
+        }else if(buttonType == 'Shipping-Document') {
+
+            var table = shippingDocumentTable;
+
+        }else if(buttonType == 'Certification') {
+
+            var table = certificationTable;
+
+        }else if(buttonType == 'Other') {
+
+            var table = otherTable;
+
         }else if(buttonType == 'Vehicle') {
+
             var table = $('#dtBasicExample1').DataTable();
+
         }
         table.row(row).remove().draw();
         resetSerialNumber(table);
@@ -1098,7 +1263,13 @@ var secondTable = $('#dtBasicExample2').DataTable({
         var variantId = $('#variant').val();
         var interiorColorId = $('#interior_color').val();
         var exteriorColorId = $('#exterior_color').val();
+        var table = $("#dtBasicExample1").DataTable();
 
+        var rowCount = table.data().count();
+        alert(rowCount);
+        if(rowCount <= 0){
+            $('#quotation-direct-add-vehicle-button').append('<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>')
+        }
         if (!variantId) {
             alert("Please select a variant before searching.");
             return;
@@ -1169,6 +1340,10 @@ var secondTable = $('#dtBasicExample2').DataTable({
         var addonId = $('#accessories_addon').val();
         var brandId = $('#accessories_brand').val();
         var modelLineId = $('#accessories_model_line').val();
+        if (!addonId || !brandId || !modelLineId) {
+            alert("Please select all the filters before searching.");
+            return;
+        }
         var url = '{{ route('booking.getbookingAccessories', ['addonId', 'brandId', 'modelLineId']) }}';
         if (addonId) {
             url = url.replace('addonId', addonId);
@@ -1193,12 +1368,11 @@ var secondTable = $('#dtBasicExample2').DataTable({
             success: function(response) {
                 var slNo = 0;
                 var data = response.map(function(accessory) { 
-                    // console.log(accessory);
                     slNo = slNo + 1;
                     var addButton = '<button class="accessory-add-button" data-accessory-id="' + accessory.id + '">Add</button>';
                     if(accessory.addon_description.description != null) {
                        var accessoryName = accessory.addon_description.addon.name + ' - ' + accessory.addon_description.description;
-                    } 
+                    }
                     else {
                         var accessoryName = accessory.addon_description.addon.name;
                     }
@@ -1206,15 +1380,32 @@ var secondTable = $('#dtBasicExample2').DataTable({
                         var accessoryBrand = 'All Brands'
                     }
                     else {
-                        console.log(accessory.addon_types);
-                        // var size = 0;
-                        // size = (accessory.addon_types).length;
-                        // for(var i=0; i < size; i++) {
-                        //     if(accessory.addon_types[i].brand_id == brandId) {
-                        //         console.log(accessory.addon_types.brands.brand_name);
-                        //         var accessoryBrand = '';
-                        //     }
-                        // }
+                        var size = 0;
+                        size = (accessory.brandModelLine).length;
+                        if(size > 0) {
+                            var accessoryBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Brand</th><th style="border: 1px solid #c4c4d4">Model Line</th></tr></thead><tbody>';
+                            for(var i=0; i < size; i++) {
+                                accessoryBrand = accessoryBrand +'<tr><td style="border: 1px solid #c4c4d4">'+accessory.brandModelLine[i].brands.brand_name+'</td>';
+                                if(accessory.brandModelLine[i].is_all_model_lines == 'yes') {
+                                    accessoryBrand = accessoryBrand +'<td style="border: 1px solid #c4c4d4">All Model Lines</td>';
+                                }
+                                else {
+                                    accessoryBrand = accessoryBrand +'<td style="border: 1px solid #c4c4d4">';
+                                    var modelLineSize = 0;
+                                    modelLineSize = (accessory.brandModelLine[i].ModelLine).length;
+                                    if(modelLineSize > 0) {
+                                        accessoryBrand = accessoryBrand + '<table><tbody>';
+                                        for(var j=0; j < modelLineSize; j++) {
+                                            accessoryBrand = accessoryBrand + '<tr><td>'+ accessory.brandModelLine[i].ModelLine[j].model_lines.model_line +'</td></tr>';
+                                        }
+                                        accessoryBrand = accessoryBrand + '</tbody></table>';                                      
+                                    }
+                                    accessoryBrand = accessoryBrand +'</td>';
+                                }
+                                accessoryBrand = accessoryBrand +'</tr>';
+                            }
+                            accessoryBrand = accessoryBrand +'</tbody></table>';
+                        }
                     }
                     if(accessory.additional_remarks != null) {
                         var accessoryAdditionalRemarks = '';
@@ -1270,7 +1461,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
                         // { title: 'Least Purchase Price(AED)'}
                         { title: 'Selling Price(AED)'},
                         {
-                            title: 'Actions',
+                            title: 'Add Into Quotation',
                             render: function(data, type, row) {
                                 return '<div class="circle-button accessory-add-button" data-accessory-id="' + row[0] + '"></div>';
                             }
@@ -1285,6 +1476,10 @@ var secondTable = $('#dtBasicExample2').DataTable({
         var brandId = $('#spare_parts_brand').val();
         var modelLineId = $('#spare_parts_model_line').val();
         var ModelDescriptionId = $('#spare_parts_model_description').val();
+        if (!addonId || !brandId || !modelLineId || !ModelDescriptionId) {
+            alert("Please select all the filters before searching.");
+            return;
+        }
         var url = '{{ route('booking.getbookingSpareParts', ['addonId', 'brandId', 'modelLineId', 'ModelDescriptionId']) }}';
         if (addonId) {
             url = url.replace('addonId', addonId);
@@ -1312,14 +1507,99 @@ var secondTable = $('#dtBasicExample2').DataTable({
             type: 'GET',
             url: url,
             success: function(response) {
-                var data = response.map(function(sparepart) {
-                    var addButton = '<button class="sparepart-add-button" data-sparepart-id="' + sparepart.id + '">Add</button>';
+                var slNo = 0;
+                var data = response.map(function(sparePart) { 
+                    slNo = slNo + 1;
+                    var addButton = '<button class="sparepart-add-button" data-sparepart-id="' + sparePart.id + '">Add</button>';
+                    if(sparePart.addon_description.description != null) {
+                       var sparePartName = sparePart.addon_description.addon.name + ' - ' + sparePart.addon_description.description;
+                    } 
+                    else {
+                        var sparePartName = sparePart.addon_description.addon.name;
+                    }
+                    if(sparePart.is_all_brands == 'no') {
+                        var sparePartBrandName = sparePart.brandModelLine[0].brands.brand_name;
+                        var sparePartBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Model Line</th><th style="border: 1px solid #c4c4d4">Model Description</th><th style="border: 1px solid #c4c4d4">Model year</th></tr></thead><tbody>';
+                        var modelLineSize = 0;
+                        modelLineSize = (sparePart.brandModelLine[0].ModelLine).length;
+                        if(modelLineSize > 0) {
+                            for(var j=0; j < modelLineSize; j++) {
+                                sparePartBrand = sparePartBrand +'<tr><td style="border: 1px solid #c4c4d4">'+sparePart.brandModelLine[0].ModelLine[j].model_lines.model_line+'</td><td style="border: 1px solid #c4c4d4">';
+                                var modelDescSize = 0;
+                                modelDescSize = (sparePart.brandModelLine[0].ModelLine[j].allDes).length;
+                                if(modelDescSize > 0) {
+                                    sparePartBrand = sparePartBrand +'<table><tbody>';
+                                    for(var i=0; i < modelDescSize; i++) {
+                                        sparePartBrand = sparePartBrand +'<tr><td>';
+                                        if(i != 0) {
+                                            sparePartBrand = sparePartBrand +'<br style="line-height: 3px">';
+                                        }
+                                        sparePartBrand = sparePartBrand +sparePart.brandModelLine[0].ModelLine[j].allDes[i].model_description+'</td></tr>';
+                                    }
+                                    sparePartBrand = sparePartBrand +'</tbody></table>';
+                                }
+                                sparePartBrand = sparePartBrand +'</td><td style="border: 1px solid #c4c4d4">'+sparePart.brandModelLine[0].ModelLine[j].model_year_start;
+                                if(sparePart.brandModelLine[0].ModelLine[j].model_year_end != null) {
+                                    sparePartBrand = sparePartBrand +' - '+sparePart.brandModelLine[0].ModelLine[j].model_year_end;
+                                }
+                                sparePartBrand = sparePartBrand +'</td></tr>';
+                            }                          
+                        }
+                        sparePartBrand = sparePartBrand +'</tbody></table>';
+                    }
+                    var sparePartNumber = '';
+                    var partNumbersSize = 0;
+                    partNumbersSize = (sparePart.part_numbers).length;
+                    if(partNumbersSize > 0) {
+                        for(var k=0; k < modelLineSize; k++) {
+                            if(sparePart.part_numbers[k]) {
+                                if(k != 0) {
+                                    sparePartNumber = sparePartNumber + '<br>';
+                                }
+                                sparePartNumber = sparePart.part_numbers[k].part_number;
+                            }
+                        }
+                    }
+                    if(sparePart.additional_remarks != null) {
+                        var sparePartAdditionalRemarks = '';
+                    }
+                    else {
+                        var sparePartAdditionalRemarks = sparePart.additional_remarks;
+                    }
+                    if(sparePart.fixing_charges_included == 'yes') {
+                        var sparePartFixingCharge = 'Included';
+                    }
+                    else {
+                        var sparePartFixingCharge = sparePart.fixing_charge_amount + ' AED';
+                    }
+                    if(sparePart.selling_price != null) {
+                        if(sparePart.selling_price.selling_price != '0.00' || sparePart.selling_price.selling_price != null) {
+                            var sparePartSellingPrice = sparePart.selling_price.selling_price;
+                        }
+                    }
+                    else if(sparePart.pending_selling_price != null) {
+                        if(sparePart.pending_selling_price != null) {
+                            if(sparePart.pending_selling_price != '0.00' || sparePart.pending_selling_price.selling_price != null) {
+                                var sparePartSellingPrice = sparePart.pending_selling_price.selling_price + ' (Approval Awaiting)';
+                            }
+                        }
+                    }
+                    else {
+                        var sparePartSellingPrice = 'Not Added';
+                    }
                     return [
-                        sparepart.id,
-                        sparepart.addon_id,
-                        sparepart.addon_code,
-                        addButton
-                    ];
+                            slNo,
+                            sparePartName,
+                            sparePart.addon_code,
+                            sparePartBrandName,
+                            sparePartBrand,
+                            sparePartNumber,
+                            sparePartAdditionalRemarks,
+                            sparePartFixingCharge,
+                            // sparePart.LeastPurchasePrices.purchase_price_aed,
+                            sparePartSellingPrice,
+                            addButton,
+                        ];
                 });
                 if ($.fn.dataTable.isDataTable('#dtBasicExample3')) {
                     $('#dtBasicExample3').DataTable().destroy();
@@ -1330,8 +1610,15 @@ var secondTable = $('#dtBasicExample2').DataTable({
                         { title: 'ID' },
                         { title: 'Spare Part Name' },
                         { title: 'Spare Part Code' },
+                        { title: 'Brand' },
+                        { title: 'Model Lines/Model Description/Model Year' },
+                        { title: 'Part Numbers' },
+                        { title: 'Additional Remarks' },
+                        { title: 'Fixing Charge'},
+                        // { title: 'Least Purchase Price(AED)'}
+                        { title: 'Selling Price(AED)'},
                         {
-                            title: 'Actions',
+                            title: 'Add Into Quotation',
                             render: function(data, type, row) {
                                 return '<div class="circle-button sparepart-add-button" data-sparepart-id="' + row[0] + '"></div>';
                             }
@@ -1346,6 +1633,10 @@ var secondTable = $('#dtBasicExample2').DataTable({
         var brandId = $('#kit_brand').val();
         var modelLineId = $('#kit_model_line').val();
         var ModelDescriptionId = $('#kits_model_description').val();
+        if (!addonId || !brandId || !modelLineId || !ModelDescriptionId) {
+            alert("Please select all the filters before searching.");
+            return;
+        }
         var url = '{{ route('booking.getbookingKits', ['addonId', 'brandId', 'modelLineId', 'ModelDescriptionId']) }}';
         if (addonId) {
             url = url.replace('addonId', addonId);
@@ -1372,15 +1663,123 @@ var secondTable = $('#dtBasicExample2').DataTable({
         $.ajax({
             type: 'GET',
             url: url,
-            success: function(response) {  console.log(response);
-                var data = response.map(function(kit) {
+            // success: function(response) {  console.log(response);
+            //     var data = response.map(function(kit) {
+            //         var addButton = '<button class="kit-add-button" data-kit-id="' + kit.id + '">Add</button>';
+            //         return [
+            //             kit.id,
+            //             kit.addon_id,
+            //             kit.addon_code,
+            //             addButton
+            //         ];
+            //     });
+            //     if ($.fn.dataTable.isDataTable('#dtBasicExample4')) {
+            //         $('#dtBasicExample4').DataTable().destroy();
+            //     }
+            //     $('#dtBasicExample4').DataTable({
+            //         data: data,
+            //         columns: [
+            //             { title: 'ID' },
+            //             { title: 'Kit Name' },
+            //             { title: 'Kit Code' },
+            //             {
+            //                 title: 'Actions',
+            //                 render: function(data, type, row) {
+            //                     return '<div class="circle-button kit-add-button" data-kit-id="' + row[0] + '"></div>';
+            //                 }
+            //             }
+            //         ]
+            //     });
+            // }
+            success: function(response) {
+                var slNo = 0;
+                var data = response.map(function(kit) { 
+                    slNo = slNo + 1;
                     var addButton = '<button class="kit-add-button" data-kit-id="' + kit.id + '">Add</button>';
+                    var kitName = '';
+                    if(kit.addon_name.name != null) {
+                       kitName = kit.addon_name.name;
+                    }
+                    if(kit.is_all_brands == 'no') {
+                        var kitBrandName = kit.brandModelLine[0].brands.brand_name;
+                        var kitBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Model Line</th><th style="border: 1px solid #c4c4d4">Model Description</th></thead><tbody>';
+                        var modelLineSize = 0;
+                        modelLineSize = (kit.brandModelLine[0].ModelLine).length;
+                        if(modelLineSize > 0) {
+                            for(var j=0; j < modelLineSize; j++) {
+                                kitBrand = kitBrand +'<tr><td style="border: 1px solid #c4c4d4">'+kit.brandModelLine[0].ModelLine[j].model_lines.model_line+'</td><td style="border: 1px solid #c4c4d4">';
+                                var modelDescSize = 0;
+                                modelDescSize = (kit.brandModelLine[0].ModelLine[j].allDes).length;
+                                if(modelDescSize > 0) {
+                                    kitBrand = kitBrand +'<table><tbody>';
+                                    for(var i=0; i < modelDescSize; i++) {
+                                        kitBrand = kitBrand +'<tr><td>';
+                                        if(i != 0) {
+                                            kitBrand = kitBrand +'<br style="line-height: 3px">';
+                                        }
+                                        kitBrand = kitBrand +kit.brandModelLine[0].ModelLine[j].allDes[i].model_description+'</td></tr>';
+                                    }
+                                    kitBrand = kitBrand +'</tbody></table>';
+                                }
+                                kitBrand = kitBrand +'</td></tr>';
+                            }                          
+                        }
+                        kitBrand = kitBrand +'</tbody></table>';
+                    }
+                    var kitItems = '';
+                    var itemCount = (kit.kit_items).length;
+                    if(itemCount > 0) {
+                        kitItems = kitItems + '<table><thead><tr><th style="border: 1px solid #c4c4d4">Item</th><th style="border: 1px solid #c4c4d4">Quantity</th></thead><tbody>'
+                        for(var l=0; l<itemCount; l++) {
+                            kitItems = kitItems + '<tr><td style="border: 1px solid #c4c4d4">'+kit.kit_items[l].item.addon.name;
+                            if(kit.kit_items[l].addon.addon_description.description != null) {
+                                kitItems = kitItems + ' - '+kit.kit_items[l].addon.addon_description.description;
+                            }
+                            kitItems = kitItems +'</td><td style="border: 1px solid #c4c4d4">'+kit.kit_items[l].quantity+'</td></tr>'
+                        }
+                        kitItems = kitItems + '</tbody></table>'
+                    }
+                    console.log(kit);
+                    if(kit.additional_remarks != null) {
+                        var kitAdditionalRemarks = '';
+                    }
+                    else {
+                        var kitAdditionalRemarks = kit.additional_remarks;
+                    }
+                    if(kit.fixing_charges_included == 'yes') {
+                        var kitFixingCharge = 'Included';
+                    }
+                    else {
+                        var kitFixingCharge = kit.fixing_charge_amount + ' AED';
+                    }
+                    if(kit.selling_price != null) {
+                        if(kit.selling_price.selling_price != '0.00' || kit.selling_price.selling_price != null) {
+                            var kitSellingPrice = kit.selling_price.selling_price;
+                        }
+                    }
+                    else if(kit.pending_selling_price != null) {
+                        if(kit.pending_selling_price != null) {
+                            if(kit.pending_selling_price != '0.00' || kit.pending_selling_price.selling_price != null) {
+                                var kitSellingPrice = kit.pending_selling_price.selling_price + ' (Approval Awaiting)';
+                            }
+                        }
+                    }
+                    else {
+                        var kitSellingPrice = 'Not Added';
+                    }
                     return [
-                        kit.id,
-                        kit.addon_id,
-                        kit.addon_code,
-                        addButton
-                    ];
+                            slNo,
+                            kitName,
+                            kit.addon_code,
+                            kitBrandName,
+                            kitBrand,
+                            kitItems,
+                            // kitAdditionalRemarks,
+                            // kitFixingCharge,
+                            // // kit.LeastPurchasePrices.purchase_price_aed,
+                            kitSellingPrice,
+                            addButton,
+                        ];
                 });
                 if ($.fn.dataTable.isDataTable('#dtBasicExample4')) {
                     $('#dtBasicExample4').DataTable().destroy();
@@ -1391,8 +1790,15 @@ var secondTable = $('#dtBasicExample2').DataTable({
                         { title: 'ID' },
                         { title: 'Kit Name' },
                         { title: 'Kit Code' },
+                        { title: 'Brand' },
+                        { title: 'Model Lines/Model Description' },
+                        { title: 'Items/ Quantity'},
+                        // { title: 'Additional Remarks' },
+                        // { title: 'Fixing Charge'},
+                        // // { title: 'Least Purchase Price(AED)'}
+                        { title: 'Selling Price(AED)'},
                         {
-                            title: 'Actions',
+                            title: 'Add Into Quotation',
                             render: function(data, type, row) {
                                 return '<div class="circle-button kit-add-button" data-kit-id="' + row[0] + '"></div>';
                             }
