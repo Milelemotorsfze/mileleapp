@@ -438,7 +438,7 @@
 					<label for="brand">Select Brand:</label>
 					<select class="form-control col" id="accessories_brand" name="accessories_brand">
 						<option value="">Select Brand</option>
-                        <option value="allbrands">ALL BRANDS</option>
+                        <!-- <option value="allbrands">ALL BRANDS</option> -->
 						@foreach($accessoriesBrands as $brand)
 						<option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
 						@endforeach
@@ -469,14 +469,13 @@
 						<thead class="bg-soft-secondary">
 							<tr>
 								<th>ID</th>
-								<th>Accessory Name</th>
 								<th>Accessory Code</th>
+								<th>Accessory Name</th>
 								<th>Brand/Model Line</th>
-								<!-- <th>Model Line</th> -->
+								<th>Selling Price(AED)</th>
 								<th>Additional Remarks</th>
 								<th>Fixing Charge</th>
 								<!-- <th>Least Purchase Price(AED)</th> -->
-								<th>Selling Price(AED)</th>
 								<th style="width:30px;">Add Into Quotation</th>
 							</tr>
 						</thead>
@@ -541,18 +540,15 @@
 						<thead class="bg-soft-secondary">
 							<tr>
 								<th>ID</th>
-								<th>Spare Part Name</th>
 								<th>Spare Part Code</th>
-								<th>Brand</th>
-								<th>Model Line/Model Description/Model Year</th>
+								<th>Spare Part Name</th>
+								<th>Brand/Model Line/Model Description</th>
+								<!-- <th>Model Line/Model Description/Model Year</th> -->
+								<th>Selling Price(AED)</th>
                                 <th>Part Numbers</th>
-								<!-- <th>Model Line</th>
-                                <th>Model Description</th> -->
-                                <!-- <th>Model Year</th> -->
 								<th>Additional Remarks</th>
 								<th>Fixing Charge</th>
 								<!-- <th>Least Purchase Price(AED)</th> -->
-								<th>Selling Price(AED)</th>
 								<th style="width:30px;">Add Into Quotation</th>
 							</tr>
 						</thead>
@@ -617,14 +613,11 @@
 						<thead class="bg-soft-secondary">
 							<tr>
 								<th>ID</th>
-								<th>Kit Name</th>
 								<th>Kit Code</th>
-								<th>Brand/Model Line/Model Description</th>
+								<th>Kit Name</th>
+								<th>Brand</th>
+								<th>Model Line/Model Description</th>
                                 <th>Items/ Quantity</th>
-								<!-- <th>Model Line</th>
-                                <th>Model Description</th> -->
-								<th>Additional Remarks</th>
-								<th>Fixing Charge</th>
 								<!-- <th>Least Purchase Price(AED)</th> -->
 								<th>Selling Price(AED)</th>
 								<th style="width:30px;">Add Into Quotation</th>
@@ -836,288 +829,298 @@
         });
     </script>
 <script>
-        $(document).ready(function() {
-            var shippingTable = $('#shipping-table').DataTable();
-            var shippingDocumentTable = $('#shipping-document-table').DataTable();
-            var certificationTable = $('#certification-table').DataTable();
-            var otherTable = $('#other-document-table').DataTable();
+    $(document).ready(function() {
+        var shippingTable = $('#shipping-table').DataTable();
+        var shippingDocumentTable = $('#shipping-document-table').DataTable();
+        var certificationTable = $('#certification-table').DataTable();
+        var otherTable = $('#other-document-table').DataTable();
 
-            $('#brand').select2();
-            $('#model_line').select2();
-            $('#variant').select2();
-            $('#interior_color').select2();
-            $('#exterior_color').select2();
+        $('#brand').select2();
+        $('#model_line').select2();
+        $('#variant').select2();
+        $('#interior_color').select2();
+        $('#exterior_color').select2();
 
-			$('#accessories_addon').select2();
-            $('#accessories_brand').select2();
-			$('#accessories_model_line').select2();
+        $('#accessories_addon').select2();
+        $('#accessories_brand').select2();
+        $('#accessories_model_line').select2();
 
-            $('#spare_parts_addon').select2();
-            $('#spare_parts_brand').select2();
-			$('#spare_parts_model_line').select2();
-            $('#spare_parts_model_description').select2();
+        $('#spare_parts_addon').select2();
+        $('#spare_parts_brand').select2();
+        $('#spare_parts_model_line').select2();
+        $('#spare_parts_model_description').select2();
 
-            $('#kit_addon').select2();
-            $('#kit_brand').select2();
-			$('#kit_model_line').select2();
-            $('#kits_model_description').select2();
+        $('#kit_addon').select2();
+        $('#kit_brand').select2();
+        $('#kit_model_line').select2();
+        $('#kits_model_description').select2();
 
-            $('#brand').on('change', function() {
-            var brandId = $(this).val();
-            if (brandId) {
-                $('#model_line').prop('disabled', false);
-                $('#model_line').empty().append('<option value="">Select Model Line</option>');
+        $('#brand').on('change', function() {
+        var brandId = $(this).val();
+        if (brandId) {
+            $('#model_line').prop('disabled', false);
+            $('#model_line').empty().append('<option value="">Select Model Line</option>');
 
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('booking.getmodel', ['brandId' => '__brandId__']) }}'
-                        .replace('__brandId__', brandId),
-                    success: function(response) {
-                        $.each(response, function(key, value) {
-                            $('#model_line').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#model_line').prop('disabled', true);
-                $('#variant').prop('disabled', true);
-                $('#model_line').empty().append('<option value="">Select Model Line</option>');
-                $('#variant').empty().append('<option value="">Select Variant</option>');
-            }
-        });
-        $('#model_line').on('change', function() {
-            var modelLineId = $(this).val();
-            if (modelLineId) {
-                $('#variant').prop('disabled', false);
-                $('#variant').empty().append('<option value="">Select Variant</option>');
-
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('booking.getvariant', ['modelLineId' => '__modelLineId__']) }}'
-                        .replace('__modelLineId__', modelLineId),
-                    success: function(response) {
-                        $.each(response, function(key, value) {
-                            $('#variant').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#variant').prop('disabled', true);
-                $('#variant').empty().append('<option value="">Select Variant</option>');
-            }
-        });
-        $('#variant').on('change', function() {
-            var variantId = $(this).val();
-            if (variantId) {
-                $('#interior_color').prop('disabled', false);
-                $('#exterior_color').prop('disabled', false);
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('booking.getInteriorColors', ['variantId' => '__variantId__']) }}'
-                        .replace('__variantId__', variantId),
-                    success: function(response) {
-                        $('#interior_color').empty().append('<option value="">Select Interior Color</option>');
-                        $.each(response, function(key, value) {
-                            $('#interior_color').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('booking.getExteriorColors', ['variantId' => '__variantId__']) }}'
-                        .replace('__variantId__', variantId),
-                    success: function(response) {
-                        $('#exterior_color').empty().append('<option value="">Select Exterior Color</option>');
-                        $.each(response, function(key, value) {
-                            $('#exterior_color').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#interior_color').prop('disabled', true);
-                $('#exterior_color').prop('disabled', true);
-                $('#interior_color').empty().append('<option value="">Select Interior Color</option>');
-                $('#exterior_color').empty().append('<option value="">Select Exterior Color</option>');
-            }
-        });
-		$('#accessories_brand').on('change', function() {
-            var brandId = $(this).val();
-            if (brandId) {
-                $('#accessories_model_line').prop('disabled', false);
-                $('#accessories_model_line').empty().append('<option value="">Select Model Line</option>');
-
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('quotation.getaddonmodel', ['brandId' => '__brandId__','type'=>'P']) }}'
-                        .replace('__brandId__', brandId),
-                    success: function(response) {
-                        $('#accessories_model_line').append('<option value="allmodellines">All Model Lines</option>');
-                        $.each(response, function(key, value) {
-                            $('#accessories_model_line').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#accessories_model_line').prop('disabled', true);
-                $('#accessories_model_line').empty().append('<option value="">Select Model Line</option>');
-            }
-        });
-        $('#spare_parts_brand').on('change', function() {
-            var brandId = $(this).val();
-            if (brandId) {
-                $('#spare_parts_model_line').prop('disabled', false);
-                $('#spare_parts_model_line').empty().append('<option value="">Select Model Line</option>');
-
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('quotation.getaddonmodel', ['brandId' => '__brandId__','type'=>'P']) }}'
-                        .replace('__brandId__', brandId),
-                    success: function(response) {
-                        $.each(response, function(key, value) {
-                            $('#spare_parts_model_line').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#spare_parts_model_line').prop('disabled', true);
-                $('#spare_parts_model_line').empty().append('<option value="">Select Model Line</option>');
-            }
-        });
-        $('#kit_brand').on('change', function() {
-            var brandId = $(this).val();
-            if (brandId) {
-                $('#kit_model_line').prop('disabled', false);
-                $('#kit_model_line').empty().append('<option value="">Select Model Line</option>');
-
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('quotation.getaddonmodel', ['brandId' => '__brandId__','type'=>'P']) }}'
-                        .replace('__brandId__', brandId),
-                    success: function(response) {
-                        $.each(response, function(key, value) {
-                            $('#kit_model_line').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#kit_model_line').prop('disabled', true);
-                $('#kit_model_line').empty().append('<option value="">Select Model Line</option>');
-            }
-        });
-        $('#spare_parts_model_line').on('change', function() {
-            var modelLineId = $(this).val();
-            if (modelLineId) {
-                $('#spare_parts_model_description').prop('disabled', false);
-                $('#spare_parts_model_description').empty().append('<option value="">Select Model Description</option>');
-
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('quotation.getmodeldescription', ['modelLineId' => '__modelLineId__','type'=>'SP']) }}'
-                        .replace('__modelLineId__', modelLineId),
-                    success: function(response) { console.log(response);
-                        $.each(response, function(key, value) {
-                            $('#spare_parts_model_description').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#spare_parts_model_description').prop('disabled', true);
-                $('#spare_parts_model_description').empty().append('<option value="">Select Model Description</option>');
-            }
-        });
-        $('#kit_model_line').on('change', function() {
-            var modelLineId = $(this).val();
-            if (modelLineId) {
-                $('#kits_model_description').prop('disabled', false);
-                $('#kits_model_description').empty().append('<option value="">Select Model Description</option>');
-
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('quotation.getmodeldescription', ['modelLineId' => '__modelLineId__','type'=>'SP']) }}'
-                        .replace('__modelLineId__', modelLineId),
-                    success: function(response) { console.log(response);
-                        $.each(response, function(key, value) {
-                            $('#kits_model_description').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#kits_model_description').prop('disabled', true);
-                $('#kits_model_description').empty().append('<option value="">Select Model Description</option>');
-            }
-        });
-var secondTable = $('#dtBasicExample2').DataTable({
-    searching: false,
-    paging: false,
-    scrollY: false,
-    sorting: false,
-    columnDefs: [
-        {
-            targets: -1,
-            data: null,
-            defaultContent: '<button class="circle-buttonr remove-button" >Remove</button>'
-        },
-        {
-            targets: -2,
-            data: null,
-            render: function (data, type, row) {
-                return '<input type="text" class="qty-editable form-control" value="1"/>';
-            }
-        },
-        {
-            targets: -3,
-            data: null,
-            render: function (data, type, row) {
-                return '<input type="text" class="qty-editable form-control" value=""/>';
-            }
-        },
-        {
-    targets: -6,
-    data: null,
-    render: function (data, type, row) {
-
-        var combinedValue = "";
-        if(row['button_type'] == 'Vehicle') {
-            var brand = row[3];
-            var modelDescription = row[5];
-            var interiorColor = row[8];
-            var exteriorColor = row[9];
-            var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
-        }else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
-            combinedValue = row[2]+', '+row[3];
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('booking.getmodel', ['brandId' => '__brandId__']) }}'
+                    .replace('__brandId__', brandId),
+                success: function(response) {
+                    $.each(response, function(key, value) {
+                        $('#model_line').append('<option value="' + key + '">' + value + '</option>');
+                    });
+                }
+            });
+        } else {
+            $('#model_line').prop('disabled', true);
+            $('#variant').prop('disabled', true);
+            $('#model_line').empty().append('<option value="">Select Model Line</option>');
+            $('#variant').empty().append('<option value="">Select Variant</option>');
         }
+    });
+    $('#model_line').on('change', function() {
+        var modelLineId = $(this).val();
+        if (modelLineId) {
+            $('#variant').prop('disabled', false);
+            $('#variant').empty().append('<option value="">Select Variant</option>');
 
-        return '<input type="text" class="combined-value-editable form-control" value="' + combinedValue + '"/>';
-    }
-    },
-    {
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('booking.getvariant', ['modelLineId' => '__modelLineId__']) }}'
+                    .replace('__modelLineId__', modelLineId),
+                success: function(response) {
+                    $.each(response, function(key, value) {
+                        $('#variant').append('<option value="' + key + '">' + value + '</option>');
+                    });
+                }
+            });
+        } else {
+            $('#variant').prop('disabled', true);
+            $('#variant').empty().append('<option value="">Select Variant</option>');
+        }
+    });
+    $('#variant').on('change', function() {
+        var variantId = $(this).val();
+        if (variantId) {
+            $('#interior_color').prop('disabled', false);
+            $('#exterior_color').prop('disabled', false);
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('booking.getInteriorColors', ['variantId' => '__variantId__']) }}'
+                    .replace('__variantId__', variantId),
+                success: function(response) {
+                    $('#interior_color').empty().append('<option value="">Select Interior Color</option>');
+                    $.each(response, function(key, value) {
+                        $('#interior_color').append('<option value="' + key + '">' + value + '</option>');
+                    });
+                }
+            });
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('booking.getExteriorColors', ['variantId' => '__variantId__']) }}'
+                    .replace('__variantId__', variantId),
+                success: function(response) {
+                    $('#exterior_color').empty().append('<option value="">Select Exterior Color</option>');
+                    $.each(response, function(key, value) {
+                        $('#exterior_color').append('<option value="' + key + '">' + value + '</option>');
+                    });
+                }
+            });
+        } else {
+            $('#interior_color').prop('disabled', true);
+            $('#exterior_color').prop('disabled', true);
+            $('#interior_color').empty().append('<option value="">Select Interior Color</option>');
+            $('#exterior_color').empty().append('<option value="">Select Exterior Color</option>');
+        }
+    });
+    $('#accessories_brand').on('change', function() {
+        var brandId = $(this).val();
+        if (brandId) {
+            $('#accessories_model_line').prop('disabled', false);
+            $('#accessories_model_line').empty().append('<option value="">Select Model Line</option>');
+
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('quotation.getaddonmodel', ['brandId' => '__brandId__','type'=>'P']) }}'
+                    .replace('__brandId__', brandId),
+                success: function(response) {
+                    // $('#accessories_model_line').append('<option value="allmodellines">All Model Lines</option>');
+                    $.each(response, function(key, value) {
+                        $('#accessories_model_line').append('<option value="' + key + '">' + value + '</option>');
+                    });
+                }
+            });
+        } else {
+            $('#accessories_model_line').prop('disabled', true);
+            $('#accessories_model_line').empty().append('<option value="">Select Model Line</option>');
+        }
+    });
+    $('#spare_parts_brand').on('change', function() {
+        var brandId = $(this).val();
+        if (brandId) {
+            $('#spare_parts_model_line').prop('disabled', false);
+            $('#spare_parts_model_line').empty().append('<option value="">Select Model Line</option>');
+
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('quotation.getaddonmodel', ['brandId' => '__brandId__','type'=>'P']) }}'
+                    .replace('__brandId__', brandId),
+                success: function(response) {
+                    $.each(response, function(key, value) {
+                        $('#spare_parts_model_line').append('<option value="' + key + '">' + value + '</option>');
+                    });
+                }
+            });
+        } else {
+            $('#spare_parts_model_line').prop('disabled', true);
+            $('#spare_parts_model_line').empty().append('<option value="">Select Model Line</option>');
+        }
+    });
+    $('#kit_brand').on('change', function() {
+        var brandId = $(this).val();
+        if (brandId) {
+            $('#kit_model_line').prop('disabled', false);
+            $('#kit_model_line').empty().append('<option value="">Select Model Line</option>');
+
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('quotation.getaddonmodel', ['brandId' => '__brandId__','type'=>'P']) }}'
+                    .replace('__brandId__', brandId),
+                success: function(response) {
+                    $.each(response, function(key, value) {
+                        $('#kit_model_line').append('<option value="' + key + '">' + value + '</option>');
+                    });
+                }
+            });
+        } else {
+            $('#kit_model_line').prop('disabled', true);
+            $('#kit_model_line').empty().append('<option value="">Select Model Line</option>');
+        }
+    });
+    $('#spare_parts_model_line').on('change', function() {
+        var modelLineId = $(this).val();
+        if (modelLineId) {
+            $('#spare_parts_model_description').prop('disabled', false);
+            $('#spare_parts_model_description').empty().append('<option value="">Select Model Description</option>');
+
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('quotation.getmodeldescription', ['modelLineId' => '__modelLineId__','type'=>'SP']) }}'
+                    .replace('__modelLineId__', modelLineId),
+                success: function(response) { console.log(response);
+                    $.each(response, function(key, value) {
+                        $('#spare_parts_model_description').append('<option value="' + key + '">' + value + '</option>');
+                    });
+                }
+            });
+        } else {
+            $('#spare_parts_model_description').prop('disabled', true);
+            $('#spare_parts_model_description').empty().append('<option value="">Select Model Description</option>');
+        }
+    });
+    $('#kit_model_line').on('change', function() {
+        var modelLineId = $(this).val();
+        if (modelLineId) {
+            $('#kits_model_description').prop('disabled', false);
+            $('#kits_model_description').empty().append('<option value="">Select Model Description</option>');
+
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('quotation.getmodeldescription', ['modelLineId' => '__modelLineId__','type'=>'SP']) }}'
+                    .replace('__modelLineId__', modelLineId),
+                success: function(response) { console.log(response);
+                    $.each(response, function(key, value) {
+                        $('#kits_model_description').append('<option value="' + key + '">' + value + '</option>');
+                    });
+                }
+            });
+        } else {
+            $('#kits_model_description').prop('disabled', true);
+            $('#kits_model_description').empty().append('<option value="">Select Model Description</option>');
+        }
+    });
+    var secondTable = $('#dtBasicExample2').DataTable({
+        searching: false,
+        paging: false,
+        scrollY: false,
+        sorting: false,
+        columnDefs: [
+            {
+                targets: -1,
+                data: null,
+                defaultContent: '<button class="circle-buttonr remove-button" >Remove</button>'
+            },
+            {
+                targets: -2,
+                data: null,
+                render: function (data, type, row) {
+                    return '<input type="text" class="qty-editable form-control" value="1"/>';
+                }
+            },
+            {
+                targets: -3,
+                data: null,
+                render: function (data, type, row) {
+                    return '<input type="text" class="qty-editable form-control" value=""/>';
+                }
+            },
+            {
+                targets: -6,
+                data: null,
+                render: function (data, type, row) {
+
+                    var combinedValue = "";
+                    if(row['button_type'] == 'Vehicle') {
+                        var brand = row[3];
+                        var modelDescription = row[5];
+                        var interiorColor = row[8];
+                        var exteriorColor = row[9];
+                        var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
+                    }
+                    else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
+                        combinedValue = row[2]+', '+row[3];
+                    }
+                    else if(['button_type'] == 'Accessory' || 'SparePart' || 'Kit') {
+                        combinedValue = 'koo';
+                    }
+                    return '<input type="text" class="combined-value-editable form-control" value="' + combinedValue + '"/>';
+                }
+            },
+            {
                 targets: -5,
                 data: null,
                 render: function (data, type, row) {
                     var code = "";
                     if(row['button_type'] == 'Vehicle') {
                         var code = row[6];
-                    }else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
+                    }
+                    else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
                         var code = row[1];
                     }
-
+                    else if(row['botton_type'] == 'Accessory' || 'SparePart' || 'Kit') {
+                        var code = 'hi';
+                    }
                     return code;
                 }
             },
             {
-        targets: -4,
-        data: null,
-        render: function (data, type, row) {
-            var price = "";
-            if(row['button_type'] == 'Vehicle') {
-                var price = row[10];
-            }else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
-                var price = row[4];
+                targets: -4,
+                data: null,
+                render: function (data, type, row) {
+                    var price = "";
+                    if(row['button_type'] == 'Vehicle') {
+                        var price = row[10];
+                    }
+                    else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
+                        var price = row[4];
+                    }
+                    else if(row['button_type'] == 'Accessory' || 'SparePart' || 'Kit') {
+                        var price = 'pricedata';
+                    }
+                    return '<input type="text" class="price-editable form-control" value="' + price + '"/>';
+                }
             }
-            return '<input type="text" class="price-editable form-control" value="' + price + '"/>';
-        }
-    }
-    ]
+        ]
     });
     $('#dtBasicExample2 tbody').on('click', '.remove-button', function(e) {
         // var row = secondTable.row($(this).parents('tr'));
@@ -1220,36 +1223,36 @@ var secondTable = $('#dtBasicExample2').DataTable({
         console.log('Add button clicked for vehicle ID:', vehicleId);
         var rowData = [];
         var buttonType = $(this).data('button-type');
-
         var row = $(this).closest('tr');
         rowData['button_type'] = buttonType;
         row.find('td').each(function() {
             rowData.push($(this).text());
         });
-
         var secondTable = $('#dtBasicExample2').DataTable();
         secondTable.row.add(rowData).draw();
-
         if(buttonType == 'Shipping') {
-
             var table = shippingTable;
-
-        }else if(buttonType == 'Shipping-Document') {
-
+        }
+        else if(buttonType == 'Shipping-Document') {
             var table = shippingDocumentTable;
-
-        }else if(buttonType == 'Certification') {
-
+        }
+        else if(buttonType == 'Certification') {
             var table = certificationTable;
-
-        }else if(buttonType == 'Other') {
-
+        }
+        else if(buttonType == 'Other') {
             var table = otherTable;
-
-        }else if(buttonType == 'Vehicle') {
-
+        }
+        else if(buttonType == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
-
+        }
+        else if(buttonType == 'Accessory') {
+            var table = $('#dtBasicExample5').DataTable();
+        }
+        else if(buttonType == 'SparePart') {
+            var table = $('#dtBasicExample3').DataTable();
+        }
+        else if(buttonType == 'Kit') {
+            var table = $('#dtBasicExample4').DataTable();
         }
         table.row(row).remove().draw();
         resetSerialNumber(table);
@@ -1369,44 +1372,45 @@ var secondTable = $('#dtBasicExample2').DataTable({
                 var slNo = 0;
                 var data = response.map(function(accessory) { 
                     slNo = slNo + 1;
-                    var addButton = '<button class="accessory-add-button" data-accessory-id="' + accessory.id + '">Add</button>';
+                    var addButton = '<button class="add-button" data-button-type="Accessory" data-accessory-id="' + accessory.id + '">Add</button>';
                     if(accessory.addon_description.description != null) {
                        var accessoryName = accessory.addon_description.addon.name + ' - ' + accessory.addon_description.description;
                     }
                     else {
                         var accessoryName = accessory.addon_description.addon.name;
                     }
-                    if(accessory.is_all_brands == 'yes') {
-                        var accessoryBrand = 'All Brands'
-                    }
-                    else {
-                        var size = 0;
-                        size = (accessory.brandModelLine).length;
-                        if(size > 0) {
-                            var accessoryBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Brand</th><th style="border: 1px solid #c4c4d4">Model Line</th></tr></thead><tbody>';
-                            for(var i=0; i < size; i++) {
-                                accessoryBrand = accessoryBrand +'<tr><td style="border: 1px solid #c4c4d4">'+accessory.brandModelLine[i].brands.brand_name+'</td>';
-                                if(accessory.brandModelLine[i].is_all_model_lines == 'yes') {
-                                    accessoryBrand = accessoryBrand +'<td style="border: 1px solid #c4c4d4">All Model Lines</td>';
-                                }
-                                else {
-                                    accessoryBrand = accessoryBrand +'<td style="border: 1px solid #c4c4d4">';
-                                    var modelLineSize = 0;
-                                    modelLineSize = (accessory.brandModelLine[i].ModelLine).length;
-                                    if(modelLineSize > 0) {
-                                        accessoryBrand = accessoryBrand + '<table><tbody>';
-                                        for(var j=0; j < modelLineSize; j++) {
-                                            accessoryBrand = accessoryBrand + '<tr><td>'+ accessory.brandModelLine[i].ModelLine[j].model_lines.model_line +'</td></tr>';
-                                        }
-                                        accessoryBrand = accessoryBrand + '</tbody></table>';                                      
-                                    }
-                                    accessoryBrand = accessoryBrand +'</td>';
-                                }
-                                accessoryBrand = accessoryBrand +'</tr>';
-                            }
-                            accessoryBrand = accessoryBrand +'</tbody></table>';
-                        }
-                    }
+                    // if(accessory.is_all_brands == 'yes') {
+                    //     var accessoryBrand = 'All Brands'
+                    // }
+                    // else {
+                        var accessoryBrand = accessory.brandModelLine;
+                        // var size = 0;
+                        // size = (accessory.brandModelLine).length;
+                        // if(size > 0) {
+                        //     var accessoryBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Brand</th><th style="border: 1px solid #c4c4d4">Model Line</th></tr></thead><tbody>';
+                        //     for(var i=0; i < size; i++) {
+                        //         accessoryBrand = accessoryBrand +'<tr><td style="border: 1px solid #c4c4d4">'+accessory.brandModelLine[i].brands.brand_name+'</td>';
+                        //         if(accessory.brandModelLine[i].is_all_model_lines == 'yes') {
+                        //             accessoryBrand = accessoryBrand +'<td style="border: 1px solid #c4c4d4">All Model Lines</td>';
+                        //         }
+                        //         else {
+                        //             accessoryBrand = accessoryBrand +'<td style="border: 1px solid #c4c4d4">';
+                        //             var modelLineSize = 0;
+                        //             modelLineSize = (accessory.brandModelLine[i].ModelLine).length;
+                        //             if(modelLineSize > 0) {
+                        //                 accessoryBrand = accessoryBrand + '<table><tbody>';
+                        //                 for(var j=0; j < modelLineSize; j++) {
+                        //                     accessoryBrand = accessoryBrand + '<tr><td>'+ accessory.brandModelLine[i].ModelLine[j].model_lines.model_line +'</td></tr>';
+                        //                 }
+                        //                 accessoryBrand = accessoryBrand + '</tbody></table>';                                      
+                        //             }
+                        //             accessoryBrand = accessoryBrand +'</td>';
+                        //         }
+                        //         accessoryBrand = accessoryBrand +'</tr>';
+                        //     }
+                        //     accessoryBrand = accessoryBrand +'</tbody></table>';
+                        // }
+                    // }
                     if(accessory.additional_remarks != null) {
                         var accessoryAdditionalRemarks = '';
                     }
@@ -1436,13 +1440,13 @@ var secondTable = $('#dtBasicExample2').DataTable({
                     }
                     return [
                             slNo,
-                            accessoryName,
                             accessory.addon_code,
+                            accessoryName,
                             accessoryBrand,
+                            accessorySellingPrice,
                             accessoryAdditionalRemarks,
                             accessoryFixingCharge,
                             // accessory.LeastPurchasePrices.purchase_price_aed,
-                            accessorySellingPrice,
                             addButton,
                         ];
                 });
@@ -1453,17 +1457,17 @@ var secondTable = $('#dtBasicExample2').DataTable({
                     data: data,
                     columns: [
                         { title: 'ID' },
-                        { title: 'Accessory Name' },
                         { title: 'Accessory Code' },
+                        { title: 'Accessory Name' },
                         { title: 'Brand/Model Lines' },
+                        { title: 'Selling Price(AED)'},
                         { title: 'Additional Remarks' },
                         { title: 'Fixing Charge'},
                         // { title: 'Least Purchase Price(AED)'}
-                        { title: 'Selling Price(AED)'},
                         {
                             title: 'Add Into Quotation',
                             render: function(data, type, row) {
-                                return '<div class="circle-button accessory-add-button" data-accessory-id="' + row[0] + '"></div>';
+                                return '<div class="circle-button add-button" data-button-type="Accessory" data-accessory-id="' + row[0] + '"></div>';
                             }
                         }
                     ]
@@ -1509,49 +1513,52 @@ var secondTable = $('#dtBasicExample2').DataTable({
             success: function(response) {
                 var slNo = 0;
                 var data = response.map(function(sparePart) { 
+                    console.log(sparePart);
                     slNo = slNo + 1;
-                    var addButton = '<button class="sparepart-add-button" data-sparepart-id="' + sparePart.id + '">Add</button>';
+                    var addButton = '<button class="add-button" data-button-type="SparePart" data-sparepart-id="' + sparePart.id + '">Add</button>';
                     if(sparePart.addon_description.description != null) {
                        var sparePartName = sparePart.addon_description.addon.name + ' - ' + sparePart.addon_description.description;
                     } 
                     else {
                         var sparePartName = sparePart.addon_description.addon.name;
                     }
-                    if(sparePart.is_all_brands == 'no') {
-                        var sparePartBrandName = sparePart.brandModelLine[0].brands.brand_name;
-                        var sparePartBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Model Line</th><th style="border: 1px solid #c4c4d4">Model Description</th><th style="border: 1px solid #c4c4d4">Model year</th></tr></thead><tbody>';
-                        var modelLineSize = 0;
-                        modelLineSize = (sparePart.brandModelLine[0].ModelLine).length;
-                        if(modelLineSize > 0) {
-                            for(var j=0; j < modelLineSize; j++) {
-                                sparePartBrand = sparePartBrand +'<tr><td style="border: 1px solid #c4c4d4">'+sparePart.brandModelLine[0].ModelLine[j].model_lines.model_line+'</td><td style="border: 1px solid #c4c4d4">';
-                                var modelDescSize = 0;
-                                modelDescSize = (sparePart.brandModelLine[0].ModelLine[j].allDes).length;
-                                if(modelDescSize > 0) {
-                                    sparePartBrand = sparePartBrand +'<table><tbody>';
-                                    for(var i=0; i < modelDescSize; i++) {
-                                        sparePartBrand = sparePartBrand +'<tr><td>';
-                                        if(i != 0) {
-                                            sparePartBrand = sparePartBrand +'<br style="line-height: 3px">';
-                                        }
-                                        sparePartBrand = sparePartBrand +sparePart.brandModelLine[0].ModelLine[j].allDes[i].model_description+'</td></tr>';
-                                    }
-                                    sparePartBrand = sparePartBrand +'</tbody></table>';
-                                }
-                                sparePartBrand = sparePartBrand +'</td><td style="border: 1px solid #c4c4d4">'+sparePart.brandModelLine[0].ModelLine[j].model_year_start;
-                                if(sparePart.brandModelLine[0].ModelLine[j].model_year_end != null) {
-                                    sparePartBrand = sparePartBrand +' - '+sparePart.brandModelLine[0].ModelLine[j].model_year_end;
-                                }
-                                sparePartBrand = sparePartBrand +'</td></tr>';
-                            }                          
-                        }
-                        sparePartBrand = sparePartBrand +'</tbody></table>';
-                    }
+                    console.log(sparePart.brandModelLineModelDescription);
+                    // if(sparePart.is_all_brands == 'no') {
+                    //     var sparePartBrandName = sparePart.brandModelLine[0].brands.brand_name;
+                    //     var sparePartBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Model Line</th><th style="border: 1px solid #c4c4d4">Model Description</th><th style="border: 1px solid #c4c4d4">Model year</th></tr></thead><tbody>';
+                    //     var modelLineSize = 0;
+                    //     modelLineSize = (sparePart.brandModelLine[0].ModelLine).length;
+                    //     if(modelLineSize > 0) {
+                    //         for(var j=0; j < modelLineSize; j++) {
+                    //             sparePartBrand = sparePartBrand +'<tr><td style="border: 1px solid #c4c4d4">'+sparePart.brandModelLine[0].ModelLine[j].model_lines.model_line+'</td><td style="border: 1px solid #c4c4d4">';
+                    //             var modelDescSize = 0;
+                    //             modelDescSize = (sparePart.brandModelLine[0].ModelLine[j].allDes).length;
+                    //             if(modelDescSize > 0) {
+                    //                 sparePartBrand = sparePartBrand +'<table><tbody>';
+                    //                 for(var i=0; i < modelDescSize; i++) {
+                    //                     sparePartBrand = sparePartBrand +'<tr><td>';
+                    //                     if(i != 0) {
+                    //                         sparePartBrand = sparePartBrand +'<br style="line-height: 3px">';
+                    //                     }
+                    //                     sparePartBrand = sparePartBrand +sparePart.brandModelLine[0].ModelLine[j].allDes[i].model_description+'</td></tr>';
+                    //                 }
+                    //                 sparePartBrand = sparePartBrand +'</tbody></table>';
+                    //             }
+                    //             sparePartBrand = sparePartBrand +'</td><td style="border: 1px solid #c4c4d4">'+sparePart.brandModelLine[0].ModelLine[j].model_year_start;
+                    //             if(sparePart.brandModelLine[0].ModelLine[j].model_year_end != null) {
+                    //                 sparePartBrand = sparePartBrand +' - '+sparePart.brandModelLine[0].ModelLine[j].model_year_end;
+                    //             }
+                    //             sparePartBrand = sparePartBrand +'</td></tr>';
+                    //         }                          
+                    //     }
+                    //     sparePartBrand = sparePartBrand +'</tbody></table>';
+                    // }
+                    sparePartBrandName = sparePart.brandModelLineModelDescription;
                     var sparePartNumber = '';
                     var partNumbersSize = 0;
                     partNumbersSize = (sparePart.part_numbers).length;
                     if(partNumbersSize > 0) {
-                        for(var k=0; k < modelLineSize; k++) {
+                        for(var k=0; k < partNumbersSize; k++) {
                             if(sparePart.part_numbers[k]) {
                                 if(k != 0) {
                                     sparePartNumber = sparePartNumber + '<br>';
@@ -1589,15 +1596,15 @@ var secondTable = $('#dtBasicExample2').DataTable({
                     }
                     return [
                             slNo,
-                            sparePartName,
                             sparePart.addon_code,
+                            sparePartName,
                             sparePartBrandName,
-                            sparePartBrand,
+                            // sparePartBrand,
+                            sparePartSellingPrice,
                             sparePartNumber,
                             sparePartAdditionalRemarks,
                             sparePartFixingCharge,
                             // sparePart.LeastPurchasePrices.purchase_price_aed,
-                            sparePartSellingPrice,
                             addButton,
                         ];
                 });
@@ -1608,19 +1615,19 @@ var secondTable = $('#dtBasicExample2').DataTable({
                     data: data,
                     columns: [
                         { title: 'ID' },
-                        { title: 'Spare Part Name' },
                         { title: 'Spare Part Code' },
-                        { title: 'Brand' },
-                        { title: 'Model Lines/Model Description/Model Year' },
+                        { title: 'Spare Part Name' },
+                        { title: 'Brand/Model Lines/Model Description' },
+                        { title: 'Selling Price(AED)'},
+                        // { title: 'Model Lines/Model Description/Model Year' },
                         { title: 'Part Numbers' },
                         { title: 'Additional Remarks' },
                         { title: 'Fixing Charge'},
                         // { title: 'Least Purchase Price(AED)'}
-                        { title: 'Selling Price(AED)'},
                         {
                             title: 'Add Into Quotation',
                             render: function(data, type, row) {
-                                return '<div class="circle-button sparepart-add-button" data-sparepart-id="' + row[0] + '"></div>';
+                                return '<div class="circle-button add-button" data-button-type="SparePart" data-sparepart-id="' + row[0] + '"></div>';
                             }
                         }
                     ]
@@ -1663,39 +1670,11 @@ var secondTable = $('#dtBasicExample2').DataTable({
         $.ajax({
             type: 'GET',
             url: url,
-            // success: function(response) {  console.log(response);
-            //     var data = response.map(function(kit) {
-            //         var addButton = '<button class="kit-add-button" data-kit-id="' + kit.id + '">Add</button>';
-            //         return [
-            //             kit.id,
-            //             kit.addon_id,
-            //             kit.addon_code,
-            //             addButton
-            //         ];
-            //     });
-            //     if ($.fn.dataTable.isDataTable('#dtBasicExample4')) {
-            //         $('#dtBasicExample4').DataTable().destroy();
-            //     }
-            //     $('#dtBasicExample4').DataTable({
-            //         data: data,
-            //         columns: [
-            //             { title: 'ID' },
-            //             { title: 'Kit Name' },
-            //             { title: 'Kit Code' },
-            //             {
-            //                 title: 'Actions',
-            //                 render: function(data, type, row) {
-            //                     return '<div class="circle-button kit-add-button" data-kit-id="' + row[0] + '"></div>';
-            //                 }
-            //             }
-            //         ]
-            //     });
-            // }
             success: function(response) {
                 var slNo = 0;
                 var data = response.map(function(kit) { 
                     slNo = slNo + 1;
-                    var addButton = '<button class="kit-add-button" data-kit-id="' + kit.id + '">Add</button>';
+                    var addButton = '<button class="add-button" data-button-type="Kit" data-kit-id="' + kit.id + '">Add</button>';
                     var kitName = '';
                     if(kit.addon_name.name != null) {
                        kitName = kit.addon_name.name;
@@ -1731,26 +1710,14 @@ var secondTable = $('#dtBasicExample2').DataTable({
                     if(itemCount > 0) {
                         kitItems = kitItems + '<table><thead><tr><th style="border: 1px solid #c4c4d4">Item</th><th style="border: 1px solid #c4c4d4">Quantity</th></thead><tbody>'
                         for(var l=0; l<itemCount; l++) {
+                            console.log(kit.kit_items[l].item.description);
                             kitItems = kitItems + '<tr><td style="border: 1px solid #c4c4d4">'+kit.kit_items[l].item.addon.name;
-                            if(kit.kit_items[l].addon.addon_description.description != null) {
-                                kitItems = kitItems + ' - '+kit.kit_items[l].addon.addon_description.description;
+                            if(kit.kit_items[l].item.description != null) {
+                                kitItems = kitItems + ' - '+kit.kit_items[l].item.description;
                             }
                             kitItems = kitItems +'</td><td style="border: 1px solid #c4c4d4">'+kit.kit_items[l].quantity+'</td></tr>'
                         }
                         kitItems = kitItems + '</tbody></table>'
-                    }
-                    console.log(kit);
-                    if(kit.additional_remarks != null) {
-                        var kitAdditionalRemarks = '';
-                    }
-                    else {
-                        var kitAdditionalRemarks = kit.additional_remarks;
-                    }
-                    if(kit.fixing_charges_included == 'yes') {
-                        var kitFixingCharge = 'Included';
-                    }
-                    else {
-                        var kitFixingCharge = kit.fixing_charge_amount + ' AED';
                     }
                     if(kit.selling_price != null) {
                         if(kit.selling_price.selling_price != '0.00' || kit.selling_price.selling_price != null) {
@@ -1769,15 +1736,13 @@ var secondTable = $('#dtBasicExample2').DataTable({
                     }
                     return [
                             slNo,
-                            kitName,
                             kit.addon_code,
+                            kitName,
                             kitBrandName,
-                            kitBrand,
-                            kitItems,
-                            // kitAdditionalRemarks,
-                            // kitFixingCharge,
-                            // // kit.LeastPurchasePrices.purchase_price_aed,
+                            // kitBrand,
                             kitSellingPrice,
+                            kitItems,
+                            // kit.LeastPurchasePrices.purchase_price_aed,
                             addButton,
                         ];
                 });
@@ -1788,19 +1753,17 @@ var secondTable = $('#dtBasicExample2').DataTable({
                     data: data,
                     columns: [
                         { title: 'ID' },
-                        { title: 'Kit Name' },
                         { title: 'Kit Code' },
-                        { title: 'Brand' },
-                        { title: 'Model Lines/Model Description' },
-                        { title: 'Items/ Quantity'},
-                        // { title: 'Additional Remarks' },
-                        // { title: 'Fixing Charge'},
-                        // // { title: 'Least Purchase Price(AED)'}
+                        { title: 'Kit Name' },
+                        { title: 'Brand/Model Lines/Model Description' },
                         { title: 'Selling Price(AED)'},
+                        // { title: 'Model Lines/Model Description' },
+                        { title: 'Items/ Quantity'},
+                        // { title: 'Least Purchase Price(AED)'}
                         {
                             title: 'Add Into Quotation',
                             render: function(data, type, row) {
-                                return '<div class="circle-button kit-add-button" data-kit-id="' + row[0] + '"></div>';
+                                return '<div class="circle-button add-button" data-button-type="Kit" data-kit-id="' + row[0] + '"></div>';
                             }
                         }
                     ]
