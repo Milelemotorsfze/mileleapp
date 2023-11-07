@@ -385,8 +385,8 @@
 					<div class="col">
 						<button type="button" class="btn btn-primary" id="search-button">Search</button>
 					</div>
-					<div class="col " id="quotation-direct-add-vehicle-button">
-{{--						<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>--}}
+					<div class="col" id="quotation-direct-add-vehicle-button" hidden>
+						<button type="button" class="btn btn-outline-warning" data-table="vehicle-table" id="directadding-button">Directly Adding Into Quotation</button>
 					</div>
 				</div>
 			</div>
@@ -1055,7 +1055,16 @@ var secondTable = $('#dtBasicExample2').DataTable({
         {
             targets: -1,
             data: null,
-            defaultContent: '<button class="circle-buttonr remove-button" >Remove</button>'
+            render: function (data, type, row) {
+                if(row['button_type'] == 'Direct-Add') {
+                    return '<button class="circle-buttonr remove-button"  data-button-type="Direct-Add"  >Remove</button>';
+
+                }else{
+                    return '<button class="circle-buttonr remove-button" >Remove</button>';
+
+                }
+            }
+            // defaultContent: '<button class="circle-buttonr remove-button" >Remove</button>'
         },
         {
             targets: -2,
@@ -1075,7 +1084,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
     targets: -6,
     data: null,
     render: function (data, type, row) {
-
+        console.log(row);
         var combinedValue = "";
         if(row['button_type'] == 'Vehicle') {
             var brand = row[3];
@@ -1083,8 +1092,11 @@ var secondTable = $('#dtBasicExample2').DataTable({
             var interiorColor = row[8];
             var exteriorColor = row[9];
             var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
-        }else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
+        }else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
+
             combinedValue = row[2]+', '+row[3];
+        }else if(row['button_type'] == 'Direct-Add') {
+            combinedValue =  row[0] + ', ' + row[1] + ', ' + row[2] + ', ' + row[3];
         }
 
         return '<input type="text" class="combined-value-editable form-control" value="' + combinedValue + '"/>';
@@ -1097,8 +1109,11 @@ var secondTable = $('#dtBasicExample2').DataTable({
                     var code = "";
                     if(row['button_type'] == 'Vehicle') {
                         var code = row[6];
-                    }else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
+                    }else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
+
                         var code = row[1];
+                    }else if(row['button_type'] == 'Direct-Add') {
+                        var code = row[4];
                     }
 
                     return code;
@@ -1111,7 +1126,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
             var price = "";
             if(row['button_type'] == 'Vehicle') {
                 var price = row[10];
-            }else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
+            }else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                 var price = row[4];
             }
             return '<input type="text" class="price-editable form-control" value="' + price + '"/>';
@@ -1145,7 +1160,10 @@ var secondTable = $('#dtBasicExample2').DataTable({
 
         var index = $(this).closest('tr').index();
         secondTable.row(index).remove().draw();
-        resetSerialNumber(table);
+        if(row['button_type'] != 'Direct-Add') {
+            alert("ok");
+            resetSerialNumber(table);
+        }
         // alert("inside romove function");
         // var rowData = row.data();
         // var vehicleIdToRemove = rowData[0];
@@ -1215,6 +1233,42 @@ var secondTable = $('#dtBasicExample2').DataTable({
     //     moveRowToFirstTable(rowData);
     // });
 
+    $(document).on('click', '#directadding-button', function() {
+        var tableType = $(this).attr('data-table');
+        var table = $('#dtBasicExample2').DataTable();
+        var row = [];
+        if(tableType == 'vehicle-table') {
+            var brand = $('#brand option:selected').text();
+            var modelLine = $('#model_line option:selected').text();
+            var variant = $("#variant option:selected").text();
+            var interiorColor = $('#interior_color option:selected').val();
+            if(interiorColor != "") {
+                var interiorColor = $('#interior_color option:selected').text();
+
+            }else{
+                var interiorColor = "";
+            }
+            var exteriorColor = $('#exterior_color option:selected').val();
+            if(exteriorColor != "") {
+                var exteriorColor = $('#exterior_color option:selected').text();
+
+            }else{
+                var exteriorColor = "";
+            }
+            row.push(brand);
+            row.push(modelLine);
+            row.push(interiorColor);
+            row.push(exteriorColor);
+            row.push(variant);
+            row['button_type'] = 'Direct-Add';
+        }
+
+        table.row.add(row).draw();
+
+        // var col1 = '<input type="text" value="'+ Description +'" class="combined-value-editable form-control" />';
+        // table.row.add([Description,2,3,4,5,6]).draw();
+
+    });
     $(document).on('click', '.add-button', function() {
         var vehicleId = $(this).data('vehicle-id');
         console.log('Add button clicked for vehicle ID:', vehicleId);
@@ -1263,13 +1317,6 @@ var secondTable = $('#dtBasicExample2').DataTable({
         var variantId = $('#variant').val();
         var interiorColorId = $('#interior_color').val();
         var exteriorColorId = $('#exterior_color').val();
-        var table = $("#dtBasicExample1").DataTable();
-
-        var rowCount = table.data().count();
-        alert(rowCount);
-        if(rowCount <= 0){
-            $('#quotation-direct-add-vehicle-button').append('<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>')
-        }
         if (!variantId) {
             alert("Please select a variant before searching.");
             return;
@@ -1291,6 +1338,15 @@ var secondTable = $('#dtBasicExample2').DataTable({
             type: 'GET',
             url: url,
             success: function(response) {
+                if(response.length <= 0) {
+                    console.log("show button");
+                    $('#quotation-direct-add-vehicle-button').attr('hidden', false);
+                }else{
+                    console.log("hide button");
+
+                    $('#quotation-direct-add-vehicle-button').attr('hidden', true);
+
+                }
                 var data = response.map(function(vehicle) {
                     var addButton = '<button class="add-button" data-button-type="Vehicle" data-vehicle-id="' + vehicle.id + '">Add</button>';
                     return [
@@ -1333,6 +1389,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
                         }
                     ]
                 });
+
             }
         });
     });
@@ -1367,7 +1424,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
             url: url,
             success: function(response) {
                 var slNo = 0;
-                var data = response.map(function(accessory) { 
+                var data = response.map(function(accessory) {
                     slNo = slNo + 1;
                     var addButton = '<button class="accessory-add-button" data-accessory-id="' + accessory.id + '">Add</button>';
                     if(accessory.addon_description.description != null) {
@@ -1398,7 +1455,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
                                         for(var j=0; j < modelLineSize; j++) {
                                             accessoryBrand = accessoryBrand + '<tr><td>'+ accessory.brandModelLine[i].ModelLine[j].model_lines.model_line +'</td></tr>';
                                         }
-                                        accessoryBrand = accessoryBrand + '</tbody></table>';                                      
+                                        accessoryBrand = accessoryBrand + '</tbody></table>';
                                     }
                                     accessoryBrand = accessoryBrand +'</td>';
                                 }
@@ -1508,12 +1565,12 @@ var secondTable = $('#dtBasicExample2').DataTable({
             url: url,
             success: function(response) {
                 var slNo = 0;
-                var data = response.map(function(sparePart) { 
+                var data = response.map(function(sparePart) {
                     slNo = slNo + 1;
                     var addButton = '<button class="sparepart-add-button" data-sparepart-id="' + sparePart.id + '">Add</button>';
                     if(sparePart.addon_description.description != null) {
                        var sparePartName = sparePart.addon_description.addon.name + ' - ' + sparePart.addon_description.description;
-                    } 
+                    }
                     else {
                         var sparePartName = sparePart.addon_description.addon.name;
                     }
@@ -1543,7 +1600,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
                                     sparePartBrand = sparePartBrand +' - '+sparePart.brandModelLine[0].ModelLine[j].model_year_end;
                                 }
                                 sparePartBrand = sparePartBrand +'</td></tr>';
-                            }                          
+                            }
                         }
                         sparePartBrand = sparePartBrand +'</tbody></table>';
                     }
@@ -1693,7 +1750,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
             // }
             success: function(response) {
                 var slNo = 0;
-                var data = response.map(function(kit) { 
+                var data = response.map(function(kit) {
                     slNo = slNo + 1;
                     var addButton = '<button class="kit-add-button" data-kit-id="' + kit.id + '">Add</button>';
                     var kitName = '';
@@ -1722,7 +1779,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
                                     kitBrand = kitBrand +'</tbody></table>';
                                 }
                                 kitBrand = kitBrand +'</td></tr>';
-                            }                          
+                            }
                         }
                         kitBrand = kitBrand +'</tbody></table>';
                     }
