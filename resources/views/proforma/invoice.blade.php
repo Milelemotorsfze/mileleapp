@@ -385,7 +385,7 @@
 					<div class="col">
 						<button type="button" class="btn btn-primary" id="search-button">Search</button>
 					</div>
-					<div class="col" id="quotation-direct-add-vehicle-button" hidden>
+					<div class="col" >
 						<button type="button" class="btn btn-outline-warning" data-table="vehicle-table" id="directadding-button">Directly Adding Into Quotation</button>
 					</div>
 				</div>
@@ -454,9 +454,9 @@
 					<div class="col">
 						<button type="button" class="btn btn-primary" id="accessories-search-button">Search</button>
 					</div>
-					<div class="col">
-						<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>
-					</div>
+                    <div class="col" >
+                        <button type="button" class="btn btn-outline-warning" data-table="accessories-table" id="directadding-button">Directly Adding Into Quotation</button>
+                    </div>
 				</div>
 			</div>
 		</div>
@@ -525,9 +525,9 @@
 					<div class="col">
 						<button type="button" class="btn btn-primary" id="spare_parts-search-button">Search</button>
 					</div>
-					<div class="col">
-						<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>
-					</div>
+                    <div class="col" >
+                        <button type="button" class="btn btn-outline-warning" data-table="spare-part-table" id="directadding-button">Directly Adding Into Quotation</button>
+                    </div>
 				</div>
 			</div>
 		</div>
@@ -599,7 +599,7 @@
 						<button type="button" class="btn btn-primary" id="kit-search-button">Search</button>
 					</div>
 					<div class="col">
-						<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>
+						<button type="button" class="btn btn-outline-warning" data-table="kit-table" id="directadding-button">Directly Adding Into Quotation</button>
 					</div>
 				</div>
 			</div>
@@ -1077,7 +1077,7 @@
                 targets: -6,
                 data: null,
                 render: function (data, type, row) {
-        console.log(row);
+                    console.log(row);
                     var combinedValue = "";
                     if(row['button_type'] == 'Vehicle') {
                         var brand = row[3];
@@ -1087,12 +1087,29 @@
                         var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
-            
-            combinedValue = row[2]+', '+row[3];
+
+                        combinedValue = row[2]+', '+row[3];
                     }else if(row['button_type'] == 'Direct-Add') {
-            combinedValue =  row[0] + ', ' + row[1] + ', ' + row[2] + ', ' + row[3];
-        }
-                    else if(['button_type'] == 'Accessory' || 'SparePart' || 'Kit') {
+                        var comma0 = comma1 = comma2 = comma3 = comma4 = ", ";
+                        if(row[1] == "") {
+                            var comma0 = " ";
+                        }
+                        if(row[2] == "") {
+                            var comma1 = " ";
+                        }
+                        if(row[3] == "") {
+                            var comma2 = " ";
+                        }
+                        if(row[4] == "") {
+                            var comma3 = " ";
+                        }
+                        if(row[5] == "") {
+                            var comma4 = " ";
+                        }
+
+                        combinedValue =  row[0] + comma0 + row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5];
+                    }
+                    else if(['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         combinedValue = 'koo';
                     }
                     return '<input type="text" class="combined-value-editable form-control" value="' + combinedValue + '"/>';
@@ -1110,9 +1127,9 @@
 
                         var code = row[1];
                     }else if(row['button_type'] == 'Direct-Add') {
-                        var code = row[4];
+                        var code = row[6];
                     }
-                    else if(row['botton_type'] == 'Accessory' || 'SparePart' || 'Kit') {
+                    else if(row['botton_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         var code = 'hi';
                     }
                     return code;
@@ -1129,7 +1146,7 @@
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                         var price = row[4];
                     }
-                    else if(row['button_type'] == 'Accessory' || 'SparePart' || 'Kit') {
+                    else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         var price = 'pricedata';
                     }
                     return '<input type="text" class="price-editable form-control" value="' + price + '"/>';
@@ -1164,7 +1181,6 @@
         var index = $(this).closest('tr').index();
         secondTable.row(index).remove().draw();
         if(row['button_type'] != 'Direct-Add') {
-            alert("ok");
             resetSerialNumber(table);
         }
         // alert("inside romove function");
@@ -1172,22 +1188,22 @@
         // var vehicleIdToRemove = rowData[0];
         // moveRowToFirstTable(vehicleIdToRemove);
     });
-    function moveRowToFirstTable(vehicleId) {
-        var firstTable = $('#dtBasicExample1').DataTable();
-        var secondTable = $('#dtBasicExample2').DataTable();
-        var secondTableRow = secondTable.rows().indexes().filter(function(value, index) {
-            return secondTable.cell(value, 0).data() == vehicleId;
-        });
-        // console.log(secondTableRow.length);
-        if (secondTableRow.length > 0) {
-            console.log("inside removal");
-
-            var rowData = secondTable.row(secondTableRow).data();
-            firstTable.row.add(rowData).draw();
-            secondTable.row(secondTableRow).remove().draw();
-        }
-
-    }
+    // function moveRowToFirstTable(vehicleId) {
+    //     var firstTable = $('#dtBasicExample1').DataTable();
+    //     var secondTable = $('#dtBasicExample2').DataTable();
+    //     var secondTableRow = secondTable.rows().indexes().filter(function(value, index) {
+    //         return secondTable.cell(value, 0).data() == vehicleId;
+    //     });
+    //     // console.log(secondTableRow.length);
+    //     if (secondTableRow.length > 0) {
+    //         console.log("inside removal");
+    //
+    //         var rowData = secondTable.row(secondTableRow).data();
+    //         firstTable.row.add(rowData).draw();
+    //         secondTable.row(secondTableRow).remove().draw();
+    //     }
+    //
+    // }
     $('#submit-button').on('click', function() {
         var selectedData = [];
         secondTable.rows().every(function() {
@@ -1240,36 +1256,124 @@
         var tableType = $(this).attr('data-table');
         var table = $('#dtBasicExample2').DataTable();
         var row = [];
+        var addon = "";
+        var modelLine = "";
+        var modelNumber = "";
+        var variant = "";
+        var interiorColor = "";
+        var exteriorColor = "";
+
         if(tableType == 'vehicle-table') {
-            var brand = $('#brand option:selected').text();
-            var modelLine = $('#model_line option:selected').text();
-            var variant = $("#variant option:selected").text();
+
+            var brand = $('#brand option:selected').val();
+            if(brand != "") {
+
+                var brand = $('#brand option:selected').text();
+            }
+            var modelLine = $('#model_line option:selected').val();
+            if(modelLine != "") {
+
+                var modelLine = $('#model_line option:selected').text();
+            }
+            var variant = $("#variant option:selected").val();
+            if(variant != "") {
+
+                var variant = $('#variant option:selected').text();
+
+            }
             var interiorColor = $('#interior_color option:selected').val();
             if(interiorColor != "") {
+
                 var interiorColor = $('#interior_color option:selected').text();
 
-            }else{
-                var interiorColor = "";
             }
             var exteriorColor = $('#exterior_color option:selected').val();
             if(exteriorColor != "") {
-                var exteriorColor = $('#exterior_color option:selected').text();
 
-            }else{
-                var exteriorColor = "";
+                var exteriorColor = $('#exterior_color option:selected').text();
             }
-            row.push(brand);
-            row.push(modelLine);
-            row.push(interiorColor);
-            row.push(exteriorColor);
-            row.push(variant);
-            row['button_type'] = 'Direct-Add';
+
+        }else if(tableType == 'accessories-table') {
+
+            var addon =  $('#accessories_addon option:selected').val();
+            if(addon != "") {
+
+                var addon = $('#accessories_addon option:selected').text();
+
+            }
+            var brand = $('#accessories_brand option:selected').val();
+            if(brand != "") {
+
+                var brand = $('#accessories_brand option:selected').text();
+
+            }
+            var modelLine = $('#accessories_model_line option:selected').val();
+            if(modelLine != "") {
+
+                var modelLine = $('#accessories_model_line option:selected').text();
+
+            }
+        }else if(tableType == 'spare-part-table') {
+
+            var addon =  $('#spare_parts_addon option:selected').val();
+            if(addon != "") {
+
+                var addon = $('#spare_parts_addon option:selected').text();
+
+            }
+            var brand = $('#spare_parts_brand option:selected').val();
+            if(brand != "") {
+
+                var brand = $('#spare_parts_brand option:selected').text();
+            }
+            var modelLine = $('#spare_parts_model_line option:selected').val();
+            if(modelLine != "") {
+
+                var modelLine = $('#spare_parts_model_line option:selected').text();
+            }
+            var modelNumber = $('#spare_parts_model_description option:selected').val();
+            if(modelNumber != "") {
+
+                var modelNumber = $('#spare_parts_model_description option:selected').text();
+            }
+
+        }else if(tableType == 'kit-table') {
+
+            var addon =  $('#kit_addon option:selected').val();
+            if(addon != "") {
+
+                var addon = $('#kit_addon option:selected').text();
+
+            }
+            var brand = $('#kit_brand option:selected').val();
+            if(brand != "") {
+
+                var brand = $('#kit_brand option:selected').text();
+
+            }
+            var modelLine = $('#kit_model_line option:selected').val();
+            if(modelLine != "") {
+
+                var modelLine = $('#kit_model_line option:selected').text();
+
+            }
+            var modelNumber = $('#kit_model_description option:selected').val();
+            if(modelNumber != "") {
+
+                var modelNumber = $('#kit_model_description option:selected').text();
+            }
         }
 
-        table.row.add(row).draw();
 
-        // var col1 = '<input type="text" value="'+ Description +'" class="combined-value-editable form-control" />';
-        // table.row.add([Description,2,3,4,5,6]).draw();
+        row.push(addon);
+        row.push(brand);
+        row.push(modelLine);
+        row.push(modelNumber);
+        row.push(interiorColor);
+        row.push(exteriorColor);
+        row.push(variant);
+        row['button_type'] = 'Direct-Add';
+        table.row.add(row).draw();
 
     });
     $(document).on('click', '.add-button', function() {
@@ -1277,6 +1381,7 @@
         console.log('Add button clicked for vehicle ID:', vehicleId);
         var rowData = [];
         var buttonType = $(this).data('button-type');
+
         var row = $(this).closest('tr');
         rowData['button_type'] = buttonType;
         row.find('td').each(function() {
@@ -1341,15 +1446,6 @@
             type: 'GET',
             url: url,
             success: function(response) {
-                if(response.length <= 0) {
-                    console.log("show button");
-                    $('#quotation-direct-add-vehicle-button').attr('hidden', false);
-                }else{
-                    console.log("hide button");
-
-                    $('#quotation-direct-add-vehicle-button').attr('hidden', true);
-
-                }
                 var data = response.map(function(vehicle) {
                     var addButton = '<button class="add-button" data-button-type="Vehicle" data-vehicle-id="' + vehicle.id + '">Add</button>';
                     return [
@@ -1426,6 +1522,7 @@
             type: 'GET',
             url: url,
             success: function(response) {
+
                 var slNo = 0;
                 var data = response.map(function(accessory) {
                     slNo = slNo + 1;
@@ -1459,7 +1556,7 @@
                         //                 for(var j=0; j < modelLineSize; j++) {
                         //                     accessoryBrand = accessoryBrand + '<tr><td>'+ accessory.brandModelLine[i].ModelLine[j].model_lines.model_line +'</td></tr>';
                         //                 }
-                        //                 accessoryBrand = accessoryBrand + '</tbody></table>';                                      
+                        //                 accessoryBrand = accessoryBrand + '</tbody></table>';
                         //             }
                         //             accessoryBrand = accessoryBrand +'</td>';
                         //         }
@@ -1569,7 +1666,7 @@
             url: url,
             success: function(response) {
                 var slNo = 0;
-                var data = response.map(function(sparePart) { 
+                var data = response.map(function(sparePart) {
                     console.log(sparePart);
                     slNo = slNo + 1;
                     var addButton = '<button class="add-button" data-button-type="SparePart" data-sparepart-id="' + sparePart.id + '">Add</button>';
@@ -1606,7 +1703,7 @@
                     //                 sparePartBrand = sparePartBrand +' - '+sparePart.brandModelLine[0].ModelLine[j].model_year_end;
                     //             }
                     //             sparePartBrand = sparePartBrand +'</td></tr>';
-                    //         }                          
+                    //         }
                     //     }
                     //     sparePartBrand = sparePartBrand +'</tbody></table>';
                     // }
