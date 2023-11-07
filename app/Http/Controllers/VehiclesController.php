@@ -1898,6 +1898,7 @@ class VehiclesController extends Controller
         $vehicle = Vehicles::find($id);
         $documentsLog = Documentlog::with('roleName')->where('documents_id', $vehicle->documents_id);
         $soLog = Solog::with('roleName')->where('so_id', $vehicle->so_id);
+        $remarks = Remarks::where('vehicles_id', $id)->where('department', 'warehouse')->get();
         $vehiclesLog = Vehicleslog::with('roleName')->where('vehicles_id', $vehicle->id);
         $mergedLogs = $documentsLog->union($soLog)->union($vehiclesLog)->orderBy('updated_at')->get();
         $pendingVehicleDetailApprovalRequests = VehicleApprovalRequests::where('vehicle_id', $id)->orderBy('id','DESC')->get();
@@ -1907,7 +1908,7 @@ class VehiclesController extends Controller
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
-           ], compact('mergedLogs', 'vehicle','pendingVehicleDetailApprovalRequests'));
+           ], compact('mergedLogs', 'vehicle','pendingVehicleDetailApprovalRequests', 'remarks'));
     }
     public function  viewremarks(Request $request,$id)
     {
@@ -2396,7 +2397,6 @@ public function viewalls(Request $request)
         $offset = $request->input('offset', 0);
         $length = $request->input('length', 40);
         $searchParams = $request->input('columns', []);
-        info($searchParams);
         $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse']);
         foreach ($searchParams as $column => $searchValue) {
             if ($searchValue !== null) {
@@ -2631,6 +2631,7 @@ public function viewalls(Request $request)
                 $salespersonName = $vehicle->so->salesperson->name;
             }
             $vehicle->salespersonname = $salespersonName;
+            info($vehicle);
             return $vehicle;
         });
         return response()->json($vehicles);

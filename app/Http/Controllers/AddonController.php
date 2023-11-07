@@ -892,6 +892,10 @@ class AddonController extends Controller {
                         $input['description'] = $createdDesc->id;
                     }
                 }
+                else if($request->addon_type == 'K') {
+                    $kitDescription = AddonDescription::where('addon_id',$request->addon_id)->first();
+                    $input['description'] = $kitDescription->id;
+                }
             }
             $input['fixing_charge_amount'] = null;
             $addon_details = AddonDetails::create($input);
@@ -1286,6 +1290,10 @@ class AddonController extends Controller {
                     $createdDesc = AddonDescription::create($createDescription);
                     $addon_details->description = $createdDesc->id;
                 }
+            }
+            else if($request->addon_type_hiden == 'K') {
+                $kitDescription = AddonDescription::where('addon_id',$request->addon_id)->first();
+                $addon_details->description = $kitDescription->id; 
             }
         }
         $addon_details->update();
@@ -1786,6 +1794,11 @@ class AddonController extends Controller {
             }
             else{
                 $addons = Addon::create($input);
+                if($request->addon_type == 'K') {
+                    $createDescr['addon_id'] = $addons->id;
+                    $createDescr['description'] = NULL;
+                    $createInput = AddonDescription::create($createDescr);
+                }
             }
             return response()->json($addons);
         }

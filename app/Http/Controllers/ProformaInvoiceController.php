@@ -136,13 +136,16 @@ class ProformaInvoiceController extends Controller {
                 $addon->brandModelLine = $existingBrandModel;
             }
             if($brandName != '' && $modelLine != '') {
-                $addon->brandModelLine = $brandName->brand_name.' , '.$modelLine->model_line;
+                $addon->brandModelLine = $brandName->brand_name.' - '.$modelLine->model_line;
             }
         }
         return response()->json($accessories);
     }
     public function getbookingSpareParts($addonId, $brandId, $modelLineId, $ModelDescriptionId) {
         $brandName = $modelLine = $modelDescription = '';
+        $brandName = Brand::where('id',$brandId)->first();
+        $modelLine = MasterModelLines::where('id',$modelLineId)->first();
+        $modelDescription = MasterModelDescription::where('id',$ModelDescriptionId)->first(); 
         $spare_parts = AddonDetails::where('addon_type_name','SP');
         if($addonId != 'addonId') {
             $spare_parts = $spare_parts->where('description',$addonId);
@@ -155,10 +158,6 @@ class ProformaInvoiceController extends Controller {
                 }
                 if($ModelDescriptionId != 'ModelDescriptionId') {
                     $q = $q->where('model_number',$ModelDescriptionId);
-                    $brandName = Brand::where('id',$brandId)->first();
-                    // dd($brandName);
-                    $modelLine = MasterModelLines::where('id',$modelLineId)->first();
-                    $modelDescription = MasterModelDescription::where('id',$ModelDescriptionId)->first();
                 }
             });
         }
@@ -199,15 +198,18 @@ class ProformaInvoiceController extends Controller {
                     $data->ModalLines = MasterModelLines::where('brand_id',$data->brand_id)->get();
                 }
                 $addon->brandModelLine = $existingBrandModel;
-                // if($brandName != '' && $modelLine != '' && $modelDescription != '') {
-                //     $addon->brandModelLineModelDescription = $brandName->brand_name.' , '.$modelLine->model_line.' , '.$modelDescription->model_description;
-                // }
-                // dd($addon);
+                if($brandName != '' && $modelLine != '' && $modelDescription != '') {
+                    $addon->brandModelLineModelDescription = $brandName->brand_name.' - '.$modelLine->model_line.' , '.$modelDescription->model_description;
+                }
             }
         }
         return response()->json($spare_parts);
     }
     public function getbookingKits($addonId, $brandId, $modelLineId, $ModelDescriptionId) {
+        $brandName = $modelLine = $modelDescription = '';
+        $brandName = Brand::where('id',$brandId)->first();
+        $modelLine = MasterModelLines::where('id',$modelLineId)->first();
+        $modelDescription = MasterModelDescription::where('id',$ModelDescriptionId)->first(); 
         $kits = AddonDetails::where('addon_type_name','K');
         if($addonId != 'addonId') {
             $kits = $kits->where('description',$addonId);
@@ -276,6 +278,9 @@ class ProformaInvoiceController extends Controller {
                     $data->ModalLines = MasterModelLines::where('brand_id',$data->brand_id)->get();
                 }
                 $addon->brandModelLine = $existingBrandModel;
+            }
+            if($brandName != '' && $modelLine != '' && $modelDescription != '') {
+                $addon->brandModelLineModelDescription = $brandName->brand_name.' , '.$modelLine->model_line.' , '.$modelDescription->model_description;
             }
         }
         return response()->json($kits);

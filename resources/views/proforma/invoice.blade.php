@@ -615,8 +615,8 @@
 								<th>ID</th>
 								<th>Kit Code</th>
 								<th>Kit Name</th>
-								<th>Brand</th>
-								<th>Model Line/Model Description</th>
+								<th>Brand/Model Line/Model Description</th>
+								<!-- <th>Model Line/Model Description</th> -->
                                 <th>Items/ Quantity</th>
 								<!-- <th>Least Purchase Price(AED)</th> -->
 								<th>Selling Price(AED)</th>
@@ -1077,7 +1077,7 @@
                 targets: -6,
                 data: null,
                 render: function (data, type, row) {
-                    console.log(row);
+
                     var combinedValue = "";
                     if(row['button_type'] == 'Vehicle') {
                         var brand = row[3];
@@ -1087,6 +1087,13 @@
                         var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
+                        combinedValue = row[2]+', '+row[3];
+                    }
+                    else if(row['button_type'] == 'Direct-Add') {
+                        combinedValue =  row[0] + ', ' + row[1] + ', ' + row[2] + ', ' + row[3];
+                    }
+                    else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
+                        combinedValue = row[2] + ' , ' + row[3];
 
                         combinedValue = row[2]+', '+row[3];
                     }else if(row['button_type'] == 'Direct-Add') {
@@ -1129,8 +1136,8 @@
                     }else if(row['button_type'] == 'Direct-Add') {
                         var code = row[6];
                     }
-                    else if(row['botton_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
-                        var code = 'hi';
+                    else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
+                        code = row[1];
                     }
                     return code;
                 }
@@ -1147,7 +1154,7 @@
                         var price = row[4];
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
-                        var price = 'pricedata';
+                        var price = row[4];
                     }
                     return '<input type="text" class="price-editable form-control" value="' + price + '"/>';
                 }
@@ -1158,29 +1165,44 @@
         // var row = secondTable.row($(this).parents('tr'));
         let row = secondTable.row(e.target.closest('tr')).data();
         // var row = $(this).closest('tr');
-        if(row['button_type'] == 'Shipping'){
+        if(row['button_type'] == 'Shipping') {
             var table = $('#shipping-table').DataTable();
             table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping" ></button>']).draw();
-        }else if(row['button_type'] == 'Vehicle'){
-
+        }
+        else if(row['button_type'] == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
             table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
                 '<button class="add-button circle-button" data-button-type="Vehicle" ></button>']).draw();
-
-        } else if(row['button_type'] == 'Shipping-Document'){
+        }
+        else if(row['button_type'] == 'Shipping-Document') {
             var table = shippingDocumentTable;
             table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping-Document" ></button>']).draw();
-        }else if(row['button_type'] == 'Certification') {
+        }
+        else if(row['button_type'] == 'Certification') {
             var table = certificationTable;
             table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Certification" ></button>']).draw();
-        }else if(row['button_type'] == 'Other') {
+        }
+        else if(row['button_type'] == 'Other') {
             var table = otherTable;
             table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Other" ></button>']).draw();
+        }
+        else if(row['button_type'] == 'Accessory') {
+            var table = $('#dtBasicExample5').DataTable();
+            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],'<button class="add-button circle-button" data-button-type="Accessory" ></button>']).draw();
+        }
+        else if(row['button_type'] == 'SparePart') {
+            var table = $('#dtBasicExample3').DataTable();
+            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],'<button class="add-button circle-button" data-button-type="SparePart" ></button>']).draw();
+        }
+        else if(row['button_type'] == 'Kit') {
+            var table = $('#dtBasicExample4').DataTable();
+            table.row.add(['', row[1],row[2],row[3],row[4],row[5],'<button class="add-button circle-button" data-button-type="Kit" ></button>']).draw();
         }
 
         var index = $(this).closest('tr').index();
         secondTable.row(index).remove().draw();
         if(row['button_type'] != 'Direct-Add') {
+            // alert("ok");
             resetSerialNumber(table);
         }
         // alert("inside romove function");
@@ -1582,15 +1604,18 @@
                             var accessorySellingPrice = accessory.selling_price.selling_price;
                         }
                     }
-                    else if(accessory.pending_selling_price != null) {
-                        if(accessory.pending_selling_price != null) {
-                            if(accessory.pending_selling_price != '0.00' || accessory.pending_selling_price.selling_price != null) {
-                                var accessorySellingPrice = accessory.pending_selling_price.selling_price + ' (Approval Awaiting)';
-                            }
-                        }
-                    }
+                    // else if(accessory.pending_selling_price != null) {
+                    //     if(accessory.pending_selling_price != null) {
+                    //         if(accessory.pending_selling_price != '0.00' || accessory.pending_selling_price.selling_price != null) {
+                    //             var accessorySellingPrice = accessory.pending_selling_price.selling_price + ' (Approval Awaiting)';
+                    //         }
+                    //     }
+                    // }
+                    // else {
+                    //     var accessorySellingPrice = 'Not Added';
+                    // }
                     else {
-                        var accessorySellingPrice = 'Not Added';
+                        var accessorySellingPrice = '';
                     }
                     return [
                             slNo,
@@ -1676,7 +1701,6 @@
                     else {
                         var sparePartName = sparePart.addon_description.addon.name;
                     }
-                    console.log(sparePart.brandModelLineModelDescription);
                     // if(sparePart.is_all_brands == 'no') {
                     //     var sparePartBrandName = sparePart.brandModelLine[0].brands.brand_name;
                     //     var sparePartBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Model Line</th><th style="border: 1px solid #c4c4d4">Model Description</th><th style="border: 1px solid #c4c4d4">Model year</th></tr></thead><tbody>';
@@ -1707,7 +1731,7 @@
                     //     }
                     //     sparePartBrand = sparePartBrand +'</tbody></table>';
                     // }
-                    sparePartBrandName = sparePart.brandModelLineModelDescription;
+                    var sparePartBrandName = sparePart.brandModelLineModelDescription;
                     var sparePartNumber = '';
                     var partNumbersSize = 0;
                     partNumbersSize = (sparePart.part_numbers).length;
@@ -1738,15 +1762,18 @@
                             var sparePartSellingPrice = sparePart.selling_price.selling_price;
                         }
                     }
-                    else if(sparePart.pending_selling_price != null) {
-                        if(sparePart.pending_selling_price != null) {
-                            if(sparePart.pending_selling_price != '0.00' || sparePart.pending_selling_price.selling_price != null) {
-                                var sparePartSellingPrice = sparePart.pending_selling_price.selling_price + ' (Approval Awaiting)';
-                            }
-                        }
-                    }
+                    // else if(sparePart.pending_selling_price != null) {
+                    //     if(sparePart.pending_selling_price != null) {
+                    //         if(sparePart.pending_selling_price != '0.00' || sparePart.pending_selling_price.selling_price != null) {
+                    //             var sparePartSellingPrice = sparePart.pending_selling_price.selling_price + ' (Approval Awaiting)';
+                    //         }
+                    //     }
+                    // }
+                    // else {
+                    //     var sparePartSellingPrice = 'Not Added';
+                    // }
                     else {
-                        var sparePartSellingPrice = 'Not Added';
+                        var sparePartSellingPrice = '';
                     }
                     return [
                             slNo,
@@ -1833,32 +1860,33 @@
                     if(kit.addon_name.name != null) {
                        kitName = kit.addon_name.name;
                     }
-                    if(kit.is_all_brands == 'no') {
-                        var kitBrandName = kit.brandModelLine[0].brands.brand_name;
-                        var kitBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Model Line</th><th style="border: 1px solid #c4c4d4">Model Description</th></thead><tbody>';
-                        var modelLineSize = 0;
-                        modelLineSize = (kit.brandModelLine[0].ModelLine).length;
-                        if(modelLineSize > 0) {
-                            for(var j=0; j < modelLineSize; j++) {
-                                kitBrand = kitBrand +'<tr><td style="border: 1px solid #c4c4d4">'+kit.brandModelLine[0].ModelLine[j].model_lines.model_line+'</td><td style="border: 1px solid #c4c4d4">';
-                                var modelDescSize = 0;
-                                modelDescSize = (kit.brandModelLine[0].ModelLine[j].allDes).length;
-                                if(modelDescSize > 0) {
-                                    kitBrand = kitBrand +'<table><tbody>';
-                                    for(var i=0; i < modelDescSize; i++) {
-                                        kitBrand = kitBrand +'<tr><td>';
-                                        if(i != 0) {
-                                            kitBrand = kitBrand +'<br style="line-height: 3px">';
-                                        }
-                                        kitBrand = kitBrand +kit.brandModelLine[0].ModelLine[j].allDes[i].model_description+'</td></tr>';
-                                    }
-                                    kitBrand = kitBrand +'</tbody></table>';
-                                }
-                                kitBrand = kitBrand +'</td></tr>';
-                            }
-                        }
-                        kitBrand = kitBrand +'</tbody></table>';
-                    }
+                    var kitBrandName = kit.brandModelLineModelDescription;
+                    // if(kit.is_all_brands == 'no') {
+                    //     var kitBrandName = kit.brandModelLine[0].brands.brand_name;
+                    //     var kitBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Model Line</th><th style="border: 1px solid #c4c4d4">Model Description</th></thead><tbody>';
+                    //     var modelLineSize = 0;
+                    //     modelLineSize = (kit.brandModelLine[0].ModelLine).length;
+                    //     if(modelLineSize > 0) {
+                    //         for(var j=0; j < modelLineSize; j++) {
+                    //             kitBrand = kitBrand +'<tr><td style="border: 1px solid #c4c4d4">'+kit.brandModelLine[0].ModelLine[j].model_lines.model_line+'</td><td style="border: 1px solid #c4c4d4">';
+                    //             var modelDescSize = 0;
+                    //             modelDescSize = (kit.brandModelLine[0].ModelLine[j].allDes).length;
+                    //             if(modelDescSize > 0) {
+                    //                 kitBrand = kitBrand +'<table><tbody>';
+                    //                 for(var i=0; i < modelDescSize; i++) {
+                    //                     kitBrand = kitBrand +'<tr><td>';
+                    //                     if(i != 0) {
+                    //                         kitBrand = kitBrand +'<br style="line-height: 3px">';
+                    //                     }
+                    //                     kitBrand = kitBrand +kit.brandModelLine[0].ModelLine[j].allDes[i].model_description+'</td></tr>';
+                    //                 }
+                    //                 kitBrand = kitBrand +'</tbody></table>';
+                    //             }
+                    //             kitBrand = kitBrand +'</td></tr>';
+                    //         }
+                    //     }
+                    //     kitBrand = kitBrand +'</tbody></table>';
+                    // }
                     var kitItems = '';
                     var itemCount = (kit.kit_items).length;
                     if(itemCount > 0) {
@@ -1878,15 +1906,18 @@
                             var kitSellingPrice = kit.selling_price.selling_price;
                         }
                     }
-                    else if(kit.pending_selling_price != null) {
-                        if(kit.pending_selling_price != null) {
-                            if(kit.pending_selling_price != '0.00' || kit.pending_selling_price.selling_price != null) {
-                                var kitSellingPrice = kit.pending_selling_price.selling_price + ' (Approval Awaiting)';
-                            }
-                        }
-                    }
+                    // else if(kit.pending_selling_price != null) {
+                    //     if(kit.pending_selling_price != null) {
+                    //         if(kit.pending_selling_price != '0.00' || kit.pending_selling_price.selling_price != null) {
+                    //             var kitSellingPrice = kit.pending_selling_price.selling_price + ' (Approval Awaiting)';
+                    //         }
+                    //     }
+                    // }
+                    // else {
+                    //     var kitSellingPrice = 'Not Added';
+                    // }
                     else {
-                        var kitSellingPrice = 'Not Added';
+                        var kitSellingPrice = '';
                     }
                     return [
                             slNo,
