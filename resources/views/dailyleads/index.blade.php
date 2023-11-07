@@ -1,5 +1,3 @@
-
-text/x-generic index.blade.php ( HTML document, UTF-8 Unicode text )
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
