@@ -14,6 +14,7 @@ use App\Models\MasterModelLines;
 use App\Models\MasterModelDescription;
 use App\Models\AddonDetails;
 use App\Models\SupplierAddons;
+use App\Models\AddonTypes;
 class ProformaInvoiceController extends Controller {
     public function proforma_invoice($callId) {
         $brands = Brand::all();
@@ -93,32 +94,43 @@ class ProformaInvoiceController extends Controller {
                 });
             }
         }
-        $accessories = $accessories->with('AddonDescription.Addon','AddonTypes.brands','SellingPrice', 'PendingSellingPrice')->get();
+        $accessories = $accessories->with('AddonDescription.Addon','SellingPrice', 'PendingSellingPrice')->get();
         foreach($accessories as $addon) {
             $price = $totalPrice = '';
-            if($addon->addon_type_name == 'P' OR $addon->addon_type_name == 'SP') {
-                $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
-                $addon->LeastPurchasePrices = $price;
-            }
-            else if($addon->addon_type_name == 'K') {
-                $supplierAddonDetails = [];
-                $supplierAddonDetails = AddonDetails::where('id',$addon->id)->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription')->first();
-                $totalPrice = 0;
-                $totalPriceTrue = 'yes';
-                foreach($supplierAddonDetails->KitItems as $oneItem) {
-                    if($oneItem->kit_item_total_purchase_price != 0) {
-                        $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
+            $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+            $addon->LeastPurchasePrices = $price;
+            $existingBrandId = [];
+            $existingBrandModel = [];
+            if($addon->is_all_brands == 'no') {
+                $existingBrandModel = AddonTypes::where('addon_details_id',$addon->id)->groupBy('brand_id')->with('brands')->get();
+                foreach($existingBrandModel as $data) {
+                    array_push($existingBrandId,$data->brand_id);
+                    $jsonmodelLine = [];
+                    $data->ModelLine = AddonTypes::where([
+                        ['addon_details_id','=',$addon->id],
+                        ['brand_id','=',$data->brand_id]
+                        ])->groupBy('model_id')->with('modelLines')->get();
+                        $data->ModelLine->modeldes = [];
+                    if($data->is_all_model_lines == 'no') {
+                        foreach($data->ModelLine as $mo) {
+                            $mo->allDes = MasterModelDescription::where('model_line_id',$mo->model_id)->get();
+                            $mo->modeldes = AddonTypes::where([
+                                ['addon_details_id','=',$addon->id],
+                                ['brand_id','=',$mo->brand_id],
+                                ['model_id','=',$mo->model_id],
+                                ])->pluck('model_number');
+                                $mo->modeldes = json_decode($mo->modeldes);
+                        }
                     }
-                    else {
-                        $totalPriceTrue = 'no';
-                    }
+                    $modelLinesData = AddonTypes::where([
+                                                        ['addon_details_id','=',$addon->id],
+                                                        ['brand_id','=',$data->brand_id]
+                                                        ])->pluck('model_id');
+                    $jsonmodelLine = json_decode($modelLinesData);
+                    $data->modelLinesData = $jsonmodelLine;
+                    $data->ModalLines = MasterModelLines::where('brand_id',$data->brand_id)->get();
                 }
-                if($totalPriceTrue == 'yes' && $totalPrice != 0) {
-                    $addon->LeastPurchasePrices = $totalPrice;
-                }
-                else {
-                    $addon->LeastPurchasePrices = '';
-                }
+                $addon->brandModelLine = $existingBrandModel;
             }
         }
         return response()->json($accessories);
@@ -139,7 +151,45 @@ class ProformaInvoiceController extends Controller {
                 }
             });
         }
-        $spare_parts = $spare_parts->get();
+        $spare_parts = $spare_parts->with('AddonDescription.Addon','SellingPrice', 'PendingSellingPrice','partNumbers')->get();
+        foreach($spare_parts as $addon) {
+            $price = $totalPrice = '';
+            $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+            $addon->LeastPurchasePrices = $price;
+            $existingBrandId = [];
+            $existingBrandModel = [];
+            if($addon->is_all_brands == 'no') {
+                $existingBrandModel = AddonTypes::where('addon_details_id',$addon->id)->groupBy('brand_id')->with('brands')->get();
+                foreach($existingBrandModel as $data) {
+                    array_push($existingBrandId,$data->brand_id);
+                    $jsonmodelLine = [];
+                    $data->ModelLine = AddonTypes::where([
+                        ['addon_details_id','=',$addon->id],
+                        ['brand_id','=',$data->brand_id]
+                        ])->groupBy('model_id')->with('modelLines')->get();
+                        $data->ModelLine->modeldes = [];
+                    if($data->is_all_model_lines == 'no') {
+                        foreach($data->ModelLine as $mo) {
+                            $mo->allDes = MasterModelDescription::where('model_line_id',$mo->model_id)->get();
+                            $mo->modeldes = AddonTypes::where([
+                                ['addon_details_id','=',$addon->id],
+                                ['brand_id','=',$mo->brand_id],
+                                ['model_id','=',$mo->model_id],
+                                ])->pluck('model_number');
+                                $mo->modeldes = json_decode($mo->modeldes);
+                        }
+                    }
+                    $modelLinesData = AddonTypes::where([
+                                                        ['addon_details_id','=',$addon->id],
+                                                        ['brand_id','=',$data->brand_id]
+                                                        ])->pluck('model_id');
+                    $jsonmodelLine = json_decode($modelLinesData);
+                    $data->modelLinesData = $jsonmodelLine;
+                    $data->ModalLines = MasterModelLines::where('brand_id',$data->brand_id)->get();
+                }
+                $addon->brandModelLine = $existingBrandModel;
+            }
+        }
         return response()->json($spare_parts);
     }
     public function getbookingKits($addonId, $brandId, $modelLineId, $ModelDescriptionId) {
@@ -158,7 +208,62 @@ class ProformaInvoiceController extends Controller {
                 }
             });
         }
-        $kits = $kits->get();
+        $kits = $kits->with('AddonName','SellingPrice','KitItems.addon.AddonDescription','KitItems.item.Addon')->get();
+        info($kits);
+        foreach($kits as $addon) {
+            $price = $totalPrice = '';
+            $supplierAddonDetails = [];
+            $supplierAddonDetails = AddonDetails::where('id',$addon->id)->with('AddonName','SellingPrice','KitItems.item.Addon')->first();
+            $totalPrice = 0;
+            $totalPriceTrue = 'yes';
+            foreach($supplierAddonDetails->KitItems as $oneItem) {
+                if($oneItem->kit_item_total_purchase_price != 0) {
+                    $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
+                }
+                else {
+                    $totalPriceTrue = 'no';
+                }
+            }
+            if($totalPriceTrue == 'yes' && $totalPrice != 0) {
+                $addon->LeastPurchasePrices = $totalPrice;
+            }
+            else {
+                $addon->LeastPurchasePrices = '';
+            }
+            $existingBrandId = [];
+            $existingBrandModel = [];
+            if($addon->is_all_brands == 'no') {
+                $existingBrandModel = AddonTypes::where('addon_details_id',$addon->id)->groupBy('brand_id')->with('brands')->get();
+                foreach($existingBrandModel as $data) {
+                    array_push($existingBrandId,$data->brand_id);
+                    $jsonmodelLine = [];
+                    $data->ModelLine = AddonTypes::where([
+                        ['addon_details_id','=',$addon->id],
+                        ['brand_id','=',$data->brand_id]
+                        ])->groupBy('model_id')->with('modelLines')->get();
+                        $data->ModelLine->modeldes = [];
+                    if($data->is_all_model_lines == 'no') {
+                        foreach($data->ModelLine as $mo) {
+                            $mo->allDes = MasterModelDescription::where('model_line_id',$mo->model_id)->get();
+                            $mo->modeldes = AddonTypes::where([
+                                ['addon_details_id','=',$addon->id],
+                                ['brand_id','=',$mo->brand_id],
+                                ['model_id','=',$mo->model_id],
+                                ])->pluck('model_number');
+                                $mo->modeldes = json_decode($mo->modeldes);
+                        }
+                    }
+                    $modelLinesData = AddonTypes::where([
+                                                        ['addon_details_id','=',$addon->id],
+                                                        ['brand_id','=',$data->brand_id]
+                                                        ])->pluck('model_id');
+                    $jsonmodelLine = json_decode($modelLinesData);
+                    $data->modelLinesData = $jsonmodelLine;
+                    $data->ModalLines = MasterModelLines::where('brand_id',$data->brand_id)->get();
+                }
+                $addon->brandModelLine = $existingBrandModel;
+            }
+        }
         return response()->json($kits);
     }
 }
