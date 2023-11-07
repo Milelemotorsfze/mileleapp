@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 use Yajra\DataTables\Html\Builder;
+use App\Http\Controllers\UserActivityController;
 
 class BrandController extends Controller
 {
@@ -16,6 +17,7 @@ class BrandController extends Controller
      */
     public function index(Builder $builder)
     {
+        (new UserActivityController)->createActivity('Open Brand info');
         $brand = Brand::orderBy('id','DESC')->get();
         if (request()->ajax()) {
             return DataTables::of($brand)
@@ -49,6 +51,7 @@ class BrandController extends Controller
      */
     public function create()
     {
+        (new UserActivityController)->createActivity('Open Create New Brand');
         return view('brands.create');
     }
 
@@ -57,7 +60,7 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-
+        (new UserActivityController)->createActivity('Create New Brand');
         $this->validate($request, [
             'brand_name' => 'required|unique:brands,brand_name',
         ]);
@@ -83,6 +86,7 @@ class BrandController extends Controller
      */
     public function edit(Brand $brand)
     {
+        (new UserActivityController)->createActivity('Open Brand Edit Page');
         $brand = Brand::findOrFail($brand->id);
 
         return view('brands.edit',compact('brand'));
@@ -93,6 +97,7 @@ class BrandController extends Controller
      */
     public function update(Request $request, Brand $brand)
     {
+        (new UserActivityController)->createActivity('update Brand Information');
         $this->validate($request, [
             'brand_name' => 'required|unique:brands,brand_name,'.$brand->id,
         ]);

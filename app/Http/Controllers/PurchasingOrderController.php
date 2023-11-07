@@ -367,6 +367,10 @@ class PurchasingOrderController extends Controller
      */
     public function update(Request $request, $id)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Update the Purchased order details";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $purchasingOrderId = $id;
     $variantNames = $request->input('variant_id');
     if($variantNames != null)
@@ -430,6 +434,10 @@ class PurchasingOrderController extends Controller
     }
     public function deletes($id)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Delete the Purchased Order";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     // Delete related records from vehicles_log table
     $vehicleIds = Vehicles::where('purchasing_order_id', $id)->pluck('id');
     Vehicleslog::whereIn('vehicles_id', $vehicleIds)->delete();
@@ -476,6 +484,10 @@ class PurchasingOrderController extends Controller
 
     public function viewdetails($id)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "View details of the Purchased Order";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $varaint = Varaint::get();
     $purchasingOrder = PurchasingOrder::findOrFail($id);
     $data = Vehicles::where('purchasing_order_id', $id)->where('status', '!=', 'cancel')->get();
@@ -536,6 +548,7 @@ public function checkcreatevins(Request $request)
     }
     public function updatepurchasingData(Request $request)
 {
+    
     $updatedData = $request->json()->all();
 
     foreach ($updatedData as $data) {
@@ -592,6 +605,10 @@ public function checkcreatevins(Request $request)
 }
 public function purchasingupdateStatus(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Update Purchasing Order Status";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $id = $request->input('orderId');
         $status = $request->input('status');
         $purchasingOrder = PurchasingOrder::find($id);
@@ -638,6 +655,10 @@ public function purchasingupdateStatus(Request $request)
     }
     public function confirmPayment($id)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Change the Purchased order status to payment confirm";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $vehicle = Vehicles::find($id);
         if ($vehicle) {
             $vehicle->status = 'Request for Payment';
@@ -674,6 +695,10 @@ public function purchasingupdateStatus(Request $request)
     }
     public function rejecteds($id)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Change the Purchased order status to Rejected By BOD";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $vehicle = Vehicles::find($id);
         if ($vehicle) {
             $vehicle->status = 'Rejected';
@@ -697,6 +722,10 @@ public function purchasingupdateStatus(Request $request)
     }
     public function unrejecteds($id)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Change the Purchased order status to Rejected By BOD";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $vehicle = Vehicles::find($id);
         if ($vehicle) {
             $vehicle->status = 'Not Approved';

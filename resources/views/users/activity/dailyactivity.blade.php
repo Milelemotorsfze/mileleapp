@@ -25,27 +25,25 @@
                     <th>No</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Login DateTime</th>
-                    <th>IP</th>
-                    <th>Login Status</th>
+                    <th>DateTime</th>
+                    <th>Activity</th>
                 </tr>
             </thead>
             <tbody>
-            </tbody>
+        </tbody>
         </table>
     </div>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" defer></script>
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script>
         $(function () {
-            var start = moment().subtract(6, 'days');
-            var end = moment();
+            var start = moment('{{ $date }}');
+            var end = moment('{{ $date }}');
             var table = $('#dtBasicExample1').DataTable({
                 "searching": true,
                 "paging": true,
                 "pageLength": 10,
             });
-
             function populateFilterDropdowns() {
                 $('#dtBasicExample1 thead select').remove();
                 table.columns().every(function () {
@@ -68,40 +66,40 @@
                 });
             }
             function loadDataAndPopulateFilters(start, end) {
+                var userId = '{{ $id }}';
                 $.ajax({
-                    url: '{{ route('listUsersgetdata') }}',
+                    url: '{{ route('listUsersgetdataac') }}',
                     method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
+                        user_id: userId,
                         start_date: start.format('YYYY-MM-DD'),
                         end_date: end.format('YYYY-MM-DD'),
                     },
                     success: function (response) {
-    var data = response.data;
-    if (Array.isArray(data)) {
-        table.clear().draw();
-        for (var i = 0; i < data.length; i++) {
-            var row = data[i];
-            var formattedDateTime = moment(row.created_at).format('YYYY-MM-DD HH:mm:ss');
-var dateForURL = moment(formattedDateTime).format('YYYY-MM-DD'); // Format to 'YYYY-MM-DD' for the URL
-var rowData = [
-    i + 1,
-    '<a href="/user/' + row.logine_user.id + '/' + dateForURL + '">' + row.logine_user.name + '</a>',  
-    row.logine_user.email, 
-    formattedDateTime,
-    row.ip, 
-    '<label class="badge ' + (row.status === 'success' ? 'badge-soft-success' : 'badge-soft-warning') + '">' + row.status + '</label>'
-];
-        table.row.add(rowData).draw(false);
-    }
-}
-    populateFilterDropdowns();
-},
-                    error: function (error) {
-                        console.log(error);
-                    }
-                });
+            var data = response.data;
+            if (Array.isArray(data)) {
+                table.clear().draw();
+                for (var i = 0; i < data.length; i++) {
+                    var row = data[i];
+                    var formattedDateTime = moment(row.created_at).format('DD-MM-YYYY HH:mm:ss');
+                    var rowData = [
+                        i + 1,
+                        row.name,
+                        row.email,
+                        formattedDateTime,
+                        row.activity
+                    ];
+                    table.row.add(rowData).draw(false);
+                }
             }
+            populateFilterDropdowns();
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+}
             $('#reportrange').daterangepicker({
         startDate: start,
         endDate: end,

@@ -18,6 +18,7 @@ class VariantPriceController extends Controller
      */
     public function index()
     {
+        (new UserActivityController)->createActivity('View Variant Price Info Page');
         $statuss = "Incoming Stock";
         $activeStocks = Vehicles::whereNull('gdn_id')
                                 ->where('payment_status', $statuss)
@@ -133,6 +134,7 @@ class VariantPriceController extends Controller
      */
     public function edit(string $id, string $type)
     {
+        (new UserActivityController)->createActivity('Edit Variant Price Page Open');
         $vehicle = Vehicles::find($id);
 
         $VariantPrices = AvailableColour::where('varaint_id', $vehicle->varaints_id)
@@ -223,6 +225,7 @@ class VariantPriceController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        (new UserActivityController)->createActivity('Update the Variant Price');
         $request->validate([
             'prices' => 'required'
         ]);

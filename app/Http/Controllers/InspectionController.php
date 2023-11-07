@@ -1147,6 +1147,7 @@ class InspectionController extends Controller
     }
     public function pdiinspectionf($id) 
     {
+        (new UserActivityController)->createActivity('View Edit PDI Report');
     $itemsWithQuantities = VehicleExtraItems::where('vehicle_id', $id)
             ->select('item_name', 'qty')
             ->get();

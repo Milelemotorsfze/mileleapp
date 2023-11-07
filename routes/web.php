@@ -490,6 +490,8 @@ Route::get('/d', function () {
 
     Route::get('/listUsers',[LoginActivityController::class, 'listUsers'])->name('listUsers');
     Route::post('/listUsersget-data',[LoginActivityController::class, 'listUsersgetdata'])->name('listUsersgetdata');
+    Route::post('/listUsersget-dataac', [LoginActivityController::class, 'listUsersgetdataac'])->name('listUsersgetdataac');
+    Route::get('/user/{id}/{date}', [UserController::class, 'showUseractivities'])->name('user.showUseractivitie');
     // vehicle stock report
 
     Route::get('/stock-count-filter',[VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
