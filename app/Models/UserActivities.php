@@ -14,4 +14,8 @@ class UserActivities extends Model
         'users_id',
         'created_at'
     ];
+    public function user()
+{
+    return $this->belongsTo(User::class, 'users_id');
+}
 }
