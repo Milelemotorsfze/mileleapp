@@ -93,7 +93,7 @@
       </li>
     </ul>      
   </div>
-  <div class="modal fade works-modal" id="routineModal" tabindex="-1" aria-labelledby="routineModalLabel" aria-hidden="true">
+  <div class="modal fade works-modal" id="routineModal" tabindex="-1" aria-labelledby="routineModalLabel" aria-hidden="true" data-inspectionid="">
     <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
@@ -133,7 +133,6 @@
             <thead>
               <tr>
                 <th>Check Items</th>
-                <th>Spec</th>
                 <th>Condition</th>
                 <th>Remarks</th>
               </tr>
@@ -142,11 +141,12 @@
             </tbody>
           </table>
         </div>
+        @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-approve');
+                @endphp
+                @if ($hasPermission) 
         <div id = "incidentDataSection">
         <div class="row">
-        <div class="col-md-2">
-          <p><strong>Reason:</strong> <span id="reason"></span></p>
-        </div>
         <div class="col-md-2">
           <p><strong>Driven By:</strong> <span id="drivenBy"></span></p>
           </div>
@@ -162,13 +162,28 @@
           <div class="col-md-2">
           <p><strong>Responsivity:</strong> <span id="responsivity"></span></p>
           </div>
+          <div class="col-md-12">
+          <p><strong>Reason:</strong> <span id="reason"></span></p>
+        </div>
           </div>
         </div>
         <img id="incidentImages" src="" alt="Incident Image" />
       </div>
+@else
+        <div id ="incidentContainer">
+</div>
+</div>
+@endif
       <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-approve');
+                @endphp
+                @if ($hasPermission) 
                 <button type="button" class="btn btn-success" onclick="approvedroutein()">Approved</button>
+                @else
+                <button type="button" class="btn btn-success" id="updateButton">Update</button>
+                @endif
             </div>
     </div>
   </div>
@@ -184,6 +199,7 @@
       <div id="buttonContainer" class="d-flex justify-content-end"></div>
       <br>
       <input type="hidden" id="inspection_id" name="inspection_id" value="">
+      <input type="hidden" id="inspection_idpdi" name="inspection_idpdi" value="">
       <div class="row">
   <div class="col-md-2">
     <p><strong>Model Line:</strong></p>
@@ -241,9 +257,16 @@
         </div>
       <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-approve');
+                @endphp
+                @if ($hasPermission) 
                 <button type="button" class="btn btn-success" onclick="approvedpdi()">Approved PDI</button>
                 <div id="incidentapp">
                 </div>
+                @else
+                <button type="button" class="btn btn-success" id="updateButtonpdi">Update</button>
+                @endif
             </div>
     </div>
   </div>
@@ -584,11 +607,32 @@
         var additionalInfo = response.additionalInfo;
         var routineInspectionData = response.routineInspectionData;
         var incidentData = response.incidentData;
+        var inspectionid = response.inspection;
         var assetUrl = "{{ asset('qc/') }}/";
         if(incidentData){
           $('#incidentDataSection').show();
           $('#incidentImages').show();
-        $('#reason').text(incidentData.reason);
+          var reasons = JSON.parse(incidentData.reason);
+var reasonsHTML = '<div class="col-md-12"><div class="row"><div class="col-md-2"><label class="form-label"><strong>Reason</strong></label></div><div class="col-md-3">';
+
+var columnCount = 3;
+var reasonsPerColumn = Math.ceil(reasons.length / columnCount);
+
+for (var i = 0; i < columnCount; i++) {
+  reasonsHTML += '<ul class="list-group">';
+  for (var j = i * reasonsPerColumn; j < (i + 1) * reasonsPerColumn && j < reasons.length; j++) {
+    var reason = reasons[j];
+    var reasonName = reason.replace('_', ' ').replace(/\b\w/g, function (l) {
+      return l.toUpperCase();
+    });
+    reasonsHTML += '<li class="list-group-item">' + reasonName + '</li>';
+  }
+  reasonsHTML += '</ul></div><div class="col-md-3">';
+}
+
+reasonsHTML += '</div></div>';
+
+$('#reason').html(reasonsHTML);
         $('#drivenBy').text(incidentData.driven_by);
         $('#detail').text(incidentData.detail);
         $('#narration').text(incidentData.narration);
@@ -606,11 +650,10 @@
         $('#extColour').text(additionalInfo.ext_colour);
         $('#location').text(additionalInfo.location);
         $('#model_year').text(additionalInfo.my);
-        var tableHtml = '<table class="table table-bordered"><thead><tr><th>Check Items</th><th>Spec</th><th>Condition</th><th>Remarks</th></tr></thead><tbody>';
+        var tableHtml = '<table class="table table-bordered"><thead><tr><th>Check Items</th><th>Condition</th><th>Remarks</th></tr></thead><tbody>';
         routineInspectionData.forEach(function (row) {
           tableHtml += `<tr>
   <td class="text-left">${row.check_items !== null ? row.check_items : ''}</td>
-  <td>${row.spec !== null ? row.spec : ''}</td>
   <td>${row.condition !== null ? row.condition : ''}</td>
   <td>${row.remarks !== null ? row.remarks : ''}</td>
 </tr>`;
@@ -958,12 +1001,10 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
     </script>
     <script>
     $(document).ready(function() {
-        $("#reworkButton").click(function() {
-          // var remarks = $("#remarks").val();
+        $("#reworkButton").click(function() { 
         var incidentId = $("#incidentId").val();
         var requestData = {
-          _token: "{{ csrf_token() }}", // Include the CSRF token
-            // remarks: remarks,
+          _token: "{{ csrf_token() }}",
             incidentId: incidentId
         };
             $.ajax({
@@ -989,7 +1030,6 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
       var data = table1.row(this).data();
       var vehicleId = data.id;
       var stage = data.stage;
-      $('#inspection_id').val(vehicleId);
       if (stage === 'Routine') {
         $.ajax({
       url: '/routine-inspection/' + vehicleId,
@@ -998,36 +1038,165 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
         var additionalInfo = response.additionalInfo;
         var routineInspectionData = response.routineInspectionData;
         var incidentData = response.incidentData;
+        var inspectionid = response.inspection;
+        console.log(inspectionid);
         var assetUrl = "{{ asset('qc/') }}/";
+        var hasInspectionEditPermission = true;
         if(incidentData){
-        $('#incidentDataSection').show();
-        $('#incidentImages').show();
-        $('#reason').text(incidentData.reason);
-        $('#drivenBy').text(incidentData.driven_by);
-        $('#detail').text(incidentData.detail);
-        $('#narration').text(incidentData.narration);
-        $('#type').text(incidentData.type);
-        $('#responsivity').text(incidentData.responsivity);
-        $('#incidentImages').attr('src', assetUrl + incidentData.file_path);
-        console.log(incidentData.file_path);
-        }else{
-          $('#incidentDataSection').hide();
-          $('#incidentImages').hide();
-        }
+          var incidentHtml = `
+    <h5>Incident Report</h5>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label class="form-label"><strong>Incident Type</strong></label>
+          </div>
+          <div class="col-md-8">
+            <select class="form-control" id="incidentTypeInput">
+              <option value="Electrical" ${incidentData.type === 'Electrical' ? 'selected' : ''}>Electrical</option>
+              <option value="Mechanical" ${incidentData.type === 'Mechanical' ? 'selected' : ''}>Mechanical</option>
+              <option value="Accident" ${incidentData.type === 'Accident' ? 'selected' : ''}>Accident</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-4">
+            <label class="form-label"><strong>Narration Of Accident / Damage</strong></label>
+          </div>
+          <div class="col-md-8">
+            <input type="text" class="form-control" id="narrationInput" value="${incidentData.narration ?? ''}">
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label class="form-label"><strong>Driven By</strong></label>
+          </div>
+          <div class="col-md-8">
+            <input type="text" class="form-control" id="drivenByInput" value="${incidentData.driven_by ?? ''}">
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-4">
+            <label class="form-label"><strong>Damage Details</strong></label>
+          </div>
+          <div class="col-md-8">
+            <input type="text" class="form-control" id="damageDetailsInput" value="${incidentData.detail ?? ''}">
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-4">
+            <label class="form-label"><strong>Responsibility for Recover the Damages</strong></label>
+          </div>
+          <div class="col-md-8">
+            <input type="text" class="form-control" id="responsivityInput" value="${incidentData.responsivity ?? ''}">
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="row">
+          <div class="col-md-2">
+            <label class="form-label"><strong>Reason</strong></label>
+          </div>
+          <div class="col-md-5">
+            <ul class="list-group">
+              <li class="list-group-item">
+                <input type="checkbox" id="overspeedInput" ${incidentData.reason.includes('overspeed') ? 'checked' : ''}>
+                <label for="overspeedInput">Over-Speed</label>
+              </li>
+              <li class="list-group-item">
+                <input type="checkbox" id="weatherInput" ${incidentData.reason.includes('weather') ? 'checked' : ''}>
+                <label for "weatherInput">Weather Conditions</label>
+              </li>
+              <li class="list-group-item">
+                <input type="checkbox" id="vehicleDefectsInput" ${incidentData.reason.includes('vehicle_defects') ? 'checked' : ''}>
+                <label for="vehicleDefectsInput">Vehicle Defects</label>
+              </li>
+              <li class="list-group-item">
+            <input type="checkbox" id="negligenceInput" ${incidentData.reason.includes('negligence') ? 'checked' : ''}>
+            <label for="negligenceInput">Negligence</label>
+          </li>
+          <li class="list-group-item">
+            <input type="checkbox" id="suddenHaltInput" ${incidentData.reason.includes('sudden_halt') ? 'checked' : ''}>
+            <label for="suddenHaltInput">Sudden Halt</label>
+          </li>
+            </ul>
+          </div>
+          <div class="col-md-5">
+          <ul class="list-group">
+          <li class="list-group-item">
+            <input type="checkbox" id="roadDefectsInput" ${incidentData.reason.includes('road_defects') ? 'checked' : ''}>
+            <label for="roadDefectsInput">Road Defects</label>
+          </li>
+          <li class="list-group-item">
+            <input type="checkbox" id="fatigueInput" ${incidentData.reason.includes('fatigue') ? 'checked' : ''}>
+            <label for="fatigueInput">Fatigue</label>
+          </li>
+          <li class="list-group-item">
+            <input type="checkbox" id="noSafetyDistanceInput" ${incidentData.reason.includes('no_safety_distance') ? 'checked' : ''}>
+            <label for="noSafetyDistanceInput">No Safety Distance</label>
+          </li>
+          <li class="list-group-item">
+            <input type="checkbox" id="usingGSMInput" ${incidentData.reason.includes('using_gsm') ? 'checked' : ''}>
+            <label for="usingGSMInput">Using GSM</label>
+          </li>
+          <li class="list-group-item">
+            <input type="checkbox" id="overtakingInput" ${incidentData.reason.includes('overtaking') ? 'checked' : ''}>
+            <label for="overtakingInput">Overtaking</label>
+          </li>
+          <li class="list-group-item">
+            <input type="checkbox" id="wrongActionInput" ${incidentData.reason.includes('wrong_action') ? 'checked' : ''}>
+            <label for="wrongActionInput">Wrong Action</label>
+          </li>
+        </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-12">
+        ${incidentData.file_path ? 
+          `<img src="{{ asset('qc/') }}/${incidentData.file_path}" alt="Incident Image" class="img-thumbnail">` : 
+          'No image available'}
+      </div>
+    </div>
+  </div>
+  <br>`;
+  $('#incidentContainer').html(incidentHtml);
+  var approvedPdiButton = '<button type="button" class="btn btn-warning" onclick="approvedincidentsonly()">Approved Incident Only</button>';
+  $('#incidentapp').html(approvedPdiButton);
+} else {
+        $('#incidentapp').hide();
+    }
         $('#modelLine').text(additionalInfo.model_line);
+        $('#inspection_id').val(inspectionid);
         $('#vin').text(additionalInfo.vin);
         $('#intColour').text(additionalInfo.int_colour);
         $('#extColour').text(additionalInfo.ext_colour);
         $('#location').text(additionalInfo.location);
         $('#model_year').text(additionalInfo.my);
-        var tableHtml = '<table class="table table-bordered"><thead><tr><th>Check Items</th><th>Spec</th><th>Condition</th><th>Remarks</th></tr></thead><tbody>';
+        var tableHtml = '<table class="table table-bordered"><thead><tr><th>Check Items</th><th>Condition</th><th>Remarks</th></tr></thead><tbody>';
         routineInspectionData.forEach(function (row) {
-          tableHtml += `<tr>
-  <td class="text-left">${row.check_items !== null ? row.check_items : ''}</td>
-  <td>${row.spec !== null ? row.spec : ''}</td>
-  <td>${row.condition !== null ? row.condition : ''}</td>
-  <td>${row.remarks !== null ? row.remarks : ''}</td>
-</tr>`;
+          tableHtml += '<tr>';
+          tableHtml += '<td class="text-left">' + (row.check_items !== null ? row.check_items : '') + '</td>';
+          tableHtml += '<td>';
+          tableHtml += '<select class="editable-condition form-control">';
+          tableHtml += '<option value="Ok" ' + (row.condition === 'Ok' ? 'selected' : '') + '>Ok</option>';
+          tableHtml += '<option value="Not Ok" ' + (row.condition === 'Not Ok' ? 'selected' : '') + '>Not Ok</option>';
+          tableHtml += '</select>';
+          tableHtml += '</td>';
+          tableHtml += '<td><input type="text" class="editable-remarks form-control" value="' + (row.remarks !== null ? row.remarks : '') + '"></td>';
+          tableHtml += '</tr>';
         });
         tableHtml += '</tbody></table>';
         $('#routineInspectionDetails').html(tableHtml);
@@ -1050,6 +1219,7 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
         var modificationpicturelink = response.modificationpicturelink;
         var Incidentpicturelink = response.Incidentpicturelink;
         var remarks = response.remarks;
+        var inspectionid = remarks.id;
         var buttonContainerHtml = '';
       if (grnpicturelink) {
         buttonContainerHtml += `<a class="btn btn-sm btn-primary" href="${grnpicturelink}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> GRN Pictures</a>&nbsp;&nbsp;`;
@@ -1073,97 +1243,256 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
       <div class="col-md-3">
         <div class="row">
           <div class="col-md-4">
-            <label><strong>Incident Type</strong></label>
+            <label class="form-label"><strong>Incident Type</strong></label>
           </div>
           <div class="col-md-8">
-            ${response.incidentDetails.type ?? ''}
+            <select class="form-control" id="incidentTypeInput">
+              <option value="Electrical" ${response.incidentDetails.type === 'Electrical' ? 'selected' : ''}>Electrical</option>
+              <option value="Mechanical" ${response.incidentDetails.type === 'Mechanical' ? 'selected' : ''}>Mechanical</option>
+              <option value="Accident" ${response.incidentDetails.type === 'Accident' ? 'selected' : ''}>Accident</option>
+            </select>
           </div>
         </div>
       </div>
       <div class="col-md-6">
         <div class="row">
           <div class="col-md-4">
-            <label><strong>Narration Of Accident / Damage</strong></label>
+            <label class="form-label"><strong>Narration Of Accident / Damage</strong></label>
           </div>
           <div class="col-md-8">
-            ${response.incidentDetails.narration ?? ''}
+            <input type="text" class="form-control" id="narrationInput" value="${response.incidentDetails.narration ?? ''}">
           </div>
         </div>
       </div>
       <div class="col-md-3">
         <div class="row">
           <div class="col-md-4">
-            <label><strong>Damage Details</strong></label>
+            <label class="form-label"><strong>Driven By</strong></label>
           </div>
           <div class="col-md-8">
-            ${response.incidentDetails.detail ?? ''}
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="row">
-          <div class="col-md-4">
-            <label><strong>Driven By</strong></label>
-          </div>
-          <div class="col-md-8">
-            ${response.incidentDetails.driven_by ?? ''}
+            <input type="text" class="form-control" id="drivenByInput" value="${response.incidentDetails.driven_by ?? ''}">
           </div>
         </div>
       </div>
       <div class="col-md-6">
         <div class="row">
           <div class="col-md-4">
-            <label><strong>Responsibility for Recover the Damages</strong></label>
+            <label class="form-label"><strong>Damage Details</strong></label>
           </div>
           <div class="col-md-8">
-            ${response.incidentDetails.responsivity ?? ''}
+            <input type="text" class="form-control" id="damageDetailsInput" value="${response.incidentDetails.detail ?? ''}">
           </div>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-6">
         <div class="row">
           <div class="col-md-4">
-            <label><strong>Reason</strong></label>
+            <label class="form-label"><strong>Responsibility for Recover the Damages</strong></label>
           </div>
           <div class="col-md-8">
-            ${response.incidentDetails.reason ?? ''}
+            <input type="text" class="form-control" id="responsivityInput" value="${response.incidentDetails.responsivity ?? ''}">
           </div>
         </div>
       </div>
       <div class="col-md-12">
         <div class="row">
-          <div class="col-md-12">
-            ${response.incidentDetails.file_path ? 
-              `<img src="{{ asset('qc/') }}/${response.incidentDetails.file_path}" alt="Incident Image">` : 
-              'No image available'}
+          <div class="col-md-2">
+            <label class="form-label"><strong>Reason</strong></label>
+          </div>
+          <div class="col-md-5">
+            <ul class="list-group">
+              <li class="list-group-item">
+                <input type="checkbox" id="overspeedInput" ${response.incidentDetails.reason.includes('overspeed') ? 'checked' : ''}>
+                <label for="overspeedInput">Over-Speed</label>
+              </li>
+              <li class="list-group-item">
+                <input type="checkbox" id="weatherInput" ${response.incidentDetails.reason.includes('weather') ? 'checked' : ''}>
+                <label for "weatherInput">Weather Conditions</label>
+              </li>
+              <li class="list-group-item">
+                <input type="checkbox" id="vehicleDefectsInput" ${response.incidentDetails.reason.includes('vehicle_defects') ? 'checked' : ''}>
+                <label for="vehicleDefectsInput">Vehicle Defects</label>
+              </li>
+              <li class="list-group-item">
+            <input type="checkbox" id="negligenceInput" ${response.incidentDetails.reason.includes('negligence') ? 'checked' : ''}>
+            <label for="negligenceInput">Negligence</label>
+          </li>
+          <li class="list-group-item">
+            <input type="checkbox" id="suddenHaltInput" ${response.incidentDetails.reason.includes('sudden_halt') ? 'checked' : ''}>
+            <label for="suddenHaltInput">Sudden Halt</label>
+          </li>
+            </ul>
+          </div>
+          <div class="col-md-5">
+          <ul class="list-group">
+          <li class="list-group-item">
+            <input type="checkbox" id="roadDefectsInput" ${response.incidentDetails.reason.includes('road_defects') ? 'checked' : ''}>
+            <label for="roadDefectsInput">Road Defects</label>
+          </li>
+          <li class="list-group-item">
+            <input type="checkbox" id="fatigueInput" ${response.incidentDetails.reason.includes('fatigue') ? 'checked' : ''}>
+            <label for="fatigueInput">Fatigue</label>
+          </li>
+          <li class="list-group-item">
+            <input type="checkbox" id="noSafetyDistanceInput" ${response.incidentDetails.reason.includes('no_safety_distance') ? 'checked' : ''}>
+            <label for="noSafetyDistanceInput">No Safety Distance</label>
+          </li>
+          <li class="list-group-item">
+            <input type="checkbox" id="usingGSMInput" ${response.incidentDetails.reason.includes('using_gsm') ? 'checked' : ''}>
+            <label for="usingGSMInput">Using GSM</label>
+          </li>
+          <li class="list-group-item">
+            <input type="checkbox" id="overtakingInput" ${response.incidentDetails.reason.includes('overtaking') ? 'checked' : ''}>
+            <label for="overtakingInput">Overtaking</label>
+          </li>
+          <li class="list-group-item">
+            <input type="checkbox" id="wrongActionInput" ${response.incidentDetails.reason.includes('wrong_action') ? 'checked' : ''}>
+            <label for="wrongActionInput">Wrong Action</label>
+          </li>
+        </ul>
           </div>
         </div>
       </div>
-    <br>`;
+    </div>
+  </div>
+  <br>
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-12">
+        ${response.incidentDetails.file_path ? 
+          `<img src="{{ asset('qc/') }}/${response.incidentDetails.file_path}" alt="Incident Image" class="img-thumbnail">` : 
+          'No image available'}
+      </div>
+    </div>
+  </div>
+  <br>`;
   $('#incidentContainer').html(incidentHtml);
   var approvedPdiButton = '<button type="button" class="btn btn-warning" onclick="approvedincidentsonly()">Approved Incident Only</button>';
-        $('#incidentapp').html(approvedPdiButton);
-    } else {
+  $('#incidentapp').html(approvedPdiButton);
+} else {
         $('#incidentapp').hide();
     }
         $('#modelLinepdi').text(additionalInfo.model_line);
         $('#vinpdi').text(additionalInfo.vin);
+        $('#inspection_idpdi').val(inspectionid);
         $('#intColourpdi').text(additionalInfo.int_colour);
         $('#extColourpdi').text(additionalInfo.ext_colour);
         $('#locationpdi').text(additionalInfo.location);
         $('#model_yearpdi').text(additionalInfo.my);
-        $('#pdiremarks').text(remarks.remark);
+        $('#pdiremarks').html('<textarea class="form-control" id="remarksInput" rows="4" style="width: 100%;">' + (remarks.remark ? remarks.remark : '') + '</textarea>');
         var tableHtml = '<table class="table table-bordered"><thead><tr><th>Check List Items</th><th>Receving</th><th>Delivery</th></tr></thead><tbody>';
         PdiInspectionData.forEach(function (row) {
-          tableHtml += `<tr>
-  <td class="text-left">${row.checking_item !== null ? row.checking_item : ''}</td>
-  <td>${row.reciving !== null ? row.reciving : ''}</td>
-  <td>${row.status !== null ? row.status : ''}</td>
-</tr>`;
-        });
-        tableHtml += '</tbody></table>';
+          tableHtml += '<tr>';
+    tableHtml += '<td class="text-left">' + (row.checking_item !== null ? row.checking_item : '') + '</td>';
+    tableHtml += '<td class="text-left">' + (row.reciving !== null ? row.reciving : '') + '</td>';
+    tableHtml += '<td>';
+    if (row.checking_item === 'FUEL / BATTERY' || row.checking_item === 'OTHER REMARKS') {
+        tableHtml += '<input type="text" class="status-input form-control" value="' + (row.status ? row.status : '') + '">';
+    }
+    else{
+    tableHtml += '<select class="status-dropdown form-control">';
+    if (row.checking_item === 'Spare Wheel') {
+      tableHtml += '<option value="NA" ' + (row.status === 'NA' ? 'selected' : '') + '>NA</option>';
+      tableHtml += '<option value="AV" ' + (row.status === 'AV' ? 'selected' : '') + '>AV</option>';
+    } else if (row.checking_item === 'Jack') {
+        tableHtml += '<option value="AV" ' + (row.status === 'AV' ? 'selected' : '') + '>AV</option>';
+        tableHtml += '<option value="NA" ' + (row.status === 'NA' ? 'selected' : '') + '>NA</option>';
+    } 
+    else if (row.checking_item === 'FIRST AID KIT') {
+        tableHtml += '<option value="AV" ' + (row.status === 'AV' ? 'selected' : '') + '>AV</option>';
+        tableHtml += '<option value="NA" ' + (row.status === 'NA' ? 'selected' : '') + '>NA</option>';
+        tableHtml += '<option value="In Box" ' + (row.status === 'In Box' ? 'selected' : '') + '>In Box</option>';
+    }
+    else if (row.checking_item === 'FLOOR MAT') {
+        tableHtml += '<option value="AV" ' + (row.status === 'AV' ? 'selected' : '') + '>AV</option>';
+        tableHtml += '<option value="NA" ' + (row.status === 'NA' ? 'selected' : '') + '>NA</option>';
+    }
+    else if (row.checking_item === 'SERVICE BOOK & MANUAL') {
+        tableHtml += '<option value="AV" ' + (row.status === 'AV' ? 'selected' : '') + '>AV</option>';
+        tableHtml += '<option value="NA" ' + (row.status === 'NA' ? 'selected' : '') + '>NA</option>';
+        tableHtml += '<option value="In Box" ' + (row.status === 'In Box' ? 'selected' : '') + '>In Box</option>';
+    }
+    else if (row.checking_item === 'KEYS / QTY') {
+        tableHtml += '<option value="AV" ' + (row.status === 'AV' ? 'selected' : '') + '>AV</option>';
+        tableHtml += '<option value="NA" ' + (row.status === 'NA' ? 'selected' : '') + '>NA</option>';
+        tableHtml += '<option value="In Box" ' + (row.status === 'In Box' ? 'selected' : '') + '>In Box</option>';
+    }
+    else if (row.checking_item === 'EXTERIOR PAINT AND BODY') {
+        tableHtml += '<option value="Ok" ' + (row.status === 'Ok' ? 'selected' : '') + '>Ok</option>';
+        tableHtml += '<option value="Not Ok" ' + (row.status === 'Not Ok' ? 'selected' : '') + '>Not Ok</option>';
+    }
+    else if (row.checking_item === 'INTERIOR & UPHOLSTERY') {
+      tableHtml += '<option value="Ok" ' + (row.status === 'Ok' ? 'selected' : '') + '>Ok</option>';
+        tableHtml += '<option value="Not Ok" ' + (row.status === 'Not Ok' ? 'selected' : '') + '>Not Ok</option>';
+    }
+    else if (row.checking_item === 'WHEEL RIM / TYRES') {
+        tableHtml += '<option value="AV" ' + (row.status === 'AV' ? 'selected' : '') + '>AV</option>';
+        tableHtml += '<option value="NA" ' + (row.status === 'NA' ? 'selected' : '') + '>NA</option>';
+    }
+    else if (row.checking_item === 'FIRE EXTINGUISHER') {
+        tableHtml += '<option value="AV" ' + (row.status === 'AV' ? 'selected' : '') + '>AV</option>';
+        tableHtml += '<option value="NA" ' + (row.status === 'NA' ? 'selected' : '') + '>NA</option>';
+        tableHtml += '<option value="In Box" ' + (row.status === 'In Box' ? 'selected' : '') + '>In Box</option>';
+    }
+    else if (row.checking_item === 'SD Card / Remote / H Phones') {
+        tableHtml += '<option value="AV" ' + (row.status === 'AV' ? 'selected' : '') + '>AV</option>';
+        tableHtml += '<option value="NA" ' + (row.status === 'NA' ? 'selected' : '') + '>NA</option>';
+    }
+    else if (row.checking_item === 'A/C System') {
+        tableHtml += '<option value="AV" ' + (row.status === 'AV' ? 'selected' : '') + '>AV</option>';
+        tableHtml += '<option value="NA" ' + (row.status === 'NA' ? 'selected' : '') + '>NA</option>';
+    }
+    else if (row.checking_item === 'DASHBOARD / T SCREEN / LCD') {
+        tableHtml += '<option value="NA" ' + (row.status === 'NA' ? 'selected' : '') + '>NA</option>';
+        tableHtml += '<option value="Ok" ' + (row.status === 'Ok' ? 'selected' : '') + '>Ok</option>';
+        tableHtml += '<option value="Not Ok" ' + (row.status === 'Not Ok' ? 'selected' : '') + '>Not Ok</option>';
+    }
+    else if (row.checking_item === 'CAMERA') {
+        tableHtml += '<option value="360 Degree" ' + (row.status === '360 Degree' ? 'selected' : '') + '>360 Degree</option>';
+        tableHtml += '<option value="RR" ' + (row.status === 'RR' ? 'selected' : '') + '>RR</option>';
+        tableHtml += '<option value="FR" ' + (row.status === 'FR' ? 'selected' : '') + '>FR</option>';
+        tableHtml += '<option value="NA" ' + (row.status === 'NA' ? 'selected' : '') + '>NA</option>';
+    }
+    else if (row.checking_item === 'STICKER REMOVAL') {
+        tableHtml += '<option value="Yes" ' + (row.status === 'Yes' ? 'selected' : '') + '>Yes</option>';
+        tableHtml += '<option value="No" ' + (row.status === 'No' ? 'selected' : '') + '>No</option>';
+    }
+    else if (row.checking_item === 'PACKING BOX') {
+      tableHtml += '<option value="Yes" ' + (row.status === 'Yes' ? 'selected' : '') + '>Yes</option>';
+        tableHtml += '<option value="No" ' + (row.status === 'No' ? 'selected' : '') + '>No</option>';
+    }
+    else if (row.checking_item === 'PHOTOS 6 Nos') {
+      tableHtml += '<option value="Yes" ' + (row.status === 'Yes' ? 'selected' : '') + '>Yes</option>';
+        tableHtml += '<option value="No" ' + (row.status === 'No' ? 'selected' : '') + '>No</option>';
+    }
+    else if (row.checking_item === 'UNDER HOOD INSPECTION') {
+      tableHtml += '<option value="Ok" ' + (row.status === 'Ok' ? 'selected' : '') + '>Ok</option>';
+        tableHtml += '<option value="Not Ok" ' + (row.status === 'Not Ok' ? 'selected' : '') + '>Not Ok</option>';
+    }
+    else if (row.checking_item === 'OILS AND FLUIDS LEVELS INSPECTION') {
+      tableHtml += '<option value="Ok" ' + (row.status === 'Ok' ? 'selected' : '') + '>Ok</option>';
+        tableHtml += '<option value="Not Ok" ' + (row.status === 'Not Ok' ? 'selected' : '') + '>Not Ok</option>';
+    }
+    else if (row.checking_item === 'ALL FUNCTIONS OPERATIONS AS PER PO') {
+      tableHtml += '<option value="Ok" ' + (row.status === 'Ok' ? 'selected' : '') + '>Ok</option>';
+        tableHtml += '<option value="Not Ok" ' + (row.status === 'Not Ok' ? 'selected' : '') + '>Not Ok</option>';
+    }
+    else if (row.checking_item === 'CLEANING AND WASHING') {
+      tableHtml += '<option value="Ok" ' + (row.status === 'Ok' ? 'selected' : '') + '>Ok</option>';
+        tableHtml += '<option value="Not Ok" ' + (row.status === 'Not Ok' ? 'selected' : '') + '>Not Ok</option>';
+    }
+    else
+    {
+    }
+    tableHtml += '</select>';
+  }
+    tableHtml += '</td>';
+    tableHtml += '</tr>';
+});
+tableHtml += '</tbody></table>';
         $('#pdiInspectionDetails').html(tableHtml);
         $('#buttonContainer').html(buttonContainerHtml);
+        $('#mangerremarks').closest('.row').hide();
         $('#pdiModal').modal('show');
       },
       error: function (error) {
@@ -1178,6 +1507,129 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
   }
     });
   });
+  $('#updateButton').on('click', function() {
+    var inspectionid = $('#inspection_id').val();
+    var updatedData = [];
+    
+    // Initialize incidentData object outside of the loop
+    var incidentData = {
+        type: $('#incidentTypeInput').val(),
+        narration: $('#narrationInput').val(),
+        detail: $('#damageDetailsInput').val(),
+        driven_by: $('#drivenByInput').val(),
+        responsivity: $('#responsivityInput').val(),
+        reason: [
+            $('#overspeedInput').is(':checked') ? 'overspeed' : '',
+            $('#weatherInput').is(':checked') ? 'weather' : '',
+            $('#vehicleDefectsInput').is(':checked') ? 'vehicle_defects' : '',
+            $('#negligenceInput').is(':checked') ? 'negligence' : '',
+            $('#suddenHaltInput').is(':checked') ? 'sudden_halt' : '',
+            $('#roadDefectsInput').is(':checked') ? 'road_defects' : '',
+            $('#fatigueInput').is(':checked') ? 'fatigue' : '',
+            $('#noSafetyDistanceInput').is(':checked') ? 'no_safety_distance' : '',
+            $('#usingGSMInput').is(':checked') ? 'using_gsm' : '',
+            $('#overtakingInput').is(':checked') ? 'overtaking' : '',
+            $('#wrongActionInput').is(':checked') ? 'wrong_action' : '',
+        ].filter(Boolean),
+    };
+
+    $('#routineInspectionDetails tbody tr').each(function(index, row) {
+        var checkItems = $(row).find('.text-left').text();
+        var spec = $(row).find('.editable-spec').val();
+        var condition = $(row).find('.editable-condition').val();
+        var remarks = $(row).find('.editable-remarks').val();
+        updatedData.push({ check_items: checkItems, spec: spec, condition: condition, remarks: remarks });
+    });
+console.log(incidentData);
+    $.ajax({
+        url: '/update-routine-inspection',
+        method: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            inspectionid: inspectionid,
+            updatedData: updatedData,
+            incidentData: incidentData
+        },
+        success: function(response) {
+            alertify.success('Routine Inspection Update successfully');
+            setTimeout(function() {
+                window.location.reload();
+            }, 500);
+            $('#routineModal').modal('hide');
+        },
+        error: function(error) {
+            console.error('Error updating routine inspection:', error);
+        }
+    });
+});
+$(document).on('click', '#updateButtonpdi', function () {
+  var inspectionid = $('#inspection_idpdi').val();
+  var remarks = {
+    remark: $('#remarksInput').val(),
+  };
+  var PDIInspectionData = [];
+  $('#pdiInspectionDetails tbody tr').each(function (index, row) {
+    var checking_item = $(row).find('td:eq(0)').text();
+    var reciving = $(row).find('td:eq(1)').text();
+    var status = '';
+    var selectInput = $(row).find('select.status-dropdown');
+    if (selectInput.length > 0) {
+      status = selectInput.val();
+    } else {
+      status = $(row).find('input.status-input').val();
+    }
+    PDIInspectionData.push({
+      checking_item: checking_item,
+      reciving: reciving,
+      status: status,
+    });
+  });
+  var incidentData = {
+    type: $('#incidentTypeInput').val(),
+    narration: $('#narrationInput').val(),
+    detail: $('#damageDetailsInput').val(),
+    driven_by: $('#drivenByInput').val(),
+    responsivity: $('#responsivityInput').val(),
+    reason: [
+      $('#overspeedInput').is(':checked') ? 'overspeed' : '',
+      $('#weatherInput').is(':checked') ? 'weather' : '',
+      $('#vehicleDefectsInput').is(':checked') ? 'vehicle_defects' : '',
+      $('#negligenceInput').is(':checked') ? 'negligence' : '',
+      $('#suddenHaltInput').is(':checked') ? 'sudden_halt' : '',
+      $('#roadDefectsInput').is(':checked') ? 'road_defects' : '',
+      $('#fatigueInput').is(':checked') ? 'fatigue' : '',
+      $('#noSafetyDistanceInput').is(':checked') ? 'no_safety_distance' : '',
+      $('#usingGSMInput').is(':checked') ? 'using_gsm' : '',
+      $('#overtakingInput').is(':checked') ? 'overtaking' : '',
+      $('#wrongActionInput').is(':checked') ? 'wrong_action' : '',
+    ].filter(Boolean),
+  };
+  var updateData = {
+    remarks: remarks,
+    PDIInspectionData: PDIInspectionData,
+    incidentData: incidentData,
+  };
+console.log(incidentData);
+  $.ajax({
+    url: '/update-pdi-inspection',
+    method: 'POST',
+    data: {
+      _token: $('meta[name="csrf-token"]').attr('content'),
+      inspectionid: inspectionid,
+      updatedData: updateData
+    },
+    success: function (response) {
+      alertify.success('PDI Inspection Update successfully');
+      setTimeout(function() {
+        window.location.reload();
+      }, 500);
+      $('#pdiModal').modal('hide');
+    },
+    error: function (error) {
+      console.error('Error updating data:', error);
+    },
+  });
+});
   </script>
     @endif
     @else

@@ -341,6 +341,7 @@
             <input type="radio" id="showOthers" name="contentType">
             <label for="showOthers">Add Other</label>
         </div>
+
 	</div>
 	<div id="vehiclesContent" class="contentveh">
 		<hr>
@@ -384,8 +385,8 @@
 					<div class="col">
 						<button type="button" class="btn btn-primary" id="search-button">Search</button>
 					</div>
-					<div class="col">
-						<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>
+					<div class="col " id="quotation-direct-add-vehicle-button">
+{{--						<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>--}}
 					</div>
 				</div>
 			</div>
@@ -409,7 +410,7 @@
 								<th>Interior Color</th>
 								<th>Exterior Color</th>
 								<th>Price</th>
-								<th style="width:30px;">Add Into Qoutation</th>
+								<th style="width:30px;">Add Into Quotation</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -639,8 +640,11 @@
 	<div id="shippingContent" class="contentveh">
         <hr>
         <br>
-{{--        <div class="card">--}}
-{{--            <div class="card-body">--}}
+        <div class="card">
+            <div class="card-header">
+                <h4>Available Shipping Charges</h4>
+            </div>
+            <div class="card-body">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="table-responsive">
@@ -652,7 +656,7 @@
                                     <th>Addon Name</th>
                                     <th>Description</th>
                                     <th>Price</th>
-                                    <th style="width:30px;">Add Into Qoutation</th>
+                                    <th style="width:30px;">Add Into Quotation</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -660,25 +664,160 @@
                                     @foreach($shippings as $shipping)
                                         <tr>
                                         <td>{{ ++$i }}</td>
-                                        <td></td>
+                                        <td>{{ $shipping->code }} </td>
                                         <td>{{ $shipping->name }}</td>
                                         <td>{{ $shipping->description  }}</td>
                                         <td>{{ $shipping->price }}</td>
-                                        <td><button class="add-button circle-button" data-shipping-id="{{ $shipping->id }}">Add</button></td>
+                                        <td>
+                                            <button class="add-button circle-button" data-button-type="Shipping"></button>
+                                        </td>
                                         </tr>
                                 @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </div>
-{{--                </div>--}}
-{{--            </div>--}}
+                </div>
+            </div>
         </div>
 
 	</div>
-	<div id="certificatesContent" class="contentveh">
-		waqar5
-	</div>
+	<div id="shippingDocumentContent" class="contentveh">
+        <hr>
+        <br>
+        <div class="card">
+            <div class="card-header">
+                <h4>Available Shipping Documents</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table id="shipping-document-table" class="table table-striped table-editable table-edits table">
+                                <thead class="bg-soft-secondary">
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Code</th>
+                                    <th>Addon Name</th>
+                                    <th>Description</th>
+                                    <th>Price</th>
+                                    <th style="width:30px;">Add Into Quotation</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <div hidden>{{$i=0;}}
+                                    @foreach($shippingDocuments as $shippingDocument)
+                                        <tr>
+                                            <td>{{ ++$i }}</td>
+                                            <td>{{ $shippingDocument->code }}</td>
+                                            <td>{{ $shippingDocument->name }}</td>
+                                            <td>{{ $shippingDocument->description  }}</td>
+                                            <td>{{ $shippingDocument->price }}</td>
+                                            <td>
+                                                <button class="add-button circle-button" data-button-type="Shipping-Document"></button>
+                                            </td>
+                                        </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="certificateContent" class="contentveh">
+        <hr>
+        <br>
+        <div class="card">
+            <div class="card-header">
+                <h4>Available Certifications</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table id="certification-table" class="table table-striped table-editable table-edits table">
+                                <thead class="bg-soft-secondary">
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Code</th>
+                                    <th>Addon Name</th>
+                                    <th>Description</th>
+                                    <th>Price</th>
+                                    <th style="width:30px;">Add Into Quotation</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <div hidden>{{$i=0;}}
+                                    @foreach($certifications as $certification)
+                                        <tr>
+                                            <td>{{ ++$i }}</td>
+                                            <td>{{ $certification->code }}</td>
+                                            <td>{{ $certification->name }}</td>
+                                            <td>{{ $certification->description  }}</td>
+                                            <td>{{ $certification->price }}</td>
+                                            <td>
+                                                <button class="add-button circle-button" data-button-type="Certification"></button>
+                                            </td>
+                                        </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="otherContent" class="contentveh">
+        <hr>
+        <br>
+        <div class="card">
+            <div class="card-header">
+                <h4>Available Other Documents</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table id="other-document-table" class="table table-striped table-editable table-edits table">
+                                <thead class="bg-soft-secondary">
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Code</th>
+                                    <th>Addon Name</th>
+                                    <th>Description</th>
+                                    <th>Price</th>
+                                    <th style="width:30px;">Add Into Quotation</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <div hidden>{{$i=0;}}
+                                    @foreach($otherDocuments as $otherDocument)
+                                        <tr>
+                                            <td>{{ ++$i }}</td>
+                                            <td>{{ $otherDocument->code }}</td>
+                                            <td>{{ $otherDocument->name }}</td>
+                                            <td>{{ $otherDocument->description  }}</td>
+                                            <td>{{ $otherDocument->price }}</td>
+                                            <td>
+                                                <button class="add-button circle-button" data-button-type="Other"></button>
+                                            </td>
+                                        </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
 @endsection
 @push('scripts')
@@ -698,7 +837,11 @@
     </script>
 <script>
         $(document).ready(function() {
-            $('#shipping-table').DataTable();
+            var shippingTable = $('#shipping-table').DataTable();
+            var shippingDocumentTable = $('#shipping-document-table').DataTable();
+            var certificationTable = $('#certification-table').DataTable();
+            var otherTable = $('#other-document-table').DataTable();
+
             $('#brand').select2();
             $('#model_line').select2();
             $('#variant').select2();
@@ -912,7 +1055,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
         {
             targets: -1,
             data: null,
-            defaultContent: '<button class="circle-buttonr remove-button">Remove</button>'
+            defaultContent: '<button class="circle-buttonr remove-button" >Remove</button>'
         },
         {
             targets: -2,
@@ -932,11 +1075,18 @@ var secondTable = $('#dtBasicExample2').DataTable({
     targets: -6,
     data: null,
     render: function (data, type, row) {
-        var brand = row[3];
-        var modelDescription = row[5];
-        var interiorColor = row[8];
-        var exteriorColor = row[9];
-        var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
+
+        var combinedValue = "";
+        if(row['button_type'] == 'Vehicle') {
+            var brand = row[3];
+            var modelDescription = row[5];
+            var interiorColor = row[8];
+            var exteriorColor = row[9];
+            var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
+        }else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
+            combinedValue = row[2]+', '+row[3];
+        }
+
         return '<input type="text" class="combined-value-editable form-control" value="' + combinedValue + '"/>';
     }
     },
@@ -944,25 +1094,62 @@ var secondTable = $('#dtBasicExample2').DataTable({
                 targets: -5,
                 data: null,
                 render: function (data, type, row) {
-                    var variant = row[6];
-                    return variant;
+                    var code = "";
+                    if(row['button_type'] == 'Vehicle') {
+                        var code = row[6];
+                    }else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
+                        var code = row[1];
+                    }
+
+                    return code;
                 }
             },
             {
         targets: -4,
         data: null,
         render: function (data, type, row) {
-            var price = row[10];
+            var price = "";
+            if(row['button_type'] == 'Vehicle') {
+                var price = row[10];
+            }else if(row['button_type'] == 'Shipping' || 'Shipping-Document' || 'Certification' || 'Other') {
+                var price = row[4];
+            }
             return '<input type="text" class="price-editable form-control" value="' + price + '"/>';
         }
     }
     ]
     });
-    $('#dtBasicExample2 tbody').on('click', '.remove-button', function() {
-        var row = secondTable.row($(this).parents('tr'));
-        var rowData = row.data();
-        var vehicleIdToRemove = rowData[0];
-        moveRowToFirstTable(vehicleIdToRemove);
+    $('#dtBasicExample2 tbody').on('click', '.remove-button', function(e) {
+        // var row = secondTable.row($(this).parents('tr'));
+        let row = secondTable.row(e.target.closest('tr')).data();
+        // var row = $(this).closest('tr');
+        if(row['button_type'] == 'Shipping'){
+            var table = $('#shipping-table').DataTable();
+            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping" ></button>']).draw();
+        }else if(row['button_type'] == 'Vehicle'){
+
+            var table = $('#dtBasicExample1').DataTable();
+            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
+                '<button class="add-button circle-button" data-button-type="Vehicle" ></button>']).draw();
+
+        } else if(row['button_type'] == 'Shipping-Document'){
+            var table = shippingDocumentTable;
+            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping-Document" ></button>']).draw();
+        }else if(row['button_type'] == 'Certification') {
+            var table = certificationTable;
+            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Certification" ></button>']).draw();
+        }else if(row['button_type'] == 'Other') {
+            var table = otherTable;
+            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Other" ></button>']).draw();
+        }
+
+        var index = $(this).closest('tr').index();
+        secondTable.row(index).remove().draw();
+        resetSerialNumber(table);
+        // alert("inside romove function");
+        // var rowData = row.data();
+        // var vehicleIdToRemove = rowData[0];
+        // moveRowToFirstTable(vehicleIdToRemove);
     });
     function moveRowToFirstTable(vehicleId) {
         var firstTable = $('#dtBasicExample1').DataTable();
@@ -970,16 +1157,19 @@ var secondTable = $('#dtBasicExample2').DataTable({
         var secondTableRow = secondTable.rows().indexes().filter(function(value, index) {
             return secondTable.cell(value, 0).data() == vehicleId;
         });
-
+        // console.log(secondTableRow.length);
         if (secondTableRow.length > 0) {
+            console.log("inside removal");
+
             var rowData = secondTable.row(secondTableRow).data();
             firstTable.row.add(rowData).draw();
             secondTable.row(secondTableRow).remove().draw();
         }
+
     }
     $('#submit-button').on('click', function() {
         var selectedData = [];
-    secondTable.rows().every(function() {
+        secondTable.rows().every(function() {
         var data = this.data();
         var vehicleId = data[0];
         var selectedDays = $(this.node()).find('.days-dropdown').val();
@@ -1016,36 +1206,70 @@ var secondTable = $('#dtBasicExample2').DataTable({
         }
     });
     });
-    $(document).on('click', '.remove-button', function() {
-        var row = $(this).closest('tr');
-        var rowData = [];
-        row.find('td').each(function() {
-            rowData.push($(this).text());
-        });
-        moveRowToFirstTable(rowData);
-    });
+    // $(document).on('click', '.remove-button', function() {
+    //     var row = $(this).closest('tr');
+    //     var rowData = [];
+    //     row.find('td').each(function() {
+    //         rowData.push($(this).text());
+    //     });
+    //     moveRowToFirstTable(rowData);
+    // });
+
     $(document).on('click', '.add-button', function() {
         var vehicleId = $(this).data('vehicle-id');
         console.log('Add button clicked for vehicle ID:', vehicleId);
         var rowData = [];
+        var buttonType = $(this).data('button-type');
+
         var row = $(this).closest('tr');
-        console.log(row);
+        rowData['button_type'] = buttonType;
         row.find('td').each(function() {
             rowData.push($(this).text());
         });
-        // pass the type(which table click inside to datatable => inside rendering chcek the row type value then add the data)
+
         var secondTable = $('#dtBasicExample2').DataTable();
         secondTable.row.add(rowData).draw();
-        var firstTable = $('#dtBasicExample1').DataTable();
-        firstTable.row(row).remove().draw();
-        var shippingTable = $('#shipping-table').DataTable();
-        shippingTable.row(row).remove().draw();
+
+        if(buttonType == 'Shipping') {
+
+            var table = shippingTable;
+
+        }else if(buttonType == 'Shipping-Document') {
+
+            var table = shippingDocumentTable;
+
+        }else if(buttonType == 'Certification') {
+
+            var table = certificationTable;
+
+        }else if(buttonType == 'Other') {
+
+            var table = otherTable;
+
+        }else if(buttonType == 'Vehicle') {
+
+            var table = $('#dtBasicExample1').DataTable();
+
+        }
+        table.row(row).remove().draw();
+        resetSerialNumber(table);
     });
+    function resetSerialNumber(table) {
+        table.$('tbody tr').each(function(i){
+            $($(this).find('td')[0]).html(i+1);
+        });
+    }
     $('#search-button').on('click', function() {
         var variantId = $('#variant').val();
         var interiorColorId = $('#interior_color').val();
         var exteriorColorId = $('#exterior_color').val();
+        var table = $("#dtBasicExample1").DataTable();
 
+        var rowCount = table.data().count();
+        alert(rowCount);
+        if(rowCount <= 0){
+            $('#quotation-direct-add-vehicle-button').append('<button type="button" class="btn btn-outline-warning" id="directadding-button">Directly Adding Into Quotation</button>')
+        }
         if (!variantId) {
             alert("Please select a variant before searching.");
             return;
@@ -1068,7 +1292,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
             url: url,
             success: function(response) {
                 var data = response.map(function(vehicle) {
-                    var addButton = '<button class="add-button" data-vehicle-id="' + vehicle.id + '">Add</button>';
+                    var addButton = '<button class="add-button" data-button-type="Vehicle" data-vehicle-id="' + vehicle.id + '">Add</button>';
                     return [
                         vehicle.id,
                         vehicle.grn_status,
@@ -1104,7 +1328,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
                         {
                             title: 'Actions',
                             render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-vehicle-id="' + row[0] + '"></div>';
+                                return '<div class="circle-button add-button" data-button-type="Vehicle" data-vehicle-id="' + row[0] + '"></div>';
                             }
                         }
                     ]
@@ -1148,7 +1372,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
                     var addButton = '<button class="accessory-add-button" data-accessory-id="' + accessory.id + '">Add</button>';
                     if(accessory.addon_description.description != null) {
                        var accessoryName = accessory.addon_description.addon.name + ' - ' + accessory.addon_description.description;
-                    } 
+                    }
                     else {
                         var accessoryName = accessory.addon_description.addon.name;
                     }

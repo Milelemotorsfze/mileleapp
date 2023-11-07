@@ -8,6 +8,7 @@ use App\Models\ShippingCertification;
 use App\Models\OtherLogisticsCharges;
 use App\Models\UserActivities;
 use Illuminate\Http\Request;
+use Psy\Util\Str;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,7 +35,7 @@ class ShippingController extends Controller
                     'shipping_charges.created_by',
                     'shipping_charges.created_at',
                 ]);
-                $data = $data->groupBy('shipping_charges.id'); 
+                $data = $data->groupBy('shipping_charges.id');
             }
             else if ($status === "Shipping_document") {
                 $data = ShippingDocuments::select([
@@ -46,7 +47,7 @@ class ShippingController extends Controller
                     'shipping_documents.created_at',
                 ]);
                 $data = $data->groupBy('shipping_documents.id');
-            }  
+            }
             else if ($status === "certification") {
                 $data = ShippingCertification::select([
                     'shipping_certification.id',
@@ -57,7 +58,7 @@ class ShippingController extends Controller
                     'shipping_certification.created_at',
                 ]);
                 $data = $data->groupBy('shipping_certification.id');
-            }  
+            }
             else if ($status === "others") {
                 $data = OtherLogisticsCharges::select([
                     'other_logistics_charges.id',
@@ -68,7 +69,7 @@ class ShippingController extends Controller
                     'other_logistics_charges.created_at',
                 ]);
                 $data = $data->groupBy('other_logistics_charges.id');
-            } 
+            }
             else {
                 $data = null;
             }
@@ -77,7 +78,7 @@ class ShippingController extends Controller
             }
         }
         return view('logistics.shipping');
-    }    
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -109,6 +110,11 @@ class ShippingController extends Controller
         $shipping->description = $description;
         $shipping->price = $price;
         $shipping->created_by = Auth::id();
+
+        $latestCode = Shipping::withTrashed()->orderBy('id', 'desc')->first();
+        $code = $this->generateUUID($latestCode, $category);
+        $shipping->code = $code;
+
         $shipping->save();
         }
         else if($category == "Shipping Documents"){
@@ -117,6 +123,13 @@ class ShippingController extends Controller
             $shippingdoc->description = $description;
             $shippingdoc->price = $price;
             $shippingdoc->created_by = Auth::id();
+
+            $latestCode = ShippingDocuments::withTrashed()->orderBy('id', 'desc')->first();
+            info("shipping documnets");
+            info($latestCode);
+            $code = $this->generateUUID($latestCode, $category);
+            $shippingdoc->code = $code;
+
             $shippingdoc->save();
         }
         else if($category == "Certificates"){
@@ -125,6 +138,11 @@ class ShippingController extends Controller
             $shippingcert->description = $description;
             $shippingcert->price = $price;
             $shippingcert->created_by = Auth::id();
+
+            $latestCode = ShippingCertification::withTrashed()->orderBy('id', 'desc')->first();
+            $code = $this->generateUUID($latestCode, $category);
+            $shippingcert->code = $code;
+
             $shippingcert->save();
         }
         else{
@@ -133,8 +151,43 @@ class ShippingController extends Controller
             $shippingother->description = $description;
             $shippingother->price = $price;
             $shippingother->created_by = Auth::id();
+
+            $latestCode = OtherLogisticsCharges::withTrashed()->orderBy('id', 'desc')->first();
+            $code = $this->generateUUID($latestCode, $category);
+            $shippingother->code = $code;
+
             $shippingother->save();
         }
+
+        return redirect()->back()->with("Shipping data Created Successfully.");
+    }
+    public function generateUUID($latestCode, $category) {
+        $length = 5;
+        $offset = 2;
+        if($category == "Shipping") {
+          $prefix = 'S-';
+        }else if($category == "Shipping Documents") {
+            $prefix = 'D-';
+        }else if($category == "Certificates") {
+            $prefix = 'DP-';
+            $length = 6;
+            $offset = 3;
+
+        }else{
+            $prefix = 'E-';
+        }
+        if($latestCode){
+            $latestShippingCode =  $latestCode->code;
+
+            $latestShippingCodeNumber = substr($latestShippingCode, $offset, $length);
+            $newCode =  str_pad($latestShippingCodeNumber + 1, 3, 0, STR_PAD_LEFT);
+
+            $code =  $prefix.$newCode;
+        }else{
+            $code = $prefix.'001';
+        }
+
+        return $code;
     }
     /**
      * Display the specified resource.
@@ -200,6 +253,6 @@ class ShippingController extends Controller
             $shipping->price = $price;
             $shipping->save();
         }
-        return response()->json(['tableid' => $tableid]);  
+        return response()->json(['tableid' => $tableid]);
     }
 }

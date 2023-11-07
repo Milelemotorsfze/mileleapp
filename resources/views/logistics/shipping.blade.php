@@ -279,7 +279,7 @@
 });
 $(document).on('click', '.price-update', function () {
   var id = $(this).data('id').toString().padStart(3, '0');
-  var tableId = $(this).data('table-id'); // Get the table ID
+  var tableId = $(this).data('table-id');
   if(tableId == "dtBasicExample1"){
     $('#addonId').text('S-' + id);
   }
