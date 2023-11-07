@@ -1794,6 +1794,11 @@ class AddonController extends Controller {
             }
             else{
                 $addons = Addon::create($input);
+                if($request->addon_type == 'K') {
+                    $createDescr['addon_id'] = $addons->id;
+                    $createDescr['description'] = NULL;
+                    $createInput = AddonDescription::create($createDescr);
+                }
             }
             return response()->json($addons);
         }
