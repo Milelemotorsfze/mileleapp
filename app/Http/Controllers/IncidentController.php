@@ -450,6 +450,7 @@ public function updatevehicledetails(Request $request)
     }
     public function getPdiInspection($incidentId)
     {
+        (new UserActivityController)->createActivity('Open PDI Inspection');
         $Incident = Incident::findOrFail($incidentId);
         $inspection = Pdi::where('inspection_id', $Incident->inspection_id)->get();
         if (!$inspection) {

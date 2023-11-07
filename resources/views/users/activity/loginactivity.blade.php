@@ -82,18 +82,19 @@
         table.clear().draw();
         for (var i = 0; i < data.length; i++) {
             var row = data[i];
-            var formattedDateTime = moment(row.created_at).format('DD-MM-YYYY HH:mm:ss');
-            var rowData = [
-                i + 1,
-                row.logine_user.name, 
-                row.logine_user.email, 
-                formattedDateTime,
-                row.ip, 
-                '<label class="badge ' + (row.status === 'success' ? 'badge-soft-success' : 'badge-soft-warning') + '">' + row.status + '</label>'
-            ];
-            table.row.add(rowData).draw(false);
-        }
+            var formattedDateTime = moment(row.created_at).format('YYYY-MM-DD HH:mm:ss');
+var dateForURL = moment(formattedDateTime).format('YYYY-MM-DD'); // Format to 'YYYY-MM-DD' for the URL
+var rowData = [
+    i + 1,
+    '<a href="/user/' + row.logine_user.id + '/' + dateForURL + '">' + row.logine_user.name + '</a>',  
+    row.logine_user.email, 
+    formattedDateTime,
+    row.ip, 
+    '<label class="badge ' + (row.status === 'success' ? 'badge-soft-success' : 'badge-soft-warning') + '">' + row.status + '</label>'
+];
+        table.row.add(rowData).draw(false);
     }
+}
     populateFilterDropdowns();
 },
                     error: function (error) {

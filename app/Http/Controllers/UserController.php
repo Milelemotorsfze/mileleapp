@@ -168,4 +168,8 @@ namespace App\Http\Controllers;
         Session::put('selectedRole', $roleId);
         return redirect()->back();
         }
+        public function showUseractivities($id, $date, Request $request)
+        {
+        return view('users.activity.dailyactivity', ['id' => $id, 'date' => $date]);
+        }
         }

@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Country;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use App\Http\Controllers\UserActivityController;
 use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller

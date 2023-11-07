@@ -17,6 +17,7 @@ class VariantController extends Controller
      */
     public function index()
     {
+        (new UserActivityController)->createActivity('Open Variant Information Page');
         $variants = Varaint::orderBy('id','DESC')->get();
         return view('variants.list', compact('variants'));
     }
@@ -26,6 +27,7 @@ class VariantController extends Controller
      */
     public function create()
     {
+        (new UserActivityController)->createActivity('|Open Create New Variant Page');
         $brands = Brand::all();
         $masterModelLines = MasterModelLines::all();
         return view('variants.create', compact('masterModelLines','brands'));
@@ -36,6 +38,7 @@ class VariantController extends Controller
      */
     public function store(Request $request)
 {
+    (new UserActivityController)->createActivity('Creating New Variant');
     $this->validate($request, [
         'name' => 'string|required|max:255',
         'detail' => 'required',
@@ -78,6 +81,7 @@ class VariantController extends Controller
      */
     public function show(string $id)
     {
+        (new UserActivityController)->createActivity('View Variant Details');
         $variant = Varaint::findOrFail($id);
 
         return view('variants.show',compact('variant'));
@@ -88,6 +92,7 @@ class VariantController extends Controller
      */
     public function edit(string $id)
     {
+        (new UserActivityController)->createActivity('Edit Variant Details page View');
         $brands = Brand::all();
         $masterModelLines = MasterModelLines::all();
         $variant = Varaint::findOrFail($id);
@@ -100,6 +105,7 @@ class VariantController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        (new UserActivityController)->createActivity('Update Variant Details');
         $this->validate($request, [
             'name' => 'string|required|max:255',
             'brands_id' => 'required',
@@ -154,6 +160,7 @@ class VariantController extends Controller
      */
     public function destroy(string $id)
     {
+        (new UserActivityController)->createActivity('Delete the variant');
         $variant = Varaint::findOrFail($id);
         $variant->delete();
 

@@ -5,6 +5,7 @@ use App\Models\ColorCode;
 use App\Models\Colorlog;
 use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
+use App\Http\Controllers\UserActivityController;
 
 
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ class ColorCodesController extends Controller
      */
     public function index()
     {
+        (new UserActivityController)->createActivity('Open Colour Code Information Page');
         $colorcodes = ColorCode::orderBy('id','DESC')->get();
         return view('colours.index', compact('colorcodes'));
     }
@@ -25,6 +27,7 @@ class ColorCodesController extends Controller
      */
     public function create()
     {
+        (new UserActivityController)->createActivity('Open Create New Colour Code Page');
         return view('colours.create');
     }
 
@@ -33,6 +36,7 @@ class ColorCodesController extends Controller
      */
     public function store(Request $request)
     {
+        (new UserActivityController)->createActivity('Create New Colour Code');
         $this->validate($request, [
             'name' => 'string|required|max:255',
             'belong_to' => 'required',
@@ -80,6 +84,7 @@ class ColorCodesController extends Controller
      */
     public function edit(string $id)
     {
+        (new UserActivityController)->createActivity('Open Colour Code Edit Page');
         $colorcodes = ColorCode::findOrFail($id);
         $colorlog = Colorlog::where('colorcode_id', $id)->orderBy('created_at', 'desc')->get();
         return view('colours.edit',compact('colorcodes','colorlog'));
@@ -90,6 +95,7 @@ class ColorCodesController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        (new UserActivityController)->createActivity('Edit Colour Code');
             $this->validate($request, [
             'name' => 'string|required|max:255',
             'belong_to' => 'required',
