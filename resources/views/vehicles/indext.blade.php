@@ -626,7 +626,7 @@ $(document).ready(function() {
             { data: 'reservation_start_date', name: 'reservation_start_date' },
             @endif
             @if (Auth::user()->hasPermissionForSelectedRole('so-remarks'))
-            { data: 'latest_remark_sales', name: 'latest_remark_sales' },
+            { data: 'latest_remark_sales', name: 'latest_remark_sales' , defaultContent: '' },
             @endif
             @if (Auth::user()->hasPermissionForSelectedRole('gdn-view'))
             { data: 'pdi_date', name: 'pdi_date' },
@@ -671,7 +671,8 @@ $(document).ready(function() {
             { data: 'warehousename', name: 'warehousename' },
             @endif
             @if (Auth::user()->hasPermissionForSelectedRole('warehouse-remarks-view'))
-            { data: 'latest_remark_warehouse', name: 'latest_remark_warehouse' },
+            {
+            data: 'latest_remark_warehouse.remarks', name: 'latest_remark_warehouse', defaultContent: '' },
             @endif
             @if (Auth::user()->hasPermissionForSelectedRole('price-view'))
             { data: 'price', name: 'price' },
