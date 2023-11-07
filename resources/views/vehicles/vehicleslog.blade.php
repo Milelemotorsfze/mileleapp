@@ -668,8 +668,6 @@
         $hasPermissionSOApprove = Auth::user()->hasPermissionForSelectedRole('approve-so');
         $hasPermissionInspectionApprove = Auth::user()->hasPermissionForSelectedRole('inspection-approve');
         $hasPermissionReservationApprove = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
-
-
     @endphp
          @if($hasPermissionInspectionApprove || $hasPermissionVehicleDetailApprove || $hasPermissionSOApprove || $hasPermissionEngineApprove)
         <!-- <div class="card">
@@ -921,6 +919,63 @@
                 </div>
         </div> -->
         @endif
+        <hr>
+        @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehousest-view');
+            @endphp
+            @if ($hasPermission)
+        <h5>Warehouse Remarks</h5>
+        <div class="table-responsive" >
+                    <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered">
+                        <thead class="bg-soft-secondary">
+                        <tr>
+                            <th>Remarks</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Updated By</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($remarks as $remark)
+						<tr>
+                            <td>{{$remark->remarks}}</td>
+                            <td>{{ date('d-m-Y', strtotime($remark->date)) }}</td>
+                            <td>{{$remark->time}}</td>
+                            <td>
+                            @php
+                                        $created = DB::table('users')->where('id', $remark->created_by)->first();
+                                        if($created) {
+                                             $change_bysn = $created->name;
+                                        }
+                                    @endphp
+                                    {{ $change_bysn ?? '' }}</td>
+                                        </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
+            @endphp
+            @if ($hasPermission)  
+        <form id="approveForm" action="{{ route('warehouse.updatewarehouseremarks') }}" method="POST">
+    @csrf
+    <input type="hidden" id="buttonValue" name="buttonValue" value="">
+    <div class="form-group">
+        <input type="hidden" name="id" id="id" value="{{$vehicle->id ?? ''}}"/>
+        <textarea id="remarks" name="remarks" class="form-control" rows="4" placeholder="Enter Remarks ..."></textarea>
+    </div>
+    <br>
+    <a style="float: right;" class="btn btn-success" onclick="setButtonValue('approve'); document.getElementById('approveForm').submit();">
+        <i class="fa fa-check" aria-hidden="true"></i> Send Remarks
+    </a>
+</form>
+<br>
+@endif
+<br>
+<hr>
+@endif
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title">Changes Log Details</h4>
@@ -1124,6 +1179,11 @@
             }
         }
     </script>
+    <script>
+function setButtonValue(value) {
+    document.getElementById('buttonValue').value = value;
+}
+</script>
 @endsection
 @push('scripts')
 @endpush

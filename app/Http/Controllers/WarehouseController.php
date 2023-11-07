@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Warehouse;
-use App\Models\Warehouselog;
+use App\Events\DataUpdatedEvent;
 use Carbon\Carbon;
+use App\Models\Vehicles;
+use App\Models\Warehouselog;
+use App\Models\Remarks;
+use App\Models\Vehicleslog;
 use Carbon\CarbonTimeZone;
 
 class WarehouseController extends Controller
@@ -18,18 +22,10 @@ class WarehouseController extends Controller
         $warehouselist = Warehouse::orderBy('id','DESC')->get();
         return view('warehouse.list', compact('warehouselist'));
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('warehouse.listcreate');
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -57,28 +53,15 @@ class WarehouseController extends Controller
         $warehouselist = Warehouse::orderBy('id','DESC')->get();
         return view('warehouse.list')->with(compact('warehouselist'))->with('success', 'Warehouse added successfully.');
     }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $warehouse = Warehouse::findOrFail($id);
         $warehouselog = Warehouselog::where('warehouse_id', $id)->orderBy('created_at', 'desc')->get();
         return view('warehouse.editlist',compact('warehouse','warehouselog'));
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $this->validate($request, [
@@ -124,12 +107,37 @@ class WarehouseController extends Controller
     $warehouselist = Warehouse::orderBy('id','DESC')->get();
     return view('warehouse.list', compact('warehouselist'))->with('success', 'Variant added successfully.');
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         //
+    }
+    public function updatewarehouseremarks(Request $request) {
+        $request->validate([
+            'id' => 'required',
+            'remarks' => 'required',
+        ]);
+        $id = $request->input('id');
+        $remarks = $request->input('remarks');
+        $vehicle_remarks = New Remarks();
+        $vehicle_remarks->remarks = $remarks;
+        $vehicle_remarks->vehicles_id = $id;
+        $now = Carbon::now();
+        $vehicle_remarks->time = $now->format('H:i:s');
+        $vehicle_remarks->date = $now->toDateString();
+        $vehicle_remarks->department = "warehouse";
+        $vehicle_remarks->created_by = auth()->user()->id;
+        $vehicle_remarks->save();
+        $vehicleslog = new Vehicleslog();
+        $vehicleslog->time = $now->format('H:i:s');
+        $vehicleslog->date = $now->toDateString();
+        $vehicleslog->status = 'Adding New Remarks';
+        $vehicleslog->vehicles_id = $id;
+        $vehicleslog->field = "Warehouse Remarks";
+        $vehicleslog->old_value = "";
+        $vehicleslog->new_value = $remarks;
+        $vehicleslog->created_by = auth()->user()->id;
+        $vehicleslog->save();
+        event(new DataUpdatedEvent(['id' => $id, 'message' => "Data Update"]));
+        return redirect()->back()->with('success', 'Remarks updated successfully');
     }
 }
