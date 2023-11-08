@@ -241,8 +241,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-delete']);
                         @endphp
                         @if ($hasPermission)
-                        <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger" 
-                           href="{{ route('users.destroy',$user->id) }}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                        <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" 
+                           data-modal-id="deleteInactiveUser{{$user->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                        <div class="modal modal-class" id="deleteInactiveUser{{$user->id}}" >
+                           <div class="modal-content">
+                              <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
+                              <h3 class="modal-title" style="text-align:center;"> Delete Inactive User </h3>
+                              <div class="dropdown-divider"></div>
+                              <h4 class="modal-paragraph"> Are you sure,</h4>
+                              <h5 class="modal-paragraph"> You want to delete the inaactive user ?</h5>
+                              <div class="dropdown-divider"></div>
+                              <div class="row modal-button-class">
+                                 <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <a href="{{ route('users.delete',$user->id) }}" style="float: right;" class="btn btn-sm btn-success ">
+                                    <i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
                         @endif
                         @endcan
                         @can('user-make-active') 
@@ -331,7 +347,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                               href="{{ route('users.edit',$user->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
                            @endif
                            @endcan
-                           @can('user-delete')
+                           <!-- @can('user-delete')
                            @php
                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-delete']);
                            @endphp
@@ -339,7 +355,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
                            <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger" 
                               href="{{ route('users.destroy',$user->id) }}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
                            @endif
-                           @endcan
+                           @endcan -->
                            @can('user-restore')
                            @php
                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-restore']);
