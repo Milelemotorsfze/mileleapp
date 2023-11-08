@@ -28,7 +28,7 @@
             @endif
         </div>
         @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addon-list']);
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addons-list']);
         @endphp
         @if ($hasPermission)
         <div class="portfolio">
