@@ -1292,10 +1292,13 @@
         var rowData = [];
         var buttonType = $(this).data('button-type');
         var row = $(this).closest('tr');
+        // console.log('row');
+        // console.log(row);
         rowData['button_type'] = buttonType;
         row.find('td').each(function() {
-            rowData.push($(this).text());
+            rowData.push($(this).html());
         });
+        // console.log(rowData);
         var secondTable = $('#dtBasicExample2').DataTable();
         secondTable.row.add(rowData).draw();
         if(buttonType == 'Shipping') {
@@ -1785,10 +1788,11 @@
                     var kitItems = '';
                     var itemCount = (kit.kit_items).length;
                     if(itemCount > 0) {
-                        kitItems = kitItems + '<table><thead><tr><th style="border: 1px solid #c4c4d4">Item</th><th style="border: 1px solid #c4c4d4">Quantity</th></thead><tbody>'
+                        kitItems = kitItems + '<table><thead><tr><th style="border: 1px solid #c4c4d4" hidden>Sl No</th><th style="border: 1px solid #c4c4d4">Item</th><th style="border: 1px solid #c4c4d4">Quantity</th></thead><tbody>'
+                        var itemSlNo = 0;
                         for(var l=0; l<itemCount; l++) {
-                            console.log(kit.kit_items[l].item.description);
-                            kitItems = kitItems + '<tr><td style="border: 1px solid #c4c4d4">'+kit.kit_items[l].item.addon.name;
+                            itemSlNo = itemSlNo+1;
+                            kitItems = kitItems + '<tr><td style="border: 1px solid #c4c4d4" hidden>'+itemSlNo+'</td><td style="border: 1px solid #c4c4d4">'+kit.kit_items[l].item.addon.name;
                             if(kit.kit_items[l].item.description != null) {
                                 kitItems = kitItems + ' - '+kit.kit_items[l].item.description;
                             }
