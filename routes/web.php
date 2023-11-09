@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\HRM\Hiring\EmployeeHiringRequestController;
+use App\Http\Controllers\HRM\Hiring\EmployeeHiringQuestionnaireController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -62,7 +64,7 @@ use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\ApprovalsController;
 use App\Http\Controllers\IncidentController;
 use App\Http\Controllers\VariantRequests;
-use App\Http\Controllers\ModificationController;
+// use App\Http\Controllers\ModificationController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ProformaInvoiceController;
 use App\Http\Controllers\ApprovalAwaitingController;
@@ -202,6 +204,29 @@ Route::get('/d', function () {
 
     Route::post('newSellingPriceRequest', [SupplierController::class, 'newSellingPriceRequest'])->name('addon.newSellingPriceRequest');
     Route::get('sellingPriceHistory/{id}', [SupplierController::class, 'sellingPriceHistory'])->name('suppliers.sellingPriceHistory');
+
+      //Profoma Invoice
+      Route::controller(ProformaInvoiceController::class)->group(function(){
+        Route::get('/proforma_invoice/{callId}', 'proforma_invoice')->name('qoutation.proforma_invoice');
+        Route::get('/get-model-lines/addon-booking/{brandId}/{type}', 'getaddonModels')->name('quotation.getaddonmodel');
+        Route::get('/get-model-descriptions/addon-booking/{modelLineId}/{type}', 'getaddonModelDescriptions')->name('quotation.getmodeldescription');
+        Route::get('/get-booking-accessories/{addonId}/{brandId}/{modelLineId}', 'getbookingAccessories')->name('booking.getbookingAccessories');
+        Route::get('/get-booking-spare-parts/{addonId}/{brandId}/{modelLineId}/{ModelDescriptionId}', 'getbookingSpareParts')->name('booking.getbookingSpareParts');
+        Route::get('/get-booking-kits/{addonId}/{brandId}/{modelLineId}/{ModelDescriptionId}', 'getbookingKits')->name('booking.getbookingKits');
+    });
+    // ApprovalAwaitingController
+    Route::controller(ApprovalAwaitingController::class)->group(function(){
+        Route::get('/addon-approval-awaiting/{type}', 'addonApprovalAwaiting')->name('addon.approval');
+    });
+
+    // HRM Module
+
+    // Employee Hiring Requset
+    Route::resource('employee-hiring-request', EmployeeHiringRequestController::class);
+    // Employee Hiring Questionnaire
+    Route::resource('employee-hiring-questionnaire', EmployeeHiringQuestionnaireController::class);
+
+
 
     // Demand & Planning Module
 
@@ -472,7 +497,7 @@ Route::get('/d', function () {
     Route::post('inspectionpdiappin/approvals', [ApprovalsController::class,'approvedincidentsonly'])->name('inspectionapprovalpdi.approvedincidentsonly');
     Route::get('incidents/updatevehicledetails', [IncidentController::class, 'updatevehicledetails'])->name('incident.updatevehicledetails');
     Route::post('incident/createincidents', [IncidentController::class,'createincidents'])->name('incident.createincidents');
-    Route::resource('modification', ModificationController::class);
+    // Route::resource('modification', ModificationController::class);
     Route::post('incident/reinspectionsforre', [IncidentController::class, 'reinspectionsforre'])->name('incident.reinspectionsforre');
     Route::post('incident/reinspectionsforrem', [IncidentController::class, 'reinspectionsforrem'])->name('incident.reinspectionsforrem');
     Route::get('/get-pdi-inspection/{incidentId}', [IncidentController::class,'getPdiInspection']);
@@ -518,17 +543,5 @@ Route::get('/d', function () {
     Route::resource('Shipping', ShippingController::class);
     Route::post('shipping/updateprice', [ShippingController::class, 'updateprice'])->name('shipping.updateprice');
 
-    //Profoma Invoice
-    Route::controller(ProformaInvoiceController::class)->group(function(){
-        Route::get('/proforma_invoice/{callId}', 'proforma_invoice')->name('qoutation.proforma_invoice');
-        Route::get('/get-model-lines/addon-booking/{brandId}/{type}', 'getaddonModels')->name('quotation.getaddonmodel');
-        Route::get('/get-model-descriptions/addon-booking/{modelLineId}/{type}', 'getaddonModelDescriptions')->name('quotation.getmodeldescription');
-        Route::get('/get-booking-accessories/{addonId}/{brandId}/{modelLineId}', 'getbookingAccessories')->name('booking.getbookingAccessories');
-        Route::get('/get-booking-spare-parts/{addonId}/{brandId}/{modelLineId}/{ModelDescriptionId}', 'getbookingSpareParts')->name('booking.getbookingSpareParts');
-        Route::get('/get-booking-kits/{addonId}/{brandId}/{modelLineId}/{ModelDescriptionId}', 'getbookingKits')->name('booking.getbookingKits');
-    });
-    // ApprovalAwaitingController
-    Route::controller(ApprovalAwaitingController::class)->group(function(){
-        Route::get('/addon-approval-awaiting/{type}', 'addonApprovalAwaiting')->name('addon.approval');
-    });
+  
     });
