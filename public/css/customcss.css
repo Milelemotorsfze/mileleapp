@@ -38,16 +38,17 @@
   font-size: 16px;
   color: white;
 }
-.cart-icon-container {
-  position: relative;
-  display: inline-block;
-  top: 10px;
-  right: 10px;
+
+/* .nav-item:first-of-type{
+  padding-left: 20px;
+} */
+
+.nav-link:focus, .nav-link:hover {
+  color: aqua;
 }
-.cart-icon-containerss {
-  position: relative;
-  display: inline-block;
-  right: 10px;
+
+.border-start{
+  padding-left: 10px;
 }
   .plus-circle-link {
     font-size: 20px;
@@ -139,9 +140,107 @@ text-decoration: none;
 }
 .topnav{
 	margin-top: 0px !important;
-  
 }
+
+.dropdown-meun {
+position: relative;
+}
+
 .page-content
 {
 margin-top: 10px !important;	
+}
+
+.cart-icon-container {
+  position: relative;
+  display: inline-block;
+  top: 10px;
+  right: 20px;
+}
+.cart-icon-containerss {
+  position: relative;
+  display: inline-block;
+  right: 15px;
+}
+
+
+.additional-menus-dots {
+  color: white;
+  padding-right: 10px;
+}
+
+.more-button-username-rolename-container {
+  /* margin: 0px 15px 0px -3rem; */
+  position: absolute;
+}
+
+.navbar-main-container {
+  margin-left: 2.5rem;
+  padding-right: 5px;
+}
+
+.username-role-name-container,
+.username-container-col1 {
+  padding: 0px;
+}
+
+.rolename-container {
+  padding: 0px 0px 0px 0rem;
+  white-space: nowrap;
+}
+
+#more-dropdown-button {
+  padding-left: 25px;
+  display: none;
+}
+
+.more-button {
+  padding-right: 50px;
+}
+
+div.container {
+  padding: 0px 10px 0px 10px;
+}
+
+.rolename-username-main-div,
+.navbar-menus-main-div {
+  padding: 0px 10px;
+}
+
+.rolename-username-main-div {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.navbar-main-div {
+  padding: 0px 10px;
+}
+
+.rolename-container {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+nav.navbar.navbar-light.navbar-expand-lg:active {
+  padding: 0px 10px;
+}
+
+.additional-menus-dots:hover, .additional-menus-dots:focus {
+
+  color:#00c3ff;
+}
+
+.rolename-button{
+  padding-right: 5px;
+}
+
+.row .rolename-username-main-div {
+  position: static;
+}
+
+@media (max-width: 1200px) {
+  .more-button-username-rolename-container {
+      margin: 0px 33px 0px -20px;
+      position: relative;
+  }
 }

@@ -1009,8 +1009,8 @@ function savedemand() {
           $('#demandmodel').modal('hide');
           reloadDataTable('dataTable3');
         } else {
-          console.error('Error saving Prospecting');
-          alert('Error saving Prospecting');
+          console.error('Error saving Demand');
+          alert('Error saving Demand');
         }
       } else {
         console.error('Request failed with status ' + xhr.status);
