@@ -287,536 +287,552 @@
 		</div>
 	</div>
 	<hr>
-	<div class="row">
-		<div class="col-lg-12">
-			<div class="table-responsive">
-				<table id="dtBasicExample2" class="table table-striped table-editable table-edits table">
-					<thead class="bg-soft-secondary">
-						<tr>
-							<th>Description</th>
-							<th>Code</th>
-							<th>Unit Price</th>
-							<th>Quantity</th>
-							<th>Total Amount</th>
-							<th>Action</th>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
-			</div>
-		</div>
-        <div class="row justify-content-end total-div" hidden>
-            <div class="col-lg-4">
-                <label class="fw-bold font-size-16 ">Total :</label>
-                <span id="total" class="fw-bold"> </span>
+    <form action="{{ route('quotation.store') }}" id="form-create" method="POST" >
+        @csrf
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="table-responsive">
+                    <table id="dtBasicExample2" class="table table-responsive table-striped table-editable table-edits table">
+                        <thead class="bg-soft-secondary">
+                            <tr>
+                                <th>Description</th>
+                                <th>Code</th>
+                                <th>Unit Price</th>
+                                <th>Quantity</th>
+                                <th>Total Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <br>
+            <hr>
+            <div class="row total-div" hidden>
+                <div class="col-lg-8">
+{{--                    <label class="fw-bold font-size-16 ">Total :</label>--}}
+                    <textarea cols="40" rows="5" name="remarks" placeholder="Add Remarks" class="form-control" value=""></textarea>
+                </div>
+                <div class="col-lg-1 ">
+                    <label class="fw-bold font-size-16">Total :</label>
+                </div>
+                <div class="col-lg-2">
+{{--                    <label class="fw-bold font-size-16 ">Total :</label>--}}
+                    <input type="number" readonly id="total" name="deal_value" placeholder="Total Amount" class="fw-bold form-control " value="">
+                </div>
             </div>
         </div>
-	</div>
-	<br>
-	<div class="row">
-		<div class="col-sm-1">
-			<input type="radio" id="showVehicles" name="contentType">
-			<label for="showVehicles">Add Vehicles</label>
-		</div>
-		<div class="col-sm-1">
-			<input type="radio" id="showAccessories" name="contentType">
-			<label for="showAccessories">Add Accessories</label>
-		</div>
-		<div class="col-sm-1">
-			<input type="radio" id="showSpareParts" name="contentType">
-			<label for="showSpareParts">Add Spare Parts</label>
-		</div>
-		<div class="col-sm-1">
-			<input type="radio" id="showKits" name="contentType">
-			<label for="showKits">Add Kits</label>
-		</div>
-		<div class="col-sm-1">
-			<input type="radio" id="showShipping" name="contentType">
-			<label for="showShipping">Add Shipping</label>
-		</div>
-        <div class="col-sm-2">
-            <input type="radio" id="showShippingDocuments" name="contentType">
-            <label for="showShippingDocuments">Add Shipping Documents</label>
-        </div>
-        <div class="col-sm-1">
-            <input type="radio" id="showCertificates" name="contentType">
-            <label for="showCertificates"> Certificate</label>
-        </div>
-        <div class="col-sm-1">
-            <input type="radio" id="showOthers" name="contentType">
-            <label for="showOthers">Add Other</label>
-        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-1">
+                <input type="radio" id="showVehicles" name="contentType">
+                <label for="showVehicles">Add Vehicles</label>
+            </div>
+            <div class="col-sm-1">
+                <input type="radio" id="showAccessories" name="contentType">
+                <label for="showAccessories">Add Accessories</label>
+            </div>
+            <div class="col-sm-1">
+                <input type="radio" id="showSpareParts" name="contentType">
+                <label for="showSpareParts">Add Spare Parts</label>
+            </div>
+            <div class="col-sm-1">
+                <input type="radio" id="showKits" name="contentType">
+                <label for="showKits">Add Kits</label>
+            </div>
+            <div class="col-sm-1">
+                <input type="radio" id="showShipping" name="contentType">
+                <label for="showShipping">Add Shipping</label>
+            </div>
+            <div class="col-sm-2">
+                <input type="radio" id="showShippingDocuments" name="contentType">
+                <label for="showShippingDocuments">Add Shipping Documents</label>
+            </div>
+            <div class="col-sm-1">
+                <input type="radio" id="showCertificates" name="contentType">
+                <label for="showCertificates"> Certificate</label>
+            </div>
+            <div class="col-sm-1">
+                <input type="radio" id="showOthers" name="contentType">
+                <label for="showOthers">Add Other</label>
+            </div>
 
-	</div>
-	<div id="vehiclesContent" class="contentveh">
-		<hr>
-		<div class="row">
-			<h4 class="col-lg-2 col-md-6">Search Available Vehicles</h4>
-			<div class="col-lg-12 col-md-6 d-flex align-items-end">
-				<div class="col-lg-2 col-md-6">
-					<label for="brand">Select Brand:</label>
-					<select class="form-control col" id="brand" name="brand">
-						<option value="">Select Brand</option>
-						@foreach($brands as $brand)
-						<option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-						@endforeach
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6">
-					<label for="model_line">Select Model Line:</label>
-					<select class="form-control col" id="model_line" name="model_line" disabled>
-						<option value="">Select Model Line</option>
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6">
-					<label for="variant">Select Variant:</label>
-					<select class="form-control col" id="variant" name="variant" disabled>
-						<option value="">Select Variant</option>
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6">
-					<label for="interior_color">Interior Color:</label>
-					<select class="form-control col" id="interior_color" name="interior_color" disabled>
-						<option value="">Select Interior Color</option>
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6">
-					<label for="exterior_color">Exterior Color:</label>
-					<select class="form-control col" id="exterior_color" name="exterior_color" disabled>
-						<option value="">Select Exterior Color</option>
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
-					<div class="col">
-						<button type="button" class="btn btn-primary" id="search-button">Search</button>
-					</div>
-					<div class="col" >
-						<button type="button" class="btn btn-outline-warning" data-table="vehicle-table" id="directadding-button">Directly Adding Into Quotation</button>
-					</div>
-				</div>
-			</div>
-		</div>
-		<br>
-		<br>
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="table-responsive">
-					<table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
-						<thead class="bg-soft-secondary">
-							<tr>
-								<th>ID</th>
-								<th>Status</th>
-								<th>VIN</th>
-								<th>Brand Name</th>
-								<th>Model Line</th>
-								<th>Model Details</th>
-								<th>Variant Name</th>
-								<th>Variant Detail</th>
-								<th>Interior Color</th>
-								<th>Exterior Color</th>
-								<th>Price</th>
-								<th style="width:30px;">Add Into Quotation</th>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="accessoriesContent" class="contentveh">
-        <hr>
-		<div class="row">
-			<h4 class="col-lg-12 col-md-12">Search Available Accessories</h4>
-			<div class="col-lg-12 col-md-6 d-flex align-items-end">
-                <div class="col-lg-2 col-md-6">
-					<label for="brand">Select Accessory Name:</label>
-					<select class="form-control col" id="accessories_addon" name="accessories_addon">
-						<option value="">Select Accessory Name</option>
-						@foreach($assessoriesDesc as $accessory)
-						<option value="{{ $accessory->id }}">{{ $accessory->Addon->name ?? '' }}@if($accessory->description!='') - {{$accessory->description}}@endif</option>
-						@endforeach
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6">
-					<label for="brand">Select Brand:</label>
-					<select class="form-control col" id="accessories_brand" name="accessories_brand">
-						<option value="">Select Brand</option>
-                        <!-- <option value="allbrands">ALL BRANDS</option> -->
-						@foreach($accessoriesBrands as $brand)
-						<option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-						@endforeach
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6">
-					<label for="model_line">Select Model Line:</label>
-					<select class="form-control col" id="accessories_model_line" name="accessories_model_line" disabled>
-						<option value="">Select Model Line</option>
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
-					<div class="col">
-						<button type="button" class="btn btn-primary" id="accessories-search-button">Search</button>
-					</div>
-                    <div class="col" >
-                        <button type="button" class="btn btn-outline-warning" data-table="accessories-table" id="directadding-button">Directly Adding Into Quotation</button>
+        </div>
+        <div id="vehiclesContent" class="contentveh">
+            <hr>
+            <div class="row">
+                <h4 class="col-lg-2 col-md-6">Search Available Vehicles</h4>
+                <div class="col-lg-12 col-md-6 d-flex align-items-end">
+                    <div class="col-lg-2 col-md-6">
+                        <label for="brand">Select Brand:</label>
+                        <select class="form-control col" id="brand" name="brand">
+                            <option value="">Select Brand</option>
+                            @foreach($brands as $brand)
+                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                            @endforeach
+                        </select>
                     </div>
-				</div>
-			</div>
-		</div>
-        <br>
-		<br>
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="table-responsive">
-                    <table id="dtBasicExample5" class="table table-striped table-editable table-edits table">
-						<thead class="bg-soft-secondary">
-							<tr>
-								<th>ID</th>
-								<th>Accessory Code</th>
-								<th>Accessory Name</th>
-								<th>Brand/Model Line</th>
-								<th>Selling Price(AED)</th>
-								<th>Additional Remarks</th>
-								<th>Fixing Charge</th>
-								<!-- <th>Least Purchase Price(AED)</th> -->
-								<th style="width:30px;">Add Into Quotation</th>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="sparePartsContent" class="contentveh">
-        <hr>
-		<div class="row">
-			<h4 class="col-lg-12 col-md-12">Search Available Spare Parts</h4>
-			<div class="col-lg-12 col-md-6 d-flex align-items-end">
-                <div class="col-lg-2 col-md-6">
-					<label for="brand">Select Spare Part Name:</label>
-					<select class="form-control col" id="spare_parts_addon" name="spare_parts_addon">
-						<option value="">Select Spare Part Name</option>
-						@foreach($sparePartsDesc as $spareParts)
-						<option value="{{ $spareParts->id }}">{{ $spareParts->Addon->name ?? '' }}@if($spareParts->description!='') - {{$spareParts->description}}@endif</option>
-						@endforeach
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6">
-					<label for="brand">Select Brand:</label>
-					<select class="form-control col" id="spare_parts_brand" name="spare_parts_brand">
-						<option value="">Select Brand</option>
-						@foreach($sparePartsBrands as $brand)
-						<option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-						@endforeach
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6">
-					<label for="model_line">Select Model Line:</label>
-					<select class="form-control col" id="spare_parts_model_line" name="spare_parts_model_line" disabled>
-						<option value="">Select Model Line</option>
-					</select>
-				</div>
-                <div class="col-lg-2 col-md-6">
-					<label for="model_description">Select Model Description:</label>
-					<select class="form-control col" id="spare_parts_model_description" name="spare_parts_model_description" disabled>
-						<option value="">Select Model Description</option>
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
-					<div class="col">
-						<button type="button" class="btn btn-primary" id="spare_parts-search-button">Search</button>
-					</div>
-                    <div class="col" >
-                        <button type="button" class="btn btn-outline-warning" data-table="spare-part-table" id="directadding-button">Directly Adding Into Quotation</button>
+                    <div class="col-lg-2 col-md-6">
+                        <label for="model_line">Select Model Line:</label>
+                        <select class="form-control col" id="model_line" name="model_line" disabled>
+                            <option value="">Select Model Line</option>
+                        </select>
                     </div>
-				</div>
-			</div>
-		</div>
-        <br>
-		<br>
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="table-responsive">
-                    <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
-						<thead class="bg-soft-secondary">
-							<tr>
-								<th>ID</th>
-								<th>Spare Part Code</th>
-								<th>Spare Part Name</th>
-								<th>Brand/Model Line/Model Description</th>
-								<!-- <th>Model Line/Model Description/Model Year</th> -->
-								<th>Selling Price(AED)</th>
-                                <th>Part Numbers</th>
-								<th>Additional Remarks</th>
-								<th>Fixing Charge</th>
-								<!-- <th>Least Purchase Price(AED)</th> -->
-								<th style="width:30px;">Add Into Quotation</th>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="kitsContent" class="contentveh">
-        <hr>
-		<div class="row">
-			<h4 class="col-lg-2 col-md-6">Search Available Kits</h4>
-			<div class="col-lg-12 col-md-6 d-flex align-items-end">
-                <div class="col-lg-2 col-md-6">
-					<label for="brand">Select Kit Name:</label>
-					<select class="form-control col" id="kit_addon" name="kit_addon">
-						<option value="">Select Kit Name</option>
-						@foreach($kitsDesc as $kit)
-						<option value="{{ $kit->id }}">{{ $kit->Addon->name ?? '' }}@if($kit->description!='') - {{$kit->description}}@endif</option>
-						@endforeach
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6">
-					<label for="brand">Select Brand:</label>
-					<select class="form-control col" id="kit_brand" name="kit_brand">
-						<option value="">Select Brand</option>
-						@foreach($kitsBrands as $brand)
-						<option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-						@endforeach
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6">
-					<label for="model_line">Select Model Line:</label>
-					<select class="form-control col" id="kit_model_line" name="kit_model_line" disabled>
-						<option value="">Select Model Line</option>
-					</select>
-				</div>
-                <div class="col-lg-2 col-md-6">
-					<label for="model_description">Select Model Description:</label>
-					<select class="form-control col" id="kits_model_description" name="kits_model_description" disabled>
-						<option value="">Select Model Description</option>
-					</select>
-				</div>
-				<div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
-					<div class="col">
-						<button type="button" class="btn btn-primary" id="kit-search-button">Search</button>
-					</div>
-					<div class="col">
-						<button type="button" class="btn btn-outline-warning" data-table="kit-table" id="directadding-button">Directly Adding Into Quotation</button>
-					</div>
-				</div>
-			</div>
-		</div>
-        <br>
-		<br>
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="table-responsive">
-                    <table id="dtBasicExample4" class="table table-striped table-editable table-edits table">
-						<thead class="bg-soft-secondary">
-							<tr>
-								<th>ID</th>
-								<th>Kit Code</th>
-								<th>Kit Name</th>
-								<th>Brand/Model Line/Model Description</th>
-								<!-- <th>Model Line/Model Description</th> -->
-                                <th>Items/ Quantity</th>
-								<!-- <th>Least Purchase Price(AED)</th> -->
-								<th>Selling Price(AED)</th>
-								<th style="width:30px;">Add Into Quotation</th>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="shippingContent" class="contentveh">
-        <hr>
-        <br>
-        <div class="card">
-            <div class="card-header">
-                <h4>Available Shipping Charges</h4>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="table-responsive">
-                            <table id="shipping-table" class="table table-striped table-editable table-edits table">
-                                <thead class="bg-soft-secondary">
-                                <tr>
-                                    <th>S.No</th>
-                                    <th>Code</th>
-                                    <th>Addon Name</th>
-                                    <th>Description</th>
-                                    <th>Price</th>
-                                    <th style="width:30px;">Add Into Quotation</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <div hidden>{{$i=0;}}
-                                    @foreach($shippings as $shipping)
-                                        <tr>
-                                        <td>{{ ++$i }}</td>
-                                        <td>{{ $shipping->code }} </td>
-                                        <td>{{ $shipping->name }}</td>
-                                        <td>{{ $shipping->description  }}</td>
-                                        <td>{{ $shipping->price }}</td>
-                                        <td>
-                                            <button class="add-button circle-button" data-button-type="Shipping"></button>
-                                        </td>
-                                        </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
+                    <div class="col-lg-2 col-md-6">
+                        <label for="variant">Select Variant:</label>
+                        <select class="form-control col" id="variant" name="variant" disabled>
+                            <option value="">Select Variant</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label for="interior_color">Interior Color:</label>
+                        <select class="form-control col" id="interior_color" name="interior_color" disabled>
+                            <option value="">Select Interior Color</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label for="exterior_color">Exterior Color:</label>
+                        <select class="form-control col" id="exterior_color" name="exterior_color" disabled>
+                            <option value="">Select Exterior Color</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
+                        <div class="col">
+                            <button type="button" class="btn btn-primary" id="search-button">Search</button>
+                        </div>
+                        <div class="col" >
+                            <button type="button" class="btn btn-outline-warning" data-table="vehicle-table" id="directadding-button">Directly Adding Into Quotation</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-	</div>
-	<div id="shippingDocumentContent" class="contentveh">
-        <hr>
-        <br>
-        <div class="card">
-            <div class="card-header">
-                <h4>Available Shipping Documents</h4>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="table-responsive">
-                            <table id="shipping-document-table" class="table table-striped table-editable table-edits table">
-                                <thead class="bg-soft-secondary">
+            <br>
+            <br>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-responsive">
+                        <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
+                            <thead class="bg-soft-secondary">
                                 <tr>
-                                    <th>S.No</th>
-                                    <th>Code</th>
-                                    <th>Addon Name</th>
-                                    <th>Description</th>
+                                    <th>ID</th>
+                                    <th>Status</th>
+                                    <th>VIN</th>
+                                    <th>Brand Name</th>
+                                    <th>Model Line</th>
+                                    <th>Model Details</th>
+                                    <th>Variant Name</th>
+                                    <th>Variant Detail</th>
+                                    <th>Interior Color</th>
+                                    <th>Exterior Color</th>
                                     <th>Price</th>
                                     <th style="width:30px;">Add Into Quotation</th>
                                 </tr>
-                                </thead>
-                                <tbody>
-                                <div hidden>{{$i=0;}}
-                                    @foreach($shippingDocuments as $shippingDocument)
-                                        <tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="accessoriesContent" class="contentveh">
+            <hr>
+            <div class="row">
+                <h4 class="col-lg-12 col-md-12">Search Available Accessories</h4>
+                <div class="col-lg-12 col-md-6 d-flex align-items-end">
+                    <div class="col-lg-2 col-md-6">
+                        <label for="brand">Select Accessory Name:</label>
+                        <select class="form-control col" id="accessories_addon" name="accessories_addon">
+                            <option value="">Select Accessory Name</option>
+                            @foreach($assessoriesDesc as $accessory)
+                            <option value="{{ $accessory->id }}">{{ $accessory->Addon->name ?? '' }}@if($accessory->description!='') - {{$accessory->description}}@endif</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label for="brand">Select Brand:</label>
+                        <select class="form-control col" id="accessories_brand" name="accessories_brand">
+                            <option value="">Select Brand</option>
+                            <!-- <option value="allbrands">ALL BRANDS</option> -->
+                            @foreach($accessoriesBrands as $brand)
+                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label for="model_line">Select Model Line:</label>
+                        <select class="form-control col" id="accessories_model_line" name="accessories_model_line" disabled>
+                            <option value="">Select Model Line</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
+                        <div class="col">
+                            <button type="button" class="btn btn-primary" id="accessories-search-button">Search</button>
+                        </div>
+                        <div class="col" >
+                            <button type="button" class="btn btn-outline-warning" data-table="accessories-table" id="directadding-button">Directly Adding Into Quotation</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-responsive">
+                        <table id="dtBasicExample5" class="table table-striped table-editable table-edits table">
+                            <thead class="bg-soft-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Accessory Code</th>
+                                    <th>Accessory Name</th>
+                                    <th>Brand/Model Line</th>
+                                    <th>Selling Price(AED)</th>
+                                    <th>Additional Remarks</th>
+                                    <th>Fixing Charge</th>
+                                    <!-- <th>Least Purchase Price(AED)</th> -->
+                                    <th style="width:30px;">Add Into Quotation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="sparePartsContent" class="contentveh">
+            <hr>
+            <div class="row">
+                <h4 class="col-lg-12 col-md-12">Search Available Spare Parts</h4>
+                <div class="col-lg-12 col-md-6 d-flex align-items-end">
+                    <div class="col-lg-2 col-md-6">
+                        <label for="brand">Select Spare Part Name:</label>
+                        <select class="form-control col" id="spare_parts_addon" name="spare_parts_addon">
+                            <option value="">Select Spare Part Name</option>
+                            @foreach($sparePartsDesc as $spareParts)
+                            <option value="{{ $spareParts->id }}">{{ $spareParts->Addon->name ?? '' }}@if($spareParts->description!='') - {{$spareParts->description}}@endif</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label for="brand">Select Brand:</label>
+                        <select class="form-control col" id="spare_parts_brand" name="spare_parts_brand">
+                            <option value="">Select Brand</option>
+                            @foreach($sparePartsBrands as $brand)
+                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label for="model_line">Select Model Line:</label>
+                        <select class="form-control col" id="spare_parts_model_line" name="spare_parts_model_line" disabled>
+                            <option value="">Select Model Line</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label for="model_description">Select Model Description:</label>
+                        <select class="form-control col" id="spare_parts_model_description" name="spare_parts_model_description" disabled>
+                            <option value="">Select Model Description</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
+                        <div class="col">
+                            <button type="button" class="btn btn-primary" id="spare_parts-search-button">Search</button>
+                        </div>
+                        <div class="col" >
+                            <button type="button" class="btn btn-outline-warning" data-table="spare-part-table" id="directadding-button">Directly Adding Into Quotation</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-responsive">
+                        <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
+                            <thead class="bg-soft-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Spare Part Code</th>
+                                    <th>Spare Part Name</th>
+                                    <th>Brand/Model Line/Model Description</th>
+                                    <!-- <th>Model Line/Model Description/Model Year</th> -->
+                                    <th>Selling Price(AED)</th>
+                                    <th>Part Numbers</th>
+                                    <th>Additional Remarks</th>
+                                    <th>Fixing Charge</th>
+                                    <!-- <th>Least Purchase Price(AED)</th> -->
+                                    <th style="width:30px;">Add Into Quotation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="kitsContent" class="contentveh">
+            <hr>
+            <div class="row">
+                <h4 class="col-lg-2 col-md-6">Search Available Kits</h4>
+                <div class="col-lg-12 col-md-6 d-flex align-items-end">
+                    <div class="col-lg-2 col-md-6">
+                        <label for="brand">Select Kit Name:</label>
+                        <select class="form-control col" id="kit_addon" name="kit_addon">
+                            <option value="">Select Kit Name</option>
+                            @foreach($kitsDesc as $kit)
+                            <option value="{{ $kit->id }}">{{ $kit->Addon->name ?? '' }}@if($kit->description!='') - {{$kit->description}}@endif</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label for="brand">Select Brand:</label>
+                        <select class="form-control col" id="kit_brand" name="kit_brand">
+                            <option value="">Select Brand</option>
+                            @foreach($kitsBrands as $brand)
+                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label for="model_line">Select Model Line:</label>
+                        <select class="form-control col" id="kit_model_line" name="kit_model_line" disabled>
+                            <option value="">Select Model Line</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label for="model_description">Select Model Description:</label>
+                        <select class="form-control col" id="kits_model_description" name="kits_model_description" disabled>
+                            <option value="">Select Model Description</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
+                        <div class="col">
+                            <button type="button" class="btn btn-primary" id="kit-search-button">Search</button>
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-outline-warning" data-table="kit-table" id="directadding-button">Directly Adding Into Quotation</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-responsive">
+                        <table id="dtBasicExample4" class="table table-striped table-editable table-edits table">
+                            <thead class="bg-soft-secondary">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Kit Code</th>
+                                    <th>Kit Name</th>
+                                    <th>Brand/Model Line/Model Description</th>
+                                    <!-- <th>Model Line/Model Description</th> -->
+                                    <th>Items/ Quantity</th>
+                                    <!-- <th>Least Purchase Price(AED)</th> -->
+                                    <th>Selling Price(AED)</th>
+                                    <th style="width:30px;">Add Into Quotation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="shippingContent" class="contentveh">
+            <hr>
+            <br>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Available Shipping Charges</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table id="shipping-table" class="table table-striped table-editable table-edits table">
+                                    <thead class="bg-soft-secondary">
+                                    <tr>
+                                        <th>S.No</th>
+                                        <th>Code</th>
+                                        <th>Addon Name</th>
+                                        <th>Description</th>
+                                        <th>Price</th>
+                                        <th style="width:30px;">Add Into Quotation</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <div hidden>{{$i=0;}}
+                                        @foreach($shippings as $shipping)
+                                            <tr>
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $shippingDocument->code }}</td>
-                                            <td>{{ $shippingDocument->name }}</td>
-                                            <td>{{ $shippingDocument->description  }}</td>
-                                            <td>{{ $shippingDocument->price }}</td>
+                                            <td>{{ $shipping->code }} </td>
+                                            <td>{{ $shipping->name }}</td>
+                                            <td>{{ $shipping->description  }}</td>
+                                            <td>{{ $shipping->price }}</td>
                                             <td>
-                                                <button class="add-button circle-button" data-button-type="Shipping-Document"></button>
+                                                <button class="add-button circle-button" data-button-type="Shipping" data-shipping-id="{{ $shipping->id }}"></button>
                                             </td>
-                                        </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
+                                            </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-    </div>
-    <div id="certificateContent" class="contentveh">
-        <hr>
+        </div>
+        <div id="shippingDocumentContent" class="contentveh">
+            <hr>
+            <br>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Available Shipping Documents</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table id="shipping-document-table" class="table table-striped table-editable table-edits table">
+                                    <thead class="bg-soft-secondary">
+                                    <tr>
+                                        <th>S.No</th>
+                                        <th>Code</th>
+                                        <th>Addon Name</th>
+                                        <th>Description</th>
+                                        <th>Price</th>
+                                        <th style="width:30px;">Add Into Quotation</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <div hidden>{{$i=0;}}
+                                        @foreach($shippingDocuments as $shippingDocument)
+                                            <tr>
+                                                <td>{{ ++$i }}</td>
+                                                <td>{{ $shippingDocument->code }}</td>
+                                                <td>{{ $shippingDocument->name }}</td>
+                                                <td>{{ $shippingDocument->description  }}</td>
+                                                <td>{{ $shippingDocument->price }}</td>
+                                                <td>
+                                                    <button class="add-button circle-button" data-button-type="Shipping-Document"
+                                                            data-shipping-document-id="{{ $shippingDocument->id }}" ></button>
+                                                </td>
+                                            </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="certificateContent" class="contentveh">
+            <hr>
+            <br>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Available Certifications</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table id="certification-table" class="table table-striped table-editable table-edits table">
+                                    <thead class="bg-soft-secondary">
+                                    <tr>
+                                        <th>S.No</th>
+                                        <th>Code</th>
+                                        <th>Addon Name</th>
+                                        <th>Description</th>
+                                        <th>Price</th>
+                                        <th style="width:30px;">Add Into Quotation</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <div hidden>{{$i=0;}}
+                                        @foreach($certifications as $certification)
+                                            <tr>
+                                                <td>{{ ++$i }}</td>
+                                                <td>{{ $certification->code }}</td>
+                                                <td>{{ $certification->name }}</td>
+                                                <td>{{ $certification->description  }}</td>
+                                                <td>{{ $certification->price }}</td>
+                                                <td>
+                                                    <button class="add-button circle-button" data-button-type="Certification"
+                                                            data-certification-id="{{ $certification->id }}"></button>
+                                                </td>
+                                            </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="otherContent" class="contentveh">
+            <hr>
+            <br>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Available Other Documents</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table id="other-document-table" class="table table-striped table-editable table-edits table">
+                                    <thead class="bg-soft-secondary">
+                                    <tr>
+                                        <th>S.No</th>
+                                        <th>Code</th>
+                                        <th>Addon Name</th>
+                                        <th>Description</th>
+                                        <th>Price</th>
+                                        <th style="width:30px;">Add Into Quotation</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <div hidden>{{$i=0;}}
+                                        @foreach($otherDocuments as $otherDocument)
+                                            <tr>
+                                                <td>{{ ++$i }}</td>
+                                                <td>{{ $otherDocument->code }}</td>
+                                                <td>{{ $otherDocument->name }}</td>
+                                                <td>{{ $otherDocument->description  }}</td>
+                                                <td>{{ $otherDocument->price }}</td>
+                                                <td>
+                                                    <button class="add-button circle-button" data-button-type="Other"
+                                                    data-other-id="{{ $otherDocument->id }}"></button>
+                                                </td>
+                                            </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
         <br>
-        <div class="card">
-            <div class="card-header">
-                <h4>Available Certifications</h4>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="table-responsive">
-                            <table id="certification-table" class="table table-striped table-editable table-edits table">
-                                <thead class="bg-soft-secondary">
-                                <tr>
-                                    <th>S.No</th>
-                                    <th>Code</th>
-                                    <th>Addon Name</th>
-                                    <th>Description</th>
-                                    <th>Price</th>
-                                    <th style="width:30px;">Add Into Quotation</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <div hidden>{{$i=0;}}
-                                    @foreach($certifications as $certification)
-                                        <tr>
-                                            <td>{{ ++$i }}</td>
-                                            <td>{{ $certification->code }}</td>
-                                            <td>{{ $certification->name }}</td>
-                                            <td>{{ $certification->description  }}</td>
-                                            <td>{{ $certification->price }}</td>
-                                            <td>
-                                                <button class="add-button circle-button" data-button-type="Certification"></button>
-                                            </td>
-                                        </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div id="otherContent" class="contentveh">
-        <hr>
-        <br>
-        <div class="card">
-            <div class="card-header">
-                <h4>Available Other Documents</h4>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="table-responsive">
-                            <table id="other-document-table" class="table table-striped table-editable table-edits table">
-                                <thead class="bg-soft-secondary">
-                                <tr>
-                                    <th>S.No</th>
-                                    <th>Code</th>
-                                    <th>Addon Name</th>
-                                    <th>Description</th>
-                                    <th>Price</th>
-                                    <th style="width:30px;">Add Into Quotation</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <div hidden>{{$i=0;}}
-                                    @foreach($otherDocuments as $otherDocument)
-                                        <tr>
-                                            <td>{{ ++$i }}</td>
-                                            <td>{{ $otherDocument->code }}</td>
-                                            <td>{{ $otherDocument->name }}</td>
-                                            <td>{{ $otherDocument->description  }}</td>
-                                            <td>{{ $otherDocument->price }}</td>
-                                            <td>
-                                                <button class="add-button circle-button" data-button-type="Other"></button>
-                                            </td>
-                                        </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
 </div>
 @endsection
 @push('scripts')
@@ -1082,7 +1098,10 @@
                     }
                     // calculate
                     var amount = price * 1;
-                    return '<input type="text"  value="'+ amount +'" class="total-amount-editable form-control" id="total-amount-'+ row['index'] +'" readonly />';
+
+                    return '<input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
+                        ' <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
+                        '<input type="text"  value="'+ amount +'" class="total-amount-editable form-control" name="total_amounts[]" id="total-amount-'+ row['index'] +'" readonly />';
                 }
             },
             {
@@ -1090,7 +1109,7 @@
                 data: null,
                 render: function (data, type, row) {
 
-                    return '<input type="number" min="0"  value="1" class="qty-editable form-control" id="quantity-'+ row['index'] +'" />';
+                    return '<input type="number" min="0"  value="1" class="qty-editable form-control" name="quantities[]" id="quantity-'+ row['index'] +'" />';
                 }
             },
             {
@@ -1139,7 +1158,7 @@
                     else if(['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         combinedValue = 'koo';
                     }
-                    return '<input type="text" class="combined-value-editable form-control" value="' + combinedValue + '"/>';
+                    return '<input type="text" name="descriptions[]" class="combined-value-editable form-control" value="' + combinedValue + '"/>';
                 }
             },
             {
@@ -1176,7 +1195,7 @@
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         var price = row[4];
                     }
-                    return '<input type="number" min="0" class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>';
+                    return '<input type="number" min="0" name="prices[]" class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>';
                 }
             }
         ]
@@ -1187,42 +1206,41 @@
         // var row = $(this).closest('tr');
         if(row['button_type'] == 'Shipping') {
             var table = $('#shipping-table').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping" ></button>']).draw();
+            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping"  data-shipping-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
             table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
-                '<button class="add-button circle-button" data-button-type="Vehicle" ></button>']).draw();
+                '<button class="add-button circle-button" data-button-type="Vehicle" data-vehicle-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Shipping-Document') {
             var table = shippingDocumentTable;
-            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping-Document" ></button>']).draw();
+            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping-Document"  data-shipping-document-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Certification') {
             var table = certificationTable;
-            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Certification" ></button>']).draw();
+            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Certification" data-certification-id="'+ row['id']+'" ></button>']).draw();
         }
         else if(row['button_type'] == 'Other') {
             var table = otherTable;
-            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Other" ></button>']).draw();
+            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Other" data-other-id="'+ row['id']+'" ></button>']).draw();
         }
         else if(row['button_type'] == 'Accessory') {
             var table = $('#dtBasicExample5').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],'<button class="add-button circle-button" data-button-type="Accessory" ></button>']).draw();
+            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],'<button class="add-button circle-button" data-button-type="Accessory"  data-accessory-id="'+ row['id']+'" ></button>']).draw();
         }
         else if(row['button_type'] == 'SparePart') {
             var table = $('#dtBasicExample3').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],'<button class="add-button circle-button" data-button-type="SparePart" ></button>']).draw();
+            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],'<button class="add-button circle-button" data-sparepart-id="'+ row['id']+'" data-button-type="SparePart" ></button>']).draw();
         }
         else if(row['button_type'] == 'Kit') {
             var table = $('#dtBasicExample4').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],row[5],'<button class="add-button circle-button" data-button-type="Kit" ></button>']).draw();
+            table.row.add(['', row[1],row[2],row[3],row[4],row[5],'<button class="add-button circle-button" data-kit-id="'+ row['id'] +'"  data-button-type="Kit" ></button>']).draw();
         }
 
         var index = $(this).closest('tr').index();
         secondTable.row(index).remove().draw();
         // var data = secondTable.rows().data();
-
 
         $('#dtBasicExample2 tr').each(function(i){
 
@@ -1230,7 +1248,6 @@
            $(this).find('td input.qty-editable').attr('id','quantity-'+ i);
            $(this).find('td input.total-amount-editable').attr('id','total-amount-'+ i);
         });
-
 
         if(row['button_type'] != 'Direct-Add') {
             resetSerialNumber(table);
@@ -1326,16 +1343,22 @@
 
             var brand = $('#brand option:selected').val();
             if(brand != "") {
-
+                row['id'] = brand;
+                // add any button type if id is brand
+                row['model_type'] = 'Brand';
                 var brand = $('#brand option:selected').text();
             }
             var modelLine = $('#model_line option:selected').val();
             if(modelLine != "") {
+                row['id'] = modelLine;
+                row['model_type'] = 'ModelLine';
 
                 var modelLine = $('#model_line option:selected').text();
             }
             var variant = $("#variant option:selected").val();
             if(variant != "") {
+                row['id'] = variant;
+                row['model_type'] = 'Variant';
 
                 var variant = $('#variant option:selected').text();
 
@@ -1445,8 +1468,9 @@
         var index = secondTable.data().length + 1;
 
         var row = $(this).closest('tr');
-
+        console.log(row);
         rowData['button_type'] = buttonType;
+        rowData['model_type'] = buttonType;
         rowData['index'] = index;
         row.find('td').each(function() {
             rowData.push($(this).html());
@@ -1454,31 +1478,49 @@
 
         // console.log(rowData);
         var secondTable = $('#dtBasicExample2').DataTable();
-        secondTable.row.add(rowData).draw();
+
         if(buttonType == 'Shipping') {
             var table = shippingTable;
+            var id = $(this).data('shipping-id');
+
         }
         else if(buttonType == 'Shipping-Document') {
             var table = shippingDocumentTable;
+            var id = $(this).data('shipping-document-id');
+
         }
         else if(buttonType == 'Certification') {
             var table = certificationTable;
+            var id = $(this).data('certification-id');
+
         }
         else if(buttonType == 'Other') {
             var table = otherTable;
+            var id = $(this).data('other-id');
+
         }
         else if(buttonType == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
+            var id = $(this).data('vehicle-id');
         }
         else if(buttonType == 'Accessory') {
             var table = $('#dtBasicExample5').DataTable();
+            var id = $(this).data('accessory-id');
+
         }
         else if(buttonType == 'SparePart') {
             var table = $('#dtBasicExample3').DataTable();
+            var id = $(this).data('sparepart-id');
+
         }
         else if(buttonType == 'Kit') {
             var table = $('#dtBasicExample4').DataTable();
+            var id = $(this).data('kit-id');
+
         }
+        rowData['id'] = id;
+        secondTable.row.add(rowData).draw();
+        console.log(rowData);
         table.row(row).remove().draw();
         resetSerialNumber(table);
         // total amount div logic
@@ -1486,21 +1528,42 @@
 
         calculateTotalSum();
     });
-    function calculateTotalSum(){
-        var count = secondTable.data().length;
-        var totalAmount = 0;
-        for(var i=1;i<= count;i++) {
-            var amount = $('#total-amount-'+i).val();
-            totalAmount = parseInt(totalAmount) + parseInt(amount);
-        }
 
-        $('#total').html(totalAmount);
-    }
     function resetSerialNumber(table) {
         table.$('tbody tr').each(function(i){
             $($(this).find('td')[0]).html(i+1);
         });
     }
+        $('#dtBasicExample2 tbody').on('input', '.price-editable', function(e) {
+            var index =  $(this).closest('tr').index() + 1;
+            CalculateTotalAmount(index);
+            calculateTotalSum();
+
+        });
+        $('#dtBasicExample2 tbody').on('input', '.qty-editable', function(e) {
+            var index =  $(this).closest('tr').index() + 1;
+            CalculateTotalAmount(index);
+            calculateTotalSum();
+
+        });
+        function CalculateTotalAmount(index) {
+            var table = $('#dtBasicExample2').DataTable();
+            var unitPrice = $('#price-'+index).val();
+            var quantity = $('#quantity-'+index).val();
+            var totalAmount = parseInt(unitPrice) * parseInt(quantity);
+            $('#total-amount-'+index).val(totalAmount);
+
+        }
+        function calculateTotalSum(){
+            var count = secondTable.data().length;
+            var totalAmount = 0;
+            for(var i=1;i<= count;i++) {
+                var amount = $('#total-amount-'+i).val();
+                totalAmount = parseInt(totalAmount) + parseInt(amount);
+            }
+
+            $('#total').val(totalAmount);
+        }
     $('#search-button').on('click', function() {
         var variantId = $('#variant').val();
         var interiorColorId = $('#interior_color').val();
@@ -2032,20 +2095,8 @@
         return isEditable;
     }
         });
-    $('#dtBasicExample2 tbody').on('input', '.price-editable', function(e) {
-        var index =  $(this).closest('tr').index() + 1;
-        CalculateTotalAmount(index);
-    });
-    $('#dtBasicExample2 tbody').on('input', '.qty-editable', function(e) {
-        var index =  $(this).closest('tr').index() + 1;
-        CalculateTotalAmount(index);
-    });
-    function CalculateTotalAmount(index) {
-        var table = $('#dtBasicExample2').DataTable();
-        var unitPrice = $('#price-'+index).val();
-        var quantity = $('#quantity-'+index).val();
-        var totalAmount = parseInt(unitPrice) * parseInt(quantity);
-        $('#total-amount-'+index).val(totalAmount);
-    }
+
+
+
     </script>
 @endpush

@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\quotation;
 use App\Models\Calls;
 use App\Models\Brand;
+use App\Models\QuotationItem;
 use App\Models\Varaint;
 use App\Models\Vehicles;
 use App\Models\Vehiclescarts;
 use App\Models\MasterModelLines;
 use App\Models\CartAddon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Monarobase\CountryList\CountryListFacade;
 
 class QuotationController extends Controller
@@ -31,11 +34,11 @@ class QuotationController extends Controller
     $latestQuotation = quotation::where('created_by', auth()->user()->id)
                     ->latest()
                     ->first();
-    $callsId = $latestQuotation->calls_id; 
+    $callsId = $latestQuotation->calls_id;
     $data = Calls::select('name', 'email')
             ->where('id', $callsId)
-            ->first();         
-            $countries = CountryListFacade::getList('en');   
+            ->first();
+            $countries = CountryListFacade::getList('en');
             $vehicles_id = Vehiclescarts::where('created_by', auth()->user()->id)->pluck('vehicle_id');
             $items = Vehicles::whereIn('id', $vehicles_id)->get();
     return view('quotation.add_new', compact('data', 'countries', 'items', 'vehicles_id'));
@@ -45,7 +48,37 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+//        dd($request->all());
+        DB::beginTransaction();
+
+        $quotation = new Quotation();
+        $quotation->calls_id = 4;
+        $quotation->deal_value = $request->deal_value;
+        $quotation->sales_notes = $request->remarks;
+        $quotation->created_by = Auth::id();
+
+        $quotation->save();
+
+
+        foreach ($request->prices as $key => $price) {
+           $quotationItem = new QuotationItem();
+           $quotationItem->unit_price = $price;
+           $quotationItem->quantity = $request->quantities[$key];
+           $quotationItem->total_amount = $request->total_amounts[$key];
+           $quotationItem->quotation_id = $quotation->id;
+           $quotationItem->created_by = Auth::id();
+           $quotationItem->reference_id = $request->reference_ids[$key];
+
+//           if($request->types[$key] == 'Shipping') {
+//               $quotationItem->reference_type =  QuotationItem::getMorphedModel($request->types[$key]);
+//
+//           }
+           $quotationItem->save();
+
+        }
+        DB::commit();
+
+        return redirect()->back();
     }
 
     /**
@@ -55,7 +88,7 @@ class QuotationController extends Controller
     {
         $data = Calls::where('id',$id)->first();
         $quotation = quotation::updateOrCreate([
-            'calls_id' => $data->id, 
+            'calls_id' => $data->id,
             'created_by' => auth()->user()->id
         ]);
      //   echo $quotation;
@@ -100,7 +133,7 @@ class QuotationController extends Controller
         ->groupBy('my')
         ->pluck('my')
         ->toArray();
-    return $data;    
+    return $data;
     }
     public function getmodelline(Request $request)
     {
@@ -112,7 +145,7 @@ class QuotationController extends Controller
        $data = MasterModelLines::whereIn('id', $masterModelLineids)
        ->pluck('model_line')
        ->toArray();
-       return $data;    
+       return $data;
     }
     public function getsubmodel(Request $request)
     {
@@ -125,7 +158,7 @@ class QuotationController extends Controller
         ->groupBy('sub_model')
         ->pluck('sub_model')
         ->toArray();
-        return $data;       
+        return $data;
     }
     public function gettrim(Request $request)
     {
@@ -138,17 +171,17 @@ class QuotationController extends Controller
         ->groupBy('sub_model')
         ->pluck('sub_model')
         ->toArray();
-        return $data;       
+        return $data;
     }
     public function addvehicles(Request $request)
     {
         if($request->actiond == "addvehicles"){
         $data = Vehiclescarts::updateOrCreate([
-                'vehicle_id' => $request->vehicles_id, 
+                'vehicle_id' => $request->vehicles_id,
                 'quotation_id' => $request->quotation_id,
                 'created_by' => auth()->user()->id
             ]);
-        return $data;    
+        return $data;
         }
     }
     public function removeVehicle($id)
@@ -160,7 +193,7 @@ public function addqaddone(Request $request)
     {
         if($request->anu == "addadones"){
          $data = CartAddon::updateOrCreate([
-                 'cart_id' => $request->cart_id, 
+                 'cart_id' => $request->cart_id,
                  'addon_id' => $request->addon_id,
                  'created_by' => auth()->user()->id
              ]);
@@ -171,7 +204,7 @@ public function addqaddone(Request $request)
              ->join('addons', 'addon_details.addon_id', '=', 'addons.id')
              ->where('addon_details.id', '=', $addonid)
              ->get();
-         return $results;    
+         return $results;
          }
     }
 }
