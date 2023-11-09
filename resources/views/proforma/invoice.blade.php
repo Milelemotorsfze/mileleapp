@@ -302,10 +302,17 @@
 						</tr>
 					</thead>
 					<tbody>
+
 					</tbody>
 				</table>
 			</div>
 		</div>
+        <div class="row justify-content-end total-div" hidden>
+            <div class="col-lg-4">
+                <label class="fw-bold font-size-16 ">Total :</label>
+                <span id="total" class="fw-bold"> </span>
+            </div>
+        </div>
 	</div>
 	<br>
 	<div class="row">
@@ -1040,6 +1047,7 @@
         }
     });
     var secondTable = $('#dtBasicExample2').DataTable({
+
         searching: false,
         paging: false,
         scrollY: false,
@@ -1063,14 +1071,28 @@
                 targets: -2,
                 data: null,
                 render: function (data, type, row) {
-                    return '<input type="text" class="qty-editable form-control" value="1"/>';
+
+                    var price = "";
+                    if(row['button_type'] == 'Vehicle') {
+                        var price = row[10];
+                    }
+                    else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
+                        var price = row[4];
+                    }
+                    else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
+                        var price = row[4];
+                    }
+                    // calculate
+                    var amount = price * 1;
+                    return '<input type="text"  value="'+ amount +'" class="total-amount-editable form-control" id="total-amount-'+ row['index'] +'" readonly />';
                 }
             },
             {
                 targets: -3,
                 data: null,
                 render: function (data, type, row) {
-                    return '<input type="text" class="qty-editable form-control" value=""/>';
+
+                    return '<input type="number" min="0"  value="1" class="qty-editable form-control" id="quantity-'+ row['index'] +'" />';
                 }
             },
             {
@@ -1156,7 +1178,7 @@
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         var price = row[4];
                     }
-                    return '<input type="text" class="price-editable form-control" value="' + price + '"/>';
+                    return '<input type="number" min="0" class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>';
                 }
             }
         ]
@@ -1201,10 +1223,27 @@
 
         var index = $(this).closest('tr').index();
         secondTable.row(index).remove().draw();
+        // var data = secondTable.rows().data();
+
+
+        $('#dtBasicExample2 tr').each(function(i){
+
+           $(this).find('td input.price-editable').attr('id','price-'+ i);
+           $(this).find('td input.qty-editable').attr('id','quantity-'+ i);
+           $(this).find('td input.total-amount-editable').attr('id','total-amount-'+ i);
+        });
+
+
         if(row['button_type'] != 'Direct-Add') {
-            // alert("ok");
             resetSerialNumber(table);
         }
+
+        // total div logic
+        var tableLength = secondTable.data().length;
+            if(tableLength == 0) {
+                $('.total-div').attr('hidden', true);
+            }
+            calculateTotalSum();
         // alert("inside romove function");
         // var rowData = row.data();
         // var vehicleIdToRemove = rowData[0];
@@ -1386,6 +1425,7 @@
             }
         }
 
+        var index = secondTable.data().length + 1;
 
         row.push(addon);
         row.push(brand);
@@ -1395,21 +1435,25 @@
         row.push(exteriorColor);
         row.push(variant);
         row['button_type'] = 'Direct-Add';
+        row['index'] = index;
         table.row.add(row).draw();
 
     });
     $(document).on('click', '.add-button', function() {
-        var vehicleId = $(this).data('vehicle-id');
-        console.log('Add button clicked for vehicle ID:', vehicleId);
+        var secondTable = $('#dtBasicExample2').DataTable();
+
         var rowData = [];
         var buttonType = $(this).data('button-type');
+        var index = secondTable.data().length + 1;
 
         var row = $(this).closest('tr');
+
         rowData['button_type'] = buttonType;
+        rowData['index'] = index;
         row.find('td').each(function() {
             rowData.push($(this).text());
         });
-        var secondTable = $('#dtBasicExample2').DataTable();
+
         secondTable.row.add(rowData).draw();
         if(buttonType == 'Shipping') {
             var table = shippingTable;
@@ -1437,7 +1481,21 @@
         }
         table.row(row).remove().draw();
         resetSerialNumber(table);
+        // total amount div logic
+        $('.total-div').attr('hidden', false);
+
+        calculateTotalSum();
     });
+    function calculateTotalSum(){
+        var count = secondTable.data().length;
+        var totalAmount = 0;
+        for(var i=1;i<= count;i++) {
+            var amount = $('#total-amount-'+i).val();
+            totalAmount = parseInt(totalAmount) + parseInt(amount);
+        }
+
+        $('#total').html(totalAmount);
+    }
     function resetSerialNumber(table) {
         table.$('tbody tr').each(function(i){
             $($(this).find('td')[0]).html(i+1);
@@ -1973,6 +2031,20 @@
         return isEditable;
     }
         });
-
+    $('#dtBasicExample2 tbody').on('input', '.price-editable', function(e) {
+        var index =  $(this).closest('tr').index() + 1;
+        CalculateTotalAmount(index);
+    });
+    $('#dtBasicExample2 tbody').on('input', '.qty-editable', function(e) {
+        var index =  $(this).closest('tr').index() + 1;
+        CalculateTotalAmount(index);
+    });
+    function CalculateTotalAmount(index) {
+        var table = $('#dtBasicExample2').DataTable();
+        var unitPrice = $('#price-'+index).val();
+        var quantity = $('#quantity-'+index).val();
+        var totalAmount = parseInt(unitPrice) * parseInt(quantity);
+        $('#total-amount-'+index).val(totalAmount);
+    }
     </script>
 @endpush
