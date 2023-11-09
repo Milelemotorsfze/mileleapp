@@ -320,6 +320,7 @@
                                             @endif
                                         @endif
                                     @endcan
+                                    @if($addonsdata->addon_type_name == 'P' OR $addonsdata->addon_type_name == 'SP')
                                     @if($addonsdata->fixing_charges_included)
                                         <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                             Fixing Charge
@@ -333,6 +334,7 @@
                                                 @endif
                                             @endif
                                         </div>
+                                    @endif
                                     @endif
                                     @if($addonsdata->lead_time)
                                         <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
