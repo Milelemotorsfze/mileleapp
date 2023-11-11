@@ -106,6 +106,7 @@ class QuotationController extends Controller
             $quotationItem->reference()->associate($item);
             $quotationItem->save();
         }
+        DB::commit();
 //        $quotationItem = QuotationItem::where('quotation_id', $quotation->id)->first();
 
         $vehicles =  QuotationItem::where("reference_type", 'App\Models\Vehicles')
@@ -126,8 +127,6 @@ class QuotationController extends Controller
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications'));
 
         return $pdfFile->stream("Halloa.pdf");
-
-        DB::commit();
 
     }
 
