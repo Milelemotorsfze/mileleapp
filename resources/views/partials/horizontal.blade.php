@@ -63,7 +63,7 @@
                         <div class="collapse navbar-collapse menu-container-div " id="topnav-menu-content">
                             <ul class="navbar-nav nav nav-pills" id="menu-items">
                                 <li class="nav-item dropdown dashboard-menu-div">
-                                    <a class="nav-link dropdown-toggle arrow-none " href="/" id="topnav-more" role="button">
+                                    <a class="nav-link dropdown-toggle arrow-none ml-3" href="/" id="topnav-more" role="button">
                                         <i data-feather="home"></i>
                                         <span data-key="t-extra-pages">Dashboard</span>
                                     </a>
@@ -1012,21 +1012,25 @@
         const rolenameDropdown = document.getElementById("rolename-dropdown-menu");
         const usernameDropdown = document.getElementById("username-dropdown-menu");
 
+        // Function to close all dropdowns
+        function closeDropdowns() {
+            moreDropdown.classList.remove("show");
+            rolenameDropdown.classList.remove("show");
+            usernameDropdown.classList.remove("show");
+        }
+
         moreButton.addEventListener("mouseenter", function() {
-            if (rolenameDropdown.classList.contains("show")) {
-                rolenameDropdown.classList.remove("show");
-            }
+            closeDropdowns();
             moreDropdown.classList.add("show");
         });
 
         rolenameButton.addEventListener("mouseenter", function() {
-            moreDropdown.classList.remove("show"); // Close the "more" dropdown
+            closeDropdowns();
             rolenameDropdown.classList.add("show");
         });
 
         usernameButton.addEventListener("mouseenter", function() {
-            moreDropdown.classList.remove("show");
-            rolenameDropdown.classList.remove("show");
+            closeDropdowns();
             usernameDropdown.classList.add("show");
         });
 
@@ -1034,24 +1038,51 @@
             moreDropdown.classList.remove("show");
         });
 
+        rolenameButton.addEventListener("mouseleave", function() {
+            rolenameDropdown.addEventListener("mouseenter", function() {
+                rolenameDropdown.classList.add("show");
+            });
+            rolenameDropdown.addEventListener("mouseleave", function() {
+                rolenameDropdown.classList.remove("show");
+            });
+        });
+
+        usernameButton.addEventListener("mouseleave", function() {
+            usernameDropdown.classList.remove("show");
+        });
+
+        // Toggle rolename dropdown on button click
+        moreButton.addEventListener("click", function() {
+            if (moreDropdown.classList.contains("show")) {
+                moreDropdown.classList.remove("show");
+            } else {
+                closeDropdowns();
+                moreDropdown.classList.add("show");
+            }
+        });
+
         rolenameButton.addEventListener("click", function() {
             if (rolenameDropdown.classList.contains("show")) {
                 rolenameDropdown.classList.remove("show");
             } else {
+                closeDropdowns();
                 rolenameDropdown.classList.add("show");
             }
         });
 
-        usernameButton.addEventListener("mouseenter", function() {
-            moreDropdown.classList.remove("show");
-            rolenameDropdown.classList.remove("show");
-            usernameDropdown.classList.add("show");
+        usernameButton.addEventListener("click", function() {
+            if (usernameDropdown.classList.contains("show")) {
+                usernameDropdown.classList.remove("show");
+            } else {
+                closeDropdowns();
+                usernameDropdown.classList.add("show");
+            }
         });
 
+        // Close dropdowns when clicking anywhere on the document
         document.addEventListener("click", function() {
-            moreDropdown.classList.remove("show");
-            rolenameDropdown.classList.remove("show");
-            usernameDropdown.classList.remove("show");
+            closeDropdowns();
         });
     });
 </script>
+
