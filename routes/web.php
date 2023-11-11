@@ -69,6 +69,8 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ProformaInvoiceController;
 use App\Http\Controllers\ApprovalAwaitingController;
 use App\Http\Controllers\ShippingController;
+use App\Http\Controllers\EmployeeController;
+
 
 
 /*
@@ -356,6 +358,7 @@ Route::get('/d', function () {
 
     // HR
     Route::resource('hiring', HiringController::class);
+    Route::resource('employee', EmployeeController::class);
     // Route::POST('hiring', [HiringController::class, 'jobStore'])->name('jobStore');
     // Route::POST('hiring', [HiringController::class, 'jobUpdate'])->name('jobUpdate');
 

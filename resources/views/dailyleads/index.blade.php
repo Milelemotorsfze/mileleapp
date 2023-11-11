@@ -928,7 +928,7 @@ function openModalr(callId) {
 function reloadDataTable(sectionId) {
     let dataTableValue;
     if (sectionId === 'dataTable2' || sectionId === 'dataTable3' || sectionId === 'dataTable4' || sectionId === 'dataTable5' || sectionId === 'dataTable6' || sectionId === 'dataTable7') {
-        dataTableValue = eval(sectionId); 
+        dataTableValue = eval(sectionId);
         if (dataTableValue) {
             dataTableValue.ajax.reload();
             console.log("Current Data Table is: ", sectionId);
@@ -1226,7 +1226,7 @@ function saveRejection() {
           $('#rejectionModal').modal('hide');
           reloadDataTable('dataTable7');
 
-          
+
         } else {
           console.error('Error saving rejection');
           alert('Error saving rejection');
