@@ -55,27 +55,8 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
-        $quotation = Quotation::find(13);
-        $quotationItem = QuotationItem::where('quotation_id', $quotation->id)->first();
+//        $quotation = Quotation::find(13);
 
-        $vehicles =  QuotationItem::where("reference_type", 'App\Models\Vehicles')
-            ->where('quotation_id', $quotation->id)->get();
-        $addons = QuotationItem::where('reference_type','App\Models\AddonDetails')
-            ->where('quotation_id', $quotation->id)->get();
-        $shippingCharges = QuotationItem::where('reference_type','App\Models\Shipping')
-            ->where('quotation_id', $quotation->id)->get();
-        $shippingDocuments = QuotationItem::where('reference_type','App\Models\ShippingDocuments')
-            ->where('quotation_id', $quotation->id)->get();
-        $otherDocuments = QuotationItem::where('reference_type','App\Models\OtherLogisticsCharges')
-            ->where('quotation_id', $quotation->id)->get();
-        $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
-            ->where('quotation_id', $quotation->id)->get();
-//        return view('proforma.proforma_invoice', compact('quotationItem','quotation',
-//            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications'));
-        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotationItem','quotation',
-            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications'));
-
-        return $pdfFile->stream("Halloa.pdf");
 
         DB::beginTransaction();
 
@@ -124,11 +105,29 @@ class QuotationController extends Controller
            }
             $quotationItem->reference()->associate($item);
             $quotationItem->save();
-
         }
+//        $quotationItem = QuotationItem::where('quotation_id', $quotation->id)->first();
+
+        $vehicles =  QuotationItem::where("reference_type", 'App\Models\Vehicles')
+            ->where('quotation_id', $quotation->id)->get();
+        $addons = QuotationItem::where('reference_type','App\Models\AddonDetails')
+            ->where('quotation_id', $quotation->id)->get();
+        $shippingCharges = QuotationItem::where('reference_type','App\Models\Shipping')
+            ->where('quotation_id', $quotation->id)->get();
+        $shippingDocuments = QuotationItem::where('reference_type','App\Models\ShippingDocuments')
+            ->where('quotation_id', $quotation->id)->get();
+        $otherDocuments = QuotationItem::where('reference_type','App\Models\OtherLogisticsCharges')
+            ->where('quotation_id', $quotation->id)->get();
+        $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
+            ->where('quotation_id', $quotation->id)->get();
+//        return view('proforma.proforma_invoice', compact('quotationItem','quotation',
+//            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications'));
+        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotationItem','quotation',
+            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications'));
+
+        return $pdfFile->stream("Halloa.pdf");
+
         DB::commit();
-
-
 
     }
 
