@@ -53,7 +53,7 @@
                         <p style="font-weight: bold;text-align:right;margin-bottom: 5px;"> PROFORMA INVOICE </p>
                         <p class="margin-0" style="text-align:right;"> Office No-AF 07, Block A,Samari Retail </p>
                         <p class="margin-0"> Ras al khor, United Arab Emirates </p>
-                        <p class="margin-0"> Tel.: +97143235991 | Email:: info@milele.com </p>
+                        <p class="margin-0"> Tel.: +97143235991 | Email: info@milele.com </p>
                         <p class="margin-0"> Website: www.milele.com </p>
                         <p style="font-weight: bold;margin-top: 5px;"> VAT TRN NO. 100057588400003 </p>
                     </td>
@@ -65,7 +65,7 @@
                 <td> <span style="font-weight: bold;">Proforma Invoice No :  </span> </td>
                 <td> <span >PI001219_V001</span> </td>
                 <td> <span style="font-weight: bold;">DATE :  </span> </td>
-                <td> <span > {{ \Illuminate\Support\Carbon::parse($quotation->created_at)->format('d M Y') }} </span> </td>
+                <td> <span> {{ \Illuminate\Support\Carbon::parse($quotation->created_at)->format('d M Y') }} </span> </td>
             </tr>
             <tr>
                 <td> <span style="font-weight: bold;">Sales Person :  </span> </td>
@@ -89,7 +89,7 @@
             <p style="font-weight: bold;padding-top:10px;padding-bottom: 10px;text-align: center"> I. DESCRIPTION AND BREAKDOWN OF GOODS </p>
         </div>
         <table id="details">
-            @if($vehicles->count() > 0)
+            @if($vehicles->count() > 0 || $variants->count() > 0)
                 <tr>
                     <th>01. VEHICLE</th>
                     <th>QTY</th>
@@ -104,6 +104,14 @@
                         <td>{{ number_format($vehicle->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
+                @foreach($variants as $variant)
+                    <tr>
+                        <td>{{ $variant->description }}</td>
+                        <td>{{ $variant->quantity }}</td>
+                        <td>{{ number_format($variant->unit_price, 2) }}</td>
+                        <td>{{ number_format($variant->total_amount, 2) }}</td>
+                    </tr>
+                @endforeach
             @endif
             @if($shippingDocuments->count() > 0 || $shippingCharges->count() > 0)
                 <tr>
@@ -112,7 +120,6 @@
                     <th>PRICE</th>
                     <th>AMOUNT</th>
                 </tr>
-
                 @foreach($shippingCharges as $shippingCharge)
                     <tr>
                         <td>{{ $shippingCharge->description }}</td>

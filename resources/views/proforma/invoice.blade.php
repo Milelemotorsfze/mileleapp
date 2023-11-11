@@ -286,33 +286,74 @@
 			</div>
 		</div>
 	</div>
-	<hr>
-    <form action="{{ route('quotation.store') }}" id="form-create" method="POST" >
+	<br>
+
+    <form action="{{ route('quotation-items.store') }}" id="form-create" method="POST" >
         @csrf
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="table-responsive">
-                    <table id="dtBasicExample2" class="table table-responsive table-striped table-editable table-edits table">
-                        <thead class="bg-soft-secondary">
-                            <tr>
-                                <th>Description</th>
-                                <th>Code</th>
-                                <th>Unit Price</th>
-                                <th>Quantity</th>
-                                <th>Total Amount</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
+        <div class="card">
+            <div class="card-header">
+                <h4>Quotation Items</h4>
             </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xxl-1 col-lg-1 col-md-2 col-sm-12">
+                        <label class="col-form-label fw-bold">{{ __('Document Type:') }}</label>
+                    </div>
+                    <div class="col-xxl-2 col-lg-2 col-md-4 col-sm-12 mt-2">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input " type="checkbox" name="document_type" id="inlineCheckbox1" value="Quotation" checked>
+                            <label class="form-check-label" for="inlineCheckbox1">Quotation</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="document_type" id="inlineCheckbox2" value="Proforma">
+                            <label class="form-check-label" for="inlineCheckbox2">Proforma Invoice</label>
+                        </div>
+                    </div>
+                    <div class="col-xxl-1 col-lg-1 col-md-3 col-sm-12">
+                        <label class="col-form-label fw-bold">{{ __('Shipping Method:') }}</label>
+                    </div>
+                    <div class="col-xxl-2 col-lg-2 col-md-3 col-sm-12 mt-2">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="document_type" id="CNF" value="option1" checked>
+                            <label class="form-check-label" for="CNF">CNF</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="shipping_method" id="EXW" value="option2">
+                            <label class="form-check-label" for="EXW">EXW</label>
+                        </div>
+                    </div>
+                    <div id="advance-amount-div" hidden>
+                        <div class="col-xxl-1 col-lg-1 col-md-6 col-sm-12">
+                            <label class="col-form-label fw-bold">{{ __('Advance Amount:') }}</label>
+                        </div>
+                        <div class="col-xxl-2 col-lg-2 col-md-6 col-sm-12">
+                            <input type="number" min="0" class="form-control" name="advance_amount" id="advance-amount" placeholder="Advance Amount">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table id="dtBasicExample2" class="table table-responsive table-striped table-editable table-edits table">
+                                <thead class="bg-soft-secondary">
+                                    <tr>
+                                        <th>Description</th>
+                                        <th>Code</th>
+                                        <th>Unit Price</th>
+                                        <th>Quantity</th>
+                                        <th>Total Amount</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             <br>
-            <hr>
             <div class="row total-div" hidden>
                 <div class="col-lg-8">
-{{--                    <label class="fw-bold font-size-16 ">Total :</label>--}}
                     <textarea cols="40" rows="5" name="remarks" placeholder="Add Remarks" class="form-control" value=""></textarea>
                 </div>
                 <div class="col-lg-1 ">
@@ -320,8 +361,10 @@
                 </div>
                 <div class="col-lg-2">
                     <input type="hidden" value="{{ $callDetails->id }}" name="calls_id" >
-                    <input type="number" readonly id="total" name="deal_value" placeholder="Total Amount" class="fw-bold form-control " value="">
+                    <input type="number" readonly id="total" name="deal_value" placeholder="Total Amount" class="fw-bold form-control" value="">
                 </div>
+            </div>
+
             </div>
         </div>
         <br>
@@ -849,6 +892,16 @@
                 }
             });
         });
+        $('input[type="checkbox"]').on('change', function() {
+            $('input[name="' + this.name + '"]').not(this).prop('checked', false);
+            var documentType = $(this).val();
+            if(documentType == 'Proforma'){
+                $('#advance-amount-div').attr('hidden', false);
+            }else{
+                $('#advance-amount').val( );
+                $('#advance-amount-div').attr('hidden', true);
+            }
+        });
     </script>
 <script>
     $(document).ready(function() {
@@ -1109,7 +1162,7 @@
                 data: null,
                 render: function (data, type, row) {
 
-                    return '<input type="number" min="0"  value="1" class="qty-editable form-control" name="quantities[]" id="quantity-'+ row['index'] +'" />';
+                    return '<input type="number" min="0"  value="1" class="qty-editable form-control" required name="quantities[]" id="quantity-'+ row['index'] +'" />';
                 }
             },
             {
@@ -1155,10 +1208,8 @@
 
                         combinedValue =  row[0] + comma0 + row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5];
                     }
-                    else if(['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
-                        combinedValue = 'koo';
-                    }
-                    return '<input type="text" name="descriptions[]" class="combined-value-editable form-control" value="' + combinedValue + '"/>';
+
+                    return '<input type="text" name="descriptions[]" required class="combined-value-editable form-control" value="' + combinedValue + '"/>';
                 }
             },
             {
@@ -1195,7 +1246,7 @@
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         var price = row[4];
                     }
-                    return '<input type="number" min="0" name="prices[]" class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>';
+                    return '<input type="number" min="0" name="prices[]" required class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>';
                 }
             }
         ]
@@ -1343,22 +1394,19 @@
 
             var brand = $('#brand option:selected').val();
             if(brand != "") {
-                row['id'] = brand;
-                // add any button type if id is brand
-                row['model_type'] = 'Brand';
+
                 var brand = $('#brand option:selected').text();
             }
             var modelLine = $('#model_line option:selected').val();
             if(modelLine != "") {
                 row['id'] = modelLine;
                 row['model_type'] = 'ModelLine';
-
                 var modelLine = $('#model_line option:selected').text();
+            }else{
+                alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
             }
             var variant = $("#variant option:selected").val();
             if(variant != "") {
-                row['id'] = variant;
-                row['model_type'] = 'Variant';
 
                 var variant = $('#variant option:selected').text();
 
@@ -1391,15 +1439,17 @@
             }
             var modelLine = $('#accessories_model_line option:selected').val();
             if(modelLine != "") {
-
+                row['id'] = modelLine;
+                row['model_type'] = 'ModelLine';
                 var modelLine = $('#accessories_model_line option:selected').text();
 
+            }else{
+                alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
             }
         }else if(tableType == 'spare-part-table') {
 
             var addon =  $('#spare_parts_addon option:selected').val();
             if(addon != "") {
-
                 var addon = $('#spare_parts_addon option:selected').text();
 
             }
@@ -1410,8 +1460,12 @@
             }
             var modelLine = $('#spare_parts_model_line option:selected').val();
             if(modelLine != "") {
+                row['id'] = modelLine;
+                row['model_type'] = 'ModelLine';
 
                 var modelLine = $('#spare_parts_model_line option:selected').text();
+            }else{
+                alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
             }
             var modelNumber = $('#spare_parts_model_description option:selected').val();
             if(modelNumber != "") {
@@ -1435,8 +1489,12 @@
             }
             var modelLine = $('#kit_model_line option:selected').val();
             if(modelLine != "") {
-
+                row['id'] = modelLine;
+                row['model_type'] = 'ModelLine';
                 var modelLine = $('#kit_model_line option:selected').text();
+
+            }else{
+                alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
 
             }
             var modelNumber = $('#kit_model_description option:selected').val();
@@ -1457,7 +1515,9 @@
         row.push(variant);
         row['button_type'] = 'Direct-Add';
         row['index'] = index;
-        table.row.add(row).draw();
+        if(modelLine != "") {
+            table.row.add(row).draw();
+        }
 
     });
     $(document).on('click', '.add-button', function() {

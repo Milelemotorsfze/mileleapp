@@ -174,7 +174,7 @@ Route::get('/d', function () {
     Route::get('getPartNumbers', [KitCommonItemController::class, 'getPartNumbers'])->name('getPartNumbers');
     Route::post('kit/items/store', [KitCommonItemController::class, 'storeKitItems'])->name('kitItems.store');
     Route::get('purchasePriceHistory/{id}', [KitCommonItemController::class, 'purchasePriceHistory'])->name('kit.purchasePriceHistory');
-    
+
 
     // Warranty
     Route::resource('warranty', WarrantyController::class);
@@ -316,7 +316,7 @@ Route::get('/d', function () {
     Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');
     Route::get('quotation-data/get-model-line', [QuotationController::class,'getmodelline'])->name('quotation.get-model-line');
     Route::get('quotation-data/get-sub-model', [QuotationController::class,'getsubmodel'])->name('quotation.get-sub-model');
-    Route::resource('quotation', QuotationController::class);
+    Route::resource('quotation-items', QuotationController::class);
     Route::post('quotation-data/vehicles-insert', [QuotationController::class,'addvehicles'])->name('quotation.vehicles-insert');
     Route::get('/get-vehicle-count/{userId}', function($userId) {
     $count = DB::table('vehiclescarts')->where('created_by', $userId)->count();
@@ -548,5 +548,5 @@ Route::get('/d', function () {
     Route::resource('Shipping', ShippingController::class);
     Route::post('shipping/updateprice', [ShippingController::class, 'updateprice'])->name('shipping.updateprice');
 
-  
+
     });
