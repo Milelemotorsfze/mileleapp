@@ -10,4 +10,8 @@ class ShippingCertification extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'shipping_certification';
+    public function quotationItems()
+    {
+        return $this->morphMany('App\QuotationItem', 'reference');
+    }
 }

@@ -29,7 +29,6 @@ class LOIItemsController extends Controller
     public function create(Request $request)
     {
         $letterOfIndent = LetterOfIndent::find($request->id);
-
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $letterOfIndent->id)
                     ->get();
 

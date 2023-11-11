@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AddonDetails;
+use App\Models\OtherLogisticsCharges;
 use App\Models\quotation;
 use App\Models\Calls;
 use App\Models\Brand;
 use App\Models\QuotationItem;
+use App\Models\Shipping;
+use App\Models\ShippingCertification;
+use App\Models\ShippingDocuments;
 use App\Models\Varaint;
 use App\Models\Vehicles;
 use App\Models\Vehiclescarts;
 use App\Models\MasterModelLines;
 use App\Models\CartAddon;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -48,6 +55,16 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
+
+        $quotation = QuotationItem::where('quotation_id', 12)->first();
+
+       $vehicles =  QuotationItem::where("reference_type", 'App\Models\Vehicles')->get();
+
+//       dd($vehicles);
+//        return view('proforma.proforma_invoice', compact('quotation'));
+        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','vehicles'));
+
+        return $pdfFile->stream("Halloa.pdf");
 //        dd($request->all());
         DB::beginTransaction();
 
@@ -59,26 +76,49 @@ class QuotationController extends Controller
 
         $quotation->save();
 
-
         foreach ($request->prices as $key => $price) {
            $quotationItem = new QuotationItem();
            $quotationItem->unit_price = $price;
            $quotationItem->quantity = $request->quantities[$key];
+           $quotationItem->description = $request->descriptions[$key];
            $quotationItem->total_amount = $request->total_amounts[$key];
            $quotationItem->quotation_id = $quotation->id;
            $quotationItem->created_by = Auth::id();
-           $quotationItem->reference_id = $request->reference_ids[$key];
 
-//           if($request->types[$key] == 'Shipping') {
-//               $quotationItem->reference_type =  QuotationItem::getMorphedModel($request->types[$key]);
-//
-//           }
+           if($request->types[$key] == 'Shipping') {
+
+               $item = Shipping::find($request->reference_ids[$key]);
+
+           }else if($request->types[$key] == 'Certification') {
+
+               $item = ShippingCertification::find($request->reference_ids[$key]);
+
+           }else if($request->types[$key] == 'Shipping-Document') {
+
+               $item = ShippingDocuments::find($request->reference_ids[$key]);
+
+           }else if($request->types[$key] == 'Vehicle') {
+//               pass the variant
+               $item = Vehicles::find($request->reference_ids[$key]);
+
+           }else if($request->types[$key] == 'Other') {
+
+               $item = OtherLogisticsCharges::find($request->reference_ids[$key]);
+
+           }else if($request->types[$key] == 'Accessory' || $request->types[$key] == 'SparePart' || $request->types[$key] == 'Kit') {
+
+               $item = AddonDetails::find($request->reference_ids[$key]);
+
+           }
+            $quotationItem->reference()->associate($item);
+
            $quotationItem->save();
 
         }
+
         DB::commit();
 
-        return redirect()->back();
+        return $pdfFile;
     }
 
     /**
