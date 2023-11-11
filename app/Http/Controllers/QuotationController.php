@@ -55,13 +55,10 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
-//        $quotation = Quotation::find(13);
-
-
+//        return dd($request->all());
         DB::beginTransaction();
 
         $quotation = new Quotation();
-        $quotation->calls_id = 4;
         $quotation->deal_value = $request->deal_value;
         $quotation->sales_notes = $request->remarks;
         $quotation->created_by = Auth::id();
@@ -91,12 +88,14 @@ class QuotationController extends Controller
                $item = ShippingDocuments::find($request->reference_ids[$key]);
 
            }else if($request->types[$key] == 'Vehicle') {
-//               pass the variant
                $item = Vehicles::find($request->reference_ids[$key]);
 
            }else if($request->types[$key] == 'Other') {
 
                $item = OtherLogisticsCharges::find($request->reference_ids[$key]);
+
+           }else if($request->types[$key] == 'ModelLine') {
+               $item = MasterModelLines::find($request->reference_ids[$key]);
 
            }else if($request->types[$key] == 'Accessory' || $request->types[$key] == 'SparePart' || $request->types[$key] == 'Kit') {
 
@@ -111,6 +110,10 @@ class QuotationController extends Controller
 
         $vehicles =  QuotationItem::where("reference_type", 'App\Models\Vehicles')
             ->where('quotation_id', $quotation->id)->get();
+
+        $variants = QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
+            ->where('quotation_id', $quotation->id)->get();
+
         $addons = QuotationItem::where('reference_type','App\Models\AddonDetails')
             ->where('quotation_id', $quotation->id)->get();
         $shippingCharges = QuotationItem::where('reference_type','App\Models\Shipping')
@@ -124,7 +127,15 @@ class QuotationController extends Controller
 //        return view('proforma.proforma_invoice', compact('quotationItem','quotation',
 //            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications'));
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotationItem','quotation',
-            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications'));
+            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants'));
+
+        $filename = 'quotation_'.$quotation->id.'.pdf';
+        $quotation->file_path = $filename;
+        $quotation->save();
+
+        $directory = public_path('Quotations');
+        \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+        $pdfFile->save($directory . '/' . $filename);
 
         return $pdfFile->stream("Halloa.pdf");
 
