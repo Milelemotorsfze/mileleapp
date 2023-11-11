@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\Masters\MasterJobPositionController;
 use App\Http\Controllers\HRM\Hiring\EmployeeHiringRequestController;
 use App\Http\Controllers\HRM\Hiring\EmployeeHiringQuestionnaireController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -220,7 +220,9 @@ Route::get('/d', function () {
     });
 
     // HRM Module
-
+    // Masters
+    // Master Job Position
+    Route::resource('master-job-position', MasterJobPositionController::class);
     // Employee Hiring Requset
     Route::resource('employee-hiring-request', EmployeeHiringRequestController::class);
     // Employee Hiring Questionnaire
