@@ -37,7 +37,7 @@ class QuotationController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-{
+    {
     $latestQuotation = quotation::where('created_by', auth()->user()->id)
                     ->latest()
                     ->first();
@@ -49,23 +49,34 @@ class QuotationController extends Controller
             $vehicles_id = Vehiclescarts::where('created_by', auth()->user()->id)->pluck('vehicle_id');
             $items = Vehicles::whereIn('id', $vehicles_id)->get();
     return view('quotation.add_new', compact('data', 'countries', 'items', 'vehicles_id'));
-}
+    }
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
+        $quotation = Quotation::find(13);
+        $quotationItem = QuotationItem::where('quotation_id', $quotation->id)->first();
 
-        $quotation = QuotationItem::where('quotation_id', 12)->first();
-
-       $vehicles =  QuotationItem::where("reference_type", 'App\Models\Vehicles')->get();
-
-//       dd($vehicles);
-//        return view('proforma.proforma_invoice', compact('quotation'));
-        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','vehicles'));
+        $vehicles =  QuotationItem::where("reference_type", 'App\Models\Vehicles')
+            ->where('quotation_id', $quotation->id)->get();
+        $addons = QuotationItem::where('reference_type','App\Models\AddonDetails')
+            ->where('quotation_id', $quotation->id)->get();
+        $shippingCharges = QuotationItem::where('reference_type','App\Models\Shipping')
+            ->where('quotation_id', $quotation->id)->get();
+        $shippingDocuments = QuotationItem::where('reference_type','App\Models\ShippingDocuments')
+            ->where('quotation_id', $quotation->id)->get();
+        $otherDocuments = QuotationItem::where('reference_type','App\Models\OtherLogisticsCharges')
+            ->where('quotation_id', $quotation->id)->get();
+        $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
+            ->where('quotation_id', $quotation->id)->get();
+//        return view('proforma.proforma_invoice', compact('quotationItem','quotation',
+//            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications'));
+        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotationItem','quotation',
+            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications'));
 
         return $pdfFile->stream("Halloa.pdf");
-//        dd($request->all());
+
         DB::beginTransaction();
 
         $quotation = new Quotation();
@@ -73,6 +84,7 @@ class QuotationController extends Controller
         $quotation->deal_value = $request->deal_value;
         $quotation->sales_notes = $request->remarks;
         $quotation->created_by = Auth::id();
+        $quotation->calls_id = $request->calls_id;
 
         $quotation->save();
 
@@ -111,14 +123,13 @@ class QuotationController extends Controller
 
            }
             $quotationItem->reference()->associate($item);
-
-           $quotationItem->save();
+            $quotationItem->save();
 
         }
-
         DB::commit();
 
-        return $pdfFile;
+
+
     }
 
     /**

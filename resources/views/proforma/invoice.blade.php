@@ -319,7 +319,7 @@
                     <label class="fw-bold font-size-16">Total :</label>
                 </div>
                 <div class="col-lg-2">
-{{--                    <label class="fw-bold font-size-16 ">Total :</label>--}}
+                    <input type="hidden" value="{{ $callDetails->id }}" name="calls_id" >
                     <input type="number" readonly id="total" name="deal_value" placeholder="Total Amount" class="fw-bold form-control " value="">
                 </div>
             </div>

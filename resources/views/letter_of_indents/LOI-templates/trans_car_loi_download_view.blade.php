@@ -135,7 +135,6 @@
             <td class="bg-light-grey"> </td>
             <td class="bg-light-grey"></td>
             <td class="bg-light-grey"></td>
-
         </tr>
     </table>
     <div class="row">
