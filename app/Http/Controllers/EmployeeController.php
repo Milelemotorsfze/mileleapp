@@ -10,4 +10,9 @@ class EmployeeController extends Controller
     {
         return view('hrm.employee_relation.dashboard');
     }
+
+    public function create()
+    {
+        return view('hrm.employee_relation.createchecklistform');
+    }
 }

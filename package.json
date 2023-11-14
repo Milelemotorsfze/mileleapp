@@ -1,32 +1,36 @@
 {
-  "private": true,
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build"
-  },
-  "devDependencies": {
-    "@popperjs/core": "^2.11.6",
-    "axios": "^1.4.0",
-    "bootstrap": "^5.2.3",
-    "laravel-vite-plugin": "^0.7.2",
-    "sass": "^1.56.1",
-    "vite": "^4.0.0"
-  },
-  "name": "mileleapp",
-  "description": "Milele Web App ..",
-  "version": "1.0.0",
-  "main": "vite.config.js",
-  "directories": {
-    "test": "tests"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "daterangepicker": "^3.1.0",
-    "laravel-echo": "^1.15.3",
-    "moment": "^2.29.4",
-    "pusher-js": "^8.3.0",
-    "selectize": "^0.12.6"
-  }
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "@popperjs/core": "^2.11.6",
+        "@vitejs/plugin-react": "^4.1.0",
+        "axios": "^1.4.0",
+        "bootstrap": "^5.2.3",
+        "laravel-vite-plugin": "^0.7.2",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "sass": "^1.56.1",
+        "vite": "^4.5.0"
+    },
+    "name": "mileleapp",
+    "description": "Milele Web App ..",
+    "version": "1.0.0",
+    "main": "vite.config.js",
+    "directories": {
+        "test": "tests"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@inertiajs/react": "^1.0.14",
+        "daterangepicker": "^3.1.0",
+        "laravel-echo": "^1.15.3",
+        "moment": "^2.29.4",
+        "pusher-js": "^8.3.0",
+        "selectize": "^0.12.6"
+    }
 }
