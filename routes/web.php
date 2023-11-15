@@ -234,7 +234,11 @@ Route::get('/d', function () {
     
     // Employee Hiring Questionnaire
     Route::resource('employee-hiring-questionnaire', EmployeeHiringQuestionnaireController::class);
-
+    Route::controller(EmployeeHiringQuestionnaireController::class)->group(function(){
+        Route::get('employee-hiring-questionnaire/createnew/{id}', 'create')->name('employee-hiring-questionnaire.createnew');
+    });
+    
+    
 
 
     // Demand & Planning Module
