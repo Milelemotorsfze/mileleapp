@@ -199,7 +199,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 @if ($hasPermission)
 <div class="card-header">
 	<h4 class="card-title">Employee Hiring Request Form</h4>
-	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee-hiring-request.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
 	@if (count($errors) > 0)
@@ -212,7 +212,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 		</ul>
 	</div>
 	@endif
-	<form id="employeeHiringRequestForm" name="employeeHiringRequestForm" enctype="multipart/form-data" method="POST">
+	<form id="employeeHiringRequestForm" name="employeeHiringRequestForm" enctype="multipart/form-data" method="POST" action="{{route('employee-hiring-request.store')}}">
 		@csrf
 		<div class="row">
 			<div class="col-xxl-2 col-lg-6 col-md-6">
@@ -302,7 +302,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 						<span class="error">* </span>
 						<label for="salary_range" class="col-form-label text-md-end">{{ __('Salary Range') }}</label>
 						<div class="input-group">
-							<input name="salary_range_start_in_aed" id="salary_range_start_in_aed" onkeyup="" oninput="inputNumberAbs(this)"
+							<input name="salary_range_start_in_aed" id="salary_range_start_in_aed"
 								class="form-control widthinput" placeholder="Enter Salary Range Start"
 								 aria-label="measurement" aria-describedby="basic-addon2">
 							<div class="input-group-append">
@@ -313,7 +313,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 					</div>
 					<div class="col-xxl-2 col-lg-6 col-md-6" style="padding-top:38px;">
 						<div class="input-group">
-							<input name="salary_range_end_in_aed" id="salary_range_end_in_aed" onkeyup="" oninput="inputNumberAbs(this)"
+							<input name="salary_range_end_in_aed" id="salary_range_end_in_aed"
 								class="form-control widthinput" placeholder="Enter Salary Range End"
 								aria-label="measurement" aria-describedby="basic-addon2">
 							<div class="input-group-append">
@@ -598,10 +598,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
                 required: true,
             },
         },
-        submitHandler: function (form) { // for demo
-            alert('valid form submitted'); // for demo
-            return false; // for demo
-        }
+        // submitHandler: function (form) { // for demo
+        //     // alert('valid form submitted'); // for demo
+        //     // return false; // for demo
+		// 	// This function will be called when the form is submitted and passes validation
+		// 	// var trade_name_or_individual_name = $('#trade_name_or_individual_name').val();
+		// 	$.ajax({
+		// 		url: '{{route("employee-hiring-request.store")}}',
+		// 		type: 'POST',
+		// 		data: {
+		// 			'_token': '{{ csrf_token() }}',
+		// 			// 'trade_name_or_individual_name': trade_name_or_individual_name
+		// 		},
+		// 		success: function(response) {
+		// 			// if (response.exists) {
+		// 			// 	alert("Name Already Existing");
+		// 			// } else {
+		// 			// 	form.submit();
+		// 			// }
+		// 		},
+		// 		// error: function(xhr) {
+		// 		// 	if (xhr.status === 422) {
+		// 		// 		alert("Name Already Existing");
+		// 		// 	}
+		// 		// }
+		// 	});
+        // }
     });
 	
 	// $("#employeeHiringRequestForm").validate({

@@ -12,7 +12,7 @@ class MasterDivisionWithHead extends Model
     protected $fillable = [
         'name',
         'division_head_id',
-        'number_of_year_of_experience',
+        'status',
         'created_by',
         'updated_by',
         'deleted_by'

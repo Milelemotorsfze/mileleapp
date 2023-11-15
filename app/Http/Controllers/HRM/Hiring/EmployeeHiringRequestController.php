@@ -1,24 +1,218 @@
 <?php
 
 namespace App\Http\Controllers\HRM\Hiring;
-
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Masters\MasterDeparment;
 use App\Models\Masters\MasterExperienceLevel;
 use App\Models\Masters\MasterJobPosition;
 use App\Models\Masters\MasterOfficeLocation;
+use App\Models\HRM\Hiring\EmployeeHiringRequest;
+use App\Models\HRM\Hiring\EmployeeHiringRequestHistory;
+use App\Models\HRM\Approvals\DepartmentHeadApprovals;
+use App\Models\HRM\Approvals\ApprovalByPositions;
+use App\Models\User;
+use Validator;
+use DB;
+use Exception;
+use Carbon\Carbon;
+use App\Http\Controllers\UserActivityController;
 
 class EmployeeHiringRequestController extends Controller
 {
     public function index() {
-        return view('hrm.hiring.hiring_request.index');
+        $page = 'listing';
+        $pendings = EmployeeHiringRequest::where('status','pending')->latest()->get();
+        $approved = EmployeeHiringRequest::where('status','approved')->latest()->get();
+        $rejected = EmployeeHiringRequest::where('status','rejected')->latest()->get();
+        return view('hrm.hiring.hiring_request.index',compact('pendings','approved','rejected','page'));
     }
     public function create() {
         $masterdepartments = MasterDeparment::where('status','active')->select('id','name')->get();
-        $masterExperienceLevels = MasterExperienceLevel::where('status','active')->select('id','name')->get();
+        $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
         $masterJobPositions = MasterJobPosition::where('status','active')->select('id','name')->get();
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name')->get();
-        return view('hrm.hiring.hiring_request.create',compact('masterdepartments','masterExperienceLevels','masterJobPositions','masterOfficeLocations'));
+        $requestedByUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
+        $reportingToUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
+        $replacementForEmployees = User::whereNotIn('id',['1','16'])->select('id','name')->get();
+        return view('hrm.hiring.hiring_request.create',compact('masterdepartments','masterExperienceLevels','masterJobPositions','masterOfficeLocations',
+            'requestedByUsers','reportingToUsers','replacementForEmployees'));
+    }
+    public function store(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'request_date' => 'required',
+            'department_id' => 'required',
+            'location_id' => 'required',
+            'requested_by' => 'required',
+            'requested_job_title' => 'required',
+            'reporting_to' => 'required',
+            'experience_level' => 'required',
+            'salary_range_start_in_aed' => 'required',
+            'salary_range_end_in_aed' => 'required',
+            'work_time_start' => 'required',
+            'reporting_to' => 'required',
+            'work_time_end' => 'required',
+            'number_of_openings' => 'required',
+            'type_of_role' => 'required',
+            'explanation_of_new_hiring' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $authId = Auth::id();
+                $departmentHead = DepartmentHeadApprovals::where('department_id',$request->department_id)->first();
+                $hiringManager = ApprovalByPositions::where('approved_by_position','Hiring Manager')->first();
+                $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                $input = $request->all();
+                $input['created_by'] = $authId;
+                $input['hiring_manager_id'] = $hiringManager->handover_to_id;
+                $input['department_head_id'] = $departmentHead->approval_by_id;
+                $input['hr_manager_id'] = $HRManager->handover_to_id;
+                $createRequest = EmployeeHiringRequest::create($input);
+                $history['hiring_request_id'] = $createRequest->id;
+                $history['icon'] = 'icons8-document-30.png';
+                $history['message'] = 'Employee hiring request created by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
+                $createHistory = EmployeeHiringRequestHistory::create($history);
+                $history2['hiring_request_id'] = $createRequest->id;
+                $history2['icon'] = 'icons8-send-30.png';
+                $history2['message'] = 'Employee hiring request send to '.$hiringManager->approved_by_position_name.' ( '.$hiringManager->handover_to_name.' - '.$hiringManager->handover_to_email.' ) for approval';
+                // $history2['message'] = 'Employee hiring request send to '.$departmentHead->department_name.' ( '.$departmentHead->approval_by_name.' - '.$departmentHead->approval_by_email.' ) for approval';
+                $createHistory2 = EmployeeHiringRequestHistory::create($history2);
+                (new UserActivityController)->createActivity('New Employee Hiring Request Created');
+                DB::commit();
+                return redirect()->route('employee-hiring-request.index')
+                                    ->with('success','New Employee Hiring Request Created Successfully');
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+            }
+        }
+    }
+    public function show($id) {
+        $data = EmployeeHiringRequest::where('id',$id)->with('history')->first();
+        $previous = EmployeeHiringRequest::where('id', '<', $id)->max('id');
+        $next = EmployeeHiringRequest::where('id', '>', $id)->min('id');
+        return view('hrm.hiring.hiring_request.show',compact('data','previous','next'));
+    }
+    public function approvalAwaiting(Request $request) {
+        $authId = Auth::id();
+        $page = 'approval';
+        $hiringManager = $HRManager = '';
+        $deptHead = $pendings = $approved = $rejected = [];
+        $hiringManager = ApprovalByPositions::where([
+            ['approved_by_position','Hiring Manager'],
+            ['handover_to_id',$authId]
+        ])->first();
+        $deptHead = DepartmentHeadApprovals::where([
+            ['approval_by_id',$authId],
+        ])->pluck('department_id');
+        $HRManager = ApprovalByPositions::where([
+            ['approved_by_position','HR Manager'],
+            ['handover_to_id',$authId]
+        ])->first();
+        if($hiringManager) {
+            $pendings = EmployeeHiringRequest::where([
+                ['action_by_hiring_manager','pending'],
+                ['hiring_manager_id',$authId],
+                ])->latest()->get();
+            $approved = EmployeeHiringRequest::where([
+                ['action_by_hiring_manager','approved'],
+                ['hiring_manager_id',$authId],
+                ])->latest()->get();
+            $rejected = EmployeeHiringRequest::where([
+                ['action_by_hiring_manager','rejected'],
+                ['hiring_manager_id',$authId],
+                ])->latest()->get();
+        }
+        else if(count($deptHead) > 0) {
+            $pendings = EmployeeHiringRequest::where([
+                ['action_by_hiring_manager','approved'],
+                ['action_by_department_head','pending'],
+                ['department_head_id',$authId],
+                ])->latest()->get();
+            $approved = EmployeeHiringRequest::where([
+                ['action_by_hiring_manager','approved'],
+                ['action_by_department_head','pending'],
+                ['department_head_id',$authId],
+                ])->latest()->get();
+            $rejected = EmployeeHiringRequest::where([
+                ['action_by_hiring_manager','approved'],
+                ['action_by_department_head','pending'],
+                ['department_head_id',$authId],
+                ])->latest()->get();
+        }
+        else if($HRManager) {
+            $pendings = EmployeeHiringRequest::where([
+                ['action_by_hiring_manager','approved'],
+                ['action_by_department_head','approved'],
+                ['action_by_hr_manager','pending'],
+                ['hr_manager_id',$authId],
+                ])->latest()->get();
+            $approved = EmployeeHiringRequest::where([
+                ['action_by_hiring_manager','approved'],
+                ['action_by_department_head','approved'],
+                ['action_by_hr_manager','pending'],
+                ['hr_manager_id',$authId],
+                ])->latest()->get();
+            $rejected = EmployeeHiringRequest::where([
+                ['action_by_hiring_manager','approved'],
+                ['action_by_department_head','approved'],                
+                ['action_by_hr_manager','pending'],
+                ['hr_manager_id',$authId],
+                ])->latest()->get();
+        }
+        return view('hrm.hiring.hiring_request.index',compact('pendings','approved','rejected','page'));
+    }
+    public function requestAction(Request $request) {
+        $message = '';
+        $update = EmployeeHiringRequest::where('id',$request->id)->first();
+        if($request->current_approve_position == 'Hiring Manager') {
+            $update->comments_by_hiring_manager = $request->comment;
+            $update->hiring_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->action_by_hiring_manager = $request->status;
+            if($request->status == 'approved') {
+                $update->action_by_department_head = 'pending';
+                $message = 'Employee hiring request send to Department Head ( '.$update->department_head_name.' - '.$update->department_head_email.' ) for approval';
+            }
+        }
+        else if($request->current_approve_position == 'Department Head') {
+            $update->comments_by_department_head = $request->comment;
+            $update->department_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->action_by_department_head = $request->status;
+            if($request->status == 'approved') {
+                $update->action_by_hr_manager = 'pending';
+                $message = 'Employee hiring request send to HR Manager ( '.$update->hr_manager_name.' - '.$update->hr_manager_email.' ) for approval';
+            }
+        }
+        else if($request->current_approve_position == 'HR Manager') {
+            $update->comments_by_hr_manager = $request->comment;
+            $update->hr_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->action_by_hr_manager = $request->status;
+            if($request->status == 'approved') {
+                $update->status = 'approved';
+            }
+        }
+        $update->update();
+        $history['hiring_request_id'] = $request->id;
+        if($request->status == 'approved') {
+            $history['icon'] = 'icons8-thumb-up-30.png';
+        }
+        else if($request->status == 'rejected') {
+            $history['icon'] = 'icons8-thumb-down-30.png';
+        }
+        $history['message'] = 'Employee hiring request '.$request->status.' by '.$request->current_approve_position.' ( '.Auth::user()->name.' - '.Auth::user()->email.' )';
+        $createHistory = EmployeeHiringRequestHistory::create($history);  
+        if($request->status == 'approved' && $message != '') {
+            $history['icon'] = 'icons8-send-30.png';
+            $history['message'] = $message;
+            $createHistory = EmployeeHiringRequestHistory::create($history);
+        }
+        (new UserActivityController)->createActivity($history['message']);
+        return response()->json('success');
+        // ,'New Employee Hiring Request '.$request->status.' Successfully'
     }
 }

@@ -227,6 +227,11 @@ Route::get('/d', function () {
     Route::resource('master-job-position', MasterJobPositionController::class);
     // Employee Hiring Requset
     Route::resource('employee-hiring-request', EmployeeHiringRequestController::class);
+    Route::controller(EmployeeHiringRequestController::class)->group(function(){
+        Route::get('employee-hiring-request-approval-awaiting', 'approvalAwaiting')->name('employee-hiring-request.approval-awaiting');
+        Route::post('employee-hiring-request/request-action', 'requestAction')->name('employee-hiring-request.request-action');
+    });
+    
     // Employee Hiring Questionnaire
     Route::resource('employee-hiring-questionnaire', EmployeeHiringQuestionnaireController::class);
 

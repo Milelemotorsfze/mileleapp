@@ -4,7 +4,8 @@ namespace App\Models\HRM\Approvals;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Masters\MasterJobPosition;
+use App\Models\User;
 class ApprovalByPositions extends Model
 {
     use HasFactory;
@@ -18,4 +19,23 @@ class ApprovalByPositions extends Model
         'updated_by',
         'deleted_by'
     ];
+    protected $appends = [
+        'approved_by_position_name',
+        'handover_to_name',
+        'handover_to_email'
+    ];
+    public function getApprovedByPositionNameAttribute() {
+        $approvedByPositionName = $this->approved_by_position;
+        return $approvedByPositionName;
+    }
+    public function getHandoverToNameAttribute() {
+        $handoverTo = User::find($this->handover_to_id);
+        $handoverToName = $handoverTo->name;
+        return $handoverToName;
+    }
+    public function gethandoverToEmailAttribute() {
+        $handoverToEmail = User::find($this->handover_to_id);
+        $handoverToEmailName = $handoverToEmail->email;
+        return $handoverToEmailName;
+    }
 }
