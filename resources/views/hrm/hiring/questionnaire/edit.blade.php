@@ -73,7 +73,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-    <h4 class="card-title">Create Questionnaire Form</h4>
+    <h4 class="card-title">Edit Questionnaire Form</h4>
     <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
@@ -769,6 +769,7 @@ redirect()->route('home')->send();
                 $('.amountPercentageInputContainer').hide();
             }
         });
+
     });
 </script>
 

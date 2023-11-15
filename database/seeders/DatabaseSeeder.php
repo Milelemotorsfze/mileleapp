@@ -32,7 +32,8 @@ class DatabaseSeeder extends Seeder
         // $this->call(StrategySeeder::class);
 //         $this->call(KitSeeder::class);
         // $this->call(BrandRegionsSeeder::class);
-        $this->call(PermissionSettingSeeder::class);
+//        $this->call(PermissionSettingSeeder::class);
+        $this->call(SettingsSeeder::class);
 
 
 

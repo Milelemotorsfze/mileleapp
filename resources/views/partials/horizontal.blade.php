@@ -81,6 +81,11 @@
                                         <div class="arrow-down"></div>
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="topnav-more">
+
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee.index') }}"  id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Employee Relation</span>
+                                        </a>
+
                                         <!-- @canany(['warranty-create', 'warranty-list'])
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create','warranty-list']);
@@ -1149,4 +1154,3 @@
         });
     });
 </script>
-

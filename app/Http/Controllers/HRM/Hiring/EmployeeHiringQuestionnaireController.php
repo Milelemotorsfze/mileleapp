@@ -13,4 +13,8 @@ class EmployeeHiringQuestionnaireController extends Controller
     public function create() {
         return view('hrm.hiring.questionnaire.create');
     }
+    public function edit() {
+        return view('hrm.hiring.questionnaire.edit');
+    }
 }
+ 

@@ -70,267 +70,309 @@
 	<br>
 </div>
 <div class="card-body">
-	<div class="row">
-		<div class="col-sm-4">
-			Document Details
-		</div>
-		<div class="col-sm-4">
-			Client's Details
-		</div>
-		<div class="col-sm-4">
-			Delivery Details
-		</div>
-	</div>
-	<hr>
-	<div class="row">
-		<div class="col-sm-4">
-			<div class="row">
-				<div class="col-sm-6">
-					Document No :
-				</div>
-				<div class="col-sm-6">
-					{{$callDetails->id}}
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					<label for="timeRange">Document Validity:</label>
-				</div>
-				<div class="col-sm-6">
-					<select id="timeRange">
-						<option value="1">1 day</option>
-						<option value="7">7 days</option>
-						<option value="14">14 days</option>
-						<option value="30">30 days</option>
-						<option value="60">60 days</option>
-					</select>
-				</div>
-			</div>
-			@php
-			$user = Auth::user();
-			$empProfile = $user->empProfile;
-			@endphp
-			<div class="row">
-				<div class="col-sm-6">
-					Sales Person :
-				</div>
-				<div class="col-sm-6">
-					{{ Auth::user()->name }}
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Sales Office :
-				</div>
-				<div class="col-sm-6">
-					{{ $empProfile->office }}
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Sales Email ID :
-				</div>
-				<div class="col-sm-6">
-					{{ Auth::user()->email }}
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Sales Contact No :
-				</div>
-				<div class="col-sm-6">
-					{{ $empProfile->phone }}
-				</div>
-			</div>
-		</div>
-		<div class="col-sm-4">
-			<div class="row">
-				<div class="col-sm-6">
-					Customer ID :
-				</div>
-				<div class="col-sm-6">
-					{{ $empProfile->id }}
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Company :
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="company" id="company">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					<label for="timeRange">Person :</label>
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="name" id="name" value="{{$callDetails->name}}">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Contact No :
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="phone_number" id="phone_number" value="{{$callDetails->phone}}">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Email :
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="email" id="email" value="{{$callDetails->email}}">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Address :
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="address" id="address">
-				</div>
-			</div>
-		</div>
-		<div class="col-sm-4">
-			<div class="row">
-				<div class="col-sm-6">
-					Final Destination :
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="address" id="address">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Incoterm :
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="address" id="address">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Place of Delivery :
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="address" id="address">
-				</div>
-			</div>
-		</div>
-	</div>
-	<hr>
-	<div class="row">
-		<div class="col-sm-4">
-			Payment Details
-		</div>
-		<div class="col-sm-8">
-			Client's Representative
-		</div>
-	</div>
-	<hr>
-	<div class="row">
-		<div class="col-sm-4">
-			<div class="row">
-				<div class="col-sm-6">
-					System Code :
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="address" id="address">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Payment Terms :
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="address" id="address">
-				</div>
-			</div>
-		</div>
-		<div class="col-sm-4">
-			<div class="row">
-				<div class="col-sm-6">
-					Rep Name :
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="address" id="address">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Rep No :
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="address" id="address">
-				</div>
-			</div>
-		</div>
-		<div class="col-sm-4">
-			<div class="row">
-				<div class="col-sm-6">
-					CB Name :
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="address" id="address">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					CB No :
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="address" id="address">
-				</div>
-			</div>
-		</div>
-	</div>
-	<br>
-
     <form action="{{ route('quotation-items.store') }}" id="form-create" method="POST" >
         @csrf
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="mb-3">
+                    <label class="col-form-label fw-bold">{{ __('Document Type:') }}</label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input document_type" type="checkbox" name="document_type" id="inlineCheckbox1" value="Quotation" checked>
+                        <label class="form-check-label" for="inlineCheckbox1">Quotation</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input document_type" type="checkbox" name="document_type" id="inlineCheckbox2" value="Proforma">
+                        <label class="form-check-label" for="inlineCheckbox2">Proforma Invoice</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="mb-3">
+                    <label class="col-form-label fw-bold">{{ __('Shipping Method:') }}</label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
+                               name="shipping_method" id="CNF" value="CNF" >
+                        <label class="form-check-label" for="CNF">CNF</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
+                               name="shipping_method" id="EXW" value="EXW" checked>
+                        <label class="form-check-label" for="EXW">EXW</label>
+                    </div>
+                </div>
+                @error('shipping_method')
+                <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                </span>
+                @enderror
+            </div>
+            <div class="col-lg-1 col-md-6 col-sm-12">
+                <label class="form-label">Currency</label>
+            </div>
+            <div class="col-lg-2 col-md-6 col-sm-12">
+                <select class="form-select" name="currency" id="currency">
+                    <option>AED</option>
+                    <option>USD</option>
+                    <option>EUR</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                Document Details
+            </div>
+            <div class="col-sm-4">
+                Client's Details
+            </div>
+            <div class="col-sm-4">
+                Delivery Details
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-6">
+                        Document No :
+                    </div>
+                    <div class="col-sm-6">
+                        {{$callDetails->id}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label for="timeRange">Document Validity:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <select id="timeRange">
+                            <option value="1">1 day</option>
+                            <option value="7">7 days</option>
+                            <option value="14">14 days</option>
+                            <option value="30">30 days</option>
+                            <option value="60">60 days</option>
+                        </select>
+                    </div>
+                </div>
+                @php
+                $user = Auth::user();
+                $empProfile = $user->empProfile;
+                @endphp
+                <div class="row">
+                    <div class="col-sm-6">
+                        Sales Person :
+                    </div>
+                    <div class="col-sm-6">
+                        {{ Auth::user()->name }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        Sales Office :
+                    </div>
+                    <div class="col-sm-6">
+                        {{ $empProfile->office }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        Sales Email ID :
+                    </div>
+                    <div class="col-sm-6">
+                        {{ Auth::user()->email }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        Sales Contact No :
+                    </div>
+                    <div class="col-sm-6">
+                        {{ $empProfile->phone }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-6">
+                        Customer ID :
+                    </div>
+                    <div class="col-sm-6">
+                        {{ $empProfile->id }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        Company :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" name="company" id="company">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label for="timeRange">Person :</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" name="name" id="name" value="{{$callDetails->name}}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        Contact No :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" name="phone_number" id="phone_number" value="{{$callDetails->phone}}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        Email :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" name="email" id="email" value="{{$callDetails->email}}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        Address :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" name="address" id="address">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4" >
+                <div id="export-shipment">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            Final Destination :
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="text" name="address" id="address">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            Incoterm :
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="text" name="address" id="address">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            Place of Delivery :
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="text" name="address" id="address">
+                        </div>
+                    </div>
+                </div>
+                <div class="row" hidden id="local-shipment">
+                    <div class="col-sm-6">
+                        Place of Supply :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" name="palce_of_supply" >
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-4">
+                Payment Details
+            </div>
+            <div class="col-sm-8">
+                Client's Representative
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-6">
+                        System Code :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" name="address" id="address">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        Payment Terms :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" name="address" id="address">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-6">
+                        Rep Name :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" name="address" id="address">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        Rep No :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" name="address" id="address">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-6">
+                        CB Name :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" name="address" id="address">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        CB No :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" name="address" id="address">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4"  id="advance-amount-div" hidden>
+                <div class="row">
+                    <div class="col-sm-6">
+                        Advance Amount :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="number" min="0" class="advance-amount" name="advance_amount" id="advance-amount" >
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="row mt-2">
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-sm-2">
+                        Remarks :
+                    </div>
+                    <div class="col-sm-6">
+                        <textarea cols="40" rows="5" name="remarks" placeholder="Add Remarks" class="form-control" value=""></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
         <div class="card">
             <div class="card-header">
                 <h4>Quotation Items</h4>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-xxl-1 col-lg-1 col-md-2 col-sm-12">
-                        <label class="col-form-label fw-bold">{{ __('Document Type:') }}</label>
-                    </div>
-                    <div class="col-xxl-2 col-lg-2 col-md-4 col-sm-12 mt-2">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input " type="checkbox" name="document_type" id="inlineCheckbox1" value="Quotation" checked>
-                            <label class="form-check-label" for="inlineCheckbox1">Quotation</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="document_type" id="inlineCheckbox2" value="Proforma">
-                            <label class="form-check-label" for="inlineCheckbox2">Proforma Invoice</label>
-                        </div>
-                    </div>
-                    <div class="col-xxl-1 col-lg-1 col-md-3 col-sm-12">
-                        <label class="col-form-label fw-bold">{{ __('Shipping Method:') }}</label>
-                    </div>
-                    <div class="col-xxl-2 col-lg-2 col-md-3 col-sm-12 mt-2">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="document_type" id="CNF" value="option1" checked>
-                            <label class="form-check-label" for="CNF">CNF</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="shipping_method" id="EXW" value="option2">
-                            <label class="form-check-label" for="EXW">EXW</label>
-                        </div>
-                    </div>
-                    <div id="advance-amount-div" hidden>
-                        <div class="col-xxl-1 col-lg-1 col-md-6 col-sm-12">
-                            <label class="col-form-label fw-bold">{{ __('Advance Amount:') }}</label>
-                        </div>
-                        <div class="col-xxl-2 col-lg-2 col-md-6 col-sm-12">
-                            <input type="number" min="0" class="form-control" name="advance_amount" id="advance-amount" placeholder="Advance Amount">
-                        </div>
-                    </div>
-                </div>
                 <div class="row mt-3">
                     <div class="col-lg-12">
                         <div class="table-responsive">
@@ -353,15 +395,20 @@
                 </div>
             <br>
             <div class="row total-div" hidden>
-                <div class="col-lg-8">
-                    <textarea cols="40" rows="5" name="remarks" placeholder="Add Remarks" class="form-control" value=""></textarea>
-                </div>
-                <div class="col-lg-1 ">
-                    <label class="fw-bold font-size-16">Total :</label>
+                <div class="col-lg-9 text-end">
+                    <label class="fw-bold font-size-16">Total (AED) :</label>
                 </div>
                 <div class="col-lg-2">
                     <input type="hidden" value="{{ $callDetails->id }}" name="calls_id" >
                     <input type="number" readonly id="total" name="deal_value" placeholder="Total Amount" class="fw-bold form-control" value="">
+                </div>
+            </div>
+            <div class="row mt-2" id="selected-currency-div" hidden >
+                <div class="col-lg-9 text-end">
+                    <label class="fw-bold font-size-16">Total (<span id="selected-currency"> </span>) :</label>
+                </div>
+                <div class="col-lg-2">
+                    <input type="number" readonly id="total_in_selected_currency" name="total_in_selected_currency" placeholder="Total Amount" class="fw-bold form-control" value="">
                 </div>
             </div>
 
@@ -874,7 +921,8 @@
 
         </div>
         <br>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <input type="hidden" id="old-currency-type" value="AED">
+        <button type="submit" class="btn btn-primary" id="submit-button" disabled>Submit</button>
     </form>
 </div>
 @endsection
@@ -892,15 +940,29 @@
                 }
             });
         });
-        $('input[type="checkbox"]').on('change', function() {
+        $('input[name="document_type"]').on('change', function() {
             $('input[name="' + this.name + '"]').not(this).prop('checked', false);
             var documentType = $(this).val();
-            if(documentType == 'Proforma'){
+            if(documentType == 'Proforma') {
                 $('#advance-amount-div').attr('hidden', false);
             }else{
-                $('#advance-amount').val( );
+                $('#advance-amount').val();
                 $('#advance-amount-div').attr('hidden', true);
             }
+        });
+        $('input[name="shipping_method"]').on('change', function() {
+            $('input[name="' + this.name + '"]').not(this).prop('checked', false);
+            var shippingMethod = $(this).val();
+            if(shippingMethod == 'CNF') {
+                $('#export-shipment').attr('hidden', true);
+                $('#local-shipment').attr('hidden', false);
+
+            }else{
+                $('#export-shipment').attr('hidden', false);
+                $('#local-shipment').attr('hidden', true);
+
+            }
+            showPriceInSelectedValue();
         });
     </script>
 <script>
@@ -929,7 +991,99 @@
         $('#kit_brand').select2();
         $('#kit_model_line').select2();
         $('#kits_model_description').select2();
+        $("#form-create").validate({
+            rules: {
+                document_type: {
+                    required: {
+                        depends: function(element) {
+                            return $(".document_type:checked")
+                        }
+                    }
+                },
+                shipping_method: {
+                    required: {
+                        depends: function(element) {
+                            return $(".shipping_method:checked")
+                        }
+                    }
+                }
+            }
+        });
+        function showPriceInSelectedValue() {
+            var count = secondTable.data().length;
+            var currency = $('#currency').val();
+            if(currency != 'AED') {
+                var shippingMethod = $('.shipping_method:checked').val();
+                if(shippingMethod == 'EXW' && count > 0) {
+                    $('#selected-currency-div').attr("hidden", false);
+                    $('#selected-currency').html(currency);
 
+                }else{
+                    $('#selected-currency-div').attr("hidden", true);
+                    $('#selected-currency').html("");
+                    $('#total_in_selected_currency').val("");
+                }
+            }else{
+                $('#selected-currency-div').attr("hidden", true);
+                $('#selected-currency').html("");
+                $('#total_in_selected_currency').val(" ");
+            }
+        }
+        $('#currency').on('change', function() {
+            var currency = $(this).val();
+            showPriceInSelectedValue();
+            var oldCurrecyType = $('#old-currency-type').val();
+            if(oldCurrecyType == 'AED') {
+                if(currency == 'USD') {
+                    var value = '{{ $aed_to_usd_rate->value }}';
+                    var operand = 'Divide';
+
+                }else if(currency == 'EUR') {
+                    var value = '{{ $aed_to_eru_rate->value }}';
+                    var operand = 'Divide';
+                }
+            }else if(oldCurrecyType == 'USD') {
+                if(currency == 'AED') {
+                    var value = '{{ $aed_to_usd_rate->value }}';
+                    var operand = 'Multiply';
+
+                }else if(currency == 'EUR') {
+                    var value = '{{ $usd_to_eru_rate->value }}';
+                    var operand = 'Divide';
+
+                }
+            }
+            else if(oldCurrecyType == 'EUR') {
+                if(currency == 'AED') {
+                    var value = '{{ $aed_to_eru_rate->value }}';
+                    var operand = 'Multiply';
+
+                }else if(currency == 'USD') {
+                    var value = '{{ $usd_to_eru_rate->value }}';
+                    var operand = 'Multiply';
+
+                }
+            }
+            ConvertRequestedPrice(value,operand);
+            $('#old-currency-type').val(currency);
+            calculateTotalSum();
+        });
+        function ConvertRequestedPrice(value,operand) {
+            var count = secondTable.data().length;
+            value = parseFloat(value);
+            for (var i = 1; i <= count; i++) {
+                var price = $('#price-' + i).val();
+                var quantity = $('#quantity-' + i).val();
+                if(operand == 'Divide') {
+                    var convertedPrice = parseFloat(price) / value;
+                }else if(operand == 'Multiply') {
+                    var convertedPrice = parseFloat(price) * value;
+                }
+                $('#price-' + i).val(convertedPrice.toFixed(3));
+                var amount = parseFloat(convertedPrice) * parseFloat(quantity);
+                $('#total-amount-' + i).val(amount.toFixed(3));
+            }
+        }
         $('#brand').on('change', function() {
         var brandId = $(this).val();
         if (brandId) {
@@ -1161,8 +1315,7 @@
                 targets: -3,
                 data: null,
                 render: function (data, type, row) {
-
-                    return '<input type="number" min="0"  value="1" class="qty-editable form-control" required name="quantities[]" id="quantity-'+ row['index'] +'" />';
+                    return '<input type="number" min="0"  value="1" step="1" class="qty-editable form-control" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)"  required name="quantities[]"  id="quantity-'+ row['index'] +'" />';
                 }
             },
             {
@@ -1181,13 +1334,9 @@
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                         combinedValue = row[2]+', '+row[3];
                     }
-                    else if(row['button_type'] == 'Direct-Add') {
-                        combinedValue =  row[0] + ', ' + row[1] + ', ' + row[2] + ', ' + row[3];
-                    }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         combinedValue = row[2] + ' , ' + row[3];
 
-                        combinedValue = row[2]+', '+row[3];
                     }else if(row['button_type'] == 'Direct-Add') {
                         var comma0 = comma1 = comma2 = comma3 = comma4 = ", ";
                         if(row[1] == "") {
@@ -1239,13 +1388,24 @@
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
                         var price = row[10];
-                    }
-                    else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
+                    }else{
                         var price = row[4];
                     }
-                    else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
-                        var price = row[4];
+                    // else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
+                    //     var price = row[4];
+                    // }
+                    // else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
+                    //     var price = row[4];
+                    // }
+                    var currency = $('#currency').val();
+                    if(currency == 'USD') {
+                        var value = '{{ $aed_to_usd_rate->value }}';
+                        var price = price / parseFloat(value);
+                    }else if(currency == 'ERU') {
+                        var value = '{{ $aed_to_eru_rate->value }}';
+                        var price = price / parseFloat(value);
                     }
+
                     return '<input type="number" min="0" name="prices[]" required class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>';
                 }
             }
@@ -1339,6 +1499,8 @@
         var selectedDays = $(this.node()).find('.days-dropdown').val();
 
         selectedData.push({ vehicleId: vehicleId, days: selectedDays });
+
+
     });
     var dateValue = $('#name').val();
     var callIdValue = $('#call_id').val();
@@ -1518,7 +1680,10 @@
         if(modelLine != "") {
             table.row.add(row).draw();
         }
+        $('.total-div').attr('hidden', false);
 
+        enableOrDisableSubmit();
+        showPriceInSelectedValue();
     });
     $(document).on('click', '.add-button', function() {
         var secondTable = $('#dtBasicExample2').DataTable();
@@ -1528,7 +1693,7 @@
         var index = secondTable.data().length + 1;
 
         var row = $(this).closest('tr');
-        console.log(row);
+
         rowData['button_type'] = buttonType;
         rowData['model_type'] = buttonType;
         rowData['index'] = index;
@@ -1580,13 +1745,14 @@
         }
         rowData['id'] = id;
         secondTable.row.add(rowData).draw();
-        console.log(rowData);
         table.row(row).remove().draw();
         resetSerialNumber(table);
         // total amount div logic
         $('.total-div').attr('hidden', false);
 
         calculateTotalSum();
+        enableOrDisableSubmit();
+        showPriceInSelectedValue();
     });
 
     function resetSerialNumber(table) {
@@ -1600,6 +1766,7 @@
             calculateTotalSum();
 
         });
+
         $('#dtBasicExample2 tbody').on('input', '.qty-editable', function(e) {
             var index =  $(this).closest('tr').index() + 1;
             CalculateTotalAmount(index);
@@ -1610,8 +1777,8 @@
             var table = $('#dtBasicExample2').DataTable();
             var unitPrice = $('#price-'+index).val();
             var quantity = $('#quantity-'+index).val();
-            var totalAmount = parseInt(unitPrice) * parseInt(quantity);
-            $('#total-amount-'+index).val(totalAmount);
+            var totalAmount = parseFloat(unitPrice) * parseFloat(quantity);
+            $('#total-amount-'+index).val(totalAmount.toFixed(3));
 
         }
         function calculateTotalSum(){
@@ -1619,10 +1786,32 @@
             var totalAmount = 0;
             for(var i=1;i<= count;i++) {
                 var amount = $('#total-amount-'+i).val();
-                totalAmount = parseInt(totalAmount) + parseInt(amount);
+                totalAmount = parseFloat(totalAmount) + parseFloat(amount);
             }
 
-            $('#total').val(totalAmount);
+            $('#total_in_selected_currency').val(totalAmount.toFixed(3));
+            var currency = $('#currency').val();
+            var total = 0;
+            if(currency == 'USD') {
+                var value = '{{ $aed_to_usd_rate->value }}';
+                var total = totalAmount * value;
+            }else if(currency == 'EUR') {
+                var value = '{{ $aed_to_eru_rate->value }}';
+                var total = totalAmount * value;
+            }
+            $('#total').val(total.toFixed(3));
+
+             enableOrDisableSubmit();
+
+        }
+        function enableOrDisableSubmit(){
+            var count = secondTable.data().length;
+
+            if(count > 0) {
+                $('#submit-button').attr("disabled", false);
+            }else{
+                $('#submit-button').attr("disabled", true);
+            }
         }
     $('#search-button').on('click', function() {
         var variantId = $('#variant').val();

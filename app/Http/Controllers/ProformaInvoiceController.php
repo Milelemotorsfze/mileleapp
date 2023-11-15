@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\OtherLogisticsCharges;
+use App\Models\Setting;
 use App\Models\Shipping;
 use App\Models\ShippingCertification;
 use App\Models\ShippingDocuments;
@@ -47,9 +48,13 @@ class ProformaInvoiceController extends Controller {
         $shippingDocuments = ShippingDocuments::all();
         $certifications = ShippingCertification::all();
         $otherDocuments = OtherLogisticsCharges::all();
+        $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
+        $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
+        $usd_to_eru_rate = Setting::where('key', 'usd_to_euro_convertion_rate')->first();
+
         return view('proforma.invoice', compact('callDetails', 'brands','assessoriesDesc',
             'sparePartsDesc','kitsDesc','accessoriesBrands','sparePartsBrands', 'kitsBrands','shippings','certifications',
-           'otherDocuments', 'shippingDocuments'));
+           'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate'));
     }
     public function getaddonModels(Request $request, $brandId, $type) {
         $modelLines = MasterModelLines::where('brand_id', $brandId)
@@ -145,7 +150,7 @@ class ProformaInvoiceController extends Controller {
         $brandName = $modelLine = $modelDescription = '';
         $brandName = Brand::where('id',$brandId)->first();
         $modelLine = MasterModelLines::where('id',$modelLineId)->first();
-        $modelDescription = MasterModelDescription::where('id',$ModelDescriptionId)->first(); 
+        $modelDescription = MasterModelDescription::where('id',$ModelDescriptionId)->first();
         $spare_parts = AddonDetails::where('addon_type_name','SP');
         if($addonId != 'addonId') {
             $spare_parts = $spare_parts->where('description',$addonId);
@@ -209,7 +214,7 @@ class ProformaInvoiceController extends Controller {
         $brandName = $modelLine = $modelDescription = '';
         $brandName = Brand::where('id',$brandId)->first();
         $modelLine = MasterModelLines::where('id',$modelLineId)->first();
-        $modelDescription = MasterModelDescription::where('id',$ModelDescriptionId)->first(); 
+        $modelDescription = MasterModelDescription::where('id',$ModelDescriptionId)->first();
         $kits = AddonDetails::where('addon_type_name','K');
         if($addonId != 'addonId') {
             $kits = $kits->where('description',$addonId);

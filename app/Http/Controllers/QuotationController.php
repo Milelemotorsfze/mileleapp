@@ -45,9 +45,9 @@ class QuotationController extends Controller
     $data = Calls::select('name', 'email')
             ->where('id', $callsId)
             ->first();
-            $countries = CountryListFacade::getList('en');
-            $vehicles_id = Vehiclescarts::where('created_by', auth()->user()->id)->pluck('vehicle_id');
-            $items = Vehicles::whereIn('id', $vehicles_id)->get();
+    $countries = CountryListFacade::getList('en');
+    $vehicles_id = Vehiclescarts::where('created_by', auth()->user()->id)->pluck('vehicle_id');
+    $items = Vehicles::whereIn('id', $vehicles_id)->get();
     return view('quotation.add_new', compact('data', 'countries', 'items', 'vehicles_id'));
     }
     /**
