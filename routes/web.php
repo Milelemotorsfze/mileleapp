@@ -2,6 +2,8 @@
 use App\Http\Controllers\Masters\MasterJobPositionController;
 use App\Http\Controllers\HRM\Hiring\EmployeeHiringRequestController;
 use App\Http\Controllers\HRM\Hiring\EmployeeHiringQuestionnaireController;
+use App\Http\Controllers\HRM\Hiring\JobDescriptionController;
+use App\Http\Controllers\HRM\Hiring\PassportRequestController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -70,8 +72,6 @@ use App\Http\Controllers\ProformaInvoiceController;
 use App\Http\Controllers\ApprovalAwaitingController;
 use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\EmployeeController;
-
-
 
 /*
 /*
@@ -234,6 +234,10 @@ Route::get('/d', function () {
     
     // Employee Hiring Questionnaire
     Route::resource('employee-hiring-questionnaire', EmployeeHiringQuestionnaireController::class);
+    // Employee Job Description
+    Route::resource('job_description', JobDescriptionController::class);
+    // Employee Passport Request
+    Route::resource('passport_request', PassportRequestController::class);
 
 
 

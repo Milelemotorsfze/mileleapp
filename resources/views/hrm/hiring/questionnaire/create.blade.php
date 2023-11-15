@@ -136,15 +136,29 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             </div>
 
 
+            <div class="row">
             <div class="col-lg-4  ">
                 <span class="error">* </span>
-                <label for="basicpill-firstname-input" class="form-label">Designation 2 (Role)</label>
-                <select name="designation" id="designation" class="form-control widthinput" autofocus>
+                <label for="basicpill-firstname-input" class="form-label">Designation 2 (New Role)</label>
+                <select name="designation-1" id="designation-1" class="form-control widthinput" onchange="showDiv('otherDesignationInputContainer', this)" autofocus>
                     <option value=""></option>
-                    <option value="option11">option11</option>
-                    <option value="option22">option22</option>
+                    <option value="option1">option1</option>
+                    <option value="option2">option2</option>
+                    <option value="option3">option3</option>
+                    <option value="0">other</option>
                 </select>
             </div>
+
+            <!-- New Designation div shown on the right side -->
+            <div class="col-lg-2 col-md-4">
+                <!-- when the user chooses other, show this other new designation div  -->
+                <div class="otherDesignationInputContainer" id="otherDesignationInputContainer" style="display: none">
+                    <span class="error">* </span>
+                    <label for="basicpill-firstname-input" class="form-label">Other:</label>
+                    <input type="text" placeholder="Other" name="otherDesignation" class="form-control" id="otherDesignationInput">
+                </div>
+            </div>
+        </div>
 
 
             <div class="col-lg-4  ">
@@ -709,24 +723,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             </div>
         </div>
 
-        <div class="col-lg-4  ">
-            <span class="error">* </span>
-            <label for="basicpill-firstname-input" class="form-label">Stake Holders for Job Evaluation</label>
-            <ul class="list-group">
-                <li class="list-group-item">
-                    <input type="checkbox" id="item1" name="item1">
-                    <label for="item1">item1</label>
-                </li>
-                <li class="list-group-item">
-                    <input type="checkbox" id="item2" name="item2">
-                    <label for="item2"> item2</label>
-                </li>
-                <li class="list-group-item">
-                    <input type="checkbox" id="item3" name="item3">
-                    <label for="item3">item3</label>
-                </li>
-            </ul>
-        </div>
+        <div class="col-lg-4">
+    <span class="error">* </span>
+    <label for="basicpill-firstname-input" class="form-label">Stakeholders for Job Evaluation</label>
+    <ul class="list-group list-group-horizontal">
+        <li class="list-group-item">
+            <input type="checkbox" id="item1" name="item1">
+            <label for="item1">Item 1</label>
+        </li>
+        <li class="list-group-item">
+            <input type="checkbox" id="item2" name="item2">
+            <label for="item2">Item 2</label>
+        </li>
+        <li class="list-group-item">
+            <input type="checkbox" id="item3" name="item3">
+            <label for="item3">Item 3</label>
+        </li>
+    </ul>
+</div>
+
 </div>
 </br>
 </br>
