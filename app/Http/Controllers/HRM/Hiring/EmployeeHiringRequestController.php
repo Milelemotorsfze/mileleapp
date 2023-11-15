@@ -32,7 +32,7 @@ class EmployeeHiringRequestController extends Controller
         $masterdepartments = MasterDeparment::where('status','active')->select('id','name')->get();
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
         $masterJobPositions = MasterJobPosition::where('status','active')->select('id','name')->get();
-        $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name')->get();
+        $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
         $requestedByUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
         $reportingToUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
         $replacementForEmployees = User::whereNotIn('id',['1','16'])->select('id','name')->get();

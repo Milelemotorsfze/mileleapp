@@ -20,7 +20,9 @@ class VisaTypeMasterSeeder extends Seeder
             ['id' => 3,'name' => 'Golden Visa','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
             ['id' => 4,'name' => 'Sponsored by Family','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
             ['id' => 5,'name' => 'Student Visa','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
-            ['id' => 6,'name' => 'Other','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 6,'name' => 'Spouse Visa','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 7,'name' => 'Cancelled Visa','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 8,'name' => 'Other','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
         ]);
         DB::table('master_sponcerships')->insert([
             ['id' => 1,'name' => 'Milele Motors FZE ','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
@@ -69,6 +71,15 @@ class VisaTypeMasterSeeder extends Seeder
             ['id' => 2,'approved_by_position' => 'HR Manager','approved_by_id'=> 10,'handover_to_id' => 10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
             ['id' => 3,'approved_by_position' => 'Finance Manager','approved_by_id'=> 10,'handover_to_id' => 10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
             ['id' => 4,'approved_by_position' => 'Supervisor','approved_by_id'=> 10,'handover_to_id' => 10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+        ]);
+        DB::table('masters_recuritment_sources')->insert([
+            ['id' => 1,'name' => 'Job Boards','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 2,'name' => 'Company Websites','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 3,'name' => 'Social Media Platforms','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 4,'name' => 'Employee Referrals','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 5,'name' => 'Recruiting Agencies','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 6,'name' => 'Networking Events Poaching','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 7,'name' => 'Head Hunting','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
         ]);
     }
 }
