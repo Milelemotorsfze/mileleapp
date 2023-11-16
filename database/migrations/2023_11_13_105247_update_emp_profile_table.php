@@ -27,7 +27,7 @@ return new class extends Migration
             $table->bigInteger('religion')->unsigned()->index()->nullable()->after('marital_status')->change();
             $table->foreign('religion')->references('id')->on('master_religions')->onDelete('cascade');
             $table->bigInteger('nationality')->unsigned()->index()->nullable()->after('religion')->change();
-            $table->foreign('nationality')->references('id')->on('master_religions')->onDelete('cascade');
+            $table->foreign('nationality')->references('id')->on('countries')->onDelete('cascade');
             $table->string('personal_email_address')->nullable()->after('nationality');
             $table->string('name_of_father')->nullable()->after('personal_email_address');
             $table->string('name_of_mother')->nullable()->after('name_of_father');
