@@ -81,5 +81,12 @@ class VisaTypeMasterSeeder extends Seeder
             ['id' => 6,'name' => 'Networking Events Poaching','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
             ['id' => 7,'name' => 'Head Hunting','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
         ]);
+        DB::table('master_specific_industry_experiences')->insert([
+            ['id' => 1,'name' => 'Automative','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 2,'name' => 'Logistics','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 3,'name' => 'Finance','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 4,'name' => 'Consultancy','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 5,'name' => 'Other','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+        ]);
     }
 }
