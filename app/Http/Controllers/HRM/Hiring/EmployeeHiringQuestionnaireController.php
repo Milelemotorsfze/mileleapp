@@ -11,6 +11,7 @@ use App\Models\Masters\MasterVisaType;
 use App\Models\Masters\MasterRecuritmentSource;
 use App\Models\Masters\MasterDeparment;
 use App\Models\Masters\MasterExperienceLevel;
+use App\Models\Masters\MasterSpecificIndustryExperience;
 use App\Models\Country;
 use App\Models\Language;
 use App\Models\User;
@@ -31,8 +32,9 @@ class EmployeeHiringQuestionnaireController extends Controller
         $masterRecuritmentSources = MasterRecuritmentSource::select('id','name')->get();
         $masterDepartments = MasterDeparment::select('id','name')->get();
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
+        $masterSpecificIndustryExperiences = MasterSpecificIndustryExperience::select('id','name')->get();
         return view('hrm.hiring.questionnaire.create',compact('data','masterDesignations','masterVisaTypes','masterNationality','masterLanguages','interviewdByUsers',
-            'masterRecuritmentSources','masterDepartments','masterExperienceLevels'));
+            'masterRecuritmentSources','masterDepartments','masterExperienceLevels','masterSpecificIndustryExperiences'));
     }
     public function edit() {
         return view('hrm.hiring.questionnaire.edit');
