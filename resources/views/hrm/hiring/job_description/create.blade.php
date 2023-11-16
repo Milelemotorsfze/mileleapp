@@ -18,6 +18,10 @@
         margin-left: 10px;
     }
 
+    .heading-name {
+        margin-left: 10px;
+    }
+
     .job-description-lable-name,
     .job-description-lable-name-1 {
         /* border: 1px solid; */
@@ -64,11 +68,11 @@
     }
 
     div.col-lg-6.col-md-6.col-6.manager-1 {
-        /* padding-right: 0px; */
+        padding-right: 0px;
     }
 
     div.col-lg-6.col-md-6.col-6.manager-2 {
-        /* padding-left: 0px; */
+        padding-left: 0px;
     }
 
     .btn.btn-success.btncenter {
@@ -94,6 +98,15 @@
             width: 30%;
         }
     }
+
+    @media (max-width: 767px) {
+
+        .dep-section-div,
+        .reporting-section-div {
+            padding-top: 20px;
+        }
+    }
+
 
     .error {
         color: #FF0000;
@@ -137,7 +150,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     </div>
     @endif
     <!-- {!! Form::open(array('route' => 'calls.store','method'=>'POST', 'id' => 'calls')) !!} -->
-
+    <div class="row">
+        <p><span style="float:right;" class="error">* Required Field</span></p>
+    </div>
     <form action="" method="post" enctype="multipart/form-data">
         <br />
 
@@ -145,34 +160,68 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             <div class="col-lg-12 job-desc-top-info">
                 <div class="row">
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-6">
-
-                        <div class="col-xxl-1 col-lg-2 col-md-2 col-sm-2 col-2 job-description-lable-name">
-
-                            <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Job Title</label>
+                    <!-- Job Title Section -->
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-10 title-section-div">
+                        <div class="row">
+                            <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-5 job-description-lable-name">
+                                <span class="error">*</span>
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Job Title:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-7 top-margin-input">
+                                <input type="text" class="form-control top-margin-input-1" name="jobtitle">
+                            </div>
                         </div>
                     </div>
 
-                        <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-4 col-4 top-margin-input">
-                            <input type="text" class="form-control top-margin-input-1" name="jobtitle">
+                    <!-- Department Section -->
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-10 dep-section-div">
+                        <div class="row">
+                            <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-5 job-description-lable-name">
+                                <span class="error">*</span>
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Department:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-7">
+                                <input type="text" class="form-control top-margin-input-1" name="department">
+                            </div>
                         </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-6">
-
-                    <div class="col-xxl-1 col-lg-2 col-md-2 col-sm-2 col-2 job-description-lable-name">
-
-                        <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Department</label>
                     </div>
-                    <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-4 col-4">
-                        <input type="text" class="form-control top-margin-input-1" name="department">
+                </div>
+                <br />
+                <div class="row ">
+                    <!-- Location Section -->
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-10 location-section-div">
+                        <div class="row">
+                            <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-5 job-description-lable-name">
+                                <span class="error">*</span>
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Location:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-7 top-margin-input">
+                                <input type="text" class="form-control top-margin-input-1" name="jobtitle">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reporting Section -->
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-10 reporting-section-div">
+                        <div class="row">
+                            <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-6 col-6 job-description-lable-name">
+                                <span class="error">*</span>
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Reporting To:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-6 col-6">
+                                <input type="text" class="form-control top-margin-input-1" name="department">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-
-                </br>
             </div>
+
+            <!-- Detailed Section of Job Description Form -->
 
             <div>
                 <div class="col-lg-12  job-description-lable-name-1">
+                    <span class="error">*</span>
                     <label for="basicpill-firstname-input" class="form-label heading-name">Job Purpose</label>
                 </div>
                 <div class="col-lg-12  ">
@@ -183,6 +232,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             <div>
                 <div class="col-lg-12  job-description-lable-name-1">
+                    <span class="error">*</span>
                     <label for="basicpill-firstname-input" class="form-label heading-name">Duties and Responsibilities (Generic) of the position </label>
                 </div>
                 <div class="col-lg-12  ">
@@ -194,6 +244,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             <div>
                 <div class="col-lg-12  job-description-lable-name-1">
+                    <span class="error">*</span>
                     <label for="basicpill-firstname-input" class="form-label heading-name">Skills required to fulfil the position </label>
                 </div>
                 <div class="col-lg-12  ">
@@ -205,6 +256,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             <div>
                 <div class="col-lg-12  job-description-lable-name-1">
+                    <span class="error">*</span>
                     <label for="basicpill-firstname-input" class="form-label heading-name">Position Qualification (Academic & Professional) </label>
                 </div>
                 <div class="col-lg-12  ">
@@ -215,6 +267,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             <div>
                 <div class="col-lg-12  job-description-lable-name-1">
+                    <span class="error">*</span>
                     <label for="basicpill-firstname-input" class="form-label heading-name">Approvals: </label>
                 </div>
                 <div class="row ">
@@ -237,7 +290,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             </div>
 
         </div>
-</div>
+
+
+    </form>
 
 </div>
 </br>
@@ -246,7 +301,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
 </div>
 </br>
-</div>
 @else
 @php
 redirect()->route('home')->send();

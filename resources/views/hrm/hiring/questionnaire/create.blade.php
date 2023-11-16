@@ -137,28 +137,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
 
             <div class="row">
-            <div class="col-lg-4  ">
-                <span class="error">* </span>
-                <label for="basicpill-firstname-input" class="form-label">Designation 2 (New Role)</label>
-                <select name="designation-1" id="designation-1" class="form-control widthinput" onchange="showDiv('otherDesignationInputContainer', this)" autofocus>
-                    <option value=""></option>
-                    <option value="option1">option1</option>
-                    <option value="option2">option2</option>
-                    <option value="option3">option3</option>
-                    <option value="0">other</option>
-                </select>
-            </div>
-
-            <!-- New Designation div shown on the right side -->
-            <div class="col-lg-2 col-md-4">
-                <!-- when the user chooses other, show this other new designation div  -->
-                <div class="otherDesignationInputContainer" id="otherDesignationInputContainer" style="display: none">
+                <div class="col-lg-4  ">
                     <span class="error">* </span>
-                    <label for="basicpill-firstname-input" class="form-label">Other:</label>
-                    <input type="text" placeholder="Other" name="otherDesignation" class="form-control" id="otherDesignationInput">
+                    <label for="basicpill-firstname-input" class="form-label">Designation 2 (New Role)</label>
+                    <select name="designation-1" id="designation-1" class="form-control widthinput" onchange="showDiv('otherDesignationInputContainer', this)" autofocus>
+                        <option value=""></option>
+                        <option value="option1">option1</option>
+                        <option value="option2">option2</option>
+                        <option value="option3">option3</option>
+                        <option value="0">other</option>
+                    </select>
+                </div>
+
+                <!-- New Designation div shown on the right side -->
+                <div class="col-lg-2 col-md-4">
+                    <!-- when the user chooses other, show this other new designation div  -->
+                    <div class="otherDesignationInputContainer" id="otherDesignationInputContainer" style="display: none">
+                        <span class="error">* </span>
+                        <label for="basicpill-firstname-input" class="form-label">Other:</label>
+                        <input type="text" placeholder="Other" name="otherDesignation" class="form-control" id="otherDesignationInput">
+                    </div>
                 </div>
             </div>
-        </div>
 
 
             <div class="col-lg-4  ">
@@ -166,10 +166,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <label for="basicpill-firstname-input" class="form-label">Reporting To</label>
                 <select name="designation" id="designation" class="form-control widthinput" autofocus>
                     <option value=""></option>
-                    <option value="option11">option11</option>
-                    <option value="option22">option22</option>
-                    <option value="option33">option33</option>
-
+                    <option value="option11">Management</option>
+                    <option value="option22">Team Lead</option>
                 </select>
             </div>
             <div class="col-lg-4  ">
@@ -209,6 +207,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             </div>
 
 
+
             <div class="col-lg-4  ">
                 <span class="error">* </span>
                 <label for="basicpill-firstname-input" class="form-label">Any Specific Company Experience : </label>
@@ -216,6 +215,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             </div>
 
         </div>
+
+        <div class="row">
+            <div class="col-lg-4  ">
+                <span class="error">* </span>
+                <label for="basicpill-firstname-input" class="form-label">Any specific industry experience</label>
+                <select name="industry-exp" id="industry-exp" class="form-control widthinput" onchange="showDiv('otherSpecificIndustryExpInputContainer', this)" autofocus>
+                    <option value=""></option>
+                    <option value="Automative">Automative</option>
+                    <option value="logistics">logistics</option>
+                    <option value="finance">finance</option>
+                    <option value="consultancy">consultancy</option>
+                    <option value="0">other</option>
+                </select>
+
+            </div>
+
+            <!-- Specifiy div shown on the right side -->
+            <div class="col-lg-2 col-md-4">
+                <!-- when the user chooses other, show this Specify div  -->
+                <div class="otherSpecificIndustryExpInputContainer" id="otherSpecificIndustryExpInputContainer" style="display: none">
+                    <span class="error">* </span>
+                    <label for="basicpill-firstname-input" class="form-label">Specify Other:</label>
+                    <input type="text" placeholder="Other" name="otherSpecificIndustryExp" class="form-control" id="otherSpecificIndustryExp">
+                </div>
+            </div>
+        </div>
+
 
         <div class="row">
             <div class="col-lg-4  ">
@@ -324,7 +350,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class="col-lg-4   designation-radio-main-div">
+                    <div class="col-lg-4 designation-radio-main-div">
                         <div class="row ">
                             <div class="col-lg-10  ">
                                 <span class="error">* </span>
@@ -441,45 +467,45 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
 
                         <!-- if yes, add radio button for: Own car, Expenses done by ? own or Company -->
-                        
+
                     </div>
                 </div>
                 <div class="col-lg-4  ">
 
-                <div class="drivingLisenceInputContainer" style="display: none">
-                            <div class="row ">
-                                <div class="col-lg-6   designation-radio-main-div">
-                                    <span class="error">* </span>
+                    <div class="drivingLisenceInputContainer" style="display: none">
+                        <div class="row ">
+                            <div class="col-lg-6   designation-radio-main-div">
+                                <span class="error">* </span>
 
-                                    <label for="ownCar" class="form-label">Own Car</label>
+                                <label for="ownCar" class="form-label">Own Car</label>
 
-                                    <div class="designation-radio-button">
-                                        <label>
-                                            <input type="radio" name="own-car" id="auto-assign-option" value="auto-assign-yes"> Yes
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="own-car" id="manual-assign-option" value="manual-assign3"> No
-                                        </label>
-                                    </div>
+                                <div class="designation-radio-button">
+                                    <label>
+                                        <input type="radio" name="own-car" id="auto-assign-option" value="auto-assign-yes"> Yes
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="own-car" id="manual-assign-option" value="manual-assign3"> No
+                                    </label>
                                 </div>
+                            </div>
 
-                                <div class="col-lg-6   designation-radio-main-div">
-                                    <span class="error">* </span>
+                            <div class="col-lg-6   designation-radio-main-div">
+                                <span class="error">* </span>
 
-                                    <label for="fuelExpenses" class="form-label">Fuels Expenses covered by?</label>
+                                <label for="fuelExpenses" class="form-label">Fuels Expenses covered by?</label>
 
-                                    <div class="designation-radio-button">
-                                        <label>
-                                            <input type="radio" name="fuel-expenses" id="auto-assign-option" value="auto-assign-yes"> Company
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="fuel-expenses" id="manual-assign-option" value="manual-assign3"> Own
-                                        </label>
-                                    </div>
+                                <div class="designation-radio-button">
+                                    <label>
+                                        <input type="radio" name="fuel-expenses" id="auto-assign-option" value="auto-assign-yes"> Company
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="fuel-expenses" id="manual-assign-option" value="manual-assign3"> Own
+                                    </label>
                                 </div>
                             </div>
                         </div>
-                        </div>
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col-lg-4  ">
@@ -724,24 +750,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         </div>
 
         <div class="col-lg-4">
-    <span class="error">* </span>
-    <label for="basicpill-firstname-input" class="form-label">Stakeholders for Job Evaluation</label>
-    <ul class="list-group list-group-horizontal">
-        <li class="list-group-item">
-            <input type="checkbox" id="item1" name="item1">
-            <label for="item1">Item 1</label>
-        </li>
-        <li class="list-group-item">
-            <input type="checkbox" id="item2" name="item2">
-            <label for="item2">Item 2</label>
-        </li>
-        <li class="list-group-item">
-            <input type="checkbox" id="item3" name="item3">
-            <label for="item3">Item 3</label>
-        </li>
-    </ul>
-</div>
-
+            <span class="error">* </span>
+            <label for="basicpill-firstname-input" class="form-label">Stakeholders for Job Evaluation</label>
+            <ul class="list-group list-group-horizontal">
+                <li class="list-group-item">
+                    <input type="checkbox" id="item1" name="item1">
+                    <label for="item1">Item 1</label>
+                </li>
+                <li class="list-group-item">
+                    <input type="checkbox" id="item2" name="item2">
+                    <label for="item2">Item 2</label>
+                </li>
+                <li class="list-group-item">
+                    <input type="checkbox" id="item3" name="item3">
+                    <label for="item3">Item 3</label>
+                </li>
+            </ul>
+        </div>
+    </form>
 </div>
 </br>
 </br>
@@ -749,7 +775,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
 </div>
 </br>
-</div>
 @else
 @php
 redirect()->route('home')->send();
