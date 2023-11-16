@@ -49,8 +49,8 @@ return new class extends Migration
             $table->integer('number_of_trial_days')->nullable();
             $table->enum('commission_involved_in_salary', ['yes', 'no'])->nullable();
             $table->enum('commission_type', ['amount', 'percentage'])->nullable();
-            $table->integer('commission_amount')->nullable();
-            $table->decimal('commission_percentage', 10,2)->default('0.00');
+            $table->decimal('commission_amount', 10,2)->default('0.00');
+            $table->integer('commission_percentage')->nullable();
             $table->text('mandatory_skills')->nullable();
             $table->bigInteger('interviewd_by')->unsigned()->index()->nullable();
             $table->foreign('interviewd_by')->references('id')->on('users')->onDelete('cascade');
