@@ -51,20 +51,8 @@
         justify-items: center;
     }
 
-    .form-control {
-        border-radius: 0 !important;
-    }
-
     .top-margin-input {
         margin-top: 1px !important;
-    }
-
-    .top-margin-input-1 {
-        /* padding: 11px 0px !important; */
-    }
-
-    div.col-xxl-5.col-lg-5.col-md-9 {
-        /* padding: 0px 20px 0px 0px; */
     }
 
     div.col-lg-6.col-md-6.col-6.manager-1 {
@@ -265,7 +253,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
             </div>
 
-            <div>
+            <!-- <div >
                 <div class="col-lg-12  job-description-lable-name-1">
                     <span class="error">*</span>
                     <label for="basicpill-firstname-input" class="form-label heading-name">Approvals: </label>
@@ -287,7 +275,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <label for="basicpill-firstname-input" class="form-control" name="hrmanager"><b class="approvals-managers">HR Manager</b></label>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
         </div>
 

@@ -317,15 +317,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <div class="col-lg-4  ">
                         <span class="error">* </span>
                         <label for="basicpill-firstname-input" class="form-label">Additional Language(s):</label>
-                        <select name="designation" id="designation" class="form-control widthinput" autofocus>
-                            <option value=""></option>
+                        <select name="designation" id="designation" class="form-control widthinput" multiple autofocus>
                             <option value="option1">option1</option>
                             <option value="option2">option2</option>
                             <option value="option3">option3</option>
                             <option value="option4">option4</option>
-
                         </select>
                     </div>
+
                 </div>
 
                 <div class="row">
@@ -416,31 +415,52 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class="col-lg-4   designation-radio-main-div">
-                        <div class="row ">
+                    <div class="col-lg-4 designation-radio-main-div">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <span class="error">* </span>
+                                <label for="sales-options" class="form-label">Is commission involved along with the salary?</label>
+                                <div class="designation-radio-button">
+                                    <label>
+                                        <input type="radio" name="sales-option" value="auto-assign-yes-3"> Yes
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="sales-option" value="manual-assign4"> No
+                                    </label>
+                                </div>
+                            </div>
 
-                            <div class="col-lg-10   designation-radio-main-div">
-                                <div class="row">
-                                    <div class="col-lg-12  ">
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <!-- Dropdown Container -->
+                                    <div class="amountpercentageDropDownInputContainer" style="display: none;">
                                         <span class="error">* </span>
-                                        <label for="sales-options" class="form-label">Is commission involved along with the salary?</label>
-                                        <div class="designation-radio-button">
-                                            <label>
-                                                <input type="radio" name="sales-option" value="auto-assign-yes-2"> Yes
-                                            </label>
-                                            <label>
-                                                <input type="radio" name="sales-option" value="manual-assign4"> No
-                                            </label>
-                                        </div>
+                                        <label for="basicpill-firstname-input" class="form-label">Choose Amount or Percentage</label>
+                                        <select name="designation" id="designation" class="form-control widthinput" onchange="showAmountPercentageInput(this)">
+                                            <option value=""></option>
+                                            <option value="1">Amount</option>
+                                            <option value="2">Percentage</option>
+                                        </select>
                                     </div>
-                                    <!-- if yes, add input for amount/percentage -->
-                                    <div class="amountPercentageInputContainer" style="display: none">
+                                </div>
+
+                                <!-- Amount Input Container -->
+                                <div class="col-lg-4">
+                                    <div class="amountInputContainer" id="amountInputContainer" style="display: none">
                                         <span class="error">* </span>
-                                        <label for="basicpill-firstname-input" class="form-label">Enter Amount or Percentage:</label>
-                                        <input type="number" placeholder="amount" name="amountPercentage" class="form-control" id="amountPercentageInput">
+                                        <label for="basicpill-firstname-input" class="form-label">Enter Amount:</label>
+                                        <input type="number" placeholder="amount" name="amount" class="form-control" id="amountInput">
+                                    </div>
+
+                                    <!-- Percentage Input Container -->
+                                    <div class="percentageInputContainer" id="percentageInputContainer" style="display: none">
+                                        <span class="error">* </span>
+                                        <label for="basicpill-firstname-input" class="form-label">Enter percentage:</label>
+                                        <input type="number" placeholder="percentage" name="percentage" class="form-control" id="percentageInput">
                                     </div>
                                 </div>
                             </div>
+
 
                         </div>
                     </div>
@@ -755,16 +775,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             <ul class="list-group list-group-horizontal">
                 <li class="list-group-item">
                     <input type="checkbox" id="item1" name="item1">
-                    <label for="item1">Item 1</label>
+                    <label for="item1">Internal departments</label>
                 </li>
                 <li class="list-group-item">
                     <input type="checkbox" id="item2" name="item2">
-                    <label for="item2">Item 2</label>
+                    <label for="item2">External vendors</label>
                 </li>
-                <li class="list-group-item">
-                    <input type="checkbox" id="item3" name="item3">
-                    <label for="item3">Item 3</label>
-                </li>
+
             </ul>
         </div>
     </form>
@@ -809,12 +826,26 @@ redirect()->route('home')->send();
                 $('.amountPercentageInputContainer').hide();
             }
         });
+        $('input[name="sales-option"]').change(function() {
+            if ($(this).val() === 'auto-assign-yes-3') {
+                $('.amountpercentageDropDownInputContainer').show();
+            } else {
+                $('.amountpercentageDropDownInputContainer').hide();
+            }
+        });
+
     });
 </script>
 
 <script>
     function showDiv(divId, element) {
         document.getElementById(divId).style.display = element.value == 0 ? 'block' : 'none';
+    }
+
+    function showAmountPercentageInput(element) {
+        var selectedValue = element.value;
+        document.getElementById('amountInputContainer').style.display = selectedValue == '1' ? 'block' : 'none';
+        document.getElementById('percentageInputContainer').style.display = selectedValue == '2' ? 'block' : 'none';
     }
 </script>
 @endpush
