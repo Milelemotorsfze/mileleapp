@@ -43,6 +43,7 @@
                             <th>Ref.No</th>
                             <th>Brand</th>
                             <th>Model Line</th>
+                            <th>Specification</th>
                             <th>Created By</th>
                             <th>Created At</th>
                             @can('master-model-lines-edit')
@@ -63,6 +64,11 @@
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $modelLine->brand->brand_name }}</td>
                                     <td>{{ $modelLine->model_line ?? ''}}</td>
+                                    <td>
+    <a data-placement="top" href="{{ route('model-lines.specification', $modelLine->id) }}" class="btn btn-primary btn-sm">
+        <i class="fa fa-arrow-circle-right"></i>
+    </a>
+</td>
                                     <td>{{ $modelLine->createdBy->name ?? '' }}</td>
                                     <td>{{ $modelLine->created_at ?? '' }}</td>
                                     @can('master-model-lines-edit')

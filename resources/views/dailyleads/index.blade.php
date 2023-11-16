@@ -253,7 +253,8 @@ input[type=number]::-webkit-outer-spin-button
     @can('sales-view')
       <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Demand</a></li>
-      <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li>
+      <!-- <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li> -->
+      <li><a class="dropdown-item"href="{{route('qoutation.proforma_invoice',['callId'=> $calls->id]) }}">Quotation</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Negotiation</a></li>
       <!-- <li><a class="dropdown-item" href="{{ route('booking.create', ['call_id' => $calls->id]) }}">Booking Vehicles</a></li> -->
       <!-- <li><a class="dropdown-item" href="">Booking (Coming Soon)</a></li> -->

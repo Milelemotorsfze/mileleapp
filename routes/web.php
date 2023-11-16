@@ -348,12 +348,16 @@ Route::get('/d', function () {
     Route::resource('variants', VariantController::class);
     Route::get('variant-prices/{id}/edit/type/{type}', [VariantPriceController::class,'edit'])->name('variant-price.edit');
     Route::resource('variant-prices', VariantPriceController::class);
-
+    Route::get('/getSpecificationDetails/{id}', [VariantController::class, 'getSpecificationDetails']);
     Route::get('/remove-vehicle/{id}', [QuotationController::class, 'removeVehicle'])->name('quotation.removeVehicle');
     // Route::get('/fetch-addon-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData'])->name('fetch-addon-data');
     Route::post('quotation-data/addone-insert', [QuotationController::class,'addqaddone'])->name('quotation.addone-insert');
     // Route::get('/modal-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData']);
     Route::get('/modal-data/{id}', [AddonController::class, 'fetchAddonData'])->name('modal.show');
+    Route::get('model-lines/specification/{id}', [VariantController::class, 'specification'])->name('model-lines.specification');
+    Route::get('model-lines/viewspec/{id}', [VariantController::class, 'viewSpecification'])->name('model-lines.viewspec');
+    Route::post('/variants/save-option', [VariantController::class, 'saveOption'])->name('variants.saveOption');
+    Route::post('/variants/savespecification', [VariantController::class, 'savespecification'])->name('variants.savespecification');
     Route::name('calls.show')
     ->get('calls/{call}/{brand_id}/{model_line_id}/{location}/{days}/{custom_brand_model?}', [CallsController::class, 'show'])
     ->where([

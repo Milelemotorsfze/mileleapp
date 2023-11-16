@@ -128,7 +128,7 @@
     </div>
                     <hr>
                     <div class="row"> 
-                    <h4>Search Available Vehicles</h4>
+                    <h4>Search Vehicles</h4>
                     <br>
                     <br>
                     <div class="col-lg-2 col-md-6">
@@ -470,7 +470,7 @@ function checkIfRowIsEditable(callId) {
     var isEditable = false;
     $.ajax({
         type: 'GET',
-        url: '{{ route('booking.checkingso') }}', // Use the named route
+        url: '{{ route('booking.checkingso') }}',
         data: { call_id: callId},
         async: false,
         success: function (response) {
