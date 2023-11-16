@@ -43,6 +43,7 @@ return new class extends Migration
             $table->enum('required_to_travel_for_work_purpose', ['yes', 'no'])->nullable();
             $table->enum('requires_multiple_industry_experience', ['yes', 'no'])->nullable();
             $table->enum('team_handling_experience_required', ['yes', 'no'])->nullable();
+            $table->enum('driving_licence', ['yes', 'no'])->nullable();
             $table->enum('own_car', ['yes', 'no'])->nullable();
             $table->enum('fuel_expenses_by', ['company', 'own'])->nullable();
             $table->enum('required_to_work_on_trial', ['yes', 'no'])->nullable();
