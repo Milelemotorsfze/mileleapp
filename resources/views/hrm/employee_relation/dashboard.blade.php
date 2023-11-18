@@ -23,9 +23,10 @@
                     <tbody>
                         @php $i = 0; @endphp
                         @foreach ([
-                            ['route' => 'employee-hiring-questionnaire', 'name' => 'Questionnaire Form', 'docType' => 'pdf'],
+                            ['route' => 'job_description', 'name' => 'Questionnaire Form', 'docType' => 'pdf'],
                             ['route' => 'job_description', 'name' => 'Job Description Form', 'docType' => 'word'],
                             ['route' => 'passport_request', 'name' => 'Passport Request Form', 'docType' => 'pdf'],
+                            ['route' => 'employee_liability', 'name' => 'Employee Liability Form', 'docType' => 'pdf'],
                         ] as $form)
                             <tr data-id="{{ ++$i }}">
                                 <td>{{ $i }}</td>

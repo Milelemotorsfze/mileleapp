@@ -38,7 +38,7 @@
     }
 
     .job-desc-top-info {
-        margin-left: 10px;
+        /* margin-left: 10px; */
     }
 
     input.job-desc-signature {
@@ -149,26 +149,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             <div class="col-lg-12 job-desc-top-info">
                 <div class="row">
                     <!-- Job Title Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-10 title-section-div">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 title-section-div">
                         <div class="row">
-                            <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-5 job-description-lable-name">
+                            <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-6 col-12 job-description-lable-name">
                                 <span class="error">*</span>
                                 <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Job Title:</label>
                             </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-7 top-margin-input">
+                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-6 col-12 top-margin-input">
                                 <input type="text" class="form-control top-margin-input-1" name="jobtitle">
                             </div>
                         </div>
                     </div>
 
                     <!-- Department Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-10 dep-section-div">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 dep-section-div">
                         <div class="row">
-                            <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-5 job-description-lable-name">
+                            <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-6 col-12 job-description-lable-name">
                                 <span class="error">*</span>
                                 <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Department:</label>
                             </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-7">
+                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-6 col-12">
                                 <input type="text" class="form-control top-margin-input-1" name="department">
                             </div>
                         </div>
@@ -177,26 +177,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <br />
                 <div class="row ">
                     <!-- Location Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-10 location-section-div">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 location-section-div">
                         <div class="row">
-                            <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-5 job-description-lable-name">
+                            <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-6 col-12 job-description-lable-name">
                                 <span class="error">*</span>
                                 <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Location:</label>
                             </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-7 top-margin-input">
+                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-6 col-12 top-margin-input">
                                 <input type="text" class="form-control top-margin-input-1" name="jobtitle">
                             </div>
                         </div>
                     </div>
 
                     <!-- Reporting Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-10 reporting-section-div">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 reporting-section-div">
                         <div class="row">
-                            <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-6 col-6 job-description-lable-name">
+                            <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-6 col-12 job-description-lable-name">
                                 <span class="error">*</span>
                                 <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Reporting To:</label>
                             </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-6 col-6">
+                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-6 col-12">
                                 <input type="text" class="form-control top-margin-input-1" name="department">
                             </div>
                         </div>
