@@ -230,12 +230,15 @@ Route::get('/d', function () {
     Route::controller(EmployeeHiringRequestController::class)->group(function(){
         Route::get('employee-hiring-request-approval-awaiting', 'approvalAwaiting')->name('employee-hiring-request.approval-awaiting');
         Route::post('employee-hiring-request/request-action', 'requestAction')->name('employee-hiring-request.request-action');
+        Route::get('employee-hiring-request/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-request.create-or-edit');
+        Route::post('employee-hiring-request/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-request.store-or-update');
     });
     
     // Employee Hiring Questionnaire
     Route::resource('employee-hiring-questionnaire', EmployeeHiringQuestionnaireController::class);
     Route::controller(EmployeeHiringQuestionnaireController::class)->group(function(){
-        Route::get('employee-hiring-questionnaire/createnew/{id}', 'create')->name('employee-hiring-questionnaire.createnew');
+        Route::get('employee-hiring-questionnaire/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-questionnaire.create-or-edit');
+        Route::post('employee-hiring-questionnaire/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-questionnaire.store-or-update');
     });
     
         // Employee Job Description

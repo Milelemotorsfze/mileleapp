@@ -198,7 +198,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title">Employee Hiring Request Form</h4>
+	<h4 class="card-title">@if($id == 'new')Create New @else Edit @endif Employee Hiring Request</h4>
+	@if($id != 'new')
+	@if($previous != '')
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('employee-hiring-request.create-or-edit',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+	@endif
+	@if($next != '')
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('employee-hiring-request.create-or-edit',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+	@endif
+	@endif
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee-hiring-request.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
@@ -212,8 +220,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 		</ul>
 	</div>
 	@endif
-	<form id="employeeHiringRequestForm" name="employeeHiringRequestForm" enctype="multipart/form-data" method="POST" action="{{route('employee-hiring-request.store')}}">
+
+		
+		<form id="employeeHiringRequestForm" name="employeeHiringRequestForm" enctype="multipart/form-data" method="POST" action="{{route('employee-hiring-request.store-or-update',$id)}}">
 		@csrf
+		
+
 		<div class="row">
 			<div class="col-xxl-2 col-lg-6 col-md-6">
 				<span class="error">* </span>
@@ -428,8 +440,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
+	var data = {!! json_encode($data) !!};
 	$(document).ready(function () {
-		document.getElementById('request_date').valueAsDate = new Date();
+		$("#replacement_for_employee_div").hide();
+		if(data.request_date){
+			document.getElementById('request_date').value = data.request_date;
+		}
+		else {
+			document.getElementById('request_date').valueAsDate = new Date();
+		}
+		$("#department_id").val(data.department_id);
+		$("#location_id").val(data.location_id);
+		$("#requested_by").val(data.requested_by);
+		$("#requested_job_title").val(data.requested_job_title);
+		$("#reporting_to").val(data.reporting_to);
+		$("#experience_level").val(data.experience_level);
+		$("#salary_range_start_in_aed").val(data.salary_range_start_in_aed);
+		$("#salary_range_end_in_aed").val(data.salary_range_end_in_aed);
+		$("#work_time_start").val(data.work_time_start);
+		$("#work_time_end").val(data.work_time_end);
+		$("#number_of_openings").val(data.number_of_openings);
+		$('#' + data.type_of_role).prop('checked',true);
+		if(data.type_of_role == 'replacement') {
+			$("#replacement_for_employee_div").show();
+			$("#replacement_for_employee").val(data.replacement_for_employee);
+		}
+		$("#explanation_of_new_hiring").val(data.explanation_of_new_hiring);
 		$('#department_id').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -465,7 +501,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
             maximumSelectionLength: 1,
             placeholder:"Choose Replacement For Employee",
         });
-		$("#replacement_for_employee_div").hide();
 	});	
 	$('.modal-button').on('click', function() {
 		$('#createNewJobPosition').modal('show');

@@ -27,7 +27,11 @@ class EmployeeHiringQuestionnaireController extends Controller
     public function index() {
         return view('hrm.hiring.questionnaire.index');
     }
-    public function create($id) {
+    public function createOrEdit($id) {
+        $currentQuestionnaire = EmployeeHiringQuestionnaire::where('hiring_request_id',$id)->first();
+        if(!$currentQuestionnaire) {
+            $currentQuestionnaire = new EmployeeHiringQuestionnaire();
+        }
         $data = EmployeeHiringRequest::where('id',$id)->first();
         $masterDesignations = MasterJobPosition::select('id','name')->get();
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
@@ -39,7 +43,7 @@ class EmployeeHiringQuestionnaireController extends Controller
         $masterDepartments = MasterDeparment::select('id','name')->get();
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
         $masterSpecificIndustryExperiences = MasterSpecificIndustryExperience::select('id','name')->get();
-        return view('hrm.hiring.questionnaire.create',compact('data','masterDesignations','masterVisaTypes','masterNationality','masterLanguages','interviewdByUsers',
+        return view('hrm.hiring.questionnaire.create',compact('data','currentQuestionnaire','masterDesignations','masterVisaTypes','masterNationality','masterLanguages','interviewdByUsers',
             'masterRecuritmentSources','masterDepartments','masterExperienceLevels','masterSpecificIndustryExperiences'));
     }
     public function store(Request $request) {

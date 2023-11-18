@@ -73,7 +73,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-    <h4 class="card-title">Create Questionnaire Form</h4>
+    <h4 class="card-title">@if($currentQuestionnaire->id == '')Create New @else Edit @endif Questionnaire</h4>
     <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
@@ -91,6 +91,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     </div>
     @endif
     <!-- {!! Form::open(array('route' => 'calls.store','method'=>'POST', 'id' => 'calls')) !!} -->
+    @include('hrm.hiring.hiring_request.details')
     <div class="row">
         <p><span style="float:right;" class="error">* Required Field</span></p>
     </div>
