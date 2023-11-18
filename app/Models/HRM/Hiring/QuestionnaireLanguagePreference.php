@@ -4,7 +4,7 @@ namespace App\Models\HRM\Hiring;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Language;
 class QuestionnaireLanguagePreference extends Model
 {
     use HasFactory;
@@ -13,4 +13,7 @@ class QuestionnaireLanguagePreference extends Model
         'questionnaire_id', 
         'language_id'
     ];
+    public function languageName() {
+        return $this->hasOne(Language::class,'id','language_id');
+    }
 }

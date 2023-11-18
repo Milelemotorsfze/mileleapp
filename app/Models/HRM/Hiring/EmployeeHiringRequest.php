@@ -197,4 +197,8 @@ class EmployeeHiringRequest extends Model
     {
         return $this->hasMany(EmployeeHiringRequestHistory::class,'hiring_request_id','id');
     }
+    public function questionnaire()
+    {
+        return $this->hasOne(EmployeeHiringQuestionnaire::class,'hiring_request_id','id');
+    }
 }

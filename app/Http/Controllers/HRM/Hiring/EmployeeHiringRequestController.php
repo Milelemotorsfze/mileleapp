@@ -9,6 +9,7 @@ use App\Models\Masters\MasterExperienceLevel;
 use App\Models\Masters\MasterJobPosition;
 use App\Models\Masters\MasterOfficeLocation;
 use App\Models\HRM\Hiring\EmployeeHiringRequest;
+use App\Models\HRM\Hiring\EmployeeHiringQuestionnaire;
 use App\Models\HRM\Hiring\EmployeeHiringRequestHistory;
 use App\Models\HRM\Approvals\DepartmentHeadApprovals;
 use App\Models\HRM\Approvals\ApprovalByPositions;
@@ -93,7 +94,7 @@ class EmployeeHiringRequestController extends Controller
         }
     }
     public function show($id) {
-        $data = EmployeeHiringRequest::where('id',$id)->with('history')->first();
+        $data = EmployeeHiringRequest::where('id',$id)->first();
         $previous = EmployeeHiringRequest::where('id', '<', $id)->max('id');
         $next = EmployeeHiringRequest::where('id', '>', $id)->min('id');
         return view('hrm.hiring.hiring_request.show',compact('data','previous','next'));
@@ -195,6 +196,9 @@ class EmployeeHiringRequestController extends Controller
             if($request->status == 'approved') {
                 $update->status = 'approved';
             }
+        }
+        if($request->status == 'rejected') {
+            $update->status = 'rejected';
         }
         $update->update();
         $history['hiring_request_id'] = $request->id;

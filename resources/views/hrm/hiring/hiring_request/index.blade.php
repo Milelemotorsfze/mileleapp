@@ -129,15 +129,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 										</button>
 									@endif
 								@elseif(isset($pending->is_auth_user_can_approve) && $pending->is_auth_user_can_approve != '')
-									@if($pending->is_auth_user_can_approve['can_approve'] == true)
-										<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-											data-bs-target="#approve-selling-price-{{$pending->id}}">
-											<i class="fa fa-thumbs-up" aria-hidden="true"></i>
-										</button>
-										<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-											data-bs-target="#reject-selling-price-{{$pending->id}}">
-											<i class="fa fa-thumbs-down" aria-hidden="true"></i>
-										</button>
+									@if(isset($pending->is_auth_user_can_approve['can_approve']))
+										@if($pending->is_auth_user_can_approve['can_approve'] == true)
+											<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#approve-selling-price-{{$pending->id}}">
+												<i class="fa fa-thumbs-up" aria-hidden="true"></i>
+											</button>
+											<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+												data-bs-target="#reject-selling-price-{{$pending->id}}">
+												<i class="fa fa-thumbs-down" aria-hidden="true"></i>
+											</button>
+										@endif
 									@endif
 								@endif
 							</td>
@@ -200,7 +202,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 																<label class="form-label font-size-13">Approval By Position</label>
 															</div>
 															<div class="col-lg-6 col-md-6 col-sm-6">
-																{{$pending->is_auth_user_can_approve['current_approve_position']}}
+																@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
+																	{{$pending->is_auth_user_can_approve['current_approve_position']}}
+																@endif
 															</div>
 														</div>
 														<div class="row mt-2">
@@ -208,10 +212,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 																<label class="form-label font-size-13">Approval By Name</label>
 															</div>
 															<div class="col-lg-6 col-md-6 col-sm-6">
-																{{$pending->is_auth_user_can_approve['current_approve_person']}}
+																@if(isset($pending->is_auth_user_can_approve['current_approve_person']))
+																	{{$pending->is_auth_user_can_approve['current_approve_person']}}
+																@endif
 															</div>
 														</div>
-														<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
+														@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
+															<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
+														@endif
 														<div class="row mt-2">
 															<div class="col-lg-12 col-md-12 col-sm-12">
 																<label class="form-label font-size-13">Comments</label>
@@ -249,21 +257,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 													<div class="col-12">
 														<div class="row mt-2">
 															<div class="col-lg-6 col-md-6 col-sm-6">
-																<label class="form-label font-size-13">Approval By Position</label>
+																<label class="form-label font-size-13">Rejection By Position</label>
 															</div>
 															<div class="col-lg-6 col-md-6 col-sm-6">
-																{{$pending->is_auth_user_can_approve['current_approve_position']}}
+																@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
+																	{{$pending->is_auth_user_can_approve['current_approve_position']}}
+																@endif
 															</div>
 														</div>
 														<div class="row mt-2">
 															<div class="col-lg-6 col-md-6 col-sm-6">
-																<label class="form-label font-size-13">Approval By Name</label>
+																<label class="form-label font-size-13">Rejection By Name</label>
 															</div>
 															<div class="col-lg-6 col-md-6 col-sm-6">
-																{{$pending->is_auth_user_can_approve['current_approve_person']}}
+																@if(isset($pending->is_auth_user_can_approve['current_approve_person']))
+																	{{$pending->is_auth_user_can_approve['current_approve_person']}}
+																@endif
 															</div>
 														</div>
-														<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
+														@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
+															<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
+														@endif
 														<div class="row mt-2">
 															<div class="col-lg-12 col-md-12 col-sm-12">
 																<label class="form-label font-size-13">Comments</label>
@@ -342,11 +356,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$approvedOne->id)}}">
 									<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
-								<a title="Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.createnew',$approvedOne->id)}}">
+								@if(isset($approvedOne->questionnaire))
+								<a title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.createnew',$approvedOne->id)}}">
 								<i class="fa fa-list" aria-hidden="true"></i>
-								<!-- <i class="fa fa-question" aria-hidden="true"></i> -->
 								</a>
-								
+								@else
+								<a title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.edit',$approvedOne->id)}}">
+								<i class="fa fa-list" aria-hidden="true"></i>
+								</a>
+								<a title="Create Job Description" class="btn btn-sm btn-secondary" href="{{route('job_description.createNew',$approvedOne->id)}}">
+								<i class="fa fa-address-card" aria-hidden="true"></i>
+								</a>
+								@endif
 							</td>
 						</tr>
 						@endforeach
@@ -401,6 +422,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{$rejectedOne->explanation_of_new_hiring}}</td>
 							<td>{{$rejectedOne->created_by_name}}</td>
 							<td>{{$rejectedOne->created_at}}</td>
+							<td>
+							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$rejectedOne->id)}}">
+								<i class="fa fa-eye" aria-hidden="true"></i>
+							</a>
+							</td>
 						</tr>
 						@endforeach
 					</tbody>

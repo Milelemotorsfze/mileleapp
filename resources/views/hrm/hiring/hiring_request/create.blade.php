@@ -546,7 +546,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 	jQuery.validator.addMethod(
 		"money",
 		function(value, element) {
-			var isValidMoney = /^\d{0,4}(\.\d{0,2})?$/.test(value);
+			var isValidMoney = /^\d{0,5}(\.\d{0,2})?$/.test(value);
 			return this.optional(element) || isValidMoney;
 		},
 		"Please enter a valid amount "

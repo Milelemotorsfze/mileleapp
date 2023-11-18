@@ -240,6 +240,10 @@ Route::get('/d', function () {
     
         // Employee Job Description
     Route::resource('job_description', JobDescriptionController::class);
+    Route::controller(JobDescriptionController::class)->group(function(){
+        Route::get('job_description/createnew/{id}', 'create')->name('job_description.createNew');
+    });
+    
     // Employee Passport Request
     Route::resource('passport_request', PassportRequestController::class);
 
