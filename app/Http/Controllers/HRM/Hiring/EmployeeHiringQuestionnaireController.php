@@ -43,8 +43,8 @@ class EmployeeHiringQuestionnaireController extends Controller
         $masterDepartments = MasterDeparment::select('id','name')->get();
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
         $masterSpecificIndustryExperiences = MasterSpecificIndustryExperience::select('id','name')->get();
-        return view('hrm.hiring.questionnaire.create',compact('data','currentQuestionnaire','masterDesignations','masterVisaTypes','masterNationality','masterLanguages','interviewdByUsers',
-            'masterRecuritmentSources','masterDepartments','masterExperienceLevels','masterSpecificIndustryExperiences'));
+        return view('hrm.hiring.questionnaire.create',compact('data','currentQuestionnaire','masterDesignations','masterVisaTypes','masterNationality','masterLanguages',
+        'interviewdByUsers','masterRecuritmentSources','masterDepartments','masterExperienceLevels','masterSpecificIndustryExperiences','masterOfficeLocations'));
     }
     public function store(Request $request) {
         $validator = Validator::make($request->all(), [

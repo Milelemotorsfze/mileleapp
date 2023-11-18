@@ -103,13 +103,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <div class="col-lg-6  ">
                         <span class="error">* </span>
 
-                        <label for="sales-options" class="form-label">Designation:</label>
+                        <label for="designation_type" class="form-label">Designation Type:</label>
                         <div class="designation-radio-button">
                             <label>
-                                <input type="radio" name="sales-option" id="auto-assign-option" value="auto-assign"> Prior
+                                <input type="radio" name="designation_type" id="prior_designation" value="prior_designation" checked> Prior Designation
                             </label>
                             <label>
-                                <input type="radio" name="sales-option" id="manual-assign-option" value="manual-assign"> Current
+                                <input type="radio" name="designation_type" id="current_designation" value="current_designation"> Current Designation
                             </label>
                         </div>
                     </div>
@@ -122,13 +122,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <div class="col-lg-6  ">
                         <span class="error">* </span>
 
-                        <label for="sales-options" class="form-label">Hiring Time:</label>
+                        <label for="hiring_time" class="form-label">Hiring Time:</label>
                         <div class="designation-radio-button">
                             <label>
-                                <input type="radio" name="sales-option" id="auto-assign-option" value="auto-assign3"> Immediate
+                                <input type="radio" name="hiring_time" id="immediate" value="immediate" checked> Immediate
                             </label>
                             <label>
-                                <input type="radio" name="sales-option" id="manual-assign-option" value="manual-assign4"> 1 - Month
+                                <input type="radio" name="hiring_time" id="one_month" value="one_month"> 1 - Month
                             </label>
                         </div>
                     </div>
@@ -140,16 +140,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             <div class="row">
                 <div class="col-lg-4  ">
                     <span class="error">* </span>
-                    <label for="basicpill-firstname-input" class="form-label">Designation 2 (New Role)</label>
-                    <select name="designation-1" id="designation-1" class="form-control widthinput" onchange="showDiv('otherDesignationInputContainer', this)" autofocus>
-                        <option value=""></option>
-                        <option value="option1">option1</option>
-                        <option value="option2">option2</option>
-                        <option value="option3">option3</option>
-                        <option value="0">other</option>
+                    <label for="designation_id" class="form-label">Designation Name</label>
+                    <select name="designation_id" id="requested_job_title" class="form-control widthinput" multiple="true" autofocus>
+                        @foreach($masterDesignations as $masterDesignation)
+                            <option value="{{$masterDesignation->id}}">{{$masterDesignation->name}}</option>
+                        @endforeach
                     </select>
                 </div>
-
+                <div class="col-xxl-4 col-lg-6 col-md-6">
+					<a id="createNewJobTitleButton" data-toggle="popover" data-trigger="hover" title="Create New Job Title" data-placement="top" style="margin-top:38px;"
+						class="btn btn-sm btn-info modal-button" data-modal-id="createNewJobPosition"><i class="fa fa-plus" aria-hidden="true"></i> Create New Job Title</a>
+				</div>
                 <!-- New Designation div shown on the right side -->
                 <div class="col-lg-2 col-md-4">
                     <!-- when the user chooses other, show this other new designation div  -->
@@ -164,27 +165,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             <div class="col-lg-4  ">
                 <span class="error">* </span>
-                <label for="basicpill-firstname-input" class="form-label">Reporting To</label>
-                <select name="designation" id="designation" class="form-control widthinput" autofocus>
+                <label for="reporting_structure" class="form-label">Reporting To</label>
+                <select name="reporting_structure" id="reporting_structure" class="form-control widthinput" autofocus>
                     <option value=""></option>
-                    <option value="option11">Management</option>
-                    <option value="option22">Team Lead</option>
+                    <option value="management">Management</option>
+                    <option value="team_lead">Team Lead / Manager</option>
                 </select>
             </div>
             <div class="col-lg-4  ">
                 <span class="error">* </span>
-                <label for="basicpill-firstname-input" class="form-label">Work Location</label>
-                <select name="designation" id="designation" class="form-control widthinput" autofocus>
-                    <option value=""></option>
-                    <option value="option1">option1</option>
-                    <option value="option2">option2</option>
+                <label for="location_id" class="form-label">Work Location</label>
+                <select name="location_id" id="location_id" class="form-control widthinput" multiple="true" autofocus>
+                    @foreach($masterOfficeLocations as $masterOfficeLocation)
+                        <option value="{{$masterOfficeLocation->id}}">{{$masterOfficeLocation->name}}</option>
+                    @endforeach
                 </select>
             </div>
 
             <div class="col-lg-4  ">
                 <span class="error">* </span>
-                <label for="basicpill-firstname-input" class="form-label">Number of Hirings : </label>
-                <input type="number" placeholder="Location" name="location" class="form-control" id="locationInput">
+                <label for="number_of_openings" class="form-label">Number of Hirings : </label>
+                <input type="number" placeholder="Number of Hirings" name="number_of_openings" class="form-control" id="number_of_openings">
             </div>
 
 
@@ -192,8 +193,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             <div class="col-lg-4  ">
                 <span class="error">* </span>
-                <label for="basicpill-firstname-input" class="form-label">Years of Experience : </label>
-                <input type="number" placeholder="No. of years" name="location" class="form-control" id="locationInput">
+                <label for="no_of_years_of_experience_in_specific_job_role" class="form-label">Years of Experience : </label>
+                <input type="number" placeholder="No. of years" name="no_of_years_of_experience_in_specific_job_role" class="form-control" id="no_of_years_of_experience_in_specific_job_role">
             </div>
 
 
@@ -793,6 +794,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
 </div>
 </br>
+@include('hrm.hiring.hiring_request.createJobPosition')
 @else
 @php
 redirect()->route('home')->send();
@@ -803,6 +805,16 @@ redirect()->route('home')->send();
 @push('scripts')
 <script>
     $(document).ready(function() {
+        $('#requested_job_title').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder:"Choose Designation Name",
+        });
+        $('#location_id').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder:"Choose Work Location",
+        });
         // Show/hide amountPercentageInputContainer based on radio button selection
         $('input[name="driving-lisence"]').change(function() {
             if ($(this).val() === 'auto-assign-yes-0') {
