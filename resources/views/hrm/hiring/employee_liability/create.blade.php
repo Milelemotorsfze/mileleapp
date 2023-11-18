@@ -379,13 +379,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <br />
 
                     <div class="row">
-                        <div class="col-lg-10 col-md-10 col-sm-10 col-12 liability-reason-section">
+                        <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12 liability-reason-section">
                             <div class="row">
                                 <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 emp-liability-lable-name">
                                     <span class="error">*</span>
                                     <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Reason</label>
                                 </div>
-                                <div class="col-xxl-5 col-lg-5 col-md-8 col-sm-7 col-12">
+                                <div class="col-xxl-9 col-lg-8 col-md-8 col-sm-7 col-12">
                                     <textarea class="form-control top-margin-input-1" name="empLiabilityReason" rows="5" cols="25"></textarea>
                                 </div>
                             </div>
