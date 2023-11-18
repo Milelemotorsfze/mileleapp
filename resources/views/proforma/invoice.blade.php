@@ -61,6 +61,9 @@
 .contentveh {
             display: none;
         }
+.row{
+    margin-top: 5px;
+}
     </style>
 <div class="card-header">
 	<h4 class="card-title">
@@ -73,50 +76,65 @@
     <form action="{{ route('quotation-items.store') }}" id="form-create" method="POST" >
         @csrf
         <div class="row">
-            <div class="col-lg-3 col-md-3 col-sm-12">
-                <div class="mb-3">
-                    <label class="col-form-label fw-bold">{{ __('Document Type:') }}</label>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input document_type" type="checkbox" name="document_type" id="inlineCheckbox1" value="Quotation" checked>
-                        <label class="form-check-label" for="inlineCheckbox1">Quotation</label>
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-6">
+                        Document Type :
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input document_type" type="checkbox" name="document_type" id="inlineCheckbox2" value="Proforma">
-                        <label class="form-check-label" for="inlineCheckbox2">Proforma Invoice</label>
+                    <div class="col-sm-6">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input document_type" type="checkbox" name="document_type" id="inlineCheckbox1" value="Quotation" checked>
+                            <label class="form-check-label" for="inlineCheckbox1">Quotation</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input document_type" type="checkbox" name="document_type" id="inlineCheckbox2" value="Proforma">
+                            <label class="form-check-label" for="inlineCheckbox2">Proforma Invoice</label>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-3 col-sm-12">
-                <div class="mb-3">
-                    <label class="col-form-label fw-bold">{{ __('Shipping Method:') }}</label>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
-                               name="shipping_method" id="CNF" value="CNF" >
-                        <label class="form-check-label" for="CNF">CNF</label>
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-6">
+                        Shipping Method :
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
-                               name="shipping_method" id="EXW" value="EXW" checked>
-                        <label class="form-check-label" for="EXW">EXW</label>
+                    <div class="col-sm-6">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
+                                   name="shipping_method" id="CNF" value="CNF" >
+                            <label class="form-check-label" for="CNF">CNF</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
+                                   name="shipping_method" id="EXW" value="EXW" checked>
+                            <label class="form-check-label" for="EXW">EXW</label>
+                        </div>
                     </div>
-                </div>
-                @error('shipping_method')
-                <span class="invalid-feedback" role="alert">
+                    @error('shipping_method')
+                    <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>
-                </span>
-                @enderror
+                    </span>
+                    @enderror
+                </div>
             </div>
-            <div class="col-lg-1 col-md-6 col-sm-12">
-                <label class="form-label">Currency</label>
-            </div>
-            <div class="col-lg-2 col-md-6 col-sm-12">
-                <select class="form-select" name="currency" id="currency">
-                    <option>AED</option>
-                    <option>USD</option>
-                    <option>EUR</option>
-                </select>
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-6">
+                        Currency :
+                    </div>
+                    <div class="col-sm-6">
+                        <select class="form-select" name="currency" id="currency">
+                            <option>AED</option>
+                            <option>USD</option>
+                            <option>EUR</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
+
+
+        <hr>
         <div class="row">
             <div class="col-sm-4">
                 Document Details
@@ -131,20 +149,20 @@
         <hr>
         <div class="row">
             <div class="col-sm-4">
-                <div class="row">
-                    <div class="col-sm-6">
-                        Document No :
-                    </div>
-                    <div class="col-sm-6">
-                        {{$callDetails->id}}
-                    </div>
-                </div>
+{{--                <div class="row">--}}
+{{--                    <div class="col-sm-6">--}}
+{{--                        Document No :--}}
+{{--                    </div>--}}
+{{--                    <div class="col-sm-6">--}}
+{{--                        {{$callDetails->id}}--}}
+{{--                    </div>--}}
+{{--                </div>--}}
                 <div class="row">
                     <div class="col-sm-6">
                         <label for="timeRange">Document Validity:</label>
                     </div>
                     <div class="col-sm-6">
-                        <select id="timeRange">
+                        <select id="timeRange" name="document_validity" class="form-select">
                             <option value="1">1 day</option>
                             <option value="7">7 days</option>
                             <option value="14">14 days</option>
@@ -191,20 +209,20 @@
                 </div>
             </div>
             <div class="col-sm-4">
-                <div class="row">
-                    <div class="col-sm-6">
-                        Customer ID :
-                    </div>
-                    <div class="col-sm-6">
-                        {{ $empProfile->id }}
-                    </div>
-                </div>
-                <div class="row">
+{{--                <div class="row">--}}
+{{--                    <div class="col-sm-6">--}}
+{{--                        Customer ID :--}}
+{{--                    </div>--}}
+{{--                    <div class="col-sm-6">--}}
+{{--                        {{ $empProfile->id }}--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Company :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="company" id="company">
+                        <input type="text"  class="form-control form-control-xs" value="{{ $callDetails->company_name }}" name="company_name" id="company" placeholder="Company Name">
                     </div>
                 </div>
                 <div class="row">
@@ -212,7 +230,7 @@
                         <label for="timeRange">Person :</label>
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="name" id="name" value="{{$callDetails->name}}">
+                        <input type="text" name="person"  placeholder="Person Name"  class="form-control form-control-xs" id="person" value="{{$callDetails->name}}">
                     </div>
                 </div>
                 <div class="row">
@@ -220,7 +238,7 @@
                         Contact No :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="phone_number" id="phone_number" value="{{$callDetails->phone}}">
+                        <input type="text" name="contact_number"  class="form-control form-control-xs" id="contact_number" value="{{$callDetails->phone}}" placeholder="Phone">
                     </div>
                 </div>
                 <div class="row">
@@ -228,7 +246,7 @@
                         Email :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="email" id="email" value="{{$callDetails->email}}">
+                        <input type="text" name="email" id="email"  class="form-control form-control-xs"  value="{{$callDetails->email}}" placeholder="Email">
                     </div>
                 </div>
                 <div class="row">
@@ -236,7 +254,7 @@
                         Address :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="address" id="address">
+                        <input type="text" name="address"  class="form-control form-control-xs" placeholder="Address" value="{{ $callDetails->address }}"  id="address">
                     </div>
                 </div>
             </div>
@@ -247,7 +265,7 @@
                             Final Destination :
                         </div>
                         <div class="col-sm-6">
-                            <input type="text" name="address" id="address">
+                            <input type="text" class="form-control form-control-xs" placeholder="Destination" name="final_destination" id="final_destination">
                         </div>
                     </div>
                     <div class="row">
@@ -255,7 +273,7 @@
                             Incoterm :
                         </div>
                         <div class="col-sm-6">
-                            <input type="text" name="address" id="address">
+                            <input type="text" name="incoterm" id="incoterm" class="form-control form-control-xs" placeholder="Incoterm">
                         </div>
                     </div>
                     <div class="row">
@@ -263,7 +281,7 @@
                             Place of Delivery :
                         </div>
                         <div class="col-sm-6">
-                            <input type="text" name="address" id="address">
+                            <input type="text" name="place_of_delivery" id="place_of_delivery" class="form-control form-control-xs" placeholder="Place of Delivery">
                         </div>
                     </div>
                 </div>
@@ -272,7 +290,7 @@
                         Place of Supply :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="palce_of_supply" >
+                        <input type="text" name="place_of_supply" class="form-control form-control-xs" placeholder="Place Of Supply">
                     </div>
                 </div>
             </div>
@@ -294,7 +312,7 @@
                         System Code :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="address" id="address">
+                        <input type="text" name="system_code" id="system_code" class="form-control form-control-xs" placeholder="System Code">
                     </div>
                 </div>
                 <div class="row">
@@ -302,7 +320,7 @@
                         Payment Terms :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="address" id="address">
+                        <input type="text" name="payment_terms" id="payment_terms" class="form-control form-control-xs" placeholder="Payment Terms">
                     </div>
                 </div>
             </div>
@@ -312,7 +330,7 @@
                         Rep Name :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="address" id="address">
+                        <input type="text" name="representative_name" id="representative_name" class="form-control form-control-xs" placeholder="Rep. Name">
                     </div>
                 </div>
                 <div class="row">
@@ -320,7 +338,7 @@
                         Rep No :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="address" id="address">
+                        <input type="text" name="representative_number" id="representative_number" class="form-control form-control-xs" placeholder="Rep. Number">
                     </div>
                 </div>
             </div>
@@ -330,7 +348,7 @@
                         CB Name :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="address" id="address">
+                        <input type="text" name="cb_name" id="cb_name" class="form-control form-control-xs" placeholder="CB Name">
                     </div>
                 </div>
                 <div class="row">
@@ -338,7 +356,7 @@
                         CB No :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="address" id="address">
+                        <input type="text" name="cb_number" id="cb_number" class="form-control form-control-xs" placeholder="CB Number">
                     </div>
                 </div>
             </div>
@@ -348,12 +366,11 @@
                         Advance Amount :
                     </div>
                     <div class="col-sm-6">
-                        <input type="number" min="0" class="advance-amount" name="advance_amount" id="advance-amount" >
+                        <input type="number" min="0" class="form-control form-control-xs advance-amount"
+                               name="advance_amount" id="advance-amount" placeholder="Advance Amount" >
                     </div>
                 </div>
-
             </div>
-
         </div>
         <div class="row mt-2">
             <div class="col-sm-12">
@@ -362,7 +379,7 @@
                         Remarks :
                     </div>
                     <div class="col-sm-6">
-                        <textarea cols="40" rows="5" name="remarks" placeholder="Add Remarks" class="form-control" value=""></textarea>
+                        <textarea cols="40" rows="5" name="remarks" placeholder="Remarks" class="form-control" value=""></textarea>
                     </div>
                 </div>
             </div>
@@ -411,7 +428,6 @@
                     <input type="number" readonly id="total_in_selected_currency" name="total_in_selected_currency" placeholder="Total Amount" class="fw-bold form-control" value="">
                 </div>
             </div>
-
             </div>
         </div>
         <br>
@@ -1749,9 +1765,9 @@
         resetSerialNumber(table);
         // total amount div logic
         $('.total-div').attr('hidden', false);
-
+        CalculateTotalAmount();
         calculateTotalSum();
-        enableOrDisableSubmit();
+        // enableOrDisableSubmit();
         showPriceInSelectedValue();
     });
 
@@ -1791,15 +1807,19 @@
 
             $('#total_in_selected_currency').val(totalAmount.toFixed(3));
             var currency = $('#currency').val();
-            var total = 0;
+
             if(currency == 'USD') {
                 var value = '{{ $aed_to_usd_rate->value }}';
                 var total = totalAmount * value;
+                $('#total').val(total.toFixed(3));
             }else if(currency == 'EUR') {
                 var value = '{{ $aed_to_eru_rate->value }}';
                 var total = totalAmount * value;
+                $('#total').val(total.toFixed(3));
+            }else{
+                $('#total').val(totalAmount.toFixed(3));
             }
-            $('#total').val(total.toFixed(3));
+
 
              enableOrDisableSubmit();
 
