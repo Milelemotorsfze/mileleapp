@@ -57,10 +57,8 @@ public function store(Request $request)
         ->where('gearbox', $request->input('gearbox'))
         ->where('steering', $request->input('steering'))
         ->where('upholestry', $request->input('upholestry'))
-        // ->where('int_colour', $request->input('int_colour'))
-        // ->where('ex_colour', $request->input('ex_colour'))
         ->where(function ($query) use ($selectedSpecifications) {
-            foreach ($selectedSpecifications as $specificationData) {
+            foreach ($selectedSpecifications as $specificationData) { 
                 $query->whereHas('variantItems', function ($q) use ($specificationData) {
                     $q->where('model_specification_id', $specificationData['specification_id'])
                       ->where('model_specification_options_id', $specificationData['value']);
@@ -71,13 +69,100 @@ public function store(Request $request)
     if ($existingVariantop) {
         return redirect()->route('variants.index')->with('error', 'Variant with the same specifications and options already exists');
     }
+    $existingspecifications = Varaint::where('brands_id', $request->input('brands_id'))
+        ->where('master_model_lines_id', $request->input('master_model_lines_id'))
+        ->where('coo', $request->input('coo'))
+        ->where('my', $request->input('my'))
+        ->where('drive_train', $request->input('drive_train'))
+        ->where('gearbox', $request->input('gearbox'))
+        ->where('upholestry', $request->input('upholestry'))
+        ->where(function ($query) use ($selectedSpecifications) {
+            foreach ($selectedSpecifications as $specificationData) { 
+                $query->whereHas('variantItems', function ($q) use ($specificationData) {
+                    $q->where('model_specification_id', $specificationData['specification_id'])
+                      ->where('model_specification_options_id', $specificationData['value']);
+                });
+            }
+        })
+        ->orderBy('created_at', 'desc')
+        ->first();
+    if ($existingspecifications) {
+        $steering = $request->input('steering');
+        if($steering == "LHD"){
+            $steeringn = "L";
+        }
+        else{
+            $steeringn = "R";
+        }
+        $master_model_lines_id = $request->input('master_model_lines_id');
+        $engine = $request->input('engine');
+        $fuel_type = $request->input('fuel_type');
+        if($fuel_type == "Petrol")
+        {
+            $f = "P";
+        }
+        else if($fuel_type == "Diesel") 
+        {
+            $f = "D";
+        }
+        else if($fuel_type == "PHEV") 
+        {
+            $f = "P";
+        }
+        else if($fuel_type == "MHEV") 
+        {
+            $f = "M";
+        }
+        else
+        {
+            $f = "E";
+        }
+        $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+        $existingName = $existingspecifications->name;
+        $parts = explode('_', $existingName);
+        
+        if (count($parts) > 1) {
+            $lastNumber = end($parts);
+        
+            if (is_numeric($lastNumber)) {
+                $namepart = $steeringn . $model_line . $engine . $f;
+                $newNumber = (int)$lastNumber;
+                $name = $namepart . '_' . $newNumber;  // Use $namepart directly
+            } else {
+                $NewexistingName = substr($existingName, 0, -1);
+                $parts = explode('_', $NewexistingName);
+        
+                if (count($parts) > 1) {
+                    $lastNumber = end($parts);
+        
+                    if (is_numeric($lastNumber)) {
+                        $namepart =  $steeringn . $model_line . $engine . $f;
+                        $newNumber = (int)$lastNumber;
+                        $name = $namepart . '_' . $newNumber;  // Use $namepart directly
+                    } 
+                }
+            }
+        }        
+         else {
+                $name = $existingName . '_1';
+        }
+    }
+    else{
     $maxVariant = Varaint::where('brands_id', $request->input('brands_id'))
     ->where('master_model_lines_id', $request->input('master_model_lines_id'))
     ->where('fuel_type', $request->input('fuel_type'))
     ->where('engine', $request->input('engine'))
+    ->where('steering', $request->input('steering'))
     ->orderBy('name', 'desc')
     ->first();
     $master_model_lines_id = $request->input('master_model_lines_id');
+    $steering = $request->input('steering');
+    if($steering == "LHD"){
+        $steeringn = "L";
+    }
+    else{
+        $steeringn = "R";
+    }
     $engine = $request->input('engine');
     $fuel_type = $request->input('fuel_type');
     if($fuel_type == "Petrol")
@@ -127,11 +212,75 @@ public function store(Request $request)
     }
     } 
     else {
-            $name = $model_line . $engine . $f . '_1';
+            $name = $steeringn . $model_line . $engine . $f . '_1';
     }
+}
     (new UserActivityController)->createActivity('Creating New Variant');
     $model_details= $request->input('model_detail');
+    if($model_details == null){
+    $steering = $request->input('steering');
+    $master_model_lines_id = $request->input('master_model_lines_id');
+    $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+    $engine = $request->input('engine');
+    $gearbox = $request->input('gearbox');
+    $fuel_type = $request->input('fuel_type');
+    if($fuel_type == "Petrol")
+    {
+        $f = "P";
+    }
+    else if($fuel_type == "Diesel") 
+    {
+        $f = "D";
+    }
+    else if($fuel_type == "PHEV") 
+    {
+        $f = "P";
+    }
+    else if($fuel_type == "MHEV") 
+    {
+        $f = "M";
+    }
+    else
+    {
+        $f = "E";
+    }
+    $model_details = $steering . ' ' . $model_line . ' ' . $engine . ' ' . $gearbox . ' ' . $fuel_type;
+    }
     $variant_details= $request->input('variant');
+    if($variant_details == null)
+    {
+        $steering = $request->input('steering');
+        $master_model_lines_id = $request->input('master_model_lines_id');
+        $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+        $engine = $request->input('engine');
+        $gearbox = $request->input('gearbox');
+        $coo = $request->input('coo');
+        $my = $request->input('my');
+        $drive_train = $request->input('drive_train');
+        $upholestry = $request->input('upholestry');
+        $fuel_type = $request->input('fuel_type');
+        if($fuel_type == "Petrol")
+        {
+            $f = "P";
+        }
+        else if($fuel_type == "Diesel") 
+        {
+            $f = "D";
+        }
+        else if($fuel_type == "PHEV") 
+        {
+            $f = "P";
+        }
+        else if($fuel_type == "MHEV") 
+        {
+            $f = "M";
+        }
+        else
+        {
+            $f = "E";
+        }
+        $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
+    }
     $variant = new Varaint();
     $variant->brands_id = $request->input('brands_id');
     $variant->master_model_lines_id = $request->input('master_model_lines_id');

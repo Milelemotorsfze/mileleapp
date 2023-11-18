@@ -65,38 +65,58 @@ class EmployeeHiringRequest extends Model
         'hr_manager_name',
         'hr_manager_email',
         'is_auth_user_can_approve',
+        'current_status',
     ];
     public function getDepartmentNameAttribute() {
+        $departmentName = '';
         $department = MasterDeparment::find($this->department_id);
-        $departmentName = $department->name;
+        if($department) {
+            $departmentName = $department->name;
+        }
         return $departmentName;
     }
     public function getDepartmentLocationAttribute() {
+        $departmentLocation = '';
         $location = MasterOfficeLocation::find($this->location_id);
-        $departmentLocation = $location->name;
+        if($location) {
+            $departmentLocation = $location->name;
+        }
         return $departmentLocation;
     }
     public function getRequestedByNameAttribute() {
+        $requestedByName = '';
         $requestedByUser = User::find($this->requested_by);
-        $requestedByName = $requestedByUser->name;
+        if($requestedByUser) {
+            $requestedByName = $requestedByUser->name;
+        }
         return $requestedByName;
     }
     public function getRequestedJobNameAttribute() {
+        $requestedJobName = '';
         $requestedJob = MasterJobPosition::find($this->requested_job_title);
-        $requestedJobName = $requestedJob->name;
+        if($requestedJob) {
+            $requestedJobName = $requestedJob->name;
+        }
         return $requestedJobName;
     }
     public function getReportingToNameAttribute() {
+        $reportingToName = '';
         $reportingTo = User::find($this->reporting_to);
-        $reportingToName = $reportingTo->name;
+        if($reportingTo) {
+            $reportingToName = $reportingTo->name;
+        }
         return $reportingToName;
     }
     public function getExperienceLevelNameAttribute() {
+        $experienceLevelName = '';
         $experienceLevel = MasterExperienceLevel::find($this->experience_level);
-        $experienceLevelName = $experienceLevel->name .' (' .$experienceLevel->number_of_year_of_experience.' )';
+        if($experienceLevel) {
+            $experienceLevelName = $experienceLevel->name .' (' .$experienceLevel->number_of_year_of_experience.' )';
+        }
         return $experienceLevelName;
     }
     public function getTypeOfRoleNameAttribute() {
+        $typeOfRoleName = '';
         if($this->type_of_role == 'new_position') {
             $typeOfRoleName = 'New Position';
         }
@@ -114,8 +134,11 @@ class EmployeeHiringRequest extends Model
         }
     }
     public function getCreatedByNameAttribute() {
+        $createdByName = '';
         $createdBy = User::find($this->created_by);
-        $createdByName = $createdBy->name;
+        if($createdBy) {
+            $createdByName = $createdBy->name;
+        }
         return $createdByName;
     }
     public function getHiringManagerNameAttribute() {
@@ -193,8 +216,31 @@ class EmployeeHiringRequest extends Model
         }
         return $isAuthUserCanApprove;
     }
+    public function getCurrentStatusAttribute() {
+        $currentStatus = '';
+        if($this->status == 'approved') {
+            $currentStatus = 'Approved';
+        }
+        else if($this->status == 'rejected') {
+            $currentStatus = 'Rejected';
+        }
+        else if($this->status == 'pending' && $this->action_by_hiring_manager == 'pending') {
+            $currentStatus = "Hiring Manager's Approval Awaiting";
+        }
+        else if($this->status == 'pending' && $this->action_by_department_head == 'pending') {
+            $currentStatus = "Department Head's Approval Awaiting";
+        }
+        else if($this->status == 'pending' && $this->action_by_hr_manager == 'pending') {
+            $currentStatus = "HR Manager's Approval Awaiting";
+        }
+        return $currentStatus;
+    }
     public function history()
     {
         return $this->hasMany(EmployeeHiringRequestHistory::class,'hiring_request_id','id');
+    }
+    public function questionnaire()
+    {
+        return $this->hasOne(EmployeeHiringQuestionnaire::class,'hiring_request_id','id');
     }
 }
