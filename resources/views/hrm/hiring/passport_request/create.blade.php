@@ -370,15 +370,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                                 <!-- Other Checkbox and Input -->
                                 <div class="row">
-                                    <div class="col-lg-12">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                                         <div class="other-checklist-div">
-                                            <div class="d-flex align-items-center">
-                                                <div class="form-check">
+                                            <div class="d-flex align-items-center" style="flex-wrap: wrap">
+                                                <div class="col-lg-3 col-md-3 col-sm-6 col-12 form-check">
                                                     <input type="checkbox" id="item10" name="item10" class="form-check-input">
                                                     <label for="item10" class="form-check-label">Other, please specify:</label>
                                                 </div>
                                                 <div class="other-input-container">
-                                                    <div class="col-lg-10 col-md-10 col-sm-10 col-12">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                                                         <input type="text" class="form-control" name="otherReason" id="otherReason">
                                                     </div>
                                                 </div>
@@ -401,7 +401,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
 
         <hr />
-        <div class="col-lg-6 col-md-12 col-sm-12 col-12">
+
+        <!-- Signatures Div -->
+        <!-- <div class="col-lg-6 col-md-12 col-sm-12 col-12">
             <div class="amountpercentageDropDownInputContainer">
                 <h5>Signatures</h5>
             </div>
@@ -410,7 +412,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
         <div class="col-lg-12 job-desc-top-info">
             <div class="row">
-                <!-- Employee Signature Section -->
                 <div class="col-lg-6 col-md-7 col-sm-10 col-12 emp-sign-section-div">
                     <div class="row">
                         <div class="col-xxl-5 col-lg-6 col-md-5 col-sm-5 col-12 passport-signature-section-lable-name">
@@ -422,21 +423,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
                 </div>
 
-                <!-- Employee Sign Date Section -->
                 <div class="col-lg-6 col-md-5 col-sm-10 col-12 sign-date-section-div">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 passport-signature-section-lable-name">
                             <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date</label>
                         </div>
                         <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="text" class="form-control top-margin-input-1" name="empSign">
+                            <input type="date" class="form-control top-margin-input-1" name="empSign">
                         </div>
                     </div>
                 </div>
             </div>
             <br />
             <div class="row ">
-                <!-- Reporting Manager Signature Section -->
                 <div class="col-lg-6 col-md-7 col-sm-10 col-12 reportingManager-signature-section-div">
                     <div class="row">
                         <div class="col-xxl-5 col-lg-6 col-md-5 col-sm-5 col-12 passport-signature-section-lable-name">
@@ -448,14 +447,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
                 </div>
 
-                <!-- Reporting Manager Signature Date Section -->
                 <div class="col-lg-6 col-md-5 col-sm-10 col-12 sign-date-section-div">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 reportingManager-signature-section-lable-name">
                             <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date</label>
                         </div>
                         <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="text" class="form-control top-margin-input-1" name="repManagerSignDate">
+                            <input type="date" class="form-control top-margin-input-1" name="repManagerSignDate">
                         </div>
                     </div>
                 </div>
@@ -464,7 +462,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             <div class="row">
 
-                <!-- Division Head Signature Section -->
                 <div class="col-lg-6 col-md-7 col-sm-10 col-12 divHead-section-div">
                     <div class="row">
                         <div class="col-xxl-5 col-lg-6 col-md-5 col-sm-5 col-12 divHead-signature-section-lable-name">
@@ -476,14 +473,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
                 </div>
 
-                <!-- Division Head Signature Date Section -->
                 <div class="col-lg-6 col-md-5 col-sm-10 col-12 sign-date-section-div">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 divHead-signature-section-lable-name">
                             <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date</label>
                         </div>
                         <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="text" class="form-control top-margin-input-1" name="divHeadSignDate">
+                            <input type="date" class="form-control top-margin-input-1" name="divHeadSignDate">
                         </div>
                     </div>
                 </div>
@@ -492,7 +488,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             <div class="row">
 
-                <!-- HR Manager Signature Section -->
                 <div class="col-lg-6 col-md-7 col-sm-10 col-12 hrManager-signature-section-div">
                     <div class="row">
                         <div class="col-xxl-5 col-lg-6 col-md-5 col-sm-5 col-12 hrManager-signature-section-lable-name">
@@ -504,20 +499,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
                 </div>
 
-                <!-- HR Manager Signature Date Section -->
                 <div class="col-lg-6 col-md-5 col-sm-10 col-12 sign-date-section-div">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 hrManager-signature-section-lable-name">
                             <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date</label>
                         </div>
                         <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="text" class="form-control top-margin-input-1" name="hrManagerSign">
+                            <input type="date" class="form-control top-margin-input-1" name="hrManagerSign">
                         </div>
                     </div>
                 </div>
             </div>
 
-        </div>
+        </div> -->
 
     </form>
 

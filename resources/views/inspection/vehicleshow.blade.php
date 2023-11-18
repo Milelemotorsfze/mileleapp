@@ -15,14 +15,14 @@
 <div class="card-body">
         <div class="row">
         <div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Brand</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$brand->brand_name ?? ''}}
-</div>
-</div>
+    <div class="row">
+        <div class="col-md-4">
+            <label><strong>Brand</strong></label>
+        </div>
+        <div class="col-md-8">
+                        {{ $brand->brand_name }}
+        </div>
+    </div>
 </div>
 <div class="col-md-3">
 <div class="row">
@@ -45,22 +45,150 @@
 </div>
 </div>
 <div class="col-md-3">
+    <div class="row">
+        <div class="col-md-4">
+            <label><strong>Steering</strong></label>
+        </div>
+        <div class="col-md-8">
+            <select name="steering" class="form-control">
+            <option value="LHD" <?php echo ($variant->steering == 'LHD') ? 'selected' : ''; ?>>LHD</option>
+            <option value="RHD" <?php echo ($variant->steering == 'RHD') ? 'selected' : ''; ?>>RHD</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="col-md-3">
+    <div class="row">
+        <div class="col-md-4">
+            <label><strong>COO</strong></label>
+        </div>
+        <div class="col-md-8">
+            <select name="coo" class="form-control">
+            <option value="LHD" <?php echo ($variant->steering == 'LHD') ? 'selected' : ''; ?>>LHD</option>
+            <option value="RHD" <?php echo ($variant->steering == 'RHD') ? 'selected' : ''; ?>>RHD</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="col-md-3">
+    <div class="row">
+        <div class="col-md-4">
+            <label><strong>Model Year</strong></label>
+        </div>
+        <div class="col-md-8">
+            <select name="model_year" class="form-control">
+                <?php
+                $currentYear = date('Y');
+                for ($i = $currentYear - 10; $i <= $currentYear + 10; $i++) {
+                    echo "<option value=\"$i\"";
+                    echo ($variant->my == $i) ? ' selected' : '';
+                    echo ">$i</option>";
+                }
+                ?>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="col-md-3">
+    <div class="row">
+        <div class="col-md-4">
+            <label><strong>Transmission</strong></label>
+        </div>
+        <div class="col-md-8">
+            <select name="gearbox" class="form-control">
+                <option value="Auto" <?php echo ($variant->gearbox == 'Auto') ? 'selected' : ''; ?>>Automatic</option>
+                <option value="Manual" <?php echo ($variant->gearbox == 'Manual') ? 'selected' : ''; ?>>Manual</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="col-md-3">
+    <div class="row">
+        <div class="col-md-4">
+            <label><strong>Drive Train</strong></label>
+        </div>
+        <div class="col-md-8">
+            <select name="drive_train" class="form-control">
+                <option value="AWD" <?php echo ($variant->drive_train == 'AWD') ? 'selected' : ''; ?>>AWD</option>
+                <option value="RWD" <?php echo ($variant->drive_train == 'RWD') ? 'selected' : ''; ?>>RWD</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="col-md-3">
+    <div class="row">
+        <div class="col-md-4">
+            <label><strong>Fuel Type</strong></label>
+        </div>
+        <div class="col-md-8">
+            <select name="fuel_type" class="form-control">
+                <option value="Petrol" <?php echo ($variant->fuel_type == 'Petrol') ? 'selected' : ''; ?>>Petrol</option>
+                <option value="Diesel" <?php echo ($variant->fuel_type == 'Diesel') ? 'selected' : ''; ?>>Diesel</option>
+                <option value="PHEV" <?php echo ($variant->fuel_type == 'PHEV') ? 'selected' : ''; ?>>PHEV</option>
+                <option value="MHEV" <?php echo ($variant->fuel_type == 'MHEV') ? 'selected' : ''; ?>>MHEV</option>
+                <option value="EV" <?php echo ($variant->fuel_type == 'EV') ? 'selected' : ''; ?>>EV</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="col-md-3">
+    <div class="row">
+        <div class="col-md-4">
+            <label><strong>Engine</strong></label>
+        </div>
+        <div class="col-md-8">
+            <select name="engine" class="form-control">
+                <option value="0.8" <?php echo ($variant->engine == '0.8') ? 'selected' : ''; ?>>0.8</option>
+                <option value="1" <?php echo ($variant->engine == '1') ? 'selected' : ''; ?>>1</option>
+                <option value="1.2" <?php echo ($variant->engine == '1.2') ? 'selected' : ''; ?>>1.2</option>
+                <option value="1.4" <?php echo ($variant->engine == '1.4') ? 'selected' : ''; ?>>1.4</option>
+                <option value="1.5" <?php echo ($variant->engine == '1.5') ? 'selected' : ''; ?>>1.5</option>
+                <option value="1.6" <?php echo ($variant->engine == '1.6') ? 'selected' : ''; ?>>1.6</option>
+                <option value="1.8" <?php echo ($variant->engine == '1.8') ? 'selected' : ''; ?>>1.8</option>
+                <option value="2" <?php echo ($variant->engine == '2') ? 'selected' : ''; ?>>2</option>
+                <option value="2.2" <?php echo ($variant->engine == '2.2') ? 'selected' : ''; ?>>2.2</option>
+                <option value="2.4" <?php echo ($variant->engine == '2.4') ? 'selected' : ''; ?>>2.4</option>
+                <option value="2.5" <?php echo ($variant->engine == '2.5') ? 'selected' : ''; ?>>2.5</option>
+                <option value="2.7" <?php echo ($variant->engine == '2.7') ? 'selected' : ''; ?>>2.7</option>
+                <option value="2.8" <?php echo ($variant->engine == '2.8') ? 'selected' : ''; ?>>2.8</option>
+                <option value="3" <?php echo ($variant->engine == '3') ? 'selected' : ''; ?>>3</option>
+                <option value="3.3" <?php echo ($variant->engine == '3.3') ? 'selected' : ''; ?>>3.3</option>
+                <option value="3.5" <?php echo ($variant->engine == '3.5') ? 'selected' : ''; ?>>3.5</option>
+                <option value="4" <?php echo ($variant->engine == '4') ? 'selected' : ''; ?>>4</option>
+                <option value="4.2" <?php echo ($variant->engine == '4.2') ? 'selected' : ''; ?>>4.2</option>
+                <option value="4.4" <?php echo ($variant->engine == '4.4') ? 'selected' : ''; ?>>4.4</option>
+                <option value="4.5" <?php echo ($variant->engine == '4.5') ? 'selected' : ''; ?>>4.5</option>
+                <option value="4.8" <?php echo ($variant->engine == '4.8') ? 'selected' : ''; ?>>4.8</option>
+                <option value="5.3" <?php echo ($variant->engine == '5.3') ? 'selected' : ''; ?>>5.3</option>
+                <option value="5.6" <?php echo ($variant->engine == '5.6') ? 'selected' : ''; ?>>5.6</option>
+                <option value="5.7" <?php echo ($variant->engine == '5.7') ? 'selected' : ''; ?>>5.7</option>
+                <option value="6" <?php echo ($variant->engine == '6') ? 'selected' : ''; ?>>6</option>
+                <option value="6.2" <?php echo ($variant->engine == '6.2') ? 'selected' : ''; ?>>6.2</option>
+                <option value="6.7" <?php echo ($variant->engine == '6.7') ? 'selected' : ''; ?>>6.7</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="col-md-3">
+    <div class="row">
+        <div class="col-md-4">
+            <label><strong>Drive Train</strong></label>
+        </div> 
+        <div class="col-md-8">
+            <select name="upholestry" class="form-control">
+                <option value="Leather" <?php echo ($variant->upholstery == 'Leather') ? 'selected' : ''; ?>>Leather</option>
+                <option value="Fabric" <?php echo ($variant->upholstery == 'Fabric') ? 'selected' : ''; ?>>Fabric</option>
+            </select>
+        </div>
+    </div>
+</div>
+<!-- <div class="col-md-3">
 <div class="row">
 <div class="col-md-4">
                     <label><strong>Variant</strong></label>
 </div>
 <div class="col-md-8">
                     {{$variant->name ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Year</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->my ?? ''}}
 </div>
 </div>
 </div>
@@ -143,7 +271,7 @@
                             {{$extColor->name ?? ''}}
             </div>
             </div>
-            </div>
+            </div> -->
             </div>
             <hr>
             <div class="modal fade" id="newVariantModal" tabindex="-1" aria-labelledby="newVariantModalLabel" aria-hidden="true">

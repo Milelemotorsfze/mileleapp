@@ -72,6 +72,8 @@ use App\Http\Controllers\ProformaInvoiceController;
 use App\Http\Controllers\ApprovalAwaitingController;
 use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\HRM\Hiring\EmployeeLeaveController;
+use App\Http\Controllers\HRM\Hiring\EmployeeLiabilityController;
 
 /*
 /*
@@ -250,6 +252,11 @@ Route::get('/d', function () {
     // Employee Passport Request
     Route::resource('passport_request', PassportRequestController::class);
 
+    // Employee Liability 
+    Route::resource('employee_liability', EmployeeLiabilityController::class);
+    
+    // Employee Leave 
+    Route::resource('employee_leave', EmployeeLeaveController::class);
 
 
     // Demand & Planning Module

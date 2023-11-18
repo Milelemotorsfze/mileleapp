@@ -127,12 +127,33 @@
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Engine</label>
                                     <select class="form-control" autofocus name="engine" id="engine">
+                                        <option value="0.8" {{ old('engine') == '0.8' ? 'selected' : '' }}>0.8</option>
+                                        <option value="1" {{ old('engine') == '1' ? 'selected' : '' }}>1</option>
+                                        <option value="1.2" {{ old('engine') == '1.2' ? 'selected' : '' }}>1.2</option>
+                                        <option value="1.4" {{ old('engine') == '1.4' ? 'selected' : '' }}>1.4</option>
+                                        <option value="1.5" {{ old('engine') == '1.5' ? 'selected' : '' }}>1.5</option>
                                         <option value="1.6" {{ old('engine') == '1.6' ? 'selected' : '' }}>1.6</option>
-                                        <option value="2.0" {{ old('engine') == '2.0' ? 'selected' : '' }}>2.0</option>
+                                        <option value="1.8" {{ old('engine') == '1.8' ? 'selected' : '' }}>1.8</option>
+                                        <option value="2" {{ old('engine') == '2' ? 'selected' : '' }}>2</option>
+                                        <option value="2.2" {{ old('engine') == '2.2' ? 'selected' : '' }}>2.2</option>
                                         <option value="2.4" {{ old('engine') == '2.4' ? 'selected' : '' }}>2.4</option>
-                                        <option value="3.0" {{ old('engine') == '3.0' ? 'selected' : '' }}>3.0</option>
+                                        <option value="2.5" {{ old('engine') == '2.5' ? 'selected' : '' }}>2.5</option>
+                                        <option value="2.7" {{ old('engine') == '2.7' ? 'selected' : '' }}>2.7</option>
+                                        <option value="2.8" {{ old('engine') == '2.8' ? 'selected' : '' }}>2.8</option>
+                                        <option value="3" {{ old('engine') == '3' ? 'selected' : '' }}>3</option>
                                         <option value="3.3" {{ old('engine') == '3.3' ? 'selected' : '' }}>3.3</option>
-                                        <option value="3.6" {{ old('engine') == '3.6' ? 'selected' : '' }}>3.6</option>
+                                        <option value="3.5" {{ old('engine') == '3.5' ? 'selected' : '' }}>3.5</option>
+                                        <option value="4" {{ old('engine') == '4' ? 'selected' : '' }}>4</option>
+                                        <option value="4.2" {{ old('engine') == '4.2' ? 'selected' : '' }}>4.2</option>
+                                        <option value="4.4" {{ old('engine') == '4.4' ? 'selected' : '' }}>4.4</option>
+                                        <option value="4.5" {{ old('engine') == '4.5' ? 'selected' : '' }}>4.5</option>
+                                        <option value="4.8" {{ old('engine') == '4.8' ? 'selected' : '' }}>4.8</option>
+                                        <option value="5.3" {{ old('engine') == '5.3' ? 'selected' : '' }}>5.3</option>
+                                        <option value="5.6" {{ old('engine') == '5.6' ? 'selected' : '' }}>5.6</option>
+                                        <option value="5.7" {{ old('engine') == '5.7' ? 'selected' : '' }}>5.7</option>
+                                        <option value="6" {{ old('engine') == '6' ? 'selected' : '' }}>6</option>
+                                        <option value="6.2" {{ old('engine') == '6.2' ? 'selected' : '' }}>6.2</option>
+                                        <option value="6.7" {{ old('engine') == '6.7' ? 'selected' : '' }}>6.7</option>
                                     </select>
                                 </div>
                             </div>
@@ -148,7 +169,7 @@
                             <div class="col-lg-2 col-md-6 col-sm-12" id="Upholstery">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Upholstery</label>
-                                    <select class="form-control" autofocus name="upholstery" id="upholstery">
+                                    <select class="form-control" autofocus name="upholestry" id="upholstery">
                                         <option value="Leather" {{ old('steering') == 'Leather' ? 'selected' : '' }}>Leather</option>
                                         <option value="Fabric" {{ old('steering') == 'Fabric' ? 'selected' : '' }}>Fabric</option>
                                     </select>
