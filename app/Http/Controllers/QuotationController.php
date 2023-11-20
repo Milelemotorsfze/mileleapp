@@ -140,9 +140,9 @@ class QuotationController extends Controller
         }
         DB::commit();
 //        $quotationItem = QuotationItem::where('quotation_id', $quotation->id)->first();
-//        $quotation = Quotation::find(57);
+//        $quotation = Quotation::find(58);
 //        $call = Calls::find($quotation->calls_id);
-//        $quotationDetail = QuotationDetail::where('quotation_id', 57)->first();
+//        $quotationDetail = QuotationDetail::where('quotation_id', 58)->first();
 
         $vehicles =  QuotationItem::where("reference_type", 'App\Models\Vehicles')
             ->where('quotation_id', $quotation->id)->get();

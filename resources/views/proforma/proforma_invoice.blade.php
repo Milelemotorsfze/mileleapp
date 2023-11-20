@@ -107,16 +107,16 @@
                     <tr>
                         <td>{{ $vehicle->description }}</td>
                         <td>{{ $vehicle->quantity }}</td>
-                        <td>{{ number_format($vehicle->unit_price, 2) }}</td>
-                        <td>{{ number_format($vehicle->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($vehicle->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($vehicle->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
                 @foreach($variants as $variant)
                     <tr>
                         <td>{{ $variant->description }}</td>
                         <td>{{ $variant->quantity }}</td>
-                        <td>{{ number_format($variant->unit_price, 2) }}</td>
-                        <td>{{ number_format($variant->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($variant->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($variant->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
             @endif
@@ -131,16 +131,16 @@
                     <tr>
                         <td>{{ $shippingCharge->description }}</td>
                         <td>{{ $shippingCharge->quantity }}</td>
-                        <td>{{ number_format($shippingCharge->unit_price, 2) }}</td>
-                        <td>{{ number_format($shippingCharge->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($shippingCharge->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($shippingCharge->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
                 @foreach($shippingDocuments as $shippingDocument)
                     <tr>
                         <td>{{ $shippingDocument->description }}</td>
                         <td>{{ $shippingDocument->quantity }}</td>
-                        <td>{{ number_format($shippingDocument->unit_price, 2) }}</td>
-                        <td>{{ number_format($shippingDocument->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($shippingDocument->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($shippingDocument->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
             @endif
@@ -156,8 +156,8 @@
                     <tr>
                         <td>{{ $addon->description }}</td>
                         <td>{{ $addon->quantity }}</td>
-                        <td>{{ number_format($addon->unit_price, 2) }}</td>
-                        <td>{{ number_format($addon->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($addon->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($addon->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
             @endif
@@ -172,16 +172,16 @@
                     <tr>
                         <td>{{ $shippingCertification->description }}</td>
                         <td>{{ $shippingCertification->quantity }}</td>
-                        <td>{{ number_format($shippingCertification->unit_price, 2) }}</td>
-                        <td>{{ number_format($shippingCertification->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($shippingCertification->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($shippingCertification->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
                 @foreach($otherDocuments as $otherDocument)
                     <tr>
                         <td>{{ $otherDocument->description }}</td>
                         <td>{{ $otherDocument->quantity }}</td>
-                        <td>{{ number_format($otherDocument->unit_price, 2) }}</td>
-                        <td>{{ number_format($otherDocument->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($otherDocument->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($otherDocument->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
             @endif
@@ -192,7 +192,7 @@
                     </tr>
                     <tr>
                         <td colspan="3">Deposit</td>
-                        <td> {{ number_format($quotationDetail->advance_amount, 2) }}</td>
+                        <td> {{ $quotation->currency ." ". number_format($quotationDetail->advance_amount, 2) }}</td>
 
                     </tr>
 
@@ -205,7 +205,7 @@
                 <td> </td>
                 <td style="font-weight: bold"> SUB TOTAL</td>
 
-                <td style="text-align: end">{{ number_format($quotation->deal_value) }} </td>
+                <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }} </td>
             </tr>
             <tr>
                 <td> </td>
@@ -217,7 +217,7 @@
                 <td> </td>
                 <td> </td>
                 <td style="font-weight: bold">Net Amount</td>
-                <td style="text-align: end">{{ number_format($quotation->deal_value) }}</td>
+                <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }}</td>
             </tr>
             <tr>
                 <td> </td>
@@ -240,9 +240,25 @@
             <tr>
                 <td> </td>
                 <td> </td>
-                <td style="font-weight: bold"> Remaining Amount</td>
-                <td> {{ number_format($quotation->deal_value - $quotationDetail->advance_amount) }} </td>
+                <td style="font-weight: bold"> Remaining Amount({{ $quotation->currency }})</td>
+                <td> {{ $quotation->currency ." ". number_format($quotation->deal_value - $quotationDetail->advance_amount) }} </td>
             </tr>
+            @if($quotation->currency != 'AED' && $quotation->shippingDocument == 'EXW')
+            <tr>
+                <td> </td>
+                <td> </td>
+                <td style="font-weight: bold"> Remaining Amount(AED)</td>
+                <td>
+
+                   @if($quotation->currency == 'USD')
+                         {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_usd_rate->value, 2) }}
+                   @elseif($quotation->currency == 'EUR')
+                        {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_eru_rate->value, 2) }}
+                   @endif
+
+                </td>
+            </tr>
+            @endif
             <tr>
                 <td> </td>
                 <td> </td>

@@ -418,7 +418,7 @@
                 </div>
                 <div class="col-lg-2">
                     <input type="hidden" value="{{ $callDetails->id }}" name="calls_id" >
-                    <input type="number" readonly id="total" name="deal_value" placeholder="Total Amount" class="fw-bold form-control" value="">
+                    <input type="number" readonly id="total"  placeholder="Total Amount" class="fw-bold form-control" value="">
                 </div>
             </div>
             <div class="row mt-2" id="selected-currency-div" hidden >
@@ -426,7 +426,7 @@
                     <label class="fw-bold font-size-16">Total (<span id="selected-currency"> </span>) :</label>
                 </div>
                 <div class="col-lg-2">
-                    <input type="number" readonly id="total_in_selected_currency" name="total_in_selected_currency" placeholder="Total Amount" class="fw-bold form-control" value="">
+                    <input type="number" readonly id="total_in_selected_currency" name="deal_value" placeholder="Total Amount" class="fw-bold form-control" value="">
                 </div>
             </div>
             </div>
@@ -1000,6 +1000,11 @@
                             return $(".shipping_method:checked")
                         }
                     }
+                },
+                contact_number:{
+                    number: true,
+                    minlength:5,
+                    maxlength:15,
                 }
             }
         });
@@ -1029,22 +1034,26 @@
             showPriceInSelectedValue();
             calculateTotalSum();
         });
+
         function showPriceInSelectedValue() {
             var count = secondTable.data().length;
+            // alert(count);
             var currency = $('#currency').val();
             if(currency != 'AED') {
                 var shippingMethod = $('.shipping_method:checked').val();
                 if(shippingMethod == 'EXW' && count > 0) {
-                    $('#selected-currency-div').attr("hidden", false);
-                    $('#selected-currency').html(currency);
-
+                    $('.total-div').attr("hidden", false)
                 }else{
                     $('.total-div').attr("hidden", true)
-                    $('#selected-currency-div').attr("hidden", true);
-                    $('#selected-currency').html("");
-                    $('#total_in_selected_currency').val("");
+                    // $('#selected-currency-div').attr("hidden", true);
+                    // $('#selected-currency').html("");
+                    // $('#total_in_selected_currency').val("");
                 }
+                $('#selected-currency-div').attr("hidden", false);
+                $('#selected-currency').html(currency);
+
             }else{
+                $('.total-div').attr("hidden", false);
                 $('#selected-currency-div').attr("hidden", true);
                 $('#selected-currency').html("");
                 $('#total_in_selected_currency').val(" ");
@@ -1418,7 +1427,9 @@
                     // else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                     //     var price = row[4];
                     // }
+
                     var currency = $('#currency').val();
+
                     if(currency == 'USD') {
                         var value = '{{ $aed_to_usd_rate->value }}';
                         var price = price / parseFloat(value);
@@ -1825,22 +1836,22 @@
                 }else if(currency == 'EUR') {
                     var value = '{{ $aed_to_eru_rate->value }}';
                     var total = parseFloat(totalAmount) / value;
-                    $('#total').val(total);
+                    $('#total').val(total.toFixed(3));
                 }else{
-                    $('#total').val(totalAmount);
+                    $('#total').val(totalAmount.toFixed(3));
                 }
             }else if(oldCurrecyType == 'USD') {
                if(currency == 'EUR') {
                     var value = '{{ $usd_to_eru_rate->value }}';
                    var total = parseFloat(totalAmount) / value;
-                   $('#total').val(total);
+                   $('#total').val(total.toFixed(3));
                 }
             }
             else if(oldCurrecyType == 'EUR') {
                 if(currency == 'USD') {
                     var value = '{{ $usd_to_eru_rate->value }}';
                     var total = parseFloat(totalAmount) * value;
-                    $('#total').val(total);
+                    $('#total').val(total.toFixed(3));
                 }
             }
 
