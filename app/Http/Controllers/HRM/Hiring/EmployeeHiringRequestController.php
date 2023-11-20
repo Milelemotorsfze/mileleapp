@@ -147,7 +147,7 @@ class EmployeeHiringRequestController extends Controller
         $authId = Auth::id();
         $page = 'approval';
         $hiringManager = $HRManager = '';
-        $deptHead = $pendings = $approved = $rejected = [];
+        $deptHead = $hiringManagerPendings = $hiringManagerApproved = $hiringManagerRejected = [];
         $hiringManager = ApprovalByPositions::where([
             ['approved_by_position','Hiring Manager'],
             ['handover_to_id',$authId]
@@ -160,15 +160,15 @@ class EmployeeHiringRequestController extends Controller
             ['handover_to_id',$authId]
         ])->first();
         if($hiringManager) {
-            $pendings = EmployeeHiringRequest::where([
+            $hiringManagerPendings = EmployeeHiringRequest::where([
                 ['action_by_hiring_manager','pending'],
                 ['hiring_manager_id',$authId],
                 ])->latest()->get();
-            $approved = EmployeeHiringRequest::where([
+            $hiringManagerApproved = EmployeeHiringRequest::where([
                 ['action_by_hiring_manager','approved'],
                 ['hiring_manager_id',$authId],
                 ])->latest()->get();
-            $rejected = EmployeeHiringRequest::where([
+            $hiringManagerRejected = EmployeeHiringRequest::where([
                 ['action_by_hiring_manager','rejected'],
                 ['hiring_manager_id',$authId],
                 ])->latest()->get();
