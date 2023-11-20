@@ -85,37 +85,25 @@
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee.index') }}"  id="topnav-utility" role="button">
                                             <span data-key="t-utility">Employee Relation</span>
                                         </a>
-
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Employee Hiring</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                              
+                                                <a href="{{ route('employee-hiring-request.index') }}" class="dropdown-item" data-key="t-login">Requests</a>
+                                              
+                                                <a href="{{ route('job_description.index') }}" class="dropdown-item" data-key="t-login">Job Descriptions</a>
+                                               
+                                            </div>
+                                        </div>
                                         <!-- @canany(['warranty-create', 'warranty-list'])
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create','warranty-list']);
                                         @endphp
                                         @if ($hasPermission) -->
-                                        <div class="dropdown">
-                                            <!-- <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility"> Request Form</span>
-                                                <div class="arrow-down"></div>
-                                            </a> -->
-                                            <a href="{{ route('employee-hiring-request.index') }}" class="dropdown-item" data-key="t-login">Employee Hiring Requests</a>
-                                            <!-- <div class="dropdown-menu" aria-labelledby="topnav-auth"> -->
-                                                <!-- @can('warranty-create')
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create']);
-                                                @endphp
-                                                @if ($hasPermission) -->
-                                                <!-- <a href="{{ route('employee-hiring-request.create') }}" class="dropdown-item" data-key="t-login">Create</a> -->
-                                                <!-- @endif
-                                                @endcan
-                                                @can('warranty-list')
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-list']);
-                                                @endphp
-                                                @if ($hasPermission) -->
-                                                <!-- <a href="{{ route('employee-hiring-request.index') }}" class="dropdown-item" data-key="t-login">Info</a> -->
-                                                <!-- @endif
-                                                @endcan -->
-                                            <!-- </div> -->
-                                        </div>
+                                       
                                         <!-- @endif
                                         @endcanany
 

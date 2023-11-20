@@ -246,7 +246,8 @@ Route::get('/d', function () {
         // Employee Job Description
     Route::resource('job_description', JobDescriptionController::class);
     Route::controller(JobDescriptionController::class)->group(function(){
-        Route::get('job_description/createnew/{id}', 'create')->name('job_description.createNew');
+        Route::get('employee-hiring-job-description/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-job-description.create-or-edit');
+        Route::post('employee-hiring-job-description/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-job-description.store-or-update');
     });
     
     // Employee Passport Request
