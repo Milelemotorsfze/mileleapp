@@ -2,9 +2,9 @@
 <div id="csrf-token" data-token="{{ csrf_token() }}"></div>
 @section('content')
 <style>
-.dataTables_wrapper .table>thead>tr>th.sorting {
-  vertical-align: middle;
-}
+/*.dataTables_wrapper .table>thead>tr>th.sorting {*/
+/*  vertical-align: middle;*/
+/*}*/
   div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
@@ -15,11 +15,11 @@
     border: none;
     outline: none;
   }
-.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-  padding: 4px 8px 4px 8px;
-  text-align: center;
-  vertical-align: middle;
-}
+/*.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {*/
+/*  padding: 4px 8px 4px 8px;*/
+/*  text-align: center;*/
+/*  vertical-align: middle;*/
+/*}*/
 .circle-button {
     display: inline-block;
     width: 20px;
@@ -378,8 +378,9 @@
                     <div class="col-sm-2">
                         Remarks :
                     </div>
-                    <div class="col-sm-6">
-                        <textarea cols="40" rows="5" name="remarks" placeholder="Remarks" class="form-control" value=""></textarea>
+                    <div class="col-sm-10">
+                        <input type="text" min="0" class="form-control form-control-xs "
+                               name="advance-amount" id="advance-amount" placeholder="Remarks" >
                     </div>
                 </div>
             </div>
@@ -394,7 +395,7 @@
                     <div class="col-lg-12">
                         <div class="table-responsive">
                             <table id="dtBasicExample2" class="table table-responsive table-striped table-editable table-edits table">
-                                <thead class="bg-soft-secondary">
+                                <thead>
                                     <tr>
                                         <th>Description</th>
                                         <th>Code</th>
@@ -956,30 +957,7 @@
                 }
             });
         });
-        $('input[name="document_type"]').on('change', function() {
-            $('input[name="' + this.name + '"]').not(this).prop('checked', false);
-            var documentType = $(this).val();
-            if(documentType == 'Proforma') {
-                $('#advance-amount-div').attr('hidden', false);
-            }else{
-                $('#advance-amount').val();
-                $('#advance-amount-div').attr('hidden', true);
-            }
-        });
-        $('input[name="shipping_method"]').on('change', function() {
-            $('input[name="' + this.name + '"]').not(this).prop('checked', false);
-            var shippingMethod = $(this).val();
-            if(shippingMethod == 'CNF') {
-                $('#export-shipment').attr('hidden', true);
-                $('#local-shipment').attr('hidden', false);
 
-            }else{
-                $('#export-shipment').attr('hidden', false);
-                $('#local-shipment').attr('hidden', true);
-
-            }
-            showPriceInSelectedValue();
-        });
     </script>
 <script>
     $(document).ready(function() {
@@ -1025,6 +1003,32 @@
                 }
             }
         });
+        $('input[name="document_type"]').on('change', function() {
+            $('input[name="' + this.name + '"]').not(this).prop('checked', false);
+            var documentType = $(this).val();
+            if(documentType == 'Proforma') {
+                $('#advance-amount-div').attr('hidden', false);
+            }else{
+                $('#advance-amount').val();
+                $('#advance-amount-div').attr('hidden', true);
+            }
+        });
+
+        $('input[name="shipping_method"]').on('change', function() {
+            $('input[name="' + this.name + '"]').not(this).prop('checked', false);
+            var shippingMethod = $(this).val();
+            if(shippingMethod == 'CNF') {
+                $('#export-shipment').attr('hidden', true);
+                $('#local-shipment').attr('hidden', false);
+
+            }else{
+                $('#export-shipment').attr('hidden', false);
+                $('#local-shipment').attr('hidden', true);
+
+            }
+            showPriceInSelectedValue();
+            calculateTotalSum();
+        });
         function showPriceInSelectedValue() {
             var count = secondTable.data().length;
             var currency = $('#currency').val();
@@ -1035,6 +1039,7 @@
                     $('#selected-currency').html(currency);
 
                 }else{
+                    $('.total-div').attr("hidden", true)
                     $('#selected-currency-div').attr("hidden", true);
                     $('#selected-currency').html("");
                     $('#total_in_selected_currency').val("");
@@ -1765,7 +1770,7 @@
         resetSerialNumber(table);
         // total amount div logic
         $('.total-div').attr('hidden', false);
-        CalculateTotalAmount();
+        CalculateTotalAmount(index);
         calculateTotalSum();
         // enableOrDisableSubmit();
         showPriceInSelectedValue();
@@ -1790,36 +1795,54 @@
 
         });
         function CalculateTotalAmount(index) {
+            console.log(index);
             var table = $('#dtBasicExample2').DataTable();
             var unitPrice = $('#price-'+index).val();
             var quantity = $('#quantity-'+index).val();
             var totalAmount = parseFloat(unitPrice) * parseFloat(quantity);
+            console.log(totalAmount);
             $('#total-amount-'+index).val(totalAmount.toFixed(3));
 
         }
         function calculateTotalSum(){
             var count = secondTable.data().length;
+
             var totalAmount = 0;
             for(var i=1;i<= count;i++) {
                 var amount = $('#total-amount-'+i).val();
                 totalAmount = parseFloat(totalAmount) + parseFloat(amount);
             }
-
+            console.log("total amount");
+            console.log(totalAmount);
             $('#total_in_selected_currency').val(totalAmount.toFixed(3));
             var currency = $('#currency').val();
-
-            if(currency == 'USD') {
-                var value = '{{ $aed_to_usd_rate->value }}';
-                var total = totalAmount * value;
-                $('#total').val(total.toFixed(3));
-            }else if(currency == 'EUR') {
-                var value = '{{ $aed_to_eru_rate->value }}';
-                var total = totalAmount * value;
-                $('#total').val(total.toFixed(3));
-            }else{
-                $('#total').val(totalAmount.toFixed(3));
+            var oldCurrecyType = $('#old-currency-type').val();
+            if(oldCurrecyType == 'AED') {
+                if(currency == 'USD') {
+                    var value = '{{ $aed_to_usd_rate->value }}';
+                    var total = parseFloat(totalAmount) / value;
+                    $('#total').val(total.toFixed(3));
+                }else if(currency == 'EUR') {
+                    var value = '{{ $aed_to_eru_rate->value }}';
+                    var total = parseFloat(totalAmount) / value;
+                    $('#total').val(total);
+                }else{
+                    $('#total').val(totalAmount);
+                }
+            }else if(oldCurrecyType == 'USD') {
+               if(currency == 'EUR') {
+                    var value = '{{ $usd_to_eru_rate->value }}';
+                   var total = parseFloat(totalAmount) / value;
+                   $('#total').val(total);
+                }
             }
-
+            else if(oldCurrecyType == 'EUR') {
+                if(currency == 'USD') {
+                    var value = '{{ $usd_to_eru_rate->value }}';
+                    var total = parseFloat(totalAmount) * value;
+                    $('#total').val(total);
+                }
+            }
 
              enableOrDisableSubmit();
 
