@@ -147,7 +147,8 @@ class EmployeeHiringRequestController extends Controller
         $authId = Auth::id();
         $page = 'approval';
         $hiringManager = $HRManager = '';
-        $deptHead = $hiringManagerPendings = $hiringManagerApproved = $hiringManagerRejected = [];
+        $deptHead = $hiringManagerPendings = $hiringManagerApproved = $hiringManagerRejected = $deptHeadPendings = $deptHeadApproved = $deptHeadRejected = 
+        $HRManagerPendings = $HRManagerApproved = $HRManagerRejected = [];
         $hiringManager = ApprovalByPositions::where([
             ['approved_by_position','Hiring Manager'],
             ['handover_to_id',$authId]
@@ -173,44 +174,45 @@ class EmployeeHiringRequestController extends Controller
                 ['hiring_manager_id',$authId],
                 ])->latest()->get();
         }
-        else if(count($deptHead) > 0) {
-            $pendings = EmployeeHiringRequest::where([
+        if(count($deptHead) > 0) {
+            $deptHeadPendings = EmployeeHiringRequest::where([
                 ['action_by_hiring_manager','approved'],
                 ['action_by_department_head','pending'],
                 ['department_head_id',$authId],
                 ])->latest()->get();
-            $approved = EmployeeHiringRequest::where([
+            $deptHeadApproved = EmployeeHiringRequest::where([
                 ['action_by_hiring_manager','approved'],
                 ['action_by_department_head','pending'],
                 ['department_head_id',$authId],
                 ])->latest()->get();
-            $rejected = EmployeeHiringRequest::where([
+            $deptHeadRejected = EmployeeHiringRequest::where([
                 ['action_by_hiring_manager','approved'],
                 ['action_by_department_head','pending'],
                 ['department_head_id',$authId],
                 ])->latest()->get();
         }
-        else if($HRManager) {
-            $pendings = EmployeeHiringRequest::where([
+        if($HRManager) {
+            $HRManagerPendings = EmployeeHiringRequest::where([
                 ['action_by_hiring_manager','approved'],
                 ['action_by_department_head','approved'],
                 ['action_by_hr_manager','pending'],
                 ['hr_manager_id',$authId],
                 ])->latest()->get();
-            $approved = EmployeeHiringRequest::where([
+            $HRManagerApproved = EmployeeHiringRequest::where([
                 ['action_by_hiring_manager','approved'],
                 ['action_by_department_head','approved'],
                 ['action_by_hr_manager','pending'],
                 ['hr_manager_id',$authId],
                 ])->latest()->get();
-            $rejected = EmployeeHiringRequest::where([
+            $HRManagerRejected = EmployeeHiringRequest::where([
                 ['action_by_hiring_manager','approved'],
                 ['action_by_department_head','approved'],                
                 ['action_by_hr_manager','pending'],
                 ['hr_manager_id',$authId],
                 ])->latest()->get();
         }
-        return view('hrm.hiring.hiring_request.index',compact('pendings','approved','rejected','page'));
+        return view('hrm.hiring.hiring_request.approvals',compact('page','hiringManagerPendings','hiringManagerApproved','hiringManagerRejected','deptHeadPendings',
+        'deptHeadApproved','deptHeadRejected','HRManagerPendings','HRManagerApproved','HRManagerRejected',));
     }
     public function requestAction(Request $request) {
         $message = '';

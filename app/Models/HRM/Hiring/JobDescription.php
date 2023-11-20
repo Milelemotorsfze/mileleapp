@@ -10,6 +10,7 @@ class JobDescription extends Model
     use HasFactory;
     protected $table = "job_descriptions";
     protected $fillable = [
+        'hiring_request_id',
         'job_title',
         'department_id',
         'location_id',

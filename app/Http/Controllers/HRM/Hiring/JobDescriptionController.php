@@ -7,12 +7,16 @@ use Illuminate\Http\Request;
 use App\Models\Masters\MasterJobPosition;
 use App\Models\Masters\MasterDeparment;
 use App\Models\Masters\MasterOfficeLocation;
+use App\Models\HRM\Hiring\JobDescription;
 use App\Models\User;
 
 class JobDescriptionController extends Controller
 {
     public function index() {
-        return view('hrm.hiring.job_description.index');
+        $pendings = JobDescription::where('status','pending')->latest()->get();
+        $approved = JobDescription::where('status','approved')->latest()->get();
+        $rejected = JobDescription::where('status','rejected')->latest()->get();
+        return view('hrm.hiring.job_description.index',compact('pendings','approved','rejected'));
     }
     public function create() {
         return view('hrm.hiring.job_description.create');

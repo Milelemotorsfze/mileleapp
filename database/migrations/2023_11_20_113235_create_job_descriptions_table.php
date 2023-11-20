@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('job_descriptions', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('hiring_request_id')->unsigned()->index()->nullable();
+            $table->foreign('hiring_request_id')->references('id')->on('employee_hiring_requests')->onDelete('cascade');
             $table->bigInteger('job_title')->unsigned()->index()->nullable();
             $table->foreign('job_title')->references('id')->on('master_job_positions')->onDelete('cascade');
             $table->bigInteger('department_id')->unsigned()->index()->nullable();
