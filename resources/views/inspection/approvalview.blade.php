@@ -48,331 +48,263 @@
     <a class="btn btn-sm btn-primary" href="{{$PDIpicturelink}}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> PDI Pictures</a>
     @endif
 </div>
-    <h5>Current Specifications</h5>
-    <br>
-        <div class="row">
-        <div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Brand</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$brand->brand_name ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Line</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$model_line->model_line ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Detail</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->model_detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Variant</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->name ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Year</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->my ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Variant Detail</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Steering</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->steering ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Seats</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->seat ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Fuel Type</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->fuel_type ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Transmission</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->gearbox ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Production Year</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$vehicle->ppmmyyy ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Interior Color</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$intColor->name ?? ''}}
-</div>
-</div>
-</div>
-            <div class="col-md-3">
-            <div class="row">
-            <div class="col-md-4">
-                                <label><strong>Exterior Color</strong></label>
-            </div>
-            <div class="col-md-8">
-                            {{$extColor->name ?? ''}}
-            </div>
-            </div>
-            </div>
-            </div>
-            <hr>
-            @if($inspection->stage != "Incident")
-            <div class="modal fade inspection-modal" id="inspectiondetail" tabindex="-1" aria-labelledby="inspectiondetailLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="inspectiondetailLabel">Inspection Updates</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="engine" class="form-label">Engine:</label>
-            </div>
-            <div class="col-md-8">
-            <input type="text" class="form-control" id="engine" value="{{$enginevalue ?? ''}}">
-            <input type="hidden" class="form-control" id="inspection_id" value="{{$inspection->id ?? ''}}">
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="vin" class="form-label">VIN:</label>
-            </div>
-            <div class="col-md-8">
-            <input type="text" class="form-control" id="vin" value="{{$vinvalue ?? ''}}">
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="int_colour" class="form-label">Interior Color:</label>
-            </div>
-            <div class="col-md-8">
-            <select class="form-control int_colour" name="int_colour" id="int_colour">
-            @if(!$int_colourvalue)
-                <option value="">Please Select</option>
-            @endif  
-            @foreach ($int_colours as $int_colour)
-    <option value="{{ $int_colour->id }}"
-        @if ($int_colour->id == $int_colourvalue)
-            selected="selected"
-        @endif
-    >
-        {{ $int_colour->name }}
-    </option>
-@endforeach
+<form id="approveForm" action="{{ route('approveInspection') }}" method="POST">
+    @csrf
+<h5>Trim Specifications</h5>
+<br>
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Items</th>
+                <th>Procurement Value</th>
+                <th>Inspection Value</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Brand</td>
+                <td>{{$brand->brand_name}}</td>
+                <td>
+                    <select class="form-control" name="brands_id">
+                    @foreach($allBrands as $singleBrand)
+                    <option value="{{$singleBrand->id}}" @if($singleBrand->id == $brands->id) selected @endif>
+                    {{$singleBrand->brand_name}}
+                    </option>
+                    @endforeach
+                 </select>
+                </td>
+                <td>
+                    @if($brand->id == $brands->id)
+                        <i class="fas fa-check text-success"></i>
+                        @else
+                        <i class="fas fa-times text-danger"></i>
+                        @endif
+                </td>
+            </tr>
+            <tr>
+                <td>Model</td>
+                <td>{{$model_line->model_line}}</td>
+                <td>
+                    <select class="form-control" name="master_model_lines_id">
+                    @foreach($model_lines as $models)
+                    <option value="{{$models->id}}" @if($models->id == $modal->id) selected @endif>
+                    {{$models->model_line}}
+                    </option>
+                    @endforeach
+                 </select>
+                </td>
+                <td>
+                    @if($model_line->id == $modal->id)
+                        <i class="fas fa-check text-success"></i>
+                        @else
+                        <i class="fas fa-times text-danger"></i>
+                        @endif
+                </td>
+            </tr>
+            <tr>
+    <td>Steering</td>
+    <td>{{$variant->steering}}</td>
+    <td>
+        <select class="form-control" name="steering">
+            <option value="LHD" @if($variant_request->steering == 'LHD') selected @endif>LHD</option>
+            <option value="RHD" @if($variant_request->steering == 'RHD') selected @endif>RHD</option>
         </select>
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="ex_colour" class="form-label">Exterior Color:</label>
-            </div>
-            <div class="col-md-8">
-            <select class="form-control ex_colour" name="ex_colour" id="ex_colour">
-            @if(!$ex_colourevalue)
-                <option value="">Please Select</option>
-            @endif  
-            @foreach ($ext_colours as $ext_colour)
-    <option value="{{ $ext_colour->id }}"
-        @if ($ext_colour->id == $ex_colourevalue)
-            selected="selected"
+    </td>
+    <td>
+        @if($variant_request->steering == $variant->steering)
+            <i class="fas fa-check text-success"></i>
+        @else
+            <i class="fas fa-times text-danger"></i>
         @endif
-    >
-        {{ $ext_colour->name }}
-    </option>
-@endforeach
-        </select>
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="extra_features" class="form-label">Extra Features:</label>
-            </div>
-            <div class="col-md-8">
-            <input type="text" class="form-control" id="extra_features" value=" {{$extra_featuresvalue ?? ''}}">
-            </div>
-          </div>
+    </td>
+</tr>
+
+            <tr>
+                <td>Engine</td>
+                <td>{{$variant->engine}}</td>
+                <td>
+                    <select class="form-control" name="engine">
+                    <option value="0.8" @if($variant_request->engine == '0.8') selected @endif>0.8</option>
+                    <option value="1.2" @if($variant_request->engine == '1.2') selected @endif>1.2</option>
+                    <option value="1.4" @if($variant_request->engine == '1.4') selected @endif>1.4</option>
+                    <option value="1.5" @if($variant_request->engine == '1.5') selected @endif>1.5</option>
+                    <option value="1.6" @if($variant_request->engine == '1.6') selected @endif>1.6</option>
+                    <option value="1.8" @if($variant_request->engine == '1.8') selected @endif>1.8</option>
+                    <option value="2" @if($variant_request->engine == '2') selected @endif>2</option>
+                    <option value="2.2" @if($variant_request->engine == '2.2') selected @endif>2.2</option>
+                    <option value="2.4" @if($variant_request->engine == '2.4') selected @endif>2.4</option>
+                    <option value="2.5" @if($variant_request->engine == '2.5') selected @endif>2.5</option>
+                    <option value="2.7" @if($variant_request->engine == '2.7') selected @endif>2.7</option>
+                    <option value="2.8" @if($variant_request->engine == '2.8') selected @endif>2.8</option>
+                    <option value="3" @if($variant_request->engine == '3') selected @endif>3</option>
+                    <option value="3.3" @if($variant_request->engine == '3.3') selected @endif>3.3</option>
+                    <option value="3.5" @if($variant_request->engine == '3.5') selected @endif>3.5</option>
+                    <option value="4" @if($variant_request->engine == '4') selected @endif>4</option>
+                    <option value="4.2" @if($variant_request->engine == '4.2') selected @endif>4.2</option>
+                    <option value="4.4" @if($variant_request->engine == '4.4') selected @endif>4.4</option>
+                    <option value="4.5" @if($variant_request->engine == '4.5') selected @endif>4.5</option>
+                    <option value="4.8" @if($variant_request->engine == '4.8') selected @endif>4.8</option>
+                    <option value="5.3" @if($variant_request->engine == '5.3') selected @endif>5.3</option>
+                    <option value="5.6" @if($variant_request->engine == '5.6') selected @endif>5.6</option>
+                    <option value="5.7" @if($variant_request->engine == '5.7') selected @endif>5.7</option>
+                    <option value="6" @if($variant_request->engine == '6') selected @endif>6</option>
+                    <option value="6.2" @if($variant_request->engine == '6.2') selected @endif>6.2</option>
+                    <option value="6.7" @if($variant_request->engine == '6.7') selected @endif>6.7</option>
+                 </select>
+                </td>
+                <td>
+                    @if($variant_request->engine == $variant->engine)
+                        <i class="fas fa-check text-success"></i>
+                        @else
+                        <i class="fas fa-times text-danger"></i>
+                        @endif
+                </td>
+            </tr>
+            <tr>
+                <td>Fuel Type</td>
+                <td>{{$variant->fuel_type}}</td>
+                <td>
+                    <select class="form-control" name="fuel_type">
+                    <option value="Petrol" @if($variant_request->fuel_type == 'Petrol') selected @endif>Petrol</option>
+                    <option value="Diesel" @if($variant_request->fuel_type == 'Diesel') selected @endif>Diesel</option>
+                    <option value="PHEV" @if($variant_request->fuel_type == 'PHEV') selected @endif>PHEV</option>
+                    <option value="MHEV" @if($variant_request->fuel_type == 'MHEV') selected @endif>MHEV</option>
+                    <option value="EV" @if($variant_request->fuel_type == 'EV') selected @endif>EV</option>
+                 </select>
+                </td>
+                <td>
+                    @if($variant_request->fuel_type == $variant->fuel_type)
+                        <i class="fas fa-check text-success"></i>
+                        @else
+                        <i class="fas fa-times text-danger"></i>
+                        @endif
+                </td>
+            </tr>
+            <tr>
+                <td>Upholstery</td>
+                <td>{{$variant->upholestry}}</td>
+                <td>
+                    <select class="form-control" name="upholestry">
+                    <option value="Leather" @if($variant_request->upholestry == 'Leather') selected @endif>Leather</option>
+                    <option value="Fabric" @if($variant_request->upholestry == 'Fabric') selected @endif>Fabric</option>
+                    <option value="Vinyl" @if($variant_request->upholestry == 'Vinyl') selected @endif>Vinyl</option>
+                    <option value="Microfibre" @if($variant_request->upholestry == 'Microfibre') selected @endif>Microfibre</option>
+                 </select>
+                </td>
+                <td>
+                @if($variant_request->upholestry == $variant->upholestry)
+                        <i class="fas fa-check text-success"></i>
+                        @else
+                        <i class="fas fa-times text-danger"></i>
+                        @endif
+                </td>
+            </tr>
+            <tr>
+                <td>Gear</td>
+                <td>{{$variant->gearbox}}</td>
+                <td>
+                    <select class="form-control" name="gearbox">
+                    <option value="Auto" @if($variant_request->upholestry == 'Auto') selected @endif>Auto</option>
+                    <option value="Manual" @if($variant_request->upholestry == 'Manual') selected @endif>Manual</option>
+                 </select>
+                </td>
+                <td>
+                @if($variant_request->gearbox == $variant->gearbox)
+                        <i class="fas fa-check text-success"></i>
+                        @else
+                        <i class="fas fa-times text-danger"></i>
+                        @endif
+                </td>
+            </tr>
+            <input type="hidden" name="coo" value="{{ $variant->coo }}"/>
+            <input type="hidden" name="drive_train" value="{{ $variant->drive_train }}"/>
+            <tr>
+                <td>Model Year</td>
+                <td>{{$variant->my}}</td>
+                <td>
+                @php
+                                    $currentYear = date("Y");
+                                    $years = range($currentYear + 10, $currentYear - 10);
+                                    $years = array_reverse($years);
+                                    @endphp
+                    <select class="form-control" name="my">
+                    @foreach ($years as $year)
+                    <option value="{{ $year }}" {{ $variant_request->my == $year ? 'selected' : '' }}>{{ $year }}</option>
+                    @endforeach
+                 </select>
+                </td>
+                <td>
+                @if($variant_request->my == $variant->my)
+                        <i class="fas fa-check text-success"></i>
+                        @else
+                        <i class="fas fa-times text-danger"></i>
+                        @endif
+                </td>
+            </tr>
+            <tr>
+                <td>Interior Colour</td>
+                <td>{{$intColor->name}}</td>
+                <td>
+                    <select class="form-control" name="int_colour">
+                    @foreach($intColorall as $intColorall)
+                    <option value="{{$intColorall->id}}" @if($intColorall->id == $intColorr->id) selected @endif>
+                    {{$intColorall->name}}
+                    </option>
+                    @endforeach
+                 </select>
+                </td>
+                <td>
+                    @if($intColor->id == $intColorr->id)
+                        <i class="fas fa-check text-success"></i>
+                        @else
+                        <i class="fas fa-times text-danger"></i>
+                        @endif
+                </td>
+            </tr>
+            <tr>
+                <td>Exterior Colour</td>
+                <td>{{$extColor->name}}</td>
+                <td>
+                    <select class="form-control" name="ex_colour">
+                    @foreach($extColorall as $exColorall)
+                    <option value="{{$exColorall->id}}" @if($exColorall->id == $extColorr->id) selected @endif>
+                    {{$exColorall->name}}
+                    </option>
+                    @endforeach
+                 </select>
+                </td>
+                <td>
+                    @if($extColor->id == $extColorr->id)
+                        <i class="fas fa-check text-success"></i>
+                        @else
+                        <i class="fas fa-times text-danger"></i>
+                        @endif
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<hr>
+<h5>Variant Specifications</h5>
+<br>
+    <div class="row">
+    @foreach($data as $item)
+    <div class="col-lg-2 col-md-6 col-sm-12">
+        <div class="mb-3">
+            <label for="choices-single-default" class="form-label">{{ $item['label'] }}</label>
+            <select class="form-control" autofocus name="specification_{{ $item['specification_id'] }}">
+                @foreach($item['options'] as $optionId => $optionValue)
+                    <option value="{{ $optionId }}" {{ old('specification_' . $item['specification_id']) == $optionId || $item['selected'] == $optionValue ? 'selected' : '' }}>
+                        {{ $optionValue }}
+                    </option>
+                @endforeach
+            </select>
         </div>
-        <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="saveinspectiondetails()">Save Changes</button>
-        </div>
-      </div>
     </div>
-  </div> 
-            <div class="button-containerinner">
-            <a class="btn btn-sm btn-primary" href="#" onclick="openModalp('{{ $inspection->id }}')">Edit</a>
-            </div>
-            <h5>Inspection Updates</h5>
-            <div class="row">
-                @if($enginevalue)
-        <div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Engine</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$enginevalue ?? ''}}
-</div>
-</div>
-</div>
-@endif
-@if($vinvalue)
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>VIN</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$vinvalue ?? ''}}
-</div>
-</div>
-</div>
-@endif
-@if($int_colourvalue)
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Interior Color</strong></label>
-</div>
-<div class="col-md-8">
-@php
-    $int_colourName = DB::table('color_codes')->where('id', $int_colourvalue)->value('name');
-@endphp
-                    {{$int_colourName ?? ''}}
-</div>
-</div>
-</div>
-@endif
-@if($ex_colourevalue)
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Exterior Color</strong></label>
-</div>
-<div class="col-md-8">
-    @php
-        $ex_colourName = DB::table('color_codes')->where('id', $ex_colourevalue)->value('name');
-        @endphp
-                    {{$ex_colourName ?? ''}}
-                    
-</div>
-</div>
-</div>
-@endif
-@if($extra_featuresvalue)
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Extra Features</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$extra_featuresvalue ?? ''}}
-</div>
-</div>
-</div>
-@endif
-</div>
-@endif
-<br>
-<h5>Inspection Remarks</h5>
-<div class="row">
-<div class="col-md-12">
-{!! $inspection->remark !!}
-</div>
-</div>
-@if($inspection->process_remarks)
-<br>
-<h5>Manager Remarks</h5>
-<div class="row">
-<div class="col-md-12">
-{!! $inspection->process_remarks !!}
-</div>
-</div>
-@endif
-@if($inspection->reinspection_remarks)
-<br>
-<h5>Re Inspection Remarks</h5>
-<div class="row">
-<div class="col-md-12">
-{!! $inspection->reinspection_remarks !!}
-</div>
-</div>
-@endif
-@if($inspection->stage != "Incident")
-@if(!$changevariant && !$newvariant)
-<div class="button-containerinner">
-            <a class="btn btn-sm btn-primary" href="#" onclick="Newvariant('{{ $inspection->id }}')">Add Or Change Variant</a>
-            </div>
-            <br>
-@endif
+    @endforeach
+     </div>
 <hr>
     <div class="modal fade extraitems-modal" id="extraitems" tabindex="-1" aria-labelledby="extraitemsLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -705,464 +637,6 @@
         </div>
     </div>
      </br>
-@if($changevariant)
-<hr>
-<div class="button-containerinner">
-            <a class="btn btn-sm btn-primary" href="#" onclick="Newvariant('{{ $inspection->id }}')">Edit</a>
-            </div>
-</br>
-<h5>Variant Change</h5>
-            <div class="row">
-        <div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Variant Name</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->name ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Description</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->model_detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Year</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->my ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Variant Detail</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Engine Capacity</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->engine ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Transmission</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->gearbox ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Fuel Type</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->fuel_type ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Steering</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->steering ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Seat Capacity</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->seat ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Upholstery</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->upholestry ?? ''}}
-</div>
-</div>
-</div>
-</div>
-@endif
-<div class="modal fade newvariant-modal" id="newvariant" tabindex="-1" aria-labelledby="newvariantLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="newvariantLabel">Variants</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-        <div class="form-group row">
-                    <label class="col-md-3 col-form-label">Select Variant Type:</label>
-                    <div class="col-md-9">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="variantType" id="newVariant" value="new">
-                            <label class="form-check-label" for="newVariant">New Variant</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="variantType" id="changeVariant" value="change">
-                            <label class="form-check-label" for="changeVariant">Change Variant</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="variantType" id="currentVariant" value="current">
-                            <label class="form-check-label" for="currentVariant">Current Variant</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="fields-to-toggle new-variant-fields" style="display: none;">
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="engine" class="form-label">Variant Name:</label>
-            </div>
-            <div class="col-md-8">
-            @if($newvariant)
-            <input type="text" class="form-control" id="newvariantname" value="{{$newvariant->name ?? ''}}">
-            <input type="hidden" class="form-control" id="newvariantid" value="{{$newvariant->id ?? ''}}">
-            @else
-            <input type="text" class="form-control" id="newvariantname" value="">
-            @endif
-            <input type="hidden" class="form-control" id="inspection_id" value="{{$inspection->id ?? ''}}">
-            <div id="validation-message"></div>
-            </div>
-          </div>
-          
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="vin" class="form-label">Model Description:</label>
-            </div>
-            <div class="col-md-8">
-            @if($newvariant)
-            <input type="text" class="form-control" id="newmodeldetail" value="{{$newvariant->model_detail ?? ''}}">
-            @else
-            <input type="text" class="form-control" id="newmodeldetail" value="">
-            @endif
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="int_colour" class="form-label">Model Year:</label>
-            </div>
-            <div class="col-md-8">
-            @php
-                            $currentYear = date("Y");
-                            $years = range($currentYear + 10, $currentYear - 10);
-                            $years = array_reverse($years);
-                            @endphp
-                            @if($newvariant)
-                            <select name="newmy" class="form-control" id="newmy">
-                                @foreach ($years as $year)
-                                    <option value="{{ $year }}" @if ($year == $newvariant->my) selected="selected" @endif >{{ $year }}</option>
-                                @endforeach
-                            </select>
-                            @else
-                            <select name="newmy" class="form-control" id="newmy">
-                                @foreach ($years as $year)
-                                    <option value="{{ $year }}">{{ $year }}</option>
-                                @endforeach
-                            </select>
-                            @endif
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="ex_colour" class="form-label">Variant Details:</label>
-            </div>
-            <div class="col-md-8">
-            @if($newvariant)
-            <input type="text" class="form-control" id="newdetail" value="{{$newvariant->detail ?? ''}}">
-            @else
-            <input type="text" class="form-control" id="newdetail" value="">
-            @endif
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="extra_features" class="form-label">Engine Capacity:</label>
-            </div>
-            <div class="col-md-8">
-            @if($newvariant)
-            <input type="text" class="form-control" id="newengine" value="{{$newvariant->engine ?? ''}}">
-            @else
-            <input type="text" class="form-control" id="newengine" value="">
-            @endif
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="ex_colour" class="form-label">Transmission:</label>
-            </div>
-            <div class="col-md-8">
-            @if($newvariant)
-            <select class="form-control ex_colour" name="newgearbox" id="newgearbox"> 
-            <option value="Auto" @if ("Auto" == $newvariant->gearbox) selected="selected" @endif  >Auto</option>
-            <option value="Manual" @if ("Manual" == $newvariant->gearbox) selected="selected" @endif  >Manual</option>
-        </select>
-        @else
-        <select class="form-control ex_colour" name="newgearbox" id="newgearbox"> 
-            <option value="Auto">Auto</option>
-            <option value="Manual">Manual</option>
-        </select>
-        @endif
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="ex_colour" class="form-label">Fuel Type:</label>
-            </div>
-            <div class="col-md-8">
-            @if($newvariant)
-            <select class="form-control ex_colour" name="newfuel_type" id="newfuel_type">
-            <option value="Diesel" @if ("Diesel" == $newvariant->fuel_type) selected="selected" @endif  >Diesel</option>
-            <option value="EV" @if ("EV" == $newvariant->fuel_type) selected="selected" @endif  >EV</option>
-            <option value="Gasoline" @if ("Gasoline" == $newvariant->fuel_type) selected="selected" @endif  >Gasoline</option>
-        </select>
-        @else
-        <select class="form-control ex_colour" name="newfuel_type" id="newfuel_type">
-            <option value="Diesel">Diesel</option>
-            <option value="EV">EV</option>
-            <option value="Gasoline">Gasoline</option>
-        </select>
-        @endif
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="ex_colour" class="form-label">Steering:</label>
-            </div>
-            <div class="col-md-8">
-            @if($newvariant)
-            <select class="form-control" autofocus name="newsteering" id="newsteering">
-            <option value="LHD" @if ("LHD" == $newvariant->steering) selected="selected" @endif >LHD</option>
-            <option value="RHD" @if ("RHD" == $newvariant->steering) selected="selected" @endif >RHD</option>
-            </select>
-            @else
-            <select class="form-control" autofocus name="newsteering" id="newsteering">
-            <option value="LHD">LHD</option>
-            <option value="RHD">RHD</option>
-            </select>
-            @endif
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="ex_colour" class="form-label">Seat Capacity:</label>
-            </div>
-            <div class="col-md-8">
-            @if($newvariant)
-            <select name="newseat" class="form-control" id="newseat">
-                                @for($i = 1; $i <= 50; $i++)
-                                    <option value="{{ $i }}" @if ($i == $newvariant->seat) selected="selected" @endif >{{ $i }}</option>
-                                @endfor
-                            </select>
-            @else
-            <select name="newseat" class="form-control" id="newseat">
-                                @for($i = 1; $i <= 50; $i++)
-                                    <option value="{{ $i }}">{{ $i }}</option>
-                                @endfor
-                            </select>
-            @endif
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="ex_colour" class="form-label">Upholstery:</label>
-            </div>
-            <div class="col-md-8">
-            @if($newvariant)
-            <select class="form-control" autofocus name="newupholestry" id="newupholestry">
-                                <option value="Fabric" @if ("Fabric" == $newvariant->upholestry) selected="selected" @endif>Fabric</option>
-                                <option value="Leather" @if ("Leather" == $newvariant->upholestry) selected="selected" @endif>Leather</option>
-                                <option value="Fabric + Leather" @if ("Fabric + Leather" == $newvariant->upholestry) selected="selected" @endif>Fabric + Leather</option>
-                                <option value="Fabric / Leather" @if ("Fabric / Leather" == $newvariant->upholestry) selected="selected" @endif>Fabric / Leather</option>
-                                <option value="Vinyl" @if ("Vinyl" == $newvariant->upholestry) selected="selected" @endif>Vinyl</option>
-                            </select>
-            @else
-            <select class="form-control" autofocus name="newupholestry" id="newupholestry">
-                                <option value="Fabric">Fabric</option>
-                                <option value="Leather">Leather</option>
-                                <option value="Fabric + Leather">Fabric + Leather</option>
-                                <option value="Fabric / Leather">Fabric / Leather</option>
-                                <option value="Vinyl">Vinyl</option>
-                            </select>
-            @endif
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="remark" class="form-label">Remarks:</label>
-            </div>
-            <div class="col-md-8">
-              <textarea class="form-control" id="editor"></textarea>
-            </div>
-          </div>
-        </div>
-        <div class="fields-to-toggle change-variant-fields" style="display: none;">
-        <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="engine" class="form-label">Variant Name:</label>
-            </div>
-            <div class="col-md-8">
-            <select class="form-control" name="varaints_id" id="variant">
-                                @foreach ($variantsall as $variantOption)
-                                    <option value="{{ $variantOption->id }}" @if ($variantOption->id === $variant->id) selected @endif>
-                                        {{ $variantOption->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-            </div>
-          </div>
-         </div>
-<div class="fields-to-toggle current-variant-fields" style="display: none;">
-</div>
-        </div>
-        <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="savevariantsd()">Save Changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
-@if($newvariant)
-<hr>
-<div class="button-containerinner">
-    <a class="btn btn-sm btn-primary" href="#" onclick="Newvariant('{{ $inspection->id }}')">Edit</a>
-            </div>
-<h5>New Variant</h5>
-            <div class="row">
-        <div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Variant Name</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->name ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Description</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->model_detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Year</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->my ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Variant Detail</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Engine Capacity</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->engine ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Transmission</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->gearbox ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Fuel Type</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->fuel_type ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Steering</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->steering ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Seat Capacity</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->seat ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Upholstery</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->upholestry ?? ''}}
-</div>
-</div>
-</div>
-</div>
-@endif
-@endif
 @if($Incident)
 <br>
 <hr>
@@ -1381,8 +855,46 @@
 </div>
 @endif
 <hr>
-<form id="approveForm" action="{{ route('approveInspection') }}" method="POST">
-    @csrf
+<div class="row">
+    @if($extra_featuresvalue)
+        <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <label><strong>Extra Features</strong></label>
+                </div>
+                <div class="col-md-8">
+                    {{$extra_featuresvalue}}
+                </div>
+            </div>
+        </div>
+    @endif
+</div>
+<br>
+<h5>Inspection Remarks</h5>
+<div class="row">
+    <div class="col-md-12">
+        {!! $inspection->remark !!}
+    </div>
+</div>
+@if($inspection->process_remarks)
+    <br>
+    <h5>Manager Remarks</h5>
+    <div class="row">
+        <div class="col-md-12">
+            {!! $inspection->process_remarks !!}
+        </div>
+    </div>
+@endif
+@if($inspection->reinspection_remarks)
+    <br>
+    <h5>Re Inspection Remarks</h5>
+    <div class="row">
+        <div class="col-md-12">
+            {!! $inspection->reinspection_remarks !!}
+        </div>
+    </div>
+@endif
+<hr>
     <input type="hidden" name="inspection_id" value="{{ $inspection->id }}">
     <input type="hidden" id="buttonValue" name="buttonValue" value="">
     <div class="form-group">
@@ -1393,13 +905,13 @@
 <a style="float: right;" class="btn btn-success" onclick="setButtonValue('approve')">
     <i class="fa fa-check" aria-hidden="true"></i> Approve Inspection
 </a>
-@if($inspection->stage != "Incident")
+<!-- @if($inspection->stage != "Incident")
 @if($inspection->status == "Pending")
 <a style="float: right; margin-right: 10px;" class="btn btn-danger" onclick="setButtonValue('reinspect')">
     <i class="fa fa-times" aria-hidden="true"></i> Re Inspection
 </a>
 @endif
-@endif
+@endif -->
 </br>
 </div>
 @endsection

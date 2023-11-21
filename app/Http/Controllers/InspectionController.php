@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\UserActivities;
 use Yajra\DataTables\DataTables;
+use Monarobase\CountryList\CountryListFacade;
 use Illuminate\Support\Facades\DB;
 use App\Models\Vehicles;
 use App\Models\VehicleExtraItems;
@@ -24,6 +25,7 @@ use App\Models\Vehicleslog;
 use App\Models\VariantRequest;
 use App\Models\IncidentWork;
 use App\Models\MasterModelLines;
+use App\Models\VariantRequestItems;
 use App\Models\Pdi;
 
 class InspectionController extends Controller
@@ -270,16 +272,12 @@ class InspectionController extends Controller
     if (!$vehicle) {
         abort(404); 
     }
-    $variant = Varaint::find($vehicle->varaints_id);
-    $brand = Brand::find($variant->brands_id);
-    $model_line = MasterModelLines::find($variant->master_model_lines_id);
-    $intColor = ColorCode::find($vehicle->int_colour);
-    $extColor = ColorCode::find($vehicle->ex_colour);
+    $brands = Brand::all();
+    $countries = CountryListFacade::getList('en');
     $int_colours = ColorCode::where('belong_to', 'int')->get();
     $ext_colours = ColorCode::where('belong_to', 'ex')->get();
-    $variants = Varaint::where('master_model_lines_id', $variant->master_model_lines_id)->where('brands_id', $variant->brands_id)->get();
-    $newvariants = VariantRequest::where('master_model_lines_id', $variant->master_model_lines_id)->where('brands_id', $variant->brands_id)->where('status', 'Pending')->get();
-    return view('inspection.vehicleshow', compact('ext_colours','int_colours', 'vehicle', 'brand', 'intColor', 'extColor', 'variant', 'model_line', 'variants', 'newvariants'));
+    $masterModelLines = MasterModelLines::all();
+    return view('inspection.vehicleshow', compact('masterModelLines','countries','brands','ext_colours','int_colours', 'vehicle'));
     }
     public function update(Request $request, $id)
     {
@@ -287,121 +285,44 @@ class InspectionController extends Controller
         $useractivities->activity = "Update the Pending Inspection Submit for Approval";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-            $vehicle = Vehicles::find($id);
-            $inspections = new Inspection();
-            $inspections->vehicle_id = $id;
-            $inspections->remark = $request->input('remarks');
-            $inspections->stage = 'GRN';
-            $inspections->created_by = auth()->user()->id;
-            $inspections->status = "Pending";
-            $inspections->save();
-            $variantsId = $request->input('varaints_id');
-            $newVariantDropdown = $request->input('newVariantDropdown');
-            $enableInputs = $request->input('enableInputs');
-            $fieldsToCheck = [
-                'vin' => 'vin',
-                'interior_color' => 'int_colour',
-                'exterior_color' => 'ex_colour',
-                'engine' => 'engine',
-                'extra_features' => 'extra_features',
-            ];
-            $changes = [];
-            $approvalRequests = [];
-            foreach ($fieldsToCheck as $inputField => $dbColumn) {
-                $newValue = $request->input($inputField);
-                if ($newValue !== null && $newValue && strcasecmp($vehicle->$dbColumn, $newValue) !== 0) {
-                    $changes[] = [
-                        'field' => $dbColumn,
-                        'old_value' => $vehicle->$dbColumn,
-                        'new_value' => $newValue,
-                    ];
-                    $approvalRequests[] = [
-                        'field' => $dbColumn,
-                        'old_value' => $vehicle->$dbColumn,
-                        'new_value' => $newValue,
-                    ];
-                }
-            }
-            if ($enableInputs) {
-            if (empty($variantsId)) {
-                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-                $currentDateTime = Carbon::now($dubaiTimeZone);
-                $variantsIds = $newVariantDropdown;
-                $vehicleslog = new Vehicleslog();
-                $vehicleslog->time = $currentDateTime->toTimeString();
-                $vehicleslog->date = $currentDateTime->toDateString();
-                $vehicleslog->status = 'Update Request QC';
-                $vehicleslog->vehicles_id = $id;
-                $vehicleslog->field = 'New Variant';
-                $vehicleslog->old_value = $vehicle->varaints_id;
-                $vehicleslog->new_value = $variantsIds;
-                $vehicleslog->created_by = auth()->user()->id;
-                $vehicleslog->save();
-            
-                $approvalLog = new VehicleApprovalRequests();
-                $approvalLog->vehicle_id = $id;
-                $approvalLog->status = 'Pending';
-                $approvalLog->field = 'New Variant';
-                $approvalLog->old_value = $vehicle->varaints_id;
-                $approvalLog->new_value = $variantsIds;
-                $approvalLog->inspection_id = $inspections->id;
-                $approvalLog->updated_by = auth()->user()->id;
-                $approvalLog->save();
-            } 
-            else {
-                if ($variantsId != $vehicle->varaints_id) {
-                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-                    $currentDateTime = Carbon::now($dubaiTimeZone);
-                    $vehicleslog = new Vehicleslog();
-                    $vehicleslog->time = $currentDateTime->toTimeString();
-                    $vehicleslog->date = $currentDateTime->toDateString();
-                    $vehicleslog->status = 'Update Request QC';
-                    $vehicleslog->vehicles_id = $id;
-                    $vehicleslog->field = 'Variant Change';
-                    $vehicleslog->old_value = $vehicle->varaints_id;
-                    $vehicleslog->new_value = $variantsId;
-                    $vehicleslog->created_by = auth()->user()->id;
-                    $vehicleslog->save();
-                    $approvalLog = new VehicleApprovalRequests();
-                    $approvalLog->vehicle_id = $id;
-                    $approvalLog->status = 'Pending';
-                    $approvalLog->field = 'Variant Change';
-                    $approvalLog->old_value = $vehicle->varaints_id;
-                    $approvalLog->new_value = $variantsId;
-                    $approvalLog->inspection_id = $inspections->id;
-                    $approvalLog->updated_by = auth()->user()->id;
-                    $approvalLog->save();
-                }
-             }
-         }
-            if (!empty($changes)) {
-                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-                $currentDateTime = Carbon::now($dubaiTimeZone);
-                $status = 'Update Request QC';
-                foreach ($changes as $change) {
-                    $vehicleslog = new Vehicleslog();
-                    $vehicleslog->time = $currentDateTime->toTimeString();
-                    $vehicleslog->date = $currentDateTime->toDateString();
-                    $vehicleslog->status = $status;
-                    $vehicleslog->vehicles_id = $id;
-                    $vehicleslog->field = $change['field'];
-                    $vehicleslog->old_value = $change['old_value'];
-                    $vehicleslog->new_value = $change['new_value'];
-                    $vehicleslog->created_by = auth()->user()->id;
-                    $vehicleslog->save();
-                }
-                foreach ($approvalRequests as $approvalRequest) {
-                    $approvalLog = new VehicleApprovalRequests();
-                    $approvalLog->vehicle_id = $id;
-                    $approvalLog->status = 'Pending';
-                    $approvalLog->field = $approvalRequest['field'];
-                    $approvalLog->old_value = $approvalRequest['old_value'];
-                    $approvalLog->new_value = $approvalRequest['new_value'];
-                    $approvalLog->inspection_id = $inspections->id;
-                    $approvalLog->updated_by = auth()->user()->id;
-                    $approvalLog->save();
-                }
-            }
+        $vehicle = Vehicles::find($id);
+        $inspections = new Inspection();
+        $inspections->vehicle_id = $id;
+        $inspections->remark = $request->input('remarks');
+        $inspections->stage = 'GRN';
+        $inspections->created_by = auth()->user()->id;
+        $inspections->status = "Pending";
+        $inspections->save();
+        $inspections_id = $inspections->id;
+        $newfeatures = New VehicleApprovalRequests();
+        $newfeatures->new_value = $request->input('extra_features');
+        $newfeatures->inspection_id = $inspections_id;
+        $newfeatures->extra_features = "";
+        $selectedSpecifications = json_decode(request('selected_specifications'), true);
+        ksort($selectedSpecifications);
+        $variant_request = new VariantRequest();
+        $variant_request->brands_id = $request->input('brands_id');
+        $variant_request->master_model_lines_id = $request->input('master_model_lines_id');
+        $variant_request->steering = $request->input('steering');
+        $variant_request->fuel_type = $request->input('fuel_type');
+        $variant_request->engine = $request->input('engine');
+        $variant_request->upholestry = $request->input('upholestry');
+        $variant_request->coo = $request->input('coo');
+        $variant_request->drive_train = $request->input('drive_train');
+        $variant_request->gearbox = $request->input('gearbox');
+        $variant_request->my = $request->input('my');
+        $variant_request->inspection_id = $inspections_id;
+        $variant_request->int_colour = $request->input('int_colour');
+        $variant_request->ex_colour = $request->input('ex_colour');
+        $variant_request->save(); 
+        $variant_requestId = $variant_request->id;
+        foreach ($selectedSpecifications as $specificationData) {
+        $specification = new VariantRequestItems();
+        $specification->variant_request_id = $variant_requestId;
+        $specification->model_specification_id = $specificationData['specification_id'];
+        $specification->model_specification_options_id = $specificationData['value'];
+        $specification->save();
+        }
             $extraItems = [
                 'sparewheel',
                 'jack',
