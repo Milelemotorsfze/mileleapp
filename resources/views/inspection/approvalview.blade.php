@@ -67,13 +67,14 @@
                 <td>Brand</td>
                 <td>{{$brand->brand_name}}</td>
                 <td>
-                    <select class="form-control" name="brands_id">
+                    <select class="form-control" name="brands_id" disabled>
                     @foreach($allBrands as $singleBrand)
                     <option value="{{$singleBrand->id}}" @if($singleBrand->id == $brands->id) selected @endif>
                     {{$singleBrand->brand_name}}
                     </option>
                     @endforeach
                  </select>
+                 <input type="hidden" name="brands_id" value="{{$brands->id}}"/>
                 </td>
                 <td>
                     @if($brand->id == $brands->id)
@@ -87,13 +88,14 @@
                 <td>Model</td>
                 <td>{{$model_line->model_line}}</td>
                 <td>
-                    <select class="form-control" name="master_model_lines_id">
+                    <select class="form-control" name="master_model_lines_id" disabled>
                     @foreach($model_lines as $models)
                     <option value="{{$models->id}}" @if($models->id == $modal->id) selected @endif>
                     {{$models->model_line}}
                     </option>
                     @endforeach
                  </select>
+                 <input type="hidden" name="master_model_lines_id" value="{{$modal->id}}"/>
                 </td>
                 <td>
                     @if($model_line->id == $modal->id)
@@ -500,7 +502,7 @@
             <li class="list-group-item">
                     @if ($extraItems->contains('item_name', 'sparewheel'))
                         <i class="fas fa-check-circle text-success"></i>
-                        <span>{{ $extraItems->where('item_name', 'sparewheel')->first()->qty }} Qty - </span>
+                        <span>{{ $extraItems->where('item_name', 'sparewheel')->first()->qty }}</span>
                     @else
                         <i class="fas fa-times-circle text-danger"></i>
                     @endif
@@ -511,7 +513,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'jack'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'jack')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'jack')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -522,7 +524,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'wheel'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'wheel')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'wheel')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -535,7 +537,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'firstaid'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'firstaid')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'firstaid')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -546,7 +548,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'floor_mat'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'floor_mat')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'floor_mat')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -557,7 +559,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'service_book'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'service_book')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'service_book')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -581,7 +583,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'wheelrim'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'wheelrim')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'wheelrim')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -592,7 +594,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'fire_extinguisher'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'fire_extinguisher')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'fire_extinguisher')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -605,7 +607,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'sd_card'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'sd_card')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'sd_card')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -616,7 +618,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'ac_system'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'ac_system')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'ac_system')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -627,7 +629,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'dash_board'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'dash_board')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'dash_board')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -905,13 +907,13 @@
 <a style="float: right;" class="btn btn-success" onclick="setButtonValue('approve')">
     <i class="fa fa-check" aria-hidden="true"></i> Approve Inspection
 </a>
-<!-- @if($inspection->stage != "Incident")
+@if($inspection->stage != "Incident")
 @if($inspection->status == "Pending")
 <a style="float: right; margin-right: 10px;" class="btn btn-danger" onclick="setButtonValue('reinspect')">
     <i class="fa fa-times" aria-hidden="true"></i> Re Inspection
 </a>
 @endif
-@endif -->
+@endif
 </br>
 </div>
 @endsection
