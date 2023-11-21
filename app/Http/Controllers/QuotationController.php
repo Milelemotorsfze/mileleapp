@@ -19,6 +19,7 @@ use App\Models\Vehiclescarts;
 use App\Models\MasterModelLines;
 use App\Models\CartAddon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -57,10 +58,13 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
+
 //        return dd($request->all());
         DB::beginTransaction();
 
         $call = Calls::find($request->calls_id);
+        $call->status = 'Quoted';
+        $call->save();
 
         $call->company_name = $request->company_name;
         $call->name = $request->name;
@@ -70,17 +74,22 @@ class QuotationController extends Controller
         $call->save();
 
         $quotation = new Quotation();
-        $quotation->deal_value = $request->deal_value;
+        if($quotation->currency == 'AED') {
+            $quotation->deal_value = $request->total;
+        }else{
+            $quotation->deal_value = $request->deal_value;
+
+        }
         $quotation->sales_notes = $request->remarks;
         $quotation->created_by = Auth::id();
         $quotation->calls_id = $request->calls_id;
         $quotation->currency = $request->currency;
         $quotation->document_type = $request->document_type;
+        $quotation->date = Carbon::now();
         if($request->document_type == 'Proforma') {
             $quotation->document_type = 'Proforma Invoice';
         }
         $quotation->shipping_method = $request->shipping_method;
-        $quotation->remarks = $request->remarks;
         $quotation->save();
 
         $quotationDetail = new QuotationDetail();
@@ -106,6 +115,7 @@ class QuotationController extends Controller
            $quotationItem->description = $request->descriptions[$key];
            $quotationItem->total_amount = $request->total_amounts[$key];
            $quotationItem->quotation_id = $quotation->id;
+           $quotationItem->is_addon = $request->is_addon[$key];
            $quotationItem->created_by = Auth::id();
 
            if($request->types[$key] == 'Shipping') {
@@ -148,7 +158,12 @@ class QuotationController extends Controller
             ->where('quotation_id', $quotation->id)->get();
 
         $variants = QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
-            ->where('quotation_id', $quotation->id)->get();
+            ->where('quotation_id', $quotation->id)
+            ->where('is_addon', false)->get();
+
+        $directlyAddedAddons =  QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
+            ->where('quotation_id', $quotation->id)
+            ->where('is_addon', true)->get();
 
         $addons = QuotationItem::where('reference_type','App\Models\AddonDetails')
             ->where('quotation_id', $quotation->id)->get();
@@ -171,26 +186,22 @@ class QuotationController extends Controller
         $data['client_address'] = $call->address;
 
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail',
-            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants'));
+            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons'));
 
         $filename = 'quotation_'.$quotation->id.'.pdf';
-
-        $directory = public_path('Quotations');
+        $generatedPdfDirectory = public_path('Quotations');
+//        $directory = public_path('quotation_files');
+        $directory = storage_path('app\public\quotation_files');
         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
-        $pdfFile->save($directory . '/' . $filename);
+        $pdfFile->save($generatedPdfDirectory . '/' . $filename);
 
         $pdf = $this->pdfMerge($quotation->id);
         $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d').'.pdf';
-
-        $quotation->file_path = $file;
+        $pdf->Output($directory.'/'.$file,'F');
+        $quotation->file_path = 'quotation_files/'.$file;
         $quotation->save();
-        if (file_exists(public_path('Quotations/' . $filename))) {
-            unlink(public_path('Quotations/' . $filename));
-        }
-        return $pdf->Output($file);
 
-//        return $pdfFile->stream("Halloa.pdf");
-
+        return redirect()->route('dailyleads.index')->with('success', 'Quotation created successfully.');
     }
     public function pdfMerge($quotationId)
     {

@@ -379,8 +379,8 @@
                         Remarks :
                     </div>
                     <div class="col-sm-10">
-                        <input type="text" min="0" class="form-control form-control-xs "
-                               name="advance-amount" id="advance-amount" placeholder="Remarks" >
+                        <input type="text"  class="form-control form-control-xs "
+                               name="remarks" placeholder="Remarks" >
                     </div>
                 </div>
             </div>
@@ -418,7 +418,7 @@
                 </div>
                 <div class="col-lg-2">
                     <input type="hidden" value="{{ $callDetails->id }}" name="calls_id" >
-                    <input type="number" readonly id="total"  placeholder="Total Amount" class="fw-bold form-control" value="">
+                    <input type="number" readonly id="total" name="total"  placeholder="Total Amount" class="fw-bold form-control" value="">
                 </div>
             </div>
             <div class="row mt-2" id="selected-currency-div" hidden >
@@ -502,7 +502,7 @@
                     <div class="col-lg-2 col-md-6">
                         <label for="exterior_color">Exterior Color:</label>
                         <select class="form-control col" id="exterior_color" name="exterior_color" disabled>
-                            <option value="">Select Exterior Color</option>
+                            <option value="">Select Exterior Color</option>.
                         </select>
                     </div>
                     <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
@@ -938,7 +938,9 @@
 
         </div>
         <br>
-        <input type="hidden" id="old-currency-type" value="AED">
+        <input type="hidden" id="old-currency-type" value="">
+        <input type="hidden" id="current-currency-type" value="AED">
+
         <button type="submit" class="btn btn-primary" id="submit-button" disabled>Submit</button>
     </form>
 </div>
@@ -1039,29 +1041,37 @@
             var count = secondTable.data().length;
             // alert(count);
             var currency = $('#currency').val();
-            if(currency != 'AED') {
-                var shippingMethod = $('.shipping_method:checked').val();
-                if(shippingMethod == 'EXW' && count > 0) {
-                    $('.total-div').attr("hidden", false)
-                }else{
-                    $('.total-div').attr("hidden", true)
-                    // $('#selected-currency-div').attr("hidden", true);
-                    // $('#selected-currency').html("");
-                    // $('#total_in_selected_currency').val("");
-                }
-                $('#selected-currency-div').attr("hidden", false);
-                $('#selected-currency').html(currency);
+            if(count > 0) {
+                if (currency != 'AED') {
+                    var shippingMethod = $('.shipping_method:checked').val();
+                    if (shippingMethod == 'EXW') {
+                        $('.total-div').attr("hidden", false)
+                    } else {
+                        $('.total-div').attr("hidden", true)
+                    }
+                    $('#selected-currency-div').attr("hidden", false);
+                    $('#selected-currency').html(currency);
 
-            }else{
-                $('.total-div').attr("hidden", false);
-                $('#selected-currency-div').attr("hidden", true);
-                $('#selected-currency').html("");
-                $('#total_in_selected_currency').val(" ");
+                } else {
+                    $('.total-div').attr("hidden", false);
+                    $('#selected-currency-div').attr("hidden", true);
+                    $('#selected-currency').html("");
+                    $('#total_in_selected_currency').val(" ");
+                }
             }
         }
         $('#currency').on('change', function() {
             var currency = $(this).val();
             showPriceInSelectedValue();
+            var oldCurrecy = $('#old-currency-type').val();
+            var PreviousCurrencyType = $('#current-currency-type').val();
+            if(oldCurrecy == PreviousCurrencyType == 'AED') {
+                $('#old-currency-type').val(currency);
+            }else{
+                $('#old-currency-type').val(PreviousCurrencyType);
+            }
+
+            $('#current-currency-type').val(currency);
             var oldCurrecyType = $('#old-currency-type').val();
             if(oldCurrecyType == 'AED') {
                 if(currency == 'USD') {
@@ -1091,11 +1101,10 @@
                 }else if(currency == 'USD') {
                     var value = '{{ $usd_to_eru_rate->value }}';
                     var operand = 'Multiply';
-
                 }
             }
             ConvertRequestedPrice(value,operand);
-            $('#old-currency-type').val(currency);
+
             calculateTotalSum();
         });
         function ConvertRequestedPrice(value,operand) {
@@ -1309,6 +1318,7 @@
                 data: null,
                 render: function (data, type, row) {
                 if(row['button_type'] == 'Direct-Add') {
+
                     return '<button class="circle-buttonr remove-button"  data-button-type="Direct-Add"  >Remove</button>';
 
                 }else{
@@ -1335,8 +1345,11 @@
                     }
                     // calculate
                     var amount = price * 1;
-
-                    return '<input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
+                    var addon = false;
+                        if(row['table_type'] == 'addon-table') {
+                            var addon = true;
+                        }
+                    return '<input type="hidden" name="is_addon[]" value="'+ addon +'" ><input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
                         ' <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
                         '<input type="text"  value="'+ amount +'" class="total-amount-editable form-control" name="total_amounts[]" id="total-amount-'+ row['index'] +'" readonly />';
                 }
@@ -1564,14 +1577,7 @@
         }
     });
     });
-    // $(document).on('click', '.remove-button', function() {
-    //     var row = $(this).closest('tr');
-    //     var rowData = [];
-    //     row.find('td').each(function() {
-    //         rowData.push($(this).text());
-    //     });
-    //     moveRowToFirstTable(rowData);
-    // });
+
 
     $(document).on('click', '#directadding-button', function() {
         var tableType = $(this).attr('data-table');
@@ -1585,7 +1591,7 @@
         var exteriorColor = "";
 
         if(tableType == 'vehicle-table') {
-
+            row['table_type'] = 'vehicle-table';
             var brand = $('#brand option:selected').val();
             if(brand != "") {
 
@@ -1618,6 +1624,7 @@
             }
 
         }else if(tableType == 'accessories-table') {
+            row['table_type'] = 'addon-table';
 
             var addon =  $('#accessories_addon option:selected').val();
             if(addon != "") {
@@ -1641,7 +1648,7 @@
                 alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
             }
         }else if(tableType == 'spare-part-table') {
-
+            row['table_type'] = 'addon-table';
             var addon =  $('#spare_parts_addon option:selected').val();
             if(addon != "") {
                 var addon = $('#spare_parts_addon option:selected').text();
@@ -1668,7 +1675,7 @@
             }
 
         }else if(tableType == 'kit-table') {
-
+            row['table_type'] = 'addon-table';
             var addon =  $('#kit_addon option:selected').val();
             if(addon != "") {
 
@@ -1817,43 +1824,30 @@
         }
         function calculateTotalSum(){
             var count = secondTable.data().length;
+            var currency = $('#currency').val();
 
             var totalAmount = 0;
             for(var i=1;i<= count;i++) {
                 var amount = $('#total-amount-'+i).val();
                 totalAmount = parseFloat(totalAmount) + parseFloat(amount);
             }
-            console.log("total amount");
-            console.log(totalAmount);
+
+            if(currency == 'AED') {
+                $('#total').val(totalAmount.toFixed(3));
+
+            }
             $('#total_in_selected_currency').val(totalAmount.toFixed(3));
-            var currency = $('#currency').val();
-            var oldCurrecyType = $('#old-currency-type').val();
-            if(oldCurrecyType == 'AED') {
                 if(currency == 'USD') {
+                // USD TO AED CONVERSION
                     var value = '{{ $aed_to_usd_rate->value }}';
-                    var total = parseFloat(totalAmount) / value;
+                    var total = parseFloat(totalAmount) * value;
                     $('#total').val(total.toFixed(3));
                 }else if(currency == 'EUR') {
+                    // EUR TO AED CONVERSION
                     var value = '{{ $aed_to_eru_rate->value }}';
-                    var total = parseFloat(totalAmount) / value;
-                    $('#total').val(total.toFixed(3));
-                }else{
-                    $('#total').val(totalAmount.toFixed(3));
-                }
-            }else if(oldCurrecyType == 'USD') {
-               if(currency == 'EUR') {
-                    var value = '{{ $usd_to_eru_rate->value }}';
-                   var total = parseFloat(totalAmount) / value;
-                   $('#total').val(total.toFixed(3));
-                }
-            }
-            else if(oldCurrecyType == 'EUR') {
-                if(currency == 'USD') {
-                    var value = '{{ $usd_to_eru_rate->value }}';
                     var total = parseFloat(totalAmount) * value;
                     $('#total').val(total.toFixed(3));
                 }
-            }
 
              enableOrDisableSubmit();
 

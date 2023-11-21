@@ -145,7 +145,7 @@
                 @endforeach
             @endif
 
-            @if($addons->count() > 0)
+            @if($addons->count() > 0 || $directlyAddedAddons->count() > 0)
                 <tr>
                     <th>03. ADD ONS AND EXTRA ITEM </th>
                     <th>QTY</th>
@@ -158,6 +158,14 @@
                         <td>{{ $addon->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($addon->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($addon->total_amount, 2) }}</td>
+                    </tr>
+                @endforeach
+                @foreach($directlyAddedAddons as $directlyAddedAddon)
+                    <tr>
+                        <td>{{ $directlyAddedAddon->description }}</td>
+                        <td>{{ $directlyAddedAddon->quantity }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($directlyAddedAddon->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($directlyAddedAddon->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
             @endif
