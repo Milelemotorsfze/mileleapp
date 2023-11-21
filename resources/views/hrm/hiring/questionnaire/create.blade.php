@@ -13,7 +13,7 @@
         margin-top: 12px !important;
     }
 
-    .form-label[for="basicpill-firstname-input"] {
+    .form-label {
         margin-top: 12px;
     }
 
@@ -103,7 +103,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <div class="row ">
                     <div class="col-lg-12 col-md-12 col-sm-12 ">
 
-                        <label for="designation_type" class="form-label"><span class="error">* </span>Designation Type:</label>
+                        <label for="designation_type" class="form-label"><span class="error">* </span>{{ __('Designation Type:') }}</label>
                         <div class="designation-radio-button">
                             <label>
                                 <input type="radio" name="designation_type" id="prior_designation" value="prior_designation"> Prior Designation
@@ -117,12 +117,71 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
             </div>
 
+
+
+
+            <div class="row">
+                <div class=" col-lg-4 col-md-6 col-sm-6">
+
+                    <label for="designation_id" class="form-label"><span class="error">* </span>{{ __('Designation Name') }}</label>
+                    <select name="designation_id" id="requested_job_title" class="form-control widthinput" multiple="true" autofocus>
+                        @foreach($masterDesignations as $masterDesignation)
+                        <option value="{{$masterDesignation->id}}">{{$masterDesignation->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-xxl-4 col-lg-6 col-md-6">
+                    <a id="createNewJobTitleButton" data-toggle="popover" data-trigger="hover" title="Create New Job Title" data-placement="top" style="margin-top:28px;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewJobPosition"><i class="fa fa-plus" aria-hidden="true"></i> Create New Job Title</a>
+                </div>
+                <!-- New Designation div shown on the right side -->
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <!-- when the user chooses other, show this other new designation div  -->
+                    <div class="otherDesignationInputContainer" id="otherDesignationInputContainer" style="display: none">
+
+                        <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>{{ __('Other:') }}</label>
+                        <input type="text" placeholder="Other" name="otherDesignation" class="form-control" id="otherDesignationInput">
+                    </div>
+                </div>
+            </div>
+
+            <div class=" col-lg-4 col-md-6 col-sm-6 ">
+
+                <label for="no_of_years_of_experience_in_specific_job_role" class="form-label"><span class="error">* </span>{{ __('Years of Experience :') }} </label>
+                <input type="number" placeholder="No. of years" name="no_of_years_of_experience_in_specific_job_role" class="form-control" id="no_of_years_of_experience_in_specific_job_role">
+            </div>
+
+            <div class=" col-lg-4 col-md-6 col-sm-6   ">
+
+                <label for="reporting_structure" class="form-label"><span class="error">* </span>{{ __('Reporting To') }}</label>
+                <select name="reporting_structure" id="reporting_structure" class="form-control widthinput" autofocus>
+                    <option value=""></option>
+                    <option value="management">Management</option>
+                    <option value="team_lead">Team Lead / Manager</option>
+                </select>
+            </div>
+
+            <div class=" col-lg-4 col-md-6 col-sm-6 ">
+
+                <label for="location_id" class="form-label"><span class="error">* </span>{{ __('Work Location') }}</label>
+                <select name="location_id" id="location_id" class="form-control widthinput" multiple="true" autofocus>
+                    @foreach($masterOfficeLocations as $masterOfficeLocation)
+                    <option value="{{$masterOfficeLocation->id}}">{{$masterOfficeLocation->name}}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class=" col-lg-4 col-md-6 col-sm-6 ">
+
+                <label for="number_of_openings" class="form-label"><span class="error">* </span>{{ __('Number of Hirings :') }} </label>
+                <input type="number" placeholder="Number of Hirings" name="number_of_openings" class="form-control" id="number_of_openings">
+            </div>
+
             <div class=" col-lg-4 col-md-6 col-sm-6 designation-radio-main-div">
                 <div class="row ">
                     <div class="col-lg-12  col-md-12 col-sm-12 ">
 
 
-                        <label for="hiring_time" class="form-label"><span class="error">* </span>Hiring Time:</label>
+                        <label for="hiring_time" class="form-label"><span class="error">* </span>{{ __('Hiring Time:') }}</label>
                         <div class="designation-radio-button">
                             <label>
                                 <input type="radio" name="hiring_time" id="immediate" value="immediate"> Immediate
@@ -136,68 +195,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
             </div>
 
-
-            <div class="row">
-                <div class=" col-lg-4 col-md-6 col-sm-6">
-
-                    <label for="designation_id" class="form-label"><span class="error">* </span>Designation Name</label>
-                    <select name="designation_id" id="requested_job_title" class="form-control widthinput" multiple="true" autofocus>
-                        @foreach($masterDesignations as $masterDesignation)
-                        <option value="{{$masterDesignation->id}}">{{$masterDesignation->name}}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-xxl-4 col-lg-6 col-md-6">
-                    <a id="createNewJobTitleButton" data-toggle="popover" data-trigger="hover" title="Create New Job Title" data-placement="top" style="margin-top:38px;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewJobPosition"><i class="fa fa-plus" aria-hidden="true"></i> Create New Job Title</a>
-                </div>
-                <!-- New Designation div shown on the right side -->
-                <div class="col-lg-2 col-md-4 col-sm-6">
-                    <!-- when the user chooses other, show this other new designation div  -->
-                    <div class="otherDesignationInputContainer" id="otherDesignationInputContainer" style="display: none">
-
-                        <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>Other:</label>
-                        <input type="text" placeholder="Other" name="otherDesignation" class="form-control" id="otherDesignationInput">
-                    </div>
-                </div>
-            </div>
-
-
-            <div class=" col-lg-4 col-md-6 col-sm-6   ">
-
-                <label for="reporting_structure" class="form-label"><span class="error">* </span>Reporting To</label>
-                <select name="reporting_structure" id="reporting_structure" class="form-control widthinput" autofocus>
-                    <option value=""></option>
-                    <option value="management">Management</option>
-                    <option value="team_lead">Team Lead / Manager</option>
-                </select>
-            </div>
             <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                <label for="location_id" class="form-label"><span class="error">* </span>Work Location</label>
-                <select name="location_id" id="location_id" class="form-control widthinput" multiple="true" autofocus>
-                    @foreach($masterOfficeLocations as $masterOfficeLocation)
-                    <option value="{{$masterOfficeLocation->id}}">{{$masterOfficeLocation->name}}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class=" col-lg-4 col-md-6 col-sm-6 ">
-
-                <label for="number_of_openings" class="form-label"><span class="error">* </span>Number of Hirings : </label>
-                <input type="number" placeholder="Number of Hirings" name="number_of_openings" class="form-control" id="number_of_openings">
-            </div>
-
-
-            <div class=" col-lg-4 col-md-6 col-sm-6 ">
-
-                <label for="no_of_years_of_experience_in_specific_job_role" class="form-label"><span class="error">* </span>Years of Experience : </label>
-                <input type="number" placeholder="No. of years" name="no_of_years_of_experience_in_specific_job_role" class="form-control" id="no_of_years_of_experience_in_specific_job_role">
-            </div>
-
-
-            <div class=" col-lg-4 col-md-6 col-sm-6 ">
-
-                <label for="work_time" class="form-label"><span class="error">* </span>Working Hours:</label>
+                <label for="work_time" class="form-label"><span class="error">* </span>{{ __('Working Hours:') }}</label>
                 <div class="input-group">
                     <input type="time" placeholder="From" name="work_time_start" class="form-control" id="work_time_start">
                     <span class="input-group-text">to</span>
@@ -205,20 +205,43 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
             </div>
 
-
-
-            <div class=" col-lg-4 col-md-6 col-sm-6 ">
-
-                <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>Any Specific Company Experience : </label>
-                <input type="number" placeholder="Company Experience" name="location" class="form-control" id="locationInput">
-            </div>
-
         </div>
+
 
         <div class="row">
             <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                <label for="industry_experience_id" class="form-label"><span class="error">* </span>Any specific industry experience</label>
+                <label for="education" class="form-label"><span class="error">* </span>{{ __('Education') }}</label>
+                <select name="education" id="education" class="form-control widthinput" onchange="showDiv('otherEducationInputContainer', this)" autofocus>
+                    <option value="" disabled selected>Choose Option</option>
+                    <option value="high_school">High School</option>
+                    <option value="bachelors">Bachelors</option>
+                    <option value="pg_in_same_specialisation_or_related_to_department">PG in the same specailisation or related to department</option>
+                    <option value="0">Other</option>
+                </select>
+            </div>
+
+            <!-- Other div shown on the right side -->
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <!-- when the user chooses other, show this other other div  -->
+                <div class="otherEducationInputContainer" id="otherEducationInputContainer" style="display: none">
+
+                    <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>{{ __('Other Certification:') }}</label>
+                    <input type="text" placeholder="Other" name="otherEducation" class="form-control" id="otherEducationInput">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class=" col-lg-4 col-md-6 col-sm-6 ">
+
+                <label for="specific_company_experience" class="form-label"><span class="error">* </span>{{ __('Any Specific Company Experience :') }} </label>
+                <input type="text" placeholder="Company Experience" name="specific_company_experience" class="form-control" id="specific_company_experience">
+            </div>
+            <div class=" col-lg-4 col-md-6 col-sm-6 ">
+
+                <label for="industry_experience_id" class="form-label"><span class="error">* </span>{{ __('Any specific industry experience') }}</label>
                 <select name="industry_experience_id" id="industry_experience_id" class="form-control widthinput" multiple="true" onchange="showIndustryExpOtherDiv('otherSpecificIndustryExpInputContainer', this)" autofocus>
                     @foreach($masterSpecificIndustryExperiences as $masterSpecificIndustryExperience)
                     <option value="{{$masterSpecificIndustryExperience->id}}">{{$masterSpecificIndustryExperience->name}}</option>
@@ -232,36 +255,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <!-- when the user chooses other, show this Specify div  -->
                 <div class="otherSpecificIndustryExpInputContainer" id="otherSpecificIndustryExpInputContainer" style="display: none">
 
-                    <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>Specify Other:</label>
+                    <!-- <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>{{ __('Specify Other:') }}</label> -->
                     <input type="text" placeholder="Other" name="otherSpecificIndustryExp" class="form-control" id="otherSpecificIndustryExp">
                 </div>
             </div>
         </div>
 
 
-        <div class="row">
-            <div class=" col-lg-4 col-md-6 col-sm-6 ">
-
-                <label for="education" class="form-label"><span class="error">* </span>Education</label>
-                <select name="education" id="education" class="form-control widthinput" onchange="showDiv('otherEducationInputContainer', this)" autofocus>
-                    <option value=""></option>
-                    <option value="high_school">High School</option>
-                    <option value="bachelors">Bachelors</option>
-                    <option value="pg_in_same_specialisation_or_related_to_department">PG in the same specailisation or related to department</option>
-                    <option value="0">Other</option>
-                </select>
-            </div>
-
-            <!-- Other div shown on the right side -->
-            <div class="col-lg-2 col-md-4 col-sm-6">
-                <!-- when the user chooses other, show this other other div  -->
-                <div class="otherEducationInputContainer" id="otherEducationInputContainer" style="display: none">
-
-                    <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>Other:</label>
-                    <input type="text" placeholder="Other" name="otherEducation" class="form-control" id="otherEducationInput">
-                </div>
-            </div>
-        </div>
 
 
         <br />
@@ -272,17 +272,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="salary_range_in_aed" class="form-label"><span class="error">* </span>Salary Range:</label>
+                        <label for="salary_range_in_aed" class="form-label"><span class="error">* </span>{{ __('Salary Range (In AED)') }}</label>
                         <div class="input-group">
                             <input type="number" placeholder="Min Salary" name="salary_range_start_in_aed" class="form-control" id="salary_range_start_in_aed">
-                            <span class="input-group-text">to</span>
+                            <span class="input-group-text">{{ __('to') }}</span>
                             <input type="number" placeholder="Max Salary" name="salary_range_end_in_aed" class="form-control" id="salary_range_end_in_aed">
                         </div>
                     </div>
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="visa_type" class="form-label"><span class="error">* </span>Visa Type</label>
+                        <label for="visa_type" class="form-label"><span class="error">* </span>{{ __('Visa Type') }}</label>
                         <select name="visa_type" id="visa_type" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($masterVisaTypes as $masterVisaType)
                             <option value="{{$masterVisaType->id}}">{{$masterVisaType->name}}</option>
@@ -292,7 +292,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="nationality" class="form-label"><span class="error">* </span>Nationality</label>
+                        <label for="nationality" class="form-label"><span class="error">* </span>{{ __('Nationality') }}</label>
                         <select name="nationality" id="nationality" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($masterNationality as $Country)
                             <option value="{{$Country->id}}">{{$Country->name}}</option>
@@ -302,7 +302,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="min_age" class="form-label"><span class="error">* </span>Age:</label>
+                        <label for="min_age" class="form-label"><span class="error">* </span>{{ __('Age:') }}</label>
                         <div class="input-group">
                             <input type="number" placeholder="From" name="min_age" class="form-control" id="min_age">
                             <span class="input-group-text">to</span>
@@ -312,7 +312,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="language_id" class="form-label"><span class="error">* </span>Additional Language(s):</label>
+                        <label for="language_id" class="form-label"><span class="error">* </span>{{ __('Additional Language(s):') }}</label>
                         <select name="language_id" id="language_id" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($masterLanguages as $Language)
                             <option value="{{$Language->id}}">{{$Language->name}}</option>
@@ -329,7 +329,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <div class="col-lg-12  ">
 
 
-                                <label for="required_to_travel_for_work_purpose" class="form-label"><span class="error">* </span>Did he require to travel for work purpose?</label>
+                                <label for="required_to_travel_for_work_purpose" class="form-label"><span class="error">* </span>{{ __('Did he require to travel for work purpose?') }}</label>
                                 <div class="designation-radio-button">
                                     <label>
                                         <input type="radio" name="required_to_travel_for_work_purpose" id="yes" value="yes"> Yes
@@ -348,7 +348,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <div class="col-lg-12  ">
 
 
-                                <label for="requires_multiple_industry_experience" class="form-label"><span class="error">* </span>Do candidates require multiple industry experience?</label>
+                                <label for="requires_multiple_industry_experience" class="form-label"><span class="error">* </span>{{ __('Do candidates require multiple industry experience?') }}</label>
                                 <div class="designation-radio-button">
                                     <label>
                                         <input type="radio" name="requires_multiple_industry_experience" id="yes" value="yes"> Yes
@@ -367,7 +367,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <div class="col-lg-12  ">
 
 
-                                <label for="team_handling_experience_required" class="form-label"><span class="error">* </span>Team handling experience is required?</label>
+                                <label for="team_handling_experience_required" class="form-label"><span class="error">* </span>{{ __('Team handling experience is required?') }}</label>
                                 <div class="designation-radio-button">
                                     <label>
                                         <input type="radio" name="team_handling_experience_required" id="yes" value="yes"> Yes
@@ -380,14 +380,75 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                         </div>
                     </div>
+                </div>
 
-
+                <div class="row">
                     <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
                         <div class="row ">
                             <div class="col-lg-12   designation-radio-main-div">
 
 
-                                <label for="required_to_work_on_trial" class="form-label"><span class="error">* </span>Is shortlisted candidate require to work on trial ?</label>
+                                <label for="driving_licence" class="form-label"><span class="error">* </span>{{ __('Driving Lisence Required?') }}</label>
+
+                                <div class="designation-radio-button">
+                                    <label>
+                                        <input type="radio" name="driving_lisence" id="yes" value="yes"> Yes
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="driving_lisence" id="no" value="no"> No
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- if yes, add radio button for: Own car, Expenses done by ? own or Company -->
+
+                        </div>
+                    </div>
+                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
+
+                        <div class="drivingLisenceInputContainer" style="display: none">
+                            <div class="row ">
+                                <div class="col-lg-6 designation-radio-main-div">
+
+
+                                    <label for="own_car" class="form-label"><span class="error">* </span>{{ __('Own Car') }}</label>
+
+                                    <div class="designation-radio-button">
+                                        <label>
+                                            <input type="radio" name="own_car" id="yes" value="yes"> Yes
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="own_car" id="no" value="no"> No
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 designation-radio-main-div">
+
+
+                                    <label for="fuel_expenses_by" class="form-label"><span class="error">* </span>{{ __('Fuels Expenses covered by?') }}</label>
+
+                                    <div class="designation-radio-button">
+                                        <label>
+                                            <input type="radio" name="fuel_expenses_by" id="yes" value="yes"> Yes
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="fuel_expenses_by" id="no" value="no"> No
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
+                        <div class="row ">
+                            <div class="col-lg-12   designation-radio-main-div">
+
+
+                                <label for="required_to_work_on_trial" class="form-label"><span class="error">* </span>{{ __('Is shortlisted candidate require to work on trial ?') }}</label>
                                 <div class="designation-radio-button">
                                     <label>
                                         <input type="radio" name="required_to_work_on_trial" id="yes" value="yes"> Yes
@@ -401,7 +462,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <!-- if yes, add input  button to enter number of days -->
                             <div class="numberOfDaysInputContainer" style="display: none">
 
-                                <label for="number_of_trial_days" class="form-label"><span class="error">* </span>Enter Number of days:</label>
+                                <label for="number_of_trial_days" class="form-label"><span class="error">* </span>{{ __('Enter Number of days:') }}</label>
                                 <input type="number" placeholder="no. of days" name="number_of_trial_days" class="form-control" id="number_of_trial_days">
                             </div>
 
@@ -413,7 +474,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <div class="row">
                             <div class="col-lg-12">
 
-                                <label for="commission_involved_in_salary" class="form-label"><span class="error">* </span>Is commission involved along with the salary?</label>
+                                <label for="commission_involved_in_salary" class="form-label"><span class="error">* </span>{{ __('Is commission involved along with the salary?') }}</label>
                                 <div class="designation-radio-button">
                                     <label>
                                         <input type="radio" name="commission_involved_in_salary" id="yes" value="yes"> Yes
@@ -429,7 +490,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                     <!-- Dropdown Container -->
                                     <div class="chooseAmountpercentageDropDownInputContainer" style="display: none;">
 
-                                        <label for="commission_type" class="form-label"><span class="error">* </span>Choose Amount or Percentage</label>
+                                        <label for="commission_type" class="form-label"><span class="error">* </span>{{ __('Choose Amount or Percentage') }}</label>
                                         <select name="commission_type" id="commission_type" class="form-control widthinput" onchange="showAmountPercentageInput(this)" autofocus>
                                             <option value="" disabled selected>Choose Option</option>
                                             <option value="amount">Amount</option>
@@ -442,14 +503,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                 <div class="col-lg-12 col-md-12 col-sm-12 amountpercentageDropDownInputContainer">
                                     <div class="amountInputContainer" id="amountInputContainer" style="display: none">
 
-                                        <label for="commission_amount" class="form-label"><span class="error">* </span>Enter Amount (in AED):</label>
+                                        <label for="commission_amount" class="form-label"><span class="error">* </span>{{ __('Enter Amount (in AED):') }}</label>
                                         <input type="number" placeholder="amount" name="commission_amount" class="form-control" id="commission_amount">
                                     </div>
 
                                     <!-- Percentage Input Container -->
                                     <div class="percentageInputContainer" id="percentageInputContainer" style="display: none">
 
-                                        <label for="commission_percentage" class="form-label"><span class="error">* </span>Enter percentage:</label>
+                                        <label for="commission_percentage" class="form-label"><span class="error">* </span>{{ __('Enter percentage:') }}</label>
                                         <input type="number" placeholder="percentage" name="commission_percentage" class="form-control" id="commission_percentage">
                                     </div>
                                 </div>
@@ -463,68 +524,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
 
 
-                <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
-                    <div class="row ">
-                        <div class="col-lg-12   designation-radio-main-div">
 
-
-                            <label for="driving_licence" class="form-label"><span class="error">* </span>Driving Lisence Required?</label>
-
-                            <div class="designation-radio-button">
-                                <label>
-                                    <input type="radio" name="driving_lisence" id="yes" value="yes"> Yes
-                                </label>
-                                <label>
-                                    <input type="radio" name="driving_lisence" id="no" value="no"> No
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- if yes, add radio button for: Own car, Expenses done by ? own or Company -->
-
-                    </div>
-                </div>
-                <div class=" col-lg-4 col-md-6 col-sm-6 ">
-
-                    <div class="drivingLisenceInputContainer" style="display: none">
-                        <div class="row ">
-                            <div class="col-lg-6 designation-radio-main-div">
-
-
-                                <label for="own_car" class="form-label"><span class="error">* </span>Own Car</label>
-
-                                <div class="designation-radio-button">
-                                    <label>
-                                        <input type="radio" name="own_car" id="yes" value="yes"> Yes
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="own_car" id="no" value="no"> No
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6 designation-radio-main-div">
-
-
-                                <label for="fuel_expenses_by" class="form-label"><span class="error">* </span>Fuels Expenses covered by?</label>
-
-                                <div class="designation-radio-button">
-                                    <label>
-                                        <input type="radio" name="fuel_expenses_by" id="yes" value="yes"> Yes
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="fuel_expenses_by" id="no" value="no"> No
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="row">
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="interviewd_by" class="form-label"><span class="error">* </span>Interviewed By:</label>
+                        <label for="interviewd_by" class="form-label"><span class="error">* </span>{{ __('Interviewed By:') }}</label>
                         <select name="interviewd_by" id="interviewd_by" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($interviewdByUsers as $User)
                             <option value="{{$User->id}}">{{$User->name}}</option>
@@ -534,35 +539,53 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
                 <div class="row">
                     <div class=" col-lg-4 col-md-12 col-sm-12 ">
-                        <label for="mandatory_skills" class="form-label"><span class="error">* </span>Top 3 skills / mandatory work experience : </label>
+                        <label for="mandatory_skills" class="form-label"><span class="error">* </span>{{ __('Top 3 skills / mandatory work experience :') }} </label>
                         <textarea name="mandatory_skills" class="form-control" rows="3" cols="15"></textarea>
                     </div>
 
                     <div class=" col-lg-4 col-md-12 col-sm-12  ">
-                        <label for="job_opening_purpose_objective" class="form-label"><span class="error">* </span>Objectives of job purpose of job posting: </label>
+                        <label for="job_opening_purpose_objective" class="form-label"><span class="error">* </span>{{ __('Objectives of job purpose of job posting: ') }}</label>
                         <textarea name="job_opening_purpose_objective" class="form-control" rows="3" cols="15"></textarea>
                     </div>
 
                     <div class=" col-lg-4 col-md-12 col-sm-12  ">
-                        <label for="screening_questions" class="form-label"><span class="error">* </span>Screening Questions: </label>
+                        <label for="screening_questions" class="form-label"><span class="error">* </span>{{ __('Screening Questions: ') }}</label>
                         <textarea name="screening_questions" class="form-control" rows="3" cols="15"></textarea>
                     </div>
 
                     <div class=" col-lg-4 col-md-12 col-sm-12  ">
-                        <label for="technical_test" class="form-label"><span class="error">* </span>Technical Questions</label>
+                        <label for="technical_test" class="form-label"><span class="error">* </span>{{ __('Technical Questions') }}</label>
                         <textarea name="technical_test" class="form-control" rows="3" cols="15"></textarea>
                     </div>
 
                     <div class=" col-lg-4 col-md-12 col-sm-12  ">
-                        <label for="trial_work_job_description" class="form-label"><span class="error">* </span>Job description during trial Working</label>
+                        <label for="trial_work_job_description" class="form-label"><span class="error">* </span>{{ __('Job description during trial Working') }}</label>
                         <textarea name="trial_work_job_description" class="form-control" rows="3" cols="15"></textarea>
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-lg-12">
+
+                        <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>{{ __('Stakeholders for Job Evaluation') }}</label>
+                        <ul class="list-group list-group-horizontal">
+                            <li class="list-group-item">
+                                <input type="checkbox" id="internal_department_evaluation" name="internal_department_evaluation">
+                                <label for="internal_department_evaluation">Internal departments</label>
+                            </li>
+                            <li class="list-group-item">
+                                <input type="checkbox" id="external_vendor_evaluation" name="external_vendor_evaluation">
+                                <label for="external_vendor_evaluation">External vendors</label>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+                <br />
                 <div class="row ">
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
-                        <label for="recruitment_source_id" class="form-label"><span class="error">* </span>Recruitment Source:</label>
+                        <label for="recruitment_source_id" class="form-label"><span class="error">* </span>{{ __('Recruitment Source:') }}</label>
                         <select name="recruitment_source_id" id="recruitment_source_id" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($masterRecuritmentSources as $MasterRecuritmentSource)
                             <option value="{{$MasterRecuritmentSource->id}}">{{$MasterRecuritmentSource->name}}</option>
@@ -570,29 +593,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </select>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
-                        <label for="department_id" class="form-label"><span class="error">* </span>Division / Department:</label>
-                        <select name="department_id" id="department_id" class="form-control widthinput" multiple="true" autofocus>
-                            @foreach($masterDepartments as $MasterDeparment)
-                            <option value="{{$MasterDeparment->id}}">{{$MasterDeparment->name}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
-                        <label for="career_level_id" class="form-label"><span class="error">* </span>Career level:</label>
-                        <select name="career_level_id" id="career_level_id" class="form-control widthinput" multiple="true" autofocus>
-                            @foreach($masterExperienceLevels as $MasterExperienceLevel)
-                            <option value="{{$MasterExperienceLevel->id}}">{{$MasterExperienceLevel->name}} ( {{$MasterExperienceLevel->number_of_year_of_experience}} )</option>
-                            @endforeach
-                        </select>
-                    </div>
 
                     <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
                         <div class="row ">
                             <div class="col-lg-12  ">
 
-                                <label for="experience" class="form-label"><span class="error">* </span>Experience</label>
+                                <label for="experience" class="form-label"><span class="error">* </span>{{ __('Experience') }}</label>
                                 <div class="designation-radio-button">
                                     <label>
                                         <input type="radio" name="experience" id="local" value="local"> Local
@@ -614,7 +620,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <div class="col-lg-12  ">
 
 
-                                <label for="travel_experience" class="form-label"><span class="error">* </span>Travel experience?</label>
+                                <label for="travel_experience" class="form-label"><span class="error">* </span>{{ __('Travel experience?') }}</label>
                                 <div class="designation-radio-button">
                                     <label>
                                         <input type="radio" name="travel_experience" id="yes" value="yes"> Yes
@@ -627,13 +633,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                         </div>
                     </div>
+
+                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
+                        <label for="department_id" class="form-label"><span class="error">* </span>{{ __('Division / Department:') }}</label>
+                        <select name="department_id" id="department_id" class="form-control widthinput" multiple="true" autofocus>
+                            @foreach($masterDepartments as $MasterDeparment)
+                            <option value="{{$MasterDeparment->id}}">{{$MasterDeparment->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
+                        <label for="career_level_id" class="form-label"><span class="error">* </span>{{ __('Career level:') }}</label>
+                        <select name="career_level_id" id="career_level_id" class="form-control widthinput" multiple="true" autofocus>
+                            @foreach($masterExperienceLevels as $MasterExperienceLevel)
+                            <option value="{{$MasterExperienceLevel->id}}">{{$MasterExperienceLevel->name}} ( {{$MasterExperienceLevel->number_of_year_of_experience}} )</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                 </div>
 
                 <div class="row">
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="current_or_past_employer_size_start" class="form-label"><span class="error">* </span>Current or Past Employer Size:</label>
+                        <label for="current_or_past_employer_size_start" class="form-label"><span class="error">* </span>{{ __('Current or Past Employer Size:') }}</label>
                         <div class="input-group">
                             <input type="number" placeholder="From" name="current_or_past_employer_size_start" class="form-control" id="current_or_past_employer_size_start">
                             <span class="input-group-text">to</span>
@@ -643,7 +668,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="trial_pay_in_aed" class="form-label"><span class="error">* </span>Trial Pay (AED): </label>
+                        <label for="trial_pay_in_aed" class="form-label"><span class="error">* </span>{{ __('Trial Pay (AED):') }} </label>
                         <input type="number" placeholder="Trial Pay in AED" name="trial_pay_in_aed" class="form-control" id="trial_pay_in_aed">
                     </div>
 
@@ -656,7 +681,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <div class="col-lg-12  ">
 
 
-                                <label for="out_of_office_visit" class="form-label"><span class="error">* </span>Out of Office Visits?</label>
+                                <label for="out_of_office_visit" class="form-label"><span class="error">* </span>{{ __('Out of Office Visits?') }}</label>
                                 <div class="designation-radio-button">
                                     <label>
                                         <input type="radio" name="out_of_office_visit" id="yes" value="yes"> Yes
@@ -675,7 +700,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <div class="col-lg-12  ">
 
 
-                                <label for="remote_work" class="form-label"><span class="error">* </span>Remote Work?</label>
+                                <label for="remote_work" class="form-label"><span class="error">* </span>{{ __('Remote Work?') }}</label>
                                 <div class="designation-radio-button">
                                     <label>
                                         <input type="radio" name="remote_work" id="yes" value="yes"> Yes
@@ -694,7 +719,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <div class="col-lg-12  ">
 
 
-                                <label for="international_business_trip_required" class="form-label"><span class="error">* </span>International Business trips required?</label>
+                                <label for="international_business_trip_required" class="form-label"><span class="error">* </span>{{ __('International Business trips required?') }}</label>
                                 <div class="designation-radio-button">
                                     <label>
                                         <input type="radio" name="international_business_trip_required" id="yes" value="yes"> Yes
@@ -709,42 +734,42 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="probation_length_in_months" class="form-label"><span class="error">* </span>Probation length (months): </label>
+                        <label for="probation_length_in_months" class="form-label"><span class="error">* </span> {{ __('Probation length (months):') }}</label>
                         <input type="number" placeholder="Probation length in months" name="probation_length_in_months" class="form-control" id="probation_length_in_months">
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="probation_pay_amount_in_aed" class="form-label"><span class="error">* </span>Probation Pay (AED): </label>
+                        <label for="probation_pay_amount_in_aed" class="form-label"><span class="error">* </span> {{ __('Probation Pay (AED):') }}</label>
                         <input type="number" placeholder="Probation Pay in AED" name="probation_pay_amount_in_aed" class="form-control" id="probation_pay_amount_in_aed">
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="incentives_perks_bonus" class="form-label"><span class="error">* </span>Incentive, Perks, & Bonus: </label>
-                        <input type="number" placeholder="Incentives" name="incentives_perks_bonus" class="form-control" id="incentives_perks_bonus">
+                        <label for="incentives_perks_bonus" class="form-label"><span class="error">* </span>{{ __('Incentive, Perks, & Bonus:') }} </label>
+                        <input type="text" placeholder="Incentives" name="incentives_perks_bonus" class="form-control" id="incentives_perks_bonus">
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="kpi" class="form-label"><span class="error">* </span>KPI: </label>
-                        <input type="number" placeholder="KPI" name="kpi" class="form-control" id="kpi">
+                        <label for="kpi" class="form-label"><span class="error">* </span>{{ __('KPI: ') }}</label>
+                        <input type="text" placeholder="KPI" name="kpi" class="form-control" id="kpi">
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="practical_test" class="form-label"><span class="error">* </span>Practical test: </label>
-                        <input type="number" placeholder="Practical test" name="practical_test" class="form-control" id="practical_test">
+                        <label for="practical_test" class="form-label"><span class="error">* </span>{{ __('Practical test:') }} </label>
+                        <input type="text" placeholder="Practical test" name="practical_test" class="form-control" id="practical_test">
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="trial_objectives_and_evaluation_method" class="form-label"><span class="error">* </span>Trial objectives and Evaluation method: </label>
-                        <input type="number" placeholder="Trial objectives and Evaluation method" name="trial_objectives_and_evaluation_method" class="form-control" id="trial_objectives_and_evaluation_method">
+                        <label for="trial_objectives_and_evaluation_method" class="form-label"><span class="error">* </span>{{ __('Trial objectives and Evaluation method: ') }}</label>
+                        <input type="text" placeholder="Trial objectives and Evaluation method" name="trial_objectives_and_evaluation_method" class="form-control" id="trial_objectives_and_evaluation_method">
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="duties_and_tasks" class="form-label"><span class="error">* </span>Duties & Tasks : </label>
-                        <input type="number" placeholder="Duties & Tasks" name="duties_and_tasks" class="form-control" id="duties_and_tasks">
+                        <label for="duties_and_tasks" class="form-label"><span class="error">* </span>{{ __('Duties & Tasks : ') }}</label>
+                        <input type="text" placeholder="Duties & Tasks" name="duties_and_tasks" class="form-control" id="duties_and_tasks">
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                        <label for="next_career_path_id" class="form-label"><span class="error">* </span>Next Career path:</label>
+                        <label for="next_career_path_id" class="form-label"><span class="error">* </span>{{ __('Next Career path:') }}</label>
                         <select name="next_career_path_id" id="next_career_path_id" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($masterExperienceLevels as $MasterExperienceLevel)
                             <option value="{{$MasterExperienceLevel->id}}">{{$MasterExperienceLevel->name}} ( {{$MasterExperienceLevel->number_of_year_of_experience}} )</option>
@@ -755,21 +780,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             </div>
         </div>
 
-        <div class="col-lg-12">
 
-            <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>Stakeholders for Job Evaluation</label>
-            <ul class="list-group list-group-horizontal">
-                <li class="list-group-item">
-                    <input type="checkbox" id="internal_department_evaluation" name="internal_department_evaluation">
-                    <label for="internal_department_evaluation">Internal departments</label>
-                </li>
-                <li class="list-group-item">
-                    <input type="checkbox" id="external_vendor_evaluation" name="external_vendor_evaluation">
-                    <label for="external_vendor_evaluation">External vendors</label>
-                </li>
-
-            </ul>
-        </div>
     </form>
 </div>
 </br>
@@ -790,7 +801,7 @@ redirect()->route('home')->send();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script>
- 	var data = {!! json_encode($data) !!};
+    var data = {!!json_encode($data) !!};
 
     $("#number_of_openings").val(data.number_of_openings);
     $("#work_time_start").val(data.work_time_start);
