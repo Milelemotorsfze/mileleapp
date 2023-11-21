@@ -10,6 +10,7 @@ class QuestionnaireLanguagePreference extends Model
 {
     use HasFactory;
     protected $table = "questionnaire_language_preferences";
+    public $timestamps = false;
     protected $fillable = [
         'questionnaire_id', 
         'language_id'

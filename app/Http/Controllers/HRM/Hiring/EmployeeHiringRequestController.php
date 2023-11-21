@@ -29,7 +29,6 @@ class EmployeeHiringRequestController extends Controller
         $rejected = EmployeeHiringRequest::where('status','rejected')->latest()->get();
         $deleted = [];
         $deleted = EmployeeHiringRequest::onlyTrashed()->get();
-        // dd('hi');
         return view('hrm.hiring.hiring_request.index',compact('pendings','approved','rejected','deleted','page'));
     }
     public function createOrEdit($id) {
