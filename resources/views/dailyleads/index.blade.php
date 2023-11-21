@@ -829,7 +829,7 @@ input[type=number]::-webkit-outer-spin-button
   </div>
   <script>
      function openModalfile(filePath) {
-      const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
+    const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
     const fileUrl = baseUrl + '/' + filePath; // Add a slash between baseUrl and filePath
     console.log('File URL:', fileUrl); // Log the URL to the console
     $('#fileViewer').attr('src', fileUrl);

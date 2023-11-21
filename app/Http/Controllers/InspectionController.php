@@ -27,6 +27,10 @@ use App\Models\IncidentWork;
 use App\Models\MasterModelLines;
 use App\Models\VariantRequestItems;
 use App\Models\Pdi;
+use App\Models\ModelSpecification;
+use App\Models\ModelSpecificationOption;
+use App\Models\VariantItems;
+use App\Models\Variantlog;
 
 class InspectionController extends Controller
 {
@@ -297,7 +301,10 @@ class InspectionController extends Controller
         $newfeatures = New VehicleApprovalRequests();
         $newfeatures->new_value = $request->input('extra_features');
         $newfeatures->inspection_id = $inspections_id;
-        $newfeatures->extra_features = "";
+        $newfeatures->field = "extra_features";
+        $newfeatures->updated_by = auth()->user()->id;
+        $newfeatures->vehicle_id = $id;
+        $newfeatures->save();
         $selectedSpecifications = json_decode(request('selected_specifications'), true);
         ksort($selectedSpecifications);
         $variant_request = new VariantRequest();
@@ -408,39 +415,67 @@ class InspectionController extends Controller
     $PDIpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Incident')->pluck('vehicle_picture_link')->first();
     $modificationpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Modification')->pluck('vehicle_picture_link')->first();
     $Incidentpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'PDI')->pluck('vehicle_picture_link')->first();
-    $enginevalue = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'engine')->pluck('new_value')->first();
-    $vinvalue = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'vin')->pluck('new_value')->first();
-    $int_colourvalue = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'int_colour')->pluck('new_value')->first();
-    $ex_colourevalue = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'ex_colour')->pluck('new_value')->first();
     $extra_featuresvalue = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'extra_features')->pluck('new_value')->first();
-    $variantChange = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'Variant Change')->whereIn('status', ['Pending', 'Reinspection'])->pluck('new_value')->first();
-    $int_colours = ColorCode::where('belong_to', 'int')->get();
-    $ext_colours = ColorCode::where('belong_to', 'ex')->get();
-    if($variantChange){
-        $changevariant = Varaint::where('id', $variantChange)->first();
-    }
-    else{
-        $changevariant = null;
-    }
-    $variantnew = VehicleApprovalRequests::where('inspection_id', $id)->where('field', 'New Variant')->where('status', 'Pending')->pluck('new_value')->first();
-    if($variantnew){
-        $newvariant = VariantRequest::where('id', $variantnew)->first();   
-    }
-    else{
-        $newvariant = null;
-    } 
     $Incident = Incident::where('inspection_id', $id)->first();
     $variant = Varaint::find($vehicle->varaints_id);
     $brand = Brand::find($variant->brands_id);
+    $allBrands = Brand::all();
     $model_line = MasterModelLines::find($variant->master_model_lines_id);
+    $model_lines = MasterModelLines::all();
     $intColor = ColorCode::find($vehicle->int_colour);
+    $intColorall = ColorCode::where('belong_to', 'int')->get();
     $extColor = ColorCode::find($vehicle->ex_colour);
-    $variantsall = Varaint::where('master_model_lines_id', $variant->master_model_lines_id)->where('brands_id', $variant->brands_id)->get();
-    $extraItems = DB::table('vehicles_extra_items')
-    ->where('vehicle_id', $inspection->vehicle_id)
-    ->get(['item_name', 'qty']);
-    return view('inspection.reinspection', compact('variantsall','ext_colours','int_colours','Incidentpicturelink','modificationpicturelink','PDIpicturelink', 'secgdnpicturelink', 'gdnpicturelink', 'secgrnpicturelink', 'grnpicturelink', 'extraItems','newvariant','changevariant', 'inspection', 'vehicle', 'variant', 'brand', 'model_line', 'intColor', 'extColor','Incident', 'enginevalue', 'vinvalue', 'int_colourvalue', 'ex_colourevalue', 'extra_featuresvalue'));
+    $extColorall = ColorCode::where('belong_to', 'ex')->get();
+    $variant_request = VariantRequest::where('inspection_id', $id)->first();
+    $variantRequestItems = VariantRequestItems::where('variant_request_id', $variant_request->id)->get();
+    $selectedData = [];
+    
+    // Collect selected specifications and options
+    foreach ($variantRequestItems as $item) {
+        $modelSpecification = ModelSpecification::find($item->model_specification_id);
+        $modelSpecificationOption = ModelSpecificationOption::find($item->model_specification_options_id);
+        if ($modelSpecification && $modelSpecificationOption) {
+            $selectedData[] = [
+                'specification_id' => $modelSpecification->id,
+                'selected_option_id' => $modelSpecificationOption->id,
+            ];
+        }
     }
+    
+    // Collect all specifications and options for $model_line_id
+    $specifications = ModelSpecification::where('master_model_lines_id', $variant_request->master_model_lines_id)->get();
+    $data = [];
+    
+    foreach ($specifications as $specification) {
+        $options = ModelSpecificationOption::where('model_specification_id', $specification->id)->get();
+        $selectedOptionId = null;
+    
+        // Check if the specification is selected
+        foreach ($selectedData as $selected) {
+            if ($selected['specification_id'] == $specification->id) {
+                $selectedOptionId = $selected['selected_option_id'];
+                break;
+            }
+        }
+    
+        // Add specification and options to $data
+        $data[] = [
+            'specification' => $specification,
+            'options' => $options,
+            'selected_option_id' => $selectedOptionId,
+        ];
+    }
+    
+    // Now, $data contains all specifications and options with the selected_option_id for those that are selected.    
+    $brands = Brand::find($variant_request->brands_id);
+    $modal = MasterModelLines::find($variant_request->master_model_lines_id);
+    $intColorr = ColorCode::find($variant_request->int_colour);
+    $extColorr = ColorCode::find($variant_request->ex_colour);
+    $extraItems = DB::table('vehicles_extra_items')
+        ->where('vehicle_id', $inspection->vehicle_id)
+        ->get(['item_name', 'qty']);
+    return view('inspection.reinspection', compact('extColorall','intColorall','intColorr','extColorr','modal','model_lines','data','allBrands','brands','variant_request','Incidentpicturelink','modificationpicturelink','PDIpicturelink', 'secgdnpicturelink', 'gdnpicturelink', 'secgrnpicturelink', 'grnpicturelink', 'extraItems','inspection', 'vehicle', 'variant', 'brand', 'model_line', 'intColor', 'extColor','Incident', 'extra_featuresvalue'));
+     }
     public function reupdate(Request $request, $id)
     {
         $this->validate($request, [
@@ -506,6 +541,43 @@ class InspectionController extends Controller
             $incidentdata->reason = implode(', ', $selectedReasons);
             $incidentdata->save();
         }
+        $selectedSpecifications = [];
+        foreach ($request->all() as $key => $value) {
+            if (strpos($key, 'specification_') !== false) {
+                $specificationId = substr($key, strlen('specification_'));
+                $selectedSpecifications[] = [
+                    'specification_id' => $specificationId,
+                    'value' => $value,
+                ];
+            }
+        }
+        $variant_request = VariantRequest::where('inspection_id', $id)->first();
+        if ($variant_request) {
+            $variant_request->steering = $request->input('steering');
+            $variant_request->fuel_type = $request->input('fuel_type');
+            $variant_request->engine = $request->input('engine');
+            $variant_request->upholestry = $request->input('upholestry');
+            $variant_request->gearbox = $request->input('gearbox');
+            $variant_request->my = $request->input('my');
+            $variant_request->inspection_id = $id;
+            $variant_request->int_colour = $request->input('int_colour');
+            $variant_request->ex_colour = $request->input('ex_colour');
+            $variant_request->save();
+        
+            $variant_requestId = $variant_request->id;
+        
+            foreach ($selectedSpecifications as $specificationData) {
+                VariantRequestItems::updateOrCreate(
+                    [
+                        'variant_request_id' => $variant_requestId,
+                        'model_specification_id' => $specificationData['specification_id'],
+                    ],
+                    [
+                        'model_specification_options_id' => $specificationData['value'],
+                    ]
+                );
+            }
+        }       
         return redirect()->route('inspection.index')->with('success', 'Vehicle Re-Inspection successfully Submit For Approval');
     }
     public function instock($id) 
