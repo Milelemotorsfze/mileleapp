@@ -57,6 +57,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#rejected-selling-prices">Rejected </a>
 		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#deleted-selling-prices">Deleted</a>
+		</li>
         <!-- @endif
         @endcanany -->
 	</ul>
@@ -146,6 +149,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 										@endif
 									@endif
 								@endif
+								<button title="Delete" type="button" class="btn btn-danger btn-sm hiring-request-delete sm-mt-3" data-id="{{ $pending->id }}" data-url="{{ route('employee-hiring-request.destroy', $pending->id) }}">
+									<i class="fa fa-trash"></i>
+								</button>
 							</td>
 							<div class="modal fade" id="edit-selling-price-{{$pending->id}}"  tabindex="-1"
 								aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -444,6 +450,67 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
+	<div class="tab-pane fade show" id="deleted-selling-prices">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="deleted-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th>Sl No</th>
+							<th>Request Date</th>
+							<th>Department Name</th>
+							<th>Department Location</th>
+							<th>Requested By</th>
+							<th>Requested Job Title</th>
+							<th>Reporting To With Position</th>
+							<th>Experience Level</th>
+							<th>Salary Range(AED)</th>
+							<th>Work Time</th>
+							<th>Number Of Openings</th>
+							<th>Type Of Role</th>
+							<th>Replacement For Employee</th>
+							<th>Detailed Explanation Of New Hiring</th>
+							<th>Created By</th>
+							<th>Created At</th>
+							<!-- <th>Current Status</th> -->
+							<!-- <th>Action</th> -->
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($deleted as $key => $deletedOne)
+						<tr data-id="1">
+						<td>{{ ++$i }}</td>
+							<td>{{ $deletedOne->request_date ?? '' }}</td>
+							<td>{{ $deletedOne->department_name ?? '' }}</td>
+							<td>{{ $deletedOne->department_location ?? '' }}</td>
+							<td>{{ $deletedOne->requested_by_name ?? '' }}</td>
+							<td>{{ $deletedOne->requested_job_name ?? '' }}</td>
+							<td>{{ $deletedOne->reporting_to_name ?? '' }}</td>							
+							<td>{{ $deletedOne->experience_level_name ?? ''}}</td>
+							<td>{{ $deletedOne->salary_range_start_in_aed ?? ''}} - {{$deletedOne->salary_range_end_in_aed ?? ''}}</td>
+							<td>{{ $deletedOne->work_time_start ?? ''}} - {{$deletedOne->work_time_end ?? ''}}</td>
+							<td>{{ $deletedOne->number_of_openings ?? ''}}</td>
+							<td>{{$deletedOne->type_of_role_name}}</td>
+							<td>{{$deletedOne->replacement_for_employee_name}}</td>
+							<td>{{$deletedOne->explanation_of_new_hiring}}</td>
+							<td>{{$deletedOne->created_by_name}}</td>
+							<td>{{$deletedOne->created_at}}</td>
+							<td>
+							<!-- <a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$deletedOne->id)}}">
+								<i class="fa fa-eye" aria-hidden="true"></i>
+							</a> -->
+							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$rejectedOne->id)}}">
+								<i class="fa fa-edit" aria-hidden="true"></i>
+							</a> -->
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
     <!-- @endif
     @endcanany -->
 </div>
@@ -512,5 +579,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 	    }
 	    input.value = val;
 	}
+	$('.hiring-request-delete').on('click',function(){
+        let id = $(this).attr('data-id');
+        let url =  $(this).attr('data-url');
+        var confirm = alertify.confirm('Are you sure you want to Delete this Employee Hiring Request ?',function (e) {
+            if (e) {
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        _method: 'DELETE',
+                        id: 'id',
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success:function (data) {
+                        location.reload();
+                        alertify.success('Employee Hiring Request Deleted successfully.');
+                    }
+                });
+            }
+        }).set({title:"Delete Employee Hiring Request"})
+    });
 </script>
 @endpush

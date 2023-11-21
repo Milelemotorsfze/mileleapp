@@ -4,10 +4,11 @@ namespace App\Models\HRM\Hiring;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class JobDescription extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = "job_descriptions";
     protected $fillable = [
         'hiring_request_id',

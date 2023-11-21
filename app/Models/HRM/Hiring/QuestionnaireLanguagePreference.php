@@ -5,6 +5,7 @@ namespace App\Models\HRM\Hiring;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Language;
+use Illuminate\Database\Eloquent\SoftDeletes;
 class QuestionnaireLanguagePreference extends Model
 {
     use HasFactory;

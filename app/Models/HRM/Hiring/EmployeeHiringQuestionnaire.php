@@ -13,10 +13,11 @@ use App\Models\Country;
 use App\Models\Masters\MasterRecuritmentSource;
 use App\Models\Masters\MasterDeparment;
 use App\Models\Masters\MasterExperienceLevel;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmployeeHiringQuestionnaire extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = "employee_hiring_questionnaires";
     protected $fillable = [
         'hiring_request_id', 

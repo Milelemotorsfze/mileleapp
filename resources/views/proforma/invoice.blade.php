@@ -188,7 +188,7 @@
                         Sales Office :
                     </div>
                     <div class="col-sm-6">
-                        {{ $empProfile->office }}
+                    {{ isset($empProfile->office) ? $empProfile->office : '' }}
                     </div>
                 </div>
                 <div class="row">
@@ -204,7 +204,7 @@
                         Sales Contact No :
                     </div>
                     <div class="col-sm-6">
-                        {{ $empProfile->phone }}
+                    {{ isset($empProfile->phone) ? $empProfile->phone : '' }}
                     </div>
                 </div>
             </div>

@@ -48,284 +48,191 @@
     <a class="btn btn-sm btn-primary" href="{{$PDIpicturelink}}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> PDI Pictures</a>
     @endif
 </div>
-    <h5>Current Specifications</h5>
-    <br>
-        <div class="row">
-        <div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Brand</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$brand->brand_name ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Line</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$model_line->model_line ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Detail</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->model_detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Variant</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->name ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Year</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->my ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Variant Detail</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Steering</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->steering ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Seats</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->seat ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Fuel Type</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->fuel_type ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Transmission</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$variant->gearbox ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Production Year</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$vehicle->ppmmyyy ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Interior Color</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$intColor->name ?? ''}}
-</div>
-</div>
-</div>
-            <div class="col-md-3">
-            <div class="row">
-            <div class="col-md-4">
-                                <label><strong>Exterior Color</strong></label>
-            </div>
-            <div class="col-md-8">
-                            {{$extColor->name ?? ''}}
-            </div>
-            </div>
-            </div>
-            </div>
-            <hr>
-            <div class="modal fade inspection-modal" id="inspectiondetail" tabindex="-1" aria-labelledby="inspectiondetailLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="inspectiondetailLabel">Inspection Updates</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="engine" class="form-label">Engine:</label>
-            </div>
-            <div class="col-md-8">
-            <input type="text" class="form-control" id="engine" value="{{$enginevalue ?? ''}}">
-            <input type="hidden" class="form-control" id="inspection_id" value="{{$inspection->id ?? ''}}">
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="vin" class="form-label">VIN:</label>
-            </div>
-            <div class="col-md-8">
-            <input type="text" class="form-control" id="vin" value="{{$vinvalue ?? ''}}">
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="int_colour" class="form-label">Interior Color:</label>
-            </div>
-            <div class="col-md-8">
-            <select class="form-control int_colour" name="int_colour" id="int_colour">
-            @if(!$int_colourvalue)
-                <option value="">Please Select</option>
-            @endif  
-            @foreach ($int_colours as $int_colour)
-    <option value="{{ $int_colour->id }}"
-        @if ($int_colour->id == $int_colourvalue)
-            selected="selected"
-        @endif
-    >
-        {{ $int_colour->name }}
-    </option>
-@endforeach
+    <form id="inspection-form" action="{{ route('inspection.reupdate', $inspection->id) }}" method="POST" enctype="multipart/form-data">
+             @method('PUT')
+            @csrf
+            <h5>Trim Specifications</h5>
+<br>
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Items</th>
+                <th>Inspection Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Brand</td>
+                <td>
+                    <select class="form-control" name="brands_id" disabled>
+                    @foreach($allBrands as $singleBrand)
+                    <option value="{{$singleBrand->id}}" @if($singleBrand->id == $brands->id) selected @endif>
+                    {{$singleBrand->brand_name}}
+                    </option>
+                    @endforeach
+                 </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Model Line</td>
+                <td>
+                    <select class="form-control" name="master_model_lines_id" disabled>
+                    @foreach($model_lines as $models)
+                    <option value="{{$models->id}}" @if($models->id == $modal->id) selected @endif>
+                    {{$models->model_line}}
+                    </option>
+                    @endforeach
+                 </select>
+                </td>
+            </tr>
+            <tr>
+    <td>Steering</td>
+    <td>
+        <select class="form-control" name="steering">
+            <option value="LHD" @if($variant_request->steering == 'LHD') selected @endif>LHD</option>
+            <option value="RHD" @if($variant_request->steering == 'RHD') selected @endif>RHD</option>
         </select>
+    </td>
+</tr>
+
+            <tr>
+                <td>Engine</td>
+                <td>
+                    <select class="form-control" name="engine">
+                    <option value="0.8" @if($variant_request->engine == '0.8') selected @endif>0.8</option>
+                    <option value="1.2" @if($variant_request->engine == '1.2') selected @endif>1.2</option>
+                    <option value="1.4" @if($variant_request->engine == '1.4') selected @endif>1.4</option>
+                    <option value="1.5" @if($variant_request->engine == '1.5') selected @endif>1.5</option>
+                    <option value="1.6" @if($variant_request->engine == '1.6') selected @endif>1.6</option>
+                    <option value="1.8" @if($variant_request->engine == '1.8') selected @endif>1.8</option>
+                    <option value="2" @if($variant_request->engine == '2') selected @endif>2</option>
+                    <option value="2.2" @if($variant_request->engine == '2.2') selected @endif>2.2</option>
+                    <option value="2.4" @if($variant_request->engine == '2.4') selected @endif>2.4</option>
+                    <option value="2.5" @if($variant_request->engine == '2.5') selected @endif>2.5</option>
+                    <option value="2.7" @if($variant_request->engine == '2.7') selected @endif>2.7</option>
+                    <option value="2.8" @if($variant_request->engine == '2.8') selected @endif>2.8</option>
+                    <option value="3" @if($variant_request->engine == '3') selected @endif>3</option>
+                    <option value="3.3" @if($variant_request->engine == '3.3') selected @endif>3.3</option>
+                    <option value="3.5" @if($variant_request->engine == '3.5') selected @endif>3.5</option>
+                    <option value="4" @if($variant_request->engine == '4') selected @endif>4</option>
+                    <option value="4.2" @if($variant_request->engine == '4.2') selected @endif>4.2</option>
+                    <option value="4.4" @if($variant_request->engine == '4.4') selected @endif>4.4</option>
+                    <option value="4.5" @if($variant_request->engine == '4.5') selected @endif>4.5</option>
+                    <option value="4.8" @if($variant_request->engine == '4.8') selected @endif>4.8</option>
+                    <option value="5.3" @if($variant_request->engine == '5.3') selected @endif>5.3</option>
+                    <option value="5.6" @if($variant_request->engine == '5.6') selected @endif>5.6</option>
+                    <option value="5.7" @if($variant_request->engine == '5.7') selected @endif>5.7</option>
+                    <option value="6" @if($variant_request->engine == '6') selected @endif>6</option>
+                    <option value="6.2" @if($variant_request->engine == '6.2') selected @endif>6.2</option>
+                    <option value="6.7" @if($variant_request->engine == '6.7') selected @endif>6.7</option>
+                 </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Fuel Type</td>
+                <td>
+                    <select class="form-control" name="fuel_type">
+                    <option value="Petrol" @if($variant_request->fuel_type == 'Petrol') selected @endif>Petrol</option>
+                    <option value="Diesel" @if($variant_request->fuel_type == 'Diesel') selected @endif>Diesel</option>
+                    <option value="PHEV" @if($variant_request->fuel_type == 'PHEV') selected @endif>PHEV</option>
+                    <option value="MHEV" @if($variant_request->fuel_type == 'MHEV') selected @endif>MHEV</option>
+                    <option value="EV" @if($variant_request->fuel_type == 'EV') selected @endif>EV</option>
+                 </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Upholstery</td>
+                <td>
+                    <select class="form-control" name="upholestry">
+                    <option value="Leather" @if($variant_request->upholestry == 'Leather') selected @endif>Leather</option>
+                    <option value="Fabric" @if($variant_request->upholestry == 'Fabric') selected @endif>Fabric</option>
+                    <option value="Vinyl" @if($variant_request->upholestry == 'Vinyl') selected @endif>Vinyl</option>
+                    <option value="Microfibre" @if($variant_request->upholestry == 'Microfibre') selected @endif>Microfibre</option>
+                 </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Gear</td>
+                <td>
+                    <select class="form-control" name="gearbox">
+                    <option value="Auto" @if($variant_request->upholestry == 'Auto') selected @endif>Auto</option>
+                    <option value="Manual" @if($variant_request->upholestry == 'Manual') selected @endif>Manual</option>
+                 </select>
+                </td>
+            </tr>
+            <input type="hidden" name="coo" value="{{ $variant->coo }}"/>
+            <input type="hidden" name="drive_train" value="{{ $variant->drive_train }}"/>
+            <tr>
+                <td>Model Year</td>
+                <td>
+                @php
+                                    $currentYear = date("Y");
+                                    $years = range($currentYear + 10, $currentYear - 10);
+                                    $years = array_reverse($years);
+                                    @endphp
+                    <select class="form-control" name="my">
+                    @foreach ($years as $year)
+                    <option value="{{ $year }}" {{ $variant_request->my == $year ? 'selected' : '' }}>{{ $year }}</option>
+                    @endforeach
+                 </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Interior Colour</td>
+                <td>
+                    <select class="form-control" name="int_colour">
+                    @foreach($intColorall as $intColorall)
+                    <option value="{{$intColorall->id}}" @if($intColorall->id == $intColorr->id) selected @endif>
+                    {{$intColorall->name}}
+                    </option>
+                    @endforeach
+                 </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Exterior Colour</td>
+                <td>
+                    <select class="form-control" name="ex_colour">
+                    @foreach($extColorall as $exColorall)
+                    <option value="{{$exColorall->id}}" @if($exColorall->id == $extColorr->id) selected @endif>
+                    {{$exColorall->name}}
+                    </option>
+                    @endforeach
+                 </select>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<hr>
+<h5>Variant Specifications</h5>
+<br>
+<div class="row">
+    @foreach($data as $item)
+        <div class="col-lg-2 col-md-6 col-sm-12">
+            <div class="mb-3">
+                <label for="choices-single-default" class="form-label">{{ $item['specification']->name }}</label>
+                <select class="form-control" autofocus name="specification_{{ $item['specification']->id }}">
+                    {{-- Add a default option if the specification is not selected --}}
+                    @if ($item['selected_option_id'] === null)
+                        <option value="" disabled selected>Select an Option</option>
+                    @endif
+
+                    {{-- Display options --}}
+                    @foreach($item['options'] as $option)
+                        <option value="{{ $option->id }}" {{ old('specification_' . $item['specification']->id) == $option->id || $item['selected_option_id'] == $option->id ? 'selected' : '' }}>
+                            {{ $option->name }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="ex_colour" class="form-label">Exterior Color:</label>
-            </div>
-            <div class="col-md-8">
-            <select class="form-control ex_colour" name="ex_colour" id="ex_colour">
-            @if(!$ex_colourevalue)
-                <option value="">Please Select</option>
-            @endif  
-            @foreach ($ext_colours as $ext_colour)
-    <option value="{{ $ext_colour->id }}"
-        @if ($ext_colour->id == $ex_colourevalue)
-            selected="selected"
-        @endif
-    >
-        {{ $ext_colour->name }}
-    </option>
-@endforeach
-        </select>
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="extra_features" class="form-label">Extra Features:</label>
-            </div>
-            <div class="col-md-8">
-            <input type="text" class="form-control" id="extra_features" value=" {{$extra_featuresvalue ?? ''}}">
-            </div>
-          </div>
         </div>
-        <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="saveinspectiondetails()">Save Changes</button>
-        </div>
-      </div>
-    </div>
-  </div> 
-            <div class="button-containerinner">
-            <a class="btn btn-sm btn-primary" href="#" onclick="openModalp('{{ $inspection->id }}')">Edit</a>
-            </div>
+    @endforeach
+</div>
+<hr>
             <h5>Inspection Updates</h5>
             <div class="row">
-                @if($enginevalue)
-        <div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Engine</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$enginevalue ?? ''}}
-</div>
-</div>
-</div>
-@endif
-@if($vinvalue)
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>VIN</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$vinvalue ?? ''}}
-</div>
-</div>
-</div>
-@endif
-@if($int_colourvalue)
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Interior Color</strong></label>
-</div>
-<div class="col-md-8">
-@php
-    $int_colourName = DB::table('color_codes')->where('id', $int_colourvalue)->value('name');
-@endphp
-                    {{$int_colourName ?? ''}}
-</div>
-</div>
-</div>
-@endif
-@if($ex_colourevalue)
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Exterior Color</strong></label>
-</div>
-<div class="col-md-8">
-    @php
-        $ex_colourName = DB::table('color_codes')->where('id', $ex_colourevalue)->value('name');
-        @endphp
-                    {{$ex_colourName ?? ''}}
-                    
-</div>
-</div>
-</div>
-@endif
 @if($extra_featuresvalue)
 <div class="col-md-3">
 <div class="row">
@@ -382,16 +289,16 @@
         <div class="row">
         <div class="col-md-2">
             <ul class="list-group">
-            <input type="hidden" id="vehicle_id" value="{{ $inspection->vehicle_id }}">
+            <input type="text" id="vehicle_id" value="{{ $inspection->vehicle_id }}">
             <li class="list-group-item">
     @if ($extraItems->contains('item_name', 'sparewheel'))
         <input type="checkbox" id="sparewheel" name="sparewheel" checked>
         <label for="sparewheel">Spare Wheel</label>
-        <input class="form-control" type="number" name="sparewheel_qty" value="{{ $extraItems->where('item_name', 'sparewheel')->first()->qty }}" placeholder="Qty">
+        <input type="hidden" class="form-control" type="number" name="sparewheel_qty" value="{{ $extraItems->where('item_name', 'sparewheel')->first()->qty }}" placeholder="Qty">
     @else
         <input type="checkbox" id="sparewheel" name="sparewheel">
         <label for="sparewheel">Spare Wheel</label>
-        <input class="form-control" type="number" name="sparewheel_qty" placeholder="Qty">
+        <input type="hidden" class="form-control" type="number" name="sparewheel_qty" placeholder="Qty">
     @endif
 </li>
                 </div>
@@ -400,11 +307,11 @@
                 @if ($extraItems->contains('item_name', 'jack'))
                     <input type="checkbox" id="jack" name="jack" checked>
                     <label for="jack">Jack</label>
-                    <input class="form-control" type="number" name="jack_qty" value="{{ $extraItems->where('item_name', 'jack')->first()->qty }}" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="jack_qty" value="{{ $extraItems->where('item_name', 'jack')->first()->qty }}" placeholder="Qty">
                 @else
                 <input type="checkbox" id="jack" name="jack">
                     <label for="jack">Jack</label>
-                    <input class="form-control" type="number" name="jack_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="jack_qty" placeholder="Qty">
                 @endif
                 </li>
                 </div>
@@ -413,11 +320,11 @@
                 @if ($extraItems->contains('item_name', 'wheel'))
                     <input type="checkbox" id="wheel" name="wheel" checked>
                     <label for="wheel">Wheel Spanner</label>
-                    <input class="form-control" type="number" name="wheel_qty" value="{{ $extraItems->where('item_name', 'wheel')->first()->qty }}" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="wheel_qty" value="{{ $extraItems->where('item_name', 'wheel')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="wheel" name="wheel">
                     <label for="wheel">Wheel Spanner</label>
-                    <input  class="form-control" type="number" name="wheel_qty" placeholder="Qty">
+                    <input  type="hidden" class="form-control" type="number" name="wheel_qty" placeholder="Qty">
                     @endif
                 </li>
             </ul>
@@ -428,11 +335,11 @@
                 @if ($extraItems->contains('item_name', 'firstaid'))
                     <input type="checkbox" id="firstaid" name="firstaid" checked>
                     <label for="firstaid">First Aid Kit / Packing Box</label>
-                    <input class="form-control" type="number" name="firstaid_qty" value="{{ $extraItems->where('item_name', 'firstaid')->first()->qty }}" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="firstaid_qty" value="{{ $extraItems->where('item_name', 'firstaid')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="firstaid" name="firstaid">
                     <label for="firstaid">First Aid Kit / Packing Box</label>
-                    <input  class="form-control" type="number" name="firstaid_qty" placeholder="Qty">
+                    <input  type="hidden" class="form-control" type="number" name="firstaid_qty" placeholder="Qty">
                     @endif
                 </li>
                 </div>
@@ -441,11 +348,11 @@
                 @if ($extraItems->contains('item_name', 'floor_mat'))
                     <input type="checkbox" id="floor_mat" name="floor_mat" checked>
                     <label for="floor_mat">Floor Mat</label>
-                    <input class="form-control" type="number" name="floor_mat_qty" value="{{ $extraItems->where('item_name', 'floor_mat')->first()->qty }}" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="floor_mat_qty" value="{{ $extraItems->where('item_name', 'floor_mat')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="floor_mat" name="floor_mat">
                     <label for="floor_mat">Floor Mat</label>
-                    <input class="form-control" type="number" name="floor_mat_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="floor_mat_qty" placeholder="Qty">
                     @endif
                 </li>
                 </div>
@@ -454,11 +361,11 @@
                 @if ($extraItems->contains('item_name', 'service_book'))
                     <input type="checkbox" id="service_book" name="service_book" checked>
                     <label for="service_book">Service Book & Manual</label>
-                    <input class="form-control" type="number" name="service_book_qty" value="{{ $extraItems->where('item_name', 'service_book')->first()->qty }}" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="service_book_qty" value="{{ $extraItems->where('item_name', 'service_book')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="service_book" name="service_book">
                     <label for="service_book">Service Book & Manual</label>
-                    <input class="form-control" type="number" name="service_book_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="service_book_qty" placeholder="Qty">
                     @endif
                 </li>
             </ul>
@@ -482,11 +389,11 @@
                 @if ($extraItems->contains('item_name', 'wheelrim'))
                     <input type="checkbox" id="wheelrim" name="wheelrim" checked>
                     <label for="wheelrim">Wheel Rim / Tyres</label>
-                    <input class="form-control" type="number" name="wheelrim_qty" value="{{ $extraItems->where('item_name', 'wheelrim')->first()->qty }}" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="wheelrim_qty" value="{{ $extraItems->where('item_name', 'wheelrim')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="wheelrim" name="wheelrim">
                     <label for="wheelrim">Wheel Rim / Tyres</label>
-                    <input class="form-control" type="number" name="wheelrim_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="wheelrim_qty" placeholder="Qty">
                     @endif
                 </li>
                 </div>
@@ -495,11 +402,11 @@
                 @if ($extraItems->contains('item_name', 'fire_extinguisher'))
                     <input type="checkbox" id="fire_extinguisher" name="fire_extinguisher" checked>
                     <label for="fire_extinguisher">Fire Extinguisher</label>
-                    <input class="form-control" type="number" name="fire_extinguisher_qty" value="{{ $extraItems->where('item_name', 'fire_extinguisher')->first()->qty }}" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="fire_extinguisher_qty" value="{{ $extraItems->where('item_name', 'fire_extinguisher')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="fire_extinguisher" name="fire_extinguisher">
                     <label for="fire_extinguisher">Fire Extinguisher</label>
-                    <input class="form-control" type="number" name="fire_extinguisher_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="fire_extinguisher_qty" placeholder="Qty">
                     @endif
                 </li>
             </ul>
@@ -510,11 +417,11 @@
                 @if ($extraItems->contains('item_name', 'sd_card'))
                     <input type="checkbox" id="sd_card" name="sd_card" checked>
                     <label for="sd_card">SD Card / Remote / H Phones</label>
-                    <input class="form-control" type="number" name="sd_card_qty" value="{{ $extraItems->where('item_name', 'sd_card')->first()->qty }}" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="sd_card_qty" value="{{ $extraItems->where('item_name', 'sd_card')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="sd_card" name="sd_card">
                     <label for="sd_card">SD Card / Remote / H Phones</label>
-                    <input class="form-control" type="number" name="sd_card_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="sd_card_qty" placeholder="Qty">
                     @endif
                 </li>
                 </div>
@@ -523,11 +430,11 @@
                 @if ($extraItems->contains('item_name', 'ac_system'))
                     <input type="checkbox" id="ac_system" name="ac_system" checked>
                     <label for="ac_system">A/C System</label>
-                    <input class="form-control" type="number" name="ac_system_qty" value="{{ $extraItems->where('item_name', 'ac_system')->first()->qty }}" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="ac_system_qty" value="{{ $extraItems->where('item_name', 'ac_system')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="ac_system" name="ac_system">
                     <label for="ac_system">A/C System</label>
-                    <input class="form-control" type="number" name="ac_system_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="ac_system_qty" placeholder="Qty">
                     @endif
                 </li>
                 </div>
@@ -536,11 +443,11 @@
                 @if ($extraItems->contains('item_name', 'dash_board'))
                     <input type="checkbox" id="dash_board" name="dash_board" checked>
                     <label for="dash_board">Dash Board / T Screen / LCD</label>
-                    <input class="form-control" type="number" name="dash_board_qty" value="{{ $extraItems->where('item_name', 'dash_board')->first()->qty }}" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="dash_board_qty" value="{{ $extraItems->where('item_name', 'dash_board')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="dash_board" name="dash_board">
                     <label for="dash_board">Dash Board / T Screen / LCD</label>
-                    <input class="form-control" type="number" name="dash_board_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" type="number" name="dash_board_qty" placeholder="Qty">
                     @endif
                 </li>
             </ul>
@@ -565,7 +472,7 @@
             <li class="list-group-item">
                     @if ($extraItems->contains('item_name', 'sparewheel'))
                         <i class="fas fa-check-circle text-success"></i>
-                        <span>{{ $extraItems->where('item_name', 'sparewheel')->first()->qty }} Qty - </span>
+                        <span>{{ $extraItems->where('item_name', 'sparewheel')->first()->qty }}</span>
                     @else
                         <i class="fas fa-times-circle text-danger"></i>
                     @endif
@@ -576,7 +483,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'jack'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'jack')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'jack')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -587,7 +494,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'wheel'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'wheel')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'wheel')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -600,7 +507,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'firstaid'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'firstaid')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'firstaid')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -611,7 +518,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'floor_mat'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'floor_mat')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'floor_mat')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -622,7 +529,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'service_book'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'service_book')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'service_book')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -646,7 +553,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'wheelrim'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'wheelrim')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'wheelrim')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -657,7 +564,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'fire_extinguisher'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'fire_extinguisher')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'fire_extinguisher')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -670,7 +577,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'sd_card'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'sd_card')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'sd_card')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -681,7 +588,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'ac_system'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'ac_system')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'ac_system')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -692,7 +599,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'dash_board'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'dash_board')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'dash_board')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -702,219 +609,6 @@
         </div>
     </div>
      </br>
-     </br>
-@if($changevariant)
-<hr>
-<h5>Variant Change</h5>
-            <div class="row">
-        <div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Variant Name</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->name ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Description</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->model_detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Year</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->my ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Variant Detail</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Engine Capacity</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->engine ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Transmission</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->gearbox ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Fuel Type</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->fuel_type ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Steering</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->steering ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Seat Capacity</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->seat ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Upholstery</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$changevariant->upholestry ?? ''}}
-</div>
-</div>
-</div>
-</div>
-@endif
-@if($newvariant)
-<hr>
-<h5>New Variant</h5>
-            <div class="row">
-        <div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Variant Name</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->name ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Description</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->model_detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Model Year</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->my ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Variant Detail</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->detail ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Engine Capacity</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->engine ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Transmission</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->gearbox ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Fuel Type</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->fuel_type ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Steering</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->steering ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Seat Capacity</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->seat ?? ''}}
-</div>
-</div>
-</div>
-<div class="col-md-3">
-<div class="row">
-<div class="col-md-4">
-                    <label><strong>Upholstery</strong></label>
-</div>
-<div class="col-md-8">
-                    {{$newvariant->upholestry ?? ''}}
-</div>
-</div>
-</div>
-</div>
-@endif
 @if($Incident)
 <br>
 <hr>
@@ -1132,9 +826,6 @@
 </div>
 </div>
 @endif
-<form id="inspection-form" action="{{ route('inspection.reupdate', $inspection->id) }}" method="POST" enctype="multipart/form-data">
-             @method('PUT')
-            @csrf
             @if(!$Incident)
      <hr>
         <input class="form-check-input" type="checkbox" id="enableInputsincludent" name="enableInputsincludent">
@@ -1324,7 +1015,6 @@ function saveinspectiondetails() {
 function saveextraitems() {
     var vehicle_id = $('#vehicle_id').val();
     var dataToSend = { vehicle_id: vehicle_id };
-
     $('#extraitems input[type=checkbox]').each(function() {
         var itemName = $(this).attr('name');
         var qtyInput = $('[name="' + itemName + '_qty"]');

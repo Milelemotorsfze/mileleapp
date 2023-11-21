@@ -6,9 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Masters\MasterJobPosition;
 use App\Models\User;
+use Illuminate\Database\Eloquent\SoftDeletes;
 class ApprovalByPositions extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = "approval_by_positions";
     protected $fillable = [
         'approved_by_position',

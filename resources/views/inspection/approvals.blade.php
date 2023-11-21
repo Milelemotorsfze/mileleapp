@@ -366,7 +366,6 @@
                 <th>Inspection Person</th>
                   <th>Stage</th>
                   <th>QC Remarks</th>
-                  <th>Changing Fields</th>
                   <th>PO Number</th>
                   <th>GRN Number</th>
                   <th>SO Number</th>
@@ -477,8 +476,8 @@
                 { data: 'detail', name: 'varaints.detail' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'exterior_color', name: 'ex_color.name' },
-                { data: 'exterior_color', name: 'ex_color.name' },
+                { data: 'approval_date', name: 'inspection.approval_date' },
+                { data: 'approval_remarks', name: 'inspection.approval_remarks' },
             ],
         });
         $('#dtBasicExample3').DataTable({

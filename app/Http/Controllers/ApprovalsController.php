@@ -93,6 +93,8 @@ class ApprovalsController extends Controller
                     'inspection.vehicle_id',
                     'inspection.reinspection_remarks',
                     'inspection.stage',
+                    'inspection.approval_remarks',
+                    DB::raw("DATE_FORMAT(inspection.approval_date, '%d-%b-%Y') as approval_date"),
                     DB::raw("DATE_FORMAT(inspection.reinspection_date, '%d-%b-%Y') as reinspection_date"),
                     DB::raw("DATE_FORMAT(inspection.processing_date, '%d-%b-%Y') as processing_date_formte"),
                     'inspection.process_remarks',
@@ -303,7 +305,7 @@ class ApprovalsController extends Controller
         $data = $request->except('_token', 'vehicle_id');
         foreach ($data as $item_name => $itemData) {
             $isChecked = $itemData['checked'];
-            $qty = $itemData['qty'];
+            $qty = $isChecked == "true" ? $itemData['qty'] : null;
             if ($isChecked == "true") {
                 VehicleExtraItems::updateOrCreate(
                     [
@@ -322,7 +324,6 @@ class ApprovalsController extends Controller
                     ->delete();
             }
         }
-    
         return response()->json(['message' => 'Data saved successfully']);
     }    
     public function updateincident(Request $request) 
@@ -502,10 +503,6 @@ class ApprovalsController extends Controller
         return response()->json(['message' => 'Data saved successfully']);
     }
     public function approveInspection(Request $request) {
-        $useractivities =  New UserActivities();
-        $useractivities->activity = "Approved The Inspection";
-        $useractivities->users_id = Auth::id();
-        $useractivities->save();
         $currentDate = Carbon::now();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -513,10 +510,16 @@ class ApprovalsController extends Controller
         $comments = $request->input('process_remarks');
         $buttonValue = $request->input('buttonValue');
         if($buttonValue == "reinspect"){
+            $useractivities =  New UserActivities();
+            $useractivities->activity = "Re Inspection The Inspection";
+            $useractivities->users_id = Auth::id();
+            $useractivities->save();
             $inspection = Inspection::find($inspectionId);
             $inspection->status = 'reinspection';
             $inspection->process_remarks = $comments;
             $inspection->processing_date = $currentDate;
+            $inspection->approval_remarks = $comments;
+            $inspection->approval_date = $currentDate;
             $inspection->save();
             VehicleApprovalRequests::where('inspection_id', $inspectionId)
             ->where('status', 'Pending')
@@ -529,6 +532,10 @@ class ApprovalsController extends Controller
             return redirect()->route('approvalsinspection.index')->with('success', 'Inspection Re-Inspection successfully Forwarded');
         }
         else{
+            $useractivities =  New UserActivities();
+            $useractivities->activity = "Approved The Inspection";
+            $useractivities->users_id = Auth::id();
+            $useractivities->save();
             $inspection = Inspection::find($inspectionId);
             $inspection->status = 'approved';
             $inspection->process_remarks = $comments;
