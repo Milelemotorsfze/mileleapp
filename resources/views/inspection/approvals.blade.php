@@ -302,7 +302,6 @@
                   <th>Inspection Person</th>
                   <th>Stage</th>
                   <th>QC Remarks</th>
-                  <th>Changing Fields</th>
                   <th>PO Number</th>
                   <th>GRN Number</th>
                   <th>SO Number</th>
@@ -442,54 +441,6 @@
                 { data: 'created_by_name', name: 'users.name' },
                 { data: 'stage', name: 'inspection.stage' },
                 { data: 'remark', name: 'inspection.remark' },
-                {
-  data: 'changing_fields',
-  name: 'vehicle_detail_approval_requests.field',
-  render: function(data) {
-    if (data === null || data === undefined) {
-    return '';
-  }
-    var fields = data.split(',');
-    var badges = [];
-    fields.forEach(function(field) {
-      var badgeClass = '';
-      var badgeText = '';
-      switch (field.trim()) {
-        case 'Variant Change':
-          badgeClass = 'custom-badge primary';
-          badgeText = 'Variant';
-          break;
-          case 'New Variant':
-          badgeClass = 'custom-badge primary';
-          badgeText = 'Variant';
-          break;
-        case 'vin':
-          badgeClass = 'custom-badge danger';
-          badgeText = 'VIN';
-          break;
-        case 'int_colour':
-          badgeClass = 'custom-badge info';
-          badgeText = 'Interior Colour';
-          break;
-        case 'ex_colour':
-          badgeClass = 'custom-badge success';
-          badgeText = 'Exterior Colour';
-          break;
-        case 'engine':
-          badgeClass = 'custom-badge warning';
-          badgeText = 'Engine';
-          break;
-          case 'extra_features':
-          badgeClass = 'custom-badge dark';
-          badgeText = 'Extra Features';
-          break;
-      }
-      var badge = '<span class="' + badgeClass + '">' + badgeText + '</span>';
-      badges.push(badge);
-    });
-    return badges.join(' ');
-  }
-},
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'grn_number', name: 'grn.grn_number' },
                 { data: 'so_number', name: 'so.so_number' },
