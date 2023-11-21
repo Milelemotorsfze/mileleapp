@@ -1345,9 +1345,9 @@
                     }
                     // calculate
                     var amount = price * 1;
-                    var addon = false;
+                    var addon = 0;
                         if(row['table_type'] == 'addon-table') {
-                            var addon = true;
+                            var addon = 1;
                         }
                     return '<input type="hidden" name="is_addon[]" value="'+ addon +'" ><input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
                         ' <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
@@ -1381,7 +1381,7 @@
                         combinedValue = row[2] + ' , ' + row[3];
 
                     }else if(row['button_type'] == 'Direct-Add') {
-                        var comma0 = comma1 = comma2 = comma3 = comma4 = ", ";
+                        var comma0 = comma1 = comma2 = comma3 = comma4 = comma5 = ", ";
                         if(row[1] == "") {
                             var comma0 = " ";
                         }
@@ -1397,8 +1397,11 @@
                         if(row[5] == "") {
                             var comma4 = " ";
                         }
+                        if(row[6] == "") {
+                            var comma5 = " ";
+                        }
 
-                        combinedValue =  row[0] + comma0 + row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5];
+                        combinedValue =  row[0] + comma0 + row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5]+ comma5 + row[6];
                     }
 
                     return '<input type="text" name="descriptions[]" required class="combined-value-editable form-control" value="' + combinedValue + '"/>';
@@ -1434,12 +1437,6 @@
                     }else{
                         var price = row[4];
                     }
-                    // else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
-                    //     var price = row[4];
-                    // }
-                    // else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
-                    //     var price = row[4];
-                    // }
 
                     var currency = $('#currency').val();
 
@@ -1467,7 +1464,7 @@
         else if(row['button_type'] == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
             table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
-                '<button class="add-button circle-button" data-button-type="Vehicle" data-vehicle-id="'+ row['id']+'"></button>']).draw();
+                '<button class="add-button circle-button" data-button-type="Vehicle" data-variant-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Shipping-Document') {
             var table = shippingDocumentTable;
@@ -1578,7 +1575,6 @@
     });
     });
 
-
     $(document).on('click', '#directadding-button', function() {
         var tableType = $(this).attr('data-table');
         var table = $('#dtBasicExample2').DataTable();
@@ -1599,17 +1595,21 @@
             }
             var modelLine = $('#model_line option:selected').val();
             if(modelLine != "") {
-                row['id'] = modelLine;
-                row['model_type'] = 'ModelLine';
+
                 var modelLine = $('#model_line option:selected').text();
             }else{
                 alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
             }
             var variant = $("#variant option:selected").val();
             if(variant != "") {
-
+                row['id'] = variant;
+                row['model_type'] = 'Vehicle';
                 var variant = $('#variant option:selected').text();
 
+            }else{
+                var modelId = $('#model_line option:selected').val();
+                row['id'] = modelId;
+                row['model_type'] = 'ModelLine';
             }
             var interiorColor = $('#interior_color option:selected').val();
             if(interiorColor != "") {
@@ -1704,7 +1704,6 @@
                 var modelNumber = $('#kit_model_description option:selected').text();
             }
         }
-
         var index = secondTable.data().length + 1;
 
         row.push(addon);
@@ -1740,7 +1739,7 @@
             rowData.push($(this).html());
         });
 
-        // console.log(rowData);
+        console.log(rowData);
         var secondTable = $('#dtBasicExample2').DataTable();
 
         if(buttonType == 'Shipping') {
@@ -1765,7 +1764,7 @@
         }
         else if(buttonType == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
-            var id = $(this).data('vehicle-id');
+            var id = $(this).data('variant-id');
         }
         else if(buttonType == 'Accessory') {
             var table = $('#dtBasicExample5').DataTable();
@@ -1813,12 +1812,10 @@
 
         });
         function CalculateTotalAmount(index) {
-            console.log(index);
             var table = $('#dtBasicExample2').DataTable();
             var unitPrice = $('#price-'+index).val();
             var quantity = $('#quantity-'+index).val();
             var totalAmount = parseFloat(unitPrice) * parseFloat(quantity);
-            console.log(totalAmount);
             $('#total-amount-'+index).val(totalAmount.toFixed(3));
 
         }
@@ -1887,7 +1884,7 @@
             url: url,
             success: function(response) {
                 var data = response.map(function(vehicle) {
-                    var addButton = '<button class="add-button" data-button-type="Vehicle" data-vehicle-id="' + vehicle.id + '">Add</button>';
+                    var addButton = '<button class="add-button" data-button-type="Vehicle" data-variant-id="'+ variantId +'" >Add</button>';
                     return [
                         vehicle.id,
                         vehicle.grn_status,
@@ -1923,7 +1920,7 @@
                         {
                             title: 'Actions',
                             render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-button-type="Vehicle" data-vehicle-id="' + row[0] + '"></div>';
+                                return '<div class="circle-button add-button"  data-variant-id="'+ variantId +'" data-button-type="Vehicle" ></div>';
                             }
                         }
                     ]
