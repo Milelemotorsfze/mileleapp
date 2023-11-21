@@ -58,7 +58,6 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
-
 //        return dd($request->all());
         DB::beginTransaction();
 
@@ -74,7 +73,7 @@ class QuotationController extends Controller
         $call->save();
 
         $quotation = new Quotation();
-        if($quotation->currency == 'AED') {
+        if($request->currency == 'AED') {
             $quotation->deal_value = $request->total;
         }else{
             $quotation->deal_value = $request->deal_value;
@@ -115,7 +114,7 @@ class QuotationController extends Controller
            $quotationItem->description = $request->descriptions[$key];
            $quotationItem->total_amount = $request->total_amounts[$key];
            $quotationItem->quotation_id = $quotation->id;
-           $quotationItem->is_addon = $request->is_addon[$key];
+           $quotationItem->is_addon = $request->is_addon[$key] ;
            $quotationItem->created_by = Auth::id();
 
            if($request->types[$key] == 'Shipping') {
@@ -131,7 +130,7 @@ class QuotationController extends Controller
                $item = ShippingDocuments::find($request->reference_ids[$key]);
 
            }else if($request->types[$key] == 'Vehicle') {
-               $item = Vehicles::find($request->reference_ids[$key]);
+               $item = Varaint::find($request->reference_ids[$key]);
 
            }else if($request->types[$key] == 'Other') {
 
@@ -154,7 +153,7 @@ class QuotationController extends Controller
 //        $call = Calls::find($quotation->calls_id);
 //        $quotationDetail = QuotationDetail::where('quotation_id', 58)->first();
 
-        $vehicles =  QuotationItem::where("reference_type", 'App\Models\Vehicles')
+        $vehicles =  QuotationItem::where("reference_type", 'App\Models\Varaint')
             ->where('quotation_id', $quotation->id)->get();
 
         $variants = QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
