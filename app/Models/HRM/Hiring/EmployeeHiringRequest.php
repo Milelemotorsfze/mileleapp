@@ -12,9 +12,10 @@ use App\Models\Masters\MasterJobPosition;
 use App\Models\Masters\MasterExperienceLevel;
 use App\Models\HRM\Approvals\ApprovalByPositions;
 use App\Models\HRM\Approvals\DepartmentHeadApprovals;
+use Illuminate\Database\Eloquent\SoftDeletes;
 class EmployeeHiringRequest extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = "employee_hiring_requests";
     protected $fillable = [
         'request_date',
@@ -235,12 +236,13 @@ class EmployeeHiringRequest extends Model
         }
         return $currentStatus;
     }
-    public function history()
-    {
+    public function history() {
         return $this->hasMany(EmployeeHiringRequestHistory::class,'hiring_request_id','id');
     }
-    public function questionnaire()
-    {
+    public function questionnaire() {
         return $this->hasOne(EmployeeHiringQuestionnaire::class,'hiring_request_id','id');
+    }
+    public function jobDescription() {
+        return $this->hasOne(JobDescription::class,'hiring_request_id','id');
     }
 }

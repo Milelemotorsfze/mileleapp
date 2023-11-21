@@ -27,7 +27,10 @@ class EmployeeHiringRequestController extends Controller
         $pendings = EmployeeHiringRequest::where('status','pending')->latest()->get();
         $approved = EmployeeHiringRequest::where('status','approved')->latest()->get();
         $rejected = EmployeeHiringRequest::where('status','rejected')->latest()->get();
-        return view('hrm.hiring.hiring_request.index',compact('pendings','approved','rejected','page'));
+        $deleted = [];
+        $deleted = EmployeeHiringRequest::onlyTrashed()->get();
+        // dd('hi');
+        return view('hrm.hiring.hiring_request.index',compact('pendings','approved','rejected','deleted','page'));
     }
     public function createOrEdit($id) {
         if($id == 'new') {
@@ -265,5 +268,11 @@ class EmployeeHiringRequestController extends Controller
         return response()->json('success');
         // ,'New Employee Hiring Request '.$request->status.' Successfully'
     }
-    
+    public function destroy($id) {
+        $data = EmployeeHiringRequest::where('id',$id)->first();
+        $data->deleted_by = Auth::id();
+        $data->update();
+        $data->delete();
+        return response(true);
+    }
 }

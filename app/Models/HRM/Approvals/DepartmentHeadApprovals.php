@@ -6,9 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Masters\MasterDeparment;
 use App\Models\User;
+use Illuminate\Database\Eloquent\SoftDeletes;
 class DepartmentHeadApprovals extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = "department_head_approvals";
     protected $fillable = [
         'department_id',

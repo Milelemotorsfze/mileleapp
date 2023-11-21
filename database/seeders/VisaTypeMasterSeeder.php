@@ -88,5 +88,20 @@ class VisaTypeMasterSeeder extends Seeder
             ['id' => 4,'name' => 'Consultancy','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
             ['id' => 5,'name' => 'Other','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
         ]);
+        DB::table('passport_request_purposes')->insert([
+            ['id' => 1,'name' => 'Safekeeping','type' => 'submit','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 2,'name' => 'My dealing with Cash','type' => 'submit','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 3,'name' => 'My dealing with Sensitive Data','type' => 'submit','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 4,'name' => 'Leave','type' => 'release','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 5,'name' => 'Passport Renewal','type' => 'release','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 6,'name' => 'ATM / Bank','type' => 'release','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 7,'name' => 'Embassy Formalities','type' => 'release','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 8,'name' => 'Driving License','type' => 'release','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 9,'name' => 'Car Registration','type' => 'release','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 10,'name' => 'Family Visa/Passport Application','type' => 'release','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 11,'name' => 'Visa Application','type' => 'release','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 12,'name' => 'E-Gate Card','type' => 'release','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 13,'name' => 'Other, please specify','type' => 'release','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+        ]);
     }
 }

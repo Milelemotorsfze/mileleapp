@@ -4,10 +4,11 @@ namespace App\Models\HRM\Employee;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmployeeProfile extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = "emp_profile";
     protected $fillable = [
         'user_id',

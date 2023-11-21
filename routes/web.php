@@ -252,12 +252,24 @@ Route::get('/d', function () {
     
     // Employee Passport Request
     Route::resource('passport_request', PassportRequestController::class);
+    Route::controller(PassportRequestController::class)->group(function(){
+        Route::get('employee-passport_request/create-or-edit/{id}', 'createOrEdit')->name('employee-passport_request.create-or-edit');
+        Route::post('employee-passport_request/store-or-update/{id}', 'storeOrUpdate')->name('employee-passport_request.store-or-update');
+    });
 
     // Employee Liability 
     Route::resource('employee_liability', EmployeeLiabilityController::class);
+    Route::controller(EmployeeLiabilityController::class)->group(function(){
+        Route::get('employee-liability/create-or-edit/{id}', 'createOrEdit')->name('employee-liability.create-or-edit');
+        Route::post('employee-liability/store-or-update/{id}', 'storeOrUpdate')->name('employee-liability.store-or-update');
+    });
     
     // Employee Leave 
     Route::resource('employee_leave', EmployeeLeaveController::class);
+    Route::controller(EmployeeLeaveController::class)->group(function(){
+        Route::get('employee-leave/create-or-edit/{id}', 'createOrEdit')->name('employee-leave.create-or-edit');
+        Route::post('employee-leave/store-or-update/{id}', 'storeOrUpdate')->name('employee-leave.store-or-update');
+    });
 
 
     // Demand & Planning Module
