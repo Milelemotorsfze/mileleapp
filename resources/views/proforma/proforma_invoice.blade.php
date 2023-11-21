@@ -7,13 +7,14 @@
         .content{
             font-family: arial, sans-serif;
             background-color: #FFFFFF;
-            color: #FFFFFF;
+            color: #000000;
             font-size: 12px;
         }
         .header{
             background-color: #0f2c52;
             padding-right: 10px;
             padding-left: 10px;
+            color: #FFFFFF;
         }
         table {
             width: 100%;
@@ -63,27 +64,33 @@
         <table style="background-color: #FFFFFF;color: black">
             <tr>
                 <td> <span style="font-weight: bold;">Proforma Invoice No :  </span> </td>
-                <td> <span >PI001219_V001</span> </td>
+                <td> <span > {{ $quotation->id }} </span> </td>
                 <td> <span style="font-weight: bold;">DATE :  </span> </td>
                 <td> <span> {{ \Illuminate\Support\Carbon::parse($quotation->created_at)->format('d M Y') }} </span> </td>
             </tr>
             <tr>
                 <td> <span style="font-weight: bold;">Sales Person :  </span> </td>
-                <td> <span>Hanif M Afiq A K</span> </td>
+                <td> <span> {{ $data['sales_person'] }}</span> </td>
                 <td> <span style="font-weight: bold;">CM Reference No: </span> </td>
-                <td> <span> CM_755 </span> </td>
+                <td> <span> {{ $data['customer_reference_number'] }} </span> </td>
             </tr>
         </table>
         <div class="header">
            <p style="font-weight: bold;padding-top:10px;padding-bottom: 10px;"> CLIENT DETAILS </p>
         </div>
         <div id="details" style="color: black">
-            <p style="margin-bottom: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 20px;"> Destination Country:  </span> Angola</p>
-            <p style="margin-bottom: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 20px;">  Company/Individual: </span> Individual</p>
-            <p style="margin-bottom: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 45px;">  Contact Person:  </span> MS. Ludmila Cristina A De E </p>
-            <p style="margin-bottom: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 100px;">  Email: </span> anu@gmail.com</p>
-            <p style="margin-bottom: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 75px;">  Phone No: </span> +971 588477855</p>
-            <p style="margin-top: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 80px;"> Address: </span> Samarai Retail </p>
+            <p style="margin-bottom: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 20px;"> Destination Country:  </span>
+                {{ $quotationDetail->final_destination }}</p>
+            <p style="margin-bottom: 5px;margin-top: 5px;">
+                <span style="font-weight: bold;margin-right: 20px;">  Company/Individual: </span> Individual</p>
+            <p style="margin-bottom: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 45px;">  Contact Person:  </span>
+                {{ strtoupper( $data['client_name'] ) }} </p>
+            <p style="margin-bottom: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 100px;">  Email: </span>
+                {{  $data['client_email'] }}</p>
+            <p style="margin-bottom: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 75px;">  Phone No: </span>
+                {{  $data['client_phone'] }}</p>
+            <p style="margin-top: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 80px;"> Address: </span>
+                {{  $data['client_address'] }} </p>
         </div>
         <div class="header">
             <p style="font-weight: bold;padding-top:10px;padding-bottom: 10px;text-align: center"> I. DESCRIPTION AND BREAKDOWN OF GOODS </p>
@@ -100,16 +107,16 @@
                     <tr>
                         <td>{{ $vehicle->description }}</td>
                         <td>{{ $vehicle->quantity }}</td>
-                        <td>{{ number_format($vehicle->unit_price, 2) }}</td>
-                        <td>{{ number_format($vehicle->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($vehicle->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($vehicle->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
                 @foreach($variants as $variant)
                     <tr>
                         <td>{{ $variant->description }}</td>
                         <td>{{ $variant->quantity }}</td>
-                        <td>{{ number_format($variant->unit_price, 2) }}</td>
-                        <td>{{ number_format($variant->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($variant->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($variant->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
             @endif
@@ -124,16 +131,16 @@
                     <tr>
                         <td>{{ $shippingCharge->description }}</td>
                         <td>{{ $shippingCharge->quantity }}</td>
-                        <td>{{ number_format($shippingCharge->unit_price, 2) }}</td>
-                        <td>{{ number_format($shippingCharge->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($shippingCharge->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($shippingCharge->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
                 @foreach($shippingDocuments as $shippingDocument)
                     <tr>
                         <td>{{ $shippingDocument->description }}</td>
                         <td>{{ $shippingDocument->quantity }}</td>
-                        <td>{{ number_format($shippingDocument->unit_price, 2) }}</td>
-                        <td>{{ number_format($shippingDocument->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($shippingDocument->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($shippingDocument->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
             @endif
@@ -149,8 +156,8 @@
                     <tr>
                         <td>{{ $addon->description }}</td>
                         <td>{{ $addon->quantity }}</td>
-                        <td>{{ number_format($addon->unit_price, 2) }}</td>
-                        <td>{{ number_format($addon->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($addon->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($addon->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
             @endif
@@ -165,19 +172,31 @@
                     <tr>
                         <td>{{ $shippingCertification->description }}</td>
                         <td>{{ $shippingCertification->quantity }}</td>
-                        <td>{{ number_format($shippingCertification->unit_price, 2) }}</td>
-                        <td>{{ number_format($shippingCertification->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($shippingCertification->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($shippingCertification->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
                 @foreach($otherDocuments as $otherDocument)
                     <tr>
                         <td>{{ $otherDocument->description }}</td>
                         <td>{{ $otherDocument->quantity }}</td>
-                        <td>{{ number_format($otherDocument->unit_price, 2) }}</td>
-                        <td>{{ number_format($otherDocument->total_amount, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($otherDocument->unit_price, 2) }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($otherDocument->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
             @endif
+                @if($quotation->document_type == 'Proforma Invoice')
+                    <tr>
+                        <th colspan="3">05. DEPOSIT / PAYMENT RECEIVED</th>
+                        <th>AMOUNT</th>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Deposit</td>
+                        <td> {{ $quotation->currency ." ". number_format($quotationDetail->advance_amount, 2) }}</td>
+
+                    </tr>
+
+                @endif
         </table>
         <br>
         <table style="color: black;width: 100%;text-align: right">
@@ -186,7 +205,7 @@
                 <td> </td>
                 <td style="font-weight: bold"> SUB TOTAL</td>
 
-                <td style="text-align: end">{{ number_format($quotation->deal_value) }} </td>
+                <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }} </td>
             </tr>
             <tr>
                 <td> </td>
@@ -198,7 +217,7 @@
                 <td> </td>
                 <td> </td>
                 <td style="font-weight: bold">Net Amount</td>
-                <td style="text-align: end">{{ number_format($quotation->deal_value) }}</td>
+                <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }}</td>
             </tr>
             <tr>
                 <td> </td>
@@ -216,20 +235,63 @@
                 <td> </td>
                 <td> </td>
                 <td style="font-weight: bold"> Advance Paid</td>
-                <td> </td>
+                <td> {{ number_format($quotationDetail->advance_amount, 2) }} </td>
             </tr>
             <tr>
                 <td> </td>
                 <td> </td>
-                <td style="font-weight: bold"> Remaining Amount</td>
-                <td> </td>
+                <td style="font-weight: bold"> Remaining Amount({{ $quotation->currency }})</td>
+                <td> {{ $quotation->currency ." ". number_format($quotation->deal_value - $quotationDetail->advance_amount) }} </td>
             </tr>
+            @if($quotation->currency != 'AED' && $quotation->shippingDocument == 'EXW')
+            <tr>
+                <td> </td>
+                <td> </td>
+                <td style="font-weight: bold"> Remaining Amount(AED)</td>
+                <td>
+
+                   @if($quotation->currency == 'USD')
+                         {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_usd_rate->value, 2) }}
+                   @elseif($quotation->currency == 'EUR')
+                        {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_eru_rate->value, 2) }}
+                   @endif
+
+                </td>
+            </tr>
+            @endif
             <tr>
                 <td> </td>
                 <td> </td>
                 <td>  </td>
                 <td style="color: #de2121">  * VAT is not applicable for Export Bill </td>
             </tr>
+        </table>
+        <p style="font-weight: bold">payment due By: </p>
+        <p>I hereby acknowledge to honor the payment by the agreed due date.</p>
+         <p> In case of my failure to clear payment on time, I stand to lose the right to my payments and my order may be delayed or subject to cancellation.</p>
+        <p> Customs clearance, taxes, duty, value added taxes or any other charges related to the above mentioned goods are the sole responsibility of the client.</p>
+        <p style="font-weight: bolder">
+            Any payments which are made to Milele Motors FZE are non refundable & the price will be changed based on the new market price, and seller has right to sell the cars
+            without prior notice to buyer.
+        </p>
+        <p >
+            Upon initiating any transaction with Milele Motors FZE, the buyer acknowledges and unconditionally agrees to our terms and conditions. It is expressly understood that any payment by the
+            buyer, whether as advances, deposits, or other payments, is non-refundable under any circumstances. The buyer confirms the sale and recognizes its binding nature by making
+            payments. Furthermore, any products or services procured are strictly non-exchangeable and non-returnable. Even without a physical signature, such a transfer signifies a binding and
+            unilateral acceptance of these terms. Before making any transaction, the buyer has had the full opportunity to review these terms in detail, thereby affirming their understanding and
+            acceptance.
+        </p>
+        <table>
+            <td style="font-weight: bold">
+                <p> Accepted By </p>
+                <p> Board of Director : </p>
+            </td>
+            <td style="font-weight: bold">
+                <p>Client Name: </p>
+                <p>Signature: </p>
+                <p>Date: </p>
+
+            </td>
         </table>
     </div>
 

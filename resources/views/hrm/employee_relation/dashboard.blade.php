@@ -27,6 +27,7 @@
                             ['route' => 'job_description', 'name' => 'Job Description Form', 'docType' => 'word'],
                             ['route' => 'passport_request', 'name' => 'Passport Request Form', 'docType' => 'pdf'],
                             ['route' => 'employee_liability', 'name' => 'Employee Liability Form', 'docType' => 'pdf'],
+                            ['route' => 'employee_leave', 'name' => 'Employee Leave Form', 'docType' => 'word'],
                         ] as $form)
                             <tr data-id="{{ ++$i }}">
                                 <td>{{ $i }}</td>

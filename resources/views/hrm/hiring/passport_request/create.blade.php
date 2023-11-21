@@ -429,7 +429,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date</label>
                         </div>
                         <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="text" class="form-control top-margin-input-1" name="empSign">
+                            <input type="date" class="form-control top-margin-input-1" name="empSign">
                         </div>
                     </div>
                 </div>
@@ -453,7 +453,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date</label>
                         </div>
                         <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="text" class="form-control top-margin-input-1" name="repManagerSignDate">
+                            <input type="date" class="form-control top-margin-input-1" name="repManagerSignDate">
                         </div>
                     </div>
                 </div>
@@ -479,7 +479,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date</label>
                         </div>
                         <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="text" class="form-control top-margin-input-1" name="divHeadSignDate">
+                            <input type="date" class="form-control top-margin-input-1" name="divHeadSignDate">
                         </div>
                     </div>
                 </div>
@@ -505,7 +505,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date</label>
                         </div>
                         <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="text" class="form-control top-margin-input-1" name="hrManagerSign">
+                            <input type="date" class="form-control top-margin-input-1" name="hrManagerSign">
                         </div>
                     </div>
                 </div>

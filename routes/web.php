@@ -72,6 +72,7 @@ use App\Http\Controllers\ProformaInvoiceController;
 use App\Http\Controllers\ApprovalAwaitingController;
 use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\HRM\Hiring\EmployeeLeaveController;
 use App\Http\Controllers\HRM\Hiring\EmployeeLiabilityController;
 
 /*
@@ -231,18 +232,22 @@ Route::get('/d', function () {
     Route::controller(EmployeeHiringRequestController::class)->group(function(){
         Route::get('employee-hiring-request-approval-awaiting', 'approvalAwaiting')->name('employee-hiring-request.approval-awaiting');
         Route::post('employee-hiring-request/request-action', 'requestAction')->name('employee-hiring-request.request-action');
+        Route::get('employee-hiring-request/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-request.create-or-edit');
+        Route::post('employee-hiring-request/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-request.store-or-update');
     });
     
     // Employee Hiring Questionnaire
     Route::resource('employee-hiring-questionnaire', EmployeeHiringQuestionnaireController::class);
     Route::controller(EmployeeHiringQuestionnaireController::class)->group(function(){
-        Route::get('employee-hiring-questionnaire/createnew/{id}', 'create')->name('employee-hiring-questionnaire.createnew');
+        Route::get('employee-hiring-questionnaire/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-questionnaire.create-or-edit');
+        Route::post('employee-hiring-questionnaire/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-questionnaire.store-or-update');
     });
     
         // Employee Job Description
     Route::resource('job_description', JobDescriptionController::class);
     Route::controller(JobDescriptionController::class)->group(function(){
-        Route::get('job_description/createnew/{id}', 'create')->name('job_description.createNew');
+        Route::get('employee-hiring-job-description/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-job-description.create-or-edit');
+        Route::post('employee-hiring-job-description/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-job-description.store-or-update');
     });
     
     // Employee Passport Request
@@ -250,7 +255,9 @@ Route::get('/d', function () {
 
     // Employee Liability 
     Route::resource('employee_liability', EmployeeLiabilityController::class);
-
+    
+    // Employee Leave 
+    Route::resource('employee_leave', EmployeeLeaveController::class);
 
 
     // Demand & Planning Module

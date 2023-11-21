@@ -114,7 +114,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-    <h4 class="card-title">Create Passport Request Form</h4>
+    <h4 class="card-title">Create Employee Liability Form</h4>
     <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
@@ -211,7 +211,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                     <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date</label>
                                 </div>
                                 <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-7 col-12 top-margin-input">
-                                    <input type="text" class="form-control top-margin-input-1" name="empInfoDate">
+                                    <input type="date" class="form-control top-margin-input-1" name="empInfoDate">
                                 </div>
                             </div>
                         </div>
@@ -250,7 +250,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                     <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Joining Date</label>
                                 </div>
                                 <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-7 col-12 top-margin-input">
-                                    <input type="text" class="form-control top-margin-input-1" name="empJoiningDate">
+                                    <input type="date" class="form-control top-margin-input-1" name="empJoiningDate">
                                 </div>
                             </div>
                         </div>
@@ -379,13 +379,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <br />
 
                     <div class="row">
-                        <div class="col-lg-10 col-md-10 col-sm-10 col-12 liability-reason-section">
+                        <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12 liability-reason-section">
                             <div class="row">
                                 <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 emp-liability-lable-name">
                                     <span class="error">*</span>
                                     <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Reason</label>
                                 </div>
-                                <div class="col-xxl-5 col-lg-5 col-md-8 col-sm-7 col-12">
+                                <div class="col-xxl-9 col-lg-8 col-md-8 col-sm-7 col-12">
                                     <textarea class="form-control top-margin-input-1" name="empLiabilityReason" rows="5" cols="25"></textarea>
                                 </div>
                             </div>
@@ -403,7 +403,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
 
         <!-- Employee Acknowledge Section -->
-        <div class="emp-acknowledgement-main-container">
+        
+        <!-- <div class="emp-acknowledgement-main-container">
 
             <div class="col-lg-12 emp-liability-top-info">
                 <div class="col-xxl-8 col-lg-8 col-md-12 col-sm-12 col-12 emp-liability-lable-name">
@@ -447,131 +448,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         </div>
         <br />
 
-        <hr />
-        <br />
-
-        <!-- Signatures Div -->
-
-        <!-- <div class="emp-acknowledgement-main-container">
-
-            <div class="col-lg-12 emp-liability-top-info">
-                <div class="col-lg-6 col-md-12 col-sm-12 col-12">
-                <div class="col-xxl-8 col-lg-8 col-md-12 col-sm-12 col-12 emp-liability-lable-name">
-                        <h4>Approvals:</h4>
-                    </div>
-                </div>
-                <hr />
-
-                <div class="col-lg-12 job-desc-top-info">
-                    <div class="row">
-                        <div class="col-lg-6 col-md-7 col-sm-10 col-12 depManager-sign-section">
-                            <div class="row">
-                                <div class="col-xxl-5 col-lg-6 col-md-5 col-sm-5 col-12 emp-liability-section-lable-name">
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Department Manager</label>
-                                </div>
-                                <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12 top-margin-input">
-                                    <input type="text" class="form-control top-margin-input-1" name="depManager">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6 col-md-5 col-sm-10 col-12 sign-date-section">
-                            <div class="row">
-                                <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 emp-liability-section-lable-name">
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Sign</label>
-                                </div>
-                                <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                    <input type="text" class="form-control top-margin-input-1" name="empSign">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <br />
-                    <div class="row ">
-                        <div class="col-lg-6 col-md-7 col-sm-10 col-12 finManager-signature-section">
-                            <div class="row">
-                                <div class="col-xxl-5 col-lg-6 col-md-5 col-sm-5 col-12 emp-liability-section-lable-name">
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Finance Manager</label>
-                                </div>
-                                <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12 top-margin-input">
-                                    <input type="text" class="form-control top-margin-input-1" name="finManagerSign">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6 col-md-5 col-sm-10 col-12 sign-date-section">
-                            <div class="row">
-                                <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 reportingManager-signature-section-lable-name">
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Sign</label>
-                                </div>
-                                <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                    <input type="text" class="form-control top-margin-input-1" name="repManagerSignDate">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <br />
-
-                    <div class="row">
-
-                        <div class="col-lg-6 col-md-7 col-sm-10 col-12 divHead-section">
-                            <div class="row">
-                                <div class="col-xxl-5 col-lg-6 col-md-5 col-sm-5 col-12 divHead-signature-section-lable-name">
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Divison Head</label>
-                                </div>
-                                <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                    <input type="text" class="form-control top-margin-input-1" name="divHeadSign">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6 col-md-5 col-sm-10 col-12 sign-date-section">
-                            <div class="row">
-                                <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 divHead-signature-section-lable-name">
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Sign</label>
-                                </div>
-                                <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                    <input type="text" class="form-control top-margin-input-1" name="divHeadSignDate">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <br />
-
-                    <div class="row">
-
-                        <div class="col-lg-6 col-md-7 col-sm-10 col-12 hrManager-signature-section">
-                            <div class="row">
-                                <div class="col-xxl-5 col-lg-6 col-md-5 col-sm-5 col-12 hrManager-signature-section-lable-name">
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">HR Manager</label>
-                                </div>
-                                <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                    <input type="text" class="form-control top-margin-input-1" name="hrManager">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6 col-md-5 col-sm-10 col-12 sign-date-section">
-                            <div class="row">
-                                <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 hrManager-signature-section-lable-name">
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Sign</label>
-                                </div>
-                                <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                    <input type="text" class="form-control top-margin-input-1" name="hrManagerSign">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div> -->
-
-
+        <hr /> -->
     </form>
 
 </div>
-</br>
 </br>
 <div class="col-lg-12 col-md-12 col-sm-12 col-12">
     <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />

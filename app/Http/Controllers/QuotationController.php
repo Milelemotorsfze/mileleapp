@@ -7,6 +7,8 @@ use App\Models\OtherLogisticsCharges;
 use App\Models\quotation;
 use App\Models\Calls;
 use App\Models\Brand;
+use App\Models\QuotationClient;
+use App\Models\QuotationDetail;
 use App\Models\QuotationItem;
 use App\Models\Shipping;
 use App\Models\ShippingCertification;
@@ -58,13 +60,44 @@ class QuotationController extends Controller
 //        return dd($request->all());
         DB::beginTransaction();
 
+        $call = Calls::find($request->calls_id);
+
+        $call->company_name = $request->company_name;
+        $call->name = $request->name;
+        $call->phone = $request->phone;
+        $call->email = $request->email;
+        $call->address = $request->address;
+        $call->save();
+
         $quotation = new Quotation();
         $quotation->deal_value = $request->deal_value;
         $quotation->sales_notes = $request->remarks;
         $quotation->created_by = Auth::id();
         $quotation->calls_id = $request->calls_id;
-
+        $quotation->currency = $request->currency;
+        $quotation->document_type = $request->document_type;
+        if($request->document_type == 'Proforma') {
+            $quotation->document_type = 'Proforma Invoice';
+        }
+        $quotation->shipping_method = $request->shipping_method;
+        $quotation->remarks = $request->remarks;
         $quotation->save();
+
+        $quotationDetail = new QuotationDetail();
+        $quotationDetail->quotation_id  = $quotation->id;
+        $quotationDetail->final_destination  = $request->final_destination;
+        $quotationDetail->incoterm  = $request->incoterm;
+        $quotationDetail->place_of_delivery  = $request->place_of_delivery;
+        $quotationDetail->place_of_supply  = $request->place_of_supply;
+        $quotationDetail->document_validity  = $request->document_validity;
+        $quotationDetail->system_code  = $request->system_code;
+        $quotationDetail->payment_terms  = $request->payment_terms;
+        $quotationDetail->representative_name = $request->representative_name;
+        $quotationDetail->representative_number = $request->representative_number;
+        $quotationDetail->cb_name = $request->cb_name;
+        $quotationDetail->cb_number = $request->cb_number;
+        $quotationDetail->advance_amount = $request->advance_amount;
+        $quotationDetail->save();
 
         foreach ($request->prices as $key => $price) {
            $quotationItem = new QuotationItem();
@@ -107,6 +140,9 @@ class QuotationController extends Controller
         }
         DB::commit();
 //        $quotationItem = QuotationItem::where('quotation_id', $quotation->id)->first();
+//        $quotation = Quotation::find(58);
+//        $call = Calls::find($quotation->calls_id);
+//        $quotationDetail = QuotationDetail::where('quotation_id', 58)->first();
 
         $vehicles =  QuotationItem::where("reference_type", 'App\Models\Vehicles')
             ->where('quotation_id', $quotation->id)->get();
@@ -124,23 +160,61 @@ class QuotationController extends Controller
             ->where('quotation_id', $quotation->id)->get();
         $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
             ->where('quotation_id', $quotation->id)->get();
-//        return view('proforma.proforma_invoice', compact('quotationItem','quotation',
+//        return view('proforma.proforma_invoice', compact('quotationItem','quotation','call','quotationDetail',
 //            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications'));
-        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotationItem','quotation',
+        $data = [];
+        $data['sales_person'] = Auth::user()->name;
+        $data['client_email'] = $call->email;
+        $data['client_name'] = $call->name;
+        $data['customer_reference_number'] = $call->id;
+        $data['client_phone'] = $call->phone;
+        $data['client_address'] = $call->address;
+
+        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants'));
 
         $filename = 'quotation_'.$quotation->id.'.pdf';
-        $quotation->file_path = $filename;
-        $quotation->save();
 
         $directory = public_path('Quotations');
         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
         $pdfFile->save($directory . '/' . $filename);
 
-        return $pdfFile->stream("Halloa.pdf");
+        $pdf = $this->pdfMerge($quotation->id);
+        $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d').'.pdf';
+
+        $quotation->file_path = $file;
+        $quotation->save();
+        if (file_exists(public_path('Quotations/' . $filename))) {
+            unlink(public_path('Quotations/' . $filename));
+        }
+        return $pdf->Output($file);
+
+//        return $pdfFile->stream("Halloa.pdf");
 
     }
+    public function pdfMerge($quotationId)
+    {
+        $quotation = Quotation::find($quotationId);
+        $filename = 'quotation_'.$quotationId.'.pdf';
 
+        $pdf = new \setasign\Fpdi\Tcpdf\Fpdi();
+
+        $pdf->setPrintHeader(false);
+        $files[] = 'Quotations/'.$filename;
+
+        $files[] = 'Quotations/quotation_attachment_documents.pdf';
+
+        foreach ($files as $file) {
+            $pageCount = $pdf->setSourceFile($file);
+            for ($i=0; $i < $pageCount; $i++)
+            {
+                $pdf->AddPage();
+                $tplIdx = $pdf->importPage($i+1);
+                $pdf->useTemplate($tplIdx);
+            }
+        }
+        return $pdf;
+    }
     /**
      * Display the specified resource.
      */

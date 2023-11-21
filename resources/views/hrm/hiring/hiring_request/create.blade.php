@@ -198,7 +198,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title">Employee Hiring Request Form</h4>
+	<h4 class="card-title">@if($id == 'new')Create New @else Edit @endif Employee Hiring Request</h4>
+	@if($id != 'new')
+	@if($previous != '')
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('employee-hiring-request.create-or-edit',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+	@endif
+	@if($next != '')
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('employee-hiring-request.create-or-edit',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+	@endif
+	@endif
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee-hiring-request.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
@@ -212,8 +220,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 		</ul>
 	</div>
 	@endif
-	<form id="employeeHiringRequestForm" name="employeeHiringRequestForm" enctype="multipart/form-data" method="POST" action="{{route('employee-hiring-request.store')}}">
+
+		
+		<form id="employeeHiringRequestForm" name="employeeHiringRequestForm" enctype="multipart/form-data" method="POST" action="{{route('employee-hiring-request.store-or-update',$id)}}">
 		@csrf
+		
+
 		<div class="row">
 			<div class="col-xxl-2 col-lg-6 col-md-6">
 				<span class="error">* </span>
@@ -391,45 +403,39 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 		</div>
 	</form>
 </div>
-<div class="modal" id="createNewJobPosition" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Create New Job Title </h5>
-				<button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodal()">
-				<span aria-hidden="true">X</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<form method="POST" enctype="multipart/form-data" id="createNewJobTitleForm">
-					<div class="row modal-row">
-						<div class="col-xxl-12 col-lg-12 col-md-12">
-							<span class="error">* </span>
-							<label for="Job Title" class="col-form-label text-md-end ">Job Title</label>
-						</div>
-						<div class="col-xxl-12 col-lg-12 col-md-12">
-							<input type="text" id="new_job_title" class="form-control @error('new_job_title') is-invalid @enderror" name="new_job_title" value="" required>
-							<span id="newTitleError" class="required-class paragraph-class"></span>
-						</div>
-					</div>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closemodal()"><i class="fa fa-times"></i> Close</button>
-				<button type="button" class="btn btn-primary btn-sm" id="createTitleId" style="float: right;">
-				<i class="fa fa-check" aria-hidden="true"></i> Submit</button>
-			</div>
-		</div>
-	</div>
-</div>
+@include('hrm.hiring.hiring_request.createJobPosition')
 <div class="overlay"></div>
 @endif
 @endcan
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
+	var data = {!! json_encode($data) !!};
 	$(document).ready(function () {
-		document.getElementById('request_date').valueAsDate = new Date();
+		$("#replacement_for_employee_div").hide();
+		if(data.request_date){
+			document.getElementById('request_date').value = data.request_date;
+		}
+		else {
+			document.getElementById('request_date').valueAsDate = new Date();
+		}
+		$("#department_id").val(data.department_id);
+		$("#location_id").val(data.location_id);
+		$("#requested_by").val(data.requested_by);
+		$("#requested_job_title").val(data.requested_job_title);
+		$("#reporting_to").val(data.reporting_to);
+		$("#experience_level").val(data.experience_level);
+		$("#salary_range_start_in_aed").val(data.salary_range_start_in_aed);
+		$("#salary_range_end_in_aed").val(data.salary_range_end_in_aed);
+		$("#work_time_start").val(data.work_time_start);
+		$("#work_time_end").val(data.work_time_end);
+		$("#number_of_openings").val(data.number_of_openings);
+		$('#' + data.type_of_role).prop('checked',true);
+		if(data.type_of_role == 'replacement') {
+			$("#replacement_for_employee_div").show();
+			$("#replacement_for_employee").val(data.replacement_for_employee);
+		}
+		$("#explanation_of_new_hiring").val(data.explanation_of_new_hiring);
 		$('#department_id').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -465,15 +471,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
             maximumSelectionLength: 1,
             placeholder:"Choose Replacement For Employee",
         });
-		$("#replacement_for_employee_div").hide();
 	});	
-	$('.modal-button').on('click', function() {
-		$('#createNewJobPosition').modal('show');
-	});	
-	function closemodal() {
-	    $('.overlay').hide();
-		$('#createNewJobPosition').modal('hide');
-	}
+	
 	$('.type_of_role').click(function() {
 		if($(this).val() == 'new_position') {
 			$("#replacement_for_employee_div").hide();
@@ -482,47 +481,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 			$("#replacement_for_employee_div").show();
 		}
 	});
-	$('#createTitleId').on('click', function() {
-	    var value = $('#new_job_title').val();
-	    if(value == '') {
-	        $msg = 'Job Title is Required';
-	        showNewTitleError($msg);
-	    }
-	    else {
-	        $.ajax({
-	            url:"{{url('master-job-position')}}",
-	            type: "POST",
-	            data:{
-	                name: value,
-	                _token: '{{csrf_token()}}'
-	            },
-	            dataType : 'json',
-	            success: function(result) { console.log(result);
-	                if(result.error) {
-	                    $msg = result.error;
-	                    showNewTitleError($msg);
-	                }
-					else {
-	                    $('.overlay').hide();
-						closemodal();
-	                    $('#requested_job_title').append("<option value='" + result.id + "'>" + result.name + "</option>");
-	                    $('#requested_job_title').val(result.id);
-	                    removeNewTitleError();						
-	                }
-	            }
-	        });
-	    }
-	});
-	function showNewTitleError($msg) {
-		document.getElementById("newTitleError").textContent=$msg;
-	    document.getElementById("new_job_title").classList.add("is-invalid");
-	    document.getElementById("newTitleError").classList.add("paragraph-class");
-	}
-	function removeNewTitleError() {
-	    document.getElementById("newTitleError").textContent="";
-	    document.getElementById("new_job_title").classList.remove("is-invalid");
-	    document.getElementById("newTitleError").classList.remove("paragraph-class");
-	}
+	
 	jQuery.validator.setDefaults({
         errorClass: "is-invalid",
         errorElement: "p",

@@ -12,7 +12,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 	<!-- <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> -->
 	@if(isset($page))
 	@if($page == 'listing')
-	<a style="float: right;" class="btn btn-sm btn-success" href="{{ route('employee-hiring-request.create') }}">
+	<a style="float: right;" class="btn btn-sm btn-success" href="{{ route('employee-hiring-request.create-or-edit','new') }}">
       <i class="fa fa-plus" aria-hidden="true"></i> New Hiring Request
     </a>
 	@endif
@@ -89,7 +89,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>Detailed Explanation Of New Hiring</th>
 							<th>Created By</th>
 							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
+							<th>Current Status</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -113,9 +113,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{$pending->explanation_of_new_hiring ?? ''}}</td>
 							<td>{{$pending->created_by_name ?? ''}}</td>
 							<td>{{$pending->created_at ?? ''}}</td>
+							<td><label class="badge badge-soft-info">{{ $pending->current_status ?? '' }}</label></td>
 							<td>
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$pending->id)}}">
 									<i class="fa fa-eye" aria-hidden="true"></i>
+								</a>
+								<a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$pending->id)}}">
+									<i class="fa fa-edit" aria-hidden="true"></i>
 								</a>
 								@if(isset($type))
 									@if($type == 'approve')
@@ -356,15 +360,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$approvedOne->id)}}">
 									<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
+								<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$approvedOne->id)}}">
+									<i class="fa fa-edit" aria-hidden="true"></i>
+								</a> -->
 								@if(isset($approvedOne->questionnaire))
-								<a title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.createnew',$approvedOne->id)}}">
+								<a title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
 								<i class="fa fa-list" aria-hidden="true"></i>
 								</a>
 								@else
-								<a title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.edit',$approvedOne->id)}}">
+								<a title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
 								<i class="fa fa-list" aria-hidden="true"></i>
 								</a>
-								<a title="Create Job Description" class="btn btn-sm btn-secondary" href="{{route('job_description.createNew',$approvedOne->id)}}">
+								<a title="Create Job Description" class="btn btn-sm btn-secondary" href="{{route('employee-hiring-job-description.create-or-edit',$approvedOne->id)}}">
 								<i class="fa fa-address-card" aria-hidden="true"></i>
 								</a>
 								@endif
@@ -426,6 +433,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$rejectedOne->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
 							</a>
+							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$rejectedOne->id)}}">
+								<i class="fa fa-edit" aria-hidden="true"></i>
+							</a> -->
 							</td>
 						</tr>
 						@endforeach
