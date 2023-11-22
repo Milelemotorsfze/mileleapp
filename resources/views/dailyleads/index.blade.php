@@ -1419,6 +1419,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                     searchable: false,
                     render: function (data, type, row) {
                       const bookingUrl = `{{ url('booking/create') }}/${data}`;
+                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
                         return `
                             <div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
@@ -1426,7 +1427,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Demand</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModal(${data})">Quotation</a></li>
+                                    <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
@@ -1519,13 +1520,14 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                     searchable: false,
                     render: function (data, type, row) {
                       const bookingUrl = `{{ url('booking/create') }}/${data}`;
+                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
                         return `
                             <div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="#" onclick="openModal(${data})">Quotation</a></li>
+                                <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
@@ -1653,13 +1655,14 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                     name: 'id',
                     render: function (data, type, row) {
                       const bookingUrl = `{{ url('booking/create') }}/${data}`;
+                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
                         return `
                             <div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-
+                                    <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
                                     <li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
@@ -1825,12 +1828,14 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                     searchable: false,
                     render: function (data, type, row) {
                       const bookingUrl = `{{ url('booking/create') }}/${data}`;
+                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
                         return `
                             <div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
                                 <li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>

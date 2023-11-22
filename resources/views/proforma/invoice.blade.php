@@ -379,13 +379,8 @@
                         Remarks :
                     </div>
                     <div class="col-sm-10">
-<<<<<<< Updated upstream
                         <input type="text"  class="form-control form-control-xs "
                                name="remarks" placeholder="Remarks" >
-=======
-                        <input type="text" class="form-control form-control-xs "
-                               name="advance-amount" id="advance-amount" placeholder="Remarks" >
->>>>>>> Stashed changes
                     </div>
                 </div>
             </div>
