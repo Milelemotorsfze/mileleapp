@@ -24,7 +24,8 @@ class SupplierInventory extends Model
     protected $appends = [
         'color_codes',
         'total_quantity',
-        'actual_quantity'
+        'actual_quantity',
+        'quantity_without_chasis'
     ];
     protected $fillable = [
         'master_model_id',
@@ -97,6 +98,23 @@ class SupplierInventory extends Model
 //            $supplierInventories = $supplierInventories->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
 //        }
 
+        if (!$supplierInventories) {
+            return 0;
+        }
+        return $supplierInventories->count();
+    }
+    public function getQuantityWithoutChasisAttribute()
+    {
+        $masterModel = MasterModel::find($this->master_model_id);
+        $masterModelIds = MasterModel::where('steering', $masterModel->steering)
+            ->where('model', $masterModel->model)
+            ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
+
+        $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->whereNull('eta_import')
+            ->whereNull('chasis')
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
         if (!$supplierInventories) {
             return 0;
         }

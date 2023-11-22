@@ -38,27 +38,27 @@
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 ">Steering</label>
                         <select class="form-control" data-trigger name="steering" >
-                            <option value="LHS">LHS</option>
-                            <option value='RHS'>RHS</option>
+                            <option value="LHS">LHD</option>
+                            <option value='RHS'>RHD</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Model</label>
-                        <input type="text" class="form-control" name="model">
+                        <input type="text" class="form-control" name="model" placeholder="Enter Model">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">SFX</label>
-                        <input type="text" class="form-control"  name="sfx">
+                        <input type="text" class="form-control"  name="sfx" placeholder="Enter SFX">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Variant</label>
-                       <select class="form-control" name="variant_id" id="variant_id">
+                       <select class="form-control" name="variant_id" id="variant_id" >
                            <option></option>
                            @foreach($variants as $variant)
                                <option value="{{ $variant->id }}">{{$variant->name}}</option>
@@ -69,13 +69,13 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Amount in USD</label>
-                        <input type="number" class="form-control"  name="amount_uae" min="0">
+                        <input type="number" class="form-control"  name="amount_uae" min="0" placeholder="Enter Amount in USD">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Amount in EUR</label>
-                        <input type="number" class="form-control" name="amount_belgium" min="0">
+                        <input type="number" class="form-control" name="amount_belgium" min="0" placeholder="Enter Amount in EUR">
                     </div>
                 </div>
                 </br>

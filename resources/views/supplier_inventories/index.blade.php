@@ -66,6 +66,7 @@
                     <th>Variant</th>
                     <th>Total QTY</th>
                     <th>Actual QTY</th>
+                    <th>Qty Without Chaisis </th>
                     <th>Group By Colors</th>
                     <th>View Items</th>
                 </tr>
@@ -86,6 +87,7 @@
                         <td>{{ $supplierInventory->masterModel->variant->name ?? 'Variant Listed But Blanked' }}</td>
                         <td>{{ $supplierInventory->total_quantity }}</td>
                         <td>{{ $supplierInventory->actual_quantity }}</td>
+                        <td>{{ $supplierInventory->quantity_without_chasis }}</td>
                         <td>
                             @foreach($supplierInventory->color_codes as $row)
                                 @php
