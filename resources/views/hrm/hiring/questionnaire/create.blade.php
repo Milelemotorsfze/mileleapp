@@ -96,7 +96,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         <p><span style="float:right;" class="error">* Required Field</span></p>
     </div>
 
-    <form id="employeeQuestionnaireForm" name="employeeQuestionnaireForm" enctype="multipart/form-data" method="POST" action="">
+    <form id="employeeQuestionnaireForm" name="employeeQuestionnaireForm" enctype="multipart/form-data" method="POST" action="{{route('employee-hiring-questionnaire.store-or-update',$data->id)}}">
+    @csrf
 
         <div class="row">
             <div class=" col-lg-4 col-md-6 col-sm-6 designation-radio-main-div">
