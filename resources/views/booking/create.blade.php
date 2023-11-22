@@ -128,40 +128,42 @@
     </div>
                     <hr>
                     <div class="row"> 
-                    <h4>Search Vehicles</h4>
+                    <h4>Vehicles</h4>
                     <br>
                     <br>
                     <div class="col-lg-2 col-md-6">
-                    <label for="brand">Select Brand:</label>
-            <select class="form-control" id="brand" name="brand">
-                <option value="">Select Brand</option>
-                @foreach($brands as $brand)
-                    <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                @endforeach
-            </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                    <label for="model_line">Select Model Line:</label>
-            <select class="form-control" id="model_line" name="model_line" disabled>
-                <option value="">Select Model Line</option>
-            </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                    <label for="variant">Select Variant:</label>
-            <select class="form-control" id="variant" name="variant" disabled>
-                <option value="">Select Variant</option>
-            </select>
-            </div>
-            <div class="col-lg-2 col-md-6">
-            <label for="interior_color">Select Interior Color:</label>
-    <select class="form-control" id="interior_color" name="interior_color" disabled>
-        <option value="">Select Interior Color</option>
+    <label for="mastermodelline">Select Master Model Line:</label>
+    <select class="form-control" name="mastermodelline" id="model_lines">
+        @foreach ($mastermodellines as $masterModelLineId => $masterModelLineName)
+            <option value="{{ $masterModelLineId }}">{{ $masterModelLineName }}</option>
+        @endforeach
+    </select>
+</div>
+<div class="col-lg-2 col-md-6">
+    <label for="variant">Select Variant:</label>
+    <select class="form-control" name="variant" id="variant">
+    <option value="" disabled selected>Please select variant</option>
+        @foreach ($variants as $variantId => $variantName)
+            <option value="{{ $variantId }}" data-mastermodel="{{ $variantsMasterModel[$variantId] }}">{{ $variantName }}</option>
+        @endforeach
+    </select>
+</div>
+<div class="col-lg-2 col-md-6">
+            <label for="exterior_color">Select Exterior Color:</label>
+    <select class="form-control" id="exterior_color" name="exterior_color">
+        <option value="">Select Exterior Color</option>
+        @foreach($exteriorColours as $color)
+            <option value="{{ $color->id }}">{{ $color->name }}</option>
+        @endforeach
     </select>
             </div>
             <div class="col-lg-2 col-md-6">
-            <label for="exterior_color">Select Exterior Color:</label>
-    <select class="form-control" id="exterior_color" name="exterior_color" disabled>
-        <option value="">Select Exterior Color</option>
+            <label for="interior_color">Select Interior Color:</label>
+    <select class="form-control" id="interior_color" name="interior_color">
+    <option value="">Select Interior Color</option>
+        @foreach($interiorColours as $color)
+            <option value="{{ $color->id }}">{{ $color->name }}</option>
+        @endforeach
     </select>
             </div>
             <div class="col-lg-2 col-md-6 d-flex align-items-end">
@@ -206,90 +208,29 @@
 @endsection
 @push('scripts')
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var masterModelLineSelect = document.getElementById('model_lines');
+        var variantSelect = document.getElementById('variant');
+        var variantsMasterModel = {!! json_encode($variantsMasterModel) !!};
+        masterModelLineSelect.addEventListener('click', function () {
+            variantSelect.value = '';
+            variantSelect.querySelector('option[value=""]').style.display = '';
+            var selectedMasterModelLine = masterModelLineSelect.value;
+            for (var i = 0; i < variantSelect.options.length; i++) {
+                var option = variantSelect.options[i];
+                if (option.getAttribute('data-mastermodel') === selectedMasterModelLine || selectedMasterModelLine === "") {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+        });
+    });
+</script>
+<script>
         $(document).ready(function() {
-            $('#brand').select2();
-            $('#model_line').select2();
-            $('#variant').select2();
             $('#interior_color').select2();
             $('#exterior_color').select2();
-            $('#brand').on('change', function() {
-            var brandId = $(this).val();
-            if (brandId) {
-                $('#model_line').prop('disabled', false);
-                $('#model_line').empty().append('<option value="">Select Model Line</option>');
-
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('booking.getmodel', ['brandId' => '__brandId__']) }}'
-                        .replace('__brandId__', brandId),
-                    success: function(response) {
-                        $.each(response, function(key, value) {
-                            $('#model_line').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#model_line').prop('disabled', true);
-                $('#variant').prop('disabled', true);
-                $('#model_line').empty().append('<option value="">Select Model Line</option>');
-                $('#variant').empty().append('<option value="">Select Variant</option>');
-            }
-        });
-        $('#model_line').on('change', function() {
-            var modelLineId = $(this).val();
-            if (modelLineId) {
-                $('#variant').prop('disabled', false);
-                $('#variant').empty().append('<option value="">Select Variant</option>');
-
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('booking.getvariant', ['modelLineId' => '__modelLineId__']) }}'
-                        .replace('__modelLineId__', modelLineId),
-                    success: function(response) {
-                        $.each(response, function(key, value) {
-                            $('#variant').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#variant').prop('disabled', true);
-                $('#variant').empty().append('<option value="">Select Variant</option>');
-            }
-        });
-        $('#variant').on('change', function() {
-            var variantId = $(this).val();
-            if (variantId) {
-                $('#interior_color').prop('disabled', false);
-                $('#exterior_color').prop('disabled', false);
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('booking.getInteriorColors', ['variantId' => '__variantId__']) }}'
-                        .replace('__variantId__', variantId),
-                    success: function(response) {
-                        $('#interior_color').empty().append('<option value="">Select Interior Color</option>');
-                        $.each(response, function(key, value) {
-                            $('#interior_color').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-                $.ajax({
-                    type: 'GET',
-                    url: '{{ route('booking.getExteriorColors', ['variantId' => '__variantId__']) }}'
-                        .replace('__variantId__', variantId),
-                    success: function(response) {
-                        $('#exterior_color').empty().append('<option value="">Select Exterior Color</option>');
-                        $.each(response, function(key, value) {
-                            $('#exterior_color').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $('#interior_color').prop('disabled', true);
-                $('#exterior_color').prop('disabled', true);
-                $('#interior_color').empty().append('<option value="">Select Interior Color</option>');
-                $('#exterior_color').empty().append('<option value="">Select Exterior Color</option>');
-            }
-        });
 var secondTable = $('#dtBasicExample2').DataTable({
     columnDefs: [
         {
@@ -383,7 +324,6 @@ $(document).on('click', '.remove-button', function() {
     });
     moveRowToFirstTable(rowData);
 });
-
 $(document).on('click', '.add-button', function() {
     var vehicleId = $(this).data('vehicle-id');
     console.log('Add button clicked for vehicle ID:', vehicleId);
@@ -405,20 +345,10 @@ $('#search-button').on('click', function() {
         alert("Please select a variant before searching.");
         return;
     }
-    var url = '{{ route('booking.getbookingvehicles', [':variantId', ':interiorColorId?', ':exteriorColorId?']) }}';
-    url = url.replace(':variantId', variantId);
-    if (interiorColorId) {
-        url = url.replace(':interiorColorId', interiorColorId);
-    } else {
-        url = url.replace(':interiorColorId?', '');
-    }
-
-    if (exteriorColorId) {
-        url = url.replace(':exteriorColorId', exteriorColorId);
-    } else {
-        url = url.replace(':exteriorColorId?', '');
-    }
-
+    var url = '{{ route('booking.getbookingvehiclesbb', [':variantId',':exteriorColorId', ':interiorColorId']) }}';
+url = url.replace(':variantId', variantId)
+         .replace(':interiorColorId', interiorColorId || '')
+         .replace(':exteriorColorId', exteriorColorId || '');
     $.ajax({
         type: 'GET',
         url: url,
@@ -480,7 +410,6 @@ function checkIfRowIsEditable(callId) {
             console.error(xhr.responseText);
         }
     });
-
     return isEditable;
 }
     });

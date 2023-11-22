@@ -505,6 +505,7 @@ Route::get('/d', function () {
     Route::get('/get-interior-colors/{variantId}', [BookingController::class, 'getInteriorColors'])->name('booking.getInteriorColors');
     Route::get('/get-exterior-colors/{variantId}', [BookingController::class, 'getExteriorColors'])->name('booking.getExteriorColors');
     Route::get('/get-booking-vehicles/{variantId}/{interiorColorId?}/{exteriorColorId?}', [BookingController::class, 'getbookingvehicles'])->name('booking.getbookingvehicles');
+    Route::get('/get-booking-vehiclesbb/{variantId}/{exteriorColorId?}/{interiorColorId?}', [BookingController::class, 'getbookingvehiclesbb'])->name('booking.getbookingvehiclesbb');
     Route::post('/submit-booking-request', [BookingController::class, 'store'])->name('booking.store');
     Route::get('booking/info', [BookingController::class, 'index'])->name('booking.index');
     Route::post('/submit-approval', [BookingController::class, 'approval'])->name('booking.approval');

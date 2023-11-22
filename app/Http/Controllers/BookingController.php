@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Booking;
 use App\Models\UserActivities;
 use App\Models\Brand;
@@ -17,6 +16,8 @@ use App\Models\ColorCode;
 use App\Models\MasterModelLines;
 use App\Models\Varaint;
 use App\Models\Vehicles;
+use App\Models\Quotation;
+use App\Models\QuotationItem;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -25,12 +26,44 @@ class BookingController extends Controller
 {
     public function create($call_id)
 {
-    $useractivities =  New UserActivities();
+    $useractivities = new UserActivities();
     $useractivities->activity = "Create Booking";
     $useractivities->users_id = Auth::id();
     $useractivities->save();
-    $brands = Brand::all();
-    return view('booking.create', compact('call_id', 'brands'));
+    $quotations = Quotation::where('calls_id', $call_id)->get();
+    $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+    $interiorColours = ColorCode::where('belong_to', 'int')->get();
+    $variants = [];
+    $mastermodellines = [];
+    $variantsMasterModel = [];
+    foreach ($quotations as $quotation) {
+        $masterModelLineItems = QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
+            ->where('quotation_id', $quotation->id)
+            ->where('is_addon', false)->get();
+        foreach ($masterModelLineItems as $masterModelLineItem) {
+            $masterModelLine = MasterModelLines::find($masterModelLineItem->reference_id);
+            $variantsFromMasterModelLine = Varaint::where('master_model_lines_id', $masterModelLine->id)->get();
+
+            foreach ($variantsFromMasterModelLine as $variantFromMasterModelLine) {
+                $variants[$variantFromMasterModelLine->id] = $variantFromMasterModelLine->name;
+                $mastermodellines[$variantFromMasterModelLine->master_model_lines_id] = $masterModelLine->model_line;
+                $variantsMasterModel[$variantFromMasterModelLine->id] = $masterModelLine->id;
+            }
+        }
+        $variantItems = QuotationItem::where("reference_type", 'App\Models\Varaint')
+            ->where('quotation_id', $quotation->id)->get();
+
+        foreach ($variantItems as $variantItem) {
+            $variant = Varaint::with('master_model_lines')->find($variantItem->reference_id);
+
+            if ($variant && $variant->masterModelLine) {
+                $variants[$variant->id] = $variant->name;
+                $mastermodellines[$variant->masterModelLine->id] = $variant->masterModelLine->model_line;
+                $variantsMasterModel[$variant->id] = $variant->masterModelLine->id;
+            }
+        }
+    }
+    return view('booking.create', compact('call_id', 'variants', 'mastermodellines', 'variantsMasterModel', 'exteriorColours', 'interiorColours'));
 }
     public function getModelLines(Request $request, $brandId)
     {
@@ -537,5 +570,47 @@ public function approval(Request $request)
             $booking->save();
         }
         return response()->json(['message' => 'Booking Status Update successfully'], 200);
+    }
+    public function getbookingvehiclesbb($variantId, $exteriorColorId = null, $interiorColorId = null)
+    {
+    $useractivities =  New UserActivities();
+    $useractivities->activity = "Shifting the Vehicle into Booking List";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
+    $today = now();
+    $query = Vehicles::select([
+        'vehicles.vin as vin',
+        'vehicles.price as price',
+        'vehicles.id',
+        'brands.brand_name as brand',
+        'master_model_lines.model_line',
+        'varaints.name as variant_name',
+        'varaints.detail as variant_detail',
+        'model_detail as model_detail',
+        'interior_color_code.name as interior_color',
+        'exterior_color_code.name as exterior_color',
+        \DB::raw('CASE WHEN vehicles.grn_id IS NULL THEN "Incoming" ELSE "Arrived" END as grn_status')
+    ])
+    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+    ->leftJoin('color_codes as interior_color_code', 'vehicles.int_colour', '=', 'interior_color_code.id')
+    ->leftJoin('color_codes as exterior_color_code', 'vehicles.ex_colour', '=', 'exterior_color_code.id')
+    ->where(function($query) use ($today) {
+        $query->whereNull('reservation_end_date')
+            ->orWhere('reservation_end_date', '<', $today);
+    })
+    ->where('vehicles.varaints_id', $variantId);
+    if ($interiorColorId !== null) {
+        $query->where('int_colour', $interiorColorId);
+    }
+    if ($exteriorColorId !== null) {
+        $query->where('ex_colour', $exteriorColorId);
+    }
+    $query->whereNotNull('vehicles.vin');
+    $query->whereNull('vehicles.so_id');
+    $query->whereNull('vehicles.gdn_id');
+    $availableVehicles = $query->get();
+    return response()->json($availableVehicles);
     }    
-}
+    }

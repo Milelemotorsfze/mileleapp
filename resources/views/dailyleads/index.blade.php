@@ -834,22 +834,13 @@ input[type=number]::-webkit-outer-spin-button
     </div>
   </div>
   <script>
-      function openModalfile(filePath) {
-          // The base URL to the public storage directory
-          const baseUrl = "{{ asset('storage/') }}";
-
-          // Combine baseUrl and filePath with a slash
-          const fileUrl = baseUrl + '/' + filePath;
-
-          // Log the URL to the console
-          console.log('File URL:', fileUrl);
-
-          // Set the 'src' attribute of '#fileViewer' to fileUrl
-          $('#fileViewer').attr('src', fileUrl);
-
-          // Show the modal with the id '#fileModal'
-          $('#fileModal').modal('show');
-      }
+     function openModalfile(filePath) {
+    const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
+    const fileUrl = baseUrl + '/' + filePath; // Add a slash between baseUrl and filePath
+    console.log('File URL:', fileUrl); // Log the URL to the console
+    $('#fileViewer').attr('src', fileUrl);
+    $('#fileModal').modal('show');
+}
 $('#fileModal').on('hidden.bs.modal', function () {
     $('#fileViewer').attr('src', '');
 });
