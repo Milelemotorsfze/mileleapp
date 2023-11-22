@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Monarobase\CountryList\CountryListFacade;
 
 class QuotationController extends Controller
@@ -58,6 +59,8 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
+//        $directory = Storage::url('quotation_files');
+//        return $directory;
 //        return dd($request->all());
         DB::beginTransaction();
 
@@ -189,8 +192,8 @@ class QuotationController extends Controller
 
         $filename = 'quotation_'.$quotation->id.'.pdf';
         $generatedPdfDirectory = public_path('Quotations');
-//        $directory = public_path('quotation_files');
-        $directory = storage_path('app\public\quotation_files');
+        $directory = public_path('storage/quotation_files');
+//        $directory = storage_path('app/public/quotation_files');
         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
         $pdfFile->save($generatedPdfDirectory . '/' . $filename);
 
