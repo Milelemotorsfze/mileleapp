@@ -13,7 +13,7 @@
         margin-top: 12px !important;
     }
 
-    .form-label {
+    #employeeQuestionnaireForm .form-label {
         margin-top: 12px;
     }
 
@@ -94,7 +94,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     </div>
 
     <form id="employeeQuestionnaireForm" name="employeeQuestionnaireForm" enctype="multipart/form-data" method="POST" action="{{route('employee-hiring-questionnaire.store-or-update',$data->id)}}">
-    @csrf
+        @csrf
 
         <div class="row">
             <div class=" col-lg-4 col-md-6 col-sm-6 designation-radio-main-div">
@@ -111,36 +111,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             </label>
                         </div>
                     </div>
-
                 </div>
             </div>
 
+            <div class=" col-lg-4 col-md-6 col-sm-6">
 
+                <label for="designation_id" class="form-label"><span class="error">* </span>{{ __('Designation Name') }}</label>
+                <select name="designation_id" id="requested_job_title" class="form-control widthinput" multiple="true" autofocus>
+                    @foreach($masterDesignations as $masterDesignation)
+                    <option value="{{$masterDesignation->id}}">{{$masterDesignation->name}}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-xxl-4 col-lg-6 col-md-6">
+                <a id="createNewJobTitleButton" data-toggle="popover" data-trigger="hover" title="Create New Job Title" data-placement="top" style="margin-top:28px;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewJobPosition"><i class="fa fa-plus" aria-hidden="true"></i> Create New Job Title</a>
+            </div>
+            <!-- New Designation div shown on the right side -->
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <!-- when the user chooses other, show this other new designation div  -->
+                <div class="otherDesignationInputContainer" id="otherDesignationInputContainer" style="display: none">
 
-
-            <div class="row">
-                <div class=" col-lg-4 col-md-6 col-sm-6">
-
-                    <label for="designation_id" class="form-label"><span class="error">* </span>{{ __('Designation Name') }}</label>
-                    <select name="designation_id" id="requested_job_title" class="form-control widthinput" multiple="true" autofocus>
-                        @foreach($masterDesignations as $masterDesignation)
-                        <option value="{{$masterDesignation->id}}">{{$masterDesignation->name}}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-xxl-4 col-lg-6 col-md-6">
-                    <a id="createNewJobTitleButton" data-toggle="popover" data-trigger="hover" title="Create New Job Title" data-placement="top" style="margin-top:28px;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewJobPosition"><i class="fa fa-plus" aria-hidden="true"></i> Create New Job Title</a>
-                </div>
-                <!-- New Designation div shown on the right side -->
-                <div class="col-lg-2 col-md-4 col-sm-6">
-                    <!-- when the user chooses other, show this other new designation div  -->
-                    <div class="otherDesignationInputContainer" id="otherDesignationInputContainer" style="display: none">
-
-                        <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>{{ __('Other:') }}</label>
-                        <input type="text" placeholder="Other" name="otherDesignation" class="form-control" id="otherDesignationInput">
-                    </div>
+                    <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>{{ __('Other:') }}</label>
+                    <input type="text" placeholder="Other" name="otherDesignation" class="form-control" id="otherDesignationInput">
                 </div>
             </div>
+        </div>
+        <div class="row ">
+
 
             <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
@@ -151,8 +148,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             <div class=" col-lg-4 col-md-6 col-sm-6   ">
 
                 <label for="reporting_structure" class="form-label"><span class="error">* </span>{{ __('Reporting To') }}</label>
-                <select name="reporting_structure" id="reporting_structure" class="form-control widthinput" autofocus>
-                    <option value=""></option>
+                <select name="reporting_structure" id="reporting_structure" class="form-control widthinput" multiple="true" autofocus>
                     <option value="management">Management</option>
                     <option value="team_lead">Team Lead / Manager</option>
                 </select>
@@ -207,8 +203,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
 
         <div class="row">
-            <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
+            <div class=" col-lg-4 col-md-6 col-sm-6 ">
                 <label for="education" class="form-label"><span class="error">* </span>{{ __('Education') }}</label>
                 <select name="education" id="education" class="form-control widthinput" onchange="showDiv('otherEducationInputContainer', this)" autofocus>
                     <option value="" disabled selected>Choose Option</option>
@@ -218,15 +214,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <option value="0">Other</option>
                 </select>
             </div>
+            <div class="col-xxl-4 col-lg-4 col-md-6">
+                <a id="createNewEducationOptionButton" data-toggle="popover" data-trigger="hover" title="Create New Education Option" data-placement="top" style="margin-top:28px;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewEducationOption"><i class="fa fa-plus" aria-hidden="true"></i> Create New Education Option</a>
+            </div>
+            <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-            <!-- Other div shown on the right side -->
-            <div class="col-lg-2 col-md-4 col-sm-6">
-                <!-- when the user chooses other, show this other other div  -->
-                <div class="otherEducationInputContainer" id="otherEducationInputContainer" style="display: none">
-
-                    <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>{{ __('Other Certification:') }}</label>
-                    <input type="text" placeholder="Other" name="otherEducation" class="form-control" id="otherEducationInput">
-                </div>
+                <label for="certification" class="form-label"><span class="error">* </span>{{ __('Certification :') }} </label>
+                <input type="text" placeholder="Certificates" name="certification" class="form-control" id="certification">
             </div>
         </div>
 
@@ -248,14 +242,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             </div>
 
-            <!-- Specifiy div shown on the right side -->
-            <div class="col-lg-2 col-md-4 col-sm-6">
-                <!-- when the user chooses other, show this Specify div  -->
-                <div class="otherSpecificIndustryExpInputContainer" id="otherSpecificIndustryExpInputContainer" style="display: none">
-
-                    <!-- <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>{{ __('Specify Other:') }}</label> -->
-                    <input type="text" placeholder="Other" name="otherSpecificIndustryExp" class="form-control" id="otherSpecificIndustryExp">
-                </div>
+            <div class="col-xxl-4 col-lg-6 col-md-6">
+                <a id="createNewIndustryExperienceButton" data-toggle="popover" data-trigger="hover" title="Create New Industry Experience" data-placement="top" style="margin-top:28px;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewIndustryExperience"><i class="fa fa-plus" aria-hidden="true"></i> Create New Industry Experience</a>
             </div>
         </div>
 
@@ -383,17 +371,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <div class="row">
                     <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
                         <div class="row ">
-                            <div class="col-lg-12   designation-radio-main-div">
+                            <div class="col-lg-12 designation-radio-main-div">
 
 
                                 <label for="driving_licence" class="form-label"><span class="error">* </span>{{ __('Driving Lisence Required?') }}</label>
 
                                 <div class="designation-radio-button">
                                     <label>
-                                        <input type="radio" name="driving_lisence" id="yes" value="yes"> Yes
+                                        <input type="radio" name="driving_licence" id="yes" value="yes"> Yes
                                     </label>
                                     <label>
-                                        <input type="radio" name="driving_lisence" id="no" value="no"> No
+                                        <input type="radio" name="driving_licence" id="no" value="no"> No
                                     </label>
                                 </div>
                             </div>
@@ -420,7 +408,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                         </label>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
+                        <div class="OwnCarInputContainer" style="display: none">
+                            <div class="row ">
                                 <div class="col-lg-6 designation-radio-main-div">
 
 
@@ -731,17 +723,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
-                        <span class="error">* </span>
-                        <label for="probation_length_in_months" class="form-label"> {{ __('Probation length (months):') }}</label>
+
+                        <label for="probation_length_in_months" class="form-label"> <span class="error">* </span>{{ __('Probation length (months):') }}</label>
                         <input type="number" placeholder="Probation length in months" name="probation_length_in_months" class="form-control" id="probation_length_in_months">
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
-                        <span class="error">* </span>
                         <label for="probation_pay_amount_in_aed" class="form-label"><span class="error">* </span> {{ __('Probation Pay (AED):') }}</label>
                         <input type="number" placeholder="Probation Pay in AED" name="probation_pay_amount_in_aed" class="form-control" id="probation_pay_amount_in_aed">
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
-                        <span class="error">* </span>
                         <label for="incentives_perks_bonus" class="form-label"><span class="error">* </span>{{ __('Incentive, Perks, & Bonus:') }} </label>
                         <input type="text" placeholder="Incentives" name="incentives_perks_bonus" class="form-control" id="incentives_perks_bonus">
                     </div>
@@ -815,6 +805,11 @@ redirect()->route('home')->send();
             maximumSelectionLength: 1,
             placeholder: "Choose Designation Name",
         });
+        $('#reporting_structure').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder: "Choose Option",
+        });
         $('#location_id').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -873,14 +868,20 @@ redirect()->route('home')->send();
             }
         });
 
-        $('input[name="driving_lisence"]').change(function() {
+        $('input[name="driving_licence"]').change(function() {
             if ($(this).val() === 'yes') {
                 $('.drivingLisenceInputContainer').show();
             } else {
                 $('.drivingLisenceInputContainer').hide();
             }
         });
-
+        $('input[name="own_car"]').change(function() {
+            if ($(this).val() === 'yes') {
+                $('.OwnCarInputContainer').show();
+            } else {
+                $('.OwnCarInputContainer').hide();
+            }
+        });
         $('input[name="commission_involved_in_salary"]').change(function() {
             if ($(this).val() === 'yes') {
                 $('.chooseAmountpercentageDropDownInputContainer').show();
@@ -953,7 +954,7 @@ redirect()->route('home')->send();
             "twoDigitValues",
             function(value, element) {
                 var isValidTotalOpenings = /^(?:[1-9]|[1-9][0-9])$/.test(value);
-                return this.optional(element) && isValidTotalOpenings;
+                return this.optional(element) || isValidTotalOpenings;
             },
             "Please enter a valid number between 1 and 99"
         );
@@ -971,7 +972,7 @@ redirect()->route('home')->send();
             "threeDigitValues",
             function(value, element) {
                 var isValidTotalOpenings = /^(?:[1-9]|[1-9]\d{1,2})$/.test(value);
-                return this.optional(element) && isValidTotalOpenings;
+                return this.optional(element) || isValidTotalOpenings;
             },
             "Please enter a valid number between 1 and 999"
         );
@@ -1032,6 +1033,9 @@ redirect()->route('home')->send();
                     required: true,
                 },
                 education: {
+                    required: true,
+                },
+                certification: {
                     required: true,
                 },
                 salary_range_start_in_aed: {
@@ -1108,13 +1112,17 @@ redirect()->route('home')->send();
                     required: true,
                 },
                 own_car: {
-                    required: function(element) {
-                        return $('input[name="driving_licence"]:checked').val() === 'yes';
+                    required: {
+                        function(element) {
+                            return $('input[name="driving_licence"]:checked').val() === 'yes';
+                        }
                     },
                 },
                 fuel_expenses_by: {
-                    required: function(element) {
-                        return $('input[name="driving_licence"]:checked').val() === 'yes';
+                    required: {
+                        function(element) {
+                            return $('input[name="own_car"]:checked').val() === 'yes';
+                        }
                     },
                 },
                 interviewd_by: {
