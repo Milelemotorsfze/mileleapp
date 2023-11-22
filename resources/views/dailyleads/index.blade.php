@@ -1668,7 +1668,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item"href="{{route('qoutation.proforma_invoice',['callId'=> $calls->id]) }}">Quotation</a></li>
+
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
                                     <li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
