@@ -34,7 +34,7 @@
                 </div>
             @endif
             <div class="row">
-                <div class="col-lg-2 col-md-4 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13">Customer</label>
                         <select class="form-control" data-trigger name="customer_id" id="customer" readonly>
@@ -42,38 +42,62 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 ">LOI Category</label>
                         <select class="form-control" name="category" readonly >
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}"
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST == $letterOfIndent->category ? 'selected' : ''}} >
+                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
+                            </option>
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED}}"
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED == $letterOfIndent->category ? 'selected' : ''}} >
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED }}
+                            </option>
                             <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}"
-                                {{$letterOfIndent->category == \App\Models\LetterOfIndent::LOI_CATEGORY_REAL ? 'selected' : " "}}  >
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_REAL == $letterOfIndent->category ? 'selected' : ''}} >
                                 {{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}
                             </option>
                             <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}"
-                                {{$letterOfIndent->category == \App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL ? 'selected' : " "}}>
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL == $letterOfIndent->category ? 'selected' : ''}} >
                                 {{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}
+                            </option>
+                            <option value="{{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}"
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE == $letterOfIndent->category ? 'selected' : ''}} >
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}
                             </option>
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 ">LOI Date</label>
                         <input type="date" class="form-control" id="basicpill-firstname-input" readonly
                                value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}" name="date">
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13">Dealers</label>
                         <input type="text" class="form-control" value="{{ $letterOfIndent->dealers }}" readonly>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">Vendor</label>
-                        <input type="text" class="form-control" value="{{ $letterOfIndent->supplier->supplier ?? '' }}" readonly>
+                        <label for="choices-single-default" class="form-label font-size-13 ">So Number</label>
+                        <input type="text" class="form-control" value="{{ $letterOfIndent->so_number }}" readonly>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13 ">Destination</label>
+                        <input type="text" class="form-control" value="{{ $letterOfIndent->destination }}" readonly>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13 ">Perefered Location</label>
+                        <input type="text" class="form-control" value="{{ $letterOfIndent->prefered_location }}" readonly>
                     </div>
                 </div>
             </div>

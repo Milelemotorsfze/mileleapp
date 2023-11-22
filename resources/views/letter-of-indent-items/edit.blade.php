@@ -22,48 +22,73 @@
                     </div>
                 @endif
                 <div class="row">
-                    <div class="col-lg-2 col-md-6">
+                    <div class="col-lg-3 col-md-6">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Customer</label>
-                            <select class="form-control" data-trigger name="customer_id" id="customer" readonly>
+                            <select class="form-control" name="customer_id" id="customer" readonly>
                                 <option> {{ $letterOfIndent->customer->name }}</option>
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-2 col-md-6">
+                    <div class="col-lg-3 col-md-6">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">LOI Category</label>
                             <select class="form-control" name="category" readonly >
+                                <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}"
+                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST == $letterOfIndent->category ? 'selected' : ''}} >
+                                    {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
+                                </option>
+                                <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED}}"
+                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED == $letterOfIndent->category ? 'selected' : ''}} >
+                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED }}
+                                </option>
                                 <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}"
-                                    {{$letterOfIndent->category == \App\Models\LetterOfIndent::LOI_CATEGORY_REAL ? 'selected' : " "}}  >
+                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_REAL == $letterOfIndent->category ? 'selected' : ''}} >
                                     {{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}
                                 </option>
                                 <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}"
-                                    {{$letterOfIndent->category == \App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL ? 'selected' : " "}}>
+                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL == $letterOfIndent->category ? 'selected' : ''}} >
                                     {{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}
+                                </option>
+                                <option value="{{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}"
+                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE == $letterOfIndent->category ? 'selected' : ''}} >
+                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}
                                 </option>
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-2 col-md-6">
+                    <div class="col-lg-3 col-md-6">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label ">LOI Date</label>
+                            <label for="choices-single-default" class="form-label">LOI Date</label>
                             <input type="date" class="form-control" id="basicpill-firstname-input" readonly
                                    value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}" name="date">
                         </div>
                     </div>
-                    <div class="col-lg-2 col-md-4 col-sm-12">
+                    <div class="col-lg-3 col-md-4 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Dealer</label>
                             <input type="text" class="form-control" value="{{ $letterOfIndent->dealers }}" readonly>
                         </div>
                     </div>
-                    <div class="col-lg-2 col-md-4 col-sm-12">
+                    <div class="col-lg-3 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Vendor</label>
-                            <input type="text" class="form-control" value="{{ $letterOfIndent->supplier->supplier ?? '' }}" readonly>
+                            <label for="choices-single-default" class="form-label">So Number</label>
+                            <input type="text" class="form-control" value="{{ $letterOfIndent->so_number }}" readonly>
                         </div>
                     </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Destination</label>
+                            <input type="text" class="form-control" value="{{ $letterOfIndent->destination }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Perefered Location</label>
+                            <input type="text" class="form-control" value="{{ $letterOfIndent->prefered_location }}" readonly>
+                        </div>
+                    </div>
+
                 </div>
                     @if($letterOfIndentItems->count() > 0)
                         <div class="row d-none d-sm-block">

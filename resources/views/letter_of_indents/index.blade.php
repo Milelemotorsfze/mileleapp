@@ -69,9 +69,10 @@
                                     <th>Date</th>
                                     <th>Customer</th>
                                     <th>Category</th>
-                                    <th>Vendor</th>
                                     <th>Dealers</th>
-        {{--                            <th>Submission Status</th>--}}
+                                    <th>So Number</th>
+                                    <th>Destination</th>
+                                    <th>Prefered Location</th>
                                     <th>Approval Status</th>
                                     <th>LOI</th>
                                     <th>Actions</th>
@@ -86,9 +87,10 @@
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                         <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
-                                        <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                         <td>{{ $letterOfIndent->dealers }}</td>
-        {{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
+                                        <td>{{ $letterOfIndent->so_number }}</td>
+                                        <td>{{ $letterOfIndent->destination }}</td>
+                                        <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <td>
                                             <select class="form-control" onchange="location = this.value;">
@@ -240,8 +242,10 @@
                                     <th>Date</th>
                                     <th>Customer</th>
                                     <th>Category</th>
-                                    <th>Vendor</th>
                                     <th>Dealers</th>
+                                    <th>So Number</th>
+                                    <th>Destination</th>
+                                    <th>Prefered Location</th>
                                     <th>Approval Status</th>
                                     @can('LOI-approve')
                                         @php
@@ -263,8 +267,10 @@
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                         <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
-                                        <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                         <td>{{ $letterOfIndent->dealers }}</td>
+                                        <td>{{ $letterOfIndent->so_number }}</td>
+                                        <td>{{ $letterOfIndent->destination }}</td>
+                                        <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
                                         @can('LOI-approve')
                                             @php
@@ -395,36 +401,6 @@
                                             </div>
                                         </div>
 
-{{--                                        <div class="modal fade" id="view-supplier-approved-loi-docs-{{$letterOfIndent->id}}"--}}
-{{--                                             tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">--}}
-{{--                                            <div class="modal-dialog modal-xl">--}}
-{{--                                                <div class="modal-content">--}}
-{{--                                                    <div class="modal-header">--}}
-{{--                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>--}}
-{{--                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>--}}
-{{--                                                    </div>--}}
-{{--                                                    <div class="modal-body">--}}
-{{--                                                        <div class="col-lg-12">--}}
-{{--                                                            <div class="row p-2">--}}
-{{--                                                                @foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument)--}}
-{{--                                                                    <div class="d-flex">--}}
-{{--                                                                        <div class="col-lg-12">--}}
-{{--                                                                            <div class="row p-2">--}}
-{{--                                                                                <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" width="400" height="600"--}}
-{{--                                                                                      ></embed>--}}
-{{--                                                                            </div>--}}
-{{--                                                                        </div>--}}
-{{--                                                                    </div>--}}
-{{--                                                                @endforeach--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                    <div class="modal-footer">--}}
-{{--                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                            </div>--}}
-{{--                                        </div>--}}
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -441,8 +417,10 @@
                                     <th>Date</th>
                                     <th>Customer</th>
                                     <th>Category</th>
-                                    <th>Vendor</th>
                                     <th>Dealer</th>
+                                    <th>So Number</th>
+                                    <th>Destination</th>
+                                    <th>Prefered Location</th>
                                     <th>Approval Status</th>
                                     @can('LOI-approve')
                                         @php
@@ -464,9 +442,10 @@
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                         <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
-                                        <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                         <td>{{ $letterOfIndent->dealers }}</td>
-        {{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
+                                        <td>{{ $letterOfIndent->so_number }}</td>
+                                        <td>{{ $letterOfIndent->destination }}</td>
+                                        <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
                                         @can('LOI-approve')
                                             @php
@@ -616,9 +595,10 @@
                                     <th>Date</th>
                                     <th>Customer</th>
                                     <th>Category</th>
-                                    <th>Vendor</th>
                                     <th>Dealer</th>
-        {{--                            <th>Submission Status</th>--}}
+                                    <th>So Number</th>
+                                    <th>Destination</th>
+                                    <th>Prefered Location</th>
                                     <th>Approval Status</th>
                                     <th>LOI</th>
                                     <th width="150px">Actions</th>
@@ -632,9 +612,10 @@
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                         <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
-                                        <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                         <td>{{ $letterOfIndent->dealers }}</td>
-        {{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
+                                        <td>{{ $letterOfIndent->so_number }}</td>
+                                        <td>{{ $letterOfIndent->destination }}</td>
+                                        <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <td>
                                             <select class="form-control" onchange="location = this.value;">
@@ -772,9 +753,10 @@
                                     <th>Date</th>
                                     <th>Customer</th>
                                     <th>Category</th>
-                                    <th>Vendor</th>
                                     <th>Dealer</th>
-        {{--                            <th>Submission Status</th>--}}
+                                    <th>So Number</th>
+                                    <th>Destination</th>
+                                    <th>Prefered Location</th>
                                     <th>Approval Status</th>
                                     <th>Review</th>
 
@@ -789,9 +771,10 @@
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                         <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
-                                        <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                         <td>{{ $letterOfIndent->dealers }}</td>
-        {{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
+                                        <td>{{ $letterOfIndent->so_number }}</td>
+                                        <td>{{ $letterOfIndent->destination }}</td>
+                                        <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <th>{{ $letterOfIndent->review }}</th>
                                         <td>

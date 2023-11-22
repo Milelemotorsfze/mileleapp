@@ -20,32 +20,32 @@
 
         </h4>
     </div>
-    <div class="card-body">
-        <form id="form-search" action="{{ route('letter-of-indents.get-suppliers-LOIs') }}" >
-            <div class="row">
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Vendor</label>
-                        <select class="form-control" autofocus  name="supplier_id"  id="supplier" required>
-                            <option></option>
-                            @foreach($suppliers as $supplier)
-                                <option value="{{ $supplier->id }}" @if($supplierId){{ $supplier->id == $supplierId ? 'selected' : '' }} @endif>{{ $supplier->supplier }}</option>
-                            @endforeach
-                        </select>
+{{--    <div class="card-body">--}}
+{{--        <form id="form-search" action="{{ route('letter-of-indents.get-suppliers-LOIs') }}" >--}}
+{{--            <div class="row">--}}
+{{--                <div class="col-lg-3 col-md-3">--}}
+{{--                    <div class="mb-3">--}}
+{{--                        <label for="choices-single-default" class="form-label">Vendor</label>--}}
+{{--                        <select class="form-control" autofocus  name="supplier_id"  id="supplier" required>--}}
+{{--                            <option></option>--}}
+{{--                            @foreach($suppliers as $supplier)--}}
+{{--                                <option value="{{ $supplier->id }}" @if($supplierId){{ $supplier->id == $supplierId ? 'selected' : '' }} @endif>{{ $supplier->supplier }}</option>--}}
+{{--                            @endforeach--}}
+{{--                        </select>--}}
 
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-primary search-button" >Search</button>
-                        <a href="{{ route('letter-of-indents.get-suppliers-LOIs') }}">
-                            <button type="button" class="btn btn-secondary "> Refresh </button>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--                <div class="col-lg-3 col-md-3">--}}
+{{--                    <div class="mt-4">--}}
+{{--                        <button type="submit" class="btn btn-primary search-button" >Search</button>--}}
+{{--                        <a href="{{ route('letter-of-indents.get-suppliers-LOIs') }}">--}}
+{{--                            <button type="button" class="btn btn-secondary "> Refresh </button>--}}
+{{--                        </a>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        </form>--}}
+{{--    </div>--}}
 
     <div class="portfolio">
         <ul class="nav nav-pills nav-fill" id="my-tab">
@@ -70,8 +70,10 @@
                             <th>S.NO</th>
                             <th>Date</th>
                             <th>Customer</th>
-                            <th>Vendor</th>
                             <th>Category</th>
+                            <th>So Number</th>
+                            <th>Destination</th>
+                            <th>Prefered Location</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
                             <th>LOI Items</th>
@@ -94,8 +96,10 @@
                                 <td> {{ ++$i }}</td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
-                                <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ $letterOfIndent->category }}</td>
+                                <td>{{ $letterOfIndent->so_number }}</td>
+                                <td>{{ $letterOfIndent->destination }}</td>
+                                <td>{{ $letterOfIndent->prefered_location }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
@@ -246,14 +250,14 @@
                                                                     <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
                                                                 </div>
                                                             </div>
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">Vendor</label>
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
-                                                                </div>
-                                                            </div>
+{{--                                                            <div class="row mt-2">--}}
+{{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
+{{--                                                                    <label class="form-label font-size-13 text-muted">Vendor</label>--}}
+{{--                                                                </div>--}}
+{{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
+{{--                                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >--}}
+{{--                                                                </div>--}}
+{{--                                                            </div>--}}
                                                             <div class="row mt-2">
                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
                                                                     <label class="form-label font-size-13 text-muted">LOI Date</label>
@@ -312,14 +316,14 @@
                                                                     <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
                                                                 </div>
                                                             </div>
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">Vendor</label>
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
-                                                                </div>
-                                                            </div>
+{{--                                                            <div class="row mt-2">--}}
+{{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
+{{--                                                                    <label class="form-label font-size-13 text-muted">Vendor</label>--}}
+{{--                                                                </div>--}}
+{{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
+{{--                                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >--}}
+{{--                                                                </div>--}}
+{{--                                                            </div>--}}
                                                             <div class="row mt-2">
                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
                                                                     <label class="form-label font-size-13 text-muted">LOI Date</label>
@@ -356,10 +360,12 @@
                         <thead class="bg-soft-secondary">
                         <tr>
                             <th>S.No:</th>
-                            <th>Vendor</th>
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Category</th>
+                            <th>So Number</th>
+                            <th>Destination</th>
+                            <th>Prefered Location</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
                             <th>Deal Items</th>
@@ -372,10 +378,12 @@
                         @foreach ($approvedLOIs as $key => $letterOfIndent)
                             <tr>
                                 <td> {{ ++$i }}</td>
-                                <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                 <td>{{ $letterOfIndent->category }}</td>
+                                <td>{{ $letterOfIndent->so_number }}</td>
+                                <td>{{ $letterOfIndent->destination }}</td>
+                                <td>{{ $letterOfIndent->prefered_location }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
@@ -498,10 +506,12 @@
                         <thead class="bg-soft-secondary">
                         <tr>
                             <th>S.No:</th>
-                            <th>Vendor</th>
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Category</th>
+                            <th>So Number</th>
+                            <th>Destination</th>
+                            <th>Prefered Location</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
                             <th>Review</th>
@@ -515,10 +525,12 @@
                         @foreach ($rejectedLOIs as $key => $letterOfIndent)
                             <tr>
                                 <td> {{ ++$i }}</td>
-                                <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                 <td>{{ $letterOfIndent->category }}</td>
+                                <td>{{ $letterOfIndent->so_number }}</td>
+                                <td>{{ $letterOfIndent->destination }}</td>
+                                <td>{{ $letterOfIndent->prefered_location }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>{{ $letterOfIndent->review }}</td>

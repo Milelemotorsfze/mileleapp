@@ -118,9 +118,7 @@ class LetterOfIndentController extends Controller
             'customer_id' => 'required',
             'category' => 'required',
             'date' => 'required',
-//            'shipment_method' => 'required',
             'dealers' => 'required',
-            'supplier_id' => 'required'
         ]);
 
         $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
@@ -136,8 +134,9 @@ class LetterOfIndentController extends Controller
             $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
             $LOI->category = $request->category;
             $LOI->dealers = $request->dealers;
-//            $LOI->shipment_method = $request->shipment_method;
-            $LOI->supplier_id = $request->supplier_id;
+            $LOI->prefered_location = $request->prefered_location;
+            $LOI->so_number = $request->so_number;
+            $LOI->destination = $request->destination;
             $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS_NEW;
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
             $LOI->created_by = Auth::id();
@@ -321,7 +320,6 @@ class LetterOfIndentController extends Controller
             'date' => 'required',
 //            'shipment_method' => 'required',
             'dealers' => 'required',
-            'supplier_id' => 'required'
         ]);
 
         $LOI = LetterOfIndent::find($id);
@@ -330,8 +328,9 @@ class LetterOfIndentController extends Controller
         $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
         $LOI->category = $request->category;
         $LOI->dealers = $request->dealers;
-        $LOI->supplier_id = $request->supplier_id;
-//        $LOI->shipment_method = $request->shipment_method;
+        $LOI->destination = $request->destination;
+        $LOI->so_number = $request->so_number;
+        $LOI->prefered_location = $request->prefered_location;
         $LOI->save();
         if ($request->has('files'))
         {
