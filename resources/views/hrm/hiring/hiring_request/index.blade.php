@@ -370,15 +370,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 									<i class="fa fa-edit" aria-hidden="true"></i>
 								</a> -->
 								@if(isset($approvedOne->questionnaire))
-								<a title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
-								<i class="fa fa-list" aria-hidden="true"></i>
-								</a>
-								@else
 								<a title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
 								<i class="fa fa-list" aria-hidden="true"></i>
 								</a>
 								<a title="Create Job Description" class="btn btn-sm btn-secondary" href="{{route('employee-hiring-job-description.create-or-edit',$approvedOne->id)}}">
 								<i class="fa fa-address-card" aria-hidden="true"></i>
+								</a>
+								@else
+								<a title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
+								<i class="fa fa-list" aria-hidden="true"></i>
 								</a>
 								@endif
 							</td>

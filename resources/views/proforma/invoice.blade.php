@@ -523,9 +523,9 @@
                         <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
                             <thead class="bg-soft-secondary">
                                 <tr>
-                                    <th>ID</th>
+{{--                                    <th>ID</th>--}}
                                     <th>Status</th>
-                                    <th>VIN</th>
+{{--                                    <th>VIN</th>--}}
                                     <th>Brand Name</th>
                                     <th>Model Line</th>
                                     <th>Model Details</th>
@@ -1275,7 +1275,7 @@
                 type: 'GET',
                 url: '{{ route('quotation.getmodeldescription', ['modelLineId' => '__modelLineId__','type'=>'SP']) }}'
                     .replace('__modelLineId__', modelLineId),
-                success: function(response) { console.log(response);
+                success: function(response) {
                     $.each(response, function(key, value) {
                         $('#spare_parts_model_description').append('<option value="' + key + '">' + value + '</option>');
                     });
@@ -1296,7 +1296,7 @@
                 type: 'GET',
                 url: '{{ route('quotation.getmodeldescription', ['modelLineId' => '__modelLineId__','type'=>'SP']) }}'
                     .replace('__modelLineId__', modelLineId),
-                success: function(response) { console.log(response);
+                success: function(response) {
                     $.each(response, function(key, value) {
                         $('#kits_model_description').append('<option value="' + key + '">' + value + '</option>');
                     });
@@ -1335,7 +1335,7 @@
 
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var price = row[10];
+                        var price = row[8];
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                         var price = row[4];
@@ -1368,10 +1368,10 @@
 
                     var combinedValue = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var brand = row[3];
-                        var modelDescription = row[5];
-                        var interiorColor = row[8];
-                        var exteriorColor = row[9];
+                        var brand = row[1];
+                        var modelDescription = row[3];
+                        var interiorColor = row[6];
+                        var exteriorColor = row[7];
                         var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
@@ -1413,7 +1413,7 @@
                 render: function (data, type, row) {
                     var code = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var code = row[6];
+                        var code = row[4];
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
 
@@ -1433,7 +1433,7 @@
                 render: function (data, type, row) {
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var price = row[10];
+                        var price = row[8];
                     }else{
                         var price = row[4];
                     }
@@ -1739,7 +1739,6 @@
             rowData.push($(this).html());
         });
 
-        console.log(rowData);
         var secondTable = $('#dtBasicExample2').DataTable();
 
         if(buttonType == 'Shipping') {
@@ -1886,9 +1885,9 @@
                 var data = response.map(function(vehicle) {
                     var addButton = '<button class="add-button" data-button-type="Vehicle" data-variant-id="'+ variantId +'" >Add</button>';
                     return [
-                        vehicle.id,
+                        // vehicle.id,
                         vehicle.grn_status,
-                        vehicle.vin,
+                        // vehicle.vin,
                         vehicle.brand,
                         vehicle.model_line,
                         vehicle.model_detail,
@@ -1906,9 +1905,9 @@
                 $('#dtBasicExample1').DataTable({
                     data: data,
                     columns: [
-                        { title: 'ID' },
+                        // { title: 'ID' },
                         { title: 'Status' },
-                        { title: 'VIN' },
+                        // { title: 'VIN' },
                         { title: 'Brand Name' },
                         { title: 'Model Line' },
                         { title: 'Model Detail' },
@@ -2107,7 +2106,6 @@
             success: function(response) {
                 var slNo = 0;
                 var data = response.map(function(sparePart) {
-                    console.log(sparePart);
                     slNo = slNo + 1;
                     var addButton = '<button class="add-button" data-button-type="SparePart" data-sparepart-id="' + sparePart.id + '">Add</button>';
                     if(sparePart.addon_description.description != null) {

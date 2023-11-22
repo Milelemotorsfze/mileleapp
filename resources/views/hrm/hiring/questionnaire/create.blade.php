@@ -77,9 +77,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
-    <div class="col-lg-12">
-        <div id="flashMessage"></div>
-    </div>
     @if (count($errors) > 0)
     <div class="alert alert-danger">
         <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -96,7 +93,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         <p><span style="float:right;" class="error">* Required Field</span></p>
     </div>
 
-    <form id="employeeQuestionnaireForm" name="employeeQuestionnaireForm" enctype="multipart/form-data" method="POST" action="">
+    <form id="employeeQuestionnaireForm" name="employeeQuestionnaireForm" enctype="multipart/form-data" method="POST" action="{{route('employee-hiring-questionnaire.store-or-update',$data->id)}}">
+    @csrf
 
         <div class="row">
             <div class=" col-lg-4 col-md-6 col-sm-6 designation-radio-main-div">
@@ -733,17 +731,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
-
-                        <label for="probation_length_in_months" class="form-label"><span class="error">* </span> {{ __('Probation length (months):') }}</label>
+                        <span class="error">* </span>
+                        <label for="probation_length_in_months" class="form-label"> {{ __('Probation length (months):') }}</label>
                         <input type="number" placeholder="Probation length in months" name="probation_length_in_months" class="form-control" id="probation_length_in_months">
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
-
+                        <span class="error">* </span>
                         <label for="probation_pay_amount_in_aed" class="form-label"><span class="error">* </span> {{ __('Probation Pay (AED):') }}</label>
                         <input type="number" placeholder="Probation Pay in AED" name="probation_pay_amount_in_aed" class="form-control" id="probation_pay_amount_in_aed">
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
-
+                        <span class="error">* </span>
                         <label for="incentives_perks_bonus" class="form-label"><span class="error">* </span>{{ __('Incentive, Perks, & Bonus:') }} </label>
                         <input type="text" placeholder="Incentives" name="incentives_perks_bonus" class="form-control" id="incentives_perks_bonus">
                     </div>
@@ -779,15 +777,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
             </div>
         </div>
-
+        </br>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+        </div>
 
     </form>
 </div>
 </br>
-</br>
-<div class="col-lg-12 col-md-12 col-sm-12">
-    <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
-</div>
+
 </br>
 @include('hrm.hiring.hiring_request.createJobPosition')
 @else
@@ -800,17 +798,18 @@ redirect()->route('home')->send();
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
-<script>
+<script type="text/javascript">
     var data = {!!json_encode($data) !!};
 
-    $("#number_of_openings").val(data.number_of_openings);
-    $("#work_time_start").val(data.work_time_start);
-    $("#work_time_end").val(data.work_time_end);
-    $("#salary_range_start_in_aed").val(data.salary_range_start_in_aed);
-    $("#salary_range_end_in_aed").val(data.salary_range_end_in_aed);
-    $("#career_level_id").val(data.experience_level);
-
     $(document).ready(function() {
+
+        $("#number_of_openings").val(data.number_of_openings);
+        $("#work_time_start").val(data.work_time_start);
+        $("#work_time_end").val(data.work_time_end);
+        $("#salary_range_start_in_aed").val(data.salary_range_start_in_aed);
+        $("#salary_range_end_in_aed").val(data.salary_range_end_in_aed);
+        $("#career_level_id").val(data.experience_level);
+
         $('#requested_job_title').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -903,6 +902,23 @@ redirect()->route('home')->send();
         //     },
         //     "Please enter a valid amount "
         // );
+        jQuery.validator.setDefaults({
+            errorClass: "is-invalid",
+            errorElement: "p",
+            errorPlacement: function(error, element) {
+                error.addClass("invalid-feedback font-size-13");
+                if (element.prop("type") === "checkbox") {
+                    error.insertAfter(element.parent("label"));
+                } else if (element.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + element.attr("id") + "-container").parent();
+                    error.insertAfter(element);
+                } else if (element.parent().hasClass('input-group')) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
 
         jQuery.validator.addMethod(
             "money",

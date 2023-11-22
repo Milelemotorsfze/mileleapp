@@ -52,7 +52,6 @@ class EmployeeHiringQuestionnaireController extends Controller
     }
     public function storeOrUpdate(Request $request, $id) {
         $validator = Validator::make($request->all(), [
-            'hiring_request_id' => 'required',
             'designation_type' => 'required',
             'designation_id' => 'required',
             'no_of_years_of_experience_in_specific_job_role' => 'required',
@@ -118,8 +117,9 @@ class EmployeeHiringQuestionnaireController extends Controller
             return redirect()->back()->withInput()->withErrors($validator);
         }
         else {
-            DB::beginTransaction();
-            try {
+            // DB::beginTransaction();
+            // try {
+                dd('let me know when reach here......');
                 $authId = Auth::id();
                 $input = $request->all();
                 $update = EmployeeHiringQuestionnaire::where('hiring_request_id',$id)->first();
@@ -177,13 +177,13 @@ class EmployeeHiringQuestionnaireController extends Controller
                         }
                         else if($request->commission_type == 'percentage') {
                             $update->commission_percentage  = $request->commission_percentage;
-                            $update->commission_amount = NULL;
+                            $update->commission_amount = 0.00;
                         }
                     }
                     else {
                         $update->commission_type  = NULL ;
                         $update->commission_percentage  = NULL;
-                        $update->commission_amount = NULL;
+                        $update->commission_amount = 0.00;
                     }
                     $update->mandatory_skills  = $request->mandatory_skills ;
                     $update->interviewd_by  = $request->interviewd_by ;
@@ -234,6 +234,23 @@ class EmployeeHiringQuestionnaireController extends Controller
                 }
                 else {
                     $input['created_by'] = $authId;
+                    if($request->commission_involved_in_salary == 'yes') {
+                        $input['commission_type']  = $request->commission_type;
+                        if($request->commission_type == 'amount') {
+                            $input['commission_amount']  = $request->commission_amount;
+                            $input['commission_percentage']  = NULL;
+                        }
+                        else if($request->commission_type == 'percentage') {
+                            $input['commission_percentage']  = $request->commission_percentage;
+                            $input['commission_amount'] = 0.00;
+                        }
+                    }
+                    else {
+                        $input['commission_type']  = NULL ;
+                        $input['commission_percentage']  = NULL;
+                        $input['commission_amount'] = 0.00;
+                    }
+                    $input['hiring_request_id'] = $id;
                     $createRequest = EmployeeHiringQuestionnaire::create($input);
                     $createLanguage['questionnaire_id'] = $createRequest->id;
                     if(count($request->language_id) > 0) {
@@ -242,20 +259,20 @@ class EmployeeHiringQuestionnaireController extends Controller
                             $languageCreated = QuestionnaireLanguagePreference::create($createLanguage);
                         }
                     }
-                    $history['hiring_request_id'] = $request->id;
+                    $history['hiring_request_id'] = $id;
                     $history['icon'] = 'icons8-questionnaire-30.png';
                     $history['message'] = 'Employee hiring request questionnaire created by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
                     $createHistory = EmployeeHiringRequestHistory::create($history);
                     (new UserActivityController)->createActivity($createHistory->message);
                     $successMessage = "New Employee Hiring Questionnaire Created Successfully";
                 }
-                DB::commit();
+                // DB::commit();
                 return redirect()->route('employee-hiring-request.index')
                                     ->with('success','New Employee Hiring Request Questionnaire Created Successfully');
-            } 
-            catch (\Exception $e) {
-                DB::rollback();
-            }
+            // } 
+            // catch (\Exception $e) {
+            //     DB::rollback();
+            // }
         }
     }
     public function edit() {
