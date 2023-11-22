@@ -126,6 +126,12 @@ input[type=number]::-webkit-outer-spin-button
     <h4 class="card-title">
       Leads Info
     </h4>
+      @if (Session::has('success'))
+          <div class="alert alert-success" id="success-alert">
+              <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+              {{ Session::get('success') }}
+          </div>
+      @endif
       @can('sales-view')
       <a class="btn btn-sm btn-success float-end" href="{{ route('dailyleads.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
@@ -420,10 +426,10 @@ input[type=number]::-webkit-outer-spin-button
             <div class="col-md-8">
               <div class="input-group">
               <select name = "currency" class="form-select" id="currency-select-negotiation">
-      <option value="AED">AED</option>
-      <option value="USD">USD</option>
-      <option value="EURO">EURO</option>
-    </select>
+                  <option value="AED">AED</option>
+                  <option value="USD">USD</option>
+                  <option value="EURO">EURO</option>
+                </select>
                 <input type="number" class="form-control" id="deal-value-input-negotiation" aria-label="Deal Value">
                 <span class="input-group-text">.00</span>
               </div>
@@ -829,7 +835,7 @@ input[type=number]::-webkit-outer-spin-button
   </div>
   <script>
 function openModalfile(filePath) {
-      const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
+      const baseUrl = "{{ asset('storage/app/public/') }}"; // The base URL to the public storage directory
     const fileUrl = baseUrl + '/' + filePath; // Add a slash between baseUrl and filePath
     console.log('File URL:', fileUrl); // Log the URL to the console
     $('#fileViewer').attr('src', fileUrl);
@@ -1653,6 +1659,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item"href="{{route('qoutation.proforma_invoice',['callId'=> $calls->id]) }}">Quotation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
                                     <li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
