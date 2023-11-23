@@ -506,14 +506,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                 <div class="col-lg-6 designation-radio-main-div">
 
 
-                                    <label for="own_car" class="form-label"><span class="error">* </span>{{ __('Car is accompanied by?') }}</label>
+                                    <label for="own_car" class="form-label"><span class="error">* </span>{{ __('Car accompoanied By?') }}</label>
 
                                     <div class="designation-radio-button">
                                         <label>
-                                            <input type="radio" name="own_car" id="own" value="own"> Own
+                                            <input type="radio" name="own_car" id="own" value="yes"> own
                                         </label>
                                         <label>
-                                            <input type="radio" name="own_car" id="company" value="company"> Company
+                                            <input type="radio" name="own_car" id="company" value="no"> Company
                                         </label>
                                     </div>
                                 </div>
@@ -521,14 +521,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                 <div class="col-lg-6 designation-radio-main-div">
 
 
-                                    <label for="fuel_expenses_by" class="form-label"><span class="error">* </span>{{ __('Fuels Expenses covered by Company?') }}</label>
+                                    <label for="fuel_expenses_by" class="form-label"><span class="error">* </span>{{ __('Fuels Expenses covered by?') }}</label>
 
                                     <div class="designation-radio-button">
                                         <label>
-                                            <input type="radio" name="fuel_expenses_by" id="yes" value="yes"> Yes
+                                            <input type="radio" name="fuel_expenses_by" id="company" value="company"> Company
                                         </label>
                                         <label>
-                                            <input type="radio" name="fuel_expenses_by" id="no" value="no"> No
+                                            <input type="radio" name="fuel_expenses_by" id="own" value="own"> Own
                                         </label>
                                     </div>
                                 </div>
