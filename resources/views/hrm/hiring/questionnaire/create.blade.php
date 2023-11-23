@@ -104,10 +104,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <label for="designation_type" class="form-label"><span class="error">* </span>{{ __('Designation Type:') }}</label>
                         <div class="designation-radio-button">
                             <label>
-                                <input type="radio" name="designation_type" id="prior_designation" value="prior_designation"> Prior Designation
+                                <input type="radio" name="designation_type" id="prior_designations" value="prior_designation"> Prior Designation
                             </label>
                             <label>
-                                <input type="radio" name="designation_type" id="current_designation" value="current_designation"> Current Designation
+                                <input type="radio" name="designation_type" id="current_designations" value="current_designation"> Current Designation
                             </label>
                         </div>
                     </div>
@@ -172,7 +172,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             <div class=" col-lg-4 col-md-6 col-sm-6 designation-radio-main-div">
                 <div class="row ">
-                    <div class="col-lg-12  col-md-12 col-sm-12 ">
+                    <div class="col-lg-12  col-md-12 col-sm-12 col-12">
 
 
                         <label for="hiring_time" class="form-label"><span class="error">* </span>{{ __('Hiring Time:') }}</label>
@@ -189,7 +189,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
             </div>
 
-            <div class=" col-lg-4 col-md-6 col-sm-6 ">
+            <div class=" col-lg-4 col-md-6 col-sm-8 ">
 
                 <label for="work_time" class="form-label"><span class="error">* </span>{{ __('Working Hours:') }}</label>
                 <div class="input-group">
@@ -206,7 +206,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             <div class=" col-lg-4 col-md-6 col-sm-6 ">
                 <label for="education" class="form-label"><span class="error">* </span>{{ __('Education') }}</label>
-                <select name="education" id="education" class="form-control widthinput" onchange="showDiv('otherEducationInputContainer', this)" autofocus>
+                <select name="education" id="education" class="form-control widthinput" autofocus>
                     <option value="" disabled selected>Choose Option</option>
                     <option value="high_school">High School</option>
                     <option value="bachelors">Bachelors</option>
@@ -234,7 +234,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
                 <label for="industry_experience_id" class="form-label"><span class="error">* </span>{{ __('Any specific industry experience') }}</label>
-                <select name="industry_experience_id" id="industry_experience_id" class="form-control widthinput" multiple="true" onchange="showIndustryExpOtherDiv('otherSpecificIndustryExpInputContainer', this)" autofocus>
+                <select name="industry_experience_id" id="industry_experience_id" class="form-control widthinput" multiple="true" autofocus>
                     @foreach($masterSpecificIndustryExperiences as $masterSpecificIndustryExperience)
                     <option value="{{$masterSpecificIndustryExperience->id}}">{{$masterSpecificIndustryExperience->name}}</option>
                     @endforeach
@@ -247,24 +247,35 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             </div>
         </div>
 
-
-
-
         <br />
 
         <div class="maindd">
             <div id="row-container">
                 <div class="row">
+                    <div class="col-lg-4 col-md-8 col-sm-8">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <label for="salary_range" class="form-label"><span class="error">* </span>{{ __('Salary Range Start ') }}</label>
+                                <div class="input-group">
+                                    <input name="salary_range_start_in_aed" id="salary_range_start_in_aed" class="form-control widthinput" placeholder="Start" aria-label="measurement" aria-describedby="basic-addon2">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
-
-                        <label for="salary_range_in_aed" class="form-label"><span class="error">* </span>{{ __('Salary Range (In AED)') }}</label>
-                        <div class="input-group">
-                            <input type="number" placeholder="Min Salary" name="salary_range_start_in_aed" class="form-control" id="salary_range_start_in_aed">
-                            <span class="input-group-text">{{ __('to') }}</span>
-                            <input type="number" placeholder="Max Salary" name="salary_range_end_in_aed" class="form-control" id="salary_range_end_in_aed">
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <label for="salary_range" class="form-label"><span class="error">* </span>{{ __('Salary Range End') }}</label>
+                                <div class="input-group">
+                                    <input name="salary_range_end_in_aed" id="salary_range_end_in_aed" class="form-control widthinput" placeholder="End" aria-label="measurement" aria-describedby="basic-addon2">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
@@ -286,20 +297,29 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </select>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
-
-                        <label for="min_age" class="form-label"><span class="error">* </span>{{ __('Age:') }}</label>
-                        <div class="input-group">
-                            <input type="number" placeholder="From" name="min_age" class="form-control" id="min_age">
-                            <span class="input-group-text">to</span>
-                            <input type="number" placeholder="End" name="max_age" class="form-control" id="max_age">
+                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <label for="age" class="form-label"><span class="error">* </span>{{ __('Age:') }}</label>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">From</span>
+                                    <input type="number" placeholder="From" name="min_age" class="form-control" id="min_age">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">to</span>
+                                    <input type="number" placeholder="End" name="max_age" class="form-control" id="max_age">
+                                </div>
+                            </div>
                         </div>
                     </div>
+
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
                         <label for="language_id" class="form-label"><span class="error">* </span>{{ __('Additional Language(s):') }}</label>
-                        <select name="language_id" id="language_id" class="form-control widthinput" multiple="true" autofocus>
+                        <select name="language_id[]" id="language_id" class="form-control widthinput" multiple autofocus>
                             @foreach($masterLanguages as $Language)
                             <option value="{{$Language->id}}">{{$Language->name}}</option>
                             @endforeach
@@ -310,9 +330,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <div class="row">
 
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
                         <div class="row ">
-                            <div class="col-lg-12  ">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 ">
 
 
                                 <label for="required_to_travel_for_work_purpose" class="form-label"><span class="error">* </span>{{ __('Did he require to travel for work purpose?') }}</label>
@@ -327,11 +347,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             </div>
 
                         </div>
+
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6 designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12 designation-radio-main-div">
                         <div class="row ">
-                            <div class="col-lg-12  ">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 ">
 
 
                                 <label for="requires_multiple_industry_experience" class="form-label"><span class="error">* </span>{{ __('Do candidates require multiple industry experience?') }}</label>
@@ -348,9 +369,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
                         <div class="row ">
-                            <div class="col-lg-12  ">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 ">
 
 
                                 <label for="team_handling_experience_required" class="form-label"><span class="error">* </span>{{ __('Team handling experience is required?') }}</label>
@@ -369,73 +390,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
 
                 <div class="row">
-                    <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
                         <div class="row ">
-                            <div class="col-lg-12 designation-radio-main-div">
-
-
-                                <label for="driving_licence" class="form-label"><span class="error">* </span>{{ __('Driving Lisence Required?') }}</label>
-
-                                <div class="designation-radio-button">
-                                    <label>
-                                        <input type="radio" name="driving_licence" id="yes" value="yes"> Yes
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="driving_licence" id="no" value="no"> No
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- if yes, add radio button for: Own car, Expenses done by ? own or Company -->
-
-                        </div>
-                    </div>
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
-
-                        <div class="drivingLisenceInputContainer" style="display: none">
-                            <div class="row ">
-                                <div class="col-lg-6 designation-radio-main-div">
-
-
-                                    <label for="own_car" class="form-label"><span class="error">* </span>{{ __('Own Car') }}</label>
-
-                                    <div class="designation-radio-button">
-                                        <label>
-                                            <input type="radio" name="own_car" id="yes" value="yes"> Yes
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="own_car" id="no" value="no"> No
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="OwnCarInputContainer" style="display: none">
-                            <div class="row ">
-                                <div class="col-lg-6 designation-radio-main-div">
-
-
-                                    <label for="fuel_expenses_by" class="form-label"><span class="error">* </span>{{ __('Fuels Expenses covered by?') }}</label>
-
-                                    <div class="designation-radio-button">
-                                        <label>
-                                            <input type="radio" name="fuel_expenses_by" id="yes" value="yes"> Yes
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="fuel_expenses_by" id="no" value="no"> No
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
-                        <div class="row ">
-                            <div class="col-lg-12   designation-radio-main-div">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 designation-radio-main-div">
 
 
                                 <label for="required_to_work_on_trial" class="form-label"><span class="error">* </span>{{ __('Is shortlisted candidate require to work on trial ?') }}</label>
@@ -460,59 +417,127 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6 designation-radio-main-div">
-                        <div class="row">
-                            <div class="col-lg-12">
+                    <div class=" col-lg-8 col-md-6 col-sm-12  designation-radio-main-div">
 
-                                <label for="commission_involved_in_salary" class="form-label"><span class="error">* </span>{{ __('Is commission involved along with the salary?') }}</label>
-                                <div class="designation-radio-button">
-                                    <label>
-                                        <input type="radio" name="commission_involved_in_salary" id="yes" value="yes"> Yes
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="commission_involved_in_salary" id="no" value="no"> No
-                                    </label>
+                        <div class="row">
+                            <!-- Left Side -->
+                            <div class="col-lg-6 col-md-12 col-sm-12 designation-radio-main-div">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-12 ">
+                                        <label for="commission_involved_in_salary" class="form-label"><span class="error">* </span>{{ __('Is commission involved along with the salary?') }}</label>
+                                        <div class="designation-radio-button">
+                                            <label>
+                                                <input type="radio" name="commission_involved_in_salary" id="yes" value="yes"> Yes
+                                            </label>
+                                            <label>
+                                                <input type="radio" name="commission_involved_in_salary" id="no" value="no"> No
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12">
-                                    <!-- Dropdown Container -->
-                                    <div class="chooseAmountpercentageDropDownInputContainer" style="display: none;">
-
-                                        <label for="commission_type" class="form-label"><span class="error">* </span>{{ __('Choose Amount or Percentage') }}</label>
-                                        <select name="commission_type" id="commission_type" class="form-control widthinput" onchange="showAmountPercentageInput(this)" autofocus>
-                                            <option value="" disabled selected>Choose Option</option>
-                                            <option value="amount">Amount</option>
-                                            <option value="percentage">Percentage</option>
-                                        </select>
+                            <!-- Right Side -->
+                            <div class="col-lg-6 col-md-12 col-sm-12">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                        <!-- Dropdown Container -->
+                                        <div class="chooseAmountpercentageDropDownInputContainer" style="display: none;">
+                                            <label for="commission_type" class="form-label"><span class="error">* </span>{{ __('Choose Amount or Percentage') }}</label>
+                                            <select name="commission_type" id="commission_type" class="form-control widthinput" onchange="showAmountPercentageInput(this)" autofocus>
+                                                <option value="" disabled selected>Choose Option</option>
+                                                <option value="amount">Amount</option>
+                                                <option value="percentage">Percentage</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- Amount Input Container -->
-                                <div class="col-lg-12 col-md-12 col-sm-12 amountpercentageDropDownInputContainer">
-                                    <div class="amountInputContainer" id="amountInputContainer" style="display: none">
-
-                                        <label for="commission_amount" class="form-label"><span class="error">* </span>{{ __('Enter Amount (in AED):') }}</label>
-                                        <input type="number" placeholder="amount" name="commission_amount" class="form-control" id="commission_amount">
+                                    <!-- Amount Input Container -->
+                                    <div class="col-lg-12 col-md-12 col-sm-12 amountpercentageDropDownInputContainer">
+                                        <div class="amountInputContainer" id="amountInputContainer" style="display: none">
+                                            <label for="commission_amount" class="form-label"><span class="error">* </span>{{ __('Enter Amount (in AED):') }}</label>
+                                            <input type="number" placeholder="amount" name="commission_amount" class="form-control" id="commission_amount">
+                                        </div>
                                     </div>
 
                                     <!-- Percentage Input Container -->
-                                    <div class="percentageInputContainer" id="percentageInputContainer" style="display: none">
-
-                                        <label for="commission_percentage" class="form-label"><span class="error">* </span>{{ __('Enter percentage:') }}</label>
-                                        <input type="number" placeholder="percentage" name="commission_percentage" class="form-control" id="commission_percentage">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 amountpercentageDropDownInputContainer">
+                                        <div class="percentageInputContainer" id="percentageInputContainer" style="display: none">
+                                            <label for="commission_percentage" class="form-label"><span class="error">* </span>{{ __('Enter percentage:') }}</label>
+                                            <input type="number" placeholder="percentage" name="commission_percentage" class="form-control" id="commission_percentage">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
 
 
+
                 </div>
 
+
+                <div class="row">
+                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
+                        <div class="row ">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 designation-radio-main-div">
+
+
+                                <label for="driving_licence" class="form-label"><span class="error">* </span>{{ __('Driving Licence Required?') }}</label>
+
+                                <div class="designation-radio-button">
+                                    <label>
+                                        <input type="radio" name="driving_licence" id="yes" value="yes"> Yes
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="driving_licence" id="no" value="no"> No
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- if yes, add radio button for: Own car, Expenses done by ? own or Company -->
+
+                        </div>
+                    </div>
+
+                    <div class=" col-lg-8 col-md-6 col-sm-12 ">
+
+                        <div class="drivingLisenceInputContainer" style="display: none">
+                            <div class="row ">
+                                <div class="col-lg-6 designation-radio-main-div">
+
+
+                                    <label for="own_car" class="form-label"><span class="error">* </span>{{ __('Car is accompanied by?') }}</label>
+
+                                    <div class="designation-radio-button">
+                                        <label>
+                                            <input type="radio" name="own_car" id="own" value="own"> Own
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="own_car" id="company" value="company"> Company
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 designation-radio-main-div">
+
+
+                                    <label for="fuel_expenses_by" class="form-label"><span class="error">* </span>{{ __('Fuels Expenses covered by Company?') }}</label>
+
+                                    <div class="designation-radio-button">
+                                        <label>
+                                            <input type="radio" name="fuel_expenses_by" id="yes" value="yes"> Yes
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="fuel_expenses_by" id="no" value="no"> No
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
 
 
 
@@ -584,7 +609,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
 
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
                         <div class="row ">
                             <div class="col-lg-12  ">
 
@@ -605,7 +630,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
                         <div class="row ">
                             <div class="col-lg-12  ">
 
@@ -644,17 +669,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                 </div>
 
+
+
                 <div class="row">
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
-
+                    <div class="col-lg-4 col-md-6 col-sm-6">
                         <label for="current_or_past_employer_size_start" class="form-label"><span class="error">* </span>{{ __('Current or Past Employer Size:') }}</label>
-                        <div class="input-group">
-                            <input type="number" placeholder="From" name="current_or_past_employer_size_start" class="form-control" id="current_or_past_employer_size_start">
-                            <span class="input-group-text">to</span>
-                            <input type="number" placeholder="Till" name="current_or_past_employer_size_end" class="form-control" id="current_or_past_employer_size_end">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">From</span>
+                                    <input type="number" placeholder="From" name="current_or_past_employer_size_start" class="form-control" id="current_or_past_employer_size_start">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">to</span>
+                                    <input type="number" placeholder="Till" name="current_or_past_employer_size_end" class="form-control" id="current_or_past_employer_size_end">
+                                </div>
+                            </div>
                         </div>
                     </div>
+
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
@@ -666,7 +702,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                 <div class="row">
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
                         <div class="row ">
                             <div class="col-lg-12  ">
 
@@ -685,7 +721,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
                         <div class="row ">
                             <div class="col-lg-12  ">
 
@@ -704,7 +740,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
                         <div class="row ">
                             <div class="col-lg-12  ">
 
@@ -800,6 +836,36 @@ redirect()->route('home')->send();
         $("#salary_range_end_in_aed").val(data.salary_range_end_in_aed);
         $("#career_level_id").val(data.experience_level);
 
+        $('#submit-button').click(function(e) {
+            e.preventDefault();
+
+            // Reset error messages
+            $('#form-errors').text('');
+
+            var variantIds = $('input[name="variant_id[]"]').map(function() {
+                return $(this).val();
+            }).get();
+
+            if (variantIds.length === 0) {
+                $('#form-errors').text('Please select variant quantity and add vehicles.');
+                formValid = false;
+            } else {
+                formValid = true;
+                checkDuplicateVIN();
+            }
+
+            // Additional validations
+            var poNumber = $('#po_number').val();
+            if (poNumber === '') {
+                $('#form-errors').append('<p>This field is required for PO Number.</p>');
+                formValid = false;
+            }
+
+            if (formValid) {
+                $('#po-create-form').unbind('submit').submit();
+            }
+        });
+
         $('#requested_job_title').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -831,7 +897,7 @@ redirect()->route('home')->send();
             placeholder: "Choose Your Nationality",
         });
         $('#language_id').select2({
-            allowClear: true,
+            minimumResultsForSearch: -1,
             placeholder: "Choose Additional Languages",
         });
         $('#interviewd_by').select2({
@@ -859,6 +925,15 @@ redirect()->route('home')->send();
             maximumSelectionLength: 1,
             placeholder: "Choose Next Career Path",
         });
+
+
+        $('#language_id').on('change', function() {
+        var selectedValues = $(this).val();
+        console.log("Selected Language IDs:", selectedValues);
+    });
+
+
+
         // Show/hide amountPercentageInputContainer based on radio button selection
         $('input[name="required_to_work_on_trial"]').change(function() {
             if ($(this).val() === 'yes') {
@@ -875,13 +950,7 @@ redirect()->route('home')->send();
                 $('.drivingLisenceInputContainer').hide();
             }
         });
-        $('input[name="own_car"]').change(function() {
-            if ($(this).val() === 'yes') {
-                $('.OwnCarInputContainer').show();
-            } else {
-                $('.OwnCarInputContainer').hide();
-            }
-        });
+
         $('input[name="commission_involved_in_salary"]').change(function() {
             if ($(this).val() === 'yes') {
                 $('.chooseAmountpercentageDropDownInputContainer').show();
@@ -994,6 +1063,24 @@ redirect()->route('home')->send();
             "Please enter a valid number"
         );
 
+        jQuery.validator.addMethod(
+            "timeDifferenceValidate",
+            function(value, element, params) {
+                var startTime = $(params[0]).val();
+                var endTime = value;
+
+                var timeDifference = calculateTimeDifference(startTime, endTime);
+                return timeDifference >= 9;
+            },
+            "The time difference must be greater than or equal to 9 hours"
+        );
+
+        function calculateTimeDifference(startTime, endTime) {
+            var start = new Date("01/01/2023 " + startTime);
+            var end = new Date("01/01/2023 " + endTime);
+            var timeDifference = Math.abs(end - start) / 36e5;
+            return timeDifference;
+        }
 
         $('#employeeQuestionnaireForm').validate({
             rules: {
@@ -1025,6 +1112,7 @@ redirect()->route('home')->send();
                 },
                 work_time_end: {
                     required: true,
+                    timeDifferenceValidate: ["#work_time_start"]
                 },
                 specific_company_experience: {
                     required: true,
@@ -1064,6 +1152,7 @@ redirect()->route('home')->send();
                 },
                 language_id: {
                     required: true,
+                    array: true,
                 },
                 required_to_travel_for_work_purpose: {
                     required: true,
@@ -1121,7 +1210,7 @@ redirect()->route('home')->send();
                 fuel_expenses_by: {
                     required: {
                         function(element) {
-                            return $('input[name="own_car"]:checked').val() === 'yes';
+                            return $('input[name="driving_licence"]:checked').val() === 'yes';
                         }
                     },
                 },
@@ -1220,24 +1309,15 @@ redirect()->route('home')->send();
 </script>
 
 <script>
-    function showDiv(divId, element) {
-        document.getElementById(divId).style.display = element.value == 0 ? 'block' : 'none';
-    }
 
-    function showIndustryExpOtherDiv(divId, element) {
-        document.getElementById(divId).style.display = element.value == 5 ? 'block' : 'none';
-    }
-
-    // function showAmountPercentageInput(element) {
-    //     var selectedValue = element.value;
-    //     document.getElementById('amountInputContainer').style.display = selectedValue == '1' ? 'block' : 'none';
-    //     document.getElementById('percentageInputContainer').style.display = selectedValue == '2' ? 'block' : 'none';
-    // }
-
-    function showAmountPercentageInput(element) {
-        var selectedValue = element.value;
-        document.getElementById('amountInputContainer').style.display = selectedValue == 'amount' ? 'block' : 'none';
-        document.getElementById('percentageInputContainer').style.display = selectedValue == 'percentage' ? 'block' : 'none';
-    }
+    document.addEventListener("DOMContentLoaded", function() {
+        function showAmountPercentageInput(element) {
+            var selectedValue = element.value;
+            document.getElementById('amountInputContainer').style.display = selectedValue == 'amount' ? 'block' : 'none';
+            document.getElementById('percentageInputContainer').style.display = selectedValue == 'percentage' ? 'block' : 'none';
+        }
+    });
 </script>
+
+
 @endpush
