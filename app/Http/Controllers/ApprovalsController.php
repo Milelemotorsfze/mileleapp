@@ -656,11 +656,11 @@ class ApprovalsController extends Controller
             }
             else if($fuel_type == "PHEV") 
             {
-                $f = "P";
+                $f = "PH";
             }
             else if($fuel_type == "MHEV") 
             {
-                $f = "M";
+                $f = "MH";
             }
             else
             {
@@ -724,11 +724,11 @@ class ApprovalsController extends Controller
         }
         else if($fuel_type == "PHEV") 
         {
-            $f = "P";
+            $f = "PH";
         }
         else if($fuel_type == "MHEV") 
         {
-            $f = "M";
+            $f = "MH";
         }
         else
         {
@@ -783,11 +783,11 @@ class ApprovalsController extends Controller
         }
         else if($fuel_type == "PHEV") 
         {
-            $f = "P";
+            $f = "PH";
         }
         else if($fuel_type == "MHEV") 
         {
-            $f = "M";
+            $f = "MH";
         }
         else
         {
@@ -818,11 +818,11 @@ class ApprovalsController extends Controller
             }
             else if($fuel_type == "PHEV") 
             {
-                $f = "P";
+                $f = "PH";
             }
             else if($fuel_type == "MHEV") 
             {
-                $f = "M";
+                $f = "MH";
             }
             else
             {

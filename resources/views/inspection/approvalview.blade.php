@@ -321,27 +321,27 @@
             <ul class="list-group">
             <input type="hidden" id="vehicle_id" value="{{ $inspection->vehicle_id }}">
             <li class="list-group-item">
-    @if ($extraItems->contains('item_name', 'sparewheel'))
-        <input type="checkbox" id="sparewheel" name="sparewheel" checked>
-        <label for="sparewheel">Spare Wheel</label>
-        <input class="form-control" type="hidden" name="sparewheel_qty" value="{{ $extraItems->where('item_name', 'sparewheel')->first()->qty }}" placeholder="Qty">
+    @if ($extraItems->contains('item_name', 'packing'))
+        <input type="checkbox" id="packing" name="packing" checked>
+        <label for="packing">Packing Box</label>
+        <input class="form-control" type="hidden" name="packing_qty" value="{{ $extraItems->where('item_name', 'packing')->first()->qty }}" placeholder="Qty">
     @else
-        <input type="checkbox" id="sparewheel" name="sparewheel">
-        <label for="sparewheel">Spare Wheel</label>
-        <input class="form-control" type="hidden" name="sparewheel_qty" placeholder="Qty">
+        <input type="checkbox" id="packing" name="packing">
+        <label for="packing">Spare Wheel</label>
+        <input class="form-control" type="hidden" name="packing_qty" placeholder="Qty">
     @endif
 </li>
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'jack'))
-                    <input type="checkbox" id="jack" name="jack" checked>
-                    <label for="jack">Jack</label>
-                    <input class="form-control" type="hidden" name="jack_qty" value="{{ $extraItems->where('item_name', 'jack')->first()->qty }}" placeholder="Qty">
+                @if ($extraItems->contains('item_name', 'warningtriangle'))
+                    <input type="checkbox" id="warningtriangle" name="warningtriangle" checked>
+                    <label for="warningtriangle">Warning Triangle</label>
+                    <input class="form-control" type="hidden" name="jack_qty" value="{{ $extraItems->where('item_name', 'warningtriangle')->first()->qty }}" placeholder="Qty">
                 @else
-                <input type="checkbox" id="jack" name="jack">
-                    <label for="jack">Jack</label>
-                    <input class="form-control" type="hidden" name="jack_qty" placeholder="Qty">
+                <input type="checkbox" id="warningtriangle" name="warningtriangle">
+                    <label for="warningtriangle">Warning Triangle</label>
+                    <input class="form-control" type="hidden" name="warningtriangle_qty" placeholder="Qty">
                 @endif
                 </li>
                 </div>
@@ -349,11 +349,11 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'wheel'))
                     <input type="checkbox" id="wheel" name="wheel" checked>
-                    <label for="wheel">Wheel Spanner</label>
+                    <label for="wheel">Jack & Wheel Spanner</label>
                     <input class="form-control" type="hidden" name="wheel_qty" value="{{ $extraItems->where('item_name', 'wheel')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="wheel" name="wheel">
-                    <label for="wheel">Wheel Spanner</label>
+                    <label for="wheel">Jack & Wheel Spanner</label>
                     <input  class="form-control" type="hidden" name="wheel_qty" placeholder="Qty">
                     @endif
                 </li>
@@ -416,14 +416,14 @@
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'wheelrim'))
-                    <input type="checkbox" id="wheelrim" name="wheelrim" checked>
-                    <label for="wheelrim">Wheel Rim / Tyres</label>
-                    <input class="form-control" type="hidden" name="wheelrim_qty" value="{{ $extraItems->where('item_name', 'wheelrim')->first()->qty }}" placeholder="Qty">
+                @if ($extraItems->contains('item_name', 'trunkcover'))
+                    <input type="checkbox" id="trunkcover" name="trunkcover" checked>
+                    <label for="trunkcover">Trunk Cover</label>
+                    <input class="form-control" type="hidden" name="trunkcover_qty" value="{{ $extraItems->where('item_name', 'trunkcover')->first()->qty }}" placeholder="Qty">
                     @else
-                    <input type="checkbox" id="wheelrim" name="wheelrim">
-                    <label for="wheelrim">Wheel Rim / Tyres</label>
-                    <input class="form-control" type="hidden" name="wheelrim_qty" placeholder="Qty">
+                    <input type="checkbox" id="trunkcover" name="trunkcover">
+                    <label for="trunkcover">Trunk Cover</label>
+                    <input class="form-control" type="hidden" name="trunkcover_qty" placeholder="Qty">
                     @endif
                 </li>
                 </div>
@@ -437,47 +437,6 @@
                     <input type="checkbox" id="fire_extinguisher" name="fire_extinguisher">
                     <label for="fire_extinguisher">Fire Extinguisher</label>
                     <input class="form-control" type="hidden" name="fire_extinguisher_qty" placeholder="Qty">
-                    @endif
-                </li>
-            </ul>
-        </div>
-        <div class="col-md-2">
-            <ul class="list-group">
-                <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'sd_card'))
-                    <input type="checkbox" id="sd_card" name="sd_card" checked>
-                    <label for="sd_card">SD Card / Remote / H Phones</label>
-                    <input class="form-control" type="hidden" name="sd_card_qty" value="{{ $extraItems->where('item_name', 'sd_card')->first()->qty }}" placeholder="Qty">
-                    @else
-                    <input type="checkbox" id="sd_card" name="sd_card">
-                    <label for="sd_card">SD Card / Remote / H Phones</label>
-                    <input class="form-control" type="hidden" name="sd_card_qty" placeholder="Qty">
-                    @endif
-                </li>
-                </div>
-        <div class="col-md-2">
-                <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'ac_system'))
-                    <input type="checkbox" id="ac_system" name="ac_system" checked>
-                    <label for="ac_system">A/C System</label>
-                    <input class="form-control" type="hidden" name="ac_system_qty" value="{{ $extraItems->where('item_name', 'ac_system')->first()->qty }}" placeholder="Qty">
-                    @else
-                    <input type="checkbox" id="ac_system" name="ac_system">
-                    <label for="ac_system">A/C System</label>
-                    <input class="form-control" type="hidden" name="ac_system_qty" placeholder="Qty">
-                    @endif
-                </li>
-                </div>
-                <div class="col-md-2">
-                <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'dash_board'))
-                    <input type="checkbox" id="dash_board" name="dash_board" checked>
-                    <label for="dash_board">Dash Board / T Screen / LCD</label>
-                    <input class="form-control" type="hidden" name="dash_board_qty" value="{{ $extraItems->where('item_name', 'dash_board')->first()->qty }}" placeholder="Qty">
-                    @else
-                    <input type="checkbox" id="dash_board" name="dash_board">
-                    <label for="dash_board">Dash Board / T Screen / LCD</label>
-                    <input class="form-control" type="hidden" name="dash_board_qty" placeholder="Qty">
                     @endif
                 </li>
             </ul>
@@ -500,24 +459,24 @@
         <div class="col-md-2">
             <ul class="list-group">
             <li class="list-group-item">
-                    @if ($extraItems->contains('item_name', 'sparewheel'))
+                    @if ($extraItems->contains('item_name', 'packing'))
                         <i class="fas fa-check-circle text-success"></i>
-                        <span>{{ $extraItems->where('item_name', 'sparewheel')->first()->qty }}</span>
+                        <span>{{ $extraItems->where('item_name', 'packing')->first()->qty }}</span>
                     @else
                         <i class="fas fa-times-circle text-danger"></i>
                     @endif
-                    <label for="loss_item_1">Spare Wheel</label>
+                    <label for="loss_item_1">Packing Box</label>
                 </li>
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'jack'))
+                @if ($extraItems->contains('item_name', 'warningtriangle'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'jack')->first()->qty }}</span>
+                    <span>{{ $extraItems->where('item_name', 'warningtriangle')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
-                    <label for="loss_item_2">Jack</label>
+                    <label for="loss_item_2">Warning Triangle</label>
                 </li>
                 </div>
         <div class="col-md-2">
@@ -581,13 +540,13 @@
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'wheelrim'))
+                @if ($extraItems->contains('item_name', 'trunkcover'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'wheelrim')->first()->qty }}</span>
+                    <span>{{ $extraItems->where('item_name', 'trunkcover')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
-                    <label for="loss_item_8">Wheel Rim / Tyres</label>
+                    <label for="loss_item_8">Trunk Cover</label>
                 </li>
                 </div>
         <div class="col-md-2">
@@ -599,41 +558,6 @@
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
                     <label for="loss_item_9">Fire Extinguisher</label>
-                </li>
-            </ul>
-        </div>
-        <div class="col-md-2">
-            <ul class="list-group">
-                <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'sd_card'))
-                    <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'sd_card')->first()->qty }}</span>
-                @else
-                    <i class="fas fa-times-circle text-danger"></i>
-                @endif
-                    <label for="loss_item_10">SD Card / Remote / H Phones</label>
-                </li>
-                </div>
-        <div class="col-md-2">
-                <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'ac_system'))
-                    <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'ac_system')->first()->qty }}</span>
-                @else
-                    <i class="fas fa-times-circle text-danger"></i>
-                @endif
-                    <label for="loss_item_11">A/C System</label>
-                </li>
-                </div>
-        <div class="col-md-2">
-                <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'dash_board'))
-                    <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'dash_board')->first()->qty }}</span>
-                @else
-                    <i class="fas fa-times-circle text-danger"></i>
-                @endif
-                    <label for="loss_item_12">Dash Board / T Screen / LCD</label>
                 </li>
             </ul>
         </div>

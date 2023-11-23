@@ -17,42 +17,33 @@
              @method('PUT')
             @csrf
                             <div class="row">
+                            <input type="hidden" name="brands_id" value="{{ $brandname->id }}">
+                            <input type="hidden" name="master_model_lines_id" value="{{ $model_line->id }}">
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Brand</label>
-                                    <select class="form-control" autofocus name="brands_id" id="brand">
-                                        @foreach($brands as $brand)
-                                            <option value="{{ $brand->id }}" {{ old('brands_id') == $brand->id ? 'selected' : '' }}>
-                                                {{ $brand->brand_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <select class="form-control" autofocus name="brands_id" id="brand" disabled>
+                                    @foreach($brands as $brand)
+                                    <option value="{{ $brand->id }}" {{ $brand->id == $brandname->id ? 'selected' : '' }}>
+                                        {{ $brand->brand_name }}
+                                    </option>
+                                @endforeach
+                                    </select> 
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Model Line</label>
-                                    <select class="form-control" autofocus name="master_model_lines_id" id="model">
+                                    <select class="form-control" autofocus name="master_model_lines_id" id="model" disabled>
                                     <option value="" disabled selected>Select a Model Line</option>
-                                        @foreach($masterModelLines as $masterModelLine)
-                                            <option value="{{ $masterModelLine->id }}" {{ old('master_model_lines_id') == $masterModelLine->id ? 'selected' : '' }}>
-                                                {{ $masterModelLine->model_line }}
-                                            </option>
-                                        @endforeach
+                                    @foreach($masterModelLines as $masterModelLine)
+                                    <option value="{{ $masterModelLine->id }}" {{ $masterModelLine->id == $model_line->id ? 'selected' : '' }}>
+                                        {{ $masterModelLine->model_line }}
+                                    </option>
+                                @endforeach
                                     </select>
                                 </div>
                             </div>
-                            <!-- <div class="col-lg-2 col-md-6 col-sm-12" id="coo">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">COO</label>
-                                    <select class="form-control coo" name="coo" id="coo">
-                                        <option value="" disabled selected>Select Country</option>
-                                        @foreach ($countries as $country)
-                                        <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div> -->
                             <div class="col-lg-2 col-md-6 col-sm-12" id="my">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Model Year</label>
@@ -68,15 +59,6 @@
                                     </select>
                                 </div>
                             </div>
-                            <!-- <div class="col-lg-2 col-md-6 col-sm-12" id="drive_train">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Drive Train</label>
-                                    <select class="form-control" autofocus name="drive_train" id="drive_train">
-                                        <option value="Auto" {{ old('drive_train') == 'AWD' ? 'selected' : '' }}>AWD</option>
-                                        <option value="Manual" {{ old('geadrive_trainrbox') == 'RWD' ? 'selected' : '' }}>RWD</option>
-                                    </select>
-                                </div>
-                            </div> -->
                             <div class="col-lg-2 col-md-6 col-sm-12" id="gear">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Gear</label>
@@ -184,22 +166,22 @@
         <div class="col-md-2">
             <ul class="list-group">
                 <li class="list-group-item">
-                    <input type="checkbox" id="loss_item_1" name="sparewheel">
-                    <label for="loss_item_1">Spare Wheel</label>
-                    <input type="hidden" class="form-control" name="sparewheel_qty" placeholder="Qty">
+                    <input type="checkbox" id="loss_item_1" name="packing">
+                    <label for="loss_item_1">Packing Box</label>
+                    <input type="hidden" class="form-control" name="packing_qty" placeholder="Qty">
                 </li>
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
-                    <input type="checkbox" id="loss_item_2" name="jack">
-                    <label for="loss_item_2">Jack</label>
-                    <input type="hidden" class="form-control" name="jack_qty" placeholder="Qty">
+                    <input type="checkbox" id="loss_item_2" name="warningtriangle">
+                    <label for="loss_item_2">Warning Triangle</label>
+                    <input type="hidden" class="form-control" name="warningtriangle_qty" placeholder="Qty">
                 </li>
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
                     <input type="checkbox" id="loss_item_3" name="wheel">
-                    <label for="loss_item_3">Wheel Spanner</label>
+                    <label for="loss_item_3">Jack & Wheel Spanner</label>
                     <input type="hidden" class="form-control" name="wheel_qty" placeholder="Qty">
                 </li>
             </ul>
@@ -208,7 +190,7 @@
             <ul class="list-group">
                 <li class="list-group-item">
                     <input type="checkbox" id="loss_item_4" name="firstaid">
-                    <label for="loss_item_4">First Aid Kit / Packing Box</label>
+                    <label for="loss_item_4">First Aid Kit</label>
                     <input type="hidden" class="form-control" name="firstaid_qty" placeholder="Qty">
                 </li>
                 </div>
@@ -237,9 +219,9 @@
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
-                    <input type="checkbox" id="loss_item_8" name="wheelrim">
-                    <label for="loss_item_8">Wheel Rim / Tyres</label>
-                    <input type="hidden" class="form-control" name="wheelrim_qty" placeholder="Qty">
+                    <input type="checkbox" id="loss_item_8" name="trunkcover">
+                    <label for="loss_item_8">Trunk Cover</label>
+                    <input type="hidden" class="form-control" name="trunkcover_qty" placeholder="Qty">
                 </li>
                 </div>
         <div class="col-md-2">
@@ -247,29 +229,6 @@
                     <input type="checkbox" id="loss_item_9" name="fire_extinguisher">
                     <label for="loss_item_9">Fire Extinguisher</label>
                     <input type="hidden" class="form-control" name="fire_extinguisher_qty" placeholder="Qty">
-                </li>
-            </ul>
-        </div>
-        <div class="col-md-2">
-            <ul class="list-group">
-                <li class="list-group-item">
-                    <input type="checkbox" id="loss_item_10" name="sd_card">
-                    <label for="loss_item_10">SD Card / Remote / H Phones</label>
-                    <input type="hidden" class="form-control" name="sd_card_qty" placeholder="Qty">
-                </li>
-                </div>
-        <div class="col-md-2">
-                <li class="list-group-item">
-                    <input type="checkbox" id="loss_item_11" name="ac_system">
-                    <label for="loss_item_11">A/C System</label>
-                    <input type="hidden" class="form-control" name="ac_system_qty" placeholder="Qty">
-                </li>
-                </div>
-        <div class="col-md-2">
-                <li class="list-group-item">
-                    <input type="checkbox" id="loss_item_12" name="dash_board">
-                    <label for="loss_item_12">Dash Board / T Screen / LCD</label>
-                    <input type="hidden" class="form-control" name="dash_board_qty" placeholder="Qty">
                 </li>
             </ul>
         </div>
@@ -383,7 +342,7 @@
      </br>
                     <div class="row">
                         <div class="col-md-23">
-                            <label>Extra Features</label>
+                            <label>Extra Features / Items</label>
                             <input type="text" class="form-control" id="extra_features" name="extra_features">
                         </div>
                     </div>
@@ -395,7 +354,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
     </br>
         <div class="col-lg-12 col-md-12">
 				    <input type="submit" id="submit-button" name="submit" value="Submit" class="btn btn-success btncenter" />
@@ -562,7 +520,7 @@
             }
         });
     </script>
-    <script>
+    <!-- <script>
     $(document).ready(function() {
         $('#brand').on('change', function() {
             $('#fuel, #coo, #steering, #gear, #drive_train, #my, #ex, #int, #engine, #Upholstery').hide();
@@ -584,14 +542,14 @@
             });
         });
     });
-</script>
+</script> -->
 <script>
 $(document).ready(function() {
-    $('#fuel, #coo, #steering, #gear, #drive_train, #my, #ex, #int, #engine, #Upholstery').hide();
-    $('#model').on('change', function() {
+    // Function to perform actions based on the selected model line
+    function performModelActions(selectedModelLineId) {
         $('#fuel, #coo, #steering, #gear, #drive_train, #my, #ex, #int, #engine, #Upholstery').show();
-        var selectedModelLineId = $(this).val();
         selectedSpecifications = [];
+
         $.ajax({
             type: 'GET',
             url: '/getSpecificationDetails/' + selectedModelLineId,
@@ -599,14 +557,17 @@ $(document).ready(function() {
                 var data = response.data;
                 $('#specification-details-container').empty();
                 var selectedSpecifications = [];
+
                 data.forEach(function(item) {
                     var specification = item.specification;
                     var options = item.options;
                     var select = $('<select class="form-control" name="specification_' + specification.id + '"data-specification-id="' + specification.id + '">');
                     select.append('<option value="" disabled selected>Select an Option</option>');
+
                     options.forEach(function(option) {
                         select.append('<option value="' + option.id + '">' + option.name + '</option>');
                     });
+
                     select.on('change', function() {
                         var selectedValue = $(this).val();
                         selectedSpecifications.push({
@@ -615,6 +576,7 @@ $(document).ready(function() {
                         });
                         $('#selected_specifications').val(JSON.stringify(selectedSpecifications));
                     });
+
                     var specificationColumn = $('<div class="col-lg-4 mb-3">');
                     specificationColumn.append('<label class="form-label">' + specification.name + '</label');
                     specificationColumn.append(select);
@@ -622,7 +584,16 @@ $(document).ready(function() {
                 });
             }
         });
+
         $('#selected_model_id').val(selectedModelLineId);
+    }
+
+    // Call the function on page load
+    performModelActions($('#model').val());
+
+    // Bind the function to the change event of the model dropdown
+    $('#model').on('change', function() {
+        performModelActions($(this).val());
     });
 });
 </script>

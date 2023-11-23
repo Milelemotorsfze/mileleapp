@@ -384,7 +384,7 @@
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'grn_number', name: 'grn.grn_number' },
                 { data: 'created_ats', name: 'inspection.created_at' },
-                { data: 'remark', name: 'inspection.remark' },  
+                { data: 'inspectionremark', name: 'inspection.remark' },  
                 { data: 'processing_date', name: 'inspection.processing_date' },
                 { data: 'process_remarks', name: 'inspection.process_remarks' }, 
                 { data: 'so_date', name: 'so.so_date' },

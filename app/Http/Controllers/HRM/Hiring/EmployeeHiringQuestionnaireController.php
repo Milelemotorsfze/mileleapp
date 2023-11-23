@@ -51,6 +51,7 @@ class EmployeeHiringQuestionnaireController extends Controller
         'interviewdByUsers','masterRecuritmentSources','masterDepartments','masterExperienceLevels','masterSpecificIndustryExperiences','masterOfficeLocations'));
     }
     public function storeOrUpdate(Request $request, $id) {
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'designation_type' => 'required',
             'designation_id' => 'required',
@@ -90,8 +91,8 @@ class EmployeeHiringQuestionnaireController extends Controller
             'screening_questions' => 'required',
             'technical_test' => 'required',
             'trial_work_job_description' => 'required',
-            'internal_department_evaluation' => 'required',
-            'external_vendor_evaluation' => 'required',
+            // 'internal_department_evaluation' => 'required',
+            // 'external_vendor_evaluation' => 'required',
             'recruitment_source_id' => 'required',
             'experience' => 'required',
             'travel_experience' => 'required',
@@ -119,7 +120,7 @@ class EmployeeHiringQuestionnaireController extends Controller
         else {
             // DB::beginTransaction();
             // try {
-                dd('let me know when reach here......');
+                // dd('let me know when reach here......');
                 $authId = Auth::id();
                 $input = $request->all();
                 $update = EmployeeHiringQuestionnaire::where('hiring_request_id',$id)->first();
