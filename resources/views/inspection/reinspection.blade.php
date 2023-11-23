@@ -470,24 +470,24 @@
         <div class="col-md-2">
             <ul class="list-group">
             <li class="list-group-item">
-                    @if ($extraItems->contains('item_name', 'sparewheel'))
+                    @if ($extraItems->contains('item_name', 'packing'))
                         <i class="fas fa-check-circle text-success"></i>
-                        <span>{{ $extraItems->where('item_name', 'sparewheel')->first()->qty }}</span>
+                        <span>{{ $extraItems->where('item_name', 'packing')->first()->qty }}</span>
                     @else
                         <i class="fas fa-times-circle text-danger"></i>
                     @endif
-                    <label for="loss_item_1">Spare Wheel</label>
+                    <label for="loss_item_1">Packing Box</label>
                 </li>
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'jack'))
+                @if ($extraItems->contains('item_name', 'warningtriangle'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'jack')->first()->qty }}</span>
+                    <span>{{ $extraItems->where('item_name', 'warningtriangle')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
-                    <label for="loss_item_2">Jack</label>
+                    <label for="loss_item_2">Warning Triangle</label>
                 </li>
                 </div>
         <div class="col-md-2">
@@ -498,7 +498,7 @@
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
-                    <label for="loss_item_3">Wheel Spanner</label>
+                    <label for="loss_item_3">Jack & Wheel Spanner</label>
                 </li>
             </ul>
         </div>
@@ -551,13 +551,13 @@
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'wheelrim'))
+                @if ($extraItems->contains('item_name', 'trunkcover'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'wheelrim')->first()->qty }}</span>
+                    <span>{{ $extraItems->where('item_name', 'trunkcover')->first()->qty }}</span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
-                    <label for="loss_item_8">Wheel Rim / Tyres</label>
+                    <label for="loss_item_8">Trunk Cover</label>
                 </li>
                 </div>
         <div class="col-md-2">
@@ -569,41 +569,6 @@
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
                     <label for="loss_item_9">Fire Extinguisher</label>
-                </li>
-            </ul>
-        </div>
-        <div class="col-md-2">
-            <ul class="list-group">
-                <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'sd_card'))
-                    <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'sd_card')->first()->qty }}</span>
-                @else
-                    <i class="fas fa-times-circle text-danger"></i>
-                @endif
-                    <label for="loss_item_10">SD Card / Remote / H Phones</label>
-                </li>
-                </div>
-        <div class="col-md-2">
-                <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'ac_system'))
-                    <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'ac_system')->first()->qty }}</span>
-                @else
-                    <i class="fas fa-times-circle text-danger"></i>
-                @endif
-                    <label for="loss_item_11">A/C System</label>
-                </li>
-                </div>
-        <div class="col-md-2">
-                <li class="list-group-item">
-                @if ($extraItems->contains('item_name', 'dash_board'))
-                    <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'dash_board')->first()->qty }}</span>
-                @else
-                    <i class="fas fa-times-circle text-danger"></i>
-                @endif
-                    <label for="loss_item_12">Dash Board / T Screen / LCD</label>
                 </li>
             </ul>
         </div>

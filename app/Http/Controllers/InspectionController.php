@@ -226,7 +226,7 @@ class InspectionController extends Controller
                     'vehicles.ppmmyyy',
                     DB::raw("DATE_FORMAT(inspection.processing_date, '%d-%b-%Y') as processing_date"),
                     'inspection.process_remarks',
-                    'inspection.remark',
+                    DB::raw("CONVERT(REPLACE(REPLACE(`inspection`.`remark`, '<p>', ''), '</p>', ''), CHAR) as inspectionremark"),
                     DB::raw("DATE_FORMAT(inspection.created_at, '%d-%b-%Y') as created_ats"),
                     'inspection.stage',
                     'vehicles.vin',
@@ -280,8 +280,11 @@ class InspectionController extends Controller
     $countries = CountryListFacade::getList('en');
     $int_colours = ColorCode::where('belong_to', 'int')->get();
     $ext_colours = ColorCode::where('belong_to', 'ex')->get();
+    $variant = Varaint::find($vehicle->varaints_id);
+    $brandname = Brand::find($variant->brands_id);
+    $model_line = MasterModelLines::find($variant->master_model_lines_id);
     $masterModelLines = MasterModelLines::all();
-    return view('inspection.vehicleshow', compact('masterModelLines','countries','brands','ext_colours','int_colours', 'vehicle'));
+    return view('inspection.vehicleshow', compact('masterModelLines','countries','brands','ext_colours','int_colours', 'vehicle', 'brandname', 'model_line'));
     }
     public function update(Request $request, $id)
     {
@@ -331,18 +334,15 @@ class InspectionController extends Controller
         $specification->save();
         }
             $extraItems = [
-                'sparewheel',
-                'jack',
+                'packing',
+                'warningtriangle',
                 'wheel',
                 'firstaid',
                 'floor_mat',
                 'service_book',
                 'keys',
-                'wheelrim',
+                'trunkcover',
                 'fire_extinguisher',
-                'sd_card',
-                'ac_system',
-                'dash_board',
             ];
             foreach ($extraItems as $itemName) {
                 if ($request->has($itemName)) {
@@ -946,18 +946,18 @@ class InspectionController extends Controller
        $inspection->stage = "PDI";
        $inspection->save();
        $pdi = New Pdi();
-       $pdi->checking_item = "Spare Wheel";
-       $pdi->reciving = $request->input('sparewheelr');
+       $pdi->checking_item = "Packing Box";
+       $pdi->reciving = $request->input('packingr');
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->status = $request->input('sparewheel');
+       $pdi->status = $request->input('packing');
        $pdi->save();
        $pdi = New Pdi();
-       $pdi->checking_item = "Jack";
-       $pdi->reciving = $request->input('jackr');
+       $pdi->checking_item = "Warning Triangle";
+       $pdi->reciving = $request->input('warningtriangler');
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->status = $request->input('jack');
+       $pdi->status = $request->input('warningtriangle');
        $pdi->save();
        $pdi = New Pdi();
        $pdi->checking_item = "FIRST AID KIT";
@@ -1000,11 +1000,11 @@ class InspectionController extends Controller
        $pdi->status = $request->input('interior');
        $pdi->save();
        $pdi = New Pdi();
-       $pdi->checking_item = "WHEEL RIM / TYRES";
-       $pdi->reciving = $request->input('wheelrimr');
+       $pdi->checking_item = "TRUNK COVER";
+       $pdi->reciving = $request->input('trunkcoverr');
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->status = $request->input('wheelrim');
+       $pdi->status = $request->input('trunkcover');
        $pdi->save();
        $pdi = New Pdi();
        $pdi->checking_item = "FIRE EXTINGUISHER";
@@ -1012,27 +1012,6 @@ class InspectionController extends Controller
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
        $pdi->status = $request->input('fire_extinguisher');
-       $pdi->save();
-       $pdi = New Pdi();
-       $pdi->checking_item = "SD Card / Remote / H Phones";
-       $pdi->reciving = $request->input('sd_cardr');
-       $pdi->vehicle_id = $vehicle_id;
-       $pdi->inspection_id = $inspection->id;
-       $pdi->status = $request->input('sd_card');
-       $pdi->save();
-       $pdi = New Pdi();
-       $pdi->checking_item = "A/C System";
-       $pdi->reciving = $request->input('ac_systemr');
-       $pdi->vehicle_id = $vehicle_id;
-       $pdi->inspection_id = $inspection->id;
-       $pdi->status = $request->input('ac_system');
-       $pdi->save();
-       $pdi = New Pdi();
-       $pdi->checking_item = "DASHBOARD / T SCREEN / LCD";
-       $pdi->reciving = $request->input('dash_boardr');
-       $pdi->vehicle_id = $vehicle_id;
-       $pdi->inspection_id = $inspection->id;
-       $pdi->status = $request->input('dash_board');
        $pdi->save();
        $pdi = New Pdi();
        $pdi->checking_item = "CAMERA";

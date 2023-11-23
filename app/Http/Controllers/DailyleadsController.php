@@ -501,6 +501,9 @@ public function saveprospecting(Request $request)
 	}
     public function leadspage($calls_id)
     {
-    dd($calls_id);
-    }
+    $calls = Calls::find($calls_id);
+    $prospecting = Prospecting::where('calls_id', $calls_id)->get();
+    $quotation = quotation::where('calls_id', $calls_id)->get();
+    return view('dailyleads.singleleadview', compact('calls', 'prospecting', 'quotation'));
+    }  
 }
