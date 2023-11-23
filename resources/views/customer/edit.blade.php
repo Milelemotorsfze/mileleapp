@@ -40,7 +40,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('customers.update', $customer->id) }}" id="form-update" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('dm-customers.update', $customer->id) }}" id="form-update" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="row">
@@ -84,8 +84,6 @@
                                 <input type="text" class="form-control" name="company_name" placeholder="Enter Company Name" value="{{ old('company_name', $customer->company_name) }}">
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Address</label>
@@ -95,7 +93,27 @@
                         <div class="col-lg-6 col-md-6" id="file-preview">
                         </div>
                     </div>
-                    <div class="col-12 text-center">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-12 col-sm-12 text-center">
+                            <div id="file1-preview">
+                                @if($customer->trade_license_file)
+                                    <h6 class="fw-bold text-center">Trade License</h6>
+                                    <iframe src="{{ url('customers/trade_licenses/' . $customer->trade_license_file) }}" alt="Trade License "></iframe>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-12 col-sm-12 text-center">
+                            <div id="file2-preview">
+                                @if($customer->passport_file)
+                                    <h6 class="fw-bold text-center">Passport</h6>
+                                    <iframe src="{{ url('customers/passports/' . $customer->passport_file) }}" alt="Trade License "></iframe>
+
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 text-center mt-3">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </form>
@@ -105,6 +123,64 @@
 @endsection
 @push('scripts')
     <script>
+
+
+        const fileInputLicense1 = document.querySelector("#file1-upload");
+        const fileInputLicense2 = document.querySelector("#file2-upload");
+
+        const previewFile1 = document.querySelector("#file1-preview");
+        const previewFile2 = document.querySelector("#file2-preview");
+
+        fileInputLicense1.addEventListener("change", function(event) {
+            const files = event.target.files;
+            while (previewFile1.firstChild) {
+                previewFile1.removeChild(previewFile1.firstChild);
+            }
+
+            for (let i = 0; i < files.length; i++)
+            {
+                const file = files[i];
+                if (file.type.match("application/pdf"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const iframe = document.createElement("iframe");
+                    iframe.src = objectUrl;
+                    previewFile1.appendChild(iframe);
+                }
+                else if (file.type.match("image/*"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    previewFile1.appendChild(image);
+                }
+            }
+        });
+        fileInputLicense2.addEventListener("change", function(event) {
+            const files = event.target.files;
+            while (previewFile2.firstChild) {
+                previewFile2.removeChild(previewFile2.firstChild);
+            }
+            for (let i = 0; i < files.length; i++)
+            {
+                const file = files[i];
+                if (file.type.match("application/pdf"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const iframe = document.createElement("iframe");
+                    iframe.src = objectUrl;
+                    previewFile2.appendChild(iframe);
+                }
+                else if (file.type.match("image/*"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    previewFile2.appendChild(image);
+                }
+            }
+        });
+
         $('#country').select2({
             placeholder: 'Select Country'
         })

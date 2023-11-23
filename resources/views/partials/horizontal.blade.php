@@ -91,11 +91,11 @@
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                              
+
                                                 <a href="{{ route('employee-hiring-request.index') }}" class="dropdown-item" data-key="t-login">Requests</a>
-                                              
+
                                                 <a href="{{ route('job_description.index') }}" class="dropdown-item" data-key="t-login">Job Descriptions</a>
-                                               
+
                                             </div>
                                         </div>
                                         <!-- @canany(['warranty-create', 'warranty-list'])
@@ -103,7 +103,7 @@
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create','warranty-list']);
                                         @endphp
                                         @if ($hasPermission) -->
-                                       
+
                                         <!-- @endif
                                         @endcanany
 
@@ -364,7 +364,7 @@
                     </li>
                     @endif
                     @endcanany
-                                
+
                                 @can('Calls-view')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
@@ -640,7 +640,7 @@
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                <a href="{{route('customers.index')}}" class="dropdown-item" data-key="t-login">List Customer </a>
+                                                <a href="{{route('dm-customers.index')}}" class="dropdown-item" data-key="t-login">List Customer </a>
                                             </div>
                                         </div>
                                         @endif
