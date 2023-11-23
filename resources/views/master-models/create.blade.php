@@ -63,8 +63,16 @@
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label">LOI Description</label>
-                        <input type="text" class="form-control" id="loi-description" name="loi_description" placeholder="LOI Description">
+                        <label for="choices-single-default" class="form-label">Dealer</label>
+                        <select class="form-control" name="dealer" >
+                            <option value="Trans Cars">Trans Cars</option>
+                            <option value="Milele Motors">Milele Motors</option>
+                        </select>
+                        @error('dealer')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
@@ -76,6 +84,12 @@
                                <option value="{{ $variant->id }}">{{$variant->name}}</option>
                            @endforeach
                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">LOI Description</label>
+                        <input type="text" class="form-control" id="loi-description" name="loi_description" placeholder="LOI Description">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
@@ -107,6 +121,10 @@
             startYear: 2000,
             endYear: 2050,
         });
+        $("#model-year").yearpicker({
+            startYear: 2000,
+            endYear: 2050,
+        });
         $("#form-create").validate({
             ignore: [],
             rules: {
@@ -131,12 +149,31 @@
                 amount_belgium: {
                     required: true,
                 },
+                dealer: {
+                    required: true
+                }
             },
         });
         $("#variant_id").attr("data-placeholder","Choose Variant....  Or  Type Here To Search....");
         $("#variant_id").select2();
         $('#variant_id').on('change',function() {
+
             $('#variant_id-error').hide();
+            let url = '{{ route('master-model.get-loi-description') }}';
+            let variantId = $("#variant_id").val();
+
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    id: variantId,
+                },
+                success:function (data) {
+                    location.reload();
+                    alertify.success('Item Deleted successfully.');
+                }
+            });
         })
 
     </script>

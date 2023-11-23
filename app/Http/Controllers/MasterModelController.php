@@ -157,4 +157,7 @@ class MasterModelController extends Controller
     {
         //
     }
+    public function getLoiDescription(Request $request) {
+
+    }
 }

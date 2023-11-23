@@ -581,6 +581,8 @@ Route::get('/d', function () {
     Route::resource('prospecting', ProspectingController::class);
     Route::resource('master-models', MasterModelController::class);
     Route::resource('dm-customers', CustomerController::class);
+    Route::get('master-model/getLoiDescription', [MasterModelController::class,'getLoiDescription'])
+        ->name('master-model.get-loi-description');
 
     // DASHBOARD PARTS AND PROCURMENT
 
