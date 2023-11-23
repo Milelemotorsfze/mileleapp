@@ -202,8 +202,8 @@ class QuotationController extends Controller
         $pdf->Output($directory.'/'.$file,'F');
         $quotation->file_path = 'quotation_files/'.$file;
         $quotation->save();
-
-        return redirect()->route('dailyleads.index')->with('success', 'Quotation created successfully.');
+//        session()->flash('newurl', $newUrl);
+        return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation created successfully.');
     }
     public function pdfMerge($quotationId)
     {

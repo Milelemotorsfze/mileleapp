@@ -834,6 +834,13 @@ input[type=number]::-webkit-outer-spin-button
     </div>
   </div>
   <script>
+      $(document).ready(function() {
+            var url = '{{ asset('storage/quotation_files/') }}';
+            var QuotationUrl = url + '/' + '{{request()->quotationFilePath}}';
+            if('{{ request()->quotationFilePath }}' ) {
+              window.open(QuotationUrl, '_blank');
+          }
+      });
      function openModalfile(filePath) {
     const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
     const fileUrl = baseUrl + '/' + filePath; // Add a slash between baseUrl and filePath
