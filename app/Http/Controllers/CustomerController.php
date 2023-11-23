@@ -53,9 +53,33 @@ class CustomerController extends Controller
         $customer->country = $request->country;
         $customer->type = $request->type;
         $customer->address = $request->address;
+
+        if ($request->has('passport_file'))
+        {
+            $file = $request->file('passport_file');
+
+            $extension = $file->getClientOriginalExtension();
+            $fileName = time().'.'.$extension;
+            $destinationPath = 'customers/passports';
+            $file->move($destinationPath, $fileName);
+
+            $customer->passport_file = $fileName;
+        }
+        if ($request->has('trade_license_file'))
+        {
+            $file = $request->file('trade_license_file');
+
+            $extension = $file->getClientOriginalExtension();
+            $fileName2 = time().'.'.$extension;
+            $destinationPath = 'customers/trade_licenses';
+            $file->move($destinationPath, $fileName2);
+
+            $customer->trade_license_file = $fileName2;
+        }
+
         $customer->save();
 
-        return redirect()->route('customers.index')->with('success','Customer Created Successfully.');
+        return redirect()->route('dm-customers.index')->with('success','Customer Created Successfully.');
     }
 
     /**
@@ -98,9 +122,30 @@ class CustomerController extends Controller
         $customer->country = $request->country;
         $customer->type = $request->type;
         $customer->address = $request->address;
+
+        if ($request->has('passport_file'))
+        {
+            $file = $request->file('passport_file');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = time().'.'.$extension;
+            $destinationPath = 'customers/passports';
+            $file->move($destinationPath, $fileName);
+            $customer->passport_file = $fileName;
+        }
+        if ($request->has('trade_license_file'))
+        {
+            $file = $request->file('trade_license_file');
+            $extension = $file->getClientOriginalExtension();
+            $fileName2 = time().'.'.$extension;
+            $destinationPath = 'customers/trade_licenses';
+            $file->move($destinationPath, $fileName2);
+
+            $customer->trade_license_file = $fileName2;
+        }
+
         $customer->save();
 
-        return redirect()->route('customers.index')->with('success','Customer Created Successfully.');
+        return redirect()->route('dm-customers.index')->with('success','Customer Created Successfully.');
     }
 
     /**

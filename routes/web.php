@@ -235,21 +235,21 @@ Route::get('/d', function () {
         Route::get('employee-hiring-request/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-request.create-or-edit');
         Route::post('employee-hiring-request/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-request.store-or-update');
     });
-    
+
     // Employee Hiring Questionnaire
     Route::resource('employee-hiring-questionnaire', EmployeeHiringQuestionnaireController::class);
     Route::controller(EmployeeHiringQuestionnaireController::class)->group(function(){
         Route::get('employee-hiring-questionnaire/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-questionnaire.create-or-edit');
         Route::post('employee-hiring-questionnaire/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-questionnaire.store-or-update');
     });
-    
+
         // Employee Job Description
     Route::resource('job_description', JobDescriptionController::class);
     Route::controller(JobDescriptionController::class)->group(function(){
         Route::get('employee-hiring-job-description/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-job-description.create-or-edit');
         Route::post('employee-hiring-job-description/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-job-description.store-or-update');
     });
-    
+
     // Employee Passport Request
     Route::resource('passport_request', PassportRequestController::class);
     Route::controller(PassportRequestController::class)->group(function(){
@@ -257,14 +257,14 @@ Route::get('/d', function () {
         Route::post('employee-passport_request/store-or-update/{id}', 'storeOrUpdate')->name('employee-passport_request.store-or-update');
     });
 
-    // Employee Liability 
+    // Employee Liability
     Route::resource('employee_liability', EmployeeLiabilityController::class);
     Route::controller(EmployeeLiabilityController::class)->group(function(){
         Route::get('employee-liability/create-or-edit/{id}', 'createOrEdit')->name('employee-liability.create-or-edit');
         Route::post('employee-liability/store-or-update/{id}', 'storeOrUpdate')->name('employee-liability.store-or-update');
     });
-    
-    // Employee Leave 
+
+    // Employee Leave
     Route::resource('employee_leave', EmployeeLeaveController::class);
     Route::controller(EmployeeLeaveController::class)->group(function(){
         Route::get('employee-leave/create-or-edit/{id}', 'createOrEdit')->name('employee-leave.create-or-edit');
@@ -580,7 +580,7 @@ Route::get('/d', function () {
     Route::resource('modules', ModuleController::class);
     Route::resource('prospecting', ProspectingController::class);
     Route::resource('master-models', MasterModelController::class);
-    Route::resource('customers', CustomerController::class);
+    Route::resource('dm-customers', CustomerController::class);
 
     // DASHBOARD PARTS AND PROCURMENT
 

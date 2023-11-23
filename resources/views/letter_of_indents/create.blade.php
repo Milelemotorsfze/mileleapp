@@ -130,7 +130,7 @@
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">So Number</label>
+                        <label for="choices-single-default" class="form-label">So Number</label>
                         <input type="text" class="form-control" name="so_number" placeholder="So Number">
                     </div>
                 </div>

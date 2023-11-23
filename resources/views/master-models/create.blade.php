@@ -5,10 +5,10 @@
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-models');
         @endphp
         @if ($hasPermission)
-    <div class="card-header">
-        <h4 class="card-title">Add New Models</h4>
-    </div>
-    <div class="card-body">
+        <div class="card-header">
+            <h4 class="card-title">Add New Models</h4>
+        </div>
+        <div class="card-body">
         @if (count($errors) > 0)
             <div class="alert alert-danger">
                 <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -36,8 +36,26 @@
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">Steering</label>
-                        <select class="form-control" data-trigger name="steering" >
+                        <label  class="form-label">Model</label>
+                        <input type="text" class="form-control" name="model" placeholder="Enter Model">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label  class="form-label">SFX</label>
+                        <input type="text" class="form-control"  name="sfx" placeholder="Enter SFX">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label  class="form-label">Model Year</label>
+                        <input type="text" class="form-control" id="model-year"  name="model_year" placeholder="Enter Model Year">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label  class="form-label font-size-13 ">Steering</label>
+                        <select class="form-control" name="steering" >
                             <option value="LHS">LHD</option>
                             <option value='RHS'>RHD</option>
                         </select>
@@ -45,19 +63,13 @@
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="basicpill-firstname-input" class="form-label">Model</label>
-                        <input type="text" class="form-control" name="model" placeholder="Enter Model">
+                        <label class="form-label">LOI Description</label>
+                        <input type="text" class="form-control" id="loi-description" name="loi_description" placeholder="LOI Description">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="basicpill-firstname-input" class="form-label">SFX</label>
-                        <input type="text" class="form-control"  name="sfx" placeholder="Enter SFX">
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="basicpill-firstname-input" class="form-label">Variant</label>
+                        <label  class="form-label">Variant</label>
                        <select class="form-control" name="variant_id" id="variant_id" >
                            <option></option>
                            @foreach($variants as $variant)
@@ -68,13 +80,13 @@
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="basicpill-firstname-input" class="form-label">Amount in USD</label>
+                        <label class="form-label">Amount in USD</label>
                         <input type="number" class="form-control"  name="amount_uae" min="0" placeholder="Enter Amount in USD">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="basicpill-firstname-input" class="form-label">Amount in EUR</label>
+                        <label class="form-label">Amount in EUR</label>
                         <input type="number" class="form-control" name="amount_belgium" min="0" placeholder="Enter Amount in EUR">
                     </div>
                 </div>
@@ -91,6 +103,10 @@
 @endsection
 @push('scripts')
     <script>
+        $("#model-year").yearpicker({
+            startYear: 2000,
+            endYear: 2050,
+        });
         $("#form-create").validate({
             ignore: [],
             rules: {

@@ -13,7 +13,7 @@
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-customer');
                         @endphp
                         @if ($hasPermission)
-                            <a  class="btn btn-sm btn-info float-end" href="{{ route('customers.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> create</a>
+                            <a  class="btn btn-sm btn-info float-end" href="{{ route('dm-customers.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> create</a>
                         @endif
                     @endcan
                 </h4>
@@ -58,7 +58,7 @@
                                     @endphp
                                     @if ($hasPermission)
                                         <td>
-                                            <a title="Edit Addon Details" class="btn btn-sm btn-info" href="{{ route('customers.edit', $customer->id) }}">
+                                            <a title="Edit Addon Details" class="btn btn-sm btn-info" href="{{ route('dm-customers.edit', $customer->id) }}">
                                                 <i class="fa fa-edit" aria-hidden="true"></i>
                                             </a>
                                         </td>

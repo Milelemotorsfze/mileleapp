@@ -40,7 +40,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('customers.store') }}" id="form-create" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('dm-customers.store') }}" id="form-create" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row">
                         <div class="col-lg-3 col-md-6">
@@ -75,19 +75,36 @@
 
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Company Name</label>
-                                <input type="text" class="form-control" name="company_name" placeholder="Enter Company Name">
+                                <label for="choices-single-default" class="form-label">Passport File</label>
+                                <input type="file" class="form-control" name="passport_file" id="file1-upload"  placeholder="Upload Passport">
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Trade License</label>
+                                <input type="file" class="form-control" id="file2-upload" name="trade_license_file" placeholder="Upload Trade License">
+                            </div>
+                        </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Address</label>
                                 <textarea class="form-control" name="address" rows="5" cols="25"></textarea>
                             </div>
                         </div>
-                        <div class="col-lg-6 col-md-6" id="file-preview">
+                        <br>
+                        <div class="card preview-div" >
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-12 col-sm-12">
+                                        <div id="file1-preview">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-12 col-sm-12">
+                                        <div id="file2-preview">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                         <div class="col-12 text-center">
@@ -100,6 +117,63 @@
 @endsection
 @push('scripts')
     <script>
+
+        const fileInputLicense1 = document.querySelector("#file1-upload");
+        const fileInputLicense2 = document.querySelector("#file2-upload");
+
+        const previewFile1 = document.querySelector("#file1-preview");
+        const previewFile2 = document.querySelector("#file2-preview");
+
+        fileInputLicense1.addEventListener("change", function(event) {
+            const files = event.target.files;
+            while (previewFile1.firstChild) {
+                previewFile1.removeChild(previewFile1.firstChild);
+            }
+
+            for (let i = 0; i < files.length; i++)
+            {
+                const file = files[i];
+                if (file.type.match("application/pdf"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const iframe = document.createElement("iframe");
+                    iframe.src = objectUrl;
+                    previewFile1.appendChild(iframe);
+                }
+                else if (file.type.match("image/*"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    previewFile1.appendChild(image);
+                }
+            }
+        });
+        fileInputLicense2.addEventListener("change", function(event) {
+            const files = event.target.files;
+            while (previewFile2.firstChild) {
+                previewFile2.removeChild(previewFile2.firstChild);
+            }
+            for (let i = 0; i < files.length; i++)
+            {
+                const file = files[i];
+                if (file.type.match("application/pdf"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const iframe = document.createElement("iframe");
+                    iframe.src = objectUrl;
+                    previewFile2.appendChild(iframe);
+                }
+                else if (file.type.match("image/*"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    previewFile2.appendChild(image);
+                }
+            }
+        });
+
         $('#country').select2({
             placeholder: 'Select Country'
         })
