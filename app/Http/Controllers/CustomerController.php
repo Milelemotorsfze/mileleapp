@@ -59,7 +59,7 @@ class CustomerController extends Controller
             $file = $request->file('passport_file');
 
             $extension = $file->getClientOriginalExtension();
-            $fileName = time().'.'.$extension;
+            $fileName = 'passport'.time().'.'.$extension;
             $destinationPath = 'customers/passports';
             $file->move($destinationPath, $fileName);
 
@@ -70,7 +70,7 @@ class CustomerController extends Controller
             $file = $request->file('trade_license_file');
 
             $extension = $file->getClientOriginalExtension();
-            $fileName2 = time().'.'.$extension;
+            $fileName2 = 'trade_license'.time().'.'.$extension;
             $destinationPath = 'customers/trade_licenses';
             $file->move($destinationPath, $fileName2);
 
