@@ -138,7 +138,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         </div>
         <div class="row ">
 
-
             <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
                 <label for="no_of_years_of_experience_in_specific_job_role" class="form-label"><span class="error">* </span>{{ __('Years of Experience :') }} </label>
@@ -1310,13 +1309,11 @@ redirect()->route('home')->send();
 
 <script>
 
-    document.addEventListener("DOMContentLoaded", function() {
         function showAmountPercentageInput(element) {
             var selectedValue = element.value;
             document.getElementById('amountInputContainer').style.display = selectedValue == 'amount' ? 'block' : 'none';
             document.getElementById('percentageInputContainer').style.display = selectedValue == 'percentage' ? 'block' : 'none';
         }
-    });
 </script>
 
 
