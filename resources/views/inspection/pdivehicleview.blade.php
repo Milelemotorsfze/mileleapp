@@ -75,22 +75,22 @@
                                 1
      </td>
                             <td>
-                                <span>Spare Wheel</span>
+                                <span>Packing Box</span>
                             </td>
                             <td>
                             <div class="text-center">
-    @if ($itemsWithQuantities->contains('item_name', 'sparewheel'))
+    @if ($itemsWithQuantities->contains('item_name', 'packing'))
         <p>AV</p>
-        <input type="hidden" name="sparewheelr" value="AV">
+        <input type="hidden" name="packingr" value="AV">
     @else
         <p>NA</p>
-        <input type="hidden" name="sparewheelr" value="NA">
+        <input type="hidden" name="packingr" value="NA">
     @endif
 </div>
 
                             </td>
                             <td>
-                            <select class="form-control" name="sparewheel">
+                            <select class="form-control" name="packing">
                                 <option value="AV">AV</option>
                                 <option value="NA">NA</option>
                             </select>
@@ -101,21 +101,21 @@
                                 2
      </td>
                             <td>
-                                <span>Jack</span>
+                                <span>Warning Triangle</span>
                             </td>
                             <td>
                             <div class="text-center">
-    @if ($itemsWithQuantities->contains('item_name', 'jack'))
+    @if ($itemsWithQuantities->contains('item_name', 'warningtriangle'))
         <p>AV</p>
-        <input type="hidden" name="jackr" value="AV">
+        <input type="hidden" name="warningtriangler" value="AV">
     @else
         <p>NA</p>
-        <input type="hidden" name="jackr" value="NA">
+        <input type="hidden" name="warningtriangler" value="NA">
     @endif
 </div>
                             </td>
                             <td>
-                            <select class="form-control" name="jack">
+                            <select class="form-control" name="warningtriangle">
                                 <option value="AV">AV</option>
                                 <option value="NA">NA</option>
                                 <option value="In Box">In Box</option>
@@ -127,7 +127,7 @@
                                 3
      </td>
                             <td>
-                                <span>WHEEL SPANNER</span>
+                                <span>Jack & WHEEL SPANNER</span>
                             </td>
                             <td>
                             <div class="text-center">
@@ -285,21 +285,21 @@
                                 10
      </td>
                             <td>
-                                <span>WHEEL RIM / TYRES</span>
+                                <span>TRUNK COVER</span>
                             </td>
                             <td>
                             <div class="text-center">
-    @if ($itemsWithQuantities->contains('item_name', 'wheelrim'))
+    @if ($itemsWithQuantities->contains('item_name', 'trunkcover'))
         <p>AV</p>
-        <input type="hidden" name="wheelrimr" value="AV">
+        <input type="hidden" name="trunkcoverr" value="AV">
     @else
         <p>NA</p>
-        <input type="hidden" name="wheelrimr" value="NA">
+        <input type="hidden" name="trunkcoverr" value="NA">
     @endif
 </div>
                             </td>
                             <td>
-                            <select class="form-control" name="wheelrim">
+                            <select class="form-control" name="trunkcover">
                                 <option value="Ok">Ok</option>
                                 <option value="Not Ok">Not Ok</option>
                             </select>
@@ -328,83 +328,6 @@
                                 <option value="AV">AV</option>
                                 <option value="NA">NA</option>
                                 <option value="In Box">In Box</option>
-                            </select>
-                            </td>
-                        </tr>
-                        <tr>
-                        <td>
-                                12
-     </td>
-                            <td>
-                                <span>SD Card / Remote / H Phones</span>
-                            </td>
-                            <td>
-                            <div class="text-center">
-    @if ($itemsWithQuantities->contains('item_name', 'sd_card'))
-        <p>AV</p>
-        <input type="hidden" name="sd_cardr" value="AV">
-    @else
-        <p>NA</p>
-        <input type="hidden" name="sd_cardr" value="NA">
-    @endif
-</div>
-                            </td>
-                            <td>
-                            <select class="form-control" name="sd_card">
-                                <option value="AV">AV</option>
-                                <option value="NA">NA</option>
-                            </select>
-                            </td>
-                        </tr>
-                        <tr>
-                        <td>
-                                13
-     </td>
-                            <td>  
-                                <span>A/C System</span>
-                            </td>
-                            <td>
-                            <div class="text-center">
-    @if ($itemsWithQuantities->contains('item_name', 'ac_system'))
-        <p>AV</p>
-        <input type="hidden" name="ac_systemr" value="AV">
-    @else
-        <p>NA</p>
-        <input type="hidden" name="ac_systemr" value="NA">
-    @endif
-</div>
-                            </td>
-                            <td>
-                            <select class="form-control" name="ac_system">
-                            <option value="Manual">Manual</option>
-                                <option value="Auto">Auto</option>
-                                <option value="NA">NA</option>
-                            </select>
-                            </td>
-                        </tr>
-                        <tr>
-                        <td>
-                                14
-     </td>
-                            <td>
-                                <span>DASHBOARD / T SCREEN / LCD</span>
-                            </td>
-                            <td>
-                            <div class="text-center">
-    @if ($itemsWithQuantities->contains('item_name', 'dash_board'))
-        <p>AV</p>
-        <input type="hidden" name="dash_boardr" value="AV">
-    @else
-        <p>NA</p>
-        <input type="hidden" name="dash_boardr" value="NA">
-    @endif
-</div>
-                            </td>
-                            <td>
-                            <select class="form-control" name="dash_board">
-                            <option value="NA">NA</option>
-                                <option value="Ok">Ok</option>
-                                <option value="Not Ok">Not Ok</option>
                             </select>
                             </td>
                         </tr>
@@ -439,23 +362,6 @@
                             <td>
                             <select class="form-control" name="sticker">
                                 <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                            </td>
-                        </tr>
-                        <tr>
-                        <td>
-                                17
-     </td>
-                            <td>
-                                <span>PACKING BOX</span>
-                            </td>
-                            <td>
-                            
-                            </td>
-                            <td>
-                            <select class="form-control" name="packingbox">
-                            <option value="Yes">Yes</option>
                                 <option value="No">No</option>
                             </select>
                             </td>

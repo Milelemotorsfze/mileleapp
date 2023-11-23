@@ -38,7 +38,7 @@
         <form id="form-create" action="{{ route('letter-of-indents.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row">
-                <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">Country</label>
                         <select class="form-control" name="country" id="country" autofocus>
@@ -49,7 +49,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label  text-muted">Customer Type</label>
                         <select class="form-control" name="customer_type" id="customer-type">
@@ -61,7 +61,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label ">Customer</label>
                         <select class="form-control @error('customer_id') is-invalid @enderror" name="customer_id" id="customer" >
@@ -73,7 +73,7 @@
                         @enderror
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
                         <input type="date" class="form-control" id="basicpill-firstname-input"  name="date">
@@ -86,15 +86,24 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
                         <select class="form-control" name="category" id="choices-single-default">
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}">
+                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
+                            </option>
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED}}">
+                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED}}
+                            </option>
                             <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}">
                                 {{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}
                             </option>
                             <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}">
                                 {{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}
+                            </option>
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE}}">
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}
                             </option>
                         </select>
                         @error('category')
@@ -104,26 +113,11 @@
                         @enderror
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label ">Vendor</label>
-                        <select class="form-control" data-trigger name="supplier_id" id="supplier">
-                            <option value="" disabled>Select The Vendor</option>
-                            @foreach($suppliers as $supplier)
-                                <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
-                            @endforeach
-                        </select>
-                        @error('supplier_id')
-                        <span role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                        @enderror
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-12">
+
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">Dealer</label>
-                        <select class="form-control" data-trigger name="dealers" >
+                        <select class="form-control" name="dealers" >
                             <option value="Trans Cars">Trans Cars</option>
                             <option value="Milele Motors">Milele Motors</option>
                         </select>
@@ -134,7 +128,35 @@
                         @enderror
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13 ">So Number</label>
+                        <input type="text" class="form-control" name="so_number" placeholder="So Number">
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">Destination</label>
+                        <input type="text" class="form-control" name="destination" placeholder="Destination" >
+                        @error('destination')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">Prefered Location</label>
+                        <input type="text" class="form-control" name="prefered_location" placeholder="Prefered Location" >
+                        @error('prefered_location')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">LOI Document</label>
                         <input type="file" name="files[]" id="file-upload" class="form-control text-dark" multiple
@@ -212,9 +234,6 @@
                 },
                 date: {
                     required: true,
-                },
-                supplier_id:{
-                    required:true
                 },
                 dealers:{
                     required:true

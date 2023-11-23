@@ -41,7 +41,7 @@
             @csrf
             @method('PUT')
             <div class="row">
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-6">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label"> Country</label>
                         <select class="form-control" autofocus name="country" id="country" >
@@ -52,7 +52,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-6">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label text-muted">Customer Type</label>
                         <select class="form-control" name="customer_type" id="customer-type">
@@ -76,32 +76,25 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-6">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">Customer</label>
                         <select class="form-control" data-trigger name="customer_id" id="customer" >
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Vendor</label>
-                        <select class="form-control" data-trigger name="supplier_id" id="supplier">
-                            <option value="" disabled>Select The Supplier</option>
-                            @foreach($suppliers as $supplier)
-                                <option value="{{ $supplier->id }}" {{ $supplier->id == $letterOfIndent->supplier_id ? 'selected' : '' }}>
-                                    {{ $supplier->supplier }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-6">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
                         <select class="form-control" name="category" id="choices-single-default">
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}"
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST == $letterOfIndent->category ? 'selected' : ''}} >
+                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
+                            </option>
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED}}"
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED == $letterOfIndent->category ? 'selected' : ''}} >
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED }}
+                            </option>
                             <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}"
                                 {{ \App\Models\LetterOfIndent::LOI_CATEGORY_REAL == $letterOfIndent->category ? 'selected' : ''}} >
                                 {{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}
@@ -110,17 +103,21 @@
                                 {{ \App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL == $letterOfIndent->category ? 'selected' : ''}} >
                                 {{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}
                             </option>
+                            <option value="{{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}"
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE == $letterOfIndent->category ? 'selected' : ''}} >
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}
+                            </option>
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-6">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
                         <input type="date" class="form-control" id="basicpill-firstname-input" name="date"
                                value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}">
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-6">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">Dealers</label>
                         <select class="form-control" data-trigger name="dealers" >
@@ -129,7 +126,40 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">So Number</label>
+                        <input type="text" class="form-control" name="so_number" placeholder="So Number" value="{{ $letterOfIndent->so_number }}">
+                        @error('so_number')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">Destination</label>
+                        <input type="text" class="form-control" name="destination" placeholder="Destination" value="{{ $letterOfIndent->destination }}">
+                        @error('destination')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">Prefered Location</label>
+                        <input type="text" class="form-control" name="prefered_location" placeholder="Prefered Location" value="{{ $letterOfIndent->prefered_location }}" >
+                        @error('prefered_location')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">LOI Document</label>
                         <input type="file" name="files[]" class="form-control mb-3" multiple
@@ -150,6 +180,7 @@
                         </div>
                     </div>
                     <!-- Modal -->
+
                     <div class="modal mb-5 justify-content-center" id="show-document-{{$letterOfIndentDocument->id}}"  aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered modal-xl ">
                             <div class="modal-content">
@@ -186,7 +217,7 @@
                 <div class="col-12 text-center">
                     <button type="submit" class="btn btn-primary">Update</button>
                     <a href="{{ route('letter-of-indent-items.edit', $letterOfIndent->id) }}" >
-                        <button type="button" class="btn btn-info"><i class="fa fa-arrow-right"></i> Next</button>
+                        <button type="button" class="btn btn-info"> Next <i class="fa fa-arrow-right"></i></button>
                     </a>
                 </div>
             </div>

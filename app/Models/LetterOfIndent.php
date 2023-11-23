@@ -9,8 +9,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class LetterOfIndent extends Model
 {
     use HasFactory, SoftDeletes;
-    public const LOI_CATEGORY_REAL = "Real";
+    public const LOI_CATEGORY_REAL = "Original";
     public const LOI_CATEGORY_SPECIAL = "Special";
+    public const LOI_CATEGORY_MANAGEMENT_REQUEST = "Management Request";
+    public const LOI_CATEGORY_END_USER_CHANGED = "End User Changed";
+    public const LOI_CATEGORY_QUANTITY_INFLATE = "Quantity Inflate";
     public const LOI_SUBMISION_STATUS_NEW = "New";
     public const LOI_STATUS_SUPPLIER_APPROVED = "Supplier Approved";
     public const LOI_STATUS_SUPPLIER_REJECTED = "Supplier Rejected";
