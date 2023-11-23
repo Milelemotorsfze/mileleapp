@@ -399,26 +399,41 @@
 @endif
 <div class="col-xxl-6 col-lg-6 col-md-6">
     <div class="card">
-    <div class="card-header">
-        <h4 class="card-title">History</h4>
-    </div>
-    <div class="card-body">
-        <div class="col-xxl-12 col-lg-12 col-md-12">
-        @if(isset($data->history))
-        @foreach($data->history as $history)
-        <div class="row">
-            <div class="col-xxl-1 col-lg-1 col-md-1">
-            <img src="{{ asset('icons/' . $history->icon) }}" style="width:30px;height:30px;">
-            </div>
-            <div class="col-xxl-11 col-lg-11 col-md-11">
-            {{$history->message ?? ''}} </br> <span style="color:gray">{{$history->created_at ?? ''}}</span>
+        <div class="card-header">
+            <h4 class="card-title">Job Description</h4>
+        </div>
+        <div class="card-body">
+            <div class="col-xxl-12 col-lg-12 col-md-12">
+                <div class="col-lg-6 col-md-3 col-sm-6">
+                    <label for="choices-single-default" class="form-label">Top 3 skills or mandatory work experience :</label>
+                </div>
+                <div class="col-lg-6 col-md-9 col-sm-6">
+                    <span>{{$data->questionnaire->mandatory_skills ?? ''}}</span>
+                </div>
             </div>
         </div>
-        </br>
-        @endforeach
-        @endif
-        </div>
     </div>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">History</h4>
+        </div>
+        <div class="card-body">
+            <div class="col-xxl-12 col-lg-12 col-md-12">
+            @if(isset($data->history))
+            @foreach($data->history as $history)
+            <div class="row">
+                <div class="col-xxl-1 col-lg-1 col-md-1">
+                <img src="{{ asset('icons/' . $history->icon) }}" style="width:30px;height:30px;">
+                </div>
+                <div class="col-xxl-11 col-lg-11 col-md-11">
+                {{$history->message ?? ''}} </br> <span style="color:gray">{{$history->created_at ?? ''}}</span>
+                </div>
+            </div>
+            </br>
+            @endforeach
+            @endif
+            </div>
+        </div>
     </div>
 </div>
 

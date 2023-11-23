@@ -100,7 +100,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             <div class=" col-lg-4 col-md-6 col-sm-6 designation-radio-main-div">
                 <div class="row ">
                     <div class="col-lg-12 col-md-12 col-sm-12 ">
-
                         <label for="designation_type" class="form-label"><span class="error">* </span>{{ __('Designation Type:') }}</label>
                         <div class="designation-radio-button">
                             <label>
@@ -210,16 +209,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <option value="high_school">High School</option>
                     <option value="bachelors">Bachelors</option>
                     <option value="pg_in_same_specialisation_or_related_to_department">PG in the same specailisation or related to department</option>
-                    <option value="0">Other</option>
                 </select>
             </div>
-            <div class="col-xxl-4 col-lg-4 col-md-6">
-                <a id="createNewEducationOptionButton" data-toggle="popover" data-trigger="hover" title="Create New Education Option" data-placement="top" style="margin-top:28px;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewEducationOption"><i class="fa fa-plus" aria-hidden="true"></i> Create New Education Option</a>
+
+            <div class=" col-lg-4 col-md-6 col-sm-6" id="educationCertificatesDiv" style="display: none;">
+                <label for="education_certificates" class="form-label"><span class="error">* </span>{{ __('Education Certificates :') }} </label>
+                <input type="text" placeholder="Educational Certificates" name="education_certificates" class="form-control" id="education_certificates">
             </div>
             <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
                 <label for="certification" class="form-label"><span class="error">* </span>{{ __('Certification :') }} </label>
-                <input type="text" placeholder="Certificates" name="certification" class="form-control" id="certification">
+                <input type="text" placeholder="Certification" name="certification" class="form-control" id="certification">
             </div>
         </div>
 
@@ -506,7 +506,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                 <div class="col-lg-6 designation-radio-main-div">
 
 
-                                    <label for="own_car" class="form-label"><span class="error">* </span>{{ __('Car accompoanied By?') }}</label>
+                                    <label for="own_car" class="form-label"><span class="error">* </span>{{ __('Car accompanied By?') }}</label>
 
                                     <div class="designation-radio-button">
                                         <label>
@@ -812,7 +812,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 </br>
 
 </br>
-@include('hrm.hiring.hiring_request.createJobPosition')
+<div id="dynamicContent" class="col-md-12">
+            <!-- Content will be loaded here -->
+</div>
 @else
 @php
 redirect()->route('home')->send();
@@ -834,36 +836,6 @@ redirect()->route('home')->send();
         $("#salary_range_start_in_aed").val(data.salary_range_start_in_aed);
         $("#salary_range_end_in_aed").val(data.salary_range_end_in_aed);
         $("#career_level_id").val(data.experience_level);
-
-        $('#submit-button').click(function(e) {
-            e.preventDefault();
-
-            // Reset error messages
-            $('#form-errors').text('');
-
-            var variantIds = $('input[name="variant_id[]"]').map(function() {
-                return $(this).val();
-            }).get();
-
-            if (variantIds.length === 0) {
-                $('#form-errors').text('Please select variant quantity and add vehicles.');
-                formValid = false;
-            } else {
-                formValid = true;
-                checkDuplicateVIN();
-            }
-
-            // Additional validations
-            var poNumber = $('#po_number').val();
-            if (poNumber === '') {
-                $('#form-errors').append('<p>This field is required for PO Number.</p>');
-                formValid = false;
-            }
-
-            if (formValid) {
-                $('#po-create-form').unbind('submit').submit();
-            }
-        });
 
         $('#requested_job_title').select2({
             allowClear: true,
@@ -932,6 +904,28 @@ redirect()->route('home')->send();
     });
 
 
+    // $("#createNewJobTitleButton, #createNewIndustryExperienceButton").click(function(){
+    //         var modalId = $(this).data("modal-id");
+    //         var contentPath = "";
+
+    //         if (modalId === "createNewJobPosition") {
+    //             contentPath = "{{ route('hiring_request.createJobPosition') }}";
+    //         } else if (modalId === "createNewIndustryExperience") {
+    //             contentPath = "{{ route('hrm.hiring.questionnaire.createIndustryExperience') }}";
+    //         }
+
+    //         // Load content dynamically
+    //         $("#dynamicContent").load(contentPath);
+    //     });
+
+
+    $("#education").change(function(){
+            if($(this).val() === "pg_in_same_specialisation_or_related_to_department") {
+                $("#educationCertificatesDiv").show();
+            } else {
+                $("#educationCertificatesDiv").hide();
+            }
+        });
 
         // Show/hide amountPercentageInputContainer based on radio button selection
         $('input[name="required_to_work_on_trial"]').change(function() {

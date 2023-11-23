@@ -19,7 +19,7 @@
                         <div class="col-lg-2 col-md-3 col-sm-6 col-12">
                             <label for="choices-single-default" class="form-label"> Request Date :</label>
                         </div>
-                        <div class="col-lg-4 col-md-3 col-sm-6 col-12" style="padding-bottom: 15px;">
+                        <div class="col-lg-4 col-md-3 col-sm-6 col-12">
                             <span>{{ $data->request_date ?? '' }}</span>
                         </div>
                         <div class="col-lg-2 col-md-3 col-sm-6 col-12">
@@ -48,19 +48,19 @@
                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                             <label for="choices-single-default" class="form-label"> Department Name :</label>
                         </div>
-                        <div class="col-lg-7 col-md-7 col-sm-6 col-12" style="padding-bottom: 15px;">
+                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                             <span>{{ $data->department_name ?? '' }}</span>
                         </div>
                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                             <label for="choices-single-default" class="form-label"> Department Location :</label>
                         </div>
-                        <div class="col-lg-7 col-md-7 col-sm-6 col-12" style="padding-bottom: 15px;">
+                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                             <span>{{ $data->department_location ?? '' }}</span>
                         </div>
                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                             <label for="choices-single-default" class="form-label"> Requested By :</label>
                         </div>
-                        <div class="col-lg-7 col-md-7 col-sm-6 col-12" style="padding-bottom: 15px;">
+                        <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                             <span>{{ $data->requested_by_name ?? '' }}</span>
                         </div>
                         <div class="col-lg-5 col-md-5 col-sm-6 col-12" >
@@ -84,37 +84,37 @@
                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                         <label for="choices-single-default" class="form-label"> Reporting To With Position:</label>
                     </div>
-                    <div class="col-lg-7 col-md-7 col-sm-6 col-12" style="padding-bottom: 15px;">
+                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                         <span>{{ $data->reporting_to_name ?? '' }}</span>
                     </div>
                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                         <label for="choices-single-default" class="form-label"> Experience Level :</label>
                     </div>
-                    <div class="col-lg-7 col-md-7 col-sm-6 col-12" style="padding-bottom: 15px;">
+                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                         <span>{{ $data->experience_level_name ?? '' }}</span>
                     </div>
                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                         <label for="choices-single-default" class="form-label"> Salary Range(AED) :</label>
                     </div>
-                    <div class="col-lg-7 col-md-7 col-sm-6 col-12" style="padding-bottom: 15px;">
+                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                         <span>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</span>
                     </div>
                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                         <label for="choices-single-default" class="form-label"> Work Time :</label>
                     </div>
-                    <div class="col-lg-7 col-md-7 col-sm-6 col-12" style="padding-bottom: 15px;">
+                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                         <span>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</span>
                     </div>
                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                         <label for="choices-single-default" class="form-label"> Number Of Openings :</label>
                     </div>
-                    <div class="col-lg-7 col-md-7 col-sm-6 col-12" style="padding-bottom: 15px;">
+                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                         <span>{{ $data->number_of_openings ?? '' }}</span>
                     </div>
                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                         <label for="choices-single-default" class="form-label"> Type Of Role :</label>
                     </div>
-                    <div class="col-lg-7 col-md-7 col-sm-6 col-12" style="padding-bottom: 15px;">
+                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                         <span>{{ $data->type_of_role_name ?? '' }}</span>
                     </div>
                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">

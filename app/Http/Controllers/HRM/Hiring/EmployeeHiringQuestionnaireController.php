@@ -192,8 +192,18 @@ class EmployeeHiringQuestionnaireController extends Controller
                     $update->screening_questions  = $request->screening_questions ;
                     $update->technical_test  = $request->technical_test ;
                     $update->trial_work_job_description  = $request->trial_work_job_description ;
-                    $update->internal_department_evaluation  = $request->internal_department_evaluation ;
-                    $update->external_vendor_evaluation  = $request->external_vendor_evaluation ;
+                    if(isset($request->internal_department_evaluation)) {
+                        $update->internal_department_evaluation  = 'yes';
+                    }
+                    else {
+                        $update->internal_department_evaluation  = NULL;
+                    }
+                    if(isset($request->external_vendor_evaluation)) {
+                        $update->external_vendor_evaluation = 'yes';
+                    }
+                    else {
+                        $update->external_vendor_evaluation = NULL;
+                    }
                     $update->recruitment_source_id  = $request->recruitment_source_id ;
                     $update->experience = $request->experience ;
                     $update->travel_experience = $request->travel_experience ;
@@ -234,6 +244,12 @@ class EmployeeHiringQuestionnaireController extends Controller
                     $successMessage = "Employee Hiring Questionnaire Updated Successfully";
                 }
                 else {
+                    if(isset($request->internal_department_evaluation)) {
+                        $input['internal_department_evaluation'] = 'yes';
+                    }
+                    if(isset($request->external_vendor_evaluation)) {
+                        $input['external_vendor_evaluation'] = 'yes';
+                    }
                     $input['created_by'] = $authId;
                     if($request->commission_involved_in_salary == 'yes') {
                         $input['commission_type']  = $request->commission_type;

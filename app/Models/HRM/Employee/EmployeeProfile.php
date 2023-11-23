@@ -93,6 +93,18 @@ class EmployeeProfile extends Model
         'updated_by',
         'deleted_by',
 
+        'educational_qualification',
+        'year_of_completion',
+        'residence_telephone_number',
+        'spouse_name',
+        'spouse_passport_number',
+        'spouse_passport_expiry_date',
+        'spouse_dob',
+        'spouse_nationality',
+        'personal_information_created_at',
+        'personal_information_created_by',
+        
+        'image_path',
         'language',
         'office',
         'phone',
