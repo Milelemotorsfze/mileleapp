@@ -7,6 +7,8 @@
         @if ($hasPermission)
         <div class="card-header">
             <h4 class="card-title">Add New Models</h4>
+            <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('master-models.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+
         </div>
         <div class="card-body">
         @if (count($errors) > 0)
@@ -71,19 +73,9 @@
                             @endforeach
                         </select>
                     </div>
+{{--                    <button type="button" class="btn btn-sm btn-info" id="variant-detail-view-btn" hidden>Variant Detail</button>--}}
                 </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <div class="mt-4">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="trans_car" name="is_transcar" >
-                            <label class="form-check-label" for="trans_car">Trans Car</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="milele" name="is_milele">
-                            <label class="form-check-label" for="milele">Milele</label>
-                        </div>
-                    </div>
-                </div>
+
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">Amount in USD</label>
@@ -94,6 +86,18 @@
                     <div class="mb-3">
                         <label class="form-label">Amount in EUR</label>
                         <input type="number" class="form-control" name="amount_belgium" min="0" placeholder="Enter Amount in EUR">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div style="margin-top: 35px;">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="trans_car" name="is_transcar" >
+                            <label class="form-check-label" for="trans_car">Trans Car</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="milele" name="is_milele">
+                            <label class="form-check-label" for="milele">Milele</label>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
@@ -111,8 +115,129 @@
                     </div>
                 </div>
                 </br>
+                <div class="card"  id="variant-detail-div" hidden>
+                    <div class="card-header">
+                        <h4>Variant Detail</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" >
+                            <div class="col-sm-4">
+                                <div class="row mt-2">
+                                    <div class="col-sm-3">
+                                        Brand :
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <dl id="brand"></dl>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        Model Line :
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <dl id="model_line"></dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                       Model Year :
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <dl id="model_year"></dl>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                       Engine :
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <dl id="engine"></dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        Fuel Type :
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <dl id="fuel_type"></dl>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        Upholestry :
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <dl id="upholestry"></dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4" >
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        Seat :
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <dl id="seat"></dl>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        COO :
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <dl id="coo"></dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4" >
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        Gear Box :
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <dl id="gear-box"></dl>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        Steering :
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <dl id="steering"></dl>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4" >
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        Detail :
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <dl id="detail"></dl>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        Model Detail :
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <dl id="model-detail"></dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="variant-items">
+
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-12">
-                    <button type="submit" class="btn btn-primary ">Submit</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </div>
         </form>
@@ -127,36 +252,33 @@
             startYear: 2000,
             endYear: 2050,
         });
-        $("#model-year").yearpicker({
-            startYear: 2000,
-            endYear: 2050,
+
+        $("#form-create").validate({
+            ignore: [],
+            rules: {
+                steering: {
+                    required: true,
+                    maxlength:255
+                },
+                model: {
+                    required: true,
+                    maxlength:255
+                },
+                sfx: {
+                    required: true,
+                    maxlength:255
+                },
+                variant_id: {
+                    required: true,
+                },
+                amount_uae: {
+                    required: true,
+                },
+                amount_belgium: {
+                    required: true,
+                },
+            },
         });
-        // $("#form-create").validate({
-        //     ignore: [],
-        //     rules: {
-        //         steering: {
-        //             required: true,
-        //             maxlength:255
-        //         },
-        //         model: {
-        //             required: true,
-        //             maxlength:255
-        //         },
-        //         sfx: {
-        //             required: true,
-        //             maxlength:255
-        //         },
-        //         variant_id: {
-        //             required: true,
-        //         },
-        //         amount_uae: {
-        //             required: true,
-        //         },
-        //         amount_belgium: {
-        //             required: true,
-        //         },
-        //     },
-        // });
         function showOrHideLoiDescription() {
             let variantId = $("#variant_id").val();
             if(variantId != "") {
@@ -189,6 +311,7 @@
         $('#variant_id').on('change',function() {
 
             $('#variant_id-error').hide();
+            $('#variant-detail-div').attr('hidden', false);
             showOrHideLoiDescription();
             getLOIDescription();
         })
@@ -217,7 +340,7 @@
                     is_transcar: is_transcar
                 },
                 success:function (data) {
-
+                    console.log(data);
                     if(is_milele == 1) {
                         $("#milele-loi-description").val(data.milele_loi_format);
                     }else{
@@ -228,6 +351,31 @@
                         $("#transcar-loi-description").val(data.transcar_loi_format);
                     }else{
                         $("#transcar-loi-description").val(" ");
+                    }
+                    $('#brand').html(data.variant.brand.brand_name);
+                    $('#model_line').html(data.variant.master_model_lines.model_line);
+                    $('#model_year').html(data.variant.my);
+                    $('#engine').html(data.variant.engine);
+                    $('#fuel_type').html(data.variant.fuel_type);
+                    $('#seat').html(data.variant.seat);
+                    $('#gear-box').html(data.variant.gearbox);
+                    $('#steering').html(data.variant.steering);
+                    $('#coo').html(data.variant.coo);
+                    $('#detail').html(data.variant.detail);
+                    $('#model-detail').html(data.variant.model_detail);
+                    if(data.variant_items) {
+                        jQuery.each(data.variant_items, function(key,value){
+                            $("#variant-items").append('<div class="col-sm-4"> ' +
+                                '<div class="row mt-2"> ' +
+                                '<div class="col-sm-3">' +
+                                ' <dl id="variant-specification"> '+ value.model_specification.name +' : </dl> ' +
+                                '</div> ' +
+                                '<div class="col-sm-9"> ' +
+                                '<dl id="variant-specification-option"> '+ value.model_specification_option.name ?? '' +' </dl> ' +
+                                '</div> ' +
+                                '</div> ' +
+                                '</div>');
+                        });
                     }
                 }
             });
