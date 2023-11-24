@@ -242,7 +242,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             </div>
 
             <div class="col-xxl-4 col-lg-6 col-md-6">
-                <a id="createNewIndustryExperienceButton" data-toggle="popover" data-trigger="hover" title="Create New Industry Experience" data-placement="top" style="margin-top:28px;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewIndustryExperience"><i class="fa fa-plus" aria-hidden="true"></i> Create New Industry Experience</a>
+                <a id="createNewIndustryExperienceButton" data-toggle="popover" data-trigger="hover" title="Create New Industry Experience" data-placement="top" style="margin-top:28px;" class="btn btn-sm btn-info industry-exp-modal-button" data-modal-id="createNewIndustryExperience"><i class="fa fa-plus" aria-hidden="true"></i> Create New Industry Experience</a>
             </div>
         </div>
 
@@ -812,9 +812,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 </br>
 
 </br>
-<div id="dynamicContent" class="col-md-12">
-            <!-- Content will be loaded here -->
-</div>
+@include('hrm.hiring.hiring_request.createJobPosition')
+@include('hrm.hiring.questionnaire.createIndustryExperience')
+
+<div class="overlay"></div>
+
 @else
 @php
 redirect()->route('home')->send();
@@ -902,22 +904,6 @@ redirect()->route('home')->send();
         var selectedValues = $(this).val();
         console.log("Selected Language IDs:", selectedValues);
     });
-
-
-    // $("#createNewJobTitleButton, #createNewIndustryExperienceButton").click(function(){
-    //         var modalId = $(this).data("modal-id");
-    //         var contentPath = "";
-
-    //         if (modalId === "createNewJobPosition") {
-    //             contentPath = "{{ route('hiring_request.createJobPosition') }}";
-    //         } else if (modalId === "createNewIndustryExperience") {
-    //             contentPath = "{{ route('hrm.hiring.questionnaire.createIndustryExperience') }}";
-    //         }
-
-    //         // Load content dynamically
-    //         $("#dynamicContent").load(contentPath);
-    //     });
-
 
     $("#education").change(function(){
             if($(this).val() === "pg_in_same_specialisation_or_related_to_department") {

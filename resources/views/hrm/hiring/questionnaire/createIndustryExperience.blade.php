@@ -12,7 +12,7 @@
 					<div class="row modal-row">
 						<div class="col-xxl-12 col-lg-12 col-md-12">
 							<span class="error">* </span>
-							<label for="Industry-Experience" class="col-form-label text-md-end ">Industry Experience</label>
+							<label for="Industry Experience" class="col-form-label text-md-end ">Industry Experience</label>
 						</div>
 						<div class="col-xxl-12 col-lg-12 col-md-12">
 							<input type="text" id="new_industry_experience" class="form-control @error('new_industry_experience') is-invalid @enderror" name="new_industry_experience" value="" required>
@@ -31,7 +31,7 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function () {
-        $('.modal-button').on('click', function() {
+        $('.industry-exp-modal-button').on('click', function() {
 		$('#createNewIndustryExperience').modal('show');
 	});
     });   	
@@ -41,6 +41,7 @@
 	}
     $('#createIndustryExpId').on('click', function() {
 	    var value = $('#new_industry_experience').val();
+		// console.log('Value being sent to the backend:', value);
 	    if(value == '') {
 	        $msg = 'Industry Experience is Required';
 	        showNewIndustryExperienceError($msg);
