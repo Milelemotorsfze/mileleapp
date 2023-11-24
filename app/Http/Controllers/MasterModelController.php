@@ -43,7 +43,10 @@ class MasterModelController extends Controller
             ['data' => 'steering', 'name' => 'steering','title' => 'Steering'],
             ['data' => 'model', 'name' => 'model','title' => 'Model'],
             ['data' => 'sfx', 'name' => 'sfx','title' => 'SFX'],
+            ['data' => 'model_year', 'name' => 'model_year','title' => 'Model Year'],
             ['data' => 'variant_id', 'name' => 'variant_id','title' => 'Variant'],
+            ['data' => 'transcar_loi_description', 'name' => 'transcar_loi_description','title' => 'Trans Car LOI'],
+            ['data' => 'milele_loi_description', 'name' => 'milele_loi_description','title' => 'Milele LOI'],
             ['data' => 'amount_uae', 'name' => 'amount_uae','title' => 'Amount in UAE '],
             ['data' => 'amount_belgium', 'name' => 'amount_belgium','title' => 'Amount in Belgium '],
             ['data' => 'action', 'name' => 'action','title' => 'Action'],
@@ -67,10 +70,12 @@ class MasterModelController extends Controller
      */
     public function store(Request $request)
     {
+//        return dd($request->all());
         $this->validate($request, [
             'model' => 'required',
             'sfx' => 'required',
             'variant_id' => 'required',
+            'model_year' => 'required'
         ]);
 
         $isAlreadyExist = MasterModel::where('model', $request->model)
@@ -90,7 +95,12 @@ class MasterModelController extends Controller
         $model->variant_id = $request->variant_id;
         $model->amount_uae = $request->amount_uae;
         $model->amount_belgium = $request->amount_belgium;
+        $model->is_milele = $request->is_milele ? true : false;
+        $model->is_transcar = $request->is_transcar ? true : false;
+        $model->milele_loi_description = $request->milele_loi_description;
+        $model->transcar_loi_description = $request->transcar_loi_description;
         $model->created_by = Auth::id();
+
         $model->save();
 
         return redirect()->route('master-models.index')->with('success','Model Created Successfully.');
@@ -158,6 +168,18 @@ class MasterModelController extends Controller
         //
     }
     public function getLoiDescription(Request $request) {
+        info("success");
+        info($request->all());
+        $variant = Varaint::find($request->id);
+        if($request->is_milele == 1) {
+            $data['milele_loi_format'] = $variant->master_model_lines->model_line.' '.$variant->engine.' Litre '.$variant->fuel_type.' '.$variant->steering;
+        }
+        if($request->is_transcar == 1) {
+            $data['transcar_loi_format'] = $variant->steering.', BRAND NEW, '.$variant->brand->brand_name.' '.$variant->master_model_lines->model_line.', '.$variant->fuel_type.' ENGINE'.$variant->engine
+                .' - SPECIFICATION ATTACHED IN APPENDIX';
+        }
+        info($data);
+        return response()->json($data);
 
     }
 }
