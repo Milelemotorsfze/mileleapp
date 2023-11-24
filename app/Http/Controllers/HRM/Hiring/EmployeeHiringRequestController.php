@@ -77,7 +77,7 @@ class EmployeeHiringRequestController extends Controller
             try {
                 $authId = Auth::id();
                 $departmentHead = DepartmentHeadApprovals::where('department_id',$request->department_id)->first();
-                $hiringManager = ApprovalByPositions::where('approved_by_position','Hiring Manager')->first();
+                $hiringManager = ApprovalByPositions::where('approved_by_position','Recruiting Manager')->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $input = $request->all();
                 if($id == 'new') {
@@ -152,7 +152,7 @@ class EmployeeHiringRequestController extends Controller
         $deptHead = $hiringManagerPendings = $hiringManagerApproved = $hiringManagerRejected = $deptHeadPendings = $deptHeadApproved = $deptHeadRejected = 
         $HRManagerPendings = $HRManagerApproved = $HRManagerRejected = [];
         $hiringManager = ApprovalByPositions::where([
-            ['approved_by_position','Hiring Manager'],
+            ['approved_by_position','Recruiting Manager'],
             ['handover_to_id',$authId]
         ])->first();
         $deptHead = DepartmentHeadApprovals::where([
@@ -219,7 +219,7 @@ class EmployeeHiringRequestController extends Controller
     public function requestAction(Request $request) {
         $message = '';
         $update = EmployeeHiringRequest::where('id',$request->id)->first();
-        if($request->current_approve_position == 'Hiring Manager') {
+        if($request->current_approve_position == 'Recruiting Manager') {
             $update->comments_by_hiring_manager = $request->comment;
             $update->hiring_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
             $update->action_by_hiring_manager = $request->status;

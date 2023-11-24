@@ -188,7 +188,7 @@ class EmployeeHiringRequest extends Model
         $deptHead = [];
         $authId = Auth::id();
         $hiringManager = ApprovalByPositions::where([
-            ['approved_by_position','Hiring Manager'],
+            ['approved_by_position','Recruiting Manager'],
             ['handover_to_id',$authId]
         ])->first();
         $deptHead = DepartmentHeadApprovals::where([
@@ -200,7 +200,7 @@ class EmployeeHiringRequest extends Model
         ])->first();
         if($hiringManager && $this->action_by_hiring_manager == 'pending' && $this->hiring_manager_id == $authId) { 
             $isAuthUserCanApprove['can_approve'] = true;
-            $isAuthUserCanApprove['current_approve_position'] = 'Hiring Manager';
+            $isAuthUserCanApprove['current_approve_position'] = 'Recruiting Manager';
             $isAuthUserCanApprove['current_approve_person'] = $this->hiring_manager_name;
         }
         else if(count($deptHead) > 0 && $this->action_by_hiring_manager == 'approved' && $this->action_by_department_head == 'pending' && 
@@ -226,7 +226,7 @@ class EmployeeHiringRequest extends Model
             $currentStatus = 'Rejected';
         }
         else if($this->status == 'pending' && $this->action_by_hiring_manager == 'pending') {
-            $currentStatus = "Hiring Manager's Approval Awaiting";
+            $currentStatus = "Recruiting Manager's Approval Awaiting";
         }
         else if($this->status == 'pending' && $this->action_by_department_head == 'pending') {
             $currentStatus = "Department Head's Approval Awaiting";
