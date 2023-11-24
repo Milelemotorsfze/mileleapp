@@ -67,10 +67,9 @@ class VisaTypeMasterSeeder extends Seeder
             ['id' => 18,'department_id' => 18,'department_head_id'=> 10,'approval_by_id' => 10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
         ]);
         DB::table('approval_by_positions')->insert([
-            ['id' => 1,'approved_by_position' => 'Hiring Manager','approved_by_id'=> 10,'handover_to_id' => 10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 1,'approved_by_position' => 'Recruiting Manager','approved_by_id'=> 10,'handover_to_id' => 10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
             ['id' => 2,'approved_by_position' => 'HR Manager','approved_by_id'=> 10,'handover_to_id' => 10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
             ['id' => 3,'approved_by_position' => 'Finance Manager','approved_by_id'=> 10,'handover_to_id' => 10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
-            ['id' => 4,'approved_by_position' => 'Supervisor','approved_by_id'=> 10,'handover_to_id' => 10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
         ]);
         DB::table('masters_recuritment_sources')->insert([
             ['id' => 1,'name' => 'Job Boards','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
@@ -86,7 +85,6 @@ class VisaTypeMasterSeeder extends Seeder
             ['id' => 2,'name' => 'Logistics','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
             ['id' => 3,'name' => 'Finance','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
             ['id' => 4,'name' => 'Consultancy','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
-            ['id' => 5,'name' => 'Other','status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
         ]);
         DB::table('passport_request_purposes')->insert([
             ['id' => 1,'name' => 'Safekeeping','type' => 'submit','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],

@@ -8,13 +8,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 
 <!-- <div class="card-header">
 	<h4 class="card-title">
-		Approvals By Hiring Manager
+		Approvals By Recruiting Manager
 	</h4>
 </div> -->
 @if(count($hiringManagerPendings) > 0 || count($hiringManagerApproved) > 0 || count($hiringManagerRejected) > 0)
 <div class="card-header">
 	<h4 class="card-title">
-		Employee Hiring Request Approvals By Hiring Manager
+		Employee Hiring Request Approvals By Recruiting Manager
 	</h4>
 	<!-- <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> -->
 	@if(isset($page))
