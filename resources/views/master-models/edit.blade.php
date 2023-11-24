@@ -53,7 +53,7 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label  class="form-label">Model Year</label>
-                        <input type="text" class="form-control" id="model-year" name="model_year" placeholder="Enter Model Year">
+                        <input type="text" class="form-control" id="model-year"  value="{{ $masterModel->model_year }}"  name="model_year" placeholder="Enter Model Year">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
@@ -361,7 +361,7 @@
                             $("#variant-items").append('<div class="col-sm-4"> ' +
                                 '<div class="row mt-2"> ' +
                                 '<div class="col-sm-3">' +
-                                ' <dl id="variant-specification"> '+ value.model_specification.name +' : </dl> ' +
+                                ' <dl id="variant-specification"> '+ value.model_specification.name ?? '' +' : </dl> ' +
                                 '</div> ' +
                                 '<div class="col-sm-9"> ' +
                                 '<dl id="variant-specification-option"> '+ value.model_specification_option.name ?? '' +' </dl> ' +
