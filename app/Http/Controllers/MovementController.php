@@ -159,7 +159,7 @@ class MovementController extends Controller
             if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
             $vehicle = Vehicles::where('vin', $vin[$index])->first();
             if ($vehicle) {
-                if (($to[$index] === '1' && $from[$index] !== '3')) {
+                if (($from[$index] === '1' && $to[$index] !== '3')) {
                     $grnVins[] = $vin[$index];
                 } elseif ($to[$index] === '2') {
                     $gdnVins[] = $vin[$index];
