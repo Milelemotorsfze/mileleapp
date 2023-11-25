@@ -120,8 +120,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <label for="designation_id" class="form-label"><span class="error">* </span>{{ __('Designation Name') }}</label>
                 <select name="designation_id" id="requested_job_title" class="form-control widthinput" multiple="true" autofocus>
                     @foreach($masterDesignations as $masterDesignation)
-                    <option value="{{$masterDesignation->id}}" {{ $masterDesignation->id == $data->questionnaire->designation->id ? 'selected' : '' }}>{{$masterDesignation->name}}</option>
+                    <option value="{{$masterDesignation->id}}" {{ $data && $data->questionnaire && $data->questionnaire->designation && $masterDesignation->id == $data->questionnaire->designation->id ? 'selected' : '' }}>{{$masterDesignation->name}}</option>
                     @endforeach
+
                 </select>
             </div>
             <div class="col-lg-4 col-md-6 col-sm-6">
@@ -140,9 +141,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                 <label for="reporting_structure" class="form-label"><span class="error">* </span>{{ __('Reporting To') }}</label>
                 <select name="reporting_structure" id="reporting_structure" class="form-control widthinput" multiple="true" autofocus>
-                    <option value="management" {{ $data->questionnaire->reporting_structure == 'management' ? 'selected' : '' }}>Management</option>
-                    <option value="team_lead" {{ $data->questionnaire->reporting_structure == 'team_lead' ? 'selected' : '' }}>Team Lead / Manager</option>
+                    <option value="management" {{ $data && $data->questionnaire && $data->questionnaire->reporting_structure == 'management' ? 'selected' : '' }}>Management</option>
+
+                    <option value="team_lead" {{ $data && $data->questionnaire && $data->questionnaire->reporting_structure == 'team_lead' ? 'selected' : '' }}>Team Lead / Manager</option>
                 </select>
+
             </div>
 
             <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
@@ -150,7 +153,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <label for="location_id" class="form-label"><span class="error">* </span>{{ __('Work Location') }}</label>
                 <select name="location_id" id="location_id" class="form-control widthinput" multiple="true" autofocus>
                     @foreach($masterOfficeLocations as $masterOfficeLocation)
-                    <option value="{{$masterOfficeLocation->id}}" {{ $masterOfficeLocation->id == $data->questionnaire->workLocation->id ? 'selected' : '' }}>{{$masterOfficeLocation->name}}</option>
+                    <option value="{{$masterOfficeLocation->id}}" {{ $data && $data->questionnaire && $data->questionnaire->workLocation && $masterOfficeLocation->id == $data->questionnaire->workLocation->id ? 'selected' : '' }}>{{$masterOfficeLocation->name}}</option>
                     @endforeach
                 </select>
             </div>
@@ -199,9 +202,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <label for="education" class="form-label"><span class="error">* </span>{{ __('Education') }}</label>
                 <select name="education" id="education" class="form-control widthinput" autofocus>
                     <option value="" disabled selected>Choose Option</option>
-                    <option value="high_school" {{ $data->questionnaire->education == 'high_school' ? 'selected' : '' }}>High School</option>
-                    <option value="bachelors" {{ $data->questionnaire->education == 'bachelors' ? 'selected' : '' }}>Bachelors</option>
-                    <option value="pg_in_same_specialisation_or_related_to_department" {{ $data->questionnaire->education == 'pg_in_same_specialisation_or_related_to_department' ? 'selected' : '' }}>PG in the same specailisation or related to department</option>
+                    <option value="high_school" {{ $data && $data->questionnaire && $data->questionnaire->education == 'high_school' ? 'selected' : '' }}>High School</option>
+                    <option value="bachelors" {{ $data && $data->questionnaire && $data->questionnaire->education == 'bachelors' ? 'selected' : '' }}>Bachelors</option>
+                    <option value="pg_in_same_specialisation_or_related_to_department" {{ $data && $data->questionnaire && $data->questionnaire->education == 'pg_in_same_specialisation_or_related_to_department' ? 'selected' : '' }}>PG in the same specialization or related to the department</option>
                 </select>
             </div>
 
@@ -228,8 +231,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <label for="industry_experience_id" class="form-label"><span class="error">* </span>{{ __('Any specific industry experience') }}</label>
                 <select name="industry_experience_id" id="industry_experience_id" class="form-control widthinput" multiple="true" autofocus>
                     @foreach($masterSpecificIndustryExperiences as $masterSpecificIndustryExperience)
-                    <option value="{{$masterSpecificIndustryExperience->id}}" {{ $masterSpecificIndustryExperience->id == $data->questionnaire->industry_experience_id ? 'selected' : '' }}>{{$masterSpecificIndustryExperience->name}}</option>
+                    <option value="{{$masterSpecificIndustryExperience->id}}" {{ $data && $data->questionnaire && $data->questionnaire->industry_experience_id && $masterSpecificIndustryExperience->id == $data->questionnaire->industry_experience_id ? 'selected' : '' }}>{{$masterSpecificIndustryExperience->name}}</option>
                     @endforeach
+
                 </select>
             </div>
 
@@ -273,8 +277,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <label for="visa_type" class="form-label"><span class="error">* </span>{{ __('Visa Type') }}</label>
                         <select name="visa_type" id="visa_type" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($masterVisaTypes as $masterVisaType)
-                            <option value="{{$masterVisaType->id}}" {{ $masterVisaType->id == $data->questionnaire->visa_type ? 'selected' : '' }}>{{$masterVisaType->name}}</option>
+                            <option value="{{$masterVisaType->id}}" {{ $data && $data->questionnaire && $data->questionnaire->visa_type && $masterVisaType->id == $data->questionnaire->visa_type ? 'selected' : '' }}>{{$masterVisaType->name}}</option>
                             @endforeach
+
                         </select>
                     </div>
 
@@ -283,7 +288,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <label for="nationality" class="form-label"><span class="error">* </span>{{ __('Nationality') }}</label>
                         <select name="nationality" id="nationality" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($masterNationality as $Country)
-                            <option value="{{$Country->id}}" {{ $Country->id == $data->questionnaire->nationality ? 'selected' : '' }}>{{$Country->name}}</option>
+                            <option value="{{$Country->id}}" {{ $data && $data->questionnaire && $data->questionnaire->nationality && $Country->id == $data->questionnaire->nationality ? 'selected' : '' }}>{{$Country->name}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -311,10 +316,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <label for="language_id" class="form-label"><span class="error">* </span>{{ __('Additional Language(s):') }}</label>
                         <select name="language_id[]" id="language_id" class="form-control widthinput" multiple autofocus>
                             @foreach($masterLanguages as $Language)
-                            <option value="{{$Language->id}}" {{ in_array($Language->id, $data->questionnaire->additionalLanguages->pluck('language_id')->toArray()) ? 'selected' : '' }}>
+                            <option value="{{$Language->id}}" {{ $data && $data->questionnaire && $data->questionnaire->additionalLanguages && in_array($Language->id, $data->questionnaire->additionalLanguages->pluck('language_id')->toArray()) ? 'selected' : '' }}>
                                 {{$Language->name}}
                             </option>
                             @endforeach
+
                         </select>
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-12 radio-button-main-div">
@@ -431,9 +437,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                     <label for="commission_type" class="form-label"><span class="error">* </span>{{ __('Choose Amount or Percentage') }}</label>
                                     <select name="commission_type" id="commission_type" class="form-control widthinput" onchange="showAmountPercentageInput(this)" autofocus>
                                         <option value="" disabled selected>Choose Option</option>
-                                        <option value="amount" {{ $data->questionnaire->commission_type == 'amount' ? 'selected' : '' }}>Amount</option>
-                                        <option value="percentage" {{ $data->questionnaire->commission_type == 'percentage' ? 'selected' : '' }}>Percentage</option>
+                                        <option value="amount" {{ $data && $data->questionnaire && $data->questionnaire->commission_type == 'amount' ? 'selected' : '' }}>Amount</option>
+                                        <option value="percentage" {{ $data && $data->questionnaire && $data->questionnaire->commission_type == 'percentage' ? 'selected' : '' }}>Percentage</option>
                                     </select>
+
                                 </div>
                             </div>
 
@@ -525,7 +532,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <label for="interviewd_by" class="form-label"><span class="error">* </span>{{ __('Interviewed By:') }}</label>
                         <select name="interviewd_by" id="interviewd_by" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($interviewdByUsers as $User)
-                            <option value="{{$User->id}}" {{ $User->id == $data->questionnaire->interviewd_by ? 'selected' : '' }}>{{$User->name}}</option>
+                            <option value="{{$User->id}}" {{$data && $data->questionnaire && $data->questionnaire->interviewd_by && $User->id == $data->questionnaire->interviewd_by ? 'selected' : '' }}>{{$User->name}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -555,18 +562,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <label for="trial_work_job_description" class="form-label"><span class="error">* </span>{{ __('Job description during trial Working') }}</label>
                         <textarea name="trial_work_job_description" class="form-control" rows="3" cols="15">{{$data->questionnaire->trial_work_job_description ?? ''}}</textarea>
                     </div>
-                    
+
                     <div class="col-lg-4 col-md-6 col-sm-12 col-12">
                         <label for="job_evaluation_stake_holders" class="form-label"><span class="error">* </span>{{ __('Stakeholders for Job Evaluation') }}</label>
                         <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                             <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
-                                <input class="form-check-input" name="internal_department_evaluation" type="checkbox" id="internal_department_evaluation" value="internal_department_evaluation" {{ $data->questionnaire->job_evaluation_stake_holders === 'Internal Departments , ' ? 'checked' : 'not' }}>
+                                <input class="form-check-input" name="internal_department_evaluation" type="checkbox" id="internal_department_evaluation" value="internal_department_evaluation" {{ $data && $data->questionnaire && $data->questionnaire->job_evaluation_stake_holders === 'Internal Departments , ' ? 'checked' : '' }}>
                                 <label class="form-check-label" for="internal_department_evaluation">Internal Departments</label>
                             </div>
                             <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
-                                <input class="form-check-input" name="external_vendor_evaluation" type="checkbox" id="external_vendor_evaluation" value="external_vendor_evaluation" {{ $data->questionnaire->job_evaluation_stake_holders === 'External vendors , ' ? 'checked' : 'not' }}>
+                                <input class="form-check-input" name="external_vendor_evaluation" type="checkbox" id="external_vendor_evaluation" value="external_vendor_evaluation" {{ $data && $data->questionnaire && $data->questionnaire->job_evaluation_stake_holders === 'External vendors , ' ? 'checked' : '' }}>
                                 <label class="form-check-label" for="external_vendor_evaluation">External vendors</label>
                             </div>
+
                         </div>
                     </div>
 
@@ -574,7 +582,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <label for="recruitment_source_id" class="form-label"><span class="error">* </span>{{ __('Recruitment Source:') }}</label>
                         <select name="recruitment_source_id" id="recruitment_source_id" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($masterRecuritmentSources as $MasterRecuritmentSource)
-                            <option value="{{$MasterRecuritmentSource->id}}" {{ $MasterRecuritmentSource->id == $data->questionnaire->recruitment_source_id ? 'selected' : '' }}>{{$MasterRecuritmentSource->name}}</option>
+                            <option value="{{$MasterRecuritmentSource->id}}" {{$data && $data->questionnaire && $data->questionnaire->recruitment_source_id && $MasterRecuritmentSource->id == $data->questionnaire->recruitment_source_id ? 'selected' : '' }}>{{$MasterRecuritmentSource->name}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -624,7 +632,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <label for="department_id" class="form-label"><span class="error">* </span>{{ __('Division / Department:') }}</label>
                         <select name="department_id" id="department_id" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($masterDepartments as $MasterDeparment)
-                            <option value="{{$MasterDeparment->id}}" {{ $MasterDeparment->id == $data->questionnaire->department_id ? 'selected' : '' }}>{{$MasterDeparment->name}}</option>
+                            <option value="{{$MasterDeparment->id}}" {{$data && $data->questionnaire && $data->questionnaire->department_id && $MasterDeparment->id == $data->questionnaire->department_id ? 'selected' : '' }}>{{$MasterDeparment->name}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -757,7 +765,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <label for="next_career_path_id" class="form-label"><span class="error">* </span>{{ __('Next Career path:') }}</label>
                         <select name="next_career_path_id" id="next_career_path_id" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($masterExperienceLevels as $MasterExperienceLevel)
-                            <option value="{{$MasterExperienceLevel->id}}" {{ $MasterExperienceLevel->id == $data->questionnaire->next_career_path_id ? 'selected' : '' }}>{{$MasterExperienceLevel->name}} ( {{$MasterExperienceLevel->number_of_year_of_experience}} )</option>
+                            <option value="{{$MasterExperienceLevel->id}}" {{$data && $data->questionnaire && $data->questionnaire->next_career_path_id && $MasterExperienceLevel->id == $data->questionnaire->next_career_path_id ? 'selected' : '' }}>{{$MasterExperienceLevel->name}} ( {{$MasterExperienceLevel->number_of_year_of_experience}} )</option>
                             @endforeach
                         </select>
                     </div>
