@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AddonDetails;
+use App\Models\HRM\Employee\EmployeeProfile;
 use App\Models\OtherLogisticsCharges;
 use App\Models\quotation;
 use App\Models\Calls;
@@ -10,6 +11,7 @@ use App\Models\Brand;
 use App\Models\QuotationClient;
 use App\Models\QuotationDetail;
 use App\Models\QuotationItem;
+use App\Models\Setting;
 use App\Models\Shipping;
 use App\Models\ShippingCertification;
 use App\Models\ShippingDocuments;
@@ -59,9 +61,6 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
-//        $directory = Storage::url('quotation_files');
-//        return $directory;
-//        return dd($request->all());
         DB::beginTransaction();
 
         $call = Calls::find($request->calls_id);
@@ -179,17 +178,31 @@ class QuotationController extends Controller
             ->where('quotation_id', $quotation->id)->get();
 //        return view('proforma.proforma_invoice', compact('quotationItem','quotation','call','quotationDetail',
 //            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications'));
+        $salesPersonDetail = EmployeeProfile::where('user_id', Auth::id())->first();
+
         $data = [];
         $data['sales_person'] = Auth::user()->name;
+        $data['sales_office'] = 'Central 191';
+        $data['sales_phone'] = '';
+        $data['sales_email'] = Auth::user()->email;
+        $data['client_id'] = $call->id;
         $data['client_email'] = $call->email;
         $data['client_name'] = $call->name;
-        $data['customer_reference_number'] = $call->id;
         $data['client_phone'] = $call->phone;
         $data['client_address'] = $call->address;
+        $data['document_number'] = $quotation->id;
+        $data['company'] = $call->company_name;
+        $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
+        if($salesPersonDetail) {
+            $data['sales_office'] = $salesPersonDetail->office;
+            $data['sales_phone'] = $salesPersonDetail->contact_number;
+        }
+//        $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
+        $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
 
-        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail',
+        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons'));
-
+//        return $pdfFile->stream("test.pdf");
         $filename = 'quotation_'.$quotation->id.'.pdf';
         $generatedPdfDirectory = public_path('Quotations');
         $directory = public_path('storage/quotation_files');

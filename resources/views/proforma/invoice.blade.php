@@ -230,7 +230,7 @@
                         <label for="timeRange">Person :</label>
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="person"  placeholder="Person Name"  class="form-control form-control-xs" id="person" value="{{$callDetails->name}}">
+                        <input type="text" name="name"  placeholder="Person Name"  class="form-control form-control-xs" id="person" value="{{$callDetails->name}}">
                     </div>
                 </div>
                 <div class="row">
@@ -238,7 +238,7 @@
                         Contact No :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="contact_number"  class="form-control form-control-xs" id="contact_number" value="{{$callDetails->phone}}" placeholder="Phone">
+                        <input type="text" name="phone"  class="form-control form-control-xs" id="contact_number" value="{{$callDetails->phone}}" placeholder="Phone">
                     </div>
                 </div>
                 <div class="row">

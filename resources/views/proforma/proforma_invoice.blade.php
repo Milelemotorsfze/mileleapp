@@ -15,6 +15,7 @@
             padding-right: 10px;
             padding-left: 10px;
             color: #FFFFFF;
+            font-weight: bold;
         }
         table {
             width: 100%;
@@ -51,7 +52,13 @@
                         <img src="{{ public_path('images/proforma/proforma_logo.png') }}" width="300px" height="85px" ><span class="logo-txt"></span>
                     </td>
                     <td style="text-align:right;font-size: 10px;">
-                        <p style="font-weight: bold;text-align:right;margin-bottom: 5px;"> PROFORMA INVOICE </p>
+                        <p style="font-weight: bold;text-align:right;margin-bottom: 5px;font-size: 16px;">
+                            @if($quotation->document_type == 'Quotation')
+                                QUOTATION
+                            @else
+                                PROFORMA INVOICE
+                            @endif
+                        </p>
                         <p class="margin-0" style="text-align:right;"> Office No-AF 07, Block A,Samari Retail </p>
                         <p class="margin-0"> Ras al khor, United Arab Emirates </p>
                         <p class="margin-0"> Tel.: +97143235991 | Email: info@milele.com </p>
@@ -61,44 +68,123 @@
                 </tr>
             </table>
         </div>
-        <table style="background-color: #FFFFFF;color: black">
-            <tr>
-                <td> <span style="font-weight: bold;">Proforma Invoice No :  </span> </td>
-                <td> <span > {{ $quotation->id }} </span> </td>
-                <td> <span style="font-weight: bold;">DATE :  </span> </td>
-                <td> <span> {{ \Illuminate\Support\Carbon::parse($quotation->created_at)->format('d M Y') }} </span> </td>
-            </tr>
-            <tr>
-                <td> <span style="font-weight: bold;">Sales Person :  </span> </td>
-                <td> <span> {{ $data['sales_person'] }}</span> </td>
-                <td> <span style="font-weight: bold;">CM Reference No: </span> </td>
-                <td> <span> {{ $data['customer_reference_number'] }} </span> </td>
-            </tr>
-        </table>
+{{--        <table style="background-color: #FFFFFF;color: black">--}}
+{{--            <tr>--}}
+{{--                <td> <span style="font-weight: bold;">Sales Person :  </span> </td>--}}
+{{--                <td> <span> {{ $data['sales_person'] }}</span> </td>--}}
+{{--                <td> <span style="font-weight: bold;">CM Reference No: </span> </td>--}}
+{{--                <td> <span> {{ $data['customer_reference_number'] }} </span> </td>--}}
+{{--            </tr>--}}
+{{--        </table>--}}
+        <div class="header" style="margin-top: 5px">
+            <table >
+                <td colspan="2">Document Details</td>
+                <td colspan="2">Client Details</td>
+                <td colspan="2">Delivery Details</td>
+            </table>
+        </div>
+        <div  style="color: black">
+            <table style="border: none;">
+                <tr>
+                    <td style="font-weight: bold;">Document No :</td>
+                    <td>{{ $data['document_number'] }}</td>
+                    <td style="font-weight: bold;">Customer ID :</td>
+                    <td> {{ $data['client_id'] }}</td>
+                    <td style="font-weight: bold;"> @if($quotation->shipping_method == 'EXW') Final Destination : @else Place Of Supply :  @endif</td>
+                    <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->final_destination  }} @else
+                        {{ $quotationDetail->place_of_supply }}  @endif </td>
+
+                </tr>
+                <tr>
+                    <td style="font-weight: bold;">Document Date :</td>
+                    <td>{{ $data['document_date'] }}</td>
+                    <td style="font-weight: bold;">Company :</td>
+                    <td>{{ $data['company'] }}</td>
+                    <td style="font-weight: bold;">
+                        @if($quotation->shipping_method == 'EXW') Incoterm :@endif </td>
+                    <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->incoterm  }} @endif </td>
+
+                </tr>
+                <tr>
+                    <td style="font-weight: bold;">Document Validity :</td>
+                    <td>{{ $quotationDetail->document_validity }} @if($quotationDetail->document_validity == 1) Day @else Days @endif</td>
+                    <td style="font-weight: bold;">Person :</td>
+                    <td>{{  $data['client_name']  }} </td>
+                    <td style="font-weight: bold;">
+                        @if($quotation->shipping_method == 'EXW') Place Of Delivery :@endif </td>
+                    <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->place_of_delivery  }} @endif </td>
+
+                </tr>
+
+                <tr>
+                    <td style="font-weight: bold;">Sales Person :</td>
+                    <td>{{$data['sales_person'] }}</td>
+                    <td style="font-weight: bold;">Phone :</td>
+                    <td>{{  $data['client_phone']  }} </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold;">Sales Office :</td>
+                    <td>{{ $data['sales_office']  }}</td>
+                    <td style="font-weight: bold;">Email :</td>
+                    <td>{{  $data['client_email'] }} </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold;">Sales Email :</td>
+                    <td>{{ $data['sales_email']  }}</td>
+                    <td style="font-weight: bold;">Address :</td>
+                    <td>{{  $data['client_address']  }} </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold;">Sales Contact :</td>
+                    <td>{{ $data['sales_phone']  }}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+
         <div class="header">
-           <p style="font-weight: bold;padding-top:10px;padding-bottom: 10px;"> CLIENT DETAILS </p>
+            <table >
+                <td colspan="2">Payment Details</td>
+                <td colspan="4">Client  Representative</td>
+            </table>
         </div>
-        <div id="details" style="color: black">
-            <p style="margin-bottom: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 20px;"> Destination Country:  </span>
-                {{ $quotationDetail->final_destination }}</p>
-            <p style="margin-bottom: 5px;margin-top: 5px;">
-                <span style="font-weight: bold;margin-right: 20px;">  Company/Individual: </span> Individual</p>
-            <p style="margin-bottom: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 45px;">  Contact Person:  </span>
-                {{ strtoupper( $data['client_name'] ) }} </p>
-            <p style="margin-bottom: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 100px;">  Email: </span>
-                {{  $data['client_email'] }}</p>
-            <p style="margin-bottom: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 75px;">  Phone No: </span>
-                {{  $data['client_phone'] }}</p>
-            <p style="margin-top: 5px;margin-top: 5px;"> <span style="font-weight: bold;margin-right: 80px;"> Address: </span>
-                {{  $data['client_address'] }} </p>
+        <div  style="color: black">
+            <table style="border: none;">
+                <tr>
+                    <td style="font-weight: bold;">System Code :</td>
+                    <td>{{ $quotationDetail->system_code }}</td>
+                    <td style="font-weight: bold;">Rep Name :</td>
+                    <td> {{ $quotationDetail->representative_name }}</td>
+                    <td style="font-weight: bold;"> CB Name :</td>
+                    <td> {{ $quotationDetail->cb_name }} </td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold;">Payment Terms :</td>
+                    <td>{{ $quotationDetail->payment_terms }}</td>
+                    <td style="font-weight: bold;">Rep No. :</td>
+                    <td> {{ $quotationDetail->representative_number }}</td>
+                    <td style="font-weight: bold;"> CB No :</td>
+                    <td> {{ $quotationDetail->cb_number }} </td>
+                </tr>
+            </table>
         </div>
+
         <div class="header">
             <p style="font-weight: bold;padding-top:10px;padding-bottom: 10px;text-align: center"> I. DESCRIPTION AND BREAKDOWN OF GOODS </p>
         </div>
         <table id="details">
             @if($vehicles->count() > 0 || $variants->count() > 0)
                 <tr>
-                    <th>01. VEHICLE</th>
+                    <th> VEHICLE</th>
                     <th>QTY</th>
                     <th>PRICE</th>
                     <th>AMOUNT</th>
@@ -122,7 +208,7 @@
             @endif
             @if($shippingDocuments->count() > 0 || $shippingCharges->count() > 0)
                 <tr>
-                    <th>02. LOGISTICS</th>
+                    <th> LOGISTICS</th>
                     <th>QTY</th>
                     <th>PRICE</th>
                     <th>AMOUNT</th>
@@ -147,7 +233,7 @@
 
             @if($addons->count() > 0 || $directlyAddedAddons->count() > 0)
                 <tr>
-                    <th>03. ADD ONS AND EXTRA ITEM </th>
+                    <th> ADD ONS AND EXTRA ITEM </th>
                     <th>QTY</th>
                     <th>PRICE</th>
                     <th>AMOUNT</th>
@@ -171,7 +257,7 @@
             @endif
             @if($shippingCertifications->count() > 0 || $otherDocuments->count() > 0)
                 <tr>
-                    <th>04. COMPLIANCE AND CERTIFICATES</th>
+                    <th> COMPLIANCE AND CERTIFICATES</th>
                     <th>QTY</th>
                     <th>PRICE</th>
                     <th>AMOUNT</th>
@@ -195,7 +281,7 @@
             @endif
                 @if($quotation->document_type == 'Proforma Invoice')
                     <tr>
-                        <th colspan="3">05. DEPOSIT / PAYMENT RECEIVED</th>
+                        <th colspan="3"> DEPOSIT / PAYMENT RECEIVED</th>
                         <th>AMOUNT</th>
                     </tr>
                     <tr>
@@ -289,6 +375,12 @@
             unilateral acceptance of these terms. Before making any transaction, the buyer has had the full opportunity to review these terms in detail, thereby affirming their understanding and
             acceptance.
         </p>
+        @if($quotation->shipping_method == 'EXW')
+           <p style="font-weight: bolder"> Currency Exchange </p>
+            <p> Bank Payments AED transfers at actuals. USD transfer at {{ $aed_to_usd_rate->value }} and customer must remit $50 equivalent extra to cover for bank fees.
+                Cash Payments AED at actuals, USD New Bills $100 at {{ $aed_to_usd_rate->value }}, all other bills at 3.60. </p>
+
+        @endif
         <table>
             <td style="font-weight: bold">
                 <p> Accepted By </p>
