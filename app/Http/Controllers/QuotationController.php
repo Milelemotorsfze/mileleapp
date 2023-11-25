@@ -197,16 +197,14 @@ class QuotationController extends Controller
             $data['sales_office'] = $salesPersonDetail->office;
             $data['sales_phone'] = $salesPersonDetail->contact_number;
         }
-//        $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
+        $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
 
-        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate',
+        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons'));
-//        return $pdfFile->stream("test.pdf");
         $filename = 'quotation_'.$quotation->id.'.pdf';
         $generatedPdfDirectory = public_path('Quotations');
         $directory = public_path('storage/quotation_files');
-//        $directory = storage_path('app/public/quotation_files');
         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
         $pdfFile->save($generatedPdfDirectory . '/' . $filename);
 
@@ -215,7 +213,6 @@ class QuotationController extends Controller
         $pdf->Output($directory.'/'.$file,'F');
         $quotation->file_path = 'quotation_files/'.$file;
         $quotation->save();
-//        session()->flash('newurl', $newUrl);
         return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation created successfully.');
     }
     public function pdfMerge($quotationId)

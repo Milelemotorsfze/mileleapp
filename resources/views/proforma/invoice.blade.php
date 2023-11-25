@@ -524,7 +524,7 @@
                             <thead class="bg-soft-secondary">
                                 <tr>
 {{--                                    <th>ID</th>--}}
-                                    <th>Status</th>
+{{--                                    <th>Status</th>--}}
 {{--                                    <th>VIN</th>--}}
                                     <th>Brand Name</th>
                                     <th>Model Line</th>
@@ -1335,7 +1335,7 @@
 
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var price = row[8];
+                        var price = row[7];
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                         var price = row[4];
@@ -1368,10 +1368,10 @@
 
                     var combinedValue = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var brand = row[1];
-                        var modelDescription = row[3];
-                        var interiorColor = row[6];
-                        var exteriorColor = row[7];
+                        var brand = row[0];
+                        var modelDescription = row[2];
+                        var interiorColor = row[5];
+                        var exteriorColor = row[6];
                         var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
@@ -1413,7 +1413,7 @@
                 render: function (data, type, row) {
                     var code = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var code = row[4];
+                        var code = row[3];
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
 
@@ -1433,11 +1433,10 @@
                 render: function (data, type, row) {
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var price = row[8];
+                        var price = row[7];
                     }else{
                         var price = row[4];
                     }
-
                     var currency = $('#currency').val();
 
                     if(currency == 'USD') {
@@ -1447,7 +1446,6 @@
                         var value = '{{ $aed_to_eru_rate->value }}';
                         var price = price / parseFloat(value);
                     }
-
                     return '<input type="number" min="0" name="prices[]" required class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>';
                 }
             }
@@ -1463,7 +1461,7 @@
         }
         else if(row['button_type'] == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
+            table.row.add(['', row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
                 '<button class="add-button circle-button" data-button-type="Vehicle" data-variant-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Shipping-Document') {
@@ -1738,7 +1736,6 @@
         row.find('td').each(function() {
             rowData.push($(this).html());
         });
-
         var secondTable = $('#dtBasicExample2').DataTable();
 
         if(buttonType == 'Shipping') {
@@ -1886,7 +1883,7 @@
                     var addButton = '<button class="add-button" data-button-type="Vehicle" data-variant-id="'+ variantId +'" >Add</button>';
                     return [
                         // vehicle.id,
-                        vehicle.grn_status,
+                        // vehicle.grn_status,
                         // vehicle.vin,
                         vehicle.brand,
                         vehicle.model_line,
@@ -1906,7 +1903,7 @@
                     data: data,
                     columns: [
                         // { title: 'ID' },
-                        { title: 'Status' },
+                        // { title: 'Status' },
                         // { title: 'VIN' },
                         { title: 'Brand Name' },
                         { title: 'Model Line' },

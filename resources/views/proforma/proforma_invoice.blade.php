@@ -76,15 +76,14 @@
 {{--                <td> <span> {{ $data['customer_reference_number'] }} </span> </td>--}}
 {{--            </tr>--}}
 {{--        </table>--}}
-        <div class="header" style="margin-top: 5px">
-            <table >
-                <td colspan="2">Document Details</td>
-                <td colspan="2">Client Details</td>
-                <td colspan="2">Delivery Details</td>
-            </table>
-        </div>
+
         <div  style="color: black">
             <table style="border: none;">
+                <tr style="background-color: #0f2c52;color: #FFFFFF;font-weight: bold">
+                    <td colspan="2">Document Details</td>
+                    <td colspan="2">Client Details</td>
+                    <td colspan="2">Delivery Details</td>
+                </tr>
                 <tr>
                     <td style="font-weight: bold;">Document No :</td>
                     <td>{{ $data['document_number'] }}</td>
@@ -151,14 +150,12 @@
             </table>
         </div>
 
-        <div class="header">
-            <table >
-                <td colspan="2">Payment Details</td>
-                <td colspan="4">Client  Representative</td>
-            </table>
-        </div>
         <div  style="color: black">
             <table style="border: none;">
+                <tr style="background-color: #0f2c52;color: #FFFFFF;font-weight: bold">
+                    <td colspan="2">Payment Details</td>
+                    <td colspan="4">Client  Representative</td>
+                </tr>
                 <tr>
                     <td style="font-weight: bold;">System Code :</td>
                     <td>{{ $quotationDetail->system_code }}</td>
@@ -183,7 +180,7 @@
         </div>
         <table id="details">
             @if($vehicles->count() > 0 || $variants->count() > 0)
-                <tr>
+                <tr style="background-color: #c9c1ea">
                     <th> VEHICLE</th>
                     <th>QTY</th>
                     <th>PRICE</th>
@@ -207,7 +204,7 @@
                 @endforeach
             @endif
             @if($shippingDocuments->count() > 0 || $shippingCharges->count() > 0)
-                <tr>
+                <tr style="background-color: #c9c1ea">
                     <th> LOGISTICS</th>
                     <th>QTY</th>
                     <th>PRICE</th>
@@ -232,7 +229,7 @@
             @endif
 
             @if($addons->count() > 0 || $directlyAddedAddons->count() > 0)
-                <tr>
+                <tr style="background-color: #c9c1ea">
                     <th> ADD ONS AND EXTRA ITEM </th>
                     <th>QTY</th>
                     <th>PRICE</th>
@@ -256,7 +253,7 @@
                 @endforeach
             @endif
             @if($shippingCertifications->count() > 0 || $otherDocuments->count() > 0)
-                <tr>
+                <tr style="background-color: #c9c1ea">
                     <th> COMPLIANCE AND CERTIFICATES</th>
                     <th>QTY</th>
                     <th>PRICE</th>
@@ -280,7 +277,7 @@
                 @endforeach
             @endif
                 @if($quotation->document_type == 'Proforma Invoice')
-                    <tr>
+                    <tr style="background-color: #c9c1ea">
                         <th colspan="3"> DEPOSIT / PAYMENT RECEIVED</th>
                         <th>AMOUNT</th>
                     </tr>
@@ -301,66 +298,70 @@
 
                 <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }} </td>
             </tr>
-            <tr>
-                <td> </td>
-                <td> </td>
-                <td style="font-weight: bold">Discount</td>
-                <td> </td>
-            </tr>
-            <tr>
-                <td> </td>
-                <td> </td>
-                <td style="font-weight: bold">Net Amount</td>
-                <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }}</td>
-            </tr>
-            <tr>
-                <td> </td>
-                <td> </td>
-                <td style="font-weight: bold">VAT:(0%)</td>
-                <td>0.00</td>
-            </tr>
-            <tr>
-                <td> </td>
-                <td> </td>
-                <td style="font-weight: bold">Gross Amount</td>
-                <td> </td>
-            </tr>
-            <tr>
-                <td> </td>
-                <td> </td>
-                <td style="font-weight: bold"> Advance Paid</td>
-                <td> {{ number_format($quotationDetail->advance_amount, 2) }} </td>
-            </tr>
-            <tr>
-                <td> </td>
-                <td> </td>
-                <td style="font-weight: bold"> Remaining Amount({{ $quotation->currency }})</td>
-                <td> {{ $quotation->currency ." ". number_format($quotation->deal_value - $quotationDetail->advance_amount) }} </td>
-            </tr>
-            @if($quotation->currency != 'AED' && $quotation->shippingDocument == 'EXW')
-            <tr>
-                <td> </td>
-                <td> </td>
-                <td style="font-weight: bold"> Remaining Amount(AED)</td>
-                <td>
+            @if($quotation->document_type == 'Proforma Invoice')
+                <tr>
+                    <td> </td>
+                    <td> </td>
+                    <td style="font-weight: bold">Discount</td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td> </td>
+                    <td> </td>
+                    <td style="font-weight: bold">Net Amount</td>
+                    <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }}</td>
+                </tr>
+                <tr>
+                    <td> </td>
+                    <td> </td>
+                    <td style="font-weight: bold">VAT:(0%)</td>
+                    <td>0.00</td>
+                </tr>
+                <tr>
+                    <td> </td>
+                    <td> </td>
+                    <td style="font-weight: bold">Gross Amount</td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td> </td>
+                    <td> </td>
+                    <td style="font-weight: bold"> Advance Paid</td>
+                    <td> {{ number_format($quotationDetail->advance_amount, 2) }} </td>
+                </tr>
+                <tr>
+                    <td> </td>
+                    <td> </td>
+                    <td style="font-weight: bold"> Remaining Amount({{ $quotation->currency }})</td>
+                    <td> {{ $quotation->currency ." ". number_format($quotation->deal_value - $quotationDetail->advance_amount) }} </td>
+                </tr>
+                @if($quotation->currency != 'AED' && $quotation->shippingDocument == 'EXW')
+                <tr>
+                    <td> </td>
+                    <td> </td>
+                    <td style="font-weight: bold"> Remaining Amount(AED)</td>
+                    <td>
 
-                   @if($quotation->currency == 'USD')
-                         {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_usd_rate->value, 2) }}
-                   @elseif($quotation->currency == 'EUR')
-                        {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_eru_rate->value, 2) }}
-                   @endif
+                       @if($quotation->currency == 'USD')
+                             {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_usd_rate->value, 2) }}
+                       @elseif($quotation->currency == 'EUR')
+                            {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_eru_rate->value, 2) }}
+                       @endif
 
-                </td>
-            </tr>
+                    </td>
+                </tr>
+                @endif
+                <tr>
+                    <td> </td>
+                    <td> </td>
+                    <td>  </td>
+                    <td style="color: #de2121">  * VAT is not applicable for Export Bill </td>
+                </tr>
             @endif
-            <tr>
-                <td> </td>
-                <td> </td>
-                <td>  </td>
-                <td style="color: #de2121">  * VAT is not applicable for Export Bill </td>
-            </tr>
         </table>
-        <p style="font-weight: bold">payment due By: </p>
+        @if($quotation->document_type == 'Proforma Invoice')
+            <p style="font-weight: bold">payment due By: </p>
+        @endif
         <p>I hereby acknowledge to honor the payment by the agreed due date.</p>
          <p> In case of my failure to clear payment on time, I stand to lose the right to my payments and my order may be delayed or subject to cancellation.</p>
         <p> Customs clearance, taxes, duty, value added taxes or any other charges related to the above mentioned goods are the sole responsibility of the client.</p>
@@ -375,11 +376,15 @@
             unilateral acceptance of these terms. Before making any transaction, the buyer has had the full opportunity to review these terms in detail, thereby affirming their understanding and
             acceptance.
         </p>
-        @if($quotation->shipping_method == 'EXW')
+        @if($quotation->currency == 'USD')
            <p style="font-weight: bolder"> Currency Exchange </p>
             <p> Bank Payments AED transfers at actuals. USD transfer at {{ $aed_to_usd_rate->value }} and customer must remit $50 equivalent extra to cover for bank fees.
                 Cash Payments AED at actuals, USD New Bills $100 at {{ $aed_to_usd_rate->value }}, all other bills at 3.60. </p>
-
+        @elseif($quotation->currency == 'EURO')
+            <p style="font-weight: bolder"> Currency Exchange </p>
+            <p> Bank Payments AED transfers at actuals. EUR transfer at {{ $aed_to_eru_rate->value }} and customer must remit EUR 50 equivalent extra to cover for bank fees.
+                Cash Payments AED at actuals, USD New Bills EUR 100 at {{ $aed_to_eru_rate->value }}, all other bills at
+                {{ $aed_to_eru_rate }}. </p>
         @endif
         <table>
             <td style="font-weight: bold">
