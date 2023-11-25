@@ -237,6 +237,7 @@ Route::get('/d', function () {
         Route::post('employee-hiring-request/request-action', 'requestAction')->name('employee-hiring-request.request-action');
         Route::get('employee-hiring-request/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-request.create-or-edit');
         Route::post('employee-hiring-request/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-request.store-or-update');
+        Route::post('employee-hiring-request/final-status', 'updateFinalStatus')->name('employee-hiring-request.final-status');
     });
 
     // Employee Hiring Questionnaire
