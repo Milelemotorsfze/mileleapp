@@ -76,6 +76,13 @@
             $('#kits-table').DataTable();
             $('#permission-table').DataTable();
             $('#module-table').DataTable();
+            $('#pending-hiring-requests-table').DataTable();
+            $('#approved-hiring-requests-table').DataTable();
+            $('#closed-hiring-requests-table').DataTable();
+            $('#on-hold-hiring-requests-table').DataTable();
+            $('#cancelled-hiring-requests-table').DataTable();
+            $('#rejected-hiring-requests-table').DataTable();
+            $('#deleted-hiring-requests-table').DataTable();
             $('#addon-pending-selling-prices').DataTable({
                 "pageLength": 5,
                 "dom": 'frtip',

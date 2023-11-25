@@ -11,6 +11,7 @@ use App\Models\Masters\MasterOfficeLocation;
 use App\Models\HRM\Hiring\EmployeeHiringRequest;
 use App\Models\HRM\Hiring\EmployeeHiringQuestionnaire;
 use App\Models\HRM\Hiring\EmployeeHiringRequestHistory;
+use App\Models\HRM\Hiring\InterviewSummaryReport;
 use App\Models\HRM\Approvals\DepartmentHeadApprovals;
 use App\Models\HRM\Approvals\ApprovalByPositions;
 use App\Models\HRM\Employee\EmployeeProfile;
@@ -30,6 +31,9 @@ class EmployeeHiringRequestController extends Controller
             ['status','approved'],
             ['final_status','open'],
         ])->latest()->get();
+        // dd($approved);
+        // ->with('shortlistedCandidates')
+        // shortlistedCandidates
         $closed = EmployeeHiringRequest::where([
             ['status','approved'],
             ['final_status','closed'],
@@ -301,6 +305,50 @@ class EmployeeHiringRequestController extends Controller
         (new UserActivityController)->createActivity($history['message']);
         return response()->json('success');
         // ,'New Employee Hiring Request '.$request->status.' Successfully'
+    }
+    public function updateFinalStatus(Request $request) {
+        $update = EmployeeHiringRequest::where('id',$request->id)->first();
+        $update->final_status = $request->status;
+        if($request->status == 'cancelled') {
+            $update->closed_by = Auth::id();
+            $update->closed_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->closed_comment = $request->comment;
+        }
+        else if($request->status == 'onhold') {
+            $update->on_hold_by = Auth::id();
+            $update->on_hold_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->on_hold_comment = $request->comment;
+        }
+        else if($request->status == 'closed') {
+            $update->cancelled_by = Auth::id();
+            $update->cancelled_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->cancelled_comment = $request->comment;
+            if(count($request->selectedCandidates) > 0 ) {
+                foreach($request->selectedCandidates as $selectedCandidate) {
+                    $candidate = InterviewSummaryReport::where('id',$selectedCandidate)->first();
+                    $candidate->seleced_status = 'selected';
+                    $candidate->selected_status_by = Auth::id();
+                    $candidate->selected_status_at = Carbon::now()->format('Y-m-d H:i:s');
+                    $candidate->selected_hiring_request_id = $request->id;
+                    $candidate->update();
+                }
+            }
+        }
+        $update->update();
+        $history['hiring_request_id'] = $request->id;
+        if($request->status == 'cancelled') {
+            $history['icon'] = 'icons8-cancel-30.png';
+        }
+        else if($request->status == 'onhold') {
+            $history['icon'] = 'icons8-hand-30.png';
+        }
+        else if($request->status == 'closed') {
+            $history['icon'] = 'icons8-check-30.png';
+        }
+        $history['message'] = 'Employee hiring request '.$request->status.' by ( '.Auth::user()->name.' - '.Auth::user()->email.' )';
+        $createHistory = EmployeeHiringRequestHistory::create($history);  
+        (new UserActivityController)->createActivity($history['message']);
+        return response()->json('success');
     }
     public function destroy($id) {
         $data = EmployeeHiringRequest::where('id',$id)->first();

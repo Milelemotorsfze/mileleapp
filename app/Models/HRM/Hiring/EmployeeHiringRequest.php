@@ -13,6 +13,7 @@ use App\Models\Masters\MasterExperienceLevel;
 use App\Models\HRM\Approvals\ApprovalByPositions;
 use App\Models\HRM\Approvals\DepartmentHeadApprovals;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\HRM\Hiring\InterviewSummaryReport;
 class EmployeeHiringRequest extends Model
 {
     use HasFactory, SoftDeletes;
@@ -35,6 +36,16 @@ class EmployeeHiringRequest extends Model
         'explanation_of_new_hiring',
         'status',
         'final_status',
+
+        'closed_by',
+        'closed_at',
+        'closed_comment',
+        'on_hold_by',
+        'on_hold_at',
+        'on_hold_comment',
+        'cancelled_by',
+        'cancelled_at',
+        'cancelled_comment',
 
         'action_by_department_head',
         'department_head_id',
@@ -303,5 +314,14 @@ class EmployeeHiringRequest extends Model
     }
     public function divisionHead() {
         return $this->hasOne(User::class,'id','division_head_id');
+    }
+    public function interviewSummaryReport() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id');
+    }
+    public function shortlistedCandidates() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where('candidate_selected','yes');
+    }
+    public function selectedCandidates() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where('candidate_selected','yes')->where('seleced_status','selected');
     }
 }
