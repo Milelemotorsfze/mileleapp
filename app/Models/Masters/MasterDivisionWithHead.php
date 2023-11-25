@@ -12,6 +12,7 @@ class MasterDivisionWithHead extends Model
     protected $fillable = [
         'name',
         'division_head_id',
+        'approval_handover_to',
         'status',
         'created_by',
         'updated_by',

@@ -651,8 +651,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <div class=" col-lg-4 col-md-6 col-sm-6 ">
                         <label for="department_id" class="form-label"><span class="error">* </span>{{ __('Division / Department:') }}</label>
                         <select name="department_id" id="department_id" class="form-control widthinput" multiple="true" autofocus>
-                            @foreach($masterDepartments as $MasterDeparment)
-                            <option value="{{$MasterDeparment->id}}">{{$MasterDeparment->name}}</option>
+                            @foreach($masterDepartments as $MasterDepartment)
+                            <option value="{{$MasterDepartment->id}}">{{$MasterDepartment->name}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -909,9 +909,9 @@ redirect()->route('home')->send();
     //         var contentPath = "";
 
     //         if (modalId === "createNewJobPosition") {
-    //             contentPath = "{{ route('hiring_request.createJobPosition') }}";
+    //            
     //         } else if (modalId === "createNewIndustryExperience") {
-    //             contentPath = "{{ route('hrm.hiring.questionnaire.createIndustryExperience') }}";
+    //             
     //         }
 
     //         // Load content dynamically

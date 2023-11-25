@@ -67,7 +67,7 @@ class PassportRequestController extends Controller
                     $createHistory = LeaveHistory::create($history);
                     $history2['leave_id'] = $createRequest->id;
                     $history2['icon'] = 'icons8-send-30.png';
-                    $history2['message'] = 'Employee passport '.$request->purposes_of_submit.' request send to Department Head ( '.$departmentHead->handover_to_name.' - '.$departmentHead->handover_to_email.' ) for approval';
+                    $history2['message'] = 'Employee passport '.$request->purposes_of_submit.' request send to Team Lead / Reporting Manager ( '.$departmentHead->handover_to_name.' - '.$departmentHead->handover_to_email.' ) for approval';
                     $createHistory2 = LeaveHistory::create($history2);
                     (new UserActivityController)->createActivity('Employee Leave Request Created');
                     $successMessage = "Employee Leave Request Created Successfully";

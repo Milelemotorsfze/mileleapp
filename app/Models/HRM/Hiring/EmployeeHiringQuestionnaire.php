@@ -11,7 +11,7 @@ use App\Models\Masters\MasterSpecificIndustryExperience;
 use App\Models\Masters\MasterVisaType;
 use App\Models\Country;
 use App\Models\Masters\MasterRecuritmentSource;
-use App\Models\Masters\MasterDeparment;
+use App\Models\Masters\MasterDepartment;
 use App\Models\Masters\MasterExperienceLevel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -184,7 +184,7 @@ class EmployeeHiringQuestionnaire extends Model
         return $this->hasOne(MasterRecuritmentSource::class,'id','recruitment_source_id');
     }
     public function department() {
-        return $this->hasOne(MasterDeparment::class,'id','department_id');
+        return $this->hasOne(MasterDepartment::class,'id','department_id');
     }
     public function carrerLevel() {
         return $this->hasOne(MasterExperienceLevel::class,'id','career_level_id');

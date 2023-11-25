@@ -4,7 +4,7 @@ namespace App\Http\Controllers\HRM\Hiring;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Masters\MasterDeparment;
+use App\Models\Masters\MasterDepartment;
 use App\Models\Masters\MasterExperienceLevel;
 use App\Models\Masters\MasterJobPosition;
 use App\Models\Masters\MasterOfficeLocation;
@@ -13,6 +13,7 @@ use App\Models\HRM\Hiring\EmployeeHiringQuestionnaire;
 use App\Models\HRM\Hiring\EmployeeHiringRequestHistory;
 use App\Models\HRM\Approvals\DepartmentHeadApprovals;
 use App\Models\HRM\Approvals\ApprovalByPositions;
+use App\Models\HRM\Employee\EmployeeProfile;
 use App\Models\User;
 use Validator;
 use DB;
@@ -25,11 +26,26 @@ class EmployeeHiringRequestController extends Controller
     public function index() {
         $page = 'listing';
         $pendings = EmployeeHiringRequest::where('status','pending')->latest()->get();
-        $approved = EmployeeHiringRequest::where('status','approved')->latest()->get();
+        $approved = EmployeeHiringRequest::where([
+            ['status','approved'],
+            ['final_status','open'],
+        ])->latest()->get();
+        $closed = EmployeeHiringRequest::where([
+            ['status','approved'],
+            ['final_status','closed'],
+        ])->latest()->get();
+        $onHold = EmployeeHiringRequest::where([
+            ['status','approved'],
+            ['final_status','onhold'],
+        ])->latest()->get();
+        $cancelled = EmployeeHiringRequest::where([
+            ['status','approved'],
+            ['final_status','cancelled'],
+        ])->latest()->get();
         $rejected = EmployeeHiringRequest::where('status','rejected')->latest()->get();
         $deleted = [];
         $deleted = EmployeeHiringRequest::onlyTrashed()->get();
-        return view('hrm.hiring.hiring_request.index',compact('pendings','approved','rejected','deleted','page'));
+        return view('hrm.hiring.hiring_request.index',compact('pendings','approved','closed','onHold','cancelled','rejected','deleted','page'));
     }
     public function createOrEdit($id) {
         if($id == 'new') {
@@ -41,7 +57,7 @@ class EmployeeHiringRequestController extends Controller
             $previous = EmployeeHiringRequest::where('status',$data->status)->where('id', '<', $id)->max('id');
             $next = EmployeeHiringRequest::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
-        $masterdepartments = MasterDeparment::where('status','active')->select('id','name')->get();
+        $masterdepartments = MasterDepartment::where('status','active')->select('id','name')->get();
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
         $masterJobPositions = MasterJobPosition::where('status','active')->select('id','name')->get();
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
@@ -58,12 +74,12 @@ class EmployeeHiringRequestController extends Controller
             'location_id' => 'required',
             'requested_by' => 'required',
             'requested_job_title' => 'required',
-            'reporting_to' => 'required',
+            // 'reporting_to' => 'required',
             'experience_level' => 'required',
             'salary_range_start_in_aed' => 'required',
             'salary_range_end_in_aed' => 'required',
             'work_time_start' => 'required',
-            'reporting_to' => 'required',
+            // 'reporting_to' => 'required',
             'work_time_end' => 'required',
             'number_of_openings' => 'required',
             'type_of_role' => 'required',
@@ -73,17 +89,22 @@ class EmployeeHiringRequestController extends Controller
             return redirect()->back()->withInput()->withErrors($validator);
         }
         else {
-            DB::beginTransaction();
-            try {
+            // DB::beginTransaction();
+            // try {
                 $authId = Auth::id();
-                $departmentHead = DepartmentHeadApprovals::where('department_id',$request->department_id)->first();
+                $teamLeadOrReportingManager = EmployeeProfile::where('user_id',$request->requested_by)->first();
+                $department = MasterDepartment::where('id',$request->department_id)->first();
                 $hiringManager = ApprovalByPositions::where('approved_by_position','Recruiting Manager')->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $input = $request->all();
                 if($id == 'new') {
+                    // Approvals =>  Team Lead/Manager -------> Recruitement(Hiring) manager -----------> Division head ---------> HR manager
                     $input['created_by'] = $authId;
+                    // $input['department_head_id'] = $department->approval_by_id;
+                    $input['department_head_id'] = $department->approval_by_id;
+                    $input['action_by_department_head'] = 'pending';
                     $input['hiring_manager_id'] = $hiringManager->handover_to_id;
-                    $input['department_head_id'] = $departmentHead->approval_by_id;
+                    $input['division_head_id'] = $department->division->approval_handover_to;
                     $input['hr_manager_id'] = $HRManager->handover_to_id;
                     $createRequest = EmployeeHiringRequest::create($input);
                     $history['hiring_request_id'] = $createRequest->id;
@@ -92,7 +113,9 @@ class EmployeeHiringRequestController extends Controller
                     $createHistory = EmployeeHiringRequestHistory::create($history);
                     $history2['hiring_request_id'] = $createRequest->id;
                     $history2['icon'] = 'icons8-send-30.png';
-                    $history2['message'] = 'Employee hiring request send to '.$hiringManager->approved_by_position_name.' ( '.$hiringManager->handover_to_name.' - '.$hiringManager->handover_to_email.' ) for approval';
+                    $history2['message'] = 'Employee hiring request send to Team Lead / Reporting Manager ( '.$teamLeadOrReportingManager->teamLeadOrReportingManager->name.' - '.$teamLeadOrReportingManager->teamLeadOrReportingManager->email.' ) for approval';
+                    // $history2['message'] = 'Employee hiring request send to Team Lead / Reporting Manager ( '.$department->approval_by_name.' - '.$department->approval_by_email.' ) for approval';
+                    // $history2['message'] = 'Employee hiring request send to '.$hiringManager->approved_by_position_name.' ( '.$hiringManager->handover_to_name.' - '.$hiringManager->handover_to_email.' ) for approval';
                     $createHistory2 = EmployeeHiringRequestHistory::create($history2);
                     (new UserActivityController)->createActivity('New Employee Hiring Request Created');
                     $successMessage = "New Employee Hiring Request Created Successfully";
@@ -105,7 +128,7 @@ class EmployeeHiringRequestController extends Controller
                         $update->location_id = $request->location_id;
                         $update->requested_by = $request->requested_by;
                         $update->requested_job_title = $request->requested_job_title;
-                        $update->reporting_to = $request->reporting_to;
+                        // $update->reporting_to = $request->reporting_to;
                         $update->experience_level = $request->experience_level;
                         $update->salary_range_start_in_aed = $request->salary_range_start_in_aed;
                         $update->salary_range_end_in_aed = $request->salary_range_end_in_aed;
@@ -130,13 +153,13 @@ class EmployeeHiringRequestController extends Controller
                         $successMessage = "Employee Hiring Request Updated Successfully";
                     }
                 }
-                DB::commit();
+                // DB::commit();
                 return redirect()->route('employee-hiring-request.index')
                                     ->with('success',$successMessage);
-            } 
-            catch (\Exception $e) {
-                DB::rollback();
-            }
+            // } 
+            // catch (\Exception $e) {
+            //     DB::rollback();
+            // }
         }
     }
     public function show($id) {
@@ -219,19 +242,30 @@ class EmployeeHiringRequestController extends Controller
     public function requestAction(Request $request) {
         $message = '';
         $update = EmployeeHiringRequest::where('id',$request->id)->first();
-        if($request->current_approve_position == 'Recruiting Manager') {
+        // Approvals =>  Team Lead/Manager -------> Recruitement(Hiring) manager -----------> Division head ---------> HR manager
+        
+        if($request->current_approve_position == 'Team Lead / Reporting Manager') {
+            $update->comments_by_department_head = $request->comment;
+            $update->department_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->action_by_department_head = $request->status;
+            if($request->status == 'approved') {
+                $update->action_by_hiring_manager = 'pending';
+                $message = 'Employee hiring request send to Recruiting Manager ( '.$update->hr_manager_name.' - '.$update->hr_manager_email.' ) for approval';
+            }
+        }
+        else if($request->current_approve_position == 'Recruiting Manager') {
             $update->comments_by_hiring_manager = $request->comment;
             $update->hiring_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
             $update->action_by_hiring_manager = $request->status;
             if($request->status == 'approved') {
-                $update->action_by_department_head = 'pending';
-                $message = 'Employee hiring request send to Department Head ( '.$update->department_head_name.' - '.$update->department_head_email.' ) for approval';
+                $update->action_by_division_head = 'pending';
+                $message = 'Employee hiring request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';
             }
         }
-        else if($request->current_approve_position == 'Department Head') {
-            $update->comments_by_department_head = $request->comment;
-            $update->department_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
-            $update->action_by_department_head = $request->status;
+        else if($request->current_approve_position == 'Division Head') {
+            $update->comments_by_division_head = $request->comment;
+            $update->division_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->action_by_division_head = $request->status;
             if($request->status == 'approved') {
                 $update->action_by_hr_manager = 'pending';
                 $message = 'Employee hiring request send to HR Manager ( '.$update->hr_manager_name.' - '.$update->hr_manager_email.' ) for approval';
@@ -243,6 +277,7 @@ class EmployeeHiringRequestController extends Controller
             $update->action_by_hr_manager = $request->status;
             if($request->status == 'approved') {
                 $update->status = 'approved';
+                $update->final_status = 'open';
             }
         }
         if($request->status == 'rejected') {

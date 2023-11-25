@@ -5,7 +5,7 @@ namespace App\Models\HRM\Hiring;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Masters\MasterDeparment;
+use App\Models\Masters\MasterDepartment;
 use App\Models\Masters\MasterOfficeLocation;
 use App\Models\User;
 use App\Models\Masters\MasterJobPosition;
@@ -34,18 +34,28 @@ class EmployeeHiringRequest extends Model
         'replacement_for_employee',
         'explanation_of_new_hiring',
         'status',
-        'action_by_hiring_manager',
-        'hiring_manager_id',
-        'hiring_manager_action_at',
-        'comments_by_hiring_manager',
+        'final_status',
+
         'action_by_department_head',
         'department_head_id',
         'department_head_action_at',
         'comments_by_department_head',
+
+        'action_by_hiring_manager',
+        'hiring_manager_id',
+        'hiring_manager_action_at',
+        'comments_by_hiring_manager',
+
+        'action_by_division_head',
+        'division_head_id',
+        'division_head_action_at',
+        'comments_by_division_head',
+
         'action_by_hr_manager',
         'hr_manager_id',
         'hr_manager_action_at',
         'comments_by_hr_manager',
+
         'created_by',
         'updated_by',
         'deleted_by'
@@ -70,7 +80,7 @@ class EmployeeHiringRequest extends Model
     ];
     public function getDepartmentNameAttribute() {
         $departmentName = '';
-        $department = MasterDeparment::find($this->department_id);
+        $department = MasterDepartment::find($this->department_id);
         if($department) {
             $departmentName = $department->name;
         }
@@ -182,34 +192,76 @@ class EmployeeHiringRequest extends Model
         }
         return $HRManagerEmail;
     }
+    // public function getIsAuthUserCanApproveAttribute() {
+    //     $isAuthUserCanApprove = [];
+    //     $hiringManager = $HRManager = '';
+    //     $deptHead = [];
+    //     $authId = Auth::id();
+    //     $hiringManager = ApprovalByPositions::where([
+    //         ['approved_by_position','Recruiting Manager'],
+    //         ['handover_to_id',$authId]
+    //     ])->first();
+    //     $deptHead = MasterDepartment::where([
+    //         ['approval_by_id',$authId],
+    //     ])->pluck('id');
+    //     $HRManager = ApprovalByPositions::where([
+    //         ['approved_by_position','HR Manager'],
+    //         ['handover_to_id',$authId]
+    //     ])->first();
+    //     if($hiringManager && $this->action_by_hiring_manager == 'pending' && $this->hiring_manager_id == $authId) { 
+    //         $isAuthUserCanApprove['can_approve'] = true;
+    //         $isAuthUserCanApprove['current_approve_position'] = 'Recruiting Manager';
+    //         $isAuthUserCanApprove['current_approve_person'] = $this->hiring_manager_name;
+    //     }
+    //     else if(count($deptHead) > 0 && $this->action_by_hiring_manager == 'approved' && $this->action_by_department_head == 'pending' && 
+    //         $this->department_head_id == $authId) {
+    //             $isAuthUserCanApprove['can_approve'] = true;
+    //             $isAuthUserCanApprove['current_approve_position'] = 'Team Lead / Reporting Manager';
+    //             $isAuthUserCanApprove['current_approve_person'] = $this->department_head_name;
+    //     }
+    //     else if($HRManager && $this->action_by_hiring_manager == 'approved' && $this->action_by_department_head == 'approved' && 
+    //         $this->action_by_hr_manager == 'pending' && $this->hr_manager_id == $authId) {
+    //             $isAuthUserCanApprove['can_approve'] = true;
+    //             $isAuthUserCanApprove['current_approve_position'] = 'HR Manager';
+    //             $isAuthUserCanApprove['current_approve_person'] = $this->hr_manager_name;
+    //     }
+    //     return $isAuthUserCanApprove;
+    // }
     public function getIsAuthUserCanApproveAttribute() {
         $isAuthUserCanApprove = [];
         $hiringManager = $HRManager = '';
         $deptHead = [];
         $authId = Auth::id();
-        $hiringManager = ApprovalByPositions::where([
-            ['approved_by_position','Recruiting Manager'],
-            ['handover_to_id',$authId]
-        ])->first();
-        $deptHead = DepartmentHeadApprovals::where([
-            ['approval_by_id',$authId],
-        ])->pluck('department_id');
-        $HRManager = ApprovalByPositions::where([
-            ['approved_by_position','HR Manager'],
-            ['handover_to_id',$authId]
-        ])->first();
-        if($hiringManager && $this->action_by_hiring_manager == 'pending' && $this->hiring_manager_id == $authId) { 
+        // $hiringManager = ApprovalByPositions::where([
+        //     ['approved_by_position','Recruiting Manager'],
+        //     ['handover_to_id',$authId]
+        // ])->first();
+        // $deptHead = MasterDepartment::where([
+        //     ['approval_by_id',$authId],
+        // ])->pluck('id');
+        // $HRManager = ApprovalByPositions::where([
+        //     ['approved_by_position','HR Manager'],
+        //     ['handover_to_id',$authId]
+        // ])->first();
+        // dd($this->department_head_id);
+        // Approvals =>  Team Lead/Manager -------> Recruitement(Hiring) manager -----------> Division head ---------> HR manager
+        if($this->action_by_department_head =='pending' && $this->department_head_id == $authId) {
+            $isAuthUserCanApprove['can_approve'] = true;
+            $isAuthUserCanApprove['current_approve_position'] = 'Team Lead / Reporting Manager';
+            $isAuthUserCanApprove['current_approve_person'] = $this->department_head_name;
+        }
+        else if($this->action_by_department_head =='approved' && $this->action_by_hiring_manager == 'pending' && $this->hiring_manager_id == $authId) { 
             $isAuthUserCanApprove['can_approve'] = true;
             $isAuthUserCanApprove['current_approve_position'] = 'Recruiting Manager';
             $isAuthUserCanApprove['current_approve_person'] = $this->hiring_manager_name;
         }
-        else if(count($deptHead) > 0 && $this->action_by_hiring_manager == 'approved' && $this->action_by_department_head == 'pending' && 
-            $this->department_head_id == $authId) {
+        else if($this->action_by_department_head =='approved' && $this->action_by_hiring_manager == 'approved' && $this->action_by_division_head == 'pending' && 
+            $this->division_head_id == $authId) {
                 $isAuthUserCanApprove['can_approve'] = true;
-                $isAuthUserCanApprove['current_approve_position'] = 'Department Head';
-                $isAuthUserCanApprove['current_approve_person'] = $this->department_head_name;
+                $isAuthUserCanApprove['current_approve_position'] = 'Division Head';
+                $isAuthUserCanApprove['current_approve_person'] = $this->divisionHead->name;
         }
-        else if($HRManager && $this->action_by_hiring_manager == 'approved' && $this->action_by_department_head == 'approved' && 
+        else if($this->action_by_department_head =='approved' && $this->action_by_hiring_manager == 'approved' && $this->action_by_division_head == 'approved' && 
             $this->action_by_hr_manager == 'pending' && $this->hr_manager_id == $authId) {
                 $isAuthUserCanApprove['can_approve'] = true;
                 $isAuthUserCanApprove['current_approve_position'] = 'HR Manager';
@@ -225,11 +277,15 @@ class EmployeeHiringRequest extends Model
         else if($this->status == 'rejected') {
             $currentStatus = 'Rejected';
         }
+        // Approvals =>  Team Lead/Manager -------> Recruitement(Hiring) manager -----------> Division head ---------> HR manager
+        else if($this->status == 'pending' && $this->action_by_department_head == 'pending') {
+            $currentStatus = "Team Lead's /Reporting Manager's Approval Awaiting";
+        }
         else if($this->status == 'pending' && $this->action_by_hiring_manager == 'pending') {
             $currentStatus = "Recruiting Manager's Approval Awaiting";
         }
-        else if($this->status == 'pending' && $this->action_by_department_head == 'pending') {
-            $currentStatus = "Department Head's Approval Awaiting";
+        else if($this->status == 'pending' && $this->action_by_division_head == 'pending') {
+            $currentStatus = "Division Head's Approval Awaiting";
         }
         else if($this->status == 'pending' && $this->action_by_hr_manager == 'pending') {
             $currentStatus = "HR Manager's Approval Awaiting";
@@ -244,5 +300,8 @@ class EmployeeHiringRequest extends Model
     }
     public function jobDescription() {
         return $this->hasOne(JobDescription::class,'hiring_request_id','id');
+    }
+    public function divisionHead() {
+        return $this->hasOne(User::class,'id','division_head_id');
     }
 }

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\HRM\Hiring;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Masters\MasterJobPosition;
-use App\Models\Masters\MasterDeparment;
+use App\Models\Masters\MasterDepartment;
 use App\Models\Masters\MasterOfficeLocation;
 use App\Models\HRM\Hiring\JobDescription;
 use App\Models\User;
@@ -29,7 +29,7 @@ class JobDescriptionController extends Controller
     }
     public function createOrEdit() {
         $masterJobPositions = MasterJobPosition::where('status','active')->select('id','name')->get();
-        $masterdepartments = MasterDeparment::where('status','active')->select('id','name')->get();
+        $masterdepartments = MasterDepartment::where('status','active')->select('id','name')->get();
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
         $reportingToUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
         return view('hrm.hiring.job_description.create',compact('masterJobPositions','masterdepartments','masterOfficeLocations','reportingToUsers'));

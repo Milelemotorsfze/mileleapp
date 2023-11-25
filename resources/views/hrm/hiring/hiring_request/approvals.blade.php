@@ -459,7 +459,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 @if(count($deptHeadPendings) > 0 || count($deptHeadApproved) > 0 || count($deptHeadRejected) > 0)
 <div class="card-header">
 	<h4 class="card-title">
-    Employee Hiring Request Approvals By Department Head
+    Employee Hiring Request Approvals By Team Lead / Reporting Manager
 	</h4>
 </div>
 <div class="portfolio">
