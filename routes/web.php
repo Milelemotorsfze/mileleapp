@@ -282,6 +282,7 @@ Route::get('/d', function () {
 
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
+    Route::get('demand-planning/get-model-year', [DemandController::class,'getModelYear'])->name('demand.get-model-year');
     Route::get('demand-planning/get-variant', [DemandController::class,'getVariant'])->name('demand.get-variant');
     Route::resource('demands', DemandController::class);
     Route::resource('demand-lists', DemandListController::class);

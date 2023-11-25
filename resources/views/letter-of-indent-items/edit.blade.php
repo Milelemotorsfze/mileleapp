@@ -22,35 +22,35 @@
                     </div>
                 @endif
                     <div class="row">
-                        <div class="col-sm-4">
+                        <div class="col-sm-12 col-xxl-4 col-lg-4 col-md-6">
                             <div class="row mt-2">
-                                <div class="col-sm-2 fw-bold">
+                                <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
                                     Customer :
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-6 col-md-6 col-lg-6">
                                     {{ $letterOfIndent->customer->name ?? '' }}
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-2 fw-bold">
+                                <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
                                     Dealers :
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-6 col-md-6 col-lg-6">
                                     {{ $letterOfIndent->dealers }}
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-3 fw-bold">
+                                <div class="col-sm-3 col-md-6 col-lg-3 fw-bold">
                                     So Number :
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-6 col-md-6 col-lg-6">
                                     {{ $letterOfIndent->so_number }}
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-12 col-xxl-4 col-lg-4 col-md-6">
                             <div class="row mt-2">
-                                <div class="col-sm-4 fw-bold">
+                                <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
                                     Perefered Location :
                                 </div>
                                 <div class="col-sm-6">
@@ -59,7 +59,7 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-sm-4 fw-bold">
+                                <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
                                     LOI Category :
                                 </div>
                                 <div class="col-sm-6">
@@ -69,15 +69,15 @@
                         </div>
                         <div class="col-sm-4">
                             <div class="row ">
-                                <div class="col-sm-2 fw-bold">
+                                <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
                                     LOI Date :
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-6 ">
                                     {{ Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-3 fw-bold">
+                                <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
                                     Destination :
                                 </div>
                                 <div class="col-sm-6">

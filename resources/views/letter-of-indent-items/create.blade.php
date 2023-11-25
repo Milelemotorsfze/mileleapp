@@ -36,33 +36,33 @@
             <div class="row">
                 <div class="col-sm-4">
                     <div class="row mt-2">
-                        <div class="col-sm-2 fw-bold">
+                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
                             Customer :
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-6 col-md-6 col-lg-6">
                             {{ $letterOfIndent->customer->name ?? '' }}
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-2 fw-bold">
+                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
                            Dealers :
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-6 col-md-6 col-lg-6">
                             {{ $letterOfIndent->dealers }}
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-3 fw-bold">
+                        <div class="col-sm-3 col-md-6 col-lg-3 fw-bold">
                             So Number :
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-6 col-md-6 col-lg-6">
                             {{ $letterOfIndent->so_number }}
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-4">
                     <div class="row mt-2">
-                        <div class="col-sm-4 fw-bold">
+                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
                             Perefered Location :
                         </div>
                         <div class="col-sm-6">
@@ -71,7 +71,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-sm-4 fw-bold">
+                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
                          LOI Category :
                         </div>
                         <div class="col-sm-6">
@@ -81,7 +81,7 @@
                 </div>
                 <div class="col-sm-4">
                     <div class="row ">
-                        <div class="col-sm-2 fw-bold">
+                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
                             LOI Date :
                         </div>
                         <div class="col-sm-6">
@@ -89,7 +89,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-3 fw-bold">
+                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
                           Destination :
                         </div>
                         <div class="col-sm-6">
@@ -109,7 +109,7 @@
                                 <div class="col-lg-2 col-md-3 col-sm-12">
                                    <label class="form-label">Model</label>
                                 </div>
-                                <div class="col-lg-1 col-md-2 col-sm-12">
+                                <div class="col-lg-2 col-md-2 col-sm-12">
                                     <label  class="form-label">SFX</label>
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-12">
@@ -134,7 +134,7 @@
                                       <label class="form-label d-block d-sm-none">Model</label>
                                             <input type="text" value="{{ $letterOfIndentItem->masterModel->model }}" readonly class="form-control" >
                                     </div>
-                                    <div class="col-lg-1 col-md-2 col-sm-12">
+                                    <div class="col-lg-2 col-md-2 col-sm-12">
                                         <label  class="form-label d-block d-sm-none">SFX</label>
                                         <input type="text" value="{{ $letterOfIndentItem->masterModel->sfx }}" readonly class="form-control">
                                     </div>
@@ -184,7 +184,7 @@
                                         </span>
                                     @enderror
                                 </div>
-                                <div class="col-lg-1 col-md-3 col-sm-12 mb-3">
+                                <div class="col-lg-2 col-md-3 col-sm-12 mb-3">
                                     <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">SFX</label>
                                     <select class="form-select text-dark" name="sfx" id="sfx" >
                                         <option value="">Select SFX</option>
@@ -197,7 +197,9 @@
                                 </div>
                                 <div class="col-lg-2 col-md-3 col-sm-12 mb-3">
                                     <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Model Year</label>
-                                    <input type="text" class="form-control" id="model-year" name="model_year" placeholder="Enter Model Year">
+                                    <select class="form-select text-dark" name="model_year" id="model-year">
+                                        <option value="">Select Model Year</option>
+                                    </select>
                                     @error('model_year')
                                     <div role="alert">
                                         <strong>{{ $message }}</strong>
@@ -206,9 +208,11 @@
                                 </div>
                                 <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
                                     <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">LOI Description</label>
-                                    <select class="form-select text-dark" name="variant" id="variant">
-                                        <option value="">Select LOI Description</option>
-                                    </select>
+                                    <input type="text" name="loi_description" placeholder="LOI Description"
+                                           class="form-control text-dark" id="loi_description">
+{{--                                    <select class="form-select text-dark" name="loi_description" id="loi_description">--}}
+{{--                                        <option value="">Select LOI Description</option>--}}
+{{--                                    </select>--}}
                                 </div>
                                 <div class="col-lg-1 col-md-2 col-sm-12">
                                     <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Quantity</label>
@@ -246,10 +250,6 @@
 @endsection
 @push('scripts')
     <script>
-        $("#model-year").yearpicker({
-            startYear: 2000,
-            endYear: 2050,
-        });
         $("#form-letter-of-indent-items").validate({
             ignore: [],
             rules: {
@@ -262,7 +262,7 @@
                 model_year: {
                     required: true,
                 },
-                variant: {
+                loi_description: {
                     required: true,
                 },
                 quantity:{
@@ -279,7 +279,12 @@
             placeholder : 'Select SFX'
         }).on('change', function() {
             $(this).valid();
-        });;
+        });
+        $('#model-year').select2({
+            placeholder : 'Select Model Year'
+        }).on('change', function() {
+            $(this).valid();
+        });
 
         $('#model').on('change',function(){
             let model = $(this).val();
@@ -297,18 +302,20 @@
                 success:function (data) {
                     $('#inventory-quantity').val(0);
                     $('select[name="sfx"]').empty();
-                    $('select[name="variant"]').empty();
+                    $('select[name="loi_description"]').empty();
                     $('#sfx').html('<option value=""> Select SFX </option>');
-                    $('#variant').html('<option value=""> Select LOI Description </option>');
+                    $('#model-year').html('<option value=""> Select Model Year </option>');
+                    $('#loi_description').html('<option value=""> Select LOI Description </option>');
                     jQuery.each(data, function(key,value){
                         $('select[name="sfx"]').append('<option value="'+ value +'">'+ value +'</option>');
                     });
                 }
             });
         });
-        $('#sfx').on('change',function(){
-            let sfx = $(this).val();
+        $('#model-year').on('change',function(){
+            let model_year = $(this).val();
             let model = $('#model').val();
+            let sfx = $('#sfx').val();
             let url = '{{ route('demand.get-variant') }}';
             let loiId = '{{ $letterOfIndent->id }}';
             $.ajax({
@@ -319,17 +326,42 @@
                     sfx: sfx,
                     model:model,
                     letter_of_indent_id: loiId,
+                    model_year: model_year,
                     module: 'LOI',
                 },
                 success:function (data) {
-                    $('select[name="variant"]').empty();
-                    $('#variant').html('<option value=""> Select LOI Description </option>');
+                    $('select[name="loi_description"]').empty();
+                    $('#loi_description').html('<option value=""> Select LOI Description </option>');
                     let quantity = data.quantity;
-                    var data = data.variants;
+                    var data = data.loi_description;
+                    console.log(data);
                     $('#inventory-quantity').val(quantity);
                     jQuery.each(data, function(key,value){
-                        $('select[name="variant"]').append('<option value="'+ value.id +'">'+ value.name +" -  (" + value.master_model.steering +" "
-                            + value.master_model_lines.model_line +" " + value.engine  + " " + value.fuel_type +" )" +'</option>');
+                        $('select[name="loi_description"]').append('<option value="'+  +'">'+ value +'</option>');
+                    });
+                }
+            });
+        });
+        $('#sfx').on('change',function(){
+            let sfx = $(this).val();
+            let model = $('#model').val();
+            let url = '{{ route('demand.get-model-year') }}';
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    sfx: sfx,
+                    model:model,
+                },
+                success:function (data) {
+                    console.log(data);
+                    $('select[name="model_year"]').empty();
+                    $('#model-year').html('<option value=""> Select Model Year </option>');
+                    $('#loi_description').html('<option value=""> Select LOI Description </option>');
+                    // $('#inventory-quantity').val(quantity);
+                    jQuery.each(data, function(key,value){
+                        $('select[name="model_year"]').append('<option value="'+ value +'">'+ value +'</option>');
                     });
                 }
             });

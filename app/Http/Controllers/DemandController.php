@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DemandList;
+use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\MasterModel;
 use App\Models\MonthlyDemand;
@@ -135,13 +136,29 @@ class DemandController extends Controller
 
         return $data;
     }
+    public function getModelYear(Request $request) {
+        $data = MasterModel::where('model', $request->model)
+            ->where('sfx', $request->sfx)
+            ->pluck('model_year');
+        return $data;
+    }
     public function getVariant(Request $request)
     {
-        $variantId = MasterModel::where('model', $request->model)
+        info($request->all());
+        $letterOfIndent = LetterOfIndent::find($request->letter_of_indent_id);
+
+        $masterModel = MasterModel::where('model', $request->model)
                                     ->where('sfx', $request->sfx)
-                                    ->pluck('variant_id');
-        $data['variants'] = Varaint::with('master_model_lines','masterModel')->whereIn('id', $variantId)
-                                     ->get();
+                                    ->where('model_year', $request->model_year)->first();
+//        info($masterModel);
+        if($letterOfIndent->dealers == 'Milele Motors') {
+            $data['loi_description'] = $masterModel->milele_loi_description;
+        }else{
+            $data['loi_description'] = $masterModel->transcar_loi_description;
+        }
+        info($data['loi_description']);
+//        $data['loi_description'] = Varaint::with('master_model_lines','masterModel')->whereIn('id', $variantId)
+//                                     ->get();
 
         if ($request->module == 'LOI') {
             $inventory = SupplierInventory::with('masterModel')
