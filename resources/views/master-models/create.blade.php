@@ -73,7 +73,6 @@
                             @endforeach
                         </select>
                     </div>
-{{--                    <button type="button" class="btn btn-sm btn-info" id="variant-detail-view-btn" hidden>Variant Detail</button>--}}
                 </div>
 
                 <div class="col-lg-4 col-md-6 col-sm-12">
@@ -249,7 +248,6 @@
 @push('scripts')
     <script>
         $("#model-year").yearpicker({
-            year: 2023
             startYear: 2000,
             endYear: 2050,
         });
