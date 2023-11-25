@@ -3,7 +3,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Create New Industry Experience </h5>
-				<button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodal()">
+				<button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodalIndExp()">
 				<span aria-hidden="true">X</span>
 				</button>
 			</div>
@@ -16,13 +16,13 @@
 						</div>
 						<div class="col-xxl-12 col-lg-12 col-md-12">
 							<input type="text" id="new_industry_experience" class="form-control @error('new_industry_experience') is-invalid @enderror" name="new_industry_experience" value="" required>
-							<span id="NewIndustryExperienceError" class="required-class paragraph-class"></span>
+							<span id="newIndustryExperienceError" class="required-class paragraph-class"></span>
 						</div>
 					</div>
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closemodal()"><i class="fa fa-times"></i> Close</button>
+				<button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closemodalIndExp()"><i class="fa fa-times"></i> Close</button>
 				<button type="button" class="btn btn-primary btn-sm" id="createIndustryExpId" style="float: right;">
 				<i class="fa fa-check" aria-hidden="true"></i> Submit</button>
 			</div>
@@ -35,13 +35,12 @@
 		$('#createNewIndustryExperience').modal('show');
 	});
     });   	
-	function closemodal() {
+	function closemodalIndExp() {
 	    $('.overlay').hide();
 		$('#createNewIndustryExperience').modal('hide');
 	}
     $('#createIndustryExpId').on('click', function() {
 	    var value = $('#new_industry_experience').val();
-		// console.log('Value being sent to the backend:', value);
 	    if(value == '') {
 	        $msg = 'Industry Experience is Required';
 	        showNewIndustryExperienceError($msg);
@@ -62,7 +61,7 @@
 	                }
 					else {
 	                    $('.overlay').hide();
-						closemodal();
+						closemodalIndExp();
 	                    $('#requested_industry_experience').append("<option value='" + result.id + "'>" + result.name + "</option>");
 	                    $('#requested_industry_experience').val(result.id);
 	                    removeNewIndustryExperienceError();						
