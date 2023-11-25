@@ -34,73 +34,71 @@
                 </div>
             @endif
             <div class="row">
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13">Customer</label>
-                        <select class="form-control" data-trigger name="customer_id" id="customer" readonly>
-                            <option> {{ $letterOfIndent->customer->name }}</option>
-                        </select>
+                <div class="col-sm-4">
+                    <div class="row mt-2">
+                        <div class="col-sm-2 fw-bold">
+                            Customer :
+                        </div>
+                        <div class="col-sm-6">
+                            {{ $letterOfIndent->customer->name ?? '' }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2 fw-bold">
+                           Dealers :
+                        </div>
+                        <div class="col-sm-6">
+                            {{ $letterOfIndent->dealers }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3 fw-bold">
+                            So Number :
+                        </div>
+                        <div class="col-sm-6">
+                            {{ $letterOfIndent->so_number }}
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">LOI Category</label>
-                        <select class="form-control" name="category" readonly >
-                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}"
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST == $letterOfIndent->category ? 'selected' : ''}} >
-                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
-                            </option>
-                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED}}"
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED == $letterOfIndent->category ? 'selected' : ''}} >
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED }}
-                            </option>
-                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}"
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_REAL == $letterOfIndent->category ? 'selected' : ''}} >
-                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}
-                            </option>
-                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}"
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL == $letterOfIndent->category ? 'selected' : ''}} >
-                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}
-                            </option>
-                            <option value="{{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}"
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE == $letterOfIndent->category ? 'selected' : ''}} >
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}
-                            </option>
-                        </select>
+                <div class="col-sm-4">
+                    <div class="row mt-2">
+                        <div class="col-sm-4 fw-bold">
+                            Perefered Location :
+                        </div>
+                        <div class="col-sm-6">
+                            {{ $letterOfIndent->prefered_location }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4 fw-bold">
+                         LOI Category :
+                        </div>
+                        <div class="col-sm-6">
+                            {{ $letterOfIndent->category }}
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">LOI Date</label>
-                        <input type="date" class="form-control" id="basicpill-firstname-input" readonly
-                               value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}" name="date">
+                <div class="col-sm-4">
+                    <div class="row ">
+                        <div class="col-sm-2 fw-bold">
+                            LOI Date :
+                        </div>
+                        <div class="col-sm-6">
+                            {{ Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13">Dealers</label>
-                        <input type="text" class="form-control" value="{{ $letterOfIndent->dealers }}" readonly>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">So Number</label>
-                        <input type="text" class="form-control" value="{{ $letterOfIndent->so_number }}" readonly>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">Destination</label>
-                        <input type="text" class="form-control" value="{{ $letterOfIndent->destination }}" readonly>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">Perefered Location</label>
-                        <input type="text" class="form-control" value="{{ $letterOfIndent->prefered_location }}" readonly>
+                    <div class="row">
+                        <div class="col-sm-3 fw-bold">
+                          Destination :
+                        </div>
+                        <div class="col-sm-6">
+                            {{ $letterOfIndent->destination }}
+                        </div>
                     </div>
                 </div>
             </div>
+            <hr>
             <br>
             @if($letterOfIndentItems->count() > 0)
 {{--                hide on small view--}}
@@ -108,11 +106,14 @@
                     <div class="d-flex">
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <div class="row">
-                                <div class="col-lg-3 col-md-3 col-sm-12">
+                                <div class="col-lg-2 col-md-3 col-sm-12">
                                    <label class="form-label">Model</label>
                                 </div>
-                                <div class="col-lg-2 col-md-2 col-sm-12">
+                                <div class="col-lg-1 col-md-2 col-sm-12">
                                     <label  class="form-label">SFX</label>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-12">
+                                    <label  class="form-label">Model Year</label>
                                 </div>
                                 <div class="col-lg-4 col-md-4 col-sm-12">
                                     <label class="form-label">LOI Description</label>
@@ -129,13 +130,17 @@
                         <div class="d-flex">
                             <div class="col-lg-12 col-md-12 col-sm-12">
                                 <div class="row mt-3">
-                                    <div class="col-lg-3 col-md-3 col-sm-12">
+                                    <div class="col-lg-2 col-md-3 col-sm-12">
                                       <label class="form-label d-block d-sm-none">Model</label>
                                             <input type="text" value="{{ $letterOfIndentItem->masterModel->model }}" readonly class="form-control" >
                                     </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                    <div class="col-lg-1 col-md-2 col-sm-12">
                                         <label  class="form-label d-block d-sm-none">SFX</label>
                                         <input type="text" value="{{ $letterOfIndentItem->masterModel->sfx }}" readonly class="form-control">
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                        <label  class="form-label d-block d-sm-none">Model Year</label>
+                                        <input type="text" value="{{ $letterOfIndentItem->masterModel->model_year }}" readonly class="form-control">
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-12">
                                         <label class="form-label d-block d-sm-none">LOI Description</label>
@@ -165,7 +170,7 @@
                     <div class="d-flex">
                         <div class="col-lg-12 col-md-12">
                             <div class="row">
-                                <div class="col-lg-3 col-md-3 sm-mt-20 col-sm-12">
+                                <div class="col-lg-2 col-md-6 col-sm-12">
                                     <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Model</label>
                                     <select class="form-select text-dark" name="model" id="model" autofocus>
                                         <option value="" >Select Model</option>
@@ -174,12 +179,12 @@
                                         @endforeach
                                     </select>
                                     @error('model')
-                                        <span >
+                                        <span>
                                             <strong >{{ $message }}</strong>
                                         </span>
                                     @enderror
                                 </div>
-                                <div class="col-lg-2 col-md-2 sm-mt-20 col-sm-12 mb-3">
+                                <div class="col-lg-1 col-md-3 col-sm-12 mb-3">
                                     <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">SFX</label>
                                     <select class="form-select text-dark" name="sfx" id="sfx" >
                                         <option value="">Select SFX</option>
@@ -190,7 +195,16 @@
                                         </div>
                                     @enderror
                                 </div>
-                                <div class="col-lg-4 col-md-4 col-sm-12 mb-3">
+                                <div class="col-lg-2 col-md-3 col-sm-12 mb-3">
+                                    <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Model Year</label>
+                                    <input type="text" class="form-control" id="model-year" name="model_year" placeholder="Enter Model Year">
+                                    @error('model_year')
+                                    <div role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </div>
+                                    @enderror
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
                                     <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">LOI Description</label>
                                     <select class="form-select text-dark" name="variant" id="variant">
                                         <option value="">Select LOI Description</option>
@@ -201,14 +215,14 @@
                                     <input type="number" name="quantity" placeholder="Quantity" maxlength="5" class="form-control text-dark"
                                            step="1" oninput="validity.valid||(value='');" min="0" >
                                 </div>
-                                <div class="col-lg-1 md-mt-20 col-sm-12">
-                                    <label class="form-label d-none d-lg-block d-xl-block d-xxl-block" @if($letterOfIndentItems->count() <= 0) style="margin-top: 30px" @endif >
-                                        Inventory Quantity
-                                    </label>
-                                </div>
-                                <div class="col-lg-1 col-md-2 md-mt-20 col-sm-12">
-                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Inventory Qty</label>
-                                    <input type="number" readonly id="inventory-quantity" value="" class="form-control" @if($letterOfIndentItems->count() <= 0) style="margin-top: 30px" @endif >
+{{--                                <div class="col-lg-1 md-mt-20 col-md-2 col-sm-12">--}}
+{{--                                    <label class="form-label d-none d-lg-block d-xl-block d-xxl-block" @if($letterOfIndentItems->count() <= 0) style="margin-top: 30px" @endif >--}}
+{{--                                        Inventory Quantity--}}
+{{--                                    </label>--}}
+{{--                                </div>--}}
+                                <div class="col-lg-1 col-md-2 col-sm-12">
+                                    <label class="form-label  @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Inventory Qty</label>
+                                    <input type="number" readonly id="inventory-quantity" value="" class="form-control" >
                                 </div>
                                 <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
                             </div>
@@ -232,6 +246,10 @@
 @endsection
 @push('scripts')
     <script>
+        $("#model-year").yearpicker({
+            startYear: 2000,
+            endYear: 2050,
+        });
         $("#form-letter-of-indent-items").validate({
             ignore: [],
             rules: {
@@ -239,6 +257,9 @@
                     required: true,
                 },
                 sfx: {
+                    required: true,
+                },
+                model_year: {
                     required: true,
                 },
                 variant: {

@@ -56,10 +56,10 @@ class BookingController extends Controller
         foreach ($variantItems as $variantItem) {
             $variant = Varaint::with('master_model_lines')->find($variantItem->reference_id);
 
-            if ($variant && $variant->masterModelLine) {
+            if ($variant && $variant->master_model_lines_id) {
                 $variants[$variant->id] = $variant->name;
-                $mastermodellines[$variant->masterModelLine->id] = $variant->masterModelLine->model_line;
-                $variantsMasterModel[$variant->id] = $variant->masterModelLine->id;
+                $mastermodellines[$variant->master_model_lines->id] = $variant->master_model_lines->model_line;
+                $variantsMasterModel[$variant->id] = $variant->master_model_lines->id;
             }
         }
     }

@@ -230,7 +230,7 @@
                         <label for="timeRange">Person :</label>
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="person"  placeholder="Person Name"  class="form-control form-control-xs" id="person" value="{{$callDetails->name}}">
+                        <input type="text" name="name"  placeholder="Person Name"  class="form-control form-control-xs" id="person" value="{{$callDetails->name}}">
                     </div>
                 </div>
                 <div class="row">
@@ -238,7 +238,7 @@
                         Contact No :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="contact_number"  class="form-control form-control-xs" id="contact_number" value="{{$callDetails->phone}}" placeholder="Phone">
+                        <input type="text" name="phone"  class="form-control form-control-xs" minlength="5" maxlength="15" id="contact_number" value="{{$callDetails->phone}}" placeholder="Phone">
                     </div>
                 </div>
                 <div class="row">
@@ -395,7 +395,7 @@
                     <div class="col-lg-12">
                         <div class="table-responsive">
                             <table id="dtBasicExample2" class="table table-responsive table-striped table-editable table-edits table">
-                                <thead>
+                                <thead class="bg-soft-secondary">
                                     <tr>
                                         <th>Description</th>
                                         <th>Code</th>
@@ -510,7 +510,7 @@
                             <button type="button" class="btn btn-primary" id="search-button">Search</button>
                         </div>
                         <div class="col" >
-                            <button type="button" class="btn btn-outline-warning" data-table="vehicle-table" id="directadding-button">Directly Adding Into Quotation</button>
+                            <a class="btn btn-outline-warning" data-table="vehicle-table" id="directadding-button"> Directly Adding Into Quotation</a>
                         </div>
                     </div>
                 </div>
@@ -524,7 +524,7 @@
                             <thead class="bg-soft-secondary">
                                 <tr>
 {{--                                    <th>ID</th>--}}
-                                    <th>Status</th>
+{{--                                    <th>Status</th>--}}
 {{--                                    <th>VIN</th>--}}
                                     <th>Brand Name</th>
                                     <th>Model Line</th>
@@ -987,29 +987,29 @@
         $('#kit_brand').select2();
         $('#kit_model_line').select2();
         $('#kits_model_description').select2();
-        $("#form-create").validate({
-            rules: {
-                document_type: {
-                    required: {
-                        depends: function(element) {
-                            return $(".document_type:checked")
-                        }
-                    }
-                },
-                shipping_method: {
-                    required: {
-                        depends: function(element) {
-                            return $(".shipping_method:checked")
-                        }
-                    }
-                },
-                contact_number:{
-                    number: true,
-                    minlength:5,
-                    maxlength:15,
-                }
-            }
-        });
+        // $("#form-create").validate({
+        //     rules: {
+        //         document_type: {
+        //             required: {
+        //                 depends: function(element) {
+        //                     return $(".document_type:checked")
+        //                 }
+        //             }
+        //         },
+        //         shipping_method: {
+        //             required: {
+        //                 depends: function(element) {
+        //                     return $(".shipping_method:checked")
+        //                 }
+        //             }
+        //         },
+        //         contact_number:{
+        //             number: true,
+        //             minlength:5,
+        //             maxlength:15,
+        //         }
+        //     }
+        // });
         $('input[name="document_type"]').on('change', function() {
             $('input[name="' + this.name + '"]').not(this).prop('checked', false);
             var documentType = $(this).val();
@@ -1335,7 +1335,7 @@
 
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var price = row[8];
+                        var price = row[7];
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                         var price = row[4];
@@ -1368,10 +1368,10 @@
 
                     var combinedValue = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var brand = row[1];
-                        var modelDescription = row[3];
-                        var interiorColor = row[6];
-                        var exteriorColor = row[7];
+                        var brand = row[0];
+                        var modelDescription = row[2];
+                        var interiorColor = row[5];
+                        var exteriorColor = row[6];
                         var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
@@ -1413,7 +1413,7 @@
                 render: function (data, type, row) {
                     var code = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var code = row[4];
+                        var code = row[3];
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
 
@@ -1433,11 +1433,10 @@
                 render: function (data, type, row) {
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var price = row[8];
+                        var price = row[7];
                     }else{
                         var price = row[4];
                     }
-
                     var currency = $('#currency').val();
 
                     if(currency == 'USD') {
@@ -1447,8 +1446,8 @@
                         var value = '{{ $aed_to_eru_rate->value }}';
                         var price = price / parseFloat(value);
                     }
-
-                    return '<input type="number" min="0" name="prices[]" required class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>';
+                    return '<input type="number" min="0" name="prices[]" required class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>' +
+                        '    <span id="priceError' +  row['index'] +'" class=" invalid-feedback"></span>';
                 }
             }
         ]
@@ -1463,7 +1462,7 @@
         }
         else if(row['button_type'] == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
+            table.row.add(['', row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
                 '<button class="add-button circle-button" data-button-type="Vehicle" data-variant-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Shipping-Document') {
@@ -1533,7 +1532,7 @@
     //     }
     //
     // }
-    $('#submit-button').on('click', function() {
+    $('#submit-button').on('click', function(e) {
         var selectedData = [];
         secondTable.rows().every(function() {
         var data = this.data();
@@ -1541,9 +1540,27 @@
         var selectedDays = $(this.node()).find('.days-dropdown').val();
 
         selectedData.push({ vehicleId: vehicleId, days: selectedDays });
-
-
+            // let formValid = true;
+            // let rowCount =  secondTable.data().length;
+            // for (let i = 1; i <= rowCount; i++) {
+            //     var inputPrice = $('#price-' + i).val();
+            //     if (inputPrice == '') {
+            //         $msg = "Price is required";
+            //         showPriceError($msg, i);
+            //         formValid = true;
+            //     }
+            // }
+            //
+            // if(formValid == true) {
+            //     e.preventDefault();
+            // }
     });
+    function showPriceError($msg,i)
+    {
+        document.getElementById("priceError"+i).textContent=$msg;
+        document.getElementById("price"+i).classList.add("is-invalid");
+        document.getElementById("priceError"+i).classList.add("paragraph-class");
+    }
     var dateValue = $('#name').val();
     var callIdValue = $('#call_id').val();
     var etd = $('#etd').val();
@@ -1738,7 +1755,6 @@
         row.find('td').each(function() {
             rowData.push($(this).html());
         });
-
         var secondTable = $('#dtBasicExample2').DataTable();
 
         if(buttonType == 'Shipping') {
@@ -1886,7 +1902,7 @@
                     var addButton = '<button class="add-button" data-button-type="Vehicle" data-variant-id="'+ variantId +'" >Add</button>';
                     return [
                         // vehicle.id,
-                        vehicle.grn_status,
+                        // vehicle.grn_status,
                         // vehicle.vin,
                         vehicle.brand,
                         vehicle.model_line,
@@ -1906,7 +1922,7 @@
                     data: data,
                     columns: [
                         // { title: 'ID' },
-                        { title: 'Status' },
+                        // { title: 'Status' },
                         // { title: 'VIN' },
                         { title: 'Brand Name' },
                         { title: 'Model Line' },

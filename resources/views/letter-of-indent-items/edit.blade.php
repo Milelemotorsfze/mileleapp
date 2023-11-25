@@ -21,75 +21,72 @@
                         </ul>
                     </div>
                 @endif
-                <div class="row">
-                    <div class="col-lg-3 col-md-6">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Customer</label>
-                            <select class="form-control" name="customer_id" id="customer" readonly>
-                                <option> {{ $letterOfIndent->customer->name }}</option>
-                            </select>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="row mt-2">
+                                <div class="col-sm-2 fw-bold">
+                                    Customer :
+                                </div>
+                                <div class="col-sm-6">
+                                    {{ $letterOfIndent->customer->name ?? '' }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-2 fw-bold">
+                                    Dealers :
+                                </div>
+                                <div class="col-sm-6">
+                                    {{ $letterOfIndent->dealers }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3 fw-bold">
+                                    So Number :
+                                </div>
+                                <div class="col-sm-6">
+                                    {{ $letterOfIndent->so_number }}
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">LOI Category</label>
-                            <select class="form-control" name="category" readonly >
-                                <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}"
-                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST == $letterOfIndent->category ? 'selected' : ''}} >
-                                    {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
-                                </option>
-                                <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED}}"
-                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED == $letterOfIndent->category ? 'selected' : ''}} >
-                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED }}
-                                </option>
-                                <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}"
-                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_REAL == $letterOfIndent->category ? 'selected' : ''}} >
-                                    {{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}
-                                </option>
-                                <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}"
-                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL == $letterOfIndent->category ? 'selected' : ''}} >
-                                    {{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}
-                                </option>
-                                <option value="{{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}"
-                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE == $letterOfIndent->category ? 'selected' : ''}} >
-                                    {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">LOI Date</label>
-                            <input type="date" class="form-control" id="basicpill-firstname-input" readonly
-                                   value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}" name="date">
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-4 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Dealer</label>
-                            <input type="text" class="form-control" value="{{ $letterOfIndent->dealers }}" readonly>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">So Number</label>
-                            <input type="text" class="form-control" value="{{ $letterOfIndent->so_number }}" readonly>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Destination</label>
-                            <input type="text" class="form-control" value="{{ $letterOfIndent->destination }}" readonly>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Perefered Location</label>
-                            <input type="text" class="form-control" value="{{ $letterOfIndent->prefered_location }}" readonly>
-                        </div>
-                    </div>
+                        <div class="col-sm-4">
+                            <div class="row mt-2">
+                                <div class="col-sm-4 fw-bold">
+                                    Perefered Location :
+                                </div>
+                                <div class="col-sm-6">
+                                    {{ $letterOfIndent->prefered_location }}
+                                </div>
+                            </div>
 
-                </div>
+                            <div class="row">
+                                <div class="col-sm-4 fw-bold">
+                                    LOI Category :
+                                </div>
+                                <div class="col-sm-6">
+                                    {{ $letterOfIndent->category }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="row ">
+                                <div class="col-sm-2 fw-bold">
+                                    LOI Date :
+                                </div>
+                                <div class="col-sm-6">
+                                    {{ Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3 fw-bold">
+                                    Destination :
+                                </div>
+                                <div class="col-sm-6">
+                                    {{ $letterOfIndent->destination }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
                     @if($letterOfIndentItems->count() > 0)
                         <div class="row d-none d-sm-block">
                             <div class="d-flex">

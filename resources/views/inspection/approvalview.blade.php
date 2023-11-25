@@ -324,7 +324,7 @@
     @if ($extraItems->contains('item_name', 'packing'))
         <input type="checkbox" id="packing" name="packing" checked>
         <label for="packing">Packing Box</label>
-        <input class="form-control" type="hidden" name="packing_qty" value="{{ $extraItems->where('item_name', 'packing')->first()->qty }}" placeholder="Qty">
+        <input class="form-control" type="hidden" name="packing_qty" value="" placeholder="Qty">
     @else
         <input type="checkbox" id="packing" name="packing">
         <label for="packing">Spare Wheel</label>
@@ -337,7 +337,7 @@
                 @if ($extraItems->contains('item_name', 'warningtriangle'))
                     <input type="checkbox" id="warningtriangle" name="warningtriangle" checked>
                     <label for="warningtriangle">Warning Triangle</label>
-                    <input class="form-control" type="hidden" name="jack_qty" value="{{ $extraItems->where('item_name', 'warningtriangle')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="warningtriangle_qty" value="" placeholder="Qty">
                 @else
                 <input type="checkbox" id="warningtriangle" name="warningtriangle">
                     <label for="warningtriangle">Warning Triangle</label>
@@ -350,7 +350,7 @@
                 @if ($extraItems->contains('item_name', 'wheel'))
                     <input type="checkbox" id="wheel" name="wheel" checked>
                     <label for="wheel">Jack & Wheel Spanner</label>
-                    <input class="form-control" type="hidden" name="wheel_qty" value="{{ $extraItems->where('item_name', 'wheel')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="wheel_qty" value="" placeholder="Qty">
                     @else
                     <input type="checkbox" id="wheel" name="wheel">
                     <label for="wheel">Jack & Wheel Spanner</label>
@@ -365,7 +365,7 @@
                 @if ($extraItems->contains('item_name', 'firstaid'))
                     <input type="checkbox" id="firstaid" name="firstaid" checked>
                     <label for="firstaid">First Aid Kit / Packing Box</label>
-                    <input class="form-control" type="hidden" name="firstaid_qty" value="{{ $extraItems->where('item_name', 'firstaid')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="firstaid_qty" value="" placeholder="Qty">
                     @else
                     <input type="checkbox" id="firstaid" name="firstaid">
                     <label for="firstaid">First Aid Kit / Packing Box</label>
@@ -378,7 +378,7 @@
                 @if ($extraItems->contains('item_name', 'floor_mat'))
                     <input type="checkbox" id="floor_mat" name="floor_mat" checked>
                     <label for="floor_mat">Floor Mat</label>
-                    <input class="form-control" type="hidden" name="floor_mat_qty" value="{{ $extraItems->where('item_name', 'floor_mat')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="floor_mat_qty" value="" placeholder="Qty">
                     @else
                     <input type="checkbox" id="floor_mat" name="floor_mat">
                     <label for="floor_mat">Floor Mat</label>
@@ -391,7 +391,7 @@
                 @if ($extraItems->contains('item_name', 'service_book'))
                     <input type="checkbox" id="service_book" name="service_book" checked>
                     <label for="service_book">Service Book & Manual</label>
-                    <input class="form-control" type="hidden" name="service_book_qty" value="{{ $extraItems->where('item_name', 'service_book')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="service_book_qty" value="" placeholder="Qty">
                     @else
                     <input type="checkbox" id="service_book" name="service_book">
                     <label for="service_book">Service Book & Manual</label>
@@ -419,7 +419,7 @@
                 @if ($extraItems->contains('item_name', 'trunkcover'))
                     <input type="checkbox" id="trunkcover" name="trunkcover" checked>
                     <label for="trunkcover">Trunk Cover</label>
-                    <input class="form-control" type="hidden" name="trunkcover_qty" value="{{ $extraItems->where('item_name', 'trunkcover')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="trunkcover_qty" value="" placeholder="Qty">
                     @else
                     <input type="checkbox" id="trunkcover" name="trunkcover">
                     <label for="trunkcover">Trunk Cover</label>
@@ -432,7 +432,7 @@
                 @if ($extraItems->contains('item_name', 'fire_extinguisher'))
                     <input type="checkbox" id="fire_extinguisher" name="fire_extinguisher" checked>
                     <label for="fire_extinguisher">Fire Extinguisher</label>
-                    <input class="form-control" type="hidden" name="fire_extinguisher_qty" value="{{ $extraItems->where('item_name', 'fire_extinguisher')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="fire_extinguisher_qty" value="" placeholder="Qty">
                     @else
                     <input type="checkbox" id="fire_extinguisher" name="fire_extinguisher">
                     <label for="fire_extinguisher">Fire Extinguisher</label>
@@ -872,7 +872,7 @@ function incidentreport(InspectionId) {
 <script>
 function saveinspectiondetails() {
     var engine = $('#engine').val();
-    var ins  ection_id = $('#inspection_id').val();
+    var inspection_id = $('#inspection_id').val();
     var vin = $('#vin').val();
     var int_colour = $('#int_colour').val();
     var ex_colour = $('#ex_colour').val();
@@ -912,7 +912,7 @@ function saveextraitems() {
         var qtyInput = $('[name="' + itemName + '_qty"]');
         var qty = qtyInput.val();
         var isChecked = $(this).is(':checked');
-        
+        console.log(qty);
         // Include data for both checked and unchecked items
         dataToSend[itemName] = { checked: isChecked, qty: qty };
     });
@@ -1011,26 +1011,6 @@ function saveincidents() {
 }
 </script>
 <script>
-  const variantInput = document.getElementById('newvariantname');
-  variantInput.addEventListener('input', checkVariantName);
-  const validationMessage = document.getElementById('validation-message');
-  function checkVariantName() {
-    const variantName = variantInput.value;
-    fetch(`/check-org-variant?name=${encodeURIComponent(variantName)}`, {
-      method: 'GET',
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.exists) {
-        validationMessage.innerHTML = '<p class="text-danger">Variant name already exists in the system</p>';
-      } else {
-        validationMessage.innerHTML = '<p class="text-success">Variant name is available</p>';
-      }
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-  }
   function setButtonValue(value) {
     document.getElementById('buttonValue').value = value;
     if (value === 'approve') {
