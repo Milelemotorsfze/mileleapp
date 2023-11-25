@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AddonDetails;
 use App\Models\HRM\Employee\EmployeeProfile;
 use App\Models\OtherLogisticsCharges;
-use App\Models\quotation;
+use App\Models\Quotation;
 use App\Models\Calls;
 use App\Models\Brand;
 use App\Models\QuotationClient;
@@ -44,7 +44,7 @@ class QuotationController extends Controller
      */
     public function create()
     {
-    $latestQuotation = quotation::where('created_by', auth()->user()->id)
+    $latestQuotation = Quotation::where('created_by', auth()->user()->id)
                     ->latest()
                     ->first();
     $callsId = $latestQuotation->calls_id;
@@ -247,7 +247,7 @@ class QuotationController extends Controller
     public function show($id)
     {
         $data = Calls::where('id',$id)->first();
-        $quotation = quotation::updateOrCreate([
+        $quotation = Quotation::updateOrCreate([
             'calls_id' => $data->id,
             'created_by' => auth()->user()->id
         ]);

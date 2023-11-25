@@ -130,15 +130,17 @@ class CallsController extends Controller
                 else
                 {
                     $lowest_lead_sales_person = ModelHasRoles::select('model_id')
-                    ->where('role_id', 7)
-                    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-                    ->where('users.status', 'active')
-                    ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
-                    ->whereIn('model_has_roles.model_id', $excluded_user_ids)
-                    ->where('calls.status', 'New')
-                    ->groupBy('calls.sales_person')
-                    ->orderByRaw('COUNT(calls.id) ASC')
-                    ->first();
+                                        ->where('role_id', 7)
+                                        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                                        ->where('users.status', 'active')
+                                        ->leftJoin('calls', function ($join) {
+                                            $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
+                                                ->where('calls.status', 'New');
+                                        })
+                                        ->whereIn('model_has_roles.model_id', $excluded_user_ids)
+                                        ->groupBy('model_has_roles.model_id')
+                                        ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
+                                        ->first();
                     $sales_person_id = $lowest_lead_sales_person->model_id;
                 }
             } 
@@ -191,20 +193,22 @@ class CallsController extends Controller
                 }
                 elseif ($existing_language_count > 1) {
                     $sales_person_ids = $sales_person_languages->pluck('sales_person');
-                     $lowest_lead_sales_person = ModelHasRoles::select('model_id')
-                                        ->where('role_id', 7)
-                                        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
-                                        ->where('users.status', 'active')
-                                        ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
-                                        ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
-                                        ->whereIn('model_has_roles.model_id', $excluded_user_ids)
-                                        ->where('calls.status', 'New')
-                                        ->whereIn('model_has_roles.model_id', $sales_person_ids)
-                                        ->where('sales_person_laugauges.language', $language)
-                                        ->groupBy('calls.sales_person')
-                                        ->orderByRaw('COUNT(calls.id) ASC')
-                                        ->first();
-                    $sales_person_id = $lowest_lead_sales_person->model_id;
+                    $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+    ->where('role_id', 7)
+    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+    ->where('users.status', 'active')
+    ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+    ->join('sales_person_languages', 'model_has_roles.model_id', '=', 'sales_person_languages.sales_person')
+    ->whereIn('model_has_roles.model_id', $excluded_user_ids)
+    ->whereIn('model_has_roles.model_id', $sales_person_ids)
+    ->where('calls.status', 'New')
+    ->where('sales_person_languages.language', $language)
+    ->groupBy('calls.sales_person')
+    ->orderByRaw('COUNT(calls.id) ASC')
+    ->first();
+
+$sales_person_id = $lowest_lead_sales_person->model_id;
+
                     break;
                     }
                 else{
@@ -212,11 +216,13 @@ class CallsController extends Controller
                     ->where('role_id', 7)
                     ->join('users', 'model_has_roles.model_id', '=', 'users.id')
                     ->where('users.status', 'active')
-                    ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
-                    ->where('calls.status', 'New')
+                    ->leftJoin('calls', function ($join) {
+                        $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
+                            ->where('calls.status', 'New');
+                    })
                     ->whereIn('model_has_roles.model_id', $excluded_user_ids)
-                    ->groupBy('calls.sales_person')
-                    ->orderByRaw('COUNT(calls.id) ASC')
+                    ->groupBy('model_has_roles.model_id')
+                    ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
                     ->first();
                     $sales_person_id = $lowest_lead_sales_person->model_id;
                 }
@@ -513,11 +519,13 @@ return view('calls.resultbrand', compact('data'));
                                         ->where('role_id', 7)
                                         ->join('users', 'model_has_roles.model_id', '=', 'users.id')
                                         ->where('users.status', 'active')
-                                        ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                                        ->leftJoin('calls', function ($join) {
+                                            $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
+                                                ->where('calls.status', 'New');
+                                        })
                                         ->whereIn('model_has_roles.model_id', $excluded_user_ids)
-                                        ->where('calls.status', 'New')
-                                        ->groupBy('calls.sales_person')
-                                        ->orderByRaw('COUNT(calls.id) ASC')
+                                        ->groupBy('model_has_roles.model_id')
+                                        ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
                                         ->first();
                                         $sales_person_id = $lowest_lead_sales_person->model_id;
                                     }
@@ -571,17 +579,16 @@ return view('calls.resultbrand', compact('data'));
                                     }
                                     elseif ($existing_language_count > 1) {
                                         $sales_person_ids = $sales_person_languages->pluck('sales_person');
-                                        info($sales_person_ids);
-                                         $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                                        $lowest_lead_sales_person = ModelHasRoles::select('model_id')
                                         ->where('role_id', 7)
                                         ->join('users', 'model_has_roles.model_id', '=', 'users.id')
                                         ->where('users.status', 'active')
                                         ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
-                                        ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
+                                        ->join('sales_person_languages', 'model_has_roles.model_id', '=', 'sales_person_languages.sales_person')
                                         ->whereIn('model_has_roles.model_id', $excluded_user_ids)
-                                        ->where('calls.status', 'New')
                                         ->whereIn('model_has_roles.model_id', $sales_person_ids)
-                                        ->where('sales_person_laugauges.language', $language)
+                                        ->where('calls.status', 'New')
+                                        ->where('sales_person_languages.language', $language)
                                         ->groupBy('calls.sales_person')
                                         ->orderByRaw('COUNT(calls.id) ASC')
                                         ->first();
@@ -593,11 +600,13 @@ return view('calls.resultbrand', compact('data'));
                                         ->where('role_id', 7)
                                         ->join('users', 'model_has_roles.model_id', '=', 'users.id')
                                         ->where('users.status', 'active')
-                                        ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                                        ->leftJoin('calls', function ($join) {
+                                            $join->on('model_has_roles.model_id', '=', 'calls.sales_person')
+                                                ->where('calls.status', 'New');
+                                        })
                                         ->whereIn('model_has_roles.model_id', $excluded_user_ids)
-                                        ->where('calls.status', 'New')
-                                        ->groupBy('calls.sales_person')
-                                        ->orderByRaw('COUNT(calls.id) ASC')
+                                        ->groupBy('model_has_roles.model_id')
+                                        ->orderByRaw('COALESCE(COUNT(calls.id), 0) ASC')
                                         ->first();
                                         $sales_person_id = $lowest_lead_sales_person->model_id;
                                     }

@@ -18,6 +18,7 @@ use App\Models\So;
 use App\Models\Prospecting;
 use App\Models\Salesdemand;
 use App\Models\Negotiation;
+use App\Models\Booking;
 use Carbon\Carbon;
 use App\Models\MasterModelLines;
 use Monarobase\CountryList\CountryListFacade;
@@ -503,7 +504,18 @@ public function saveprospecting(Request $request)
     {
     $calls = Calls::find($calls_id);
     $prospecting = Prospecting::where('calls_id', $calls_id)->get();
-    $quotation = quotation::where('calls_id', $calls_id)->get();
-    return view('dailyleads.singleleadview', compact('calls', 'prospecting', 'quotation'));
+    $quotations = quotation::where('calls_id', $calls_id)->get();
+    $negotiations = Negotiation::where('calls_id', $calls_id)->get();
+    $closed = Closed::where('call_id', $calls_id)->get();
+    $bookingDetails = Booking::join('vehicles', 'booking.vehicle_id', '=', 'vehicles.id')
+    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+    ->where('booking.calls_id', $calls_id)
+    ->select('booking.*', 'vehicles.*', 'brands.brand_name', 'varaints.name', 'master_model_lines.model_line')
+    ->groupby('booking.id')
+    ->get();
+    $demands = Salesdemand::where('calls_id', $calls_id)->get();
+    return view('dailyleads.singleleadview', compact('calls', 'prospecting', 'quotations', 'demands', 'negotiations', 'closed', 'bookingDetails'));
     }  
 }
