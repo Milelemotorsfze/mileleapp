@@ -1,16 +1,18 @@
 @extends('layouts.main')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.css">
 <style>
-    .select2-container {
-        width: 100% !important;
-    }
-
     .designation-radio-button {
         margin-left: 15px;
     }
 
-    .designation-radio-main-div {
+    .radio-button-main-div {
         margin-top: 12px !important;
+    }
+
+    .radio-error,
+    .select-error,
+    .other-error {
+        color: red;
     }
 
     #employeeQuestionnaireForm .form-label {
@@ -97,10 +99,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         @csrf
 
         <div class="row">
-            <div class=" col-lg-4 col-md-6 col-sm-6 designation-radio-main-div">
-                <div class="row ">
-                    <div class="col-lg-12 col-md-12 col-sm-12 ">
-                        <label for="designation_type" class="form-label"><span class="error">* </span>{{ __('Designation Type:') }}</label>
+            <div class=" col-lg-4 col-md-6 col-sm-6 radio-button-main-div">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 radio-div-container">
+                        <label for="designation_types" class="form-label"><span class="error">* </span>{{ __('Designation Type:') }}</label>
                         <div class="designation-radio-button">
                             <label>
                                 <input type="radio" name="designation_type" id="prior_designations" value="prior_designation"> Prior Designation
@@ -113,7 +115,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
             </div>
 
-            <div class=" col-lg-4 col-md-6 col-sm-6">
+            <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
 
                 <label for="designation_id" class="form-label"><span class="error">* </span>{{ __('Designation Name') }}</label>
                 <select name="designation_id" id="requested_job_title" class="form-control widthinput" multiple="true" autofocus>
@@ -122,7 +124,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     @endforeach
                 </select>
             </div>
-            <div class="col-xxl-4 col-lg-6 col-md-6">
+            <div class="col-xxl-4 col-lg-4 col-md-6">
                 <a id="createNewJobTitleButton" data-toggle="popover" data-trigger="hover" title="Create New Job Title" data-placement="top" style="margin-top:28px;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewJobPosition"><i class="fa fa-plus" aria-hidden="true"></i> Create New Job Title</a>
             </div>
             <!-- New Designation div shown on the right side -->
@@ -143,7 +145,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <input type="number" placeholder="No. of years" name="no_of_years_of_experience_in_specific_job_role" class="form-control" id="no_of_years_of_experience_in_specific_job_role">
             </div>
 
-            <div class=" col-lg-4 col-md-6 col-sm-6   ">
+            <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
 
                 <label for="reporting_structure" class="form-label"><span class="error">* </span>{{ __('Reporting To') }}</label>
                 <select name="reporting_structure" id="reporting_structure" class="form-control widthinput" multiple="true" autofocus>
@@ -152,7 +154,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </select>
             </div>
 
-            <div class=" col-lg-4 col-md-6 col-sm-6 ">
+            <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
 
                 <label for="location_id" class="form-label"><span class="error">* </span>{{ __('Work Location') }}</label>
                 <select name="location_id" id="location_id" class="form-control widthinput" multiple="true" autofocus>
@@ -168,9 +170,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <input type="number" placeholder="Number of Hirings" name="number_of_openings" class="form-control" id="number_of_openings">
             </div>
 
-            <div class=" col-lg-4 col-md-6 col-sm-6 designation-radio-main-div">
+            <div class=" col-lg-4 col-md-6 col-sm-6 radio-button-main-div">
                 <div class="row ">
-                    <div class="col-lg-12  col-md-12 col-sm-12 col-12">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-12 radio-div-container">
 
 
                         <label for="hiring_time" class="form-label"><span class="error">* </span>{{ __('Hiring Time:') }}</label>
@@ -230,7 +232,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <label for="specific_company_experience" class="form-label"><span class="error">* </span>{{ __('Any Specific Company Experience :') }} </label>
                 <input type="text" placeholder="Company Experience" name="specific_company_experience" class="form-control" id="specific_company_experience">
             </div>
-            <div class=" col-lg-4 col-md-6 col-sm-6 ">
+            <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
 
                 <label for="industry_experience_id" class="form-label"><span class="error">* </span>{{ __('Any specific industry experience') }}</label>
                 <select name="industry_experience_id" id="industry_experience_id" class="form-control widthinput" multiple="true" autofocus>
@@ -241,8 +243,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
             </div>
 
-            <div class="col-xxl-4 col-lg-6 col-md-6">
-                <a id="createNewIndustryExperienceButton" data-toggle="popover" data-trigger="hover" title="Create New Industry Experience" data-placement="top" style="margin-top:28px;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewIndustryExperience"><i class="fa fa-plus" aria-hidden="true"></i> Create New Industry Experience</a>
+            <div class="col-xxl-4 col-lg-4 col-md-6">
+                <a id="createNewIndustryExperienceButton" data-toggle="popover" data-trigger="hover" title="Create New Industry Experience" data-placement="top" style="margin-top:28px;" class="btn btn-sm btn-info industry-exp-modal-button" data-modal-id="createNewIndustryExperience"><i class="fa fa-plus" aria-hidden="true"></i> Create New Industry Experience</a>
             </div>
         </div>
 
@@ -276,7 +278,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
 
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
+                    <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
 
                         <label for="visa_type" class="form-label"><span class="error">* </span>{{ __('Visa Type') }}</label>
                         <select name="visa_type" id="visa_type" class="form-control widthinput" multiple="true" autofocus>
@@ -286,7 +288,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </select>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
+                    <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
 
                         <label for="nationality" class="form-label"><span class="error">* </span>{{ __('Nationality') }}</label>
                         <select name="nationality" id="nationality" class="form-control widthinput" multiple="true" autofocus>
@@ -296,16 +298,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </select>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
                         <label for="age" class="form-label"><span class="error">* </span>{{ __('Age:') }}</label>
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-6">
                                 <div class="input-group">
                                     <span class="input-group-text">From</span>
                                     <input type="number" placeholder="From" name="min_age" class="form-control" id="min_age">
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-6">
                                 <div class="input-group">
                                     <span class="input-group-text">to</span>
                                     <input type="number" placeholder="End" name="max_age" class="form-control" id="max_age">
@@ -315,7 +317,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
 
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
+                    <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
 
                         <label for="language_id" class="form-label"><span class="error">* </span>{{ __('Additional Language(s):') }}</label>
                         <select name="language_id[]" id="language_id" class="form-control widthinput" multiple autofocus>
@@ -324,14 +326,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             @endforeach
                         </select>
                     </div>
-                </div>
 
-                <div class="row">
-
-
-                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12 radio-button-main-div">
                         <div class="row ">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 ">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 radio-div-container">
 
 
                                 <label for="required_to_travel_for_work_purpose" class="form-label"><span class="error">* </span>{{ __('Did he require to travel for work purpose?') }}</label>
@@ -349,9 +347,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-12 designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12 radio-button-main-div">
                         <div class="row ">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 ">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 radio-div-container">
 
 
                                 <label for="requires_multiple_industry_experience" class="form-label"><span class="error">* </span>{{ __('Do candidates require multiple industry experience?') }}</label>
@@ -368,9 +366,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12  radio-button-main-div">
                         <div class="row ">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 ">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 radio-div-container">
 
 
                                 <label for="team_handling_experience_required" class="form-label"><span class="error">* </span>{{ __('Team handling experience is required?') }}</label>
@@ -386,22 +384,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                         </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12 ">
                         <div class="row ">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 designation-radio-main-div">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 radio-button-main-div">
 
+                                <div class="radio-div-container">
 
-                                <label for="required_to_work_on_trial" class="form-label"><span class="error">* </span>{{ __('Is shortlisted candidate require to work on trial ?') }}</label>
-                                <div class="designation-radio-button">
-                                    <label>
-                                        <input type="radio" name="required_to_work_on_trial" id="yes" value="yes"> Yes
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="required_to_work_on_trial" id="no" value="no"> No
-                                    </label>
+                                    <label for="required_to_work_on_trial" class="form-label"><span class="error">* </span>{{ __('Is shortlisted candidate require to work on trial ?') }}</label>
+                                    <div class="designation-radio-button">
+                                        <label>
+                                            <input type="radio" name="required_to_work_on_trial" id="yes" value="yes"> Yes
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="required_to_work_on_trial" id="no" value="no"> No
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
 
@@ -416,70 +414,60 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class=" col-lg-8 col-md-6 col-sm-12  designation-radio-main-div">
 
+                    <!-- Left Side -->
+                    <div class="col-lg-4 col-md-12 col-sm-12 radio-button-main-div">
                         <div class="row">
-                            <!-- Left Side -->
-                            <div class="col-lg-6 col-md-12 col-sm-12 designation-radio-main-div">
-                                <div class="row">
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-12 ">
-                                        <label for="commission_involved_in_salary" class="form-label"><span class="error">* </span>{{ __('Is commission involved along with the salary?') }}</label>
-                                        <div class="designation-radio-button">
-                                            <label>
-                                                <input type="radio" name="commission_involved_in_salary" id="yes" value="yes"> Yes
-                                            </label>
-                                            <label>
-                                                <input type="radio" name="commission_involved_in_salary" id="no" value="no"> No
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Right Side -->
-                            <div class="col-lg-6 col-md-12 col-sm-12">
-                                <div class="row">
-                                    <div class="col-lg-12 col-md-12 col-sm-12">
-                                        <!-- Dropdown Container -->
-                                        <div class="chooseAmountpercentageDropDownInputContainer" style="display: none;">
-                                            <label for="commission_type" class="form-label"><span class="error">* </span>{{ __('Choose Amount or Percentage') }}</label>
-                                            <select name="commission_type" id="commission_type" class="form-control widthinput" onchange="showAmountPercentageInput(this)" autofocus>
-                                                <option value="" disabled selected>Choose Option</option>
-                                                <option value="amount">Amount</option>
-                                                <option value="percentage">Percentage</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <!-- Amount Input Container -->
-                                    <div class="col-lg-12 col-md-12 col-sm-12 amountpercentageDropDownInputContainer">
-                                        <div class="amountInputContainer" id="amountInputContainer" style="display: none">
-                                            <label for="commission_amount" class="form-label"><span class="error">* </span>{{ __('Enter Amount (in AED):') }}</label>
-                                            <input type="number" placeholder="amount" name="commission_amount" class="form-control" id="commission_amount">
-                                        </div>
-                                    </div>
-
-                                    <!-- Percentage Input Container -->
-                                    <div class="col-lg-12 col-md-12 col-sm-12 amountpercentageDropDownInputContainer">
-                                        <div class="percentageInputContainer" id="percentageInputContainer" style="display: none">
-                                            <label for="commission_percentage" class="form-label"><span class="error">* </span>{{ __('Enter percentage:') }}</label>
-                                            <input type="number" placeholder="percentage" name="commission_percentage" class="form-control" id="commission_percentage">
-                                        </div>
-                                    </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 radio-div-container">
+                                <label for="commission_involved_in_salary" class="form-label"><span class="error">* </span>{{ __('Is commission involved along with the salary?') }}</label>
+                                <div class="designation-radio-button">
+                                    <label>
+                                        <input type="radio" name="commission_involved_in_salary" id="yes" value="yes"> Yes
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="commission_involved_in_salary" id="no" value="no"> No
+                                    </label>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Right Side -->
+                    <div class="col-lg-4 col-md-12 col-sm-12 commissionInputContainer" style="display: none">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-12 col-sm-12">
+                                <!-- Dropdown Container -->
+                                <div class="chooseAmountpercentageDropDownInputContainer" style="display: none;">
+                                    <label for="commission_type" class="form-label"><span class="error">* </span>{{ __('Choose Amount or Percentage') }}</label>
+                                    <select name="commission_type" id="commission_type" class="form-control widthinput" onchange="showAmountPercentageInput(this)" autofocus>
+                                        <option value="" disabled selected>Choose Option</option>
+                                        <option value="amount">Amount</option>
+                                        <option value="percentage">Percentage</option>
+                                    </select>
+                                </div>
+                            </div>
 
+                            <!-- Amount Input Container -->
+                            <div class="col-lg-6 col-md-12 col-sm-12 amountDropDownInputContainer" id="amountDropDownInputContainer" style="display: none">
+                                <div class="amountInputContainer" id="amountInputContainer">
+                                    <label for="commission_amount" class="form-label"><span class="error">* </span>{{ __('Enter Amount (in AED):') }}</label>
+                                    <input type="number" placeholder="amount" name="commission_amount" class="form-control" id="commission_amount">
+                                </div>
+                            </div>
 
-                </div>
+                            <!-- Percentage Input Container -->
+                            <div class="col-lg-6 col-md-12 col-sm-12 percentageDropDownInputContainer" id="percentageDropDownInputContainer" style="display: none">
+                                <div class="percentageInputContainer" id="percentageInputContainer">
+                                    <label for="commission_percentage" class="form-label"><span class="error">* </span>{{ __('Enter percentage:') }}</label>
+                                    <input type="number" placeholder="percentage" name="commission_percentage" class="form-control" id="commission_percentage">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-
-                <div class="row">
-                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12 radio-button-main-div">
                         <div class="row ">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 designation-radio-main-div">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12 radio-div-container">
 
 
                                 <label for="driving_licence" class="form-label"><span class="error">* </span>{{ __('Driving Licence Required?') }}</label>
@@ -499,13 +487,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class=" col-lg-8 col-md-6 col-sm-12 ">
+                    <div class="col-lg-8 col-md-6 col-sm-12 drivingLisenceInputContainer" style="display: none">
+                        <div class="  ">
 
-                        <div class="drivingLisenceInputContainer" style="display: none">
                             <div class="row ">
-                                <div class="col-lg-6 designation-radio-main-div">
+                                <div class="col-lg-6 radio-button-main-div">
 
-
+                                    <div class="radio-div-container">
+                                    </div>
                                     <label for="own_car" class="form-label"><span class="error">* </span>{{ __('Car accompanied By?') }}</label>
 
                                     <div class="designation-radio-button">
@@ -516,10 +505,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                             <input type="radio" name="own_car" id="company" value="no"> Company
                                         </label>
                                     </div>
+
                                 </div>
 
-                                <div class="col-lg-6 designation-radio-main-div">
+                                <div class="col-lg-6 radio-button-main-div">
 
+                                    <div class="radio-div-container">
+                                    </div>
 
                                     <label for="fuel_expenses_by" class="form-label"><span class="error">* </span>{{ __('Fuels Expenses covered by?') }}</label>
 
@@ -531,17 +523,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                             <input type="radio" name="fuel_expenses_by" id="own" value="own"> Own
                                         </label>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                </div>
 
-
-
-                <div class="row">
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
+                    <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
 
                         <label for="interviewd_by" class="form-label"><span class="error">* </span>{{ __('Interviewed By:') }}</label>
                         <select name="interviewd_by" id="interviewd_by" class="form-control widthinput" multiple="true" autofocus>
@@ -579,26 +568,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
 
                 <div class="row">
-                    <div class="col-lg-12">
+                    <div class="col-lg-8 col-md-12 col-sm-12 col-12">
+                        <label for="evaluation" class="form-label"><span class="error">* </span>{{ __('Stakeholders for Job Evaluation') }}</label>
+                        <div class="d-flex flex-wrap">
+                            <ul class="list-group col-lg-6 col-md-6 col-sm-6 col-12">
+                                <li class="list-group-item">
+                                    <input type="checkbox" id="internal_department_evaluation" name="internal_department_evaluation">
+                                    <label for="internal_department_evaluation">Internal departments</label>
+                                </li>
+                            </ul>
+                            <ul class="list-group col-lg-6 col-md-6 col-sm-6 col-12">
+                                <li class="list-group-item">
+                                    <input type="checkbox" id="external_vendor_evaluation" name="external_vendor_evaluation">
+                                    <label for="external_vendor_evaluation">External vendors</label>
+                                </li>
+                            </ul>
 
-                        <label for="basicpill-firstname-input" class="form-label"><span class="error">* </span>{{ __('Stakeholders for Job Evaluation') }}</label>
-                        <ul class="list-group list-group-horizontal">
-                            <li class="list-group-item">
-                                <input type="checkbox" id="internal_department_evaluation" name="internal_department_evaluation">
-                                <label for="internal_department_evaluation">Internal departments</label>
-                            </li>
-                            <li class="list-group-item">
-                                <input type="checkbox" id="external_vendor_evaluation" name="external_vendor_evaluation">
-                                <label for="external_vendor_evaluation">External vendors</label>
-                            </li>
-
-                        </ul>
+                        </div>
                     </div>
-                </div>
-                <br />
-                <div class="row ">
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
+                    <div class=" col-lg-4 col-md-6 col-sm-6 radio-button-main-div select-button-main-div">
                         <label for="recruitment_source_id" class="form-label"><span class="error">* </span>{{ __('Recruitment Source:') }}</label>
                         <select name="recruitment_source_id" id="recruitment_source_id" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($masterRecuritmentSources as $MasterRecuritmentSource)
@@ -608,9 +597,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
 
 
-                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12 radio-button-main-div">
                         <div class="row ">
-                            <div class="col-lg-12  ">
+                            <div class="col-lg-12 radio-div-container">
 
                                 <label for="experience" class="form-label"><span class="error">* </span>{{ __('Experience') }}</label>
                                 <div class="designation-radio-button">
@@ -629,9 +618,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12 radio-button-main-div">
                         <div class="row ">
-                            <div class="col-lg-12  ">
+                            <div class="col-lg-12 radio-div-container">
 
 
                                 <label for="travel_experience" class="form-label"><span class="error">* </span>{{ __('Travel experience?') }}</label>
@@ -648,7 +637,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
+                    <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
                         <label for="department_id" class="form-label"><span class="error">* </span>{{ __('Division / Department:') }}</label>
                         <select name="department_id" id="department_id" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($masterDepartments as $MasterDepartment)
@@ -657,7 +646,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </select>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
+                    <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
                         <label for="career_level_id" class="form-label"><span class="error">* </span>{{ __('Career level:') }}</label>
                         <select name="career_level_id" id="career_level_id" class="form-control widthinput" multiple="true" autofocus>
                             @foreach($masterExperienceLevels as $MasterExperienceLevel)
@@ -666,22 +655,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </select>
                     </div>
 
-                </div>
-
-
-
-                <div class="row">
-
-                    <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
                         <label for="current_or_past_employer_size_start" class="form-label"><span class="error">* </span>{{ __('Current or Past Employer Size:') }}</label>
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-6">
                                 <div class="input-group">
                                     <span class="input-group-text">From</span>
                                     <input type="number" placeholder="From" name="current_or_past_employer_size_start" class="form-control" id="current_or_past_employer_size_start">
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-12">
                                 <div class="input-group">
                                     <span class="input-group-text">to</span>
                                     <input type="number" placeholder="Till" name="current_or_past_employer_size_end" class="form-control" id="current_or_past_employer_size_end">
@@ -701,9 +684,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                 <div class="row">
 
-                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12 radio-button-main-div">
                         <div class="row ">
-                            <div class="col-lg-12  ">
+                            <div class="col-lg-12 radio-div-container">
 
 
                                 <label for="out_of_office_visit" class="form-label"><span class="error">* </span>{{ __('Out of Office Visits?') }}</label>
@@ -720,9 +703,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12 radio-button-main-div">
                         <div class="row ">
-                            <div class="col-lg-12  ">
+                            <div class="col-lg-12 radio-div-container">
 
 
                                 <label for="remote_work" class="form-label"><span class="error">* </span>{{ __('Remote Work?') }}</label>
@@ -739,9 +722,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class=" col-lg-4 col-md-6 col-sm-12  designation-radio-main-div">
+                    <div class=" col-lg-4 col-md-6 col-sm-12 radio-button-main-div">
                         <div class="row ">
-                            <div class="col-lg-12  ">
+                            <div class="col-lg-12 radio-div-container">
 
 
                                 <label for="international_business_trip_required" class="form-label"><span class="error">* </span>{{ __('International Business trips required?') }}</label>
@@ -790,7 +773,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <label for="duties_and_tasks" class="form-label"><span class="error">* </span>{{ __('Duties & Tasks : ') }}</label>
                         <input type="text" placeholder="Duties & Tasks" name="duties_and_tasks" class="form-control" id="duties_and_tasks">
                     </div>
-                    <div class=" col-lg-4 col-md-6 col-sm-6 ">
+                    <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
 
                         <label for="next_career_path_id" class="form-label"><span class="error">* </span>{{ __('Next Career path:') }}</label>
                         <select name="next_career_path_id" id="next_career_path_id" class="form-control widthinput" multiple="true" autofocus>
@@ -809,12 +792,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
     </form>
 </div>
-</br>
 
-</br>
-<div id="dynamicContent" class="col-md-12">
-            <!-- Content will be loaded here -->
-</div>
+@include('hrm.hiring.hiring_request.createJobPosition')
+@include('hrm.hiring.questionnaire.createIndustryExperience')
+
+<div class="overlay"></div>
+
 @else
 @php
 redirect()->route('home')->send();
@@ -896,12 +879,14 @@ redirect()->route('home')->send();
             maximumSelectionLength: 1,
             placeholder: "Choose Next Career Path",
         });
+        
+    });
 
 
         $('#language_id').on('change', function() {
-        var selectedValues = $(this).val();
-        console.log("Selected Language IDs:", selectedValues);
-    });
+            var selectedValues = $(this).val();
+            console.log("Selected Language IDs:", selectedValues);
+        });
 
 
     // $("#createNewJobTitleButton, #createNewIndustryExperienceButton").click(function(){
@@ -936,6 +921,20 @@ redirect()->route('home')->send();
             }
         });
 
+        $('input[name="commission_involved_in_salary"]').change(function() {
+            if ($(this).val() === 'yes') {
+                $('.commissionInputContainer').show();
+                $('.chooseAmountpercentageDropDownInputContainer').show();
+                $('.amountDropDownInputContainer').hide();
+                $('.percentageDropDownInputContainer').hide();
+            } else {
+                $('.commissionInputContainer').hide();
+                $('.chooseAmountpercentageDropDownInputContainer').hide();
+                $('.amountDropDownInputContainer').show();
+                $('.percentageDropDownInputContainer').show();
+            }
+        });
+
         $('input[name="driving_licence"]').change(function() {
             if ($(this).val() === 'yes') {
                 $('.drivingLisenceInputContainer').show();
@@ -944,44 +943,32 @@ redirect()->route('home')->send();
             }
         });
 
-        $('input[name="commission_involved_in_salary"]').change(function() {
-            if ($(this).val() === 'yes') {
-                $('.chooseAmountpercentageDropDownInputContainer').show();
-            } else {
-                $('.chooseAmountpercentageDropDownInputContainer').hide();
-            }
-            if ($(this).val() === 'no') {
-                $('.amountpercentageDropDownInputContainer').hide();
-            } else {
-                $('.amountpercentageDropDownInputContainer').show();
-            }
-        });
+        // $('.select-button-main-div select').on('change', function() {
+        //     $(this).closest('.select-button-main-div').find('.error').remove();
+        // });
 
-        // jQuery.validator.addMethod(
-        //     "money",
-        //     function(value, element) {
-        //         var isValidMoney = /^\d{0,5}(\.\d{0,2})?$/.test(value);
-        //         return this.optional(element) || isValidMoney;
-        //     },
-        //     "Please enter a valid amount "
-        // );
-        jQuery.validator.setDefaults({
-            errorClass: "is-invalid",
-            errorElement: "p",
-            errorPlacement: function(error, element) {
-                error.addClass("invalid-feedback font-size-13");
-                if (element.prop("type") === "checkbox") {
-                    error.insertAfter(element.parent("label"));
-                } else if (element.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + element.attr("id") + "-container").parent();
-                    error.insertAfter(element);
-                } else if (element.parent().hasClass('input-group')) {
-                    error.insertAfter(element.parent());
-                } else {
-                    error.insertAfter(element);
-                }
-            }
-        });
+        // jQuery.validator.setDefaults({
+        //     errorClass: "is-invalid",
+        //     errorElement: "p",
+        //     errorPlacement: function(error, element) {
+        //         error.addClass("invalid-feedback font-size-13");
+        //         if (element.hasClass("select2-hidden-accessible")) {
+        //             element = $("#select2-" + element.attr("id") + "-container").parent();
+        //             error.insertAfter(element);
+        //         } else if (element.is(':radio') && element.closest('.radio-button-main-div').length > 0) {
+        //             error.addClass('radio-error');
+        //             error.insertAfter(element.closest('.radio-button-main-div').find('div.radio-div-container').last());
+        //         } else if (element.attr('name') === 'min_age' || element.attr('name') === 'max_age' ||
+        //             element.attr('name') === 'salary_range_start_in_aed' || element.attr('name') === 'salary_range_end_in_aed' ||
+        //             element.attr('name') === 'current_or_past_employer_size_start' || element.attr('name') === 'current_or_past_employer_size_end') {
+        //             error.addClass('other-error');
+        //             error.insertAfter(element.closest('.input-group'));
+        //         } else {
+        //             error.addClass('other-error');
+        //             error.insertAfter(element);
+        //         }
+        //     }
+        // });
 
         jQuery.validator.addMethod(
             "money",
@@ -1143,9 +1130,9 @@ redirect()->route('home')->send();
                     twoDigitValues: true,
                     greaterThanFirstValueValidate: "#min_age",
                 },
-                language_id: {
+                'language_id[]': {
                     required: true,
-                    array: true,
+                    // array: true,
                 },
                 required_to_travel_for_work_purpose: {
                     required: true,
@@ -1296,18 +1283,44 @@ redirect()->route('home')->send();
                     required: true,
                 },
             },
+            errorPlacement: function(error, element) {
+                console.log("Error placement function called");
+                console.log("Element:", element);
+
+
+                if (element.is(':radio') && element.closest('.radio-button-main-div').length > 0) {
+                    error.addClass('radio-error');
+                    error.insertAfter(element.closest('.radio-button-main-div').find('div.radio-div-container').last());
+                } else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+                    if (!element.val() || element.val().length === 0) {
+
+                        console.log("Error is here with length",element.val().length);
+                        error.addClass('select-error');
+                        error.insertAfter(element.closest('.select-button-main-div').find('span').last());
+                    } else {
+                        console.log("No error");
+                    }
+                } else if (element.attr('name') === 'min_age' || element.attr('name') === 'max_age' ||
+                    element.attr('name') === 'salary_range_start_in_aed' || element.attr('name') === 'salary_range_end_in_aed' ||
+                    element.attr('name') === 'current_or_past_employer_size_start' || element.attr('name') === 'current_or_past_employer_size_end') {
+                    error.addClass('other-error');
+                    error.insertAfter(element.closest('.input-group'));
+                } else {
+                    
+                    error.addClass('other-error');
+                    error.insertAfter(element);
+                }
+            },
         });
 
-    });
 </script>
 
 <script>
-
-        function showAmountPercentageInput(element) {
-            var selectedValue = element.value;
-            document.getElementById('amountInputContainer').style.display = selectedValue == 'amount' ? 'block' : 'none';
-            document.getElementById('percentageInputContainer').style.display = selectedValue == 'percentage' ? 'block' : 'none';
-        }
+    function showAmountPercentageInput(element) {
+        var selectedValue = element.value;
+        document.getElementById('amountDropDownInputContainer').style.display = selectedValue == 'amount' ? 'block' : 'none';
+        document.getElementById('percentageDropDownInputContainer').style.display = selectedValue == 'percentage' ? 'block' : 'none';
+    }
 </script>
 
 
