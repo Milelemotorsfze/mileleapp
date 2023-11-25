@@ -5,7 +5,7 @@ namespace App\Models\HRM\Employee;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use App\Models\User;
 class EmployeeProfile extends Model
 {
     use HasFactory, SoftDeletes;
@@ -110,4 +110,7 @@ class EmployeeProfile extends Model
         'phone',
         'visa_status',
     ];
+    public function teamLeadOrReportingManager() {
+        return $this->hasOne(User::class,'id','team_lead_or_reporting_manager');
+    }
 }

@@ -292,7 +292,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 			</div>
 			<div class="card-body">
 				<div class="row">
-					<div class="col-xxl-4 col-lg-6 col-md-6">
+					<!-- <div class="col-xxl-4 col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="reporting_to" class="col-form-label text-md-end">{{ __('Choose Reporting To With Position') }}</label>
 						<select name="reporting_to" id="reporting_to" multiple="true" class="form-control widthinput" onchange="" autofocus>
@@ -300,7 +300,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 								<option value="{{$reportingToUser->id}}">{{$reportingToUser->name}} ( JOB POSITION )</option>
 							@endforeach
 						</select>
-					</div>
+					</div> -->
 					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="experience_level" class="col-form-label text-md-end">Choose Experience Level</label>

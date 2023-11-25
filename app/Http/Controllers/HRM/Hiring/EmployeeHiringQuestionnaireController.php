@@ -9,7 +9,7 @@ use App\Models\Masters\MasterJobPosition;
 use App\Models\Masters\MasterOfficeLocation;
 use App\Models\Masters\MasterVisaType;
 use App\Models\Masters\MasterRecuritmentSource;
-use App\Models\Masters\MasterDeparment;
+use App\Models\Masters\MasterDepartment;
 use App\Models\Masters\MasterExperienceLevel;
 use App\Models\Masters\MasterSpecificIndustryExperience;
 use App\Models\HRM\Hiring\EmployeeHiringQuestionnaire;
@@ -44,7 +44,7 @@ class EmployeeHiringQuestionnaireController extends Controller
         $masterLanguages = Language::select('id','name')->get();
         $interviewdByUsers = User::whereNot('id',16)->select('id','name')->get();
         $masterRecuritmentSources = MasterRecuritmentSource::select('id','name')->get();
-        $masterDepartments = MasterDeparment::select('id','name')->get();
+        $masterDepartments = MasterDepartment::select('id','name')->get();
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
         $masterSpecificIndustryExperiences = MasterSpecificIndustryExperience::select('id','name')->get();
         return view('hrm.hiring.questionnaire.create',compact('data','questionnaireId','currentQuestionnaire','masterDesignations','masterVisaTypes','masterNationality','masterLanguages',

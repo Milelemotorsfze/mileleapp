@@ -49,13 +49,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
         @endphp
         @if ($hasPermission) -->
 		<li class="nav-item">
-			<a class="nav-link active" data-bs-toggle="pill" href="#pending-selling-prices">Pending </a>
+			<a class="nav-link active" data-bs-toggle="pill" href="#pending-selling-prices">Pending</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#approved-selling-prices">Approved </a>
+			<a class="nav-link" data-bs-toggle="pill" href="#approved-selling-prices">Approved(Open)</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#rejected-selling-prices">Rejected </a>
+			<a class="nav-link" data-bs-toggle="pill" href="#closed-selling-prices">Closed</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#on-hold-selling-prices">On Hold</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#cancelled-selling-prices">Cancelled</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#rejected-selling-prices">Rejected</a>
 		</li>
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#deleted-selling-prices">Deleted</a>
@@ -118,40 +127,58 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{$pending->created_at ?? ''}}</td>
 							<td><label class="badge badge-soft-info">{{ $pending->current_status ?? '' }}</label></td>
 							<td>
-								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$pending->id)}}">
-									<i class="fa fa-eye" aria-hidden="true"></i>
-								</a>
-								<a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$pending->id)}}">
-									<i class="fa fa-edit" aria-hidden="true"></i>
-								</a>
-								@if(isset($type))
-									@if($type == 'approve')
-										<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-											data-bs-target="#approve-selling-price-{{$pending->id}}">
-											<i class="fa fa-thumbs-up" aria-hidden="true"></i>
-										</button>
-										<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-											data-bs-target="#reject-selling-price-{{$pending->id}}">
-											<i class="fa fa-thumbs-down" aria-hidden="true"></i>
-										</button>
-									@endif
-								@elseif(isset($pending->is_auth_user_can_approve) && $pending->is_auth_user_can_approve != '')
-									@if(isset($pending->is_auth_user_can_approve['can_approve']))
-										@if($pending->is_auth_user_can_approve['can_approve'] == true)
-											<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-												data-bs-target="#approve-selling-price-{{$pending->id}}">
-												<i class="fa fa-thumbs-up" aria-hidden="true"></i>
-											</button>
-											<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-												data-bs-target="#reject-selling-price-{{$pending->id}}">
-												<i class="fa fa-thumbs-down" aria-hidden="true"></i>
-											</button>
+							<div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$pending->id)}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+										</a>
+									</li>
+                                    <li>
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$pending->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit Hiring Request
+										</a>
+									</li>
+                                    <li>
+										@if(isset($type))
+											@if($type == 'approve')
+												<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+													data-bs-target="#approve-selling-price-{{$pending->id}}">
+													<i class="fa fa-thumbs-up" aria-hidden="true"></i>  Approve 
+												</button>
+												<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+													data-bs-target="#reject-selling-price-{{$pending->id}}">
+													<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
+												</button>
+											@endif
+										@elseif(isset($pending->is_auth_user_can_approve) && $pending->is_auth_user_can_approve != '')
+											@if(isset($pending->is_auth_user_can_approve['can_approve']))
+												@if($pending->is_auth_user_can_approve['can_approve'] == true)
+													<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+														data-bs-target="#approve-selling-price-{{$pending->id}}">
+														<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
+													</button>
+													<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+														data-bs-target="#reject-selling-price-{{$pending->id}}">
+														<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
+													</button>
+												@endif
+											@endif
 										@endif
-									@endif
-								@endif
-								<button title="Delete" type="button" class="btn btn-danger btn-sm hiring-request-delete sm-mt-3" data-id="{{ $pending->id }}" data-url="{{ route('employee-hiring-request.destroy', $pending->id) }}">
-									<i class="fa fa-trash"></i>
-								</button>
+									</li>
+                                    <li>
+										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Delete" type="button" class="btn btn-secondary btn-sm hiring-request-delete sm-mt-3" data-id="{{ $pending->id }}" data-url="{{ route('employee-hiring-request.destroy', $pending->id) }}">
+											<i class="fa fa-trash"></i> Delete
+										</button>
+									</li>
+                                </ul>
+                            </div>
+								
+								
+								
+								
 							</td>
 							<div class="modal fade" id="edit-selling-price-{{$pending->id}}"  tabindex="-1"
 								aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -363,24 +390,226 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{$approvedOne->created_by_name}}</td>
 							<td>{{$approvedOne->created_at}}</td>
 							<td>
-								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$approvedOne->id)}}">
-									<i class="fa fa-eye" aria-hidden="true"></i>
-								</a>
+							<div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$approvedOne->id)}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+										</a>
+									</li>
+                                    <li>
+										@if(isset($approvedOne->questionnaire))
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
+										<i class="fa fa-list" aria-hidden="true"></i> Edit Questionnaire
+										</a>
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Job Description" class="btn btn-sm btn-secondary" href="{{route('employee-hiring-job-description.create-or-edit',$approvedOne->id)}}">
+										<i class="fa fa-address-card" aria-hidden="true"></i> Create Job Description
+										</a>
+										@else
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
+										<i class="fa fa-list" aria-hidden="true"></i> Create Questionnaire
+										</a>
+									@endif
+									</li>
+                                    <!-- <li>
+										
+									</li>
+                                    <li>
+										
+									</li> -->
+                                </ul>
+                            </div>
+								
 								<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$approvedOne->id)}}">
 									<i class="fa fa-edit" aria-hidden="true"></i>
 								</a> -->
-								@if(isset($approvedOne->questionnaire))
-								<a title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
-								<i class="fa fa-list" aria-hidden="true"></i>
-								</a>
-								<a title="Create Job Description" class="btn btn-sm btn-secondary" href="{{route('employee-hiring-job-description.create-or-edit',$approvedOne->id)}}">
-								<i class="fa fa-address-card" aria-hidden="true"></i>
-								</a>
-								@else
-								<a title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
-								<i class="fa fa-list" aria-hidden="true"></i>
-								</a>
-								@endif
+								
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="closed-selling-prices">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="closed-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th>Sl No</th>
+							<th>Request Date</th>
+							<th>Department Name</th>
+							<th>Department Location</th>
+							<th>Requested By</th>
+							<th>Requested Job Title</th>
+							<th>Reporting To With Position</th>
+							<th>Experience Level</th>
+							<th>Salary Range(AED)</th>
+							<th>Work Time</th>
+							<th>Number Of Openings</th>
+							<th>Type Of Role</th>
+							<th>Replacement For Employee</th>
+							<th>Detailed Explanation Of New Hiring</th>
+							<th>Created By</th>
+							<th>Created At</th>
+							<!-- <th>Current Status</th> -->
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($closed as $key => $closedOne)
+						<tr data-id="1">
+						<td>{{ ++$i }}</td>
+							<td>{{ $closedOne->request_date ?? '' }}</td>
+							<td>{{ $closedOne->department_name ?? '' }}</td>
+							<td>{{ $closedOne->department_location ?? '' }}</td>
+							<td>{{ $closedOne->requested_by_name ?? '' }}</td>
+							<td>{{ $closedOne->requested_job_name ?? '' }}</td>
+							<td>{{ $closedOne->reporting_to_name ?? '' }}</td>							
+							<td>{{ $closedOne->experience_level_name ?? ''}}</td>
+							<td>{{ $closedOne->salary_range_start_in_aed ?? ''}} - {{$closedOne->salary_range_end_in_aed ?? ''}}</td>
+							<td>{{ $closedOne->work_time_start ?? ''}} - {{$closedOne->work_time_end ?? ''}}</td>
+							<td>{{ $closedOne->number_of_openings ?? ''}}</td>
+							<td>{{$closedOne->type_of_role_name}}</td>
+							<td>{{$closedOne->replacement_for_employee_name}}</td>
+							<td>{{$closedOne->explanation_of_new_hiring}}</td>
+							<td>{{$closedOne->created_by_name}}</td>
+							<td>{{$closedOne->created_at}}</td>
+							<td>
+							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$closedOne->id)}}">
+								<i class="fa fa-eye" aria-hidden="true"></i>
+							</a>
+							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$closedOne->id)}}">
+								<i class="fa fa-edit" aria-hidden="true"></i>
+							</a> -->
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="on-hold-selling-prices">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="on-hold-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th>Sl No</th>
+							<th>Request Date</th>
+							<th>Department Name</th>
+							<th>Department Location</th>
+							<th>Requested By</th>
+							<th>Requested Job Title</th>
+							<th>Reporting To With Position</th>
+							<th>Experience Level</th>
+							<th>Salary Range(AED)</th>
+							<th>Work Time</th>
+							<th>Number Of Openings</th>
+							<th>Type Of Role</th>
+							<th>Replacement For Employee</th>
+							<th>Detailed Explanation Of New Hiring</th>
+							<th>Created By</th>
+							<th>Created At</th>
+							<!-- <th>Current Status</th> -->
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($onHold as $key => $onHoldOne)
+						<tr data-id="1">
+						<td>{{ ++$i }}</td>
+							<td>{{ $onHoldOne->request_date ?? '' }}</td>
+							<td>{{ $onHoldOne->department_name ?? '' }}</td>
+							<td>{{ $onHoldOne->department_location ?? '' }}</td>
+							<td>{{ $onHoldOne->requested_by_name ?? '' }}</td>
+							<td>{{ $onHoldOne->requested_job_name ?? '' }}</td>
+							<td>{{ $onHoldOne->reporting_to_name ?? '' }}</td>							
+							<td>{{ $onHoldOne->experience_level_name ?? ''}}</td>
+							<td>{{ $onHoldOne->salary_range_start_in_aed ?? ''}} - {{$onHoldOne->salary_range_end_in_aed ?? ''}}</td>
+							<td>{{ $onHoldOne->work_time_start ?? ''}} - {{$onHoldOne->work_time_end ?? ''}}</td>
+							<td>{{ $onHoldOne->number_of_openings ?? ''}}</td>
+							<td>{{$onHoldOne->type_of_role_name}}</td>
+							<td>{{$onHoldOne->replacement_for_employee_name}}</td>
+							<td>{{$onHoldOne->explanation_of_new_hiring}}</td>
+							<td>{{$onHoldOne->created_by_name}}</td>
+							<td>{{$onHoldOne->created_at}}</td>
+							<td>
+							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$onHoldOne->id)}}">
+								<i class="fa fa-eye" aria-hidden="true"></i>
+							</a>
+							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$onHoldOne->id)}}">
+								<i class="fa fa-edit" aria-hidden="true"></i>
+							</a> -->
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="cancelled-selling-prices">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="cancelled-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th>Sl No</th>
+							<th>Request Date</th>
+							<th>Department Name</th>
+							<th>Department Location</th>
+							<th>Requested By</th>
+							<th>Requested Job Title</th>
+							<th>Reporting To With Position</th>
+							<th>Experience Level</th>
+							<th>Salary Range(AED)</th>
+							<th>Work Time</th>
+							<th>Number Of Openings</th>
+							<th>Type Of Role</th>
+							<th>Replacement For Employee</th>
+							<th>Detailed Explanation Of New Hiring</th>
+							<th>Created By</th>
+							<th>Created At</th>
+							<!-- <th>Current Status</th> -->
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($cancelled as $key => $cancelledOne)
+						<tr data-id="1">
+						<td>{{ ++$i }}</td>
+							<td>{{ $cancelledOne->request_date ?? '' }}</td>
+							<td>{{ $cancelledOne->department_name ?? '' }}</td>
+							<td>{{ $cancelledOne->department_location ?? '' }}</td>
+							<td>{{ $cancelledOne->requested_by_name ?? '' }}</td>
+							<td>{{ $cancelledOne->requested_job_name ?? '' }}</td>
+							<td>{{ $cancelledOne->reporting_to_name ?? '' }}</td>							
+							<td>{{ $cancelledOne->experience_level_name ?? ''}}</td>
+							<td>{{ $cancelledOne->salary_range_start_in_aed ?? ''}} - {{$cancelledOne->salary_range_end_in_aed ?? ''}}</td>
+							<td>{{ $cancelledOne->work_time_start ?? ''}} - {{$cancelledOne->work_time_end ?? ''}}</td>
+							<td>{{ $cancelledOne->number_of_openings ?? ''}}</td>
+							<td>{{$cancelledOne->type_of_role_name}}</td>
+							<td>{{$cancelledOne->replacement_for_employee_name}}</td>
+							<td>{{$cancelledOne->explanation_of_new_hiring}}</td>
+							<td>{{$cancelledOne->created_by_name}}</td>
+							<td>{{$cancelledOne->created_at}}</td>
+							<td>
+							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$cancelledOne->id)}}">
+								<i class="fa fa-eye" aria-hidden="true"></i>
+							</a>
+							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$cancelledOne->id)}}">
+								<i class="fa fa-edit" aria-hidden="true"></i>
+							</a> -->
 							</td>
 						</tr>
 						@endforeach
@@ -500,7 +729,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<!-- <a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$deletedOne->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
 							</a> -->
-							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$rejectedOne->id)}}">
+							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$deletedOne->id)}}">
 								<i class="fa fa-edit" aria-hidden="true"></i>
 							</a> -->
 							</td>
