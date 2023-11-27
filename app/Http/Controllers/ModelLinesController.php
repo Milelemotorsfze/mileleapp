@@ -7,6 +7,8 @@ use App\Models\MasterModelLines;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserActivityController;
+use Illuminate\Support\Facades\Validator;
+
 class ModelLinesController extends Controller
 {
     /**
@@ -33,18 +35,37 @@ class ModelLinesController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
+
             'model_line' => 'required|unique:master_model_lines,model_line',
             'brand_id' => 'required'
+            ],
+            [
+                'brand_id.required' => 'Please Choose any Brand!'
+            ]);
+        if ($validator->fails() ) {
 
-        ]);
+            if($request->request_from == 'Quotation') {
+                info("inside condition");
+                $data['error'] = $validator->messages()->first();
+                return response($data);
+            }else{
+                return redirect()->back()->withErrors($validator);
 
+            }
+
+        }
         $modelLine = new MasterModelLines();
         $modelLine->brand_id = $request->brand_id;
         $modelLine->model_line = $request->model_line;
         $modelLine->created_by = Auth::id();
         $modelLine->save();
         (new UserActivityController)->createActivity('New Master Model Line Created');
+
+        if($request->request_from == 'Quotation') {
+            return response($modelLine);
+        }
+
         return redirect()->route('model-lines.index')->with('success','Model Line Created Successfully.');
     }
 

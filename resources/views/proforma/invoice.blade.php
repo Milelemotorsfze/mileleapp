@@ -8,6 +8,21 @@
   div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
+.overlay
+{
+    position: fixed; /* Positioning and size */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(128,128,128,0.5); /* color */
+    display: none; /* making it hidden by default */
+}
+.paragraph-class
+{
+    color: red;
+    font-size:11px;
+}
 .days-dropdownf {
     background: none;
     text-align: center;
@@ -61,9 +76,9 @@
 .contentveh {
             display: none;
         }
-.row{
-    margin-top: 5px;
-}
+/*.row{*/
+/*    margin-top: 5px;*/
+/*}*/
     </style>
 <div class="card-header">
 	<h4 class="card-title">
@@ -149,14 +164,6 @@
         <hr>
         <div class="row">
             <div class="col-sm-4">
-{{--                <div class="row">--}}
-{{--                    <div class="col-sm-6">--}}
-{{--                        Document No :--}}
-{{--                    </div>--}}
-{{--                    <div class="col-sm-6">--}}
-{{--                        {{$callDetails->id}}--}}
-{{--                    </div>--}}
-{{--                </div>--}}
                 <div class="row">
                     <div class="col-sm-6">
                         <label for="timeRange">Document Validity:</label>
@@ -465,84 +472,105 @@
                 <input type="radio" id="showOthers" name="contentType">
                 <label for="showOthers">Add Other</label>
             </div>
-
         </div>
         <div id="vehiclesContent" class="contentveh">
-            <hr>
-            <div class="row">
-                <h4 class="col-lg-2 col-md-6">Search Available Vehicles</h4>
-                <div class="col-lg-12 col-md-6 d-flex align-items-end">
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Brand:</label>
-                        <select class="form-control col" id="brand" name="brand">
+        <div class="card">
+            <div class="card-header">
+                <h4 >Search Available Vehicles</h4>
+                <div class="row justify-content-end">
+                    <div class="col-lg-4 col-sm-12 col-md-4" >
+                        <a class="btn btn-outline-warning float-end mb-4" data-table="vehicle-table" id="directadding-button"> Directly Adding Into Quotation</a>
+                    </div>
+                </div>
+                <div class="row">
+
+                    {{--                <div class="col-lg-12 col-md-6 d-flex align-items-end">--}}
+                    <div class="col-lg-1 col-md-6 col-sm-12">
+                        <label for="brand"> Brand</label>
+                        <select class="form-control col" id="brand" name="brand" style="width: 100%">
                             <option value="">Select Brand</option>
                             @foreach($brands as $brand)
                             <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="model_line">Select Model Line:</label>
-                        <select class="form-control col" id="model_line" name="model_line" disabled>
+                    <div class="col-lg-1 col-md-6" style="margin-top: 26px;">
+                        <a id="addnewBrandButton" data-toggle="popover" data-trigger="hover" title="Create New Brand" data-placement="top" style="float: right;"
+                           class="btn btn-info modal-button" data-modal-id="createNewBrand"><i class="fa fa-plus" aria-hidden="true"></i> Add Brand</a>
+{{--                        <a id="addnewBrandButton" data-bs-toggle="modal" data-bs-target="#createNewBrand"--}}
+{{--                           data-bs-trigger="modal" data-modal-id="createNewBrand title="Create New Brand" data-placement="top"--}}
+{{--                           class="btn btn-info modal-button" ><i class="fa fa-plus" aria-hidden="true"></i> Add Brand</a>--}}
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-12">
+                        <label for="model_line"> Model Line</label>
+                        <select class="form-control col" id="model_line" style="width: 100%" name="model_line" disabled >
                             <option value="">Select Model Line</option>
                         </select>
                     </div>
+                    <div class="col-lg-1 col-md-6 add-new-model-line-div" style="margin-top: 26px;" hidden>
+                        <a id="createNewModelLineButton" data-toggle="popover" data-trigger="hover" title="Create New Model Line" data-placement="top" style="float: right;"
+                           class="btn btn-info modal-model-line-button" data-modal-id="createNewModelLine"><i class="fa fa-plus" aria-hidden="true"></i> Add Model Line</a>
+
+                    </div>
                     <div class="col-lg-2 col-md-6">
-                        <label for="variant">Select Variant:</label>
-                        <select class="form-control col" id="variant" name="variant" disabled>
+                        <label for="variant"> Variant</label>
+                        <select class="form-control col" id="variant" style="width: 100%" name="variant" disabled>
                             <option value="">Select Variant</option>
                         </select>
                     </div>
                     <div class="col-lg-2 col-md-6">
-                        <label for="interior_color">Interior Color:</label>
-                        <select class="form-control col" id="interior_color" name="interior_color" disabled>
+                        <label for="interior_color">Interior Color</label>
+                        <select class="form-control col" id="interior_color" style="width: 100%" name="interior_color" disabled>
                             <option value="">Select Interior Color</option>
                         </select>
                     </div>
                     <div class="col-lg-2 col-md-6">
-                        <label for="exterior_color">Exterior Color:</label>
-                        <select class="form-control col" id="exterior_color" name="exterior_color" disabled>
-                            <option value="">Select Exterior Color</option>.
+                        <label for="exterior_color">Exterior Color</label>
+                        <select class="form-control col" id="exterior_color" style="width: 100%" name="exterior_color" disabled>
+                            <option value="">Select Exterior Color</option>
                         </select>
                     </div>
-                    <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
-                        <div class="col">
-                            <button type="button" class="btn btn-primary" id="search-button">Search</button>
-                        </div>
-                        <div class="col" >
-                            <a class="btn btn-outline-warning" data-table="vehicle-table" id="directadding-button"> Directly Adding Into Quotation</a>
-                        </div>
+                    <div class="col-lg-1 col-md-6" style="margin-top: 26px;">
+{{--                        <div class="col-lg-1 col-md-2 col-sm-12">--}}
+                        <button type="button" class="btn btn-primary" id="search-button">Search</button>
+
+{{--                        </div>--}}
+{{--                        <div class="col-lg-1 col-md-2 col-sm-12">--}}
+
+{{--                        </div>--}}
                     </div>
                 </div>
+
             </div>
-            <br>
-            <br>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="table-responsive">
-                        <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
-                            <thead class="bg-soft-secondary">
-                                <tr>
-{{--                                    <th>ID</th>--}}
-{{--                                    <th>Status</th>--}}
-{{--                                    <th>VIN</th>--}}
-                                    <th>Brand Name</th>
-                                    <th>Model Line</th>
-                                    <th>Model Details</th>
-                                    <th>Variant Name</th>
-                                    <th>Variant Detail</th>
-                                    <th>Interior Color</th>
-                                    <th>Exterior Color</th>
-                                    <th>Price</th>
-                                    <th style="width:30px;">Add Into Quotation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+            <div class="card-body">
+                <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
+                                    <thead class="bg-soft-secondary">
+                                    <tr>
+                                        {{--                                    <th>ID</th>--}}
+                                        {{--                                    <th>Status</th>--}}
+                                        {{--                                    <th>VIN</th>--}}
+                                        <th>Brand Name</th>
+                                        <th>Model Line</th>
+                                        <th>Model Details</th>
+                                        <th>Variant Name</th>
+                                        <th>Variant Detail</th>
+                                        <th>Interior Color</th>
+                                        <th>Exterior Color</th>
+                                        <th>Price</th>
+                                        <th style="width:30px;">Add Into Quotation</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                </div>
             </div>
+        </div>
         </div>
         <div id="accessoriesContent" class="contentveh">
             <hr>
@@ -943,6 +971,84 @@
 
         <button type="submit" class="btn btn-primary" id="submit-button" disabled>Submit</button>
     </form>
+    <div class="overlay">
+        <div class="modal" id="createNewBrand" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Create New Brand </h5>
+                        <button type="button" class="btn btn-secondary btn-sm close form-control modal-close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">X</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="row modal-row">
+                                <div class="col-xxl-12 col-lg-12 col-md-12">
+                                    <span class="error">* </span>
+                                    <label for="name" class="col-form-label text-md-end ">Brand Name</label>
+                                </div>
+                                <div class="col-xxl-12 col-lg-12 col-md-12">
+								<input type="text" id="new_brand_name" class="form-control @error('brand_name') is-invalid @enderror" name="brand_name"
+                                          placeholder="Enter Brand Name" value="{{ old('brand_name') }}" oninput="checkValidation()" autofocus>
+                                    <span id="newBrandError" class="is-invalid"></span>
+                                    @error('brand_name')
+                                    <span class="invalid-feedback" role="alert">
+								<strong>{{ $message }}</strong>
+								</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm modal-close" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        <button type="button" class="btn btn-primary btn-sm" id="createBrandId" style="float: right;">
+                            <i class="fa fa-check" aria-hidden="true"></i> Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="createNewModelLine" tabindex="-1" role="dialog" aria-labelledby="exampleModalLineCenteredLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLineCenteredLabel" style="text-align:center;"> Create New Model Line </h5>
+                        <button type="button" class="btn btn-secondary btn-sm close form-control modal-close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">X</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="row modal-row">
+                                <div class="col-xxl-12 col-lg-12 col-md-12">
+                                    <span class="error">* </span>
+                                    <label for="name" class="col-form-label text-md-end">Model Line</label>
+                                </div>
+                                <div class="col-xxl-12 col-lg-12 col-md-12">
+                                    <input type="text" id="new_model_line_name" class="form-control @error('model_line') is-invalid @enderror" name="model_line"
+                                           placeholder="Enter Model Line Name" value="{{ old('model_line') }}" oninput="checkModelLine()" autofocus>
+                                    <span id="newModelLineError" class="is-invalid"></span>
+                                    @error('model_line')
+                                    <span class="invalid-feedback" role="alert">
+								<strong>{{ $message }}</strong>
+								</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm modal-close" data-dismiss="modal" ><i class="fa fa-times"></i> Close</button>
+                        <button type="button" class="btn btn-primary btn-sm" id="createModelLineId" style="float: right;">
+                            <i class="fa fa-check" aria-hidden="true"></i> Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 @push('scripts')
@@ -962,7 +1068,173 @@
 
     </script>
 <script>
+    function checkValidation()
+    {
+        var value = $('#new_brand_name').val();
+        if(value == '')
+        {
+            $msg = 'Brand Name is Required';
+            showNewBrandError($msg);
+        }
+        else
+        {
+            removeNewBrandError();
+        }
+    }
+    function checkModelLine() {
+        var value = $('#new_model_line_name').val();
+        if(value == '')
+        {
+            $msg = 'Model Line is Required';
+            showNewModelLineError($msg);
+        }
+        else
+        {
+            removeNewModelLineError();
+        }
+    }
+    function showNewModelLineError($msg) {
+        document.getElementById("newModelLineError").textContent=$msg;
+        document.getElementById("new_model_line_name").classList.add("is-invalid");
+        document.getElementById("newModelLineError").classList.add("paragraph-class");
+    }
+    function removeNewModelLineError()
+    {
+        document.getElementById("newModelLineError").textContent="";
+        document.getElementById("new_model_line_name").classList.remove("is-invalid");
+        document.getElementById("newModelLineError").classList.remove("paragraph-class");
+    }
+    function showNewBrandError($msg)
+    {
+        document.getElementById("newBrandError").textContent=$msg;
+        document.getElementById("new_brand_name").classList.add("is-invalid");
+        document.getElementById("newBrandError").classList.add("paragraph-class");
+    }
+    function removeNewBrandError()
+    {
+        document.getElementById("newBrandError").textContent="";
+        document.getElementById("new_brand_name").classList.remove("is-invalid");
+        document.getElementById("newBrandError").classList.remove("paragraph-class");
+    }
+
     $(document).ready(function() {
+
+        $('.modal-close').on('click', function(){
+            $('.overlay').hide();
+            $('.modal').removeClass('modalshow');
+            $('.modal').addClass('modalhide');
+            $('#new_brand_name').val("");
+            $('#new_model_line_name').val("");
+            removeNewBrandError();
+            removeNewModelLineError();
+        });
+        $('#createBrandId').on('click', function()
+        {
+            // create new addon and list new addon in addon list
+            var value = $('#new_brand_name').val();
+            if(value == '')
+            {
+                $msg = 'Brand Name is Required';
+                showNewBrandError($msg);
+            }
+            else
+            {
+                $.ajax
+                ({
+                    url:"{{route('brands.store')}}",
+                    type: "POST",
+                    data:
+                        {
+                            brand_name: value,
+                            request_from: 'Quotation',
+                            _token: '{{csrf_token()}}'
+                        },
+                    dataType : 'json',
+                    success: function(result)
+                    {
+                        console.log(result);
+                        if(result.error) {
+                            $msg = result.error;
+                            showNewBrandError($msg);
+                        }else{
+                            $('.overlay').hide();
+                            $('.modal').removeClass('modalshow');
+                            $('.modal').addClass('modalhide');
+                            $('#brand').append("<option value='" + result.id + "'>" + result.brand_name + "</option>");
+                            $('#brand').val(result.id);
+                            $('#new_brand_name').val("");
+                            $msg = "";
+                            removeNewBrandError();
+                        }
+                    }
+                });
+            }
+        });
+
+        $('#createModelLineId').on('click', function()
+        {
+            // create new addon and list new addon in addon list
+            var model_line = $('#new_model_line_name').val();
+            var brand = $('#brand').val();
+
+            if(model_line == '')
+            {
+                $msg = 'Model Line Name is Required';
+                showNewModelLineError($msg);
+            }
+            else
+            {
+                $.ajax
+                ({
+                    url:"{{route('model-lines.store')}}",
+                    type: "POST",
+                    data:
+                        {
+                            model_line: model_line,
+                            brand_id: brand,
+                            request_from: 'Quotation',
+                            _token: '{{csrf_token()}}'
+                        },
+                    dataType : 'json',
+                    success: function(result)
+                    {
+                        if(result.error) {
+                            $msg = result.error;
+                            showNewModelLineError($msg);
+                        }else{
+                            $('.overlay').hide();
+                            $('.modal').removeClass('modalshow');
+                            $('.modal').addClass('modalhide');
+                            $('#model_line').append("<option value='" + result.id + "'>" + result.model_line + "</option>");
+                            $('#model_line').val(result.id);
+                            $('#model_line').prop('disabled', false);
+
+                            $('#new_model_line_name').val("");
+                            $msg = "";
+                            removeNewModelLineError();
+                        }
+                    }
+                });
+
+            }
+        });
+
+        $('.modal-button').on('click', function()
+        {
+            var modalId = $(this).data('modal-id');
+            showOrHideModal(modalId);
+        });
+        $('.modal-model-line-button').on('click', function()
+        {
+            var modalId = $(this).data('modal-id');
+            showOrHideModal(modalId);
+        });
+        function showOrHideModal(modalId) {
+            $('.overlay').show();
+            $('#' + modalId).addClass('modalshow');
+            $('#' + modalId).removeClass('modalhide');
+
+        }
         var shippingTable = $('#shipping-table').DataTable();
         var shippingDocumentTable = $('#shipping-document-table').DataTable();
         var certificationTable = $('#certification-table').DataTable();
@@ -1125,8 +1397,9 @@
         }
         $('#brand').on('change', function() {
         var brandId = $(this).val();
-        if (brandId) {
+        if (brandId ) {
             $('#model_line').prop('disabled', false);
+            $('.add-new-model-line-div').prop('hidden', false);
             $('#model_line').empty().append('<option value="">Select Model Line</option>');
 
             $.ajax({
@@ -1142,6 +1415,7 @@
         } else {
             $('#model_line').prop('disabled', true);
             $('#variant').prop('disabled', true);
+            $('.add-new-model-line-div').prop('hidden', true);
             $('#model_line').empty().append('<option value="">Select Model Line</option>');
             $('#variant').empty().append('<option value="">Select Variant</option>');
         }

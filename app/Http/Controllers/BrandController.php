@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\UserActivityController;
 use App\Models\Brand;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
 use Yajra\DataTables\Html\Builder;
-use App\Http\Controllers\UserActivityController;
 
 class BrandController extends Controller
 {
@@ -60,15 +61,31 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        (new UserActivityController)->createActivity('Create New Brand');
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'brand_name' => 'required|unique:brands,brand_name',
         ]);
+        if ($validator->fails() ) {
+            info("yes");
+            if($request->request_from == 'Quotation') {
+                info("inside condition");
+                $data['error'] = $validator->messages()->first();
+                return response($data);
+            }else{
+                return redirect()->back()->withErrors($validator);
 
+            }
+
+        }
         $brand = new Brand();
         $brand->brand_name = $request->brand_name;
         $brand->created_by = Auth::id();
         $brand->save();
+
+        (new UserActivityController)->createActivity('Create New Brand');
+
+        if($request->request_from == 'Quotation') {
+            return response($brand);
+        }
 
         return redirect()->route('brands.index')->with('success','Brand Created Successfully.');
     }
