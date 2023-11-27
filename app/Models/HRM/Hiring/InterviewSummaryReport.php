@@ -4,6 +4,10 @@ namespace App\Models\HRM\Hiring;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Country;
+use App\Models\Masters\MasterGender;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class InterviewSummaryReport extends Model
 {
@@ -11,6 +15,7 @@ class InterviewSummaryReport extends Model
     protected $table = "interview_summary_reports";
     protected $fillable = [
         'hiring_request_id',
+        // 'resume_file_name',
         'candidate_name',
         'nationality',
         'gender',
@@ -50,4 +55,44 @@ class InterviewSummaryReport extends Model
         'updated_by',
         'deleted_by',
     ];
+    protected $appends = [
+        'is_auth_user_can_approve',
+    ];
+    public function getIsAuthUserCanApproveAttribute() {
+        $isAuthUserCanApprove = [];
+        $authId = Auth::id();
+        if($this->action_by_department_head =='pending' && $this->department_head_id == $authId) {
+            $isAuthUserCanApprove['can_approve'] = true;
+            $isAuthUserCanApprove['current_approve_position'] = 'Team Lead / Reporting Manager';
+            $isAuthUserCanApprove['current_approve_person'] = $this->departmentHeadName->name;
+        }
+        else if($this->action_by_department_head =='approved' && $this->division_head_id == $authId) {
+            $isAuthUserCanApprove['can_approve'] = true;
+            $isAuthUserCanApprove['current_approve_position'] = 'Division Head';
+            $isAuthUserCanApprove['current_approve_person'] = $this->divisionHeadName->name;
+        }
+        return $isAuthUserCanApprove;
+    }
+    public function nationalities() {
+        return $this->hasOne(Country::class,'id','nationality');
+    }
+    public function genderName() {
+        return $this->hasOne(MasterGender::class,'id','gender');
+    }
+    public function employeeHiringRequest() {
+        return $this->hasOne(EmployeeHiringRequest::class,'id','hiring_request_id');
+    }
+    public function nameOfInterviewer() {
+        return $this->hasOne(User::class,'id','name_of_interviewer');
+    }
+    public function departmentHeadName() {
+        return $this->hasOne(User::class,'id','department_head_id');
+    }
+    public function divisionHeadName() {
+        return $this->hasOne(User::class,'id','division_head_id');
+    }
+    public function createdBy() {
+        return $this->hasOne(User::class,'id','created_by');
+    }
+
 }

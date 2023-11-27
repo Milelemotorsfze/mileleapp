@@ -249,8 +249,6 @@ class EmployeeHiringRequest extends Model
     // }
     public function getIsAuthUserCanApproveAttribute() {
         $isAuthUserCanApprove = [];
-        $hiringManager = $HRManager = '';
-        $deptHead = [];
         $authId = Auth::id();
         // $hiringManager = ApprovalByPositions::where([
         //     ['approved_by_position','Recruiting Manager'],

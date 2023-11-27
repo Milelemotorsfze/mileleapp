@@ -7,16 +7,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 @if ($hasPermission) -->
 <div class="card-header">
 	<h4 class="card-title">
-		Employee Hiring Request Info
+		Interview Summary Report Info
 	</h4>
 	<!-- <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> -->
-	@if(isset($page))
-	@if($page == 'listing')
-	<a style="float: right;" class="btn btn-sm btn-success" href="{{ route('employee-hiring-request.create-or-edit','new') }}">
-      <i class="fa fa-plus" aria-hidden="true"></i> New Hiring Request
+	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('interview-summary-report.create-or-edit','new')}}">
+      <i class="fa fa-plus" aria-hidden="true"></i> New Interview Summary Report
     </a>
-	@endif
-	@endif
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -49,25 +45,37 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
         @endphp
         @if ($hasPermission) -->
 		<li class="nav-item">
-			<a class="nav-link active" data-bs-toggle="pill" href="#pending-hiring-requests">Pending</a>
+			<a class="nav-link active" data-bs-toggle="pill" href="#shortlisted-for-interview">Shortlisted For Interview</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#approved-hiring-requests">Approved(Open)</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#telephonic_interview">Telephonic Interview</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#closed-hiring-requests">Closed</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#first_round">First Round</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#on-hold-hiring-requests">On Hold</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#second_round">Second Round</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#cancelled-hiring-requests">Cancelled</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#third_round">Third Round</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#forth_round">Forth Round</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#selected_candidates">Selected Candidates</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#not_selected_candidates">Not Selected Candidates</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#pending-hiring-requests">Pending</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#approved-hiring-requests">Approved</a>
 		</li>
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#rejected-hiring-requests">Rejected</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#deleted-hiring-requests">Deleted</a>
 		</li>
         <!-- @endif
         @endcanany -->
@@ -86,23 +94,39 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 					<thead>
 						<tr>
 							<th>Sl No</th>
-							<th>UUID</th>
-							<th>Request Date</th>
-							<th>Department Name</th>
-							<th>Department Location</th>
-							<th>Requested By</th>
-							<th>Requested Job Title</th>
-							<!-- <th>Reporting To With Position</th> -->
-							<th>Experience Level</th>
-							<th>Salary Range(AED)</th>
-							<th>Work Time</th>
-							<th>Number Of Openings</th>
-							<th>Type Of Role</th>
-							<th>Replacement For Employee</th>
-							<th>Detailed Explanation Of New Hiring</th>
-							<th>Created By</th>
-							<th>Created At</th>
-							<th>Current Status</th>
+							<th>Hiring Request UUID</th>
+							<th>Candidate Name</th>
+							<th>Nationality</th>
+							<th>Gender</th>
+							<th>Name Of Interviewer</th>
+							<th>Date Of Interview</th>
+							<th>Date Of Telephonic Interview</th>
+							<th>Telephonic Interview</th>
+							<th>Rate Dress Appearance</th>
+							<th>Rate Body Language Appearance</th>
+							<th>Date Of First Round</th>
+							<th>First Round</th>
+                            <th>Date Of Second Round</th>
+							<th>Second Round</th>
+                            <th>Date Of Third Round</th>
+							<th>Third Round</th>
+                            <th>Date Of Forth Round</th>
+							<th>Forth Round</th>
+                            <th>Date Of Fifth Round</th>
+							<th>Fifth Round</th>
+                            <th>Final Evaluation Of Candidate</th>
+                            <th>Candidate Selected</th>
+                            <!-- status -->
+							<th>Team Lead/ Manager Name</th>
+							<th>Team Lead/ Manager Action</th>
+							<th>Team Lead/ Manager Action At</th>
+							<th>Team Lead/ Manager Comment</th>
+							<th>Division Head Name</th>
+							<th>Division Head Action</th>
+							<th>Division Head Action At</th>
+							<th>Division Head Comment</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -111,36 +135,52 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($pendings as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
-							<td>{{ $data->uuid ?? ''}}</td>
-							<td>{{ $data->request_date ?? '' }}</td>
-							<td>{{ $data->department_name ?? '' }}</td>
-							<td>{{ $data->department_location ?? '' }}</td>
-							<td>{{ $data->requested_by_name ?? '' }}</td>
-							<td>{{ $data->requested_job_name ?? '' }}</td>
-							<!-- <td>{{ $data->reporting_to_name ?? '' }}</td>							 -->
-							<td>{{ $data->experience_level_name ?? ''}}</td>
-							<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
-							<td>{{ $data->number_of_openings ?? ''}}</td>
-							<td>{{$data->type_of_role_name ?? ''}}</td>
-							<td>{{$data->replacement_for_employee_name ?? ''}}</td>
-							<td>{{$data->explanation_of_new_hiring ?? ''}}</td>
-							<td>{{$data->created_by_name ?? ''}}</td>
-							<td>{{$data->created_at ?? ''}}</td>
-							<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td>{{ $data->nameOfInterviewer->name ?? '' }}</td>
+							<td>{{ $data->date_of_interview ?? '' }}</td>
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td>{{ $data->rate_body_language_appearance ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>{{$data->third_round ?? ''}}</td>
+							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>{{$data->forth_round ?? ''}}</td>
+							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>{{$data->fifth_round ?? ''}}</td>
+                            <td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
+                            <td>{{$data->candidate_selected ?? ''}}</td>
+
+                            <td>{{$data->action_by_department_head ?? ''}}</td>
+							<td>{{$data->departmentHeadName->name ?? ''}}</td>
+							<td>{{$data->department_head_action_at ?? ''}}</td>
+							<td>{{$data->comments_by_department_head ?? ''}}</td>
+							<td>{{$data->action_by_division_head ?? ''}}</td>
+							<td>{{$data->divisionHeadName->name ?? ''}}</td>
+                            <td>{{$data->division_head_action_at ?? ''}}</td>
+                            <td>{{$data->comments_by_division_head ?? ''}}</td>
+                            <td>{{ $data->createdBy->name ?? ''}}</td>
+                            <td>{{ $data->created_at ?? ''}}</td>
 							<td>
 							<div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
 											<i class="fa fa-eye" aria-hidden="true"></i> View Details
 										</a>
 									</li>
                                     <li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$data->id)}}">
-											<i class="fa fa-edit" aria-hidden="true"></i> Edit Hiring Request
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 										</a>
 									</li>
                                     <li>
@@ -170,15 +210,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 											@endif
 										@endif
 									</li>
-                                    <li>
+                                    <!-- <li>
 										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Delete" type="button" class="btn btn-secondary btn-sm hiring-request-delete sm-mt-3" data-id="{{ $data->id }}" data-url="{{ route('employee-hiring-request.destroy', $data->id) }}">
 											<i class="fa fa-trash"></i> Delete
 										</button>
-									</li>
+									</li> -->
                                 </ul>
                             </div>
 							</td>
-							@include('hrm.hiring.hiring_request.approve_reject_modal')					
+							@include('hrm.hiring.interview_summary_report.approve_reject_modal')					
 						</tr>
 						@endforeach
 					</tbody>
@@ -193,23 +233,38 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 					<thead>
 						<tr>
 							<th>Sl No</th>
-							<th>UUID</th>
-							<th>Request Date</th>
-							<th>Department Name</th>
-							<th>Department Location</th>
-							<th>Requested By</th>
-							<th>Requested Job Title</th>
-							<!-- <th>Reporting To With Position</th> -->
-							<th>Experience Level</th>
-							<th>Salary Range(AED)</th>
-							<th>Work Time</th>
-							<th>Number Of Openings</th>
-							<th>Type Of Role</th>
-							<th>Replacement For Employee</th>
-							<th>Detailed Explanation Of New Hiring</th>
-							<th>Created By</th>
-							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
+							<th>Hiring Request UUID</th>
+							<th>candidate_name</th>
+							<th>Nationality</th>
+							<th>Gender</th>
+							<th>Name Of Interviewer</th>
+							<th>Date Of Interview</th>
+							<th>Date Of Telephonic Interview</th>
+							<th>Telephonic Interview</th>
+							<th>Rate Dress Appearance</th>
+							<th>Rate Body Language Appearance</th>
+							<th>Date Of First Round</th>
+							<th>First Round</th>
+                            <th>Date Of Second Round</th>
+							<th>Second Round</th>
+                            <th>Date Of Third Round</th>
+							<th>Third Round</th>
+                            <th>Date Of Forth Round</th>
+							<th>Forth Round</th>
+                            <th>Date Of Fifth Round</th>
+							<th>Fifth Round</th>
+                            <th>Final Evaluation Of Candidate</th>
+                            <th>Candidate Selected</th>
+							<th>Team Lead/ Manager Name</th>
+							<th>Team Lead/ Manager Action</th>
+							<th>Team Lead/ Manager Action At</th>
+							<th>Team Lead/ Manager Comment</th>
+							<th>Division Head Name</th>
+							<th>Division Head Action</th>
+							<th>Division Head Action At</th>
+							<th>Division Head Comment</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -218,33 +273,50 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($approved as $key => $approvedOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
-							<td>{{ $approvedOne->uuid ?? ''}}</td>
-							<td>{{ $approvedOne->request_date ?? '' }}</td>
-							<td>{{ $approvedOne->department_name ?? '' }}</td>
-							<td>{{ $approvedOne->department_location ?? '' }}</td>
-							<td>{{ $approvedOne->requested_by_name ?? '' }}</td>
-							<td>{{ $approvedOne->requested_job_name ?? '' }}</td>
-							<!-- <td>{{ $approvedOne->reporting_to_name ?? '' }}</td>							 -->
-							<td>{{ $approvedOne->experience_level_name ?? ''}}</td>
-							<td>{{ $approvedOne->salary_range_start_in_aed ?? ''}} - {{$approvedOne->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $approvedOne->work_time_start ?? ''}} - {{$approvedOne->work_time_end ?? ''}}</td>
-							<td>{{ $approvedOne->number_of_openings ?? ''}}</td>
-							<td>{{$approvedOne->type_of_role_name}}</td>
-							<td>{{$approvedOne->replacement_for_employee_name}}</td>
-							<td>{{$approvedOne->explanation_of_new_hiring}}</td>
-							<td>{{$approvedOne->created_by_name}}</td>
-							<td>{{$approvedOne->created_at}}</td>
+						<td>{{ $approvedOne->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $approvedOne->candidate_name ?? '' }}</td>
+							<td>{{ $approvedOne->nationalities->name ?? '' }}</td>
+							<td>{{ $approvedOne->genderName->name ?? '' }}</td>
+							<td>{{ $approvedOne->nameOfInterviewer->name ?? '' }}</td>
+							<td>{{ $approvedOne->date_of_interview ?? '' }}</td>
+							<td>{{ $approvedOne->date_of_telephonic_interview ?? ''}}</td>
+							<td>{{ $approvedOne->telephonic_interview ?? ''}}</td>
+							<td>{{ $approvedOne->rate_dress_appearance ?? ''}}</td>
+							<td>{{ $approvedOne->rate_body_language_appearance ?? ''}}</td>
+							<td>{{$approvedOne->date_of_first_round ?? ''}}</td>
+							<td>{{$approvedOne->first_round ?? ''}}</td>
+							<td>{{$approvedOne->date_of_second_round ?? ''}}</td>
+							<td>{{$approvedOne->second_round ?? ''}}</td>
+							<td>{{$approvedOne->date_of_third_round ?? ''}}</td>
+							<td>{{$approvedOne->third_round ?? ''}}</td>
+							<td>{{$approvedOne->date_of_forth_round ?? ''}}</td>
+							<td>{{$approvedOne->forth_round ?? ''}}</td>
+							<td>{{$approvedOne->date_of_fifth_round ?? ''}}</td>
+							<td>{{$approvedOne->fifth_round ?? ''}}</td>
+                            <td>{{$approvedOne->final_evaluation_of_candidate ?? ''}}</td>
+                            <td>{{$approvedOne->candidate_selected ?? ''}}</td>
+
+                            <td>{{$approvedOne->action_by_department_head ?? ''}}</td>
+							<td>{{$approvedOne->departmentHeadName->name ?? ''}}</td>
+							<td>{{$approvedOne->department_head_action_at ?? ''}}</td>
+							<td>{{$approvedOne->comments_by_department_head ?? ''}}</td>
+							<td>{{$approvedOne->action_by_division_head ?? ''}}</td>
+							<td>{{$approvedOne->divisionHeadName->name ?? ''}}</td>
+                            <td>{{$approvedOne->division_head_action_at ?? ''}}</td>
+                            <td>{{$approvedOne->comments_by_division_head ?? ''}}</td>
+                            <td>{{ $approvedOne->createdBy->name ?? ''}}</td>
+                            <td>{{ $approvedOne->created_at ?? ''}}</td>
 							<td>
-							<div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+							<!-- <div class="dropdown"> -->
+                                <!-- <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$approvedOne->id)}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+                                    <li> -->
+										<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$approvedOne->id)}}">
+											<i class="fa fa-eye" aria-hidden="true"></i>
 										</a>
-									</li>
+									<!-- </li>
                                     <li>
 										@if(isset($approvedOne->questionnaire))
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
@@ -278,7 +350,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 										</button>
 									</li>
                                 </ul>
-                            </div>
+                            </div> -->
 								
 								<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$approvedOne->id)}}">
 									<i class="fa fa-edit" aria-hidden="true"></i>
@@ -406,219 +478,45 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade show" id="closed-hiring-requests">
-		<div class="card-body">
-			<div class="table-responsive">
-				<table id="closed-hiring-requests-table" class="table table-striped table-editable table-edits table">
-					<thead>
-						<tr>
-							<th>Sl No</th>
-							<th>UUID</th>
-							<th>Request Date</th>
-							<th>Department Name</th>
-							<th>Department Location</th>
-							<th>Requested By</th>
-							<th>Requested Job Title</th>
-							<!-- <th>Reporting To With Position</th> -->
-							<th>Experience Level</th>
-							<th>Salary Range(AED)</th>
-							<th>Work Time</th>
-							<th>Number Of Openings</th>
-							<th>Type Of Role</th>
-							<th>Replacement For Employee</th>
-							<th>Detailed Explanation Of New Hiring</th>
-							<th>Created By</th>
-							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
-							<th>Action</th>
-						</tr>
-					</thead>
-					<tbody>
-						<div hidden>{{$i=0;}}</div>
-						@foreach ($closed as $key => $closedOne)
-						<tr data-id="1">
-						<td>{{ ++$i }}</td>
-							<td>{{ $closedOne->uuid ?? ''}}</td>
-							<td>{{ $closedOne->request_date ?? '' }}</td>
-							<td>{{ $closedOne->department_name ?? '' }}</td>
-							<td>{{ $closedOne->department_location ?? '' }}</td>
-							<td>{{ $closedOne->requested_by_name ?? '' }}</td>
-							<td>{{ $closedOne->requested_job_name ?? '' }}</td>
-							<!-- <td>{{ $closedOne->reporting_to_name ?? '' }}</td>							 -->
-							<td>{{ $closedOne->experience_level_name ?? ''}}</td>
-							<td>{{ $closedOne->salary_range_start_in_aed ?? ''}} - {{$closedOne->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $closedOne->work_time_start ?? ''}} - {{$closedOne->work_time_end ?? ''}}</td>
-							<td>{{ $closedOne->number_of_openings ?? ''}}</td>
-							<td>{{$closedOne->type_of_role_name}}</td>
-							<td>{{$closedOne->replacement_for_employee_name}}</td>
-							<td>{{$closedOne->explanation_of_new_hiring}}</td>
-							<td>{{$closedOne->created_by_name}}</td>
-							<td>{{$closedOne->created_at}}</td>
-							<td>
-							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$closedOne->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
-							</a>
-							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$closedOne->id)}}">
-								<i class="fa fa-edit" aria-hidden="true"></i>
-							</a> -->
-							</td>
-						</tr>
-						@endforeach
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
-	<div class="tab-pane fade show" id="on-hold-hiring-requests">
-		<div class="card-body">
-			<div class="table-responsive">
-				<table id="on-hold-hiring-requests-table" class="table table-striped table-editable table-edits table">
-					<thead>
-						<tr>
-							<th>Sl No</th>
-							<th>UUID</th>
-							<th>Request Date</th>
-							<th>Department Name</th>
-							<th>Department Location</th>
-							<th>Requested By</th>
-							<th>Requested Job Title</th>
-							<!-- <th>Reporting To With Position</th> -->
-							<th>Experience Level</th>
-							<th>Salary Range(AED)</th>
-							<th>Work Time</th>
-							<th>Number Of Openings</th>
-							<th>Type Of Role</th>
-							<th>Replacement For Employee</th>
-							<th>Detailed Explanation Of New Hiring</th>
-							<th>Created By</th>
-							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
-							<th>Action</th>
-						</tr>
-					</thead>
-					<tbody>
-						<div hidden>{{$i=0;}}</div>
-						@foreach ($onHold as $key => $onHoldOne)
-						<tr data-id="1">
-						<td>{{ ++$i }}</td>
-						<td>{{$onHoldOne->uuid ?? ''}}</td>
-							<td>{{ $onHoldOne->request_date ?? '' }}</td>
-							<td>{{ $onHoldOne->department_name ?? '' }}</td>
-							<td>{{ $onHoldOne->department_location ?? '' }}</td>
-							<td>{{ $onHoldOne->requested_by_name ?? '' }}</td>
-							<td>{{ $onHoldOne->requested_job_name ?? '' }}</td>
-							<!-- <td>{{ $onHoldOne->reporting_to_name ?? '' }}</td>							 -->
-							<td>{{ $onHoldOne->experience_level_name ?? ''}}</td>
-							<td>{{ $onHoldOne->salary_range_start_in_aed ?? ''}} - {{$onHoldOne->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $onHoldOne->work_time_start ?? ''}} - {{$onHoldOne->work_time_end ?? ''}}</td>
-							<td>{{ $onHoldOne->number_of_openings ?? ''}}</td>
-							<td>{{$onHoldOne->type_of_role_name}}</td>
-							<td>{{$onHoldOne->replacement_for_employee_name}}</td>
-							<td>{{$onHoldOne->explanation_of_new_hiring}}</td>
-							<td>{{$onHoldOne->created_by_name}}</td>
-							<td>{{$onHoldOne->created_at}}</td>
-							<td>
-							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$onHoldOne->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
-							</a>
-							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$onHoldOne->id)}}">
-								<i class="fa fa-edit" aria-hidden="true"></i>
-							</a> -->
-							</td>
-						</tr>
-						@endforeach
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
-	<div class="tab-pane fade show" id="cancelled-hiring-requests">
-		<div class="card-body">
-			<div class="table-responsive">
-				<table id="cancelled-hiring-requests-table" class="table table-striped table-editable table-edits table">
-					<thead>
-						<tr>
-							<th>Sl No</th>
-							<th>UUID</th>
-							<th>Request Date</th>
-							<th>Department Name</th>
-							<th>Department Location</th>
-							<th>Requested By</th>
-							<th>Requested Job Title</th>
-							<!-- <th>Reporting To With Position</th> -->
-							<th>Experience Level</th>
-							<th>Salary Range(AED)</th>
-							<th>Work Time</th>
-							<th>Number Of Openings</th>
-							<th>Type Of Role</th>
-							<th>Replacement For Employee</th>
-							<th>Detailed Explanation Of New Hiring</th>
-							<th>Created By</th>
-							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
-							<th>Action</th>
-						</tr>
-					</thead>
-					<tbody>
-						<div hidden>{{$i=0;}}</div>
-						@foreach ($cancelled as $key => $cancelledOne)
-						<tr data-id="1">
-						<td>{{ ++$i }}</td>
-						<td>{{ $cancelledOne->uuid ?? ''}}</td>
-							<td>{{ $cancelledOne->request_date ?? '' }}</td>
-							<td>{{ $cancelledOne->department_name ?? '' }}</td>
-							<td>{{ $cancelledOne->department_location ?? '' }}</td>
-							<td>{{ $cancelledOne->requested_by_name ?? '' }}</td>
-							<td>{{ $cancelledOne->requested_job_name ?? '' }}</td>
-							<!-- <td>{{ $cancelledOne->reporting_to_name ?? '' }}</td>							 -->
-							<td>{{ $cancelledOne->experience_level_name ?? ''}}</td>
-							<td>{{ $cancelledOne->salary_range_start_in_aed ?? ''}} - {{$cancelledOne->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $cancelledOne->work_time_start ?? ''}} - {{$cancelledOne->work_time_end ?? ''}}</td>
-							<td>{{ $cancelledOne->number_of_openings ?? ''}}</td>
-							<td>{{$cancelledOne->type_of_role_name}}</td>
-							<td>{{$cancelledOne->replacement_for_employee_name}}</td>
-							<td>{{$cancelledOne->explanation_of_new_hiring}}</td>
-							<td>{{$cancelledOne->created_by_name}}</td>
-							<td>{{$cancelledOne->created_at}}</td>
-							<td>
-							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$cancelledOne->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
-							</a>
-							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$cancelledOne->id)}}">
-								<i class="fa fa-edit" aria-hidden="true"></i>
-							</a> -->
-							</td>
-						</tr>
-						@endforeach
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
 	<div class="tab-pane fade show" id="rejected-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
 				<table id="rejected-hiring-requests-table" class="table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
-							<th>Sl No</th>
-							<th>UUID</th>
-							<th>Request Date</th>
-							<th>Department Name</th>
-							<th>Department Location</th>
-							<th>Requested By</th>
-							<th>Requested Job Title</th>
-							<!-- <th>Reporting To With Position</th> -->
-							<th>Experience Level</th>
-							<th>Salary Range(AED)</th>
-							<th>Work Time</th>
-							<th>Number Of Openings</th>
-							<th>Type Of Role</th>
-							<th>Replacement For Employee</th>
-							<th>Detailed Explanation Of New Hiring</th>
-							<th>Created By</th>
-							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
+						<th>Sl No</th>
+							<th>Hiring Request UUID</th>
+							<th>candidate_name</th>
+							<th>Nationality</th>
+							<th>Gender</th>
+							<th>Name Of Interviewer</th>
+							<th>Date Of Interview</th>
+							<th>Date Of Telephonic Interview</th>
+							<th>Duties and Responsibilities (Generic) of the position</th>
+							<th>Rate Dress Appearance</th>
+							<th>Rate Body Language Appearance</th>
+							<th>Date Of First Round</th>
+							<th>First Round</th>
+                            <th>Date Of Second Round</th>
+							<th>Second Round</th>
+                            <th>Date Of Third Round</th>
+							<th>Third Round</th>
+                            <th>Date Of Forth Round</th>
+							<th>Forth Round</th>
+                            <th>Date Of Fifth Round</th>
+							<th>Fifth Round</th>
+                            <th>Final Evaluation Of Candidate</th>
+                            <th>Candidate Selected</th>
+							<th>Team Lead/ Manager Name</th>
+							<th>Team Lead/ Manager Action</th>
+							<th>Team Lead/ Manager Action At</th>
+							<th>Team Lead/ Manager Comment</th>
+							<th>Division Head Name</th>
+							<th>Division Head Action</th>
+							<th>Division Head Action At</th>
+							<th>Division Head Comment</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -627,22 +525,39 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($rejected as $key => $rejectedOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
-						<td>{{ $rejectedOne->uuid ?? ''}}</td>
-							<td>{{ $rejectedOne->request_date ?? '' }}</td>
-							<td>{{ $rejectedOne->department_name ?? '' }}</td>
-							<td>{{ $rejectedOne->department_location ?? '' }}</td>
-							<td>{{ $rejectedOne->requested_by_name ?? '' }}</td>
-							<td>{{ $rejectedOne->requested_job_name ?? '' }}</td>
-							<!-- <td>{{ $rejectedOne->reporting_to_name ?? '' }}</td>							 -->
-							<td>{{ $rejectedOne->experience_level_name ?? ''}}</td>
-							<td>{{ $rejectedOne->salary_range_start_in_aed ?? ''}} - {{$rejectedOne->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $rejectedOne->work_time_start ?? ''}} - {{$rejectedOne->work_time_end ?? ''}}</td>
-							<td>{{ $rejectedOne->number_of_openings ?? ''}}</td>
-							<td>{{$rejectedOne->type_of_role_name}}</td>
-							<td>{{$rejectedOne->replacement_for_employee_name}}</td>
-							<td>{{$rejectedOne->explanation_of_new_hiring}}</td>
-							<td>{{$rejectedOne->created_by_name}}</td>
-							<td>{{$rejectedOne->created_at}}</td>
+						<td>{{ $rejectedOne->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $rejectedOne->candidate_name ?? '' }}</td>
+							<td>{{ $rejectedOne->nationalities->name ?? '' }}</td>
+							<td>{{ $rejectedOne->genderName->name ?? '' }}</td>
+							<td>{{ $rejectedOne->nameOfInterviewer->name ?? '' }}</td>
+							<td>{{ $rejectedOne->date_of_interview ?? '' }}</td>
+							<td>{{ $rejectedOne->date_of_telephonic_interview ?? ''}}</td>
+							<td>{{ $rejectedOne->telephonic_interview ?? ''}}</td>
+							<td>{{ $rejectedOne->rate_dress_appearance ?? ''}}</td>
+							<td>{{ $rejectedOne->rate_body_language_appearance ?? ''}}</td>
+							<td>{{$rejectedOne->date_of_first_round ?? ''}}</td>
+							<td>{{$rejectedOne->first_round ?? ''}}</td>
+							<td>{{$rejectedOne->date_of_second_round ?? ''}}</td>
+							<td>{{$rejectedOne->second_round ?? ''}}</td>
+							<td>{{$rejectedOne->date_of_third_round ?? ''}}</td>
+							<td>{{$rejectedOne->third_round ?? ''}}</td>
+							<td>{{$rejectedOne->date_of_forth_round ?? ''}}</td>
+							<td>{{$rejectedOne->forth_round ?? ''}}</td>
+							<td>{{$rejectedOne->date_of_fifth_round ?? ''}}</td>
+							<td>{{$rejectedOne->fifth_round ?? ''}}</td>
+                            <td>{{$rejectedOne->final_evaluation_of_candidate ?? ''}}</td>
+                            <td>{{$rejectedOne->candidate_selected ?? ''}}</td>
+
+                            <td>{{$rejectedOne->action_by_department_head ?? ''}}</td>
+							<td>{{$rejectedOne->departmentHeadName->name ?? ''}}</td>
+							<td>{{$rejectedOne->department_head_action_at ?? ''}}</td>
+							<td>{{$rejectedOne->comments_by_department_head ?? ''}}</td>
+							<td>{{$rejectedOne->action_by_division_head ?? ''}}</td>
+							<td>{{$rejectedOne->divisionHeadName->name ?? ''}}</td>
+                            <td>{{$rejectedOne->division_head_action_at ?? ''}}</td>
+                            <td>{{$rejectedOne->comments_by_division_head ?? ''}}</td>
+                            <td>{{ $rejectedOne->createdBy->name ?? ''}}</td>
+                            <td>{{ $rejectedOne->created_at ?? ''}}</td>
 							<td>
 							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$rejectedOne->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
@@ -658,69 +573,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade show" id="deleted-hiring-requests">
-		<div class="card-body">
-			<div class="table-responsive">
-				<table id="deleted-hiring-requests-table" class="table table-striped table-editable table-edits table">
-					<thead>
-						<tr>
-							<th>Sl No</th>
-							<th>UUID</th>
-							<th>Request Date</th>
-							<th>Department Name</th>
-							<th>Department Location</th>
-							<th>Requested By</th>
-							<th>Requested Job Title</th>
-							<!-- <th>Reporting To With Position</th> -->
-							<th>Experience Level</th>
-							<th>Salary Range(AED)</th>
-							<th>Work Time</th>
-							<th>Number Of Openings</th>
-							<th>Type Of Role</th>
-							<th>Replacement For Employee</th>
-							<th>Detailed Explanation Of New Hiring</th>
-							<th>Created By</th>
-							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
-							<!-- <th>Action</th> -->
-						</tr>
-					</thead>
-					<tbody>
-						<div hidden>{{$i=0;}}</div>
-						@foreach ($deleted as $key => $deletedOne)
-						<tr data-id="1">
-						<td>{{ ++$i }}</td>
-						<td>{{ $deletedOne->uuid ?? ''}}</td>
-							<td>{{ $deletedOne->request_date ?? '' }}</td>
-							<td>{{ $deletedOne->department_name ?? '' }}</td>
-							<td>{{ $deletedOne->department_location ?? '' }}</td>
-							<td>{{ $deletedOne->requested_by_name ?? '' }}</td>
-							<td>{{ $deletedOne->requested_job_name ?? '' }}</td>
-							<!-- <td>{{ $deletedOne->reporting_to_name ?? '' }}</td>							 -->
-							<td>{{ $deletedOne->experience_level_name ?? ''}}</td>
-							<td>{{ $deletedOne->salary_range_start_in_aed ?? ''}} - {{$deletedOne->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $deletedOne->work_time_start ?? ''}} - {{$deletedOne->work_time_end ?? ''}}</td>
-							<td>{{ $deletedOne->number_of_openings ?? ''}}</td>
-							<td>{{$deletedOne->type_of_role_name}}</td>
-							<td>{{$deletedOne->replacement_for_employee_name}}</td>
-							<td>{{$deletedOne->explanation_of_new_hiring}}</td>
-							<td>{{$deletedOne->created_by_name}}</td>
-							<td>{{$deletedOne->created_at}}</td>
-							<td>
-							<!-- <a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$deletedOne->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
-							</a> -->
-							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$deletedOne->id)}}">
-								<i class="fa fa-edit" aria-hidden="true"></i>
-							</a> -->
-							</td>
-						</tr>
-						@endforeach
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
+	
     <!-- @endif
     @endcanany -->
 </div>
