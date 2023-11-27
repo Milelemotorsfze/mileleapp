@@ -448,11 +448,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                 <div class="amountInputContainer" id="amountInputContainer">
                                     <label for="commission_amount" class="form-label"><span class="error">* </span>{{ __('Enter Amount (in AED):') }}</label>
                                     <div class="input-group">
-                                    <input type="number" name="commission_amount" id="commission_amount" class="form-control widthinput" placeholder="amount" aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->questionnaire->commission_amount ?? ''}}">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                        <input type="number" name="commission_amount" id="commission_amount" class="form-control widthinput" placeholder="amount" aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->questionnaire->commission_amount ?? ''}}">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                        </div>
                                     </div>
-                                </div>
                                 </div>
                             </div>
 
@@ -575,7 +575,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                 <label class="form-check-label" for="internal_department_evaluation">Internal Departments</label>
                             </div>
                             <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
-                                <input class="form-check-input" name="external_vendor_evaluation" type="checkbox" id="external_vendor_evaluation" value="external_vendor_evaluation" {{ $data && $data->questionnaire && $data->questionnaire->job_evaluation_stake_holders === 'External vendors , ' ? 'checked' : '' }}>
+                                <input class="form-check-input" name="external_vendor_evaluation" type="checkbox" id="external_vendor_evaluation" value="external_vendor_evaluation" {{ $data && $data->questionnaire && $data->questionnaire->job_evaluation_stake_holders === 'External vendors ' ? 'checked' : '' }}>
                                 <label class="form-check-label" for="external_vendor_evaluation">External vendors</label>
                             </div>
 
@@ -805,12 +805,79 @@ redirect()->route('home')->send();
 
     $(document).ready(function() {
 
-        $("#number_of_openings").val(data.number_of_openings);
-        $("#work_time_start").val(data.work_time_start);
-        $("#work_time_end").val(data.work_time_end);
-        $("#salary_range_start_in_aed").val(data.salary_range_start_in_aed);
-        $("#salary_range_end_in_aed").val(data.salary_range_end_in_aed);
+        var currentNumberOfOpenings = $("#number_of_openings").val();
+        console.log("current position opening value is: ", currentNumberOfOpenings)
+        console.log("old position opening value is: ", data.number_of_openings);
+        if (currentNumberOfOpenings && data.number_of_openings !== currentNumberOfOpenings ) {
+            console.log("ifffffffffff")
+            $("#number_of_openings").val(currentNumberOfOpenings);
+        }
+
+        else {
+            console.log("elseeeeeeeee")
+                $("#number_of_openings").val(data.number_of_openings)};
+        // (data.number_of_openings === null || data.number_of_openings === currentNumberOfOpenings) 
+        
+
+        var currentStartTimeValue = $("#work_time_start").val();
+        console.log("current starting value of work time is: ", currentStartTimeValue)
+        console.log("old starting value of work time is: ", data.work_time_start);
+        if (currentStartTimeValue && data.work_time_start !== currentStartTimeValue ) {
+            console.log("ifffffffffff")
+            $("#work_time_start").val(currentStartTimeValue);
+        } else {
+            console.log("elseeeeeeeee")
+                $("#work_time_start").val(data.work_time_start)};
+
+
+        var currentEndTimeValue = $("#work_time_end").val();
+        console.log("current ending value of work time is: ", currentEndTimeValue)
+        console.log("old ending value of work time is: ", data.work_time_end);
+        if (currentEndTimeValue && data.work_time_end !== currentEndTimeValue ) {
+            console.log("ifffffffffff")
+            $("#work_time_end").val(currentEndTimeValue);
+        } else {
+            console.log("elseeeeeeeee")
+                $("#work_time_end").val(data.work_time_end)};
+
+
+        var currentStartingSalaryValue = $("#salary_range_start_in_aed").val();
+        console.log("current starting value of salary is: ", currentStartingSalaryValue)
+        console.log("old starting value of salary is: ", data.salary_range_start_in_aed);
+        if (currentStartingSalaryValue && data.salary_range_start_in_aed !== currentStartingSalaryValue ) {
+            console.log("ifffffffffff")
+            $("#salary_range_start_in_aed").val(currentStartingSalaryValue);
+        } else {
+            console.log("elseeeeeeeee")
+                $("#salary_range_start_in_aed").val(data.salary_range_start_in_aed)};
+
+
+        var currentEndingSalaryValue = $("#salary_range_end_in_aed").val();
+        console.log("current ending value of salary is: ", currentEndingSalaryValue)
+        console.log("old ending value of salary is: ", data.salary_range_end_in_aed);
+        if (currentEndingSalaryValue && data.salary_range_end_in_aed !== currentEndingSalaryValue ) {
+            console.log("ifffffffffff")
+            $("#salary_range_end_in_aed").val(currentEndingSalaryValue);
+        } else {
+            console.log("elseeeeeeeee")
+                $("#salary_range_end_in_aed").val(data.salary_range_end_in_aed)};
+                
+
+        var backendCareerLevelId = {{$data->questionnaire->carrerLevel->id ?? 'null'}};
+        console.log("Updated Career Level ID: ", backendCareerLevelId);
+        if (backendCareerLevelId !== null){
+
+        $("#career_level_id option").each(function() {
+            var optionValue = $(this).val();
+
+            if (optionValue == backendCareerLevelId) {
+                $(this).prop("selected", true);
+            }
+        });
+    }else {
+        console.log("In else of career vlvl")
         $("#career_level_id").val(data.experience_level);
+    }
 
         $('#requested_job_title').select2({
             allowClear: true,
@@ -822,7 +889,7 @@ redirect()->route('home')->send();
             maximumSelectionLength: 1,
             placeholder: "Choose Designation Name",
         });
-        
+
         $('#reporting_structure').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -892,38 +959,50 @@ redirect()->route('home')->send();
         } else {
             $("#educationCertificatesDiv").hide();
         }
-    });
+    }).change();
 
-    // Show/hide amountPercentageInputContainer based on radio button selection
-    $('input[name="required_to_work_on_trial"]').change(function() {
-        if ($(this).val() === 'yes') {
+    function handleTrialWorkDaysVisibility() {
+        var TrialWorkDaysValue = $('input[name="required_to_work_on_trial"]:checked').val();
+
+        if (TrialWorkDaysValue === 'yes') {
             $('.numberOfDaysInputContainer').show();
         } else {
             $('.numberOfDaysInputContainer').hide();
         }
-    });
+    }
 
-    $('input[name="commission_involved_in_salary"]').change(function() {
-        if ($(this).val() === 'yes') {
-            $('.commissionInputContainer').show();
-            $('.chooseAmountpercentageDropDownInputContainer').show();
-            $('.amountDropDownInputContainer').hide();
-            $('.percentageDropDownInputContainer').hide();
+    $('input[name="required_to_work_on_trial"]').change(handleTrialWorkDaysVisibility);
+    handleTrialWorkDaysVisibility();
+
+
+    function handleCommissionVisibility() {
+        var commissionValue = $('input[name="commission_involved_in_salary"]:checked').val();
+
+        if (commissionValue === 'yes') {
+            $('.commissionInputContainer, .chooseAmountpercentageDropDownInputContainer').show();
+            $('.amountDropDownInputContainer, .percentageDropDownInputContainer').hide();
         } else {
-            $('.commissionInputContainer').hide();
-            $('.chooseAmountpercentageDropDownInputContainer').hide();
-            $('.amountDropDownInputContainer').show();
-            $('.percentageDropDownInputContainer').show();
+            $('.commissionInputContainer, .chooseAmountpercentageDropDownInputContainer').hide();
+            $('.amountDropDownInputContainer, .percentageDropDownInputContainer').show();
         }
-    });
+    }
+
+    $('input[name="commission_involved_in_salary"]').change(handleCommissionVisibility);
+    handleCommissionVisibility();
+
 
     $('input[name="driving_licence"]').change(function() {
-        if ($(this).val() === 'yes') {
-            $('.drivingLisenceInputContainer').show();
-        } else {
-            $('.drivingLisenceInputContainer').hide();
-        }
+        setTimeout(function() {
+            if ($('input[name="driving_licence"]:checked').val() === 'yes') {
+                $('.drivingLisenceInputContainer').show();
+            } else {
+                $('.drivingLisenceInputContainer').hide();
+            }
+        }, 100);
     });
+
+    $('input[name="driving_licence"]').change();
+
 
     // $('.select-button-main-div select').on('change', function() {
     //     $(this).closest('.select-button-main-div').find('.error').remove();
@@ -1297,11 +1376,20 @@ redirect()->route('home')->send();
 </script>
 
 <script>
-    function showAmountPercentageInput(element) {
-        var selectedValue = element.value;
-        document.getElementById('amountDropDownInputContainer').style.display = selectedValue == 'amount' ? 'block' : 'none';
-        document.getElementById('percentageDropDownInputContainer').style.display = selectedValue == 'percentage' ? 'block' : 'none';
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        function showAmountPercentageInput(element) {
+            var selectedValue = element.value;
+            document.getElementById('amountDropDownInputContainer').style.display = selectedValue == 'amount' ? 'block' : 'none';
+            document.getElementById('percentageDropDownInputContainer').style.display = selectedValue == 'percentage' ? 'block' : 'none';
+        }
+        var selectElement = document.getElementById('commission_type');
+
+        selectElement.addEventListener('change', function() {
+            showAmountPercentageInput(this);
+        });
+
+        showAmountPercentageInput(selectElement);
+    });
 </script>
 
 

@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB; // Import the DB facade here
+use App\Models\HRM\Employee\EmployeeProfile;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
@@ -57,6 +58,6 @@ class User extends Authenticatable
     }
     public function empProfile()
     {
-        return $this->hasOne(Profile::class, 'user_id');
+        return $this->hasOne(EmployeeProfile::class, 'user_id');
     }
 }

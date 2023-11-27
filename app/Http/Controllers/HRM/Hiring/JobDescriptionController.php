@@ -9,6 +9,12 @@ use App\Models\Masters\MasterDepartment;
 use App\Models\Masters\MasterOfficeLocation;
 use App\Models\HRM\Hiring\JobDescription;
 use App\Models\User;
+use Carbon\Carbon;
+use App\Models\HRM\Hiring\EmployeeHiringRequestHistory;
+use App\Http\Controllers\UserActivityController;
+use DB;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class JobDescriptionController extends Controller
 {
@@ -99,6 +105,55 @@ class JobDescriptionController extends Controller
             catch (\Exception $e) {
                 DB::rollback();
             }
+        }
+    }
+    public function requestAction(Request $request) {
+        DB::beginTransaction();
+        try {
+            $message = '';
+            $update = JobDescription::where('id',$request->id)->first();
+            if($request->current_approve_position == 'Team Lead / Reporting Manager') {
+                $update->comments_by_department_head = $request->comment;
+                $update->department_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->action_by_department_head = $request->status;
+                if($request->status == 'approved') {
+                    $update->action_by_hr_manager = 'pending';
+                    $message = 'Employee hiring request send to HR Manager ( '.$update->hrManagerName->name.' - '.$update->hrManagerName->email.' ) for approval';
+                }
+            }
+            else if($request->current_approve_position == 'HR Manager') {
+                $update->comments_by_hr_manager = $request->comment;
+                $update->hr_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->action_by_hr_manager = $request->status;
+                if($request->status == 'approved') {
+                    $update->status = 'approved';
+                }
+            }
+            if($request->status == 'rejected') {
+                $update->status = 'rejected';
+            }
+            $update->update();
+            $history['hiring_request_id'] = $request->id;
+            if($request->status == 'approved') {
+                $history['icon'] = 'icons8-thumb-up-30.png';
+            }
+            else if($request->status == 'rejected') {
+                $history['icon'] = 'icons8-thumb-down-30.png';
+            }
+            $history['message'] = 'Employee hiring job description '.$request->status.' by '.$request->current_approve_position.' ( '.Auth::user()->name.' - '.Auth::user()->email.' )';
+            $createHistory = EmployeeHiringRequestHistory::create($history);  
+            if($request->status == 'approved' && $message != '') {
+                $history['icon'] = 'icons8-send-30.png';
+                $history['message'] = $message;
+                $createHistory = EmployeeHiringRequestHistory::create($history);
+            }
+            (new UserActivityController)->createActivity($history['message']);
+            DB::commit();
+            return response()->json('success');
+        } 
+        catch (\Exception $e) {
+            // info($e);
+            DB::rollback();
         }
     }
 }
