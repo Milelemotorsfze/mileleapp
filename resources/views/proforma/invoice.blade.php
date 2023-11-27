@@ -8,6 +8,9 @@
   div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
+    .full-width {
+       width: 100%;
+    }
 .overlay
 {
     position: fixed; /* Positioning and size */
@@ -164,7 +167,7 @@
         <hr>
         <div class="row">
             <div class="col-sm-4">
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         <label for="timeRange">Document Validity:</label>
                     </div>
@@ -182,7 +185,7 @@
                 $user = Auth::user();
                 $empProfile = $user->empProfile;
                 @endphp
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Sales Person :
                     </div>
@@ -190,7 +193,7 @@
                         {{ Auth::user()->name }}
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Sales Office :
                     </div>
@@ -198,7 +201,7 @@
                     {{ isset($empProfile->office) ? $empProfile->office : '' }}
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Sales Email ID :
                     </div>
@@ -206,7 +209,7 @@
                         {{ Auth::user()->email }}
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Sales Contact No :
                     </div>
@@ -232,7 +235,7 @@
                         <input type="text"  class="form-control form-control-xs" value="{{ $callDetails->company_name }}" name="company_name" id="company" placeholder="Company Name">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         <label for="timeRange">Person :</label>
                     </div>
@@ -240,7 +243,7 @@
                         <input type="text" name="name"  placeholder="Person Name"  class="form-control form-control-xs" id="person" value="{{$callDetails->name}}">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Contact No :
                     </div>
@@ -248,7 +251,7 @@
                         <input type="text" name="phone"  class="form-control form-control-xs" minlength="5" maxlength="15" id="contact_number" value="{{$callDetails->phone}}" placeholder="Phone">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Email :
                     </div>
@@ -256,7 +259,7 @@
                         <input type="text" name="email" id="email"  class="form-control form-control-xs"  value="{{$callDetails->email}}" placeholder="Email">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Address :
                     </div>
@@ -267,7 +270,7 @@
             </div>
             <div class="col-sm-4" >
                 <div id="export-shipment">
-                    <div class="row">
+                    <div class="row mt-2">
                         <div class="col-sm-6">
                             Final Destination :
                         </div>
@@ -275,7 +278,7 @@
                             <input type="text" class="form-control form-control-xs" placeholder="Destination" name="final_destination" id="final_destination">
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mt-2">
                         <div class="col-sm-6">
                             Incoterm :
                         </div>
@@ -283,7 +286,7 @@
                             <input type="text" name="incoterm" id="incoterm" class="form-control form-control-xs" placeholder="Incoterm">
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mt-2">
                         <div class="col-sm-6">
                             Place of Delivery :
                         </div>
@@ -292,7 +295,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row" hidden id="local-shipment">
+                <div class="row mt-2" hidden id="local-shipment">
                     <div class="col-sm-6">
                         Place of Supply :
                     </div>
@@ -303,7 +306,7 @@
             </div>
         </div>
         <hr>
-        <div class="row">
+        <div class="row mt-2">
             <div class="col-sm-4">
                 Payment Details
             </div>
@@ -314,7 +317,7 @@
         <hr>
         <div class="row">
             <div class="col-sm-4">
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         System Code :
                     </div>
@@ -322,7 +325,7 @@
                         <input type="text" name="system_code" id="system_code" class="form-control form-control-xs" placeholder="System Code">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Payment Terms :
                     </div>
@@ -332,7 +335,7 @@
                 </div>
             </div>
             <div class="col-sm-4">
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Rep Name :
                     </div>
@@ -340,7 +343,7 @@
                         <input type="text" name="representative_name" id="representative_name" class="form-control form-control-xs" placeholder="Rep. Name">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Rep No :
                     </div>
@@ -350,7 +353,7 @@
                 </div>
             </div>
             <div class="col-sm-4">
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         CB Name :
                     </div>
@@ -358,7 +361,7 @@
                         <input type="text" name="cb_name" id="cb_name" class="form-control form-control-xs" placeholder="CB Name">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         CB No :
                     </div>
@@ -368,7 +371,7 @@
                 </div>
             </div>
             <div class="col-sm-4"  id="advance-amount-div" hidden>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Advance Amount :
                     </div>
@@ -381,7 +384,7 @@
         </div>
         <div class="row mt-2">
             <div class="col-sm-12">
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-2">
                         Remarks :
                     </div>
@@ -440,41 +443,41 @@
         </div>
         <br>
         <div class="row">
-            <div class="col-sm-1">
+            <div class="col-lg-1 col-md-2 col-sm-12">
                 <input type="radio" id="showVehicles" name="contentType">
                 <label for="showVehicles">Add Vehicles</label>
             </div>
-            <div class="col-sm-1">
-                <input type="radio" id="showAccessories" name="contentType">
+            <div class="col-lg-1 col-md-3 col-sm-12">
+            <input type="radio" id="showAccessories" name="contentType">
                 <label for="showAccessories">Add Accessories</label>
             </div>
-            <div class="col-sm-1">
-                <input type="radio" id="showSpareParts" name="contentType">
+            <div class="col-lg-1 col-md-3 col-sm-12">
+            <input type="radio" id="showSpareParts" name="contentType">
                 <label for="showSpareParts">Add Spare Parts</label>
             </div>
-            <div class="col-sm-1">
-                <input type="radio" id="showKits" name="contentType">
+            <div class="col-lg-1 col-md-2 col-sm-12">
+            <input type="radio" id="showKits" name="contentType">
                 <label for="showKits">Add Kits</label>
             </div>
-            <div class="col-sm-1">
-                <input type="radio" id="showShipping" name="contentType">
+            <div class="col-lg-1 col-md-2 col-sm-12">
+            <input type="radio" id="showShipping" name="contentType">
                 <label for="showShipping">Add Shipping</label>
             </div>
-            <div class="col-sm-2">
+            <div class="col-lg-2 col-md-3 col-sm-12">
                 <input type="radio" id="showShippingDocuments" name="contentType">
                 <label for="showShippingDocuments">Add Shipping Documents</label>
             </div>
-            <div class="col-sm-1">
-                <input type="radio" id="showCertificates" name="contentType">
+            <div class="col-lg-1 col-md-2 col-sm-12">
+            <input type="radio" id="showCertificates" name="contentType">
                 <label for="showCertificates"> Certificate</label>
             </div>
-            <div class="col-sm-1">
-                <input type="radio" id="showOthers" name="contentType">
+            <div class="col-lg-1 col-md-2 col-sm-12">
+            <input type="radio" id="showOthers" name="contentType">
                 <label for="showOthers">Add Other</label>
             </div>
         </div>
         <div id="vehiclesContent" class="contentveh">
-        <div class="card">
+            <div class="card">
             <div class="card-header">
                 <h4 >Search Available Vehicles</h4>
                 <div class="row justify-content-end">
@@ -483,10 +486,8 @@
                     </div>
                 </div>
                 <div class="row">
-
-                    {{--                <div class="col-lg-12 col-md-6 d-flex align-items-end">--}}
                     <div class="col-lg-1 col-md-6 col-sm-12">
-                        <label for="brand"> Brand</label>
+                        <label class="form-label"> Brand</label>
                         <select class="form-control col" id="brand" name="brand" style="width: 100%">
                             <option value="">Select Brand</option>
                             @foreach($brands as $brand)
@@ -497,12 +498,9 @@
                     <div class="col-lg-1 col-md-6" style="margin-top: 26px;">
                         <a id="addnewBrandButton" data-toggle="popover" data-trigger="hover" title="Create New Brand" data-placement="top" style="float: right;"
                            class="btn btn-info modal-button" data-modal-id="createNewBrand"><i class="fa fa-plus" aria-hidden="true"></i> Add Brand</a>
-{{--                        <a id="addnewBrandButton" data-bs-toggle="modal" data-bs-target="#createNewBrand"--}}
-{{--                           data-bs-trigger="modal" data-modal-id="createNewBrand title="Create New Brand" data-placement="top"--}}
-{{--                           class="btn btn-info modal-button" ><i class="fa fa-plus" aria-hidden="true"></i> Add Brand</a>--}}
                     </div>
                     <div class="col-lg-2 col-md-6 col-sm-12">
-                        <label for="model_line"> Model Line</label>
+                        <label class="form-label"> Model Line</label>
                         <select class="form-control col" id="model_line" style="width: 100%" name="model_line" disabled >
                             <option value="">Select Model Line</option>
                         </select>
@@ -513,34 +511,27 @@
 
                     </div>
                     <div class="col-lg-2 col-md-6">
-                        <label for="variant"> Variant</label>
+                        <label class="form-label"> Variant</label>
                         <select class="form-control col" id="variant" style="width: 100%" name="variant" disabled>
                             <option value="">Select Variant</option>
                         </select>
                     </div>
                     <div class="col-lg-2 col-md-6">
-                        <label for="interior_color">Interior Color</label>
+                        <label class="form-label">Interior Color</label>
                         <select class="form-control col" id="interior_color" style="width: 100%" name="interior_color" disabled>
                             <option value="">Select Interior Color</option>
                         </select>
                     </div>
                     <div class="col-lg-2 col-md-6">
-                        <label for="exterior_color">Exterior Color</label>
+                        <label class="form-label">Exterior Color</label>
                         <select class="form-control col" id="exterior_color" style="width: 100%" name="exterior_color" disabled>
                             <option value="">Select Exterior Color</option>
                         </select>
                     </div>
                     <div class="col-lg-1 col-md-6" style="margin-top: 26px;">
-{{--                        <div class="col-lg-1 col-md-2 col-sm-12">--}}
                         <button type="button" class="btn btn-primary" id="search-button">Search</button>
-
-{{--                        </div>--}}
-{{--                        <div class="col-lg-1 col-md-2 col-sm-12">--}}
-
-{{--                        </div>--}}
                     </div>
                 </div>
-
             </div>
             <div class="card-body">
                 <div class="row">
@@ -573,211 +564,210 @@
         </div>
         </div>
         <div id="accessoriesContent" class="contentveh">
-            <hr>
-            <div class="row">
-                <h4 class="col-lg-12 col-md-12">Search Available Accessories</h4>
-                <div class="col-lg-12 col-md-6 d-flex align-items-end">
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Accessory Name:</label>
-                        <select class="form-control col" id="accessories_addon" name="accessories_addon">
-                            <option value="">Select Accessory Name</option>
-                            @foreach($assessoriesDesc as $accessory)
-                            <option value="{{ $accessory->id }}">{{ $accessory->Addon->name ?? '' }}@if($accessory->description!='') - {{$accessory->description}}@endif</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Brand:</label>
-                        <select class="form-control col" id="accessories_brand" name="accessories_brand">
-                            <option value="">Select Brand</option>
-                            <!-- <option value="allbrands">ALL BRANDS</option> -->
-                            @foreach($accessoriesBrands as $brand)
-                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="model_line">Select Model Line:</label>
-                        <select class="form-control col" id="accessories_model_line" name="accessories_model_line" disabled>
-                            <option value="">Select Model Line</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
-                        <div class="col">
-                            <button type="button" class="btn btn-primary" id="accessories-search-button">Search</button>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Search Available Accessories</h4>
+                    <div class="row">
+                            <div class="col-lg-3 col-md-6" style="margin-right: 10px;">
+                                <label for="brand"> Accessory Name</label>
+                                <select class="form-select col" id="accessories_addon" name="accessories_addon" style="width: 100%">
+                                    <option value="">Select Accessory Name</option>
+                                    @foreach($assessoriesDesc as $accessory)
+                                        <option value="{{ $accessory->id }}">{{ $accessory->Addon->name ?? '' }}@if($accessory->description!='') - {{$accessory->description}}@endif</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6" style="margin-right: 10px;">
+                                <label for="brand"> Brand</label>
+                                <select class="form-select col" id="accessories_brand" name="accessories_brand" style="width: 100%">
+                                    <option value="">Select Brand</option>
+                                    <!-- <option value="allbrands">ALL BRANDS</option> -->
+                                    @foreach($accessoriesBrands as $brand)
+                                        <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6" style="margin-right: 10px;">
+                                <label for="model_line"> Model Line</label>
+                                <select class="form-select col" id="accessories_model_line" style="width: 100%" name="accessories_model_line" disabled>
+                                    <option value="">Select Model Line</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-1 col-md-6" style="margin-top: 26px;" >
+                                <button type="button" class="btn btn-primary" id="accessories-search-button">Search</button>
+                            </div>
+                            <div class="col-lg-3 col-md-6" style="margin-top: 26px;">
+                                <button type="button" class="btn btn-outline-warning" data-table="accessories-table" id="directadding-button">Directly Adding Into Quotation</button>
+                            </div>
                         </div>
-                        <div class="col" >
-                            <button type="button" class="btn btn-outline-warning" data-table="accessories-table" id="directadding-button">Directly Adding Into Quotation</button>
-                        </div>
-                    </div>
                 </div>
-            </div>
-            <br>
-            <br>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="table-responsive">
-                        <table id="dtBasicExample5" class="table table-striped table-editable table-edits table">
-                            <thead class="bg-soft-secondary">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Accessory Code</th>
-                                    <th>Accessory Name</th>
-                                    <th>Brand/Model Line</th>
-                                    <th>Selling Price(AED)</th>
-                                    <th>Additional Remarks</th>
-                                    <th>Fixing Charge</th>
-                                    <!-- <th>Least Purchase Price(AED)</th> -->
-                                    <th style="width:30px;">Add Into Quotation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table id="dtBasicExample5" class="table table-striped table-editable table-edits table">
+                                    <thead class="bg-soft-secondary">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Accessory Code</th>
+                                        <th>Accessory Name</th>
+                                        <th>Brand/Model Line</th>
+                                        <th>Selling Price(AED)</th>
+                                        <th>Additional Remarks</th>
+                                        <th>Fixing Charge</th>
+                                        <!-- <th>Least Purchase Price(AED)</th> -->
+                                        <th style="width:30px;">Add Into Quotation</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div id="sparePartsContent" class="contentveh">
-            <hr>
-            <div class="row">
-                <h4 class="col-lg-12 col-md-12">Search Available Spare Parts</h4>
-                <div class="col-lg-12 col-md-6 d-flex align-items-end">
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Spare Part Name:</label>
-                        <select class="form-control col" id="spare_parts_addon" name="spare_parts_addon">
-                            <option value="">Select Spare Part Name</option>
-                            @foreach($sparePartsDesc as $spareParts)
-                            <option value="{{ $spareParts->id }}">{{ $spareParts->Addon->name ?? '' }}@if($spareParts->description!='') - {{$spareParts->description}}@endif</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Brand:</label>
-                        <select class="form-control col" id="spare_parts_brand" name="spare_parts_brand">
-                            <option value="">Select Brand</option>
-                            @foreach($sparePartsBrands as $brand)
-                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="model_line">Select Model Line:</label>
-                        <select class="form-control col" id="spare_parts_model_line" name="spare_parts_model_line" disabled>
-                            <option value="">Select Model Line</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="model_description">Select Model Description:</label>
-                        <select class="form-control col" id="spare_parts_model_description" name="spare_parts_model_description" disabled>
-                            <option value="">Select Model Description</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
-                        <div class="col">
-                            <button type="button" class="btn btn-primary" id="spare_parts-search-button">Search</button>
+           <div class="card">
+               <div class="card-header">
+                   <h4>Search Available Spare Parts</h4>
+                   <div class="row">
+                       <div class="col-lg-2 col-md-6">
+                           <label for="brand"> Spare Part Name</label>
+                           <select class="form-control full-width" id="spare_parts_addon" name="spare_parts_addon" style="width: 100%">
+                               <option value="">Select Spare Part Name</option>
+                               @foreach($sparePartsDesc as $spareParts)
+                                   <option value="{{ $spareParts->id }}">{{ $spareParts->Addon->name ?? '' }}@if($spareParts->description!='') - {{$spareParts->description}}@endif</option>
+                               @endforeach
+                           </select>
+                       </div>
+                       <div class="col-lg-2 col-md-6">
+                           <label for="brand"> Brand</label>
+                           <select class="form-select" id="spare_parts_brand" name="spare_parts_brand" style="width: 100%">
+                               <option value="">Select Brand</option>
+                               @foreach($sparePartsBrands as $brand)
+                                   <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                               @endforeach
+                           </select>
+                       </div>
+                       <div class="col-lg-2 col-md-6">
+                           <label for="model_line"> Model Line</label>
+                           <select class="form-select" id="spare_parts_model_line" name="spare_parts_model_line" disabled style="width: 100%">
+                               <option value="">Select Model Line</option>
+                           </select>
+                       </div>
+                       <div class="col-lg-2 col-md-6">
+                           <label for="model_description"> Model Description</label>
+                           <select class="form-select" id="spare_parts_model_description" name="spare_parts_model_description" disabled style="width: 100%">
+                               <option value="">Select Model Description</option>
+                           </select>
+                       </div>
+                       <div class="col-lg-1 col-md-6" style="margin-top: 26px;">
+                           <div class="col">
+                               <button type="button" class="btn btn-primary" id="spare_parts-search-button">Search</button>
+                           </div>
+                       </div>
+                       <div class="col-lg-3 col-md-6" style="margin-top: 26px;">
+                           <button type="button" class="btn btn-outline-warning" data-table="spare-part-table" id="directadding-button">Directly Adding Into Quotation</button>
                         </div>
-                        <div class="col" >
-                            <button type="button" class="btn btn-outline-warning" data-table="spare-part-table" id="directadding-button">Directly Adding Into Quotation</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <br>
-            <br>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="table-responsive">
-                        <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
-                            <thead class="bg-soft-secondary">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Spare Part Code</th>
-                                    <th>Spare Part Name</th>
-                                    <th>Brand/Model Line/Model Description</th>
-                                    <!-- <th>Model Line/Model Description/Model Year</th> -->
-                                    <th>Selling Price(AED)</th>
-                                    <th>Part Numbers</th>
-                                    <th>Additional Remarks</th>
-                                    <th>Fixing Charge</th>
-                                    <!-- <th>Least Purchase Price(AED)</th> -->
-                                    <th style="width:30px;">Add Into Quotation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+                   </div>
+               </div>
+               <div class="card-body">
+                   <div class="row">
+                       <div class="col-lg-12">
+                           <div class="table-responsive">
+                               <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
+                                   <thead class="bg-soft-secondary">
+                                   <tr>
+                                       <th>ID</th>
+                                       <th>Spare Part Code</th>
+                                       <th>Spare Part Name</th>
+                                       <th>Brand/Model Line/Model Description</th>
+                                       <!-- <th>Model Line/Model Description/Model Year</th> -->
+                                       <th>Selling Price(AED)</th>
+                                       <th>Part Numbers</th>
+                                       <th>Additional Remarks</th>
+                                       <th>Fixing Charge</th>
+                                       <!-- <th>Least Purchase Price(AED)</th> -->
+                                       <th style="width:30px;">Add Into Quotation</th>
+                                   </tr>
+                                   </thead>
+                                   <tbody>
+                                   </tbody>
+                               </table>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
         </div>
         <div id="kitsContent" class="contentveh">
-            <hr>
-            <div class="row">
-                <h4 class="col-lg-2 col-md-6">Search Available Kits</h4>
-                <div class="col-lg-12 col-md-6 d-flex align-items-end">
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Kit Name:</label>
-                        <select class="form-control col" id="kit_addon" name="kit_addon">
-                            <option value="">Select Kit Name</option>
-                            @foreach($kitsDesc as $kit)
-                            <option value="{{ $kit->id }}">{{ $kit->Addon->name ?? '' }}@if($kit->description!='') - {{$kit->description}}@endif</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Brand:</label>
-                        <select class="form-control col" id="kit_brand" name="kit_brand">
-                            <option value="">Select Brand</option>
-                            @foreach($kitsBrands as $brand)
-                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="model_line">Select Model Line:</label>
-                        <select class="form-control col" id="kit_model_line" name="kit_model_line" disabled>
-                            <option value="">Select Model Line</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="model_description">Select Model Description:</label>
-                        <select class="form-control col" id="kits_model_description" name="kits_model_description" disabled>
-                            <option value="">Select Model Description</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
-                        <div class="col">
-                            <button type="button" class="btn btn-primary" id="kit-search-button">Search</button>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Search Available Kits</h4>
+                    <div class="row">
+                            <div class="col-lg-2 col-md-6">
+                                <label for="brand"> Kit Name</label>
+                                <select class="form-control col" id="kit_addon" name="kit_addon" style="width: 100%">
+                                    <option value="">Select Kit Name</option>
+                                    @foreach($kitsDesc as $kit)
+                                        <option value="{{ $kit->id }}">{{ $kit->Addon->name ?? '' }}@if($kit->description!='') - {{$kit->description}}@endif</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6">
+                                <label for="brand"> Brand</label>
+                                <select class="form-control col" id="kit_brand" name="kit_brand" style="width: 100%">
+                                    <option value="">Select Brand</option>
+                                    @foreach($kitsBrands as $brand)
+                                        <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6">
+                                <label for="model_line"> Model Line</label>
+                                <select class="form-control col" id="kit_model_line" name="kit_model_line" disabled style="width: 100%">
+                                    <option value="">Select Model Line</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6">
+                                <label for="model_description"> Model Description</label>
+                                <select class="form-control col" id="kits_model_description" name="kits_model_description" disabled style="width: 100%">
+                                    <option value="">Select Model Description</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-1 col-md-6" style="margin-top: 26px">
+                                <button type="button" class="btn btn-primary" id="kit-search-button">Search</button>
+                            </div>
+                            <div class="col-lg-3 col-md-6" style="margin-top: 26px">
+                                <button type="button" class="btn btn-outline-warning" data-table="kit-table" id="directadding-button">Directly Adding Into Quotation</button>
+                            </div>
                         </div>
-                        <div class="col">
-                            <button type="button" class="btn btn-outline-warning" data-table="kit-table" id="directadding-button">Directly Adding Into Quotation</button>
-                        </div>
-                    </div>
                 </div>
-            </div>
-            <br>
-            <br>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="table-responsive">
-                        <table id="dtBasicExample4" class="table table-striped table-editable table-edits table">
-                            <thead class="bg-soft-secondary">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Kit Code</th>
-                                    <th>Kit Name</th>
-                                    <th>Brand/Model Line/Model Description</th>
-                                    <!-- <th>Model Line/Model Description</th> -->
-                                    <th>Items/ Quantity</th>
-                                    <!-- <th>Least Purchase Price(AED)</th> -->
-                                    <th>Selling Price(AED)</th>
-                                    <th style="width:30px;">Add Into Quotation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table id="dtBasicExample4" class="table table-striped table-editable table-edits table">
+                                    <thead class="bg-soft-secondary">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Kit Code</th>
+                                        <th>Kit Name</th>
+                                        <th>Brand/Model Line/Model Description</th>
+                                        <!-- <th>Model Line/Model Description</th> -->
+                                        <th>Items/ Quantity</th>
+                                        <!-- <th>Least Purchase Price(AED)</th> -->
+                                        <th>Selling Price(AED)</th>
+                                        <th style="width:30px;">Add Into Quotation</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1170,7 +1160,6 @@
                 });
             }
         });
-
         $('#createModelLineId').on('click', function()
         {
             // create new addon and list new addon in addon list
