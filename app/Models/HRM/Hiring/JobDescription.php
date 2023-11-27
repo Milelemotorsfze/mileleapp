@@ -5,6 +5,10 @@ namespace App\Models\HRM\Hiring;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Masters\MasterOfficeLocation;
+use App\Models\Masters\MasterJobPosition;
+use App\Models\Masters\MasterDepartment;
+use App\Models\User;
 
 class JobDescription extends Model
 {
@@ -33,4 +37,16 @@ class JobDescription extends Model
         'updated_by',
         'deleted_by',
     ];
+    public function jobTitle() {
+        return $this->hasOne(MasterJobPosition::class,'id','job_title');
+    }
+    public function department() {
+        return $this->hasOne(MasterDepartment::class,'id','department_id');
+    }
+    public function location() {
+        return $this->hasOne(MasterOfficeLocation::class,'id','location_id');
+    }
+    public function reportingTo() {
+        return $this->hasOne(User::class,'id','reporting_to');
+    }
 }

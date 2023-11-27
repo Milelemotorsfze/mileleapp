@@ -225,11 +225,11 @@ class EmployeeHiringQuestionnaireController extends Controller
                     $update->next_career_path_id = $request->next_career_path_id ;
                     $update->updated_by = $authId;
                     $update->update();
-                    $oldLanguages = QuestionnaireLanguagePreference::where('questionnaire_id',$id)->get();
+                    $oldLanguages = QuestionnaireLanguagePreference::where('questionnaire_id',$update->id)->get();
                     foreach($oldLanguages as $oldLanguage) {
                         $oldLanguage->delete();
                     }
-                    $createLanguage['questionnaire_id'] = $id;
+                    $createLanguage['questionnaire_id'] = $update->id;
                     if(count($request->language_id) > 0) {
                         foreach($request->language_id as $language_id) {
                             $createLanguage['language_id'] = $language_id;

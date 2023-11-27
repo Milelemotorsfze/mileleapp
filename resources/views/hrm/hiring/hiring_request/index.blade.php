@@ -86,12 +86,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -110,12 +111,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($pendings as $key => $pending)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
+							<td>{{ $pending->uuid ?? ''}}</td>
 							<td>{{ $pending->request_date ?? '' }}</td>
 							<td>{{ $pending->department_name ?? '' }}</td>
 							<td>{{ $pending->department_location ?? '' }}</td>
 							<td>{{ $pending->requested_by_name ?? '' }}</td>
 							<td>{{ $pending->requested_job_name ?? '' }}</td>
-							<td>{{ $pending->reporting_to_name ?? '' }}</td>							
+							<!-- <td>{{ $pending->reporting_to_name ?? '' }}</td>							 -->
 							<td>{{ $pending->experience_level_name ?? ''}}</td>
 							<td>{{ $pending->salary_range_start_in_aed ?? ''}} - {{$pending->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $pending->work_time_start ?? ''}} - {{$pending->work_time_end ?? ''}}</td>
@@ -350,12 +352,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -374,12 +377,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($approved as $key => $approvedOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
+							<td>{{ $approvedOne->uuid ?? ''}}</td>
 							<td>{{ $approvedOne->request_date ?? '' }}</td>
 							<td>{{ $approvedOne->department_name ?? '' }}</td>
 							<td>{{ $approvedOne->department_location ?? '' }}</td>
 							<td>{{ $approvedOne->requested_by_name ?? '' }}</td>
 							<td>{{ $approvedOne->requested_job_name ?? '' }}</td>
-							<td>{{ $approvedOne->reporting_to_name ?? '' }}</td>							
+							<!-- <td>{{ $approvedOne->reporting_to_name ?? '' }}</td>							 -->
 							<td>{{ $approvedOne->experience_level_name ?? ''}}</td>
 							<td>{{ $approvedOne->salary_range_start_in_aed ?? ''}} - {{$approvedOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $approvedOne->work_time_start ?? ''}} - {{$approvedOne->work_time_end ?? ''}}</td>
@@ -406,7 +410,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 										<i class="fa fa-list" aria-hidden="true"></i> Edit Questionnaire
 										</a>
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Job Description" class="btn btn-sm btn-secondary" href="{{route('employee-hiring-job-description.create-or-edit',$approvedOne->id)}}">
-										<i class="fa fa-address-card" aria-hidden="true"></i> Create Job Description
+										<i class="fa fa-address-card" aria-hidden="true"></i> Add Job Description
 										</a>
 										@else
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
@@ -568,12 +572,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -592,12 +597,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($closed as $key => $closedOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
+							<td>{{ $closedOne->uuid ?? ''}}</td>
 							<td>{{ $closedOne->request_date ?? '' }}</td>
 							<td>{{ $closedOne->department_name ?? '' }}</td>
 							<td>{{ $closedOne->department_location ?? '' }}</td>
 							<td>{{ $closedOne->requested_by_name ?? '' }}</td>
 							<td>{{ $closedOne->requested_job_name ?? '' }}</td>
-							<td>{{ $closedOne->reporting_to_name ?? '' }}</td>							
+							<!-- <td>{{ $closedOne->reporting_to_name ?? '' }}</td>							 -->
 							<td>{{ $closedOne->experience_level_name ?? ''}}</td>
 							<td>{{ $closedOne->salary_range_start_in_aed ?? ''}} - {{$closedOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $closedOne->work_time_start ?? ''}} - {{$closedOne->work_time_end ?? ''}}</td>
@@ -629,12 +635,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -653,12 +660,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($onHold as $key => $onHoldOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
+						<td>{{$onHoldOne->uuid ?? ''}}</td>
 							<td>{{ $onHoldOne->request_date ?? '' }}</td>
 							<td>{{ $onHoldOne->department_name ?? '' }}</td>
 							<td>{{ $onHoldOne->department_location ?? '' }}</td>
 							<td>{{ $onHoldOne->requested_by_name ?? '' }}</td>
 							<td>{{ $onHoldOne->requested_job_name ?? '' }}</td>
-							<td>{{ $onHoldOne->reporting_to_name ?? '' }}</td>							
+							<!-- <td>{{ $onHoldOne->reporting_to_name ?? '' }}</td>							 -->
 							<td>{{ $onHoldOne->experience_level_name ?? ''}}</td>
 							<td>{{ $onHoldOne->salary_range_start_in_aed ?? ''}} - {{$onHoldOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $onHoldOne->work_time_start ?? ''}} - {{$onHoldOne->work_time_end ?? ''}}</td>
@@ -690,12 +698,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -714,12 +723,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($cancelled as $key => $cancelledOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
+						<td>{{ $cancelledOne->uuid ?? ''}}</td>
 							<td>{{ $cancelledOne->request_date ?? '' }}</td>
 							<td>{{ $cancelledOne->department_name ?? '' }}</td>
 							<td>{{ $cancelledOne->department_location ?? '' }}</td>
 							<td>{{ $cancelledOne->requested_by_name ?? '' }}</td>
 							<td>{{ $cancelledOne->requested_job_name ?? '' }}</td>
-							<td>{{ $cancelledOne->reporting_to_name ?? '' }}</td>							
+							<!-- <td>{{ $cancelledOne->reporting_to_name ?? '' }}</td>							 -->
 							<td>{{ $cancelledOne->experience_level_name ?? ''}}</td>
 							<td>{{ $cancelledOne->salary_range_start_in_aed ?? ''}} - {{$cancelledOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $cancelledOne->work_time_start ?? ''}} - {{$cancelledOne->work_time_end ?? ''}}</td>
@@ -751,12 +761,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -775,12 +786,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($rejected as $key => $rejectedOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
+						<td>{{ $rejectedOne->uuid ?? ''}}</td>
 							<td>{{ $rejectedOne->request_date ?? '' }}</td>
 							<td>{{ $rejectedOne->department_name ?? '' }}</td>
 							<td>{{ $rejectedOne->department_location ?? '' }}</td>
 							<td>{{ $rejectedOne->requested_by_name ?? '' }}</td>
 							<td>{{ $rejectedOne->requested_job_name ?? '' }}</td>
-							<td>{{ $rejectedOne->reporting_to_name ?? '' }}</td>							
+							<!-- <td>{{ $rejectedOne->reporting_to_name ?? '' }}</td>							 -->
 							<td>{{ $rejectedOne->experience_level_name ?? ''}}</td>
 							<td>{{ $rejectedOne->salary_range_start_in_aed ?? ''}} - {{$rejectedOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $rejectedOne->work_time_start ?? ''}} - {{$rejectedOne->work_time_end ?? ''}}</td>
@@ -812,12 +824,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -836,12 +849,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($deleted as $key => $deletedOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
+						<td>{{ $deletedOne->uuid ?? ''}}</td>
 							<td>{{ $deletedOne->request_date ?? '' }}</td>
 							<td>{{ $deletedOne->department_name ?? '' }}</td>
 							<td>{{ $deletedOne->department_location ?? '' }}</td>
 							<td>{{ $deletedOne->requested_by_name ?? '' }}</td>
 							<td>{{ $deletedOne->requested_job_name ?? '' }}</td>
-							<td>{{ $deletedOne->reporting_to_name ?? '' }}</td>							
+							<!-- <td>{{ $deletedOne->reporting_to_name ?? '' }}</td>							 -->
 							<td>{{ $deletedOne->experience_level_name ?? ''}}</td>
 							<td>{{ $deletedOne->salary_range_start_in_aed ?? ''}} - {{$deletedOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $deletedOne->work_time_start ?? ''}} - {{$deletedOne->work_time_end ?? ''}}</td>

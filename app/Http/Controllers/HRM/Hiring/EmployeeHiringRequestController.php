@@ -21,6 +21,7 @@ use DB;
 use Exception;
 use Carbon\Carbon;
 use App\Http\Controllers\UserActivityController;
+// use Haruncpi\LaravelIdGenerator\IdGenerator;
 
 class EmployeeHiringRequestController extends Controller
 {
@@ -72,6 +73,19 @@ class EmployeeHiringRequestController extends Controller
             'requestedByUsers','reportingToUsers','replacementForEmployees'));
     }
     public function storeOrUpdate(Request $request, $id) { 
+        // public function store(Request $request){
+// $prefix = 'A';
+//             $uuid = IdGenerator::generate(['table' => 'employee_hiring_requests', 'length' => 7, 'prefix' => $prefix]);
+//         dd($uuid);
+        //     $todo = new Todo();
+        //     $todo->id = $id;
+        //     $todo->title = $request->get('title');
+        //     $todo->save();
+        
+        // }
+        // $uuid = IdGenerator::generate(['table' => 'employee_hiring_requests', 'length' => 10, 'prefix' =>'INV-']);
+        // dd($uuid);
+//output: INV-000001
         $validator = Validator::make($request->all(), [
             'request_date' => 'required',
             'department_id' => 'required',

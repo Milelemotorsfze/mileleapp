@@ -14,11 +14,13 @@ use App\Models\HRM\Approvals\ApprovalByPositions;
 use App\Models\HRM\Approvals\DepartmentHeadApprovals;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\HRM\Hiring\InterviewSummaryReport;
+use Haruncpi\LaravelIdGenerator\IdGenerator;
 class EmployeeHiringRequest extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = "employee_hiring_requests";
     protected $fillable = [
+        'uuid',
         'request_date',
         'department_id',
         'location_id',
@@ -71,6 +73,13 @@ class EmployeeHiringRequest extends Model
         'updated_by',
         'deleted_by'
     ];
+    public static function boot()
+    {
+        parent::boot();
+        self::creating(function ($model) {
+            $model->uuid = IdGenerator::generate(['table' => 'employee_hiring_requests','field'=>'uuid', 'length' => 10, 'prefix' =>'EHR-']);
+        });
+    }
     protected $appends = [
         'department_name',
         'department_location',
@@ -323,5 +332,8 @@ class EmployeeHiringRequest extends Model
     }
     public function selectedCandidates() {
         return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where('candidate_selected','yes')->where('seleced_status','selected');
+    }
+    public function location() {
+        return $this->hasOne(MasterOfficeLocation::class,'id','location_id');
     }
 }
