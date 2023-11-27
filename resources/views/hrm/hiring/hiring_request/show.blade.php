@@ -4,8 +4,8 @@
     text-transform: capitalize;
   }
   
-element.style {
-}
+/* element.style {
+} */
 .nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
     width: 99%;
     border: 1px solid #4ba6ef !important;
