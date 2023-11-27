@@ -229,11 +229,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
 
                 <label for="industry_experience_id" class="form-label"><span class="error">* </span>{{ __('Any specific industry experience') }}</label>
-                <select name="industry_experience_id" id="industry_experience_id" class="form-control widthinput" multiple="true" autofocus>
+                <select name="industry_experience_id" id="requested_industry_experience" class="form-control widthinput" multiple="true" autofocus>
                     @foreach($masterSpecificIndustryExperiences as $masterSpecificIndustryExperience)
-                    <option value="{{$masterSpecificIndustryExperience->id}}" {{ $data && $data->questionnaire && $data->questionnaire->industry_experience_id && $masterSpecificIndustryExperience->id == $data->questionnaire->industry_experience_id ? 'selected' : '' }}>{{$masterSpecificIndustryExperience->name}}</option>
+                    <option value="{{$masterSpecificIndustryExperience->id}}" {{ $data && $data->questionnaire && $data->questionnaire->specificIndustryExperience->id && $masterSpecificIndustryExperience->id == $data->questionnaire->specificIndustryExperience->id ? 'selected' : '' }}>{{$masterSpecificIndustryExperience->name}}</option>
                     @endforeach
-
                 </select>
             </div>
 
@@ -431,7 +430,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <!-- Right Side -->
                     <div class="col-lg-4 col-md-12 col-sm-12 commissionInputContainer" style="display: none">
                         <div class="row">
-                            <div class="col-lg-6 col-md-12 col-sm-12">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
                                 <!-- Dropdown Container -->
                                 <div class="chooseAmountpercentageDropDownInputContainer" style="display: none;">
                                     <label for="commission_type" class="form-label"><span class="error">* </span>{{ __('Choose Amount or Percentage') }}</label>
@@ -445,15 +444,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             </div>
 
                             <!-- Amount Input Container -->
-                            <div class="col-lg-6 col-md-12 col-sm-12 amountDropDownInputContainer" id="amountDropDownInputContainer" style="display: none">
+                            <div class="col-lg-6 col-md-6 col-sm-12 amountDropDownInputContainer" id="amountDropDownInputContainer" style="display: none">
                                 <div class="amountInputContainer" id="amountInputContainer">
                                     <label for="commission_amount" class="form-label"><span class="error">* </span>{{ __('Enter Amount (in AED):') }}</label>
-                                    <input type="number" placeholder="amount" name="commission_amount" class="form-control" id="commission_amount" value="{{$data->questionnaire->commission_amount ?? ''}}">
+                                    <div class="input-group">
+                                    <input type="number" name="commission_amount" id="commission_amount" class="form-control widthinput" placeholder="amount" aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->questionnaire->commission_amount ?? ''}}">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+                                </div>
                                 </div>
                             </div>
 
                             <!-- Percentage Input Container -->
-                            <div class="col-lg-6 col-md-12 col-sm-12 percentageDropDownInputContainer" id="percentageDropDownInputContainer" style="display: none">
+                            <div class="col-lg-6 col-md-6 col-sm-12 percentageDropDownInputContainer" id="percentageDropDownInputContainer" style="display: none">
                                 <div class="percentageInputContainer" id="percentageInputContainer">
                                     <label for="commission_percentage" class="form-label"><span class="error">* </span>{{ __('Enter percentage:') }}</label>
                                     <input type="number" placeholder="percentage" name="commission_percentage" class="form-control" id="commission_percentage" value="{{$data->questionnaire->commission_percentage ?? ''}}">
@@ -781,8 +785,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 </div>
 
 @include('hrm.hiring.questionnaire.createIndustryExperience')
-@include('hrm.hiring.hiring_request.createJobPosition')
+<div class="overlay"></div>
 
+@include('hrm.hiring.hiring_request.createJobPosition')
 <div class="overlay"></div>
 
 @else
@@ -812,6 +817,12 @@ redirect()->route('home')->send();
             maximumSelectionLength: 1,
             placeholder: "Choose Designation Name",
         });
+        $('#designation_id').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder: "Choose Designation Name",
+        });
+        
         $('#reporting_structure').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -822,7 +833,7 @@ redirect()->route('home')->send();
             maximumSelectionLength: 1,
             placeholder: "Choose Work Location",
         });
-        $('#industry_experience_id').select2({
+        $('#requested_industry_experience').select2({
             allowClear: true,
             maximumSelectionLength: 1,
             placeholder: "Choose Industry Experience",
