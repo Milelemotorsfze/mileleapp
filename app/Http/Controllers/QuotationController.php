@@ -11,6 +11,7 @@ use App\Models\Brand;
 use App\Models\QuotationClient;
 use App\Models\QuotationDetail;
 use App\Models\QuotationItem;
+use App\Models\QuotationSubItem;
 use App\Models\Setting;
 use App\Models\Shipping;
 use App\Models\ShippingCertification;
@@ -61,9 +62,9 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
-        dd("test");
+//        dd($request->all());
         DB::beginTransaction();
-
+        $isVehicle = 0;
         $call = Calls::find($request->calls_id);
         $call->status = 'Quoted';
         $call->save();
@@ -110,6 +111,9 @@ class QuotationController extends Controller
         $quotationDetail->advance_amount = $request->advance_amount;
         $quotationDetail->save();
 
+        $quotationItemIds = [];
+        $quotationSubItemKeys = [];
+//        info($request->types);
         foreach ($request->prices as $key => $price) {
            $quotationItem = new QuotationItem();
            $quotationItem->unit_price = $price;
@@ -134,6 +138,18 @@ class QuotationController extends Controller
 
            }else if($request->types[$key] == 'Vehicle') {
                $item = Varaint::find($request->reference_ids[$key]);
+                //confirming it is a vehicle
+//               if($request->is_addon[$key] == 0) {
+
+                    $isVehicle = 1;
+                    $variant = Varaint::find($request->reference_ids[$key]);
+                    if($variant) {
+                        $vehicleModelLineId = $variant->master_model_lines->id ?? '';
+                        info("vehicle type");
+                        info($key);
+
+                    }
+//               }
 
            }else if($request->types[$key] == 'Other') {
 
@@ -141,6 +157,13 @@ class QuotationController extends Controller
 
            }else if($request->types[$key] == 'ModelLine') {
                $item = MasterModelLines::find($request->reference_ids[$key]);
+               //confirming it is a vehicle
+               if($request->is_addon[$key] == 0) {
+                   $isVehicle = 1;
+                   $vehicleModelLineId = $request->reference_ids[$key];
+                   info("vehicle - > model line");
+                   info($key);
+               }
 
            }else if($request->types[$key] == 'Accessory' || $request->types[$key] == 'SparePart' || $request->types[$key] == 'Kit') {
 
@@ -149,7 +172,55 @@ class QuotationController extends Controller
            }
             $quotationItem->reference()->associate($item);
             $quotationItem->save();
+//            info("is vehicle");
+//            info($isVehicle);
+//
+            if($isVehicle == 1){
+//                info($vehicleModelLineId);
+//                info($request->model_lines);
+                $arrayKeys = array_keys($request->model_lines, $vehicleModelLineId);
+                if (count($arrayKeys) > 0) {
+//                    info("same keys");
+//                    info($arrayKeys);
+                   array_push($quotationItemIds, $quotationItem->id);
+                    // At least one match...
+                    $quotationSubItemKeys[$quotationItem->id] = $arrayKeys;
+
+                }
+//               check this model line is existing in addons array, if yes get the array key;
+            }
+            $isVehicle = 0;
         }
+        foreach ($quotationItemIds as $itemId) {
+            $itemKeys = $quotationSubItemKeys[$itemId];
+            info("each set of array keys");
+            $referenceIds = [];
+            foreach ($itemKeys as $itemKey) {
+                if($request->types[$itemKey] == 'ModelLine' ) {
+                    if($request->is_addon[$key] == 1) {
+                        array_push($referenceIds,$request->reference_ids[$itemKey]);
+                    }
+                }else{
+                    array_push($referenceIds,$request->reference_ids[$itemKey]);
+                }
+            }
+//            if($request->types[$itemKey] == 'ModelLine') {
+                // addon added by directly add button
+                $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
+                    ->whereIn('reference_id', $referenceIds)
+                   ->get();
+                if($quotationItemRow->count > 0) {
+                    foreach ($quotationItemRow as $row) {
+                        $quotationSubItem = new QuotationSubItem();
+                        $quotationSubItem->quotation_item_parent_id = $itemId;
+                        $quotationSubItem->quotation_item_id = $row->id;
+                        $quotationSubItem->save();
+                    }
+                }
+
+        }
+        info($quotationItemIds);
+        info($quotationSubItemKeys);
         DB::commit();
 //        $quotationItem = QuotationItem::where('quotation_id', $quotation->id)->first();
 //        $quotation = Quotation::find(58);
