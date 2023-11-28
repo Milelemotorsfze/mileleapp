@@ -295,7 +295,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <label for="nationality" class="form-label"><span class="error">* </span>{{ __('Nationality') }}</label>
                             <select name="nationality" id="nationality" class="form-control widthinput" multiple="true" autofocus>
                                 @foreach($masterNationality as $Country)
-                                <option value="{{$Country->id}}" {{ $data && $data->questionnaire && $data->questionnaire->nationality && $Country->id == $data->questionnaire->nationality ? 'selected' : '' }}>{{$Country->name}}</option>
+                                <option value="{{$Country->id}}" {{ $data && $data->questionnaire && $data->questionnaire->nationality && $Country->id == $data->questionnaire->nationality ? 'selected' : '' }}>{{$Country->nationality}} ({{$Country->name}})</option>
                                 @endforeach
                             </select>
                         </div>
@@ -459,6 +459,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                 <div class="amountInputContainer" id="amountInputContainer">
                                     <label for="commission_amount" class="form-label"><span class="error">* </span>{{ __('Amount:') }}</label>
                                     <div class="input-group">
+                                    
                                         <input type="number" name="commission_amount" id="commission_amount" class="form-control widthinput" placeholder="amount" aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->questionnaire->commission_amount ?? ''}}">
                                         <div class="input-group-append">
                                             <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -1305,7 +1306,6 @@ redirect()->route('home')->send();
             console.log("Error placement function called");
             console.log("Element:", element);
 
-
             if (element.is(':radio') && element.closest('.radio-button-main-div').length > 0) {
                 error.addClass('radio-error');
                 error.insertAfter(element.closest('.radio-button-main-div').find('div.radio-div-container').last());
@@ -1323,7 +1323,7 @@ redirect()->route('home')->send();
             } else if (element.attr('name') === 'min_age' || element.attr('name') === 'max_age' ||
                 element.attr('name') === 'work_time_start' || element.attr('name') === 'work_time_end' ||
                 element.attr('name') === 'salary_range_start_in_aed' || element.attr('name') === 'salary_range_end_in_aed' ||
-                element.attr('name') === 'current_or_past_employer_size_start' || element.attr('name') === 'current_or_past_employer_size_end') {
+                element.attr('name') === 'current_or_past_employer_size_start' || element.attr('name') === 'current_or_past_employer_size_end' || element.attr('name') === 'commission_amount')  {
                 error.addClass('other-error');
                 error.insertAfter(element.closest('.input-group'));
             } else {
@@ -1331,6 +1331,8 @@ redirect()->route('home')->send();
                 error.insertAfter(element);
             }
         },
+
+
     });
 </script>
 

@@ -74,6 +74,9 @@
 		document.getElementById("newIndustryExperienceError").textContent=$msg;
 	    document.getElementById("new_industry_experience").classList.add("is-invalid");
 	    document.getElementById("newIndustryExperienceError").classList.add("paragraph-class");
+		
+		document.getElementById("newIndustryExperienceError").style.color = "red";
+
 	}
 	function removeNewIndustryExperienceError() {
 	    document.getElementById("newIndustryExperienceError").textContent="";
