@@ -118,8 +118,8 @@ class EmployeeHiringQuestionnaireController extends Controller
             return redirect()->back()->withInput()->withErrors($validator);
         }
         else {
-            // DB::beginTransaction();
-            // try {
+            DB::beginTransaction();
+            try {
                 // dd('let me know when reach here......');
                 $authId = Auth::id();
                 $input = $request->all();
@@ -283,13 +283,14 @@ class EmployeeHiringQuestionnaireController extends Controller
                     (new UserActivityController)->createActivity($createHistory->message);
                     $successMessage = "New Employee Hiring Questionnaire Created Successfully";
                 }
-                // DB::commit();
+                DB::commit();
                 return redirect()->route('employee-hiring-request.index')
                                     ->with('success','New Employee Hiring Request Questionnaire Created Successfully');
-            // } 
-            // catch (\Exception $e) {
-            //     DB::rollback();
-            // }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();               
+                dd($e);
+            }
         }
     }
     public function edit() {

@@ -63,6 +63,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			<a class="nav-link" data-bs-toggle="pill" href="#forth_round">Forth Round</a>
 		</li>
 		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#fifth_round">Fifth Round</a>
+		</li>
+		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#selected_candidates">Selected Candidates</a>
 		</li>
 		<li class="nav-item">

@@ -116,14 +116,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             </div>
 
             <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
-
-                <label for="designation_id" class="form-label"><span class="error">* </span>{{ __('Designation Name') }}</label>
-                <select name="designation_id" id="requested_job_title" class="form-control widthinput" multiple="true" autofocus>
-                    @foreach($masterDesignations as $masterDesignation)
-                    <option value="{{$masterDesignation->id}}" {{ $data && $data->questionnaire && $data->questionnaire->designation && $masterDesignation->id == $data->questionnaire->designation->id ? 'selected' : '' }}>{{$masterDesignation->name}}</option>
-                    @endforeach
-
-                </select>
+                <div class="dropdown-option-div">
+                    <label for="designation_id" class="form-label"><span class="error">* </span>{{ __('Designation Name') }}</label>
+                    <select name="designation_id" id="requested_job_title" class="form-control widthinput" multiple="true" autofocus>
+                        @foreach($masterDesignations as $masterDesignation)
+                        <option value="{{$masterDesignation->id}}" {{ $data && $data->questionnaire && $data->questionnaire->designation && $masterDesignation->id == $data->questionnaire->designation->id ? 'selected' : '' }}>{{$masterDesignation->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
             <div class="col-lg-4 col-md-6 col-sm-6">
                 <a id="createNewJobTitleButton" data-toggle="popover" data-trigger="hover" title="Create New Job Title" data-placement="top" style="margin-top:43px;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewJobPosition"><i class="fa fa-plus" aria-hidden="true"></i> Create New Job Title</a>
@@ -138,24 +138,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             </div>
 
             <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
+                <div class="dropdown-option-div">
+                    <label for="reporting_structure" class="form-label"><span class="error">* </span>{{ __('Reporting To') }}</label>
+                    <select name="reporting_structure" id="reporting_structure" class="form-control widthinput" multiple="true" autofocus>
+                        <option value="management" {{ $data && $data->questionnaire && $data->questionnaire->reporting_structure == 'management' ? 'selected' : '' }}>Management</option>
+                        <option value="team_lead" {{ $data && $data->questionnaire && $data->questionnaire->reporting_structure == 'team_lead' ? 'selected' : '' }}>Team Lead / Manager</option>
+                    </select>
 
-                <label for="reporting_structure" class="form-label"><span class="error">* </span>{{ __('Reporting To') }}</label>
-                <select name="reporting_structure" id="reporting_structure" class="form-control widthinput" multiple="true" autofocus>
-                    <option value="management" {{ $data && $data->questionnaire && $data->questionnaire->reporting_structure == 'management' ? 'selected' : '' }}>Management</option>
-
-                    <option value="team_lead" {{ $data && $data->questionnaire && $data->questionnaire->reporting_structure == 'team_lead' ? 'selected' : '' }}>Team Lead / Manager</option>
-                </select>
-
+                </div>
             </div>
 
             <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
-
-                <label for="location_id" class="form-label"><span class="error">* </span>{{ __('Work Location') }}</label>
-                <select name="location_id" id="location_id" class="form-control widthinput" multiple="true" autofocus>
-                    @foreach($masterOfficeLocations as $masterOfficeLocation)
-                    <option value="{{$masterOfficeLocation->id}}" {{ $data && $data->questionnaire && $data->questionnaire->workLocation && $masterOfficeLocation->id == $data->questionnaire->workLocation->id ? 'selected' : '' }}>{{$masterOfficeLocation->name}}</option>
-                    @endforeach
-                </select>
+                <div class="dropdown-option-div">
+                    <label for="location_id" class="form-label"><span class="error">* </span>{{ __('Work Location') }}</label>
+                    <select name="location_id" id="location_id" class="form-control widthinput" multiple="true" autofocus>
+                        @foreach($masterOfficeLocations as $masterOfficeLocation)
+                        <option value="{{$masterOfficeLocation->id}}" {{ $data && $data->questionnaire && $data->questionnaire->workLocation && $masterOfficeLocation->id == $data->questionnaire->workLocation->id ? 'selected' : '' }}>{{$masterOfficeLocation->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
             <div class=" col-lg-4 col-md-6 col-sm-6 ">
@@ -183,13 +184,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
             </div>
 
-            <div class=" col-lg-4 col-md-6 col-sm-8 ">
-
+            <div class="col-lg-4 col-md-8 col-sm-12">
                 <label for="work_time" class="form-label"><span class="error">* </span>{{ __('Working Hours:') }}</label>
-                <div class="input-group">
-                    <input type="time" placeholder="From" name="work_time_start" class="form-control" id="work_time_start" value="{{$data->questionnaire->work_time_start ?? ''}}">
-                    <span class="input-group-text">to</span>
-                    <input type="time" placeholder="Till" name="work_time_end" class="form-control" id="work_time_end" value="{{$data->questionnaire->work_time_end ?? ''}}">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-12">
+                        <div class="input-group">
+                            <input type="time" placeholder="From" name="work_time_start" class="form-control" id="work_time_start" value="{{$data->questionnaire->work_time_start ?? ''}}">
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-12">
+                        <div class="input-group">
+                            <input type="time" placeholder="Till" name="work_time_end" class="form-control" id="work_time_end" value="{{$data->questionnaire->work_time_end ?? ''}}">
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -227,13 +234,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <input type="text" placeholder="Company Experience" name="specific_company_experience" class="form-control" id="specific_company_experience" value="{{$data->questionnaire->specific_company_experience ?? ''}}">
             </div>
             <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
-
-                <label for="industry_experience_id" class="form-label"><span class="error">* </span>{{ __('Any specific industry experience') }}</label>
-                <select name="industry_experience_id" id="requested_industry_experience" class="form-control widthinput" multiple="true" autofocus>
-                    @foreach($masterSpecificIndustryExperiences as $masterSpecificIndustryExperience)
-                    <option value="{{$masterSpecificIndustryExperience->id}}" {{ $data && $data->questionnaire && $data->questionnaire->specificIndustryExperience->id && $masterSpecificIndustryExperience->id == $data->questionnaire->specificIndustryExperience->id ? 'selected' : '' }}>{{$masterSpecificIndustryExperience->name}}</option>
-                    @endforeach
-                </select>
+                <div class="dropdown-option-div">
+                    <label for="industry_experience_id" class="form-label"><span class="error">* </span>{{ __('Any specific industry experience') }}</label>
+                    <select name="industry_experience_id" id="requested_industry_experience" class="form-control widthinput" multiple="true" autofocus>
+                        @foreach($masterSpecificIndustryExperiences as $masterSpecificIndustryExperience)
+                        <option value="{{$masterSpecificIndustryExperience->id}}" {{ $data && $data->questionnaire && $data->questionnaire->specificIndustryExperience->id && $masterSpecificIndustryExperience->id == $data->questionnaire->specificIndustryExperience->id ? 'selected' : '' }}>{{$masterSpecificIndustryExperience->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
             <div class="col-lg-4 col-md-6 col-sm-6">
@@ -272,36 +280,37 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
-
-                        <label for="visa_type" class="form-label"><span class="error">* </span>{{ __('Visa Type') }}</label>
-                        <select name="visa_type" id="visa_type" class="form-control widthinput" multiple="true" autofocus>
-                            @foreach($masterVisaTypes as $masterVisaType)
-                            <option value="{{$masterVisaType->id}}" {{ $data && $data->questionnaire && $data->questionnaire->visa_type && $masterVisaType->id == $data->questionnaire->visa_type ? 'selected' : '' }}>{{$masterVisaType->name}}</option>
-                            @endforeach
-
-                        </select>
+                        <div class="dropdown-option-div">
+                            <label for="visa_type" class="form-label"><span class="error">* </span>{{ __('Visa Type') }}</label>
+                            <select name="visa_type" id="visa_type" class="form-control widthinput" multiple="true" autofocus>
+                                @foreach($masterVisaTypes as $masterVisaType)
+                                <option value="{{$masterVisaType->id}}" {{ $data && $data->questionnaire && $data->questionnaire->visa_type && $masterVisaType->id == $data->questionnaire->visa_type ? 'selected' : '' }}>{{$masterVisaType->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
-
-                        <label for="nationality" class="form-label"><span class="error">* </span>{{ __('Nationality') }}</label>
-                        <select name="nationality" id="nationality" class="form-control widthinput" multiple="true" autofocus>
-                            @foreach($masterNationality as $Country)
-                            <option value="{{$Country->id}}" {{ $data && $data->questionnaire && $data->questionnaire->nationality && $Country->id == $data->questionnaire->nationality ? 'selected' : '' }}>{{$Country->name}}</option>
-                            @endforeach
-                        </select>
+                        <div class="dropdown-option-div">
+                            <label for="nationality" class="form-label"><span class="error">* </span>{{ __('Nationality') }}</label>
+                            <select name="nationality" id="nationality" class="form-control widthinput" multiple="true" autofocus>
+                                @foreach($masterNationality as $Country)
+                                <option value="{{$Country->id}}" {{ $data && $data->questionnaire && $data->questionnaire->nationality && $Country->id == $data->questionnaire->nationality ? 'selected' : '' }}>{{$Country->nationality}} ({{$Country->name}})</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <label for="age" class="form-label"><span class="error">* </span>{{ __('Age:') }}</label>
                         <div class="row">
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-6">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-12">
                                 <div class="input-group">
                                     <span class="input-group-text">From</span>
                                     <input type="number" placeholder="From" name="min_age" class="form-control" id="min_age" value="{{$data->questionnaire->min_age ?? ''}}">
                                 </div>
                             </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-6">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-12">
                                 <div class="input-group">
                                     <span class="input-group-text">to</span>
                                     <input type="number" placeholder="End" name="max_age" class="form-control" id="max_age" value="{{$data->questionnaire->max_age ?? ''}}">
@@ -312,16 +321,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
 
                     <div class="col-lg-4 col-md-6 col-sm-6 select-button-main-div">
-                        <label for="language_id" class="form-label"><span class="error">* </span>{{ __('Additional Language(s):') }}</label>
-                        <select name="language_id[]" id="language_id" class="form-control widthinput" multiple autofocus>
-                            @foreach($masterLanguages as $Language)
-                            <option value="{{$Language->id}}" {{ $data && $data->questionnaire && $data->questionnaire->additionalLanguages && in_array($Language->id, $data->questionnaire->additionalLanguages->pluck('language_id')->toArray()) ? 'selected' : '' }}>
-                                {{$Language->name}}
-                            </option>
-                            @endforeach
-
-                        </select>
+                        <div class="dropdown-option-div">
+                            <label for="language_id" class="form-label"><span class="error">* </span>{{ __('Additional Language(s):') }}</label>
+                            <select name="language_id[]" id="language_id" class="form-control widthinput" multiple autofocus>
+                                @foreach($masterLanguages as $Language)
+                                <option value="{{$Language->id}}" {{ $data && $data->questionnaire && $data->questionnaire->additionalLanguages && in_array($Language->id, $data->questionnaire->additionalLanguages->pluck('language_id')->toArray()) ? 'selected' : '' }}>
+                                    {{$Language->name}}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
+
                     <div class=" col-lg-4 col-md-6 col-sm-12 radio-button-main-div">
                         <div class="row ">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-12 radio-div-container">
@@ -433,7 +444,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <div class="col-lg-6 col-md-6 col-sm-12">
                                 <!-- Dropdown Container -->
                                 <div class="chooseAmountpercentageDropDownInputContainer" style="display: none;">
-                                    <label for="commission_type" class="form-label"><span class="error">* </span>{{ __('Choose Amount or Percentage') }}</label>
+                                    <label for="commission_type" class="form-label"><span class="error">* </span>{{ __('Choose Option') }}</label>
                                     <select name="commission_type" id="commission_type" class="form-control widthinput" onchange="showAmountPercentageInput(this)" autofocus>
                                         <option value="" disabled selected>Choose Option</option>
                                         <option value="amount" {{ $data && $data->questionnaire && $data->questionnaire->commission_type == 'amount' ? 'selected' : '' }}>Amount</option>
@@ -446,8 +457,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <!-- Amount Input Container -->
                             <div class="col-lg-6 col-md-6 col-sm-12 amountDropDownInputContainer" id="amountDropDownInputContainer" style="display: none">
                                 <div class="amountInputContainer" id="amountInputContainer">
-                                    <label for="commission_amount" class="form-label"><span class="error">* </span>{{ __('Enter Amount (in AED):') }}</label>
+                                    <label for="commission_amount" class="form-label"><span class="error">* </span>{{ __('Amount:') }}</label>
                                     <div class="input-group">
+                                    
                                         <input type="number" name="commission_amount" id="commission_amount" class="form-control widthinput" placeholder="amount" aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->questionnaire->commission_amount ?? ''}}">
                                         <div class="input-group-append">
                                             <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -495,36 +507,34 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                 <div class="col-lg-6 radio-button-main-div">
 
                                     <div class="radio-div-container">
-                                    </div>
-                                    <label for="own_car" class="form-label"><span class="error">* </span>{{ __('Car accompanied By?') }}</label>
+                                        <label for="own_car" class="form-label"><span class="error">* </span>{{ __('Car accompanied By?') }}</label>
 
-                                    <div class="designation-radio-button">
-                                        <label>
-                                            <input type="radio" name="own_car" id="own" value="yes" @if($currentQuestionnaire->own_car == 'yes') checked @endif> own
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="own_car" id="company" value="no" @if($currentQuestionnaire->own_car == 'no') checked @endif> Company
-                                        </label>
+                                        <div class="designation-radio-button">
+                                            <label>
+                                                <input type="radio" name="own_car" id="own" value="yes" @if($currentQuestionnaire->own_car == 'yes') checked @endif> own
+                                            </label>
+                                            <label>
+                                                <input type="radio" name="own_car" id="company" value="no" @if($currentQuestionnaire->own_car == 'no') checked @endif> Company
+                                            </label>
+                                        </div>
                                     </div>
-
                                 </div>
 
                                 <div class="col-lg-6 radio-button-main-div">
 
                                     <div class="radio-div-container">
+
+                                        <label for="fuel_expenses_by" class="form-label"><span class="error">* </span>{{ __('Fuels Expenses covered by?') }}</label>
+
+                                        <div class="designation-radio-button">
+                                            <label>
+                                                <input type="radio" name="fuel_expenses_by" id="company" value="company" @if($currentQuestionnaire->fuel_expenses_by == 'company') checked @endif> Company
+                                            </label>
+                                            <label>
+                                                <input type="radio" name="fuel_expenses_by" id="own" value="own" @if($currentQuestionnaire->fuel_expenses_by == 'own') checked @endif> Own
+                                            </label>
+                                        </div>
                                     </div>
-
-                                    <label for="fuel_expenses_by" class="form-label"><span class="error">* </span>{{ __('Fuels Expenses covered by?') }}</label>
-
-                                    <div class="designation-radio-button">
-                                        <label>
-                                            <input type="radio" name="fuel_expenses_by" id="company" value="company" @if($currentQuestionnaire->fuel_expenses_by == 'company') checked @endif> Company
-                                        </label>
-                                        <label>
-                                            <input type="radio" name="fuel_expenses_by" id="own" value="own" @if($currentQuestionnaire->fuel_expenses_by == 'own') checked @endif> Own
-                                        </label>
-                                    </div>
-
                                 </div>
                             </div>
                         </div>
@@ -532,15 +542,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
-
-                        <label for="interviewd_by" class="form-label"><span class="error">* </span>{{ __('Interviewed By:') }}</label>
-                        <select name="interviewd_by" id="interviewd_by" class="form-control widthinput" multiple="true" autofocus>
-                            @foreach($interviewdByUsers as $User)
-                            <option value="{{$User->id}}" {{$data && $data->questionnaire && $data->questionnaire->interviewd_by && $User->id == $data->questionnaire->interviewd_by ? 'selected' : '' }}>{{$User->name}}</option>
-                            @endforeach
-                        </select>
+                        <div class="dropdown-option-div">
+                            <label for="interviewd_by" class="form-label"><span class="error">* </span>{{ __('Interviewed By:') }}</label>
+                            <select name="interviewd_by" id="interviewd_by" class="form-control widthinput" multiple="true" autofocus>
+                                @foreach($interviewdByUsers as $User)
+                                <option value="{{$User->id}}" {{$data && $data->questionnaire && $data->questionnaire->interviewd_by && $User->id == $data->questionnaire->interviewd_by ? 'selected' : '' }}>{{$User->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>
+
                 <div class="row">
                     <div class=" col-lg-4 col-md-12 col-sm-12 ">
                         <label for="mandatory_skills" class="form-label"><span class="error">* </span>{{ __('Top 3 skills / mandatory work experience :') }} </label>
@@ -567,28 +579,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <textarea name="trial_work_job_description" class="form-control" rows="3" cols="15">{{$data->questionnaire->trial_work_job_description ?? ''}}</textarea>
                     </div>
 
-                    <div class="col-lg-4 col-md-6 col-sm-12 col-12">
-                        <label for="job_evaluation_stake_holders" class="form-label"><span class="error">* </span>{{ __('Stakeholders for Job Evaluation') }}</label>
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                            <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
-                                <input class="form-check-input" name="internal_department_evaluation" type="checkbox" id="internal_department_evaluation" value="internal_department_evaluation" {{ $data && $data->questionnaire && $data->questionnaire->job_evaluation_stake_holders === 'Internal Departments , ' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="internal_department_evaluation">Internal Departments</label>
+                    <div class="col-lg-4 col-md-6 col-sm-12 col-12 ">
+                        <div class="stakeholders-main-div">
+                            <label for="job_evaluation_stake_holders" id="job_evaluation_stake_holders" class="form-label"><span class="error">* </span>{{ __('Stakeholders for Job Evaluation') }}</label>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-12" id="internal_or_external_evaluation">
+                                <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <input class="form-check-input" name="evaluation[]" type="checkbox" id="internal_department_evaluation" value="internal_department_evaluation" {{ $data && $data->questionnaire && str_contains($data->questionnaire->job_evaluation_stake_holders, 'Internal Departments') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="internal_department_evaluation">Internal Departments</label>
+                                </div>
+                                <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <input class="form-check-input" name="evaluation[]" type="checkbox" id="external_vendor_evaluation" value="external_vendor_evaluation" {{ $data && $data->questionnaire && str_contains($data->questionnaire->job_evaluation_stake_holders, 'External Vendors') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="external_vendor_evaluation">External vendors</label>
+                                </div>
                             </div>
-                            <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
-                                <input class="form-check-input" name="external_vendor_evaluation" type="checkbox" id="external_vendor_evaluation" value="external_vendor_evaluation" {{ $data && $data->questionnaire && $data->questionnaire->job_evaluation_stake_holders === 'External vendors ' ? 'checked' : '' }}>
-                                <label class="form-check-label" for="external_vendor_evaluation">External vendors</label>
+                            <div class="stakeholders-error-container">
                             </div>
-
                         </div>
                     </div>
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 radio-button-main-div select-button-main-div">
-                        <label for="recruitment_source_id" class="form-label"><span class="error">* </span>{{ __('Recruitment Source:') }}</label>
-                        <select name="recruitment_source_id" id="recruitment_source_id" class="form-control widthinput" multiple="true" autofocus>
-                            @foreach($masterRecuritmentSources as $MasterRecuritmentSource)
-                            <option value="{{$MasterRecuritmentSource->id}}" {{$data && $data->questionnaire && $data->questionnaire->recruitment_source_id && $MasterRecuritmentSource->id == $data->questionnaire->recruitment_source_id ? 'selected' : '' }}>{{$MasterRecuritmentSource->name}}</option>
-                            @endforeach
-                        </select>
+                        <div class="dropdown-option-div">
+                            <label for="recruitment_source_id" class="form-label"><span class="error">* </span>{{ __('Recruitment Source:') }}</label>
+                            <select name="recruitment_source_id" id="recruitment_source_id" class="form-control widthinput" multiple="true" autofocus>
+                                @foreach($masterRecuritmentSources as $MasterRecuritmentSource)
+                                <option value="{{$MasterRecuritmentSource->id}}" {{$data && $data->questionnaire && $data->questionnaire->recruitment_source_id && $MasterRecuritmentSource->id == $data->questionnaire->recruitment_source_id ? 'selected' : '' }}>{{$MasterRecuritmentSource->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 
 
@@ -633,21 +650,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
-                        <label for="department_id" class="form-label"><span class="error">* </span>{{ __('Division / Department:') }}</label>
-                        <select name="department_id" id="department_id" class="form-control widthinput" multiple="true" autofocus>
-                            @foreach($masterDepartments as $MasterDeparment)
-                            <option value="{{$MasterDeparment->id}}" {{$data && $data->questionnaire && $data->questionnaire->department_id && $MasterDeparment->id == $data->questionnaire->department_id ? 'selected' : '' }}>{{$MasterDeparment->name}}</option>
-                            @endforeach
-                        </select>
+                        <div class="dropdown-option-div">
+                            <label for="department_id" class="form-label"><span class="error">* </span>{{ __('Division / Department:') }}</label>
+                            <select name="department_id" id="department_id" class="form-control widthinput" multiple="true" autofocus>
+                                @foreach($masterDepartments as $MasterDeparment)
+                                <option value="{{$MasterDeparment->id}}" {{$data && $data->questionnaire && $data->questionnaire->department_id && $MasterDeparment->id == $data->questionnaire->department_id ? 'selected' : '' }}>{{$MasterDeparment->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
-                        <label for="career_level_id" class="form-label"><span class="error">* </span>{{ __('Career level:') }}</label>
-                        <select name="career_level_id" id="career_level_id" class="form-control widthinput" multiple="true" autofocus>
-                            @foreach($masterExperienceLevels as $MasterExperienceLevel)
-                            <option value="{{$MasterExperienceLevel->id}}">{{$MasterExperienceLevel->name}} ( {{$MasterExperienceLevel->number_of_year_of_experience}} )</option>
-                            @endforeach
-                        </select>
+                        <div class="dropdown-option-div">
+                            <label for="career_level_id" class="form-label"><span class="error">* </span>{{ __('Career level:') }}</label>
+                            <select name="career_level_id" id="career_level_id" class="form-control widthinput" multiple="true" autofocus>
+                                @foreach($masterExperienceLevels as $MasterExperienceLevel)
+                                <option value="{{$MasterExperienceLevel->id}}">{{$MasterExperienceLevel->name}} ( {{$MasterExperienceLevel->number_of_year_of_experience}} )</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 
                     <div class="col-lg-4 col-md-6 col-sm-12">
@@ -765,13 +786,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <input type="text" placeholder="Duties & Tasks" name="duties_and_tasks" class="form-control" id="duties_and_tasks" value="{{$data->questionnaire->duties_and_tasks ?? ''}}">
                     </div>
                     <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
-
-                        <label for="next_career_path_id" class="form-label"><span class="error">* </span>{{ __('Next Career path:') }}</label>
-                        <select name="next_career_path_id" id="next_career_path_id" class="form-control widthinput" multiple="true" autofocus>
-                            @foreach($masterExperienceLevels as $MasterExperienceLevel)
-                            <option value="{{$MasterExperienceLevel->id}}" {{$data && $data->questionnaire && $data->questionnaire->next_career_path_id && $MasterExperienceLevel->id == $data->questionnaire->next_career_path_id ? 'selected' : '' }}>{{$MasterExperienceLevel->name}} ( {{$MasterExperienceLevel->number_of_year_of_experience}} )</option>
-                            @endforeach
-                        </select>
+                        <div class="dropdown-option-div">
+                            <label for="next_career_path_id" class="form-label"><span class="error">* </span>{{ __('Next Career path:') }}</label>
+                            <select name="next_career_path_id" id="next_career_path_id" class="form-control widthinput" multiple="true" autofocus>
+                                @foreach($masterExperienceLevels as $MasterExperienceLevel)
+                                <option value="{{$MasterExperienceLevel->id}}" {{$data && $data->questionnaire && $data->questionnaire->next_career_path_id && $MasterExperienceLevel->id == $data->questionnaire->next_career_path_id ? 'selected' : '' }}>{{$MasterExperienceLevel->name}} ( {{$MasterExperienceLevel->number_of_year_of_experience}} )</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -808,143 +830,99 @@ redirect()->route('home')->send();
         var currentNumberOfOpenings = $("#number_of_openings").val();
         console.log("current position opening value is: ", currentNumberOfOpenings)
         console.log("old position opening value is: ", data.number_of_openings);
-        if (currentNumberOfOpenings && data.number_of_openings !== currentNumberOfOpenings ) {
+        if (currentNumberOfOpenings && data.number_of_openings !== currentNumberOfOpenings) {
             console.log("ifffffffffff")
             $("#number_of_openings").val(currentNumberOfOpenings);
-        }
-
-        else {
+        } else {
             console.log("elseeeeeeeee")
-                $("#number_of_openings").val(data.number_of_openings)};
-        // (data.number_of_openings === null || data.number_of_openings === currentNumberOfOpenings) 
-        
+            $("#number_of_openings").val(data.number_of_openings)
+        };
+
 
         var currentStartTimeValue = $("#work_time_start").val();
         console.log("current starting value of work time is: ", currentStartTimeValue)
         console.log("old starting value of work time is: ", data.work_time_start);
-        if (currentStartTimeValue && data.work_time_start !== currentStartTimeValue ) {
+        if (currentStartTimeValue && data.work_time_start !== currentStartTimeValue) {
             console.log("ifffffffffff")
             $("#work_time_start").val(currentStartTimeValue);
         } else {
             console.log("elseeeeeeeee")
-                $("#work_time_start").val(data.work_time_start)};
+            $("#work_time_start").val(data.work_time_start)
+        };
 
 
         var currentEndTimeValue = $("#work_time_end").val();
         console.log("current ending value of work time is: ", currentEndTimeValue)
         console.log("old ending value of work time is: ", data.work_time_end);
-        if (currentEndTimeValue && data.work_time_end !== currentEndTimeValue ) {
+        if (currentEndTimeValue && data.work_time_end !== currentEndTimeValue) {
             console.log("ifffffffffff")
             $("#work_time_end").val(currentEndTimeValue);
         } else {
             console.log("elseeeeeeeee")
-                $("#work_time_end").val(data.work_time_end)};
+            $("#work_time_end").val(data.work_time_end)
+        };
 
 
         var currentStartingSalaryValue = $("#salary_range_start_in_aed").val();
         console.log("current starting value of salary is: ", currentStartingSalaryValue)
         console.log("old starting value of salary is: ", data.salary_range_start_in_aed);
-        if (currentStartingSalaryValue && data.salary_range_start_in_aed !== currentStartingSalaryValue ) {
+        if (currentStartingSalaryValue && data.salary_range_start_in_aed !== currentStartingSalaryValue) {
             console.log("ifffffffffff")
             $("#salary_range_start_in_aed").val(currentStartingSalaryValue);
         } else {
             console.log("elseeeeeeeee")
-                $("#salary_range_start_in_aed").val(data.salary_range_start_in_aed)};
+            $("#salary_range_start_in_aed").val(data.salary_range_start_in_aed)
+        };
 
 
         var currentEndingSalaryValue = $("#salary_range_end_in_aed").val();
         console.log("current ending value of salary is: ", currentEndingSalaryValue)
         console.log("old ending value of salary is: ", data.salary_range_end_in_aed);
-        if (currentEndingSalaryValue && data.salary_range_end_in_aed !== currentEndingSalaryValue ) {
+        if (currentEndingSalaryValue && data.salary_range_end_in_aed !== currentEndingSalaryValue) {
             console.log("ifffffffffff")
             $("#salary_range_end_in_aed").val(currentEndingSalaryValue);
         } else {
             console.log("elseeeeeeeee")
-                $("#salary_range_end_in_aed").val(data.salary_range_end_in_aed)};
-                
+            $("#salary_range_end_in_aed").val(data.salary_range_end_in_aed)
+        };
+
 
         var backendCareerLevelId = {{$data->questionnaire->carrerLevel->id ?? 'null'}};
         console.log("Updated Career Level ID: ", backendCareerLevelId);
-        if (backendCareerLevelId !== null){
+        if (backendCareerLevelId !== null) {
 
-        $("#career_level_id option").each(function() {
-            var optionValue = $(this).val();
+            $("#career_level_id option").each(function() {
+                var optionValue = $(this).val();
 
-            if (optionValue == backendCareerLevelId) {
-                $(this).prop("selected", true);
-            }
-        });
-    }else {
-        console.log("In else of career vlvl")
-        $("#career_level_id").val(data.experience_level);
-    }
+                if (optionValue == backendCareerLevelId) {
+                    $(this).prop("selected", true);
+                }
+            });
+        } else {
+            console.log("In else of career vlvl")
+            $("#career_level_id").val(data.experience_level);
+        }
 
-        $('#requested_job_title').select2({
+        $('select[multiple="true"]').select2({
             allowClear: true,
             maximumSelectionLength: 1,
-            placeholder: "Choose Designation Name",
-        });
-        $('#designation_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Designation Name",
+            placeholder: "Choose...",
         });
 
-        $('#reporting_structure').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Option",
-        });
-        $('#location_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Work Location",
-        });
-        $('#requested_industry_experience').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Industry Experience",
-        });
-        $('#visa_type').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Visa Type",
-        });
-        $('#nationality').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Your Nationality",
-        });
         $('#language_id').select2({
             minimumResultsForSearch: -1,
             placeholder: "Choose Additional Languages",
         });
-        $('#interviewd_by').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose User Name",
-        });
-        $('#recruitment_source_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Recruitment Source",
-        });
-        $('#department_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Department",
-        });
-        $('#career_level_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Career Level",
-        });
-        $('#next_career_path_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Next Career Path",
-        });
 
+    });
+
+    $('select[multiple="true"]').on('change', function() {
+        var fieldName = $(this).attr('name');
+        $('#employeeQuestionnaireForm').validate().element('[name="' + fieldName + '"]');
+    });
+    $('#language_id').on('change', function() {
+        var fieldName = $(this).attr('name');
+        $('#employeeQuestionnaireForm').validate().element('[name="' + fieldName + '"]');
     });
 
 
@@ -1003,33 +981,6 @@ redirect()->route('home')->send();
 
     $('input[name="driving_licence"]').change();
 
-
-    // $('.select-button-main-div select').on('change', function() {
-    //     $(this).closest('.select-button-main-div').find('.error').remove();
-    // });
-
-    // jQuery.validator.setDefaults({
-    //     errorClass: "is-invalid",
-    //     errorElement: "p",
-    //     errorPlacement: function(error, element) {
-    //         error.addClass("invalid-feedback font-size-13");
-    //         if (element.hasClass("select2-hidden-accessible")) {
-    //             element = $("#select2-" + element.attr("id") + "-container").parent();
-    //             error.insertAfter(element);
-    //         } else if (element.is(':radio') && element.closest('.radio-button-main-div').length > 0) {
-    //             error.addClass('radio-error');
-    //             error.insertAfter(element.closest('.radio-button-main-div').find('div.radio-div-container').last());
-    //         } else if (element.attr('name') === 'min_age' || element.attr('name') === 'max_age' ||
-    //             element.attr('name') === 'salary_range_start_in_aed' || element.attr('name') === 'salary_range_end_in_aed' ||
-    //             element.attr('name') === 'current_or_past_employer_size_start' || element.attr('name') === 'current_or_past_employer_size_end') {
-    //             error.addClass('other-error');
-    //             error.insertAfter(element.closest('.input-group'));
-    //         } else {
-    //             error.addClass('other-error');
-    //             error.insertAfter(element);
-    //         }
-    //     }
-    // });
 
     jQuery.validator.addMethod(
         "money",
@@ -1193,7 +1144,6 @@ redirect()->route('home')->send();
             },
             'language_id[]': {
                 required: true,
-                // array: true,
             },
             required_to_travel_for_work_purpose: {
                 required: true,
@@ -1273,6 +1223,10 @@ redirect()->route('home')->send();
             trial_work_job_description: {
                 required: true,
             },
+            'evaluation[]': {
+                required: true,
+                minlength: 1
+            },
             recruitment_source_id: {
                 required: true,
             },
@@ -1344,34 +1298,41 @@ redirect()->route('home')->send();
                 required: true,
             },
         },
+        groups: {
+            job_evaluation_stake_holders: "internal_department_evaluation external_vendor_evaluation"
+        },
+
         errorPlacement: function(error, element) {
             console.log("Error placement function called");
             console.log("Element:", element);
 
-
             if (element.is(':radio') && element.closest('.radio-button-main-div').length > 0) {
                 error.addClass('radio-error');
                 error.insertAfter(element.closest('.radio-button-main-div').find('div.radio-div-container').last());
+            } else if (element.is(':checkbox') && element.closest('.col-lg-4').length > 0) {
+                error.addClass('checkbox-error');
+                error.insertAfter(element.closest('.stakeholders-main-div').find('.stakeholders-error-container'));
             } else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
                 if (!element.val() || element.val().length === 0) {
-
                     console.log("Error is here with length", element.val().length);
                     error.addClass('select-error');
-                    error.insertAfter(element.closest('.select-button-main-div').find('span').last());
+                    error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
                 } else {
                     console.log("No error");
                 }
             } else if (element.attr('name') === 'min_age' || element.attr('name') === 'max_age' ||
+                element.attr('name') === 'work_time_start' || element.attr('name') === 'work_time_end' ||
                 element.attr('name') === 'salary_range_start_in_aed' || element.attr('name') === 'salary_range_end_in_aed' ||
-                element.attr('name') === 'current_or_past_employer_size_start' || element.attr('name') === 'current_or_past_employer_size_end') {
+                element.attr('name') === 'current_or_past_employer_size_start' || element.attr('name') === 'current_or_past_employer_size_end' || element.attr('name') === 'commission_amount')  {
                 error.addClass('other-error');
                 error.insertAfter(element.closest('.input-group'));
             } else {
-
                 error.addClass('other-error');
                 error.insertAfter(element);
             }
         },
+
+
     });
 </script>
 

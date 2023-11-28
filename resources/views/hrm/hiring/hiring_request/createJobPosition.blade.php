@@ -74,6 +74,9 @@
 		document.getElementById("newTitleError").textContent=$msg;
 	    document.getElementById("new_job_title").classList.add("is-invalid");
 	    document.getElementById("newTitleError").classList.add("paragraph-class");
+
+		document.getElementById("newTitleError").style.color = "red";
+
 	}
 	function removeNewTitleError() {
 	    document.getElementById("newTitleError").textContent="";
