@@ -571,14 +571,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         <label for="job_evaluation_stake_holders" class="form-label"><span class="error">* </span>{{ __('Stakeholders for Job Evaluation') }}</label>
                         <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                             <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
-                                <input class="form-check-input" name="internal_department_evaluation" type="checkbox" id="internal_department_evaluation" value="internal_department_evaluation" {{ $data && $data->questionnaire && $data->questionnaire->job_evaluation_stake_holders === 'Internal Departments , ' ? 'checked' : '' }}>
+                            <input class="form-check-input" name="internal_department_evaluation" type="checkbox" id="internal_department_evaluation" value="internal_department_evaluation" {{ $data && $data->questionnaire && str_contains($data->questionnaire->job_evaluation_stake_holders, 'Internal Departments') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="internal_department_evaluation">Internal Departments</label>
                             </div>
                             <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
-                                <input class="form-check-input" name="external_vendor_evaluation" type="checkbox" id="external_vendor_evaluation" value="external_vendor_evaluation" {{ $data && $data->questionnaire && $data->questionnaire->job_evaluation_stake_holders === 'External vendors ' ? 'checked' : '' }}>
+                            <input class="form-check-input" name="external_vendor_evaluation" type="checkbox" id="external_vendor_evaluation" value="external_vendor_evaluation" {{ $data && $data->questionnaire && str_contains($data->questionnaire->job_evaluation_stake_holders, 'External Vendors') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="external_vendor_evaluation">External vendors</label>
                             </div>
-
                         </div>
                     </div>
 
@@ -808,145 +807,96 @@ redirect()->route('home')->send();
         var currentNumberOfOpenings = $("#number_of_openings").val();
         console.log("current position opening value is: ", currentNumberOfOpenings)
         console.log("old position opening value is: ", data.number_of_openings);
-        if (currentNumberOfOpenings && data.number_of_openings !== currentNumberOfOpenings ) {
+        if (currentNumberOfOpenings && data.number_of_openings !== currentNumberOfOpenings) {
             console.log("ifffffffffff")
             $("#number_of_openings").val(currentNumberOfOpenings);
-        }
-
-        else {
+        } else {
             console.log("elseeeeeeeee")
-                $("#number_of_openings").val(data.number_of_openings)};
-        // (data.number_of_openings === null || data.number_of_openings === currentNumberOfOpenings) 
-        
+            $("#number_of_openings").val(data.number_of_openings)
+        };
+
 
         var currentStartTimeValue = $("#work_time_start").val();
         console.log("current starting value of work time is: ", currentStartTimeValue)
         console.log("old starting value of work time is: ", data.work_time_start);
-        if (currentStartTimeValue && data.work_time_start !== currentStartTimeValue ) {
+        if (currentStartTimeValue && data.work_time_start !== currentStartTimeValue) {
             console.log("ifffffffffff")
             $("#work_time_start").val(currentStartTimeValue);
         } else {
             console.log("elseeeeeeeee")
-                $("#work_time_start").val(data.work_time_start)};
+            $("#work_time_start").val(data.work_time_start)
+        };
 
 
         var currentEndTimeValue = $("#work_time_end").val();
         console.log("current ending value of work time is: ", currentEndTimeValue)
         console.log("old ending value of work time is: ", data.work_time_end);
-        if (currentEndTimeValue && data.work_time_end !== currentEndTimeValue ) {
+        if (currentEndTimeValue && data.work_time_end !== currentEndTimeValue) {
             console.log("ifffffffffff")
             $("#work_time_end").val(currentEndTimeValue);
         } else {
             console.log("elseeeeeeeee")
-                $("#work_time_end").val(data.work_time_end)};
+            $("#work_time_end").val(data.work_time_end)
+        };
 
 
         var currentStartingSalaryValue = $("#salary_range_start_in_aed").val();
         console.log("current starting value of salary is: ", currentStartingSalaryValue)
         console.log("old starting value of salary is: ", data.salary_range_start_in_aed);
-        if (currentStartingSalaryValue && data.salary_range_start_in_aed !== currentStartingSalaryValue ) {
+        if (currentStartingSalaryValue && data.salary_range_start_in_aed !== currentStartingSalaryValue) {
             console.log("ifffffffffff")
             $("#salary_range_start_in_aed").val(currentStartingSalaryValue);
         } else {
             console.log("elseeeeeeeee")
-                $("#salary_range_start_in_aed").val(data.salary_range_start_in_aed)};
+            $("#salary_range_start_in_aed").val(data.salary_range_start_in_aed)
+        };
 
 
         var currentEndingSalaryValue = $("#salary_range_end_in_aed").val();
         console.log("current ending value of salary is: ", currentEndingSalaryValue)
         console.log("old ending value of salary is: ", data.salary_range_end_in_aed);
-        if (currentEndingSalaryValue && data.salary_range_end_in_aed !== currentEndingSalaryValue ) {
+        if (currentEndingSalaryValue && data.salary_range_end_in_aed !== currentEndingSalaryValue) {
             console.log("ifffffffffff")
             $("#salary_range_end_in_aed").val(currentEndingSalaryValue);
         } else {
             console.log("elseeeeeeeee")
-                $("#salary_range_end_in_aed").val(data.salary_range_end_in_aed)};
-                
+            $("#salary_range_end_in_aed").val(data.salary_range_end_in_aed)
+        };
+
 
         var backendCareerLevelId = {{$data->questionnaire->carrerLevel->id ?? 'null'}};
         console.log("Updated Career Level ID: ", backendCareerLevelId);
-        if (backendCareerLevelId !== null){
+        if (backendCareerLevelId !== null) {
 
-        $("#career_level_id option").each(function() {
-            var optionValue = $(this).val();
+            $("#career_level_id option").each(function() {
+                var optionValue = $(this).val();
 
-            if (optionValue == backendCareerLevelId) {
-                $(this).prop("selected", true);
-            }
-        });
-    }else {
-        console.log("In else of career vlvl")
-        $("#career_level_id").val(data.experience_level);
-    }
+                if (optionValue == backendCareerLevelId) {
+                    $(this).prop("selected", true);
+                }
+            });
+        } else {
+            console.log("In else of career vlvl")
+            $("#career_level_id").val(data.experience_level);
+        }
 
-        $('#requested_job_title').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Designation Name",
-        });
-        $('#designation_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Designation Name",
+        $('select[multiple="true"]').select2({
+        allowClear: true,
+        maximumSelectionLength: 1,
+        placeholder: "Choose...",
         });
 
-        $('#reporting_structure').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Option",
-        });
-        $('#location_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Work Location",
-        });
-        $('#requested_industry_experience').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Industry Experience",
-        });
-        $('#visa_type').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Visa Type",
-        });
-        $('#nationality').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Your Nationality",
-        });
         $('#language_id').select2({
             minimumResultsForSearch: -1,
             placeholder: "Choose Additional Languages",
         });
-        $('#interviewd_by').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose User Name",
-        });
-        $('#recruitment_source_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Recruitment Source",
-        });
-        $('#department_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Department",
-        });
-        $('#career_level_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Career Level",
-        });
-        $('#next_career_path_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Next Career Path",
-        });
 
     });
 
+    $('select[multiple="true"]').on('change', function () {
+        var fieldName = $(this).attr('name');
+        $('#employeeQuestionnaireForm').validate().element('[name="' + fieldName + '"]');
+    });
 
     $('#language_id').on('change', function() {
         var selectedValues = $(this).val();
@@ -1344,6 +1294,7 @@ redirect()->route('home')->send();
                 required: true,
             },
         },
+
         errorPlacement: function(error, element) {
             console.log("Error placement function called");
             console.log("Element:", element);
@@ -1373,6 +1324,8 @@ redirect()->route('home')->send();
             }
         },
     });
+
+    
 </script>
 
 <script>
