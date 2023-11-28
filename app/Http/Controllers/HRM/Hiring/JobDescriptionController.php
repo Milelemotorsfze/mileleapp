@@ -33,19 +33,27 @@ class JobDescriptionController extends Controller
     public function show(string $id) {
         return view('hrm.hiring.job_description.show');
     }
-    public function createOrEdit() {
-        $masterJobPositions = MasterJobPosition::where('status','active')->select('id','name')->get();
-        $masterdepartments = MasterDepartment::where('status','active')->select('id','name')->get();
+    public function createOrEdit($id) {
+        $jobDescription = JobDescription::where('id',$id)->first();
+        if(!$jobDescription) {
+            $jobDescription = new JobDescription();
+            $jobDescriptionId = 'new';
+            $currentHiringRequest ='';
+        }
+        else {
+            $jobDescriptionId = $jobDescription->id;
+            $currentHiringRequest = EmployeeHiringRequest::where('id',$jobDescription->hiring_request_id)->first();
+        }
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
-        $reportingToUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
-        return view('hrm.hiring.job_description.create',compact('masterJobPositions','masterdepartments','masterOfficeLocations','reportingToUsers'));
+        $allHiringRequests = EmployeeHiringRequest::all();
+        return view('hrm.hiring.job_description.create',compact('jobDescriptionId','currentHiringRequest','jobDescription','masterOfficeLocations','allHiringRequests'));
     }
     public function storeOrUpdate(Request $request, $id) { 
         $validator = Validator::make($request->all(), [
-            'job_title' => 'required',
-            'department_id' => 'required',
+            // 'job_title' => 'required',
+            // 'department_id' => 'required',
             'location_id' => 'required',
-            'reporting_to' => 'required',
+            // 'reporting_to' => 'required',
             'job_purpose' => 'required',
             'duties_and_responsibilities' => 'required',
             'skills_required' => 'required',

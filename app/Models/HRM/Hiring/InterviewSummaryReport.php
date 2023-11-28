@@ -15,12 +15,12 @@ class InterviewSummaryReport extends Model
     protected $table = "interview_summary_reports";
     protected $fillable = [
         'hiring_request_id',
-        // 'resume_file_name',
+        'resume_file_name',
         'candidate_name',
         'nationality',
         'gender',
-        'name_of_interviewer',
-        'date_of_interview',
+        // 'name_of_interviewer',
+        // 'date_of_interview',
         'date_of_telephonic_interview',
         'telephonic_interview',
         'rate_dress_appearance',

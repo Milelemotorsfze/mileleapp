@@ -253,6 +253,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Job Description" class="btn btn-sm btn-secondary" href="{{route('employee-hiring-job-description.create-or-edit',$approvedOne->id)}}">
 										<i class="fa fa-address-card" aria-hidden="true"></i> Add Job Description
 										</a>
+										<!-- <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Interview Summary Report" class="btn btn-sm btn-warning" href="{{route('interview-summary-report.create-or-edit',$approvedOne->id)}}">
+										<i class="fa fa-plus" aria-hidden="true"></i> Interview Summary
+										</a> -->
 										@else
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
 										<i class="fa fa-list" aria-hidden="true"></i> Create Questionnaire

@@ -712,7 +712,7 @@
                                         </div>
                                         @endif
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-lines.index');
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-model-lines-list');
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
