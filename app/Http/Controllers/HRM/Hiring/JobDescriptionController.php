@@ -15,6 +15,7 @@ use App\Http\Controllers\UserActivityController;
 use DB;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use App\Models\HRM\Hiring\EmployeeHiringRequest;
 
 class JobDescriptionController extends Controller
 {
