@@ -1153,6 +1153,8 @@
                             $('#brand').append("<option value='" + result.id + "'>" + result.brand_name + "</option>");
                             $('#brand').val(result.id);
                             $('#new_brand_name').val("");
+                            $('.add-new-model-line-div').prop('hidden', false);
+                            $('#model_line').attr('disabled', false)
                             $msg = "";
                             removeNewBrandError();
                         }
@@ -1664,7 +1666,7 @@
                             var comma5 = " ";
                         }
 
-                        combinedValue =  row[0] + comma0 + row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5]+ comma5 + row[6];
+                        combinedValue = row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5]+ comma5 + row[6];
                     }
 
                     return '<input type="text" name="descriptions[]" required class="combined-value-editable form-control" value="' + combinedValue + '"/>';
@@ -1674,6 +1676,7 @@
                 targets: -5,
                 data: null,
                 render: function (data, type, row) {
+                    console.log(row);
                     var code = "";
                     if(row['button_type'] == 'Vehicle') {
                         var code = row[3];
@@ -1683,10 +1686,14 @@
                         var code = row[1];
                     }else if(row['button_type'] == 'Direct-Add') {
                         var code = row[6];
+                        if(row['table_type'] == 'vehicle-table') {
+                            var code = row[2]
+                        }
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         code = row[1];
                     }
+
                     return code;
                 }
             },
