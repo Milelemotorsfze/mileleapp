@@ -141,7 +141,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-6 col-md-3 col-sm-6">
+                    <!-- <div class="col-lg-6 col-md-3 col-sm-6">
                         <label for="choices-single-default" class="form-label">Job Title :</label>
                     </div>
                     <div class="col-lg-6 col-md-9 col-sm-6">
@@ -152,19 +152,19 @@
                     </div>
                     <div class="col-lg-6 col-md-9 col-sm-6">
                         <span>{{$data->jobDescription->department->name ?? ''}}</span>
-                    </div>
+                    </div> -->
                     <div class="col-lg-6 col-md-3 col-sm-6">
                         <label for="choices-single-default" class="form-label">Location :</label>
                     </div>
                     <div class="col-lg-6 col-md-9 col-sm-6">
                         <span>{{$data->jobDescription->location->name ?? ''}}, {{$data->jobDescription->location->address ?? ''}}</span>
                     </div>
-                    <div class="col-lg-6 col-md-3 col-sm-6">
+                    <!-- <div class="col-lg-6 col-md-3 col-sm-6">
                         <label for="choices-single-default" class="form-label">Reporting To :</label>
                     </div>
                     <div class="col-lg-6 col-md-9 col-sm-6">
                         <span>{{$data->jobDescription->reportingTo->name ?? ''}} ( {{$data->jobDescription->reportingTo->empProfile->designation->name ?? ''}},{{$data->jobDescription->reportingTo->email ?? ''}} )</span>
-                    </div>
+                    </div> -->
                     <div class="col-lg-6 col-md-3 col-sm-6">
                         <label for="choices-single-default" class="form-label">Job Purpose :</label>
                     </div>

@@ -18,10 +18,7 @@ class JobDescription extends Model
     protected $fillable = [
         'hiring_request_id',
         'request_date',
-        'job_title',
-        'department_id',
         'location_id',
-        'reporting_to',
         'job_purpose',
         'duties_and_responsibilities',
         'skills_required',
