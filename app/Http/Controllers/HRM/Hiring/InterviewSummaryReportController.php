@@ -38,8 +38,7 @@ class InterviewSummaryReportController extends Controller
         else {
             $interviewSummaryId = $currentInterviewReport->id;
         }
-        $hiringrequests = EmployeeHiringRequest::all();
-        // dd($interviewSummaryId);
+        $hiringrequests = EmployeeHiringRequest::whereHas('questionnaire')->with('questionnaire.department','questionnaire.designation')->get();
         $data = EmployeeHiringRequest::where('id',$id)->first();
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterGender = MasterGender::whereIn('id',[1,2])->get();
@@ -100,6 +99,7 @@ class InterviewSummaryReportController extends Controller
         }
     }
     public function storeOrUpdate(Request $request, $id) {
+        dd('hi');
         $validator = Validator::make($request->all(), [
             'candidate_name' => 'required',
             'nationality' => 'required',

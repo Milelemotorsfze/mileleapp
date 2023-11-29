@@ -26,7 +26,6 @@ class EmployeeHiringRequest extends Model
         'location_id',
         'requested_by',
         'requested_job_title',
-        'reporting_to',
         'number_of_openings',
         'salary_range_start_in_aed',
         'salary_range_end_in_aed',
