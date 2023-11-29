@@ -118,8 +118,8 @@ class EmployeeHiringQuestionnaireController extends Controller
             return redirect()->back()->withInput()->withErrors($validator);
         }
         else {
-            // DB::beginTransaction();
-            // try {
+            DB::beginTransaction();
+            try {
                 // dd('let me know when reach here......');
                 $authId = Auth::id();
                 $input = $request->all();
@@ -225,11 +225,11 @@ class EmployeeHiringQuestionnaireController extends Controller
                     $update->next_career_path_id = $request->next_career_path_id ;
                     $update->updated_by = $authId;
                     $update->update();
-                    $oldLanguages = QuestionnaireLanguagePreference::where('questionnaire_id',$id)->get();
+                    $oldLanguages = QuestionnaireLanguagePreference::where('questionnaire_id',$update->id)->get();
                     foreach($oldLanguages as $oldLanguage) {
                         $oldLanguage->delete();
                     }
-                    $createLanguage['questionnaire_id'] = $id;
+                    $createLanguage['questionnaire_id'] = $update->id;
                     if(count($request->language_id) > 0) {
                         foreach($request->language_id as $language_id) {
                             $createLanguage['language_id'] = $language_id;
@@ -283,13 +283,14 @@ class EmployeeHiringQuestionnaireController extends Controller
                     (new UserActivityController)->createActivity($createHistory->message);
                     $successMessage = "New Employee Hiring Questionnaire Created Successfully";
                 }
-                // DB::commit();
+                DB::commit();
                 return redirect()->route('employee-hiring-request.index')
                                     ->with('success','New Employee Hiring Request Questionnaire Created Successfully');
-            // } 
-            // catch (\Exception $e) {
-            //     DB::rollback();
-            // }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();               
+                dd($e);
+            }
         }
     }
     public function edit() {

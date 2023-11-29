@@ -49,25 +49,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
         @endphp
         @if ($hasPermission) -->
 		<li class="nav-item">
-			<a class="nav-link active" data-bs-toggle="pill" href="#pending-selling-prices">Pending</a>
+			<a class="nav-link active" data-bs-toggle="pill" href="#pending-hiring-requests">Pending</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#approved-selling-prices">Approved(Open)</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#approved-hiring-requests">Approved(Open)</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#closed-selling-prices">Closed</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#closed-hiring-requests">Closed</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#on-hold-selling-prices">On Hold</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#on-hold-hiring-requests">On Hold</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#cancelled-selling-prices">Cancelled</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#cancelled-hiring-requests">Cancelled</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#rejected-selling-prices">Rejected</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#rejected-hiring-requests">Rejected</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#deleted-selling-prices">Deleted</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#deleted-hiring-requests">Deleted</a>
 		</li>
         <!-- @endif
         @endcanany -->
@@ -79,19 +79,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price']);
     @endphp
     @if ($hasPermission) -->
-	<div class="tab-pane fade show active" id="pending-selling-prices">
+	<div class="tab-pane fade show active" id="pending-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="pending-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table id="pending-hiring-requests-table" class="table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -107,37 +108,38 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($pendings as $key => $pending)
+						@foreach ($pendings as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
-							<td>{{ $pending->request_date ?? '' }}</td>
-							<td>{{ $pending->department_name ?? '' }}</td>
-							<td>{{ $pending->department_location ?? '' }}</td>
-							<td>{{ $pending->requested_by_name ?? '' }}</td>
-							<td>{{ $pending->requested_job_name ?? '' }}</td>
-							<td>{{ $pending->reporting_to_name ?? '' }}</td>							
-							<td>{{ $pending->experience_level_name ?? ''}}</td>
-							<td>{{ $pending->salary_range_start_in_aed ?? ''}} - {{$pending->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $pending->work_time_start ?? ''}} - {{$pending->work_time_end ?? ''}}</td>
-							<td>{{ $pending->number_of_openings ?? ''}}</td>
-							<td>{{$pending->type_of_role_name ?? ''}}</td>
-							<td>{{$pending->replacement_for_employee_name ?? ''}}</td>
-							<td>{{$pending->explanation_of_new_hiring ?? ''}}</td>
-							<td>{{$pending->created_by_name ?? ''}}</td>
-							<td>{{$pending->created_at ?? ''}}</td>
-							<td><label class="badge badge-soft-info">{{ $pending->current_status ?? '' }}</label></td>
+							<td>{{ $data->uuid ?? ''}}</td>
+							<td>{{ $data->request_date ?? '' }}</td>
+							<td>{{ $data->department_name ?? '' }}</td>
+							<td>{{ $data->department_location ?? '' }}</td>
+							<td>{{ $data->requested_by_name ?? '' }}</td>
+							<td>{{ $data->requested_job_name ?? '' }}</td>
+							<!-- <td>{{ $data->reporting_to_name ?? '' }}</td>							 -->
+							<td>{{ $data->experience_level_name ?? ''}}</td>
+							<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+							<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+							<td>{{ $data->number_of_openings ?? ''}}</td>
+							<td>{{$data->type_of_role_name ?? ''}}</td>
+							<td>{{$data->replacement_for_employee_name ?? ''}}</td>
+							<td>{{$data->explanation_of_new_hiring ?? ''}}</td>
+							<td>{{$data->created_by_name ?? ''}}</td>
+							<td>{{$data->created_at ?? ''}}</td>
+							<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
 							<td>
 							<div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$pending->id)}}">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i> View Details
 										</a>
 									</li>
                                     <li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$pending->id)}}">
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit Hiring Request
 										</a>
 									</li>
@@ -145,23 +147,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 										@if(isset($type))
 											@if($type == 'approve')
 												<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-													data-bs-target="#approve-selling-price-{{$pending->id}}">
+													data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
 													<i class="fa fa-thumbs-up" aria-hidden="true"></i>  Approve 
 												</button>
 												<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-													data-bs-target="#reject-selling-price-{{$pending->id}}">
+													data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
 													<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 												</button>
 											@endif
-										@elseif(isset($pending->is_auth_user_can_approve) && $pending->is_auth_user_can_approve != '')
-											@if(isset($pending->is_auth_user_can_approve['can_approve']))
-												@if($pending->is_auth_user_can_approve['can_approve'] == true)
+										@elseif(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
+											@if(isset($data->is_auth_user_can_approve['can_approve']))
+												@if($data->is_auth_user_can_approve['can_approve'] == true)
 													<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-														data-bs-target="#approve-selling-price-{{$pending->id}}">
+														data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
 														<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 													</button>
 													<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-														data-bs-target="#reject-selling-price-{{$pending->id}}">
+														data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
 														<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 													</button>
 												@endif
@@ -169,173 +171,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 										@endif
 									</li>
                                     <li>
-										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Delete" type="button" class="btn btn-secondary btn-sm hiring-request-delete sm-mt-3" data-id="{{ $pending->id }}" data-url="{{ route('employee-hiring-request.destroy', $pending->id) }}">
+										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Delete" type="button" class="btn btn-secondary btn-sm hiring-request-delete sm-mt-3" data-id="{{ $data->id }}" data-url="{{ route('employee-hiring-request.destroy', $data->id) }}">
 											<i class="fa fa-trash"></i> Delete
 										</button>
 									</li>
                                 </ul>
                             </div>
-								
-								
-								
-								
 							</td>
-							<div class="modal fade" id="edit-selling-price-{{$pending->id}}"  tabindex="-1"
-								aria-labelledby="exampleModalLabel" aria-hidden="true">
-								<div class="modal-dialog ">
-									<form id="form-update" action="{{ route('addon.UpdateSellingPrice', $pending->id) }}"
-										method="POST" >
-										@csrf
-										<div class="modal-content">
-											<div class="modal-header">
-												<h1 class="modal-title fs-5" id="exampleModalLabel">Update Selling Price</h1>
-												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-											</div>
-											<div class="modal-body p-3">
-												<div class="col-lg-12">
-													<div class="row">
-														<div class="row mt-2">
-															<div class="col-lg-12 col-md-12 col-sm-12">
-																<label class="form-label font-size-13 text-muted">Selling Price</label>
-															</div>
-															<div class="col-lg-12 col-md-12 col-sm-12">
-																<div class="input-group">
-																	<input name="selling_price" id="update_selling_price_{{$pending->id}}"
-																		oninput="inputNumberAbs(this)" class="form-control" required
-																		placeholder="Enter Selling Price" value="{{$pending->selling_price}}">
-																	<div class="input-group-append">
-																		<span class="input-group-text widthinput" id="basic-addon2">AED</span>
-																	</div>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-												<button type="submit" class="btn btn-primary ">Submit</button>
-											</div>
-										</div>
-									</form>
-								</div>
-							</div>
-							
-
-							<div class="modal fade" id="approve-selling-price-{{$pending->id}}"
-								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-								<div class="modal-dialog ">
-									<div class="modal-content">
-										<div class="modal-header">
-											<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Hiring Request Approval</h1>
-											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-										</div>
-										<div class="modal-body p-3">
-											<div class="col-lg-12">
-												<div class="row">
-													<div class="col-12">
-														<div class="row mt-2">
-															<div class="col-lg-6 col-md-6 col-sm-6">
-																<label class="form-label font-size-13">Approval By Position</label>
-															</div>
-															<div class="col-lg-6 col-md-6 col-sm-6">
-																@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																	{{$pending->is_auth_user_can_approve['current_approve_position']}}
-																@endif
-															</div>
-														</div>
-														<div class="row mt-2">
-															<div class="col-lg-6 col-md-6 col-sm-6">
-																<label class="form-label font-size-13">Approval By Name</label>
-															</div>
-															<div class="col-lg-6 col-md-6 col-sm-6">
-																@if(isset($pending->is_auth_user_can_approve['current_approve_person']))
-																	{{$pending->is_auth_user_can_approve['current_approve_person']}}
-																@endif
-															</div>
-														</div>
-														@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-															<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
-														@endif
-														<div class="row mt-2">
-															<div class="col-lg-12 col-md-12 col-sm-12">
-																<label class="form-label font-size-13">Comments</label>
-															</div>
-															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="comment-{{$pending->id}}" class="form-control" name="comment">
-																</textarea>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="modal-footer">
-											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-											<button type="button" class="btn btn-success status-approve-button"
-												data-id="{{ $pending->id }}" data-status="approved">Approve</button>
-										</div>
-									</div>
-								</div>
-							</div>
-
-
-							<div class="modal fade" id="reject-selling-price-{{$pending->id}}"
-								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-								<div class="modal-dialog ">
-									<div class="modal-content">
-										<div class="modal-header">
-											<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Hiring Request Rejection</h1>
-											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-										</div>
-										<div class="modal-body p-3">
-											<div class="col-lg-12">
-												<div class="row">
-													<div class="col-12">
-														<div class="row mt-2">
-															<div class="col-lg-6 col-md-6 col-sm-6">
-																<label class="form-label font-size-13">Rejection By Position</label>
-															</div>
-															<div class="col-lg-6 col-md-6 col-sm-6">
-																@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																	{{$pending->is_auth_user_can_approve['current_approve_position']}}
-																@endif
-															</div>
-														</div>
-														<div class="row mt-2">
-															<div class="col-lg-6 col-md-6 col-sm-6">
-																<label class="form-label font-size-13">Rejection By Name</label>
-															</div>
-															<div class="col-lg-6 col-md-6 col-sm-6">
-																@if(isset($pending->is_auth_user_can_approve['current_approve_person']))
-																	{{$pending->is_auth_user_can_approve['current_approve_person']}}
-																@endif
-															</div>
-														</div>
-														@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-															<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
-														@endif
-														<div class="row mt-2">
-															<div class="col-lg-12 col-md-12 col-sm-12">
-																<label class="form-label font-size-13">Comments</label>
-															</div>
-															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="comment-{{$pending->id}}" class="form-control" name="comment">
-																</textarea>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="modal-footer">
-											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-											<button type="button" class="btn btn-danger  status-reject-button" data-id="{{ $pending->id }}"
-												data-status="rejected">Reject</button>
-										</div>
-									</div>
-								</div>
-							</div>
+							@include('hrm.hiring.hiring_request.approve_reject_modal')					
 						</tr>
 						@endforeach
 					</tbody>
@@ -343,19 +186,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-    <div class="tab-pane fade show" id="approved-selling-prices">
+    <div class="tab-pane fade show" id="approved-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="approved-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table id="approved-hiring-requests-table" class="table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -374,12 +218,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($approved as $key => $approvedOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
+							<td>{{ $approvedOne->uuid ?? ''}}</td>
 							<td>{{ $approvedOne->request_date ?? '' }}</td>
 							<td>{{ $approvedOne->department_name ?? '' }}</td>
 							<td>{{ $approvedOne->department_location ?? '' }}</td>
 							<td>{{ $approvedOne->requested_by_name ?? '' }}</td>
 							<td>{{ $approvedOne->requested_job_name ?? '' }}</td>
-							<td>{{ $approvedOne->reporting_to_name ?? '' }}</td>							
+							<!-- <td>{{ $approvedOne->reporting_to_name ?? '' }}</td>							 -->
 							<td>{{ $approvedOne->experience_level_name ?? ''}}</td>
 							<td>{{ $approvedOne->salary_range_start_in_aed ?? ''}} - {{$approvedOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $approvedOne->work_time_start ?? ''}} - {{$approvedOne->work_time_end ?? ''}}</td>
@@ -406,20 +251,35 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 										<i class="fa fa-list" aria-hidden="true"></i> Edit Questionnaire
 										</a>
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Job Description" class="btn btn-sm btn-secondary" href="{{route('employee-hiring-job-description.create-or-edit',$approvedOne->id)}}">
-										<i class="fa fa-address-card" aria-hidden="true"></i> Create Job Description
+										<i class="fa fa-address-card" aria-hidden="true"></i> Add Job Description
 										</a>
+										<!-- <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Interview Summary Report" class="btn btn-sm btn-warning" href="{{route('interview-summary-report.create-or-edit',$approvedOne->id)}}">
+										<i class="fa fa-plus" aria-hidden="true"></i> Interview Summary
+										</a> -->
 										@else
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
 										<i class="fa fa-list" aria-hidden="true"></i> Create Questionnaire
 										</a>
 									@endif
 									</li>
-                                    <!-- <li>
-										
+									<li>
+										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+											data-bs-target="#closed-hiring-request-{{$approvedOne->id}}">
+											<i class="fa fa-check" aria-hidden="true"></i> Closed
+										</button>
 									</li>
                                     <li>
-										
-									</li> -->
+										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="On Hold" type="button" class="btn btn-primary btn-sm"  data-bs-toggle="modal"
+											data-bs-target="#on-hold-hiring-request-{{$approvedOne->id}}">
+											<i class="fa fa-hand-rock" aria-hidden="true"></i> On Hold
+										</button>
+									</li>
+                                    <li>
+										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Cancelled" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+											data-bs-target="#cancelled-hiring-request-{{$approvedOne->id}}">
+											<i class="fa fa-ban" aria-hidden="true"></i> Cancelled
+										</button>
+									</li>
                                 </ul>
                             </div>
 								
@@ -428,6 +288,120 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 								</a> -->
 								
 							</td>
+							<div class="modal fade" id="cancelled-hiring-request-{{$approvedOne->id}}"
+								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div class="modal-dialog ">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Hiring Request Cancelled</h1>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body p-3">
+											<div class="col-lg-12">
+												<div class="row">
+													<div class="col-12">
+														<div class="row mt-2">
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<label class="form-label font-size-13">Comments</label>
+															</div>
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<textarea rows="5" id="comment-{{$approvedOne->id}}" class="form-control" name="comment">
+																</textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+											<button type="button" class="btn btn-danger status-cancelled-button"
+												data-id="{{ $approvedOne->id }}" data-status="cancelled">Submit</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="modal fade" id="on-hold-hiring-request-{{$approvedOne->id}}"
+								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div class="modal-dialog ">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Hiring Request On Hold</h1>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body p-3">
+											<div class="col-lg-12">
+												<div class="row">
+													<div class="col-12">
+														<div class="row mt-2">
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<label class="form-label font-size-13">Comments</label>
+															</div>
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<textarea rows="5" id="comment-{{$approvedOne->id}}" class="form-control" name="comment">
+																</textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+											<button type="button" class="btn btn-primary status-onhold-button"
+												data-id="{{ $approvedOne->id }}" data-status="onhold">Submit</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="modal fade" id="closed-hiring-request-{{$approvedOne->id}}"
+								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div class="modal-dialog ">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Hiring Request Closed</h1>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body p-3">
+											<div class="col-lg-12">
+												<div class="row">
+													<div class="col-12">
+														<div class="row mt-2">
+															@if(isset($approvedOne->shortlistedCandidates))
+																@if(count($approvedOne->shortlistedCandidates) > 0)
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Selected Candidates</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<select name="candidate_id[]" id="candidate_id_{{$approvedOne->id}}" multiple="true" style="width:100%;"
+																		class="candidate_id form-control widthinput" autofocus>
+																			@foreach($approvedOne->shortlistedCandidates as $shortlistedCandidate)
+																				<option value="{{$shortlistedCandidate->id}}" selected>{{$shortlistedCandidate->candidate_name}}</option>
+																			@endforeach
+																		</select>
+																	</div>
+																@endif
+															@endif
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<label class="form-label font-size-13">Comments</label>
+															</div>
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<textarea rows="5" id="comment-{{$approvedOne->id}}" class="form-control" name="comment">
+																</textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+											<button type="button" class="btn btn-primary status-closed-button"
+												data-id="{{ $approvedOne->id }}" data-status="closed">Submit</button>
+										</div>
+									</div>
+								</div>
+							</div>
 						</tr>
 						@endforeach
 					</tbody>
@@ -435,19 +409,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade show" id="closed-selling-prices">
+	<div class="tab-pane fade show" id="closed-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="closed-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table id="closed-hiring-requests-table" class="table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -466,12 +441,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($closed as $key => $closedOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
+							<td>{{ $closedOne->uuid ?? ''}}</td>
 							<td>{{ $closedOne->request_date ?? '' }}</td>
 							<td>{{ $closedOne->department_name ?? '' }}</td>
 							<td>{{ $closedOne->department_location ?? '' }}</td>
 							<td>{{ $closedOne->requested_by_name ?? '' }}</td>
 							<td>{{ $closedOne->requested_job_name ?? '' }}</td>
-							<td>{{ $closedOne->reporting_to_name ?? '' }}</td>							
+							<!-- <td>{{ $closedOne->reporting_to_name ?? '' }}</td>							 -->
 							<td>{{ $closedOne->experience_level_name ?? ''}}</td>
 							<td>{{ $closedOne->salary_range_start_in_aed ?? ''}} - {{$closedOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $closedOne->work_time_start ?? ''}} - {{$closedOne->work_time_end ?? ''}}</td>
@@ -496,19 +472,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade show" id="on-hold-selling-prices">
+	<div class="tab-pane fade show" id="on-hold-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="on-hold-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table id="on-hold-hiring-requests-table" class="table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -527,12 +504,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($onHold as $key => $onHoldOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
+						<td>{{$onHoldOne->uuid ?? ''}}</td>
 							<td>{{ $onHoldOne->request_date ?? '' }}</td>
 							<td>{{ $onHoldOne->department_name ?? '' }}</td>
 							<td>{{ $onHoldOne->department_location ?? '' }}</td>
 							<td>{{ $onHoldOne->requested_by_name ?? '' }}</td>
 							<td>{{ $onHoldOne->requested_job_name ?? '' }}</td>
-							<td>{{ $onHoldOne->reporting_to_name ?? '' }}</td>							
+							<!-- <td>{{ $onHoldOne->reporting_to_name ?? '' }}</td>							 -->
 							<td>{{ $onHoldOne->experience_level_name ?? ''}}</td>
 							<td>{{ $onHoldOne->salary_range_start_in_aed ?? ''}} - {{$onHoldOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $onHoldOne->work_time_start ?? ''}} - {{$onHoldOne->work_time_end ?? ''}}</td>
@@ -557,19 +535,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade show" id="cancelled-selling-prices">
+	<div class="tab-pane fade show" id="cancelled-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="cancelled-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table id="cancelled-hiring-requests-table" class="table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -588,12 +567,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($cancelled as $key => $cancelledOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
+						<td>{{ $cancelledOne->uuid ?? ''}}</td>
 							<td>{{ $cancelledOne->request_date ?? '' }}</td>
 							<td>{{ $cancelledOne->department_name ?? '' }}</td>
 							<td>{{ $cancelledOne->department_location ?? '' }}</td>
 							<td>{{ $cancelledOne->requested_by_name ?? '' }}</td>
 							<td>{{ $cancelledOne->requested_job_name ?? '' }}</td>
-							<td>{{ $cancelledOne->reporting_to_name ?? '' }}</td>							
+							<!-- <td>{{ $cancelledOne->reporting_to_name ?? '' }}</td>							 -->
 							<td>{{ $cancelledOne->experience_level_name ?? ''}}</td>
 							<td>{{ $cancelledOne->salary_range_start_in_aed ?? ''}} - {{$cancelledOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $cancelledOne->work_time_start ?? ''}} - {{$cancelledOne->work_time_end ?? ''}}</td>
@@ -618,19 +598,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade show" id="rejected-selling-prices">
+	<div class="tab-pane fade show" id="rejected-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="rejected-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table id="rejected-hiring-requests-table" class="table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -649,12 +630,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($rejected as $key => $rejectedOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
+						<td>{{ $rejectedOne->uuid ?? ''}}</td>
 							<td>{{ $rejectedOne->request_date ?? '' }}</td>
 							<td>{{ $rejectedOne->department_name ?? '' }}</td>
 							<td>{{ $rejectedOne->department_location ?? '' }}</td>
 							<td>{{ $rejectedOne->requested_by_name ?? '' }}</td>
 							<td>{{ $rejectedOne->requested_job_name ?? '' }}</td>
-							<td>{{ $rejectedOne->reporting_to_name ?? '' }}</td>							
+							<!-- <td>{{ $rejectedOne->reporting_to_name ?? '' }}</td>							 -->
 							<td>{{ $rejectedOne->experience_level_name ?? ''}}</td>
 							<td>{{ $rejectedOne->salary_range_start_in_aed ?? ''}} - {{$rejectedOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $rejectedOne->work_time_start ?? ''}} - {{$rejectedOne->work_time_end ?? ''}}</td>
@@ -679,19 +661,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade show" id="deleted-selling-prices">
+	<div class="tab-pane fade show" id="deleted-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="deleted-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table id="deleted-hiring-requests-table" class="table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
+							<th>UUID</th>
 							<th>Request Date</th>
 							<th>Department Name</th>
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<th>Reporting To With Position</th>
+							<!-- <th>Reporting To With Position</th> -->
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -710,12 +693,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						@foreach ($deleted as $key => $deletedOne)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
+						<td>{{ $deletedOne->uuid ?? ''}}</td>
 							<td>{{ $deletedOne->request_date ?? '' }}</td>
 							<td>{{ $deletedOne->department_name ?? '' }}</td>
 							<td>{{ $deletedOne->department_location ?? '' }}</td>
 							<td>{{ $deletedOne->requested_by_name ?? '' }}</td>
 							<td>{{ $deletedOne->requested_job_name ?? '' }}</td>
-							<td>{{ $deletedOne->reporting_to_name ?? '' }}</td>							
+							<!-- <td>{{ $deletedOne->reporting_to_name ?? '' }}</td>							 -->
 							<td>{{ $deletedOne->experience_level_name ?? ''}}</td>
 							<td>{{ $deletedOne->salary_range_start_in_aed ?? ''}} - {{$deletedOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $deletedOne->work_time_start ?? ''}} - {{$deletedOne->work_time_end ?? ''}}</td>
@@ -748,26 +732,49 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 @endsection
 @push('scripts')
 <script type="text/javascript">
+	var approved = {!! json_encode($approved) !!};
 	$(document).ready(function () {
-	    $('.status-reject-button').click(function (e) {
+		var countApproved = 0;
+		countApproved = approved.length;
+		if(countApproved > 0 ) {
+			for(var i=0; i<countApproved; i++) {
+				$('#candidate_id_'+approved[i].id).select2({
+					allowClear: true,
+					placeholder:"Choose Selected Candidates Name",
+					dropdownParent: $('#closed-hiring-request-'+approved[i].id)
+				});
+			}
+		}
+		$('.status-closed-button').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
-	        approveOrRejectHiringrequest(id, status)
+	        updateFinalStatusHiringrequest(id, status)
 	    })
-	    $('.status-approve-button').click(function (e) {
+		$('.status-onhold-button').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
-	        approveOrRejectHiringrequest(id, status)
+	        updateFinalStatusHiringrequest(id, status)
 	    })
-	    function approveOrRejectHiringrequest(id, status) {
+		$('.status-cancelled-button').click(function (e) {
+	        var id = $(this).attr('data-id');
+	        var status = $(this).attr('data-status');
+	        updateFinalStatusHiringrequest(id, status)
+	    })
+		function updateFinalStatusHiringrequest(id, status) {
 			var comment = $("#comment-"+id).val();
-			var current_approve_position = $("#current_approve_position_"+id).val();
-	        let url = '{{ route('employee-hiring-request.request-action') }}';
-	        if(status == 'rejected') {
-	            var message = 'Reject';
-	        }else{
-	            var message = 'Approve';
+	        let url = '{{ route('employee-hiring-request.final-status') }}';
+	        if(status == 'closed') {
+	            var message = 'Closed';
+				var selectedCandidates = $("#candidate_id_"+id).val();
 	        }
+			else if(status == 'onhold'){
+	            var message = 'On Hold';
+				var selectedCandidates = [];
+	        }
+			else if(status =='cancelled'){
+				var message = 'Cancelled';
+				var selectedCandidates = [];
+			}
 	        var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee hiring request ?',function (e) {
 	            if (e) {
 	                $.ajax({
@@ -778,7 +785,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 	                        id: id,
 	                        status: status,
 	                        comment: comment,
-							current_approve_position: current_approve_position,
+							selectedCandidates: selectedCandidates,
 	                        _token: '{{ csrf_token() }}'
 	                    },
 	                    success: function (data) {

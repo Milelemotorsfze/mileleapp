@@ -13,12 +13,13 @@ class MasterJobPositionController extends Controller
 {
     public function store(Request $request) {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|unique:master_job_positions',
         ]);
         if ($validator->fails()) {
-            $jobPosition['error'] = 'Job Title is Required';
+            $jobPosition['error'] = $validator->messages()->first();
         }
         else {
+
             $jobPosition = new MasterJobPosition();
             $jobPosition->name = $request->name;
             $jobPosition->created_by = Auth::id();

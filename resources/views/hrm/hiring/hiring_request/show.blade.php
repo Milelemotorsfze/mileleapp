@@ -3,6 +3,24 @@
   .texttransform {
     text-transform: capitalize;
   }
+  
+/* element.style {
+} */
+.nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
+    width: 99%;
+    border: 1px solid #4ba6ef !important;
+    background-color: #c1e1fb !important;
+}
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: black!important;
+    background-image: linear-gradient(to right,#4ba6ef,#4ba6ef,#0065ac)!important;
+}
+.nav-link:focus{
+    color: black!important;
+}
+.nav-link:hover {
+    color: black!important;
+}
 </style>
 @section('content')
 <div class="card-header">
@@ -39,383 +57,227 @@
 	@endif
 </div>
 <div class="card-body">
-@include('hrm.hiring.hiring_request.details')
-<div class="row">
-@if(isset($data->questionnaire))
-    <div class="col-xxl-6 col-lg-6 col-md-6">
-    <div class="col-xxl-12 col-lg-12 col-md-12">
+<div class="portfolio">
+	<ul class="nav nav-pills nav-fill" id="my-tab">
+      
+		<li class="nav-item">
+			<a class="nav-link active" data-bs-toggle="pill" href="#requests"> Hiring Request</a>
+		</li>
+        <li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#approvals-and-history"> Approvals and History</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#questionnaire-and-job-descriptions">Questionnaire and Job Description</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#cancelled-hiring-requests">Interview Summary Report</a>
+		</li>
+	</ul>
+</div>
+<div class="tab-content">
+	<div class="tab-pane fade show active" id="requests">
+        <br>
+            <div class="card">
+                <div class="card-header" style="background-color:#e8f3fd;">
+                    <div class="row">
+                        <div class="col-lg-10 col-md-3 col-sm-6 col-12">
+                            <h4 class="card-title"><center>Hiring request Info</center></h4>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-6 col-12">
+                            @if(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
+                                @if(isset($data->is_auth_user_can_approve['can_approve']))
+                                    @if($data->is_auth_user_can_approve['can_approve'] == true)
+                                        <button style="float:right;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+                                            <i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
+                                        </button>
+                                        <button style="float:right; margin-right:5px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+                                            data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+                                            <i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
+                                        </button>
+                                        @include('hrm.hiring.hiring_request.approve_reject_modal')
+                                    @endif
+                                @endif
+                            @endif
+                            <a style="float:right; margin-right:5px;" title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$data->id)}}">
+                                <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @include('hrm.hiring.hiring_request.details')
+                </div>
+            </div>
+	</div>
+</div>
+<div class="tab-content">
+	<div class="tab-pane fade show" id="approvals-and-history">
+        <br>
+        <div class="row">
+        <div class="col-xxl-6 col-lg-6 col-md-6">
+            <div class="card">
+                <div class="card-header" style="background-color:#e8f3fd;">
+                    <h4 class="card-title"><center>Approvals By</center></h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <center><h4 class="card-title">Team Lead / Reporting Manager</h4></center>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Name :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->department_head_name ?? ''}}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Status :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                        <label class="badge texttransform @if($data->action_by_department_head =='pending') badge-soft-info 
+                                        @elseif($data->action_by_department_head =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->action_by_department_head ?? ''}}</label>
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Date & Time :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->department_head_action_at ?? ''}}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Comments :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->comments_by_department_head ?? ''}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <center><h4 class="card-title">Recruiting Manager</h4></center>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Name :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->hiring_manager_name ?? ''}}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Status :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                        <label class="badge texttransform @if($data->action_by_hiring_manager =='pending') badge-soft-info 
+                                        @elseif($data->action_by_hiring_manager =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->action_by_hiring_manager ?? ''}}</label>
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Date & Time :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->hiring_manager_action_at ?? ''}}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Comments :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->comments_by_hiring_manager ?? ''}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <center><h4 class="card-title">Division Head</h4></center>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Name :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->divisionHead->name ?? ''}}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Status :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            <label class="badge texttransform @if($data->action_by_division_head =='pending') badge-soft-info 
+                                        @elseif($data->action_by_division_head =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->action_by_division_head ?? ''}}</label>
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Date & Time :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->division_head_action_at ?? ''}}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Comments :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->comments_by_division_head ?? ''}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <center><h4 class="card-title">HR Manager</h4></center>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Name :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->hr_manager_name ?? ''}}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Status :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                        <label class="badge texttransform @if($data->action_by_hr_manager =='pending') badge-soft-info 
+                                        @elseif($data->action_by_hr_manager =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->action_by_hr_manager ?? ''}}</label>
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Date & Time :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->hr_manager_action_at ?? ''}}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Comments :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->comments_by_hr_manager ?? ''}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+		</div>
+        <div class="col-xxl-6 col-lg-6 col-md-6">
         <div class="card">
-        <div class="card-header">
-            <h4 class="card-title">Questionnaire</h4>
-        </div>
-        <div class="card-body">
-            <div class="row">
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Designation Type :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->designation_type_name ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Designation Name :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->designation->name ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Years of experience in specific job role :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->no_of_years_of_experience_in_specific_job_role ?? ''}} Years</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Reporting structure :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->reporting_structure_name ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Work location :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->workLocation->name ?? ''}} , {{$data->questionnaire->workLocation->address ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Number of hiring :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->number_of_openings ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Hiring time :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->hiring_time_name ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Working hours :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->work_time_start ?? ''}} - {{$data->questionnaire->work_time_end ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Education :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->education_name ?? ''}}</span>
-            </div>
-            @if($data->questionnaire->education == 'pg_in_same_specialisation_or_related_to_department')
-                <div class="col-lg-6 col-md-3 col-sm-6">
-                    <label for="choices-single-default" class="form-label">Education Certificates:</label>
-                </div>
-                <div class="col-lg-6 col-md-9 col-sm-6">
-                    <span>{{$data->questionnaire->education_certificates ?? ''}}</span>
-                </div>
-            @endif
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Certification :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->certification ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Any specific industry experience :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->specificIndustryExperience->name ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Any specific company experience :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->specific_company_experience ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Salary range :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->salary_range_start_in_aed ?? ''}} AED - {{$data->questionnaire->salary_range_end_in_aed ?? ''}} AED</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Visa Type :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->visaType->name ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Nationality :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->nationalities->nationality ?? ''}} ( {{$data->questionnaire->nationalities->name ?? ''}} )</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Age Range :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->min_age ?? ''}} - {{$data->questionnaire->max_age ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Any additional langauage other than English :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>
-                @if(isset($data->questionnaire->additionalLanguages))
-                    @if(count($data->questionnaire->additionalLanguages) > 0)
-                    @foreach($data->questionnaire->additionalLanguages as $additionalLanguage)
-                        {{$additionalLanguage->languageName->name}} ,
-                    @endforeach
-                    @endif
-                @endif
-                </span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Did he required to travel for work purpose ? :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span class="texttransform">{{$data->questionnaire->required_to_travel_for_work_purpose ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Do candidate requires multiple industry experience ? :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span class="texttransform">{{$data->questionnaire->requires_multiple_industry_experience ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Team Handling experience is required ? :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span class="texttransform">{{$data->questionnaire->team_handling_experience_required ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Driving license :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span class="texttransform">{{$data->questionnaire->driving_licence ?? ''}}</span>
-            </div>
-            @if($data->questionnaire->driving_licence == 'yes')
-                <div class="col-lg-6 col-md-3 col-sm-6">
-                    <label for="choices-single-default" class="form-label">Own car :</label>
-                </div>
-                <div class="col-lg-6 col-md-9 col-sm-6">
-                    <span class="texttransform">{{$data->questionnaire->own_car ?? ''}}</span>
-                </div>
-                <div class="col-lg-6 col-md-3 col-sm-6">
-                    <label for="choices-single-default" class="form-label">Fuels Expenses covered by :</label>
-                </div>
-                <div class="col-lg-6 col-md-9 col-sm-6">
-                    <span class="texttransform">{{$data->questionnaire->fuel_expenses_by ?? ''}}</span>
-                </div>
-            @endif
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Is shortlisted candidate required to work on trial ? :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span class="texttransform">{{$data->questionnaire->required_to_work_on_trial ?? ''}}</span>
-            </div>
-            @if($data->questionnaire->required_to_work_on_trial == 'yes')
-                <div class="col-lg-6 col-md-3 col-sm-6">
-                    <label for="choices-single-default" class="form-label">Number Of Trial Days :</label>
-                </div>
-                <div class="col-lg-6 col-md-9 col-sm-6">
-                    <span>{{$data->questionnaire->number_of_trial_days ?? ''}} Days</span>
-                </div>
-            @endif             
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Is comission involved along with the salary ? :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span class="texttransform">{{$data->questionnaire->commission_involved_in_salary ?? ''}}</span>
-            </div>
-            @if($data->questionnaire->commission_involved_in_salary == 'yes' && $data->questionnaire->commission_type == 'amount')
-                <div class="col-lg-6 col-md-3 col-sm-6">
-                    <label for="choices-single-default" class="form-label">Commission Amount :</label>
-                </div>
-                <div class="col-lg-6 col-md-9 col-sm-6">
-                    <span>{{$data->questionnaire->commission_amount ?? ''}} AED</span>
-                </div>
-            @elseif($data->questionnaire->commission_involved_in_salary == 'yes' && $data->questionnaire->commission_type == 'percentage')              
-                <div class="col-lg-6 col-md-3 col-sm-6">
-                    <label for="choices-single-default" class="form-label">Commission Percentage :</label>
-                </div>
-                <div class="col-lg-6 col-md-9 col-sm-6">
-                    <span>{{$data->questionnaire->commission_percentage ?? ''}} %</span>
-                </div>
-            @endif
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Top 3 skills or mandatory work experience :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->mandatory_skills ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Interviewed by :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->interviewedBy->name ?? ''}} ( {{$data->questionnaire->interviewedBy->email ?? ''}} )</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Objective of the job Purpose of the job opening :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->job_opening_purpose_objective ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Screening questions :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->screening_questions ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Technical test :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->technical_test ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Job description during trial working :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->trial_work_job_description ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Stake holders for job evaluation :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->job_evaluation_stake_holders ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Recuritment Source :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->recruitmentSource->name ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Experience :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->experience_name ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Travel Experience:</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span class="texttransform">{{$data->questionnaire->travel_experience ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Divison or Department:</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->department->name ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Career Level :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->carrerLevel->name ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Current or Past Employer Size :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->current_or_past_employer_size_start ?? ''}} - {{$data->questionnaire->current_or_past_employer_size_end ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Trial Pay :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->trial_pay_in_aed ?? ''}} AED</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Out of Office visits :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span class="texttransform">{{$data->questionnaire->out_of_office_visit ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Remote work :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span class="texttransform">{{$data->questionnaire->remote_work ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">International Business Trips required :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span class="texttransform">{{$data->questionnaire->international_business_trip_required ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Probation length :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->probation_length_in_months ?? ''}} Months</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Probation Pay :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->probation_pay_amount_in_aed ?? ''}} AED</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Incentives, Perks, & Bonus :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->incentives_perks_bonus ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">KPI :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->kpi ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Practical test :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->practical_test ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Trial objectives and evaluation method :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->trial_objectives_and_evaluation_method ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Duties & Tasks :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->duties_and_tasks ?? ''}}</span>
-            </div>
-            <div class="col-lg-6 col-md-3 col-sm-6">
-                <label for="choices-single-default" class="form-label">Next Career Path :</label>
-            </div>
-            <div class="col-lg-6 col-md-9 col-sm-6">
-                <span>{{$data->questionnaire->nextCareerPath->name ?? ''}}</span>
-            </div>
-            </div>
-        </div>
-        </div>
-    </div>
-    </div>
-@endif
-<div class="col-xxl-6 col-lg-6 col-md-6">
-    <div class="card">
-        <div class="card-header">
-            <h4 class="card-title">Job Description</h4>
-        </div>
-        <div class="card-body">
-            <div class="col-xxl-12 col-lg-12 col-md-12">
-                <div class="col-lg-6 col-md-3 col-sm-6">
-                    <label for="choices-single-default" class="form-label">Top 3 skills or mandatory work experience :</label>
-                </div>
-                <div class="col-lg-6 col-md-9 col-sm-6">
-                    <span>{{$data->questionnaire->mandatory_skills ?? ''}}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="card">
-        <div class="card-header">
-            <h4 class="card-title">History</h4>
+        <div class="card-header" style="background-color:#e8f3fd;">
+            <h4 class="card-title"><center>History</center></h4>
         </div>
         <div class="card-body">
             <div class="col-xxl-12 col-lg-12 col-md-12">
@@ -434,9 +296,19 @@
             @endif
             </div>
         </div>
+        </div>
+		</div>
+		</div>
     </div>
 </div>
-
+<div class="tab-content">
+	<div class="tab-pane fade show" id="questionnaire-and-job-descriptions">
+        <br>
+        <div class="row">
+            @include('hrm.hiring.hiring_request.questionnaire_details')
+            @include('hrm.hiring.hiring_request.job_description_details')
+        </div>
+    </div>
 </div>
 </div>
 @endsection

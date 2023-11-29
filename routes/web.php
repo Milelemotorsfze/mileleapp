@@ -75,7 +75,7 @@ use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\HRM\Hiring\EmployeeLeaveController;
 use App\Http\Controllers\HRM\Hiring\EmployeeLiabilityController;
-
+use App\Http\Controllers\HRM\Hiring\InterviewSummaryReportController;
 /*
 /*
 |--------------------------------------------------------------------------
@@ -237,6 +237,7 @@ Route::get('/d', function () {
         Route::post('employee-hiring-request/request-action', 'requestAction')->name('employee-hiring-request.request-action');
         Route::get('employee-hiring-request/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-request.create-or-edit');
         Route::post('employee-hiring-request/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-request.store-or-update');
+        Route::post('employee-hiring-request/final-status', 'updateFinalStatus')->name('employee-hiring-request.final-status');
     });
 
     // Employee Hiring Questionnaire
@@ -251,8 +252,15 @@ Route::get('/d', function () {
     Route::controller(JobDescriptionController::class)->group(function(){
         Route::get('employee-hiring-job-description/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-job-description.create-or-edit');
         Route::post('employee-hiring-job-description/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-job-description.store-or-update');
+        Route::post('employee-hiring-job-description/request-action', 'requestAction')->name('employee-hiring-job-description.request-action');
     });
-
+    // Interview Summary Report
+    Route::resource('interview-summary-report', InterviewSummaryReportController::class);
+    Route::controller(InterviewSummaryReportController::class)->group(function(){
+        Route::get('interview-summary-report/create-or-edit/{id}', 'createOrEdit')->name('interview-summary-report.create-or-edit');
+        Route::post('interview-summary-report/store-or-update/{id}', 'storeOrUpdate')->name('interview-summary-report.store-or-update');
+        Route::post('interview-summary-report/request-action', 'requestAction')->name('interview-summary-report.request-action');
+    });
     // Employee Passport Request
     Route::resource('passport_request', PassportRequestController::class);
     Route::controller(PassportRequestController::class)->group(function(){
@@ -282,6 +290,7 @@ Route::get('/d', function () {
 
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
+    Route::get('demand-planning/get-model-year', [DemandController::class,'getModelYear'])->name('demand.get-model-year');
     Route::get('demand-planning/get-variant', [DemandController::class,'getVariant'])->name('demand.get-variant');
     Route::resource('demands', DemandController::class);
     Route::resource('demand-lists', DemandListController::class);

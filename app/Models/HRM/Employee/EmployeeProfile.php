@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
+use App\Models\Masters\MasterJobPosition;
 class EmployeeProfile extends Model
 {
     use HasFactory, SoftDeletes;
@@ -112,5 +113,8 @@ class EmployeeProfile extends Model
     ];
     public function teamLeadOrReportingManager() {
         return $this->hasOne(User::class,'id','team_lead_or_reporting_manager');
+    }
+    public function designation() {
+        return $this->hasOne(MasterJobPosition::class,'id','designation_id');
     }
 }

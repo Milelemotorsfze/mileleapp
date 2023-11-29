@@ -9,35 +9,42 @@
         }
     }
 </style>
-
 <div class="row">
-    <div class="col-xxl-6 col-lg-6 col-md-12">
-        <div class="col-xxl-12 col-lg-12 col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-2 col-md-3 col-sm-6 col-12">
-                            <label for="choices-single-default" class="form-label"> Request Date :</label>
-                        </div>
-                        <div class="col-lg-4 col-md-3 col-sm-6 col-12">
-                            <span>{{ $data->request_date ?? '' }}</span>
-                        </div>
-                        <div class="col-lg-2 col-md-3 col-sm-6 col-12">
-                            <label for="choices-single-default" class="form-label"> Current Status :</label>
-                        </div>
-                        <div class="col-lg-4 col-md-3 col-sm-6 col-12">
-                            @if($data->current_status == 'Rejected')
-                            <label class="badge badge-soft-danger">{{ $data->current_status ?? '' }}</label>
-                            @elseif($data->current_status == 'Approved')
-                            <label class="badge badge-soft-success">{{ $data->current_status ?? '' }}</label>
-                            @else
-                            <label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label>
-                            @endif
-                        </div>
+    <div class="col-xxl-12 col-lg-12 col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-1 col-md-3 col-sm-6 col-12">
+                        <label for="choices-single-default" class="form-label"> Request Date :</label>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                        <span>{{ $data->request_date ?? '' }}</span>
+                    </div>
+                    <div class="col-lg-1 col-md-3 col-sm-6 col-12">
+                        <label for="choices-single-default" class="form-label"> UUID :</label>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                        <span style="color:#fd625e;"><strong>{{$data->uuid ?? ''}}</strong></span>
+                    </div>
+                    <div class="col-lg-1 col-md-3 col-sm-6 col-12">
+                        <label for="choices-single-default" class="form-label"> Current Status :</label>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                        @if($data->current_status == 'Rejected')
+                        <label class="badge badge-soft-danger">{{ $data->current_status ?? '' }}</label>
+                        @elseif($data->current_status == 'Approved')
+                        <label class="badge badge-soft-success">{{ $data->current_status ?? '' }}</label>
+                        @else
+                        <label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xxl-6 col-lg-6 col-md-12">
         <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
             <div class="card">
                 <div class="card-header">
@@ -55,7 +62,7 @@
                             <label for="choices-single-default" class="form-label"> Department Location :</label>
                         </div>
                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                            <span>{{ $data->department_location ?? '' }}</span>
+                            <span>{{ $data->department_location ?? '' }} </br> {{ $data->location->address ?? ''}}</span>
                         </div>
                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                             <label for="choices-single-default" class="form-label"> Requested By :</label>
@@ -81,12 +88,12 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                    <!-- <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                         <label for="choices-single-default" class="form-label"> Reporting To With Position:</label>
                     </div>
                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                         <span>{{ $data->reporting_to_name ?? '' }}</span>
-                    </div>
+                    </div> -->
                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                         <label for="choices-single-default" class="form-label"> Experience Level :</label>
                     </div>
@@ -115,14 +122,19 @@
                         <label for="choices-single-default" class="form-label"> Type Of Role :</label>
                     </div>
                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                        <span>{{ $data->type_of_role_name ?? '' }}</span>
+                        <span>
+                            {{ $data->type_of_role_name ?? '' }}
+                            @if($data->type_of_role_name == 'Replacement')
+                            (' for' {{ $data->replacement_for_employee_name ?? '' }})
+                            @endif
+                        </span>
                     </div>
-                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                    <!-- <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                         <label for="choices-single-default" class="form-label">Replacement For Employee :</label>
                     </div>
                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                         <span>{{ $data->replacement_for_employee_name ?? '' }}</span>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -138,167 +150,6 @@
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12">
                         <span>{{$data->explanation_of_new_hiring ?? ''}}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xxl-12 col-lg-12 col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">Approvals By</h4>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-6 col-md-6 col-sm-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <center><h4 class="card-title">Team Lead / Reporting Manager</h4></center>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Name :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->department_head_name ?? ''}}
-                                    </div>
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Status :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                    <label class="badge texttransform @if($data->action_by_department_head =='pending') badge-soft-info 
-                                    @elseif($data->action_by_department_head =='approved') badge-soft-success 
-                                    @else badge-soft-danger @endif">{{$data->action_by_department_head ?? ''}}</label>
-                                    </div>
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Date & Time :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->department_head_action_at ?? ''}}
-                                    </div>
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Comments :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->comments_by_department_head ?? ''}}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <center><h4 class="card-title">Recruiting Manager</h4></center>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Name :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->hiring_manager_name ?? ''}}
-                                    </div>
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Status :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                    <label class="badge texttransform @if($data->action_by_hiring_manager =='pending') badge-soft-info 
-                                    @elseif($data->action_by_hiring_manager =='approved') badge-soft-success 
-                                    @else badge-soft-danger @endif">{{$data->action_by_hiring_manager ?? ''}}</label>
-                                    </div>
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Date & Time :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->hiring_manager_action_at ?? ''}}
-                                    </div>
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Comments :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->comments_by_hiring_manager ?? ''}}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <center><h4 class="card-title">Division Head</h4></center>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Name :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->divisionHead->name ?? ''}}
-                                    </div>
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Status :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                          <label class="badge texttransform @if($data->action_by_division_head =='pending') badge-soft-info 
-                                    @elseif($data->action_by_division_head =='approved') badge-soft-success 
-                                    @else badge-soft-danger @endif">{{$data->action_by_division_head ?? ''}}</label>
-                                    </div>
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Date & Time :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->division_head_action_at ?? ''}}
-                                    </div>
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Comments :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->comments_by_division_head ?? ''}}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <center><h4 class="card-title">HR Manager</h4></center>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Name :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->hr_manager_name ?? ''}}
-                                    </div>
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Status :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                    <label class="badge texttransform @if($data->action_by_hr_manager =='pending') badge-soft-info 
-                                    @elseif($data->action_by_hr_manager =='approved') badge-soft-success 
-                                    @else badge-soft-danger @endif">{{$data->action_by_hr_manager ?? ''}}</label>
-                                    </div>
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Date & Time :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->hr_manager_action_at ?? ''}}
-                                    </div>
-                                    <div class="col-lg-2 col-md-12 col-sm-12">
-                                        Comments :
-                                    </div>
-                                    <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->comments_by_hr_manager ?? ''}}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

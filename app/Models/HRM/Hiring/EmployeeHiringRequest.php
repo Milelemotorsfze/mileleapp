@@ -13,17 +13,19 @@ use App\Models\Masters\MasterExperienceLevel;
 use App\Models\HRM\Approvals\ApprovalByPositions;
 use App\Models\HRM\Approvals\DepartmentHeadApprovals;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\HRM\Hiring\InterviewSummaryReport;
+use Haruncpi\LaravelIdGenerator\IdGenerator;
 class EmployeeHiringRequest extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = "employee_hiring_requests";
     protected $fillable = [
+        'uuid',
         'request_date',
         'department_id',
         'location_id',
         'requested_by',
         'requested_job_title',
-        'reporting_to',
         'number_of_openings',
         'salary_range_start_in_aed',
         'salary_range_end_in_aed',
@@ -35,6 +37,16 @@ class EmployeeHiringRequest extends Model
         'explanation_of_new_hiring',
         'status',
         'final_status',
+
+        'closed_by',
+        'closed_at',
+        'closed_comment',
+        'on_hold_by',
+        'on_hold_at',
+        'on_hold_comment',
+        'cancelled_by',
+        'cancelled_at',
+        'cancelled_comment',
 
         'action_by_department_head',
         'department_head_id',
@@ -60,6 +72,13 @@ class EmployeeHiringRequest extends Model
         'updated_by',
         'deleted_by'
     ];
+    public static function boot()
+    {
+        parent::boot();
+        self::creating(function ($model) {
+            $model->uuid = IdGenerator::generate(['table' => 'employee_hiring_requests','field'=>'uuid', 'length' => 10, 'prefix' =>'EHR-']);
+        });
+    }
     protected $appends = [
         'department_name',
         'department_location',
@@ -229,8 +248,6 @@ class EmployeeHiringRequest extends Model
     // }
     public function getIsAuthUserCanApproveAttribute() {
         $isAuthUserCanApprove = [];
-        $hiringManager = $HRManager = '';
-        $deptHead = [];
         $authId = Auth::id();
         // $hiringManager = ApprovalByPositions::where([
         //     ['approved_by_position','Recruiting Manager'],
@@ -303,5 +320,17 @@ class EmployeeHiringRequest extends Model
     }
     public function divisionHead() {
         return $this->hasOne(User::class,'id','division_head_id');
+    }
+    public function interviewSummaryReport() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id');
+    }
+    public function shortlistedCandidates() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where('candidate_selected','yes');
+    }
+    public function selectedCandidates() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where('candidate_selected','yes')->where('seleced_status','selected');
+    }
+    public function location() {
+        return $this->hasOne(MasterOfficeLocation::class,'id','location_id');
     }
 }

@@ -95,7 +95,7 @@
                                                 <a href="{{ route('employee-hiring-request.index') }}" class="dropdown-item" data-key="t-login">Requests</a>
 
                                                 <a href="{{ route('job_description.index') }}" class="dropdown-item" data-key="t-login">Job Descriptions</a>
-
+                                                <a href="{{ route('interview-summary-report.index') }}" class="dropdown-item" data-key="t-login">Interview Summary Report</a>
                                             </div>
                                         </div>
                                         <!-- @canany(['warranty-create', 'warranty-list'])
@@ -712,7 +712,7 @@
                                         </div>
                                         @endif
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-lines.index');
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-model-lines-list');
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">

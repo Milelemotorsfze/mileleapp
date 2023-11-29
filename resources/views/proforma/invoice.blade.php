@@ -8,6 +8,24 @@
   div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
+    .full-width {
+       width: 100%;
+    }
+.overlay
+{
+    position: fixed; /* Positioning and size */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(128,128,128,0.5); /* color */
+    display: none; /* making it hidden by default */
+}
+.paragraph-class
+{
+    color: red;
+    font-size:11px;
+}
 .days-dropdownf {
     background: none;
     text-align: center;
@@ -61,9 +79,9 @@
 .contentveh {
             display: none;
         }
-.row{
-    margin-top: 5px;
-}
+/*.row{*/
+/*    margin-top: 5px;*/
+/*}*/
     </style>
 <div class="card-header">
 	<h4 class="card-title">
@@ -149,15 +167,7 @@
         <hr>
         <div class="row">
             <div class="col-sm-4">
-{{--                <div class="row">--}}
-{{--                    <div class="col-sm-6">--}}
-{{--                        Document No :--}}
-{{--                    </div>--}}
-{{--                    <div class="col-sm-6">--}}
-{{--                        {{$callDetails->id}}--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         <label for="timeRange">Document Validity:</label>
                     </div>
@@ -175,7 +185,7 @@
                 $user = Auth::user();
                 $empProfile = $user->empProfile;
                 @endphp
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Sales Person :
                     </div>
@@ -183,7 +193,7 @@
                         {{ Auth::user()->name }}
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Sales Office :
                     </div>
@@ -191,7 +201,7 @@
                     {{ isset($empProfile->office) ? $empProfile->office : '' }}
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Sales Email ID :
                     </div>
@@ -199,7 +209,7 @@
                         {{ Auth::user()->email }}
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Sales Contact No :
                     </div>
@@ -225,7 +235,7 @@
                         <input type="text"  class="form-control form-control-xs" value="{{ $callDetails->company_name }}" name="company_name" id="company" placeholder="Company Name">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         <label for="timeRange">Person :</label>
                     </div>
@@ -233,15 +243,15 @@
                         <input type="text" name="name"  placeholder="Person Name"  class="form-control form-control-xs" id="person" value="{{$callDetails->name}}">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Contact No :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="phone"  class="form-control form-control-xs" id="contact_number" value="{{$callDetails->phone}}" placeholder="Phone">
+                        <input type="text" name="phone"  class="form-control form-control-xs" minlength="5" maxlength="15" id="contact_number" value="{{$callDetails->phone}}" placeholder="Phone">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Email :
                     </div>
@@ -249,7 +259,7 @@
                         <input type="text" name="email" id="email"  class="form-control form-control-xs"  value="{{$callDetails->email}}" placeholder="Email">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Address :
                     </div>
@@ -260,7 +270,7 @@
             </div>
             <div class="col-sm-4" >
                 <div id="export-shipment">
-                    <div class="row">
+                    <div class="row mt-2">
                         <div class="col-sm-6">
                             Final Destination :
                         </div>
@@ -268,7 +278,7 @@
                             <input type="text" class="form-control form-control-xs" placeholder="Destination" name="final_destination" id="final_destination">
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mt-2">
                         <div class="col-sm-6">
                             Incoterm :
                         </div>
@@ -276,7 +286,7 @@
                             <input type="text" name="incoterm" id="incoterm" class="form-control form-control-xs" placeholder="Incoterm">
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mt-2">
                         <div class="col-sm-6">
                             Place of Delivery :
                         </div>
@@ -285,7 +295,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row" hidden id="local-shipment">
+                <div class="row mt-2" hidden id="local-shipment">
                     <div class="col-sm-6">
                         Place of Supply :
                     </div>
@@ -296,7 +306,7 @@
             </div>
         </div>
         <hr>
-        <div class="row">
+        <div class="row mt-2">
             <div class="col-sm-4">
                 Payment Details
             </div>
@@ -307,7 +317,7 @@
         <hr>
         <div class="row">
             <div class="col-sm-4">
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         System Code :
                     </div>
@@ -315,7 +325,7 @@
                         <input type="text" name="system_code" id="system_code" class="form-control form-control-xs" placeholder="System Code">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Payment Terms :
                     </div>
@@ -325,7 +335,7 @@
                 </div>
             </div>
             <div class="col-sm-4">
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Rep Name :
                     </div>
@@ -333,7 +343,7 @@
                         <input type="text" name="representative_name" id="representative_name" class="form-control form-control-xs" placeholder="Rep. Name">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Rep No :
                     </div>
@@ -343,7 +353,7 @@
                 </div>
             </div>
             <div class="col-sm-4">
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         CB Name :
                     </div>
@@ -351,7 +361,7 @@
                         <input type="text" name="cb_name" id="cb_name" class="form-control form-control-xs" placeholder="CB Name">
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         CB No :
                     </div>
@@ -361,7 +371,7 @@
                 </div>
             </div>
             <div class="col-sm-4"  id="advance-amount-div" hidden>
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-6">
                         Advance Amount :
                     </div>
@@ -374,7 +384,7 @@
         </div>
         <div class="row mt-2">
             <div class="col-sm-12">
-                <div class="row">
+                <div class="row mt-2">
                     <div class="col-sm-2">
                         Remarks :
                     </div>
@@ -395,7 +405,7 @@
                     <div class="col-lg-12">
                         <div class="table-responsive">
                             <table id="dtBasicExample2" class="table table-responsive table-striped table-editable table-edits table">
-                                <thead>
+                                <thead class="bg-soft-secondary">
                                     <tr>
                                         <th>Description</th>
                                         <th>Code</th>
@@ -433,323 +443,331 @@
         </div>
         <br>
         <div class="row">
-            <div class="col-sm-1">
+            <div class="col-lg-1 col-md-2 col-sm-12">
                 <input type="radio" id="showVehicles" name="contentType">
                 <label for="showVehicles">Add Vehicles</label>
             </div>
-            <div class="col-sm-1">
-                <input type="radio" id="showAccessories" name="contentType">
+            <div class="col-lg-1 col-md-3 col-sm-12">
+            <input type="radio" id="showAccessories" name="contentType">
                 <label for="showAccessories">Add Accessories</label>
             </div>
-            <div class="col-sm-1">
-                <input type="radio" id="showSpareParts" name="contentType">
+            <div class="col-lg-1 col-md-3 col-sm-12">
+            <input type="radio" id="showSpareParts" name="contentType">
                 <label for="showSpareParts">Add Spare Parts</label>
             </div>
-            <div class="col-sm-1">
-                <input type="radio" id="showKits" name="contentType">
+            <div class="col-lg-1 col-md-2 col-sm-12">
+            <input type="radio" id="showKits" name="contentType">
                 <label for="showKits">Add Kits</label>
             </div>
-            <div class="col-sm-1">
-                <input type="radio" id="showShipping" name="contentType">
+            <div class="col-lg-1 col-md-2 col-sm-12">
+            <input type="radio" id="showShipping" name="contentType">
                 <label for="showShipping">Add Shipping</label>
             </div>
-            <div class="col-sm-2">
+            <div class="col-lg-2 col-md-3 col-sm-12">
                 <input type="radio" id="showShippingDocuments" name="contentType">
                 <label for="showShippingDocuments">Add Shipping Documents</label>
             </div>
-            <div class="col-sm-1">
-                <input type="radio" id="showCertificates" name="contentType">
+            <div class="col-lg-1 col-md-2 col-sm-12">
+            <input type="radio" id="showCertificates" name="contentType">
                 <label for="showCertificates"> Certificate</label>
             </div>
-            <div class="col-sm-1">
-                <input type="radio" id="showOthers" name="contentType">
+            <div class="col-lg-1 col-md-2 col-sm-12">
+            <input type="radio" id="showOthers" name="contentType">
                 <label for="showOthers">Add Other</label>
             </div>
-
         </div>
         <div id="vehiclesContent" class="contentveh">
-            <hr>
-            <div class="row">
-                <h4 class="col-lg-2 col-md-6">Search Available Vehicles</h4>
-                <div class="col-lg-12 col-md-6 d-flex align-items-end">
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Brand:</label>
-                        <select class="form-control col" id="brand" name="brand">
+            <div class="card">
+            <div class="card-header">
+                <h4 >Search Available Vehicles</h4>
+                <div class="row justify-content-end">
+                    <div class="col-lg-4 col-sm-12 col-md-4" >
+                        <a class="btn btn-outline-warning float-end mb-4" data-table="vehicle-table" id="directadding-button"> Directly Adding Into Quotation</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-1 col-md-6 col-sm-12">
+                        <label class="form-label"> Brand</label>
+                        <select class="form-control col" id="brand" name="brand" style="width: 100%">
                             <option value="">Select Brand</option>
                             @foreach($brands as $brand)
                             <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="model_line">Select Model Line:</label>
-                        <select class="form-control col" id="model_line" name="model_line" disabled>
+                    <div class="col-lg-1 col-md-6" style="margin-top: 26px;">
+                        <a id="addnewBrandButton" data-toggle="popover" data-trigger="hover" title="Create New Brand" data-placement="top" style="float: right;"
+                           class="btn btn-info modal-button" data-modal-id="createNewBrand"><i class="fa fa-plus" aria-hidden="true"></i> Add Brand</a>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-12">
+                        <label class="form-label"> Model Line</label>
+                        <select class="form-control col" id="model_line" style="width: 100%" name="model_line" disabled >
                             <option value="">Select Model Line</option>
                         </select>
                     </div>
+                    <div class="col-lg-1 col-md-6 add-new-model-line-div" style="margin-top: 26px;" hidden>
+                        <a id="createNewModelLineButton" data-toggle="popover" data-trigger="hover" title="Create New Model Line" data-placement="top" style="float: right;"
+                           class="btn btn-info modal-model-line-button" data-modal-id="createNewModelLine"><i class="fa fa-plus" aria-hidden="true"></i> Add Model Line</a>
+
+                    </div>
                     <div class="col-lg-2 col-md-6">
-                        <label for="variant">Select Variant:</label>
-                        <select class="form-control col" id="variant" name="variant" disabled>
+                        <label class="form-label"> Variant</label>
+                        <select class="form-control col" id="variant" style="width: 100%" name="variant" disabled>
                             <option value="">Select Variant</option>
                         </select>
                     </div>
                     <div class="col-lg-2 col-md-6">
-                        <label for="interior_color">Interior Color:</label>
-                        <select class="form-control col" id="interior_color" name="interior_color" disabled>
+                        <label class="form-label">Interior Color</label>
+                        <select class="form-control col" id="interior_color" style="width: 100%" name="interior_color" disabled>
                             <option value="">Select Interior Color</option>
                         </select>
                     </div>
                     <div class="col-lg-2 col-md-6">
-                        <label for="exterior_color">Exterior Color:</label>
-                        <select class="form-control col" id="exterior_color" name="exterior_color" disabled>
-                            <option value="">Select Exterior Color</option>.
+                        <label class="form-label">Exterior Color</label>
+                        <select class="form-control col" id="exterior_color" style="width: 100%" name="exterior_color" disabled>
+                            <option value="">Select Exterior Color</option>
                         </select>
                     </div>
-                    <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
-                        <div class="col">
-                            <button type="button" class="btn btn-primary" id="search-button">Search</button>
-                        </div>
-                        <div class="col" >
-                            <button type="button" class="btn btn-outline-warning" data-table="vehicle-table" id="directadding-button">Directly Adding Into Quotation</button>
-                        </div>
+                    <div class="col-lg-1 col-md-6" style="margin-top: 26px;">
+                        <button type="button" class="btn btn-primary" id="search-button">Search</button>
                     </div>
                 </div>
             </div>
-            <br>
-            <br>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="table-responsive">
-                        <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
-                            <thead class="bg-soft-secondary">
-                                <tr>
-{{--                                    <th>ID</th>--}}
-                                    <th>Status</th>
-{{--                                    <th>VIN</th>--}}
-                                    <th>Brand Name</th>
-                                    <th>Model Line</th>
-                                    <th>Model Details</th>
-                                    <th>Variant Name</th>
-                                    <th>Variant Detail</th>
-                                    <th>Interior Color</th>
-                                    <th>Exterior Color</th>
-                                    <th>Price</th>
-                                    <th style="width:30px;">Add Into Quotation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+            <div class="card-body">
+                <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
+                                    <thead class="bg-soft-secondary">
+                                    <tr>
+                                        {{--                                    <th>ID</th>--}}
+                                        {{--                                    <th>Status</th>--}}
+                                        {{--                                    <th>VIN</th>--}}
+                                        <th>Brand Name</th>
+                                        <th>Model Line</th>
+                                        <th>Model Details</th>
+                                        <th>Variant Name</th>
+                                        <th>Variant Detail</th>
+                                        <th>Interior Color</th>
+                                        <th>Exterior Color</th>
+                                        <th>Price</th>
+                                        <th style="width:30px;">Add Into Quotation</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                </div>
             </div>
         </div>
+        </div>
         <div id="accessoriesContent" class="contentveh">
-            <hr>
-            <div class="row">
-                <h4 class="col-lg-12 col-md-12">Search Available Accessories</h4>
-                <div class="col-lg-12 col-md-6 d-flex align-items-end">
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Accessory Name:</label>
-                        <select class="form-control col" id="accessories_addon" name="accessories_addon">
-                            <option value="">Select Accessory Name</option>
-                            @foreach($assessoriesDesc as $accessory)
-                            <option value="{{ $accessory->id }}">{{ $accessory->Addon->name ?? '' }}@if($accessory->description!='') - {{$accessory->description}}@endif</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Brand:</label>
-                        <select class="form-control col" id="accessories_brand" name="accessories_brand">
-                            <option value="">Select Brand</option>
-                            <!-- <option value="allbrands">ALL BRANDS</option> -->
-                            @foreach($accessoriesBrands as $brand)
-                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="model_line">Select Model Line:</label>
-                        <select class="form-control col" id="accessories_model_line" name="accessories_model_line" disabled>
-                            <option value="">Select Model Line</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
-                        <div class="col">
-                            <button type="button" class="btn btn-primary" id="accessories-search-button">Search</button>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Search Available Accessories</h4>
+                    <div class="row">
+                            <div class="col-lg-3 col-md-6" style="margin-right: 10px;">
+                                <label for="brand"> Accessory Name</label>
+                                <select class="form-select col" id="accessories_addon" name="accessories_addon" style="width: 100%">
+                                    <option value="">Select Accessory Name</option>
+                                    @foreach($assessoriesDesc as $accessory)
+                                        <option value="{{ $accessory->id }}">{{ $accessory->Addon->name ?? '' }}@if($accessory->description!='') - {{$accessory->description}}@endif</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6" style="margin-right: 10px;">
+                                <label for="brand"> Brand</label>
+                                <select class="form-select col" id="accessories_brand" name="accessories_brand" style="width: 100%">
+                                    <option value="">Select Brand</option>
+                                    <!-- <option value="allbrands">ALL BRANDS</option> -->
+                                    @foreach($accessoriesBrands as $brand)
+                                        <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6" style="margin-right: 10px;">
+                                <label for="model_line"> Model Line</label>
+                                <select class="form-select col" id="accessories_model_line" style="width: 100%" name="accessories_model_line" disabled>
+                                    <option value="">Select Model Line</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-1 col-md-6" style="margin-top: 26px;" >
+                                <button type="button" class="btn btn-primary" id="accessories-search-button">Search</button>
+                            </div>
+                            <div class="col-lg-3 col-md-6" style="margin-top: 26px;">
+                                <button type="button" class="btn btn-outline-warning" data-table="accessories-table" id="directadding-button">Directly Adding Into Quotation</button>
+                            </div>
                         </div>
-                        <div class="col" >
-                            <button type="button" class="btn btn-outline-warning" data-table="accessories-table" id="directadding-button">Directly Adding Into Quotation</button>
-                        </div>
-                    </div>
                 </div>
-            </div>
-            <br>
-            <br>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="table-responsive">
-                        <table id="dtBasicExample5" class="table table-striped table-editable table-edits table">
-                            <thead class="bg-soft-secondary">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Accessory Code</th>
-                                    <th>Accessory Name</th>
-                                    <th>Brand/Model Line</th>
-                                    <th>Selling Price(AED)</th>
-                                    <th>Additional Remarks</th>
-                                    <th>Fixing Charge</th>
-                                    <!-- <th>Least Purchase Price(AED)</th> -->
-                                    <th style="width:30px;">Add Into Quotation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table id="dtBasicExample5" class="table table-striped table-editable table-edits table">
+                                    <thead class="bg-soft-secondary">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Accessory Code</th>
+                                        <th>Accessory Name</th>
+                                        <th>Brand/Model Line</th>
+                                        <th>Selling Price(AED)</th>
+                                        <th>Additional Remarks</th>
+                                        <th>Fixing Charge</th>
+                                        <!-- <th>Least Purchase Price(AED)</th> -->
+                                        <th style="width:30px;">Add Into Quotation</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div id="sparePartsContent" class="contentveh">
-            <hr>
-            <div class="row">
-                <h4 class="col-lg-12 col-md-12">Search Available Spare Parts</h4>
-                <div class="col-lg-12 col-md-6 d-flex align-items-end">
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Spare Part Name:</label>
-                        <select class="form-control col" id="spare_parts_addon" name="spare_parts_addon">
-                            <option value="">Select Spare Part Name</option>
-                            @foreach($sparePartsDesc as $spareParts)
-                            <option value="{{ $spareParts->id }}">{{ $spareParts->Addon->name ?? '' }}@if($spareParts->description!='') - {{$spareParts->description}}@endif</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Brand:</label>
-                        <select class="form-control col" id="spare_parts_brand" name="spare_parts_brand">
-                            <option value="">Select Brand</option>
-                            @foreach($sparePartsBrands as $brand)
-                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="model_line">Select Model Line:</label>
-                        <select class="form-control col" id="spare_parts_model_line" name="spare_parts_model_line" disabled>
-                            <option value="">Select Model Line</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="model_description">Select Model Description:</label>
-                        <select class="form-control col" id="spare_parts_model_description" name="spare_parts_model_description" disabled>
-                            <option value="">Select Model Description</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
-                        <div class="col">
-                            <button type="button" class="btn btn-primary" id="spare_parts-search-button">Search</button>
+           <div class="card">
+               <div class="card-header">
+                   <h4>Search Available Spare Parts</h4>
+                   <div class="row">
+                       <div class="col-lg-2 col-md-6">
+                           <label for="brand"> Spare Part Name</label>
+                           <select class="form-control full-width" id="spare_parts_addon" name="spare_parts_addon" style="width: 100%">
+                               <option value="">Select Spare Part Name</option>
+                               @foreach($sparePartsDesc as $spareParts)
+                                   <option value="{{ $spareParts->id }}">{{ $spareParts->Addon->name ?? '' }}@if($spareParts->description!='') - {{$spareParts->description}}@endif</option>
+                               @endforeach
+                           </select>
+                       </div>
+                       <div class="col-lg-2 col-md-6">
+                           <label for="brand"> Brand</label>
+                           <select class="form-select" id="spare_parts_brand" name="spare_parts_brand" style="width: 100%">
+                               <option value="">Select Brand</option>
+                               @foreach($sparePartsBrands as $brand)
+                                   <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                               @endforeach
+                           </select>
+                       </div>
+                       <div class="col-lg-2 col-md-6">
+                           <label for="model_line"> Model Line</label>
+                           <select class="form-select" id="spare_parts_model_line" name="spare_parts_model_line" disabled style="width: 100%">
+                               <option value="">Select Model Line</option>
+                           </select>
+                       </div>
+                       <div class="col-lg-2 col-md-6">
+                           <label for="model_description"> Model Description</label>
+                           <select class="form-select" id="spare_parts_model_description" name="spare_parts_model_description" disabled style="width: 100%">
+                               <option value="">Select Model Description</option>
+                           </select>
+                       </div>
+                       <div class="col-lg-1 col-md-6" style="margin-top: 26px;">
+                           <div class="col">
+                               <button type="button" class="btn btn-primary" id="spare_parts-search-button">Search</button>
+                           </div>
+                       </div>
+                       <div class="col-lg-3 col-md-6" style="margin-top: 26px;">
+                           <button type="button" class="btn btn-outline-warning" data-table="spare-part-table" id="directadding-button">Directly Adding Into Quotation</button>
                         </div>
-                        <div class="col" >
-                            <button type="button" class="btn btn-outline-warning" data-table="spare-part-table" id="directadding-button">Directly Adding Into Quotation</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <br>
-            <br>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="table-responsive">
-                        <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
-                            <thead class="bg-soft-secondary">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Spare Part Code</th>
-                                    <th>Spare Part Name</th>
-                                    <th>Brand/Model Line/Model Description</th>
-                                    <!-- <th>Model Line/Model Description/Model Year</th> -->
-                                    <th>Selling Price(AED)</th>
-                                    <th>Part Numbers</th>
-                                    <th>Additional Remarks</th>
-                                    <th>Fixing Charge</th>
-                                    <!-- <th>Least Purchase Price(AED)</th> -->
-                                    <th style="width:30px;">Add Into Quotation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+                   </div>
+               </div>
+               <div class="card-body">
+                   <div class="row">
+                       <div class="col-lg-12">
+                           <div class="table-responsive">
+                               <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
+                                   <thead class="bg-soft-secondary">
+                                   <tr>
+                                       <th>ID</th>
+                                       <th>Spare Part Code</th>
+                                       <th>Spare Part Name</th>
+                                       <th>Brand/Model Line/Model Description</th>
+                                       <!-- <th>Model Line/Model Description/Model Year</th> -->
+                                       <th>Selling Price(AED)</th>
+                                       <th>Part Numbers</th>
+                                       <th>Additional Remarks</th>
+                                       <th>Fixing Charge</th>
+                                       <!-- <th>Least Purchase Price(AED)</th> -->
+                                       <th style="width:30px;">Add Into Quotation</th>
+                                   </tr>
+                                   </thead>
+                                   <tbody>
+                                   </tbody>
+                               </table>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
         </div>
         <div id="kitsContent" class="contentveh">
-            <hr>
-            <div class="row">
-                <h4 class="col-lg-2 col-md-6">Search Available Kits</h4>
-                <div class="col-lg-12 col-md-6 d-flex align-items-end">
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Kit Name:</label>
-                        <select class="form-control col" id="kit_addon" name="kit_addon">
-                            <option value="">Select Kit Name</option>
-                            @foreach($kitsDesc as $kit)
-                            <option value="{{ $kit->id }}">{{ $kit->Addon->name ?? '' }}@if($kit->description!='') - {{$kit->description}}@endif</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="brand">Select Brand:</label>
-                        <select class="form-control col" id="kit_brand" name="kit_brand">
-                            <option value="">Select Brand</option>
-                            @foreach($kitsBrands as $brand)
-                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="model_line">Select Model Line:</label>
-                        <select class="form-control col" id="kit_model_line" name="kit_model_line" disabled>
-                            <option value="">Select Model Line</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="model_description">Select Model Description:</label>
-                        <select class="form-control col" id="kits_model_description" name="kits_model_description" disabled>
-                            <option value="">Select Model Description</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6 d-flex align-items-end justify-content-between">
-                        <div class="col">
-                            <button type="button" class="btn btn-primary" id="kit-search-button">Search</button>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Search Available Kits</h4>
+                    <div class="row">
+                            <div class="col-lg-2 col-md-6">
+                                <label for="brand"> Kit Name</label>
+                                <select class="form-control col" id="kit_addon" name="kit_addon" style="width: 100%">
+                                    <option value="">Select Kit Name</option>
+                                    @foreach($kitsDesc as $kit)
+                                        <option value="{{ $kit->id }}">{{ $kit->Addon->name ?? '' }}@if($kit->description!='') - {{$kit->description}}@endif</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6">
+                                <label for="brand"> Brand</label>
+                                <select class="form-control col" id="kit_brand" name="kit_brand" style="width: 100%">
+                                    <option value="">Select Brand</option>
+                                    @foreach($kitsBrands as $brand)
+                                        <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6">
+                                <label for="model_line"> Model Line</label>
+                                <select class="form-control col" id="kit_model_line" name="kit_model_line" disabled style="width: 100%">
+                                    <option value="">Select Model Line</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6">
+                                <label for="model_description"> Model Description</label>
+                                <select class="form-control col" id="kits_model_description" name="kits_model_description" disabled style="width: 100%">
+                                    <option value="">Select Model Description</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-1 col-md-6" style="margin-top: 26px">
+                                <button type="button" class="btn btn-primary" id="kit-search-button">Search</button>
+                            </div>
+                            <div class="col-lg-3 col-md-6" style="margin-top: 26px">
+                                <button type="button" class="btn btn-outline-warning" data-table="kit-table" id="directadding-button">Directly Adding Into Quotation</button>
+                            </div>
                         </div>
-                        <div class="col">
-                            <button type="button" class="btn btn-outline-warning" data-table="kit-table" id="directadding-button">Directly Adding Into Quotation</button>
-                        </div>
-                    </div>
                 </div>
-            </div>
-            <br>
-            <br>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="table-responsive">
-                        <table id="dtBasicExample4" class="table table-striped table-editable table-edits table">
-                            <thead class="bg-soft-secondary">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Kit Code</th>
-                                    <th>Kit Name</th>
-                                    <th>Brand/Model Line/Model Description</th>
-                                    <!-- <th>Model Line/Model Description</th> -->
-                                    <th>Items/ Quantity</th>
-                                    <!-- <th>Least Purchase Price(AED)</th> -->
-                                    <th>Selling Price(AED)</th>
-                                    <th style="width:30px;">Add Into Quotation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table id="dtBasicExample4" class="table table-striped table-editable table-edits table">
+                                    <thead class="bg-soft-secondary">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Kit Code</th>
+                                        <th>Kit Name</th>
+                                        <th>Brand/Model Line/Model Description</th>
+                                        <!-- <th>Model Line/Model Description</th> -->
+                                        <th>Items/ Quantity</th>
+                                        <!-- <th>Least Purchase Price(AED)</th> -->
+                                        <th>Selling Price(AED)</th>
+                                        <th style="width:30px;">Add Into Quotation</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -943,6 +961,84 @@
 
         <button type="submit" class="btn btn-primary" id="submit-button" disabled>Submit</button>
     </form>
+    <div class="overlay">
+        <div class="modal" id="createNewBrand" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Create New Brand </h5>
+                        <button type="button" class="btn btn-secondary btn-sm close form-control modal-close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">X</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="row modal-row">
+                                <div class="col-xxl-12 col-lg-12 col-md-12">
+                                    <span class="error">* </span>
+                                    <label for="name" class="col-form-label text-md-end ">Brand Name</label>
+                                </div>
+                                <div class="col-xxl-12 col-lg-12 col-md-12">
+								<input type="text" id="new_brand_name" class="form-control @error('brand_name') is-invalid @enderror" name="brand_name"
+                                          placeholder="Enter Brand Name" value="{{ old('brand_name') }}" oninput="checkValidation()" autofocus>
+                                    <span id="newBrandError" class="is-invalid"></span>
+                                    @error('brand_name')
+                                    <span class="invalid-feedback" role="alert">
+								<strong>{{ $message }}</strong>
+								</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm modal-close" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                        <button type="button" class="btn btn-primary btn-sm" id="createBrandId" style="float: right;">
+                            <i class="fa fa-check" aria-hidden="true"></i> Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="createNewModelLine" tabindex="-1" role="dialog" aria-labelledby="exampleModalLineCenteredLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLineCenteredLabel" style="text-align:center;"> Create New Model Line </h5>
+                        <button type="button" class="btn btn-secondary btn-sm close form-control modal-close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">X</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="row modal-row">
+                                <div class="col-xxl-12 col-lg-12 col-md-12">
+                                    <span class="error">* </span>
+                                    <label for="name" class="col-form-label text-md-end">Model Line</label>
+                                </div>
+                                <div class="col-xxl-12 col-lg-12 col-md-12">
+                                    <input type="text" id="new_model_line_name" class="form-control @error('model_line') is-invalid @enderror" name="model_line"
+                                           placeholder="Enter Model Line Name" value="{{ old('model_line') }}" oninput="checkModelLine()" autofocus>
+                                    <span id="newModelLineError" class="is-invalid"></span>
+                                    @error('model_line')
+                                    <span class="invalid-feedback" role="alert">
+								<strong>{{ $message }}</strong>
+								</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm modal-close" data-dismiss="modal" ><i class="fa fa-times"></i> Close</button>
+                        <button type="button" class="btn btn-primary btn-sm" id="createModelLineId" style="float: right;">
+                            <i class="fa fa-check" aria-hidden="true"></i> Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 @push('scripts')
@@ -962,7 +1058,174 @@
 
     </script>
 <script>
+    function checkValidation()
+    {
+        var value = $('#new_brand_name').val();
+        if(value == '')
+        {
+            $msg = 'Brand Name is Required';
+            showNewBrandError($msg);
+        }
+        else
+        {
+            removeNewBrandError();
+        }
+    }
+    function checkModelLine() {
+        var value = $('#new_model_line_name').val();
+        if(value == '')
+        {
+            $msg = 'Model Line is Required';
+            showNewModelLineError($msg);
+        }
+        else
+        {
+            removeNewModelLineError();
+        }
+    }
+    function showNewModelLineError($msg) {
+        document.getElementById("newModelLineError").textContent=$msg;
+        document.getElementById("new_model_line_name").classList.add("is-invalid");
+        document.getElementById("newModelLineError").classList.add("paragraph-class");
+    }
+    function removeNewModelLineError()
+    {
+        document.getElementById("newModelLineError").textContent="";
+        document.getElementById("new_model_line_name").classList.remove("is-invalid");
+        document.getElementById("newModelLineError").classList.remove("paragraph-class");
+    }
+    function showNewBrandError($msg)
+    {
+        document.getElementById("newBrandError").textContent=$msg;
+        document.getElementById("new_brand_name").classList.add("is-invalid");
+        document.getElementById("newBrandError").classList.add("paragraph-class");
+    }
+    function removeNewBrandError()
+    {
+        document.getElementById("newBrandError").textContent="";
+        document.getElementById("new_brand_name").classList.remove("is-invalid");
+        document.getElementById("newBrandError").classList.remove("paragraph-class");
+    }
+
     $(document).ready(function() {
+
+        $('.modal-close').on('click', function(){
+            $('.overlay').hide();
+            $('.modal').removeClass('modalshow');
+            $('.modal').addClass('modalhide');
+            $('#new_brand_name').val("");
+            $('#new_model_line_name').val("");
+            removeNewBrandError();
+            removeNewModelLineError();
+        });
+        $('#createBrandId').on('click', function()
+        {
+            // create new addon and list new addon in addon list
+            var value = $('#new_brand_name').val();
+            if(value == '')
+            {
+                $msg = 'Brand Name is Required';
+                showNewBrandError($msg);
+            }
+            else
+            {
+                $.ajax
+                ({
+                    url:"{{route('brands.store')}}",
+                    type: "POST",
+                    data:
+                        {
+                            brand_name: value,
+                            request_from: 'Quotation',
+                            _token: '{{csrf_token()}}'
+                        },
+                    dataType : 'json',
+                    success: function(result)
+                    {
+                        console.log(result);
+                        if(result.error) {
+                            $msg = result.error;
+                            showNewBrandError($msg);
+                        }else{
+                            $('.overlay').hide();
+                            $('.modal').removeClass('modalshow');
+                            $('.modal').addClass('modalhide');
+                            $('#brand').append("<option value='" + result.id + "'>" + result.brand_name + "</option>");
+                            $('#brand').val(result.id);
+                            $('#new_brand_name').val("");
+                            $('.add-new-model-line-div').prop('hidden', false);
+                            $('#model_line').attr('disabled', false)
+                            $msg = "";
+                            removeNewBrandError();
+                        }
+                    }
+                });
+            }
+        });
+        $('#createModelLineId').on('click', function()
+        {
+            // create new addon and list new addon in addon list
+            var model_line = $('#new_model_line_name').val();
+            var brand = $('#brand').val();
+
+            if(model_line == '')
+            {
+                $msg = 'Model Line Name is Required';
+                showNewModelLineError($msg);
+            }
+            else
+            {
+                $.ajax
+                ({
+                    url:"{{route('model-lines.store')}}",
+                    type: "POST",
+                    data:
+                        {
+                            model_line: model_line,
+                            brand_id: brand,
+                            request_from: 'Quotation',
+                            _token: '{{csrf_token()}}'
+                        },
+                    dataType : 'json',
+                    success: function(result)
+                    {
+                        if(result.error) {
+                            $msg = result.error;
+                            showNewModelLineError($msg);
+                        }else{
+                            $('.overlay').hide();
+                            $('.modal').removeClass('modalshow');
+                            $('.modal').addClass('modalhide');
+                            $('#model_line').append("<option value='" + result.id + "'>" + result.model_line + "</option>");
+                            $('#model_line').val(result.id);
+                            $('#model_line').prop('disabled', false);
+
+                            $('#new_model_line_name').val("");
+                            $msg = "";
+                            removeNewModelLineError();
+                        }
+                    }
+                });
+
+            }
+        });
+
+        $('.modal-button').on('click', function()
+        {
+            var modalId = $(this).data('modal-id');
+            showOrHideModal(modalId);
+        });
+        $('.modal-model-line-button').on('click', function()
+        {
+            var modalId = $(this).data('modal-id');
+            showOrHideModal(modalId);
+        });
+        function showOrHideModal(modalId) {
+            $('.overlay').show();
+            $('#' + modalId).addClass('modalshow');
+            $('#' + modalId).removeClass('modalhide');
+
+        }
         var shippingTable = $('#shipping-table').DataTable();
         var shippingDocumentTable = $('#shipping-document-table').DataTable();
         var certificationTable = $('#certification-table').DataTable();
@@ -987,29 +1250,29 @@
         $('#kit_brand').select2();
         $('#kit_model_line').select2();
         $('#kits_model_description').select2();
-        $("#form-create").validate({
-            rules: {
-                document_type: {
-                    required: {
-                        depends: function(element) {
-                            return $(".document_type:checked")
-                        }
-                    }
-                },
-                shipping_method: {
-                    required: {
-                        depends: function(element) {
-                            return $(".shipping_method:checked")
-                        }
-                    }
-                },
-                contact_number:{
-                    number: true,
-                    minlength:5,
-                    maxlength:15,
-                }
-            }
-        });
+        // $("#form-create").validate({
+        //     rules: {
+        //         document_type: {
+        //             required: {
+        //                 depends: function(element) {
+        //                     return $(".document_type:checked")
+        //                 }
+        //             }
+        //         },
+        //         shipping_method: {
+        //             required: {
+        //                 depends: function(element) {
+        //                     return $(".shipping_method:checked")
+        //                 }
+        //             }
+        //         },
+        //         contact_number:{
+        //             number: true,
+        //             minlength:5,
+        //             maxlength:15,
+        //         }
+        //     }
+        // });
         $('input[name="document_type"]').on('change', function() {
             $('input[name="' + this.name + '"]').not(this).prop('checked', false);
             var documentType = $(this).val();
@@ -1125,8 +1388,9 @@
         }
         $('#brand').on('change', function() {
         var brandId = $(this).val();
-        if (brandId) {
+        if (brandId ) {
             $('#model_line').prop('disabled', false);
+            $('.add-new-model-line-div').prop('hidden', false);
             $('#model_line').empty().append('<option value="">Select Model Line</option>');
 
             $.ajax({
@@ -1142,6 +1406,7 @@
         } else {
             $('#model_line').prop('disabled', true);
             $('#variant').prop('disabled', true);
+            $('.add-new-model-line-div').prop('hidden', true);
             $('#model_line').empty().append('<option value="">Select Model Line</option>');
             $('#variant').empty().append('<option value="">Select Variant</option>');
         }
@@ -1335,7 +1600,8 @@
 
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var price = row[8];
+                        var price = row[7];
+
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                         var price = row[4];
@@ -1348,9 +1614,11 @@
                     var addon = 0;
                         if(row['table_type'] == 'addon-table') {
                             var addon = 1;
+
                         }
+                    var modelLine = row['model_line_id'];
                     return '<input type="hidden" name="is_addon[]" value="'+ addon +'" ><input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
-                        ' <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
+                        '<input type="hidden" name="model_lines[]" value="'+ modelLine +'" > <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
                         '<input type="text"  value="'+ amount +'" class="total-amount-editable form-control" name="total_amounts[]" id="total-amount-'+ row['index'] +'" readonly />';
                 }
             },
@@ -1368,10 +1636,10 @@
 
                     var combinedValue = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var brand = row[1];
-                        var modelDescription = row[3];
-                        var interiorColor = row[6];
-                        var exteriorColor = row[7];
+                        var brand = row[0];
+                        var modelDescription = row[2];
+                        var interiorColor = row[5];
+                        var exteriorColor = row[6];
                         var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
@@ -1400,7 +1668,6 @@
                         if(row[6] == "") {
                             var comma5 = " ";
                         }
-
                         combinedValue =  row[0] + comma0 + row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5]+ comma5 + row[6];
                     }
 
@@ -1411,19 +1678,24 @@
                 targets: -5,
                 data: null,
                 render: function (data, type, row) {
+                    console.log(row);
                     var code = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var code = row[4];
+                        var code = row[3];
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
 
                         var code = row[1];
                     }else if(row['button_type'] == 'Direct-Add') {
                         var code = row[6];
+                        if(row['table_type'] == 'vehicle-table') {
+                            var code = row[2]
+                        }
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         code = row[1];
                     }
+
                     return code;
                 }
             },
@@ -1433,11 +1705,10 @@
                 render: function (data, type, row) {
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var price = row[8];
+                        var price = row[7];
                     }else{
                         var price = row[4];
                     }
-
                     var currency = $('#currency').val();
 
                     if(currency == 'USD') {
@@ -1447,8 +1718,8 @@
                         var value = '{{ $aed_to_eru_rate->value }}';
                         var price = price / parseFloat(value);
                     }
-
-                    return '<input type="number" min="0" name="prices[]" required class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>';
+                    return '<input type="number" min="0" name="prices[]" required class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>' +
+                        '    <span id="priceError' +  row['index'] +'" class=" invalid-feedback"></span>';
                 }
             }
         ]
@@ -1463,7 +1734,7 @@
         }
         else if(row['button_type'] == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
+            table.row.add(['', row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
                 '<button class="add-button circle-button" data-button-type="Vehicle" data-variant-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Shipping-Document') {
@@ -1533,7 +1804,7 @@
     //     }
     //
     // }
-    $('#submit-button').on('click', function() {
+    $('#submit-button').on('click', function(e) {
         var selectedData = [];
         secondTable.rows().every(function() {
         var data = this.data();
@@ -1541,9 +1812,27 @@
         var selectedDays = $(this.node()).find('.days-dropdown').val();
 
         selectedData.push({ vehicleId: vehicleId, days: selectedDays });
-
-
+            // let formValid = true;
+            // let rowCount =  secondTable.data().length;
+            // for (let i = 1; i <= rowCount; i++) {
+            //     var inputPrice = $('#price-' + i).val();
+            //     if (inputPrice == '') {
+            //         $msg = "Price is required";
+            //         showPriceError($msg, i);
+            //         formValid = true;
+            //     }
+            // }
+            //
+            // if(formValid == true) {
+            //     e.preventDefault();
+            // }
     });
+    function showPriceError($msg,i)
+    {
+        document.getElementById("priceError"+i).textContent=$msg;
+        document.getElementById("price"+i).classList.add("is-invalid");
+        document.getElementById("priceError"+i).classList.add("paragraph-class");
+    }
     var dateValue = $('#name').val();
     var callIdValue = $('#call_id').val();
     var etd = $('#etd').val();
@@ -1595,7 +1884,6 @@
             }
             var modelLine = $('#model_line option:selected').val();
             if(modelLine != "") {
-
                 var modelLine = $('#model_line option:selected').text();
             }else{
                 alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
@@ -1642,6 +1930,8 @@
             if(modelLine != "") {
                 row['id'] = modelLine;
                 row['model_type'] = 'ModelLine';
+                row['model_line_id'] = modelLine;
+
                 var modelLine = $('#accessories_model_line option:selected').text();
 
             }else{
@@ -1663,7 +1953,7 @@
             if(modelLine != "") {
                 row['id'] = modelLine;
                 row['model_type'] = 'ModelLine';
-
+                row['model_line_id'] = modelLine;
                 var modelLine = $('#spare_parts_model_line option:selected').text();
             }else{
                 alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
@@ -1692,6 +1982,8 @@
             if(modelLine != "") {
                 row['id'] = modelLine;
                 row['model_type'] = 'ModelLine';
+                row['model_line_id'] = modelLine;
+
                 var modelLine = $('#kit_model_line option:selected').text();
 
             }else{
@@ -1722,6 +2014,7 @@
 
         enableOrDisableSubmit();
         showPriceInSelectedValue();
+        console.log(row);
     });
     $(document).on('click', '.add-button', function() {
         var secondTable = $('#dtBasicExample2').DataTable();
@@ -1738,7 +2031,6 @@
         row.find('td').each(function() {
             rowData.push($(this).html());
         });
-
         var secondTable = $('#dtBasicExample2').DataTable();
 
         if(buttonType == 'Shipping') {
@@ -1778,8 +2070,9 @@
         else if(buttonType == 'Kit') {
             var table = $('#dtBasicExample4').DataTable();
             var id = $(this).data('kit-id');
-
         }
+        var modelLineId = $(this).data('model-line-id');
+        rowData['model_line_id'] = modelLineId;
         rowData['id'] = id;
         secondTable.row.add(rowData).draw();
         table.row(row).remove().draw();
@@ -1790,6 +2083,7 @@
         calculateTotalSum();
         // enableOrDisableSubmit();
         showPriceInSelectedValue();
+        console.log(rowData);
     });
 
     function resetSerialNumber(table) {
@@ -1858,6 +2152,7 @@
             }
         }
     $('#search-button').on('click', function() {
+        var modelLineId = $('#model_line').val();
         var variantId = $('#variant').val();
         var interiorColorId = $('#interior_color').val();
         var exteriorColorId = $('#exterior_color').val();
@@ -1886,7 +2181,7 @@
                     var addButton = '<button class="add-button" data-button-type="Vehicle" data-variant-id="'+ variantId +'" >Add</button>';
                     return [
                         // vehicle.id,
-                        vehicle.grn_status,
+                        // vehicle.grn_status,
                         // vehicle.vin,
                         vehicle.brand,
                         vehicle.model_line,
@@ -1906,7 +2201,7 @@
                     data: data,
                     columns: [
                         // { title: 'ID' },
-                        { title: 'Status' },
+                        // { title: 'Status' },
                         // { title: 'VIN' },
                         { title: 'Brand Name' },
                         { title: 'Model Line' },
@@ -1919,7 +2214,7 @@
                         {
                             title: 'Actions',
                             render: function(data, type, row) {
-                                return '<div class="circle-button add-button"  data-variant-id="'+ variantId +'" data-button-type="Vehicle" ></div>';
+                                return '<div class="circle-button add-button" data-variant-id="'+ variantId +'" data-button-type="Vehicle" ></div>';
                             }
                         }
                     ]
@@ -1962,7 +2257,7 @@
                 var slNo = 0;
                 var data = response.map(function(accessory) {
                     slNo = slNo + 1;
-                    var addButton = '<button class="add-button" data-button-type="Accessory" data-accessory-id="' + accessory.id + '">Add</button>';
+                    var addButton = '<button class="add-button" data-button-type="Accessory" data-model-line-id="'+ modelLineId +'" data-accessory-id="' + accessory.id + '">Add</button>';
                     if(accessory.addon_description.description != null) {
                        var accessoryName = accessory.addon_description.addon.name + ' - ' + accessory.addon_description.description;
                     }
@@ -2060,7 +2355,7 @@
                         {
                             title: 'Add Into Quotation',
                             render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-button-type="Accessory" data-accessory-id="' + row[0] + '"></div>';
+                                return '<div class="circle-button add-button" data-button-type="Accessory" data-model-line-id="'+ modelLineId +'" data-accessory-id="' + row[0] + '"></div>';
                             }
                         }
                     ]
@@ -2107,7 +2402,7 @@
                 var slNo = 0;
                 var data = response.map(function(sparePart) {
                     slNo = slNo + 1;
-                    var addButton = '<button class="add-button" data-button-type="SparePart" data-sparepart-id="' + sparePart.id + '">Add</button>';
+                    var addButton = '<button class="add-button" data-button-type="SparePart" data-model-line-id="'+ modelLineId +'"  data-sparepart-id="' + sparePart.id + '">Add</button>';
                     if(sparePart.addon_description.description != null) {
                        var sparePartName = sparePart.addon_description.addon.name + ' - ' + sparePart.addon_description.description;
                     }
@@ -2221,7 +2516,7 @@
                         {
                             title: 'Add Into Quotation',
                             render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-button-type="SparePart" data-sparepart-id="' + row[0] + '"></div>';
+                                return '<div class="circle-button add-button" data-button-type="SparePart" data-model-line-id="'+ modelLineId +'"  data-sparepart-id="' + row[0] + '"></div>';
                             }
                         }
                     ]
@@ -2268,7 +2563,7 @@
                 var slNo = 0;
                 var data = response.map(function(kit) {
                     slNo = slNo + 1;
-                    var addButton = '<button class="add-button" data-button-type="Kit" data-kit-id="' + kit.id + '">Add</button>';
+                    var addButton = '<button class="add-button" data-button-type="Kit" data-model-line-id="'+ modelLineId +'" data-kit-id="' + kit.id + '">Add</button>';
                     var kitName = '';
                     if(kit.addon_name.name != null) {
                        kitName = kit.addon_name.name;
@@ -2362,7 +2657,7 @@
                         {
                             title: 'Add Into Quotation',
                             render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-button-type="Kit" data-kit-id="' + row[0] + '"></div>';
+                                return '<div class="circle-button add-button" data-button-type="Kit" data-model-line-id="'+ modelLineId +'" data-kit-id="' + row[0] + '"></div>';
                             }
                         }
                     ]
