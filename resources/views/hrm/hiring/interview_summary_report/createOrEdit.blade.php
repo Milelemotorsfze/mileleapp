@@ -278,11 +278,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 						<fieldset style="margin-top:5px;" class="radio-div-container">
                             <div class="row some-class">
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="gender" name="gender" value="1" id="male" />
+                                    <input type="radio" class="gender" name="gender" value="1" id="1" />
                                     <label for="male">Male</label>
                                 </div>
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="gender" name="gender" value="2" id="female" />
+                                    <input type="radio" class="gender" name="gender" value="2" id="2" />
                                     <label for="female">Female</label>
                                 </div>
                             </div>
@@ -292,7 +292,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 						<span class="error">* </span>
 						<label for="resume_file_name" class="col-form-label text-md-end">{{ __('Upload Resume PDF') }}</label>
 						<input type="file" class="form-control" id="documents" name="resume_file_name"
-                                           placeholder="Upload Other Document" accept="application/pdf">
+                                           placeholder="Upload Other Document" accept="application/pdf" value="s">
 					</div>
 				</div>
 			</div>
@@ -304,12 +304,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 			<div class="card-body">
 				<div class="row">
                     <div class="col-xxl-4 col-lg-6 col-md-6">
-						<span class="error">* </span>
+						<!-- <span class="error">* </span> -->
 						<label for="date_of_telephonic_interview" class="col-form-label text-md-end">{{ __('Telephonic Interview Date') }}</label>
                         <input type="date" name="date_of_telephonic_interview" id="date_of_telephonic_interview" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6">
-						<span class="error">* </span>
+						<!-- <span class="error">* </span> -->
 						<label for="interviewer_id" class="col-form-label text-md-end">{{ __('Choose Name Of Interviewers') }}</label>
                         <select name="interviewer_id[]" id="interviewer_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
 							@foreach($interviewersNames as $interviewers)
@@ -319,8 +319,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
                         <label for="interviewer_id" class="col-form-label text-md-end">{{ __('Telephonic Interview Summary') }}</label>
-						<textarea rows="5" id="explanation_of_new_hiring" type="text" class="form-control @error('explanation_of_new_hiring') is-invalid @enderror"
-						name="explanation_of_new_hiring" placeholder="Telephonic Interview Summary" value="{{ old('explanation_of_new_hiring') }}"  autocomplete="explanation_of_new_hiring"
+						<textarea rows="5" id="telephonic_interview" type="text" class="form-control @error('telephonic_interview') is-invalid @enderror"
+						name="telephonic_interview" placeholder="Telephonic Interview Summary" value="{{ old('telephonic_interview') }}"  autocomplete="telephonic_interview"
 						autofocus></textarea>
 					</div>
 				</div>
@@ -337,7 +337,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
                         <fieldset style="margin-top:5px;">
                             <div class="row some-class">
                                 <div class="col-xxl-2 col-lg-6 col-md-6">
-                                    <span class="error">* </span>
+                                    <!-- <span class="error">* </span> -->
                                     <label for="rate_dress_appearance" class="col-form-label text-md-end">{{ __('Dress') }}</label>
                                 </div>
                                 <div class="col-xxl-2 col-lg-6 col-md-6">
@@ -369,28 +369,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
                         <fieldset style="margin-top:5px;">
                             <div class="row some-class">
                                 <div class="col-xxl-2 col-lg-6 col-md-6">
-                                    <span class="error">* </span>
+                                    <!-- <span class="error">* </span> -->
                                     <label for="rate_body_language_appearance" class="col-form-label text-md-end">{{ __('Body Language') }}</label>
                                 </div>
                                 <div class="col-xxl-2 col-lg-6 col-md-6">
-                                    <input type="radio" class="rate_body_language_appearance" name="rate_body_language_appearance" value="poor" id="dress_poor" />
-                                    <label for="dress_poor">POOR</label>
+                                    <input type="radio" class="rate_body_language_appearance" name="rate_body_language_appearance" value="poor" id="body_language_poor" />
+                                    <label for="body_language_poor">POOR</label>
                                 </div>
                                 <div class="col-xxl-2 col-lg-6 col-md-6">
-                                    <input type="radio" class="rate_body_language_appearance" name="rate_body_language_appearance" value="fair" id="dress_fair" />
-                                    <label for="dress_fair">FAIR</label>
+                                    <input type="radio" class="rate_body_language_appearance" name="rate_body_language_appearance" value="fair" id="body_language_fair" />
+                                    <label for="body_language_fair">FAIR</label>
                                 </div>
                                 <div class="col-xxl-2 col-lg-6 col-md-6">
-                                    <input type="radio" class="rate_body_language_appearance" name="rate_body_language_appearance" value="average" id="dress_average" />
-                                    <label for="dress_average">AVERAGE</label>
+                                    <input type="radio" class="rate_body_language_appearance" name="rate_body_language_appearance" value="average" id="body_language_average" />
+                                    <label for="body_language_average">AVERAGE</label>
                                 </div>
                                 <div class="col-xxl-2 col-lg-6 col-md-6">
-                                    <input type="radio" class="rate_body_language_appearance" name="rate_body_language_appearance" value="good" id="dress_good" />
-                                    <label for="dress_good">GOOD</label>
+                                    <input type="radio" class="rate_body_language_appearance" name="rate_body_language_appearance" value="good" id="body_language_good" />
+                                    <label for="body_language_good">GOOD</label>
                                 </div>
                                 <div class="col-xxl-2 col-lg-6 col-md-6">
-                                    <input type="radio" class="rate_body_language_appearance" name="rate_body_language_appearance" value="superior" id="dress_superior" />
-                                    <label for="dress_superior">SUPERIOR</label>
+                                    <input type="radio" class="rate_body_language_appearance" name="rate_body_language_appearance" value="superior" id="body_language_superior" />
+                                    <label for="body_language_superior">SUPERIOR</label>
                                 </div>
                             </div>
                         </fieldset>
@@ -423,7 +423,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 	const file4InputLicense = document.querySelector("#documents");
 	const previewFile4 = document.querySelector("#file4-preview");
 	var hiringrequests = {!! json_encode($hiringrequests) !!};
+	var currentInterviewReport = {!! json_encode($currentInterviewReport) !!};
+	var interviewersArr =[];
 	$(document).ready(function () {
+		$("#hiring_request_id").val(currentInterviewReport.hiring_request_id);
+		$("#candidate_name").val(currentInterviewReport.candidate_name);
+		$("#nationality").val(currentInterviewReport.nationality);
+		$('#' + currentInterviewReport.gender).prop('checked',true);
+		// alert(currentInterviewReport.resume_file_name);
+		// $("#resume_file_name").val(currentInterviewReport.resume_file_name);
+		$("#date_of_telephonic_interview").val(currentInterviewReport.date_of_telephonic_interview);
+		if(currentInterviewReport.interviewers.length >0) {
+			for(var i=0; i<currentInterviewReport.interviewers.length; i++) {
+				interviewersArr.push(currentInterviewReport.interviewers[i].interviewer_id);
+			}
+		}
+		$("#interviewer_id").val(interviewersArr);
+		$("#telephonic_interview").val(currentInterviewReport.telephonic_interview);
+		$('#dress_' + currentInterviewReport.rate_dress_appearance).prop('checked',true);
+		$('#body_language_' + currentInterviewReport.rate_body_language_appearance).prop('checked',true);
+
 		$('#job_position_div').hide();
 		$('#department_div').hide();
         $('#nationality').select2({
@@ -459,9 +478,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 				$('#department_div').hide();
 			}			
 		});
-		// $("select").on("change", function (e) {  
-        // $(this).valid(); 
-    	// });
 	});
 	file4InputLicense.addEventListener("change", function(event) {
             $('.preview-div').attr('hidden', false);
@@ -484,6 +500,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
         
     });
 	$('#interviewSummaryReportForm').validate({ // initialize the plugin
+		// alert($('#resume_file_name').val());
         rules: {
 			candidate_name: {
 				required: true,
@@ -508,10 +525,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
                 error.addClass('radio-error');
                 error.insertAfter(element.closest('.radio-main-div').find('fieldset.radio-div-container').last());
             }
-            // else if (element.hasClass("select2-hidden-accessible")) {
-            //     element = $("#select2-" + element.attr("id") + "-container").parent();
-            //     error.insertAfter(element);
-            // }
 			else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
                 if (!element.val() || element.val().length === 0) {
                     console.log("Error is here with length", element.val().length);

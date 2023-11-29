@@ -23,14 +23,21 @@ use Validator;
 class InterviewSummaryReportController extends Controller
 {
     public function index() {
-        
+        $shortlists = InterviewSummaryReport::where([
+            ['date_of_fifth_round',NULL],
+            ['date_of_forth_round',NULL],
+            ['date_of_third_round',NULL],
+            ['date_of_second_round',NULL],
+            ['date_of_first_round',NULL],
+            ['status','pending'],
+        ])->latest()->get();
         $pendings = InterviewSummaryReport::where('status','pending')->latest()->get();
         $approved = InterviewSummaryReport::where('status','approved')->latest()->get();
         $rejected = InterviewSummaryReport::where('status','rejected')->latest()->get();
-        return view('hrm.hiring.interview_summary_report.index',compact('pendings','approved','rejected'));
+        return view('hrm.hiring.interview_summary_report.index',compact('shortlists','pendings','approved','rejected'));
     }
     public function createOrEdit($id) {
-        $currentInterviewReport = InterviewSummaryReport::where('id',$id)->first();
+        $currentInterviewReport = InterviewSummaryReport::with('interviewers')->where('id',$id)->first();
         if(!$currentInterviewReport) {
             $currentInterviewReport = new InterviewSummaryReport();
             $interviewSummaryId = 'new';
@@ -43,11 +50,8 @@ class InterviewSummaryReportController extends Controller
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterGender = MasterGender::whereIn('id',[1,2])->get();
         $interviewersNames = User::whereNot('id',16)->select('id','name')->get();
-        // $masterDepartments = MasterDepartment::select('id','name')->get();
-        // $masterJobPositions = MasterJobPosition::select('id','name')->get();
         return view('hrm.hiring.interview_summary_report.createOrEdit',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
         'masterGender','interviewersNames','hiringrequests'));
-        // ,'masterDepartments','masterJobPositions'
     }
     public function requestAction(Request $request) {
         DB::beginTransaction();
@@ -99,8 +103,8 @@ class InterviewSummaryReportController extends Controller
         }
     }
     public function storeOrUpdate(Request $request, $id) {
-        dd('hi');
         $validator = Validator::make($request->all(), [
+            'hiring_request_id' => 'required',
             'candidate_name' => 'required',
             'nationality' => 'required',
             'gender' => 'required',
@@ -110,8 +114,8 @@ class InterviewSummaryReportController extends Controller
             return redirect()->back()->withInput()->withErrors($validator);
         }
         else {
-            // DB::beginTransaction();
-            // try {
+            DB::beginTransaction();
+            try {
                 $authId = Auth::id();
                 $input = $request->all();
                 $update = InterviewSummaryReport::where('id',$id)->first();
@@ -122,9 +126,11 @@ class InterviewSummaryReportController extends Controller
                     $request->resume_file_name->move(public_path('resume'), $fileName);
                 }
                 if($update) {
+                    $update->hiring_request_id  = $request->hiring_request_id ;
                     $update->candidate_name  = $request->candidate_name ;
                     $update->nationality  = $request->nationality ;
                     $update->gender  = $request->gender ;
+                    $update->telephonic_interview = $request->telephonic_interview;
                     $update->date_of_telephonic_interview  = $request->date_of_telephonic_interview ;
                     $update->rate_dress_appearance  = $request->rate_dress_appearance ;
                     $update->rate_body_language_appearance  = $request->rate_body_language_appearance ;
@@ -139,13 +145,15 @@ class InterviewSummaryReportController extends Controller
                     }
                     $createInterviewer['interview_summary_report_id'] = $update->id;
                     $createInterviewer['round'] = $request->round;
-                    if(count($request->interviewer_id) > 0) {
-                        foreach($request->interviewer_id as $interviewer_id) {
-                            $createInterviewer['interviewer_id'] = $interviewer_id;
-                            $intervierCreated = Interviewers::create($createInterviewer);
+                    if(isset($request->interviewer_id)) {
+                        if(count($request->interviewer_id) > 0) {
+                            foreach($request->interviewer_id as $interviewer_id) {
+                                $createInterviewer['interviewer_id'] = $interviewer_id;
+                                $intervierCreated = Interviewers::create($createInterviewer);
+                            }
                         }
                     }
-                    $history['hiring_request_id'] = $id;
+                    $history['hiring_request_id'] = $update->hiring_request_id;
                     $history['icon'] = 'icons8-edit-30.png';
                     $history['message'] = $request->candidate_name.' Interview Summary updated by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
                     $createHistory = EmployeeHiringRequestHistory::create($history);
@@ -164,21 +172,21 @@ class InterviewSummaryReportController extends Controller
                             $intervierCreated = Interviewers::create($createInterviewer);
                         }
                     }
-                    $history['hiring_request_id'] = $id;
+                    $history['hiring_request_id'] = $createRequest->hiring_request_id;
                     $history['icon'] = 'icons8-questionnaire-30.png';
                     $history['message'] = $request->candidate_name.' Interview Summary created by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
                     $createHistory = EmployeeHiringRequestHistory::create($history);
                     (new UserActivityController)->createActivity($createHistory->message);
                     $successMessage = "Interview Summary created Successfully";
                 }
-                // DB::commit();
+                DB::commit();
                 return redirect()->route('interview-summary-report.index')
                                     ->with('success','Interview Summary Report Created Successfully');
-            // } 
-            // catch (\Exception $e) {
-            //     DB::rollback();               
-            //     dd($e);
-            // }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();               
+                dd($e);
+            }
         }
     }
 }

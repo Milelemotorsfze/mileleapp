@@ -544,6 +544,7 @@ Route::get('/d', function () {
     Route::post('/approve-inspection', [ApprovalsController::class, 'approveInspection'])->name('approveInspection');
     Route::post('/reinspectionrequest', [InspectionController::class, 'reinspectionrequest'])->name('reinspectionrequest');
     Route::put('/resinspection/{id}', [InspectionController::class, 'reupdate'])->name('inspection.reupdate');
+    Route::put('/resinspectionspec/{id}', [InspectionController::class, 'reupdatespec'])->name('inspection.reupdatespec');
     Route::get('approvalsinspection/reshow/{approvalsreinspection}', [ApprovalsController::class, 'approvalsreinspection'])->name('reinspection.approvalsreinspection');
     Route::get('incident/showre/{id}', [IncidentController::class, 'showre'])->name('incident.showre');
     Route::post('incident/reinspectionsforapp', [IncidentController::class, 'reinspectionsforapp'])->name('incident.reinspectionsforapp');
@@ -553,6 +554,7 @@ Route::get('/d', function () {
     Route::get('/routine-inspection/{vehicleId}', [ApprovalsController::class, 'getRoutineInspectionData']);
     Route::post('inspectionretuinapp/approvals', [ApprovalsController::class,'approvalsrotein'])->name('inspectionapprovalroten.approvalsrotein');
     Route::post('pdiinspection', [InspectionController::class,'pdiinspection'])->name('pdi.pdiinspection');
+    Route::get('inspection/reinspectionspec/{id}', [InspectionController::class, 'reinspectionspec'])->name('inspection.reinspectionspec');
     Route::get('/get-vehicle-extra-items/{vehicle_id}', [InspectionController::class, 'getVehicleExtraItems']);
     Route::get('/pdi-inspection/{vehicleId}', [ApprovalsController::class, 'getpdiInspectionData']);
     Route::post('inspectionpdiapp/approvals', [ApprovalsController::class,'approvalspdi'])->name('inspectionapprovalpdi.approvalspdi');

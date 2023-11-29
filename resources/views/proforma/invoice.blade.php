@@ -96,7 +96,7 @@
         <div class="row">
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         Document Type :
                     </div>
                     <div class="col-sm-6">
@@ -113,19 +113,19 @@
             </div>
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-6">
-                        Shipping Method :
+                    <div class="col-sm-2">
+                        Category :
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
                                    name="shipping_method" id="CNF" value="CNF" >
-                            <label class="form-check-label" for="CNF">CNF</label>
+                            <label class="form-check-label" for="CNF">Local</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
                                    name="shipping_method" id="EXW" value="EXW" checked>
-                            <label class="form-check-label" for="EXW">EXW</label>
+                            <label class="form-check-label" for="EXW">Export</label>
                         </div>
                     </div>
                     @error('shipping_method')
@@ -137,10 +137,10 @@
             </div>
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-2">
                         Currency :
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <select class="form-select" name="currency" id="currency">
                             <option>AED</option>
                             <option>USD</option>

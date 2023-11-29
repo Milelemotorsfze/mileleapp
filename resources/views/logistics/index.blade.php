@@ -214,9 +214,9 @@
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
             <thead class="bg-soft-secondary">
                 <tr>
-                  <th>VIN</th>
+                <th>Purchasing Order Number</th>
                   <th>Model</th>
-                  <th>Purchasing Order Number</th>
+                  <th>Qty</th>
                 </tr>
               </thead>
               <tbody>
@@ -319,10 +319,28 @@
             serverSide: true,
             ajax: "{{ route('logisticsdocuments.index', ['status' => 'Incoming']) }}",
             columns: [
-                { data: 'vin', name: 'vehicles.vin' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-            ]
+        { data: 'po_number', name: 'purchasing_order.po_number' },
+        { data: 'model_details', name: 'model_details', searchable: false },
+        { data: 'vehicle_count', name: 'vehicles.id', searchable: false },
+    ],
+    columnDefs: [
+        {
+            targets: 1,
+            render: function (data, type, row, meta) {
+                // Split and display each model_detail on a new line
+                var modelDetailsArray = data.split(',');
+                var modelDetailsHtml = '';
+                modelDetailsArray.forEach(function (modelDetail) {
+                    modelDetailsHtml += modelDetail + '<br>';
+                });
+                return modelDetailsHtml;
+            }
+        },
+        {
+            targets: [0, 2], // Target the first and third columns (0-indexed)
+            className: 'text-center'
+        }
+    ]
         });
         $('#dtBasicExample2').DataTable({
             processing: true,
@@ -380,7 +398,7 @@
                 { data: 'bl_number', name: 'documents.bl_number' },
             ]
         });
-});
+  });
     </script>
 <script>
   $(document).ready(function () {
