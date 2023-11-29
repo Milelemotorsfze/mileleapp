@@ -94,5 +94,8 @@ class InterviewSummaryReport extends Model
     public function createdBy() {
         return $this->hasOne(User::class,'id','created_by');
     }
-
+    public function interviewers()
+    {
+        return $this->hasMany(Interviewers::class,'interview_summary_report_id','id');
+    }
 }

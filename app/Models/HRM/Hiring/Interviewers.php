@@ -4,6 +4,7 @@ namespace App\Models\HRM\Hiring;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Interviewers extends Model
 {
@@ -15,4 +16,7 @@ class Interviewers extends Model
         'interviewer_id',
         'round',
     ];
+    public function interviewerName() {
+        return $this->hasOne(User::class,'id','interviewer_id');
+    }
 }
