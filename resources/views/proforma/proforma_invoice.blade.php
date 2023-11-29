@@ -196,7 +196,7 @@
 
                         @if($vehicle->quotationSubItems->count() > 0)
                             <tr>
-                                <th colspan="4">ADDON</th>
+                                <th colspan="4"><span style="text-align: center"> ADDON </span> </th>
                             </tr>
                             @foreach($vehicle->quotationSubItems as $addon)
                                 <tr style="background-color: #e1c7a8">
@@ -206,10 +206,6 @@
                                     <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->total_amount, 2) }}</td>
                                 </tr>
                             @endforeach
-                        <tr>
-                            <td colspan="3" style="font-weight: bold;text-align: end">TOTAL</td>
-                            <td>{{ number_format($vehicle->addon_sum , 2) }}</td>
-                        </tr>
                         @endif
                 @endforeach
                 @foreach($variants as $variant)
@@ -231,11 +227,6 @@
                                 <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->total_amount, 2) }}</td>
                             </tr>
                         @endforeach
-                        <tr>
-                            <td colspan="3" style="font-weight: bold;text-align: end">TOTAL</td>
-
-                            <td style="font-weight: bold;">{{ number_format($variant->addon_sum , 2) }}</td>
-                        </tr>
                     @endif
                 @endforeach
             @endif

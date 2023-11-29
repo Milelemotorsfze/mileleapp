@@ -150,8 +150,6 @@
                 </div>
             </div>
         </div>
-
-
         <hr>
         <div class="row">
             <div class="col-sm-4">
@@ -1058,6 +1056,7 @@
 
     </script>
 <script>
+
     function checkValidation()
     {
         var value = $('#new_brand_name').val();
@@ -1108,7 +1107,14 @@
     }
 
     $(document).ready(function() {
-
+        $('#dtBasicExample2 tbody').on('click', '.checkbox-hide', function(e) {
+            var id = this.id;
+            if($(this).is(':unchecked')) {
+                $('#'+ id).val(null);
+            }else{
+                $('#'+ id).val("yes");
+            }
+        });
         $('.modal-close').on('click', function(){
             $('.overlay').hide();
             $('.modal').removeClass('modalshow');
@@ -1250,29 +1256,7 @@
         $('#kit_brand').select2();
         $('#kit_model_line').select2();
         $('#kits_model_description').select2();
-        // $("#form-create").validate({
-        //     rules: {
-        //         document_type: {
-        //             required: {
-        //                 depends: function(element) {
-        //                     return $(".document_type:checked")
-        //                 }
-        //             }
-        //         },
-        //         shipping_method: {
-        //             required: {
-        //                 depends: function(element) {
-        //                     return $(".shipping_method:checked")
-        //                 }
-        //             }
-        //         },
-        //         contact_number:{
-        //             number: true,
-        //             minlength:5,
-        //             maxlength:15,
-        //         }
-        //     }
-        // });
+
         $('input[name="document_type"]').on('change', function() {
             $('input[name="' + this.name + '"]').not(this).prop('checked', false);
             var documentType = $(this).val();
@@ -1582,14 +1566,11 @@
                 targets: -1,
                 data: null,
                 render: function (data, type, row) {
-                if(row['button_type'] == 'Direct-Add') {
+                    var directAdd = "";
+                    var directAdd = 'Direct-Add';
+                    var arrayIndex = row['index'] - 1;
+                    return ' <input type="checkbox" name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide" checked id="checkbox-'+ row['index'] +'"> <button class="circle-buttonr remove-button"  data-button-type="'+ directAdd +'">Remove</button>';
 
-                    return '<button class="circle-buttonr remove-button"  data-button-type="Direct-Add"  >Remove</button>';
-
-                }else{
-                    return '<button class="circle-buttonr remove-button" >Remove</button>';
-
-                }
             }
             // defaultContent: '<button class="circle-buttonr remove-button" >Remove</button>'
             },
@@ -1597,7 +1578,6 @@
                 targets: -2,
                 data: null,
                 render: function (data, type, row) {
-
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
                         var price = row[7];

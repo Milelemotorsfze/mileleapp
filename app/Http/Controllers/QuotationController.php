@@ -63,177 +63,161 @@ class QuotationController extends Controller
     public function store(Request $request)
     {
 //        dd($request->all());
-//        DB::beginTransaction();
-//        $isVehicle = 0;
-//        $call = Calls::find($request->calls_id);
-//        $call->status = 'Quoted';
-//        $call->save();
-//
-//        $call->company_name = $request->company_name;
-//        $call->name = $request->name;
-//        $call->phone = $request->phone;
-//        $call->email = $request->email;
-//        $call->address = $request->address;
-//        $call->save();
-//
-//        $quotation = new Quotation();
-//        if($request->currency == 'AED') {
-//            $quotation->deal_value = $request->total;
-//        }else{
-//            $quotation->deal_value = $request->deal_value;
-//
-//        }
-//        $quotation->sales_notes = $request->remarks;
-//        $quotation->created_by = Auth::id();
-//        $quotation->calls_id = $request->calls_id;
-//        $quotation->currency = $request->currency;
-//        $quotation->document_type = $request->document_type;
-//        $quotation->date = Carbon::now();
-//        if($request->document_type == 'Proforma') {
-//            $quotation->document_type = 'Proforma Invoice';
-//        }
-//        $quotation->shipping_method = $request->shipping_method;
-//        $quotation->save();
-//
-//        $quotationDetail = new QuotationDetail();
-//        $quotationDetail->quotation_id  = $quotation->id;
-//        $quotationDetail->final_destination  = $request->final_destination;
-//        $quotationDetail->incoterm  = $request->incoterm;
-//        $quotationDetail->place_of_delivery  = $request->place_of_delivery;
-//        $quotationDetail->place_of_supply  = $request->place_of_supply;
-//        $quotationDetail->document_validity  = $request->document_validity;
-//        $quotationDetail->system_code  = $request->system_code;
-//        $quotationDetail->payment_terms  = $request->payment_terms;
-//        $quotationDetail->representative_name = $request->representative_name;
-//        $quotationDetail->representative_number = $request->representative_number;
-//        $quotationDetail->cb_name = $request->cb_name;
-//        $quotationDetail->cb_number = $request->cb_number;
-//        $quotationDetail->advance_amount = $request->advance_amount;
-//        $quotationDetail->save();
-//
-//        $quotationItemIds = [];
-//        $quotationSubItemKeys = [];
-////        info($request->types);
-//        foreach ($request->prices as $key => $price) {
-//           $quotationItem = new QuotationItem();
-//           $quotationItem->unit_price = $price;
-//           $quotationItem->quantity = $request->quantities[$key];
-//           $quotationItem->description = $request->descriptions[$key];
-//           $quotationItem->total_amount = $request->total_amounts[$key];
-//           $quotationItem->quotation_id = $quotation->id;
-//           $quotationItem->is_addon = $request->is_addon[$key] ;
-//           $quotationItem->created_by = Auth::id();
-//
-//           if($request->types[$key] == 'Shipping') {
-//
-//               $item = Shipping::find($request->reference_ids[$key]);
-//
-//           }else if($request->types[$key] == 'Certification') {
-//
-//               $item = ShippingCertification::find($request->reference_ids[$key]);
-//
-//           }else if($request->types[$key] == 'Shipping-Document') {
-//
-//               $item = ShippingDocuments::find($request->reference_ids[$key]);
-//
-//           }else if($request->types[$key] == 'Vehicle') {
-//               $item = Varaint::find($request->reference_ids[$key]);
-//                //confirming it is a vehicle
-////               if($request->is_addon[$key] == 0) {
-//
-//                    $isVehicle = 1;
-//                    $variant = Varaint::find($request->reference_ids[$key]);
-//                    if($variant) {
-//                        $vehicleModelLineId = $variant->master_model_lines->id ?? '';
-//                        info("vehicle type");
-//                        info($key);
-//
-//                    }
-////               }
-//
-//           }else if($request->types[$key] == 'Other') {
-//
-//               $item = OtherLogisticsCharges::find($request->reference_ids[$key]);
-//
-//           }else if($request->types[$key] == 'ModelLine') {
-//               $item = MasterModelLines::find($request->reference_ids[$key]);
-//               //confirming it is a vehicle
-//               if($request->is_addon[$key] == 0) {
-//                   $isVehicle = 1;
-//                   $vehicleModelLineId = $request->reference_ids[$key];
-//                   info("vehicle - > model line");
-//                   info($key);
-//               }
-//
-//           }else if($request->types[$key] == 'Accessory' || $request->types[$key] == 'SparePart' || $request->types[$key] == 'Kit') {
-//
-//               $item = AddonDetails::find($request->reference_ids[$key]);
-//
-//           }
-//            $quotationItem->reference()->associate($item);
-//            $quotationItem->save();
-//
-//            if($isVehicle == 1){
-//                $arrayKeys = array_keys($request->model_lines, $vehicleModelLineId);
-//                if (count($arrayKeys) > 0) {
-//                   array_push($quotationItemIds, $quotationItem->id);
-//                    // At least one match...
-//                    $quotationSubItemKeys[$quotationItem->id] = $arrayKeys;
-//                }
-////               check this model line is existing in addons array, if yes get the array key;
-//            }
-//            $isVehicle = 0;
-//        }
-//
-//        foreach ($quotationItemIds as $itemId) {
-//            $itemKeys = $quotationSubItemKeys[$itemId];
-//            info("each set of array keys");
-//            info("parent Id ".$itemId);
-//            foreach ($itemKeys as $itemKey) {
-//                info("item key: ". $itemKey);
-//                if($request->types[$itemKey] == 'ModelLine' ) {
-//                    info("it is directly added");
-//                     $alreadyaddedquotationIds = QuotationSubItem::where('quotation_id', $quotation->id)
-//                         ->pluck('quotation_item_id')->toArray();
-//
-//                    if($request->is_addon[$itemKey] == 1) {
-//                        info("it is directly added addon with ref id". $request->reference_ids[$itemKey]);
-//
-//                        $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
-//                            ->where('reference_id', $request->reference_ids[$itemKey])
-//                            ->where('reference_type', 'App\Models\MasterModelLines')
-//                            ->whereNotIn('id', $alreadyaddedquotationIds)
-//                            ->where('is_addon', true)
-//                            ->first();
-////                        array_push($referenceIds,$request->reference_ids[$itemKey]);
-//                    }
-//                }else if($request->types[$itemKey] == 'Accessory' || $request->types[$itemKey] == 'SparePart' || $request->types[$itemKey] == 'Kit') {
-//                    info("it is added by search also addon ". $request->reference_ids[$itemKey]);
-//
-//                    $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
-//                        ->where('reference_id', $request->reference_ids[$itemKey])
-//                        ->where('reference_type', 'App\Models\AddonDetails')
-//                        ->whereNotIn('id', $alreadyaddedquotationIds)
-//                        ->first();
-//                }
-//                info("corresponding row result" . $quotationItemRow);
-//                if($quotationItemRow) {
-//                    $quotationSubItem = new QuotationSubItem();
-//                    $quotationSubItem->quotation_id = $quotation->id;
-//                    $quotationSubItem->quotation_item_parent_id = $itemId;
-//                    $quotationSubItem->quotation_item_id = $quotationItemRow->id;
-//                    $quotationSubItem->save();
-//
-//                }
-//            }
-//        }
-//        DB::commit();
+        DB::beginTransaction();
+        $isVehicle = 0;
+        $call = Calls::find($request->calls_id);
+        $call->status = 'Quoted';
+        $call->save();
+
+        $call->company_name = $request->company_name;
+        $call->name = $request->name;
+        $call->phone = $request->phone;
+        $call->email = $request->email;
+        $call->address = $request->address;
+        $call->save();
+
+        $quotation = new Quotation();
+        if($request->currency == 'AED') {
+            $quotation->deal_value = $request->total;
+        }else{
+            $quotation->deal_value = $request->deal_value;
+
+        }
+        $quotation->sales_notes = $request->remarks;
+        $quotation->created_by = Auth::id();
+        $quotation->calls_id = $request->calls_id;
+        $quotation->currency = $request->currency;
+        $quotation->document_type = $request->document_type;
+        $quotation->date = Carbon::now();
+        if($request->document_type == 'Proforma') {
+            $quotation->document_type = 'Proforma Invoice';
+        }
+        $quotation->shipping_method = $request->shipping_method;
+        $quotation->save();
+
+        $quotationDetail = new QuotationDetail();
+        $quotationDetail->quotation_id  = $quotation->id;
+        $quotationDetail->final_destination  = $request->final_destination;
+        $quotationDetail->incoterm  = $request->incoterm;
+        $quotationDetail->place_of_delivery  = $request->place_of_delivery;
+        $quotationDetail->place_of_supply  = $request->place_of_supply;
+        $quotationDetail->document_validity  = $request->document_validity;
+        $quotationDetail->system_code  = $request->system_code;
+        $quotationDetail->payment_terms  = $request->payment_terms;
+        $quotationDetail->representative_name = $request->representative_name;
+        $quotationDetail->representative_number = $request->representative_number;
+        $quotationDetail->cb_name = $request->cb_name;
+        $quotationDetail->cb_number = $request->cb_number;
+        $quotationDetail->advance_amount = $request->advance_amount;
+        $quotationDetail->save();
+
+        $quotationItemIds = [];
+        $quotationSubItemKeys = [];
+        foreach ($request->prices as $key => $price) {
+           $quotationItem = new QuotationItem();
+           $quotationItem->unit_price = $price;
+           $quotationItem->quantity = $request->quantities[$key];
+           $quotationItem->description = $request->descriptions[$key];
+           $quotationItem->total_amount = $request->total_amounts[$key];
+           $quotationItem->quotation_id = $quotation->id;
+           $quotationItem->is_addon = $request->is_addon[$key];
+           $quotationItem->is_enable = isset($request->is_hide[$key]) ? true : false;
+           $quotationItem->created_by = Auth::id();
+
+           if($request->types[$key] == 'Shipping') {
+
+               $item = Shipping::find($request->reference_ids[$key]);
+
+           }else if($request->types[$key] == 'Certification') {
+
+               $item = ShippingCertification::find($request->reference_ids[$key]);
+
+           }else if($request->types[$key] == 'Shipping-Document') {
+
+               $item = ShippingDocuments::find($request->reference_ids[$key]);
+
+           }else if($request->types[$key] == 'Vehicle') {
+               $item = Varaint::find($request->reference_ids[$key]);
+                //confirming it is a vehicle
+                    $isVehicle = 1;
+                    $variant = Varaint::find($request->reference_ids[$key]);
+                    if($variant) {
+                        $vehicleModelLineId = $variant->master_model_lines->id ?? '';
+                    }
+           }else if($request->types[$key] == 'Other') {
+               $item = OtherLogisticsCharges::find($request->reference_ids[$key]);
+
+           }else if($request->types[$key] == 'ModelLine') {
+               $item = MasterModelLines::find($request->reference_ids[$key]);
+               //confirming it is a vehicle
+               if($request->is_addon[$key] == 0) {
+                   $isVehicle = 1;
+                   $vehicleModelLineId = $request->reference_ids[$key];
+                   info("vehicle - > model line");
+                   info($key);
+               }
+
+           }else if($request->types[$key] == 'Accessory' || $request->types[$key] == 'SparePart' || $request->types[$key] == 'Kit') {
+
+               $item = AddonDetails::find($request->reference_ids[$key]);
+
+           }
+            $quotationItem->reference()->associate($item);
+            $quotationItem->save();
+
+            if($isVehicle == 1){
+                $arrayKeys = array_keys($request->model_lines, $vehicleModelLineId);
+                if (count($arrayKeys) > 0) {
+                   array_push($quotationItemIds, $quotationItem->id);
+                    // At least one match...
+                    $quotationSubItemKeys[$quotationItem->id] = $arrayKeys;
+                }
+//               check this model line is existing in addons array, if yes get the array key;
+            }
+            $isVehicle = 0;
+        }
+
+        foreach ($quotationItemIds as $itemId) {
+            $itemKeys = $quotationSubItemKeys[$itemId];
+            foreach ($itemKeys as $itemKey) {
+                if($request->types[$itemKey] == 'ModelLine' ) {
+                     $alreadyaddedquotationIds = QuotationSubItem::where('quotation_id', $quotation->id)
+                         ->pluck('quotation_item_id')->toArray();
+                    if($request->is_addon[$itemKey] == 1) {
+
+                        $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
+                            ->where('reference_id', $request->reference_ids[$itemKey])
+                            ->where('reference_type', 'App\Models\MasterModelLines')
+                            ->whereNotIn('id', $alreadyaddedquotationIds)
+                            ->where('is_addon', true)
+                            ->first();
+//                        array_push($referenceIds,$request->reference_ids[$itemKey]);
+                    }
+                }else if($request->types[$itemKey] == 'Accessory' || $request->types[$itemKey] == 'SparePart' || $request->types[$itemKey] == 'Kit') {
+
+                    $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
+                        ->where('reference_id', $request->reference_ids[$itemKey])
+                        ->where('reference_type', 'App\Models\AddonDetails')
+                        ->whereNotIn('id', $alreadyaddedquotationIds)
+                        ->first();
+                }
+                if($quotationItemRow) {
+                    $quotationSubItem = new QuotationSubItem();
+                    $quotationSubItem->quotation_id = $quotation->id;
+                    $quotationSubItem->quotation_item_parent_id = $itemId;
+                    $quotationSubItem->quotation_item_id = $quotationItemRow->id;
+                    $quotationSubItem->save();
+
+                }
+            }
+        }
+        DB::commit();
 
 
 //        $quotationItem = QuotationItem::where('quotation_id', $quotation->id)->first();
-        $quotation = Quotation::find(7);
-        $call = Calls::find($quotation->calls_id);
-        $quotationDetail = QuotationDetail::where('quotation_id', 7)->first();
+//        $quotation = Quotation::find(7);
+//        $call = Calls::find($quotation->calls_id);
+//        $quotationDetail = QuotationDetail::where('quotation_id', 7)->first();
 
         $vehicles =  QuotationItem::where("reference_type", 'App\Models\Varaint')
             ->where('quotation_id', $quotation->id)->get();
@@ -285,7 +269,7 @@ class QuotationController extends Controller
 
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons'));
-        return $pdfFile->stream('test.pdf');
+//        return $pdfFile->stream('test.pdf');
         $filename = 'quotation_'.$quotation->id.'.pdf';
         $generatedPdfDirectory = public_path('Quotations');
         $directory = public_path('storage/quotation_files');
