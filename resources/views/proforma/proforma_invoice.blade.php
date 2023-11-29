@@ -181,7 +181,7 @@
         <table id="details">
             @if($vehicles->count() > 0 || $variants->count() > 0)
                 <tr style="background-color: #c9c1ea">
-                    <th> VEHICLE</th>
+                    <th>VEHICLE</th>
                     <th>QTY</th>
                     <th>PRICE</th>
                     <th>AMOUNT</th>
@@ -193,6 +193,24 @@
                         <td>{{ $quotation->currency ." ". number_format($vehicle->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($vehicle->total_amount, 2) }}</td>
                     </tr>
+
+                        @if($vehicle->quotationSubItems->count() > 0)
+                            <tr>
+                                <th colspan="4">ADDON</th>
+                            </tr>
+                            @foreach($vehicle->quotationSubItems as $addon)
+                                <tr style="background-color: #e1c7a8">
+                                    <td>  {{ $addon->quotationItem->description ?? ''}}</td>
+                                    <td>{{ $addon->quotationItem->quantity ?? ''}}</td>
+                                    <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->unit_price, 2) }}</td>
+                                    <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->total_amount, 2) }}</td>
+                                </tr>
+                            @endforeach
+                        <tr>
+                            <td colspan="3" style="font-weight: bold;text-align: end">TOTAL</td>
+                            <td>{{ number_format($vehicle->addon_sum , 2) }}</td>
+                        </tr>
+                        @endif
                 @endforeach
                 @foreach($variants as $variant)
                     <tr>
@@ -201,6 +219,24 @@
                         <td>{{ $quotation->currency ." ". number_format($variant->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($variant->total_amount, 2) }}</td>
                     </tr>
+                    @if($variant->quotationSubItems->count() > 0)
+                        <tr>
+                            <th colspan="4">ADDON</th>
+                        </tr>
+                        @foreach($variant->quotationSubItems as $addon)
+                            <tr style="background-color: #e1c7a8">
+                                <td>  {{ $addon->quotationItem->description ?? ''}}</td>
+                                <td>{{ $addon->quotationItem->quantity ?? ''}}</td>
+                                <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->unit_price, 2) }}</td>
+                                <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->total_amount, 2) }}</td>
+                            </tr>
+                        @endforeach
+                        <tr>
+                            <td colspan="3" style="font-weight: bold;text-align: end">TOTAL</td>
+
+                            <td style="font-weight: bold;">{{ number_format($variant->addon_sum , 2) }}</td>
+                        </tr>
+                    @endif
                 @endforeach
             @endif
             @if($shippingDocuments->count() > 0 || $shippingCharges->count() > 0)
@@ -284,9 +320,7 @@
                     <tr>
                         <td colspan="3">Deposit</td>
                         <td> {{ $quotation->currency ." ". number_format($quotationDetail->advance_amount, 2) }}</td>
-
                     </tr>
-
                 @endif
         </table>
         <br>
@@ -295,7 +329,6 @@
                 <td style="font-weight: bold;text-align: left">Note:- Third Party Payments will not be accepted.</td>
                 <td> </td>
                 <td style="font-weight: bold"> SUB TOTAL</td>
-
                 <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }} </td>
             </tr>
             @if($quotation->document_type == 'Proforma Invoice')
