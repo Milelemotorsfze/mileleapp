@@ -9,4 +9,8 @@ class ModelSpecification extends Model
 {
     use HasFactory;
     protected $table = 'model_specification';
+    public function options()
+    {
+        return $this->hasMany(ModelSpecificationOption::class);
+    }
 }

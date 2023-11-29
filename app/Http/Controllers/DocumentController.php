@@ -9,6 +9,7 @@ use App\Models\Document;
 use App\Events\DataUpdatedEvent;
 use App\Models\Documentlog;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
@@ -33,15 +34,16 @@ class DocumentController extends Controller
                     'warehouse.name as location',
                     'vehicles.vin',
                     'vehicles.id',
-                    'varaints.model_detail',
+                    DB::raw('GROUP_CONCAT(varaints.model_detail) as model_details'),
                     'purchasing_order.po_number',
+                    DB::raw('COUNT(vehicles.id) as vehicle_count'),
                 ])
                 ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
                 ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->whereNull('vehicles.grn_id');
-                $data = $data->groupBy('vehicles.id');
+                $data = $data->groupBy('purchasing_order.id');
             } 
             if($status === "Pending")
             {

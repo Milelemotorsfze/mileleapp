@@ -33,6 +33,20 @@
       white-space: nowrap;
       height: 10px;
     }
+    .nav-pills .nav-link {
+      position: relative;
+    }
+
+    .badge-notification {
+      position: absolute;
+      top: 0;
+      right: 0;
+      transform: translate(50%, -110%);
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      padding: 0.3rem 0.6rem;
+    }
   </style>
 @section('content')
 @php
@@ -64,19 +78,34 @@
     @can('inspection-edit')
     <ul class="nav nav-pills nav-fill">
     <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab2">Incoming Vehicles</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab2">Incoming Vehicles
+        <span class="badge badge-danger row-badge2 badge-notification"></span>
+        </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab1">Pending Inspections</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab1">Pending Inspections
+        <span class="badge badge-danger row-badge1 badge-notification"></span>
+        </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Stock Vehicles</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Stock Vehicles
+        <span class="badge badge-danger row-badge3 badge-notification"></span>
+        </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Pending PDI</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Pending PDI
+        <span class="badge badge-danger row-badge4 badge-notification"></span>
+        </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab5">Pending Re-Inspection</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab5">Re-Inspection
+        <span class="badge badge-danger row-badge5 badge-notification"></span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Re-Inspection Spec Update
+        <span class="badge badge-danger row-badge6 badge-notification"></span>
+        </a>
       </li>
     </ul>      
   </div>
@@ -258,13 +287,44 @@
           </div> 
         </div>  
       </div> 
+      <div class="tab-pane fade show" id="tab6">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
+            <thead class="bg-soft-secondary">
+                <tr>
+                  <th>PO Number</th>
+                  <th>GRN Number</th>
+                  <th>SO Date</th>
+                  <th>So Number</th>
+                  <th>Location</th>
+                  <th>VIN</th>
+                  <th>Brand</th>
+                  <th>Model Line</th>
+                  <th>Model Description</th>
+                  <th>Variant Name</th>
+                  <th>Variant Detail</th>
+                  <th>Model Year</th>
+                  <th>Steering</th>
+                  <th>Fuel Type</th>
+                  <th>Upholstery</th>
+                  <th>Interior Color</th>
+                  <th>Exterior Color</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div> 
+        </div>  
+      </div> 
       @endcan
       </div>
     </div>
   </div>
   <script>
         $(document).ready(function () {
-        $('#dtBasicExample1').DataTable({
+          var table1 =  $('#dtBasicExample1').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('inspection.index', ['status' => 'Pending']) }}",
@@ -291,7 +351,15 @@
                 { data: 'exterior_color', name: 'ex_color.name' },
             ]
         });
-        $('#dtBasicExample2').DataTable({
+        table1.on('draw', function () {
+            var rowCount = table1.page.info().recordsDisplay;
+            if (rowCount > 0) {
+                $('.row-badge1').text(rowCount).show();
+            } else {
+                $('.row-badge1').hide();
+            }
+        });
+        var table2 = $('#dtBasicExample2').DataTable({
             processing: true,
             serverSide: true,
             searching: true,
@@ -320,7 +388,15 @@
         console.log(api.rows().data().toArray());
     }
         });
-        $('#dtBasicExample3').DataTable({
+        table2.on('draw', function () {
+            var rowCount = table2.page.info().recordsDisplay;
+            if (rowCount > 0) {
+                $('.row-badge2').text(rowCount).show();
+            } else {
+                $('.row-badge2').hide();
+            }
+        });
+        var table3 = $('#dtBasicExample3').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('inspection.index', ['status' => 'stock']) }}",
@@ -347,7 +423,15 @@
                 { data: 'exterior_color', name: 'ex_color.name' },
             ]
         });
-        $('#dtBasicExample4').DataTable({
+        table3.on('draw', function () {
+            var rowCount = table3.page.info().recordsDisplay;
+            if (rowCount > 0) {
+                $('.row-badge3').text(rowCount).show();
+            } else {
+                $('.row-badge3').hide();
+            }
+        });
+        var table4 = $('#dtBasicExample4').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('inspection.index', ['status' => 'Pending PDI']) }}",
@@ -376,7 +460,15 @@
                 { data: 'exterior_color', name: 'ex_color.name' },
             ]
         });
-        $('#dtBasicExample5').DataTable({
+        table4.on('draw', function () {
+            var rowCount = table4.page.info().recordsDisplay;
+            if (rowCount > 0) {
+                $('.row-badge4').text(rowCount).show();
+            } else {
+                $('.row-badge4').hide();
+            }
+        });
+        var table5 = $('#dtBasicExample5').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('inspection.index', ['status' => 'Pending Re Inspection']) }}",
@@ -406,6 +498,46 @@
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
             ]
+        });
+        table5.on('draw', function () {
+            var rowCount = table5.page.info().recordsDisplay;
+            if (rowCount > 0) {
+                $('.row-badge5').text(rowCount).show();
+            } else {
+                $('.row-badge5').hide();
+            }
+        });
+        var table6 =  $('#dtBasicExample6').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('inspection.index', ['status' => 'Spec Re Inspection']) }}",
+            columns: [
+                { data: 'po_number', name: 'purchasing_order.po_number' },
+                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'so_date', name: 'so.so_date' },
+                { data: 'so_number', name: 'so.so_number' },
+                { data: 'location', name: 'warehouse.name' },
+                { data: 'vin', name: 'vehicles.vin' },
+                { data: 'brand_name', name: 'brands.brand_name' },
+                { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'model_detail', name: 'varaints.model_detail' },
+                { data: 'variant', name: 'varaints.name' },
+                { data: 'detail', name: 'varaints.detail' },
+                { data: 'my', name: 'varaints.my' },
+                { data: 'steering', name: 'varaints.steering' },
+                { data: 'fuel_type', name: 'varaints.fuel_type' },
+                { data: 'upholestry', name: 'varaints.upholestry' },
+                { data: 'interior_color', name: 'int_color.name' },
+                { data: 'exterior_color', name: 'ex_color.name' },
+            ]
+        });
+        table6.on('draw', function () {
+            var rowCount = table6.page.info().recordsDisplay;
+            if (rowCount > 0) {
+                $('.row-badge6').text(rowCount).show();
+            } else {
+                $('.row-badge6').hide();
+            }
         });
 });
     </script>
@@ -452,6 +584,19 @@ $(document).ready(function () {
       var data = table.row(this).data();
       var vehicleId = data.id;
       var url = "{{ route('inspection.pdiinspection', ['id' => ':id']) }}";
+      url = url.replace(':id', vehicleId);
+      window.location.href = url;
+    });
+  });
+</script>
+<script>
+  $(document).ready(function () {
+    var table = $('#dtBasicExample6').DataTable();
+    $('#dtBasicExample6 tbody').on('dblclick', 'tr', function () {
+      var data = table.row(this).data();
+      var vehicleId = data.id;
+      console.log(vehicleId);
+      var url = "{{ route('inspection.reinspectionspec', ['id' => ':id']) }}";
       url = url.replace(':id', vehicleId);
       window.location.href = url;
     });
