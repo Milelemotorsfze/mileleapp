@@ -2072,7 +2072,6 @@
             var id = $(this).data('kit-id');
         }
         var modelLineId = $(this).data('model-line-id');
-        alert(modelLineId);
         rowData['model_line_id'] = modelLineId;
         rowData['id'] = id;
         secondTable.row.add(rowData).draw();

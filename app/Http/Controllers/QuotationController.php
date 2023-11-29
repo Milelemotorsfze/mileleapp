@@ -172,55 +172,61 @@ class QuotationController extends Controller
            }
             $quotationItem->reference()->associate($item);
             $quotationItem->save();
-//            info("is vehicle");
-//            info($isVehicle);
-//
+
             if($isVehicle == 1){
-//                info($vehicleModelLineId);
-//                info($request->model_lines);
                 $arrayKeys = array_keys($request->model_lines, $vehicleModelLineId);
                 if (count($arrayKeys) > 0) {
-//                    info("same keys");
-//                    info($arrayKeys);
                    array_push($quotationItemIds, $quotationItem->id);
                     // At least one match...
                     $quotationSubItemKeys[$quotationItem->id] = $arrayKeys;
-
                 }
 //               check this model line is existing in addons array, if yes get the array key;
             }
             $isVehicle = 0;
         }
+
         foreach ($quotationItemIds as $itemId) {
             $itemKeys = $quotationSubItemKeys[$itemId];
             info("each set of array keys");
-            $referenceIds = [];
+            info("parent Id ".$itemId);
             foreach ($itemKeys as $itemKey) {
+                info("item key: ". $itemKey);
                 if($request->types[$itemKey] == 'ModelLine' ) {
-                    if($request->is_addon[$key] == 1) {
-                        array_push($referenceIds,$request->reference_ids[$itemKey]);
+                    info("it is directly added");
+                     $alreadyaddedquotationIds = QuotationSubItem::where('quotation_id', $quotation->id)
+                         ->pluck('quotation_item_id')->toArray();
+
+                    if($request->is_addon[$itemKey] == 1) {
+                        info("it is directly added addon with ref id". $request->reference_ids[$itemKey]);
+
+                        $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
+                            ->where('reference_id', $request->reference_ids[$itemKey])
+                            ->where('reference_type', 'App\Models\MasterModelLines')
+                            ->whereNotIn('id', $alreadyaddedquotationIds)
+                            ->where('is_addon', true)
+                            ->first();
+//                        array_push($referenceIds,$request->reference_ids[$itemKey]);
                     }
-                }else{
-                    array_push($referenceIds,$request->reference_ids[$itemKey]);
+                }else if($request->types[$itemKey] == 'Accessory' || $request->types[$itemKey] == 'SparePart' || $request->types[$itemKey] == 'Kit') {
+                    info("it is added by search also addon ". $request->reference_ids[$itemKey]);
+
+                    $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
+                        ->where('reference_id', $request->reference_ids[$itemKey])
+                        ->where('reference_type', 'App\Models\AddonDetails')
+                        ->whereNotIn('id', $alreadyaddedquotationIds)
+                        ->first();
+                }
+                info("corresponding row result" . $quotationItemRow);
+                if($quotationItemRow) {
+                    $quotationSubItem = new QuotationSubItem();
+                    $quotationSubItem->quotation_id = $quotation->id;
+                    $quotationSubItem->quotation_item_parent_id = $itemId;
+                    $quotationSubItem->quotation_item_id = $quotationItemRow->id;
+                    $quotationSubItem->save();
+
                 }
             }
-//            if($request->types[$itemKey] == 'ModelLine') {
-                // addon added by directly add button
-                $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
-                    ->whereIn('reference_id', $referenceIds)
-                   ->get();
-                if($quotationItemRow->count > 0) {
-                    foreach ($quotationItemRow as $row) {
-                        $quotationSubItem = new QuotationSubItem();
-                        $quotationSubItem->quotation_item_parent_id = $itemId;
-                        $quotationSubItem->quotation_item_id = $row->id;
-                        $quotationSubItem->save();
-                    }
-                }
-
         }
-        info($quotationItemIds);
-        info($quotationSubItemKeys);
         DB::commit();
 //        $quotationItem = QuotationItem::where('quotation_id', $quotation->id)->first();
 //        $quotation = Quotation::find(58);
