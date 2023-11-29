@@ -96,7 +96,7 @@
         <div class="row">
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         Document Type :
                     </div>
                     <div class="col-sm-6">
@@ -113,19 +113,19 @@
             </div>
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-6">
-                        Shipping Method :
+                    <div class="col-sm-2">
+                        Category :
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
                                    name="shipping_method" id="CNF" value="CNF" >
-                            <label class="form-check-label" for="CNF">CNF</label>
+                            <label class="form-check-label" for="CNF">Local</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input shipping_method @error('shipping_method') is-invalid @enderror" type="checkbox"
                                    name="shipping_method" id="EXW" value="EXW" checked>
-                            <label class="form-check-label" for="EXW">EXW</label>
+                            <label class="form-check-label" for="EXW">Export</label>
                         </div>
                     </div>
                     @error('shipping_method')
@@ -137,10 +137,10 @@
             </div>
             <div class="col-sm-4">
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-2">
                         Currency :
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <select class="form-select" name="currency" id="currency">
                             <option>AED</option>
                             <option>USD</option>
@@ -1153,6 +1153,8 @@
                             $('#brand').append("<option value='" + result.id + "'>" + result.brand_name + "</option>");
                             $('#brand').val(result.id);
                             $('#new_brand_name').val("");
+                            $('.add-new-model-line-div').prop('hidden', false);
+                            $('#model_line').attr('disabled', false)
                             $msg = "";
                             removeNewBrandError();
                         }
@@ -1599,6 +1601,7 @@
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
                         var price = row[7];
+
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                         var price = row[4];
@@ -1611,9 +1614,11 @@
                     var addon = 0;
                         if(row['table_type'] == 'addon-table') {
                             var addon = 1;
+
                         }
+                    var modelLine = row['model_line_id'];
                     return '<input type="hidden" name="is_addon[]" value="'+ addon +'" ><input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
-                        ' <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
+                        '<input type="hidden" name="model_lines[]" value="'+ modelLine +'" > <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
                         '<input type="text"  value="'+ amount +'" class="total-amount-editable form-control" name="total_amounts[]" id="total-amount-'+ row['index'] +'" readonly />';
                 }
             },
@@ -1663,7 +1668,6 @@
                         if(row[6] == "") {
                             var comma5 = " ";
                         }
-
                         combinedValue =  row[0] + comma0 + row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5]+ comma5 + row[6];
                     }
 
@@ -1674,6 +1678,7 @@
                 targets: -5,
                 data: null,
                 render: function (data, type, row) {
+                    console.log(row);
                     var code = "";
                     if(row['button_type'] == 'Vehicle') {
                         var code = row[3];
@@ -1683,10 +1688,14 @@
                         var code = row[1];
                     }else if(row['button_type'] == 'Direct-Add') {
                         var code = row[6];
+                        if(row['table_type'] == 'vehicle-table') {
+                            var code = row[2]
+                        }
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         code = row[1];
                     }
+
                     return code;
                 }
             },
@@ -1875,7 +1884,6 @@
             }
             var modelLine = $('#model_line option:selected').val();
             if(modelLine != "") {
-
                 var modelLine = $('#model_line option:selected').text();
             }else{
                 alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
@@ -1922,6 +1930,8 @@
             if(modelLine != "") {
                 row['id'] = modelLine;
                 row['model_type'] = 'ModelLine';
+                row['model_line_id'] = modelLine;
+
                 var modelLine = $('#accessories_model_line option:selected').text();
 
             }else{
@@ -1943,7 +1953,7 @@
             if(modelLine != "") {
                 row['id'] = modelLine;
                 row['model_type'] = 'ModelLine';
-
+                row['model_line_id'] = modelLine;
                 var modelLine = $('#spare_parts_model_line option:selected').text();
             }else{
                 alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
@@ -1972,6 +1982,8 @@
             if(modelLine != "") {
                 row['id'] = modelLine;
                 row['model_type'] = 'ModelLine';
+                row['model_line_id'] = modelLine;
+
                 var modelLine = $('#kit_model_line option:selected').text();
 
             }else{
@@ -2002,6 +2014,7 @@
 
         enableOrDisableSubmit();
         showPriceInSelectedValue();
+        console.log(row);
     });
     $(document).on('click', '.add-button', function() {
         var secondTable = $('#dtBasicExample2').DataTable();
@@ -2057,8 +2070,9 @@
         else if(buttonType == 'Kit') {
             var table = $('#dtBasicExample4').DataTable();
             var id = $(this).data('kit-id');
-
         }
+        var modelLineId = $(this).data('model-line-id');
+        rowData['model_line_id'] = modelLineId;
         rowData['id'] = id;
         secondTable.row.add(rowData).draw();
         table.row(row).remove().draw();
@@ -2069,6 +2083,7 @@
         calculateTotalSum();
         // enableOrDisableSubmit();
         showPriceInSelectedValue();
+        console.log(rowData);
     });
 
     function resetSerialNumber(table) {
@@ -2137,6 +2152,7 @@
             }
         }
     $('#search-button').on('click', function() {
+        var modelLineId = $('#model_line').val();
         var variantId = $('#variant').val();
         var interiorColorId = $('#interior_color').val();
         var exteriorColorId = $('#exterior_color').val();
@@ -2198,7 +2214,7 @@
                         {
                             title: 'Actions',
                             render: function(data, type, row) {
-                                return '<div class="circle-button add-button"  data-variant-id="'+ variantId +'" data-button-type="Vehicle" ></div>';
+                                return '<div class="circle-button add-button" data-variant-id="'+ variantId +'" data-button-type="Vehicle" ></div>';
                             }
                         }
                     ]
@@ -2241,7 +2257,7 @@
                 var slNo = 0;
                 var data = response.map(function(accessory) {
                     slNo = slNo + 1;
-                    var addButton = '<button class="add-button" data-button-type="Accessory" data-accessory-id="' + accessory.id + '">Add</button>';
+                    var addButton = '<button class="add-button" data-button-type="Accessory" data-model-line-id="'+ modelLineId +'" data-accessory-id="' + accessory.id + '">Add</button>';
                     if(accessory.addon_description.description != null) {
                        var accessoryName = accessory.addon_description.addon.name + ' - ' + accessory.addon_description.description;
                     }
@@ -2339,7 +2355,7 @@
                         {
                             title: 'Add Into Quotation',
                             render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-button-type="Accessory" data-accessory-id="' + row[0] + '"></div>';
+                                return '<div class="circle-button add-button" data-button-type="Accessory" data-model-line-id="'+ modelLineId +'" data-accessory-id="' + row[0] + '"></div>';
                             }
                         }
                     ]
@@ -2386,7 +2402,7 @@
                 var slNo = 0;
                 var data = response.map(function(sparePart) {
                     slNo = slNo + 1;
-                    var addButton = '<button class="add-button" data-button-type="SparePart" data-sparepart-id="' + sparePart.id + '">Add</button>';
+                    var addButton = '<button class="add-button" data-button-type="SparePart" data-model-line-id="'+ modelLineId +'"  data-sparepart-id="' + sparePart.id + '">Add</button>';
                     if(sparePart.addon_description.description != null) {
                        var sparePartName = sparePart.addon_description.addon.name + ' - ' + sparePart.addon_description.description;
                     }
@@ -2500,7 +2516,7 @@
                         {
                             title: 'Add Into Quotation',
                             render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-button-type="SparePart" data-sparepart-id="' + row[0] + '"></div>';
+                                return '<div class="circle-button add-button" data-button-type="SparePart" data-model-line-id="'+ modelLineId +'"  data-sparepart-id="' + row[0] + '"></div>';
                             }
                         }
                     ]
@@ -2547,7 +2563,7 @@
                 var slNo = 0;
                 var data = response.map(function(kit) {
                     slNo = slNo + 1;
-                    var addButton = '<button class="add-button" data-button-type="Kit" data-kit-id="' + kit.id + '">Add</button>';
+                    var addButton = '<button class="add-button" data-button-type="Kit" data-model-line-id="'+ modelLineId +'" data-kit-id="' + kit.id + '">Add</button>';
                     var kitName = '';
                     if(kit.addon_name.name != null) {
                        kitName = kit.addon_name.name;
@@ -2641,7 +2657,7 @@
                         {
                             title: 'Add Into Quotation',
                             render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-button-type="Kit" data-kit-id="' + row[0] + '"></div>';
+                                return '<div class="circle-button add-button" data-button-type="Kit" data-model-line-id="'+ modelLineId +'" data-kit-id="' + row[0] + '"></div>';
                             }
                         }
                     ]

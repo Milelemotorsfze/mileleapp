@@ -9,6 +9,11 @@ class VariantItems extends Model
 {
     use HasFactory;
     protected $table = 'variant_items';
+    protected $fillable = [
+        'varaint_id',
+        'model_specification_id',
+        'model_specification_options_id',
+    ];
     public function model_specification()
     {
         return $this->belongsTo(ModelSpecification::class,'model_specification_id');

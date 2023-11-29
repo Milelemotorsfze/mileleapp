@@ -670,6 +670,11 @@
                                             </a>
                                         </div>
                                         @endif
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('Shipping.index') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Shipping </span>
+                                            </a>
+                                        </div>
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('vendor-view');
                                         @endphp

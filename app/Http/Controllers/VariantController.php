@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\MasterModelLines;
 use App\Models\ColorCode;
 use App\Models\Varaint;
+use App\Models\Vehicles;
 use Monarobase\CountryList\CountryListFacade;
 use App\Models\Variantlog;
 use App\Models\ModelSpecification;
@@ -402,7 +403,7 @@ public function store(Request $request)
         (new UserActivityController)->createActivity('Delete the variant');
         $variant = Varaint::findOrFail($id);
         $variant->delete();
-
+ 
         return response(true);
     }
     public function getSpecificationDetails($modelLineId)
@@ -460,6 +461,18 @@ public function savespecification(Request $request)
     $specificationoptions->name = $request->input('newSpecificationName');
     $specificationoptions->master_model_lines_id = $request->input('model_line_id');
     $specificationoptions->save();
+    $masterModelLineId = $request->input('model_line_id');
+    $variants = Varaint::where('master_model_lines_id', $masterModelLineId)->get();
+    foreach ($variants as $variant) {
+        $vehicles = Vehicles::where('varaints_id', $variant->id)
+        ->whereNull('gdn_id')
+        ->whereNotNull('grn_id')
+        ->get();
+        foreach ($vehicles as $vehicle) {
+            $vehicle->inspection_status = "Pending";
+            $vehicle->save();
+        }
+    }
     return response()->json(['message' => 'Option added successfully'], 200);
 }
 }

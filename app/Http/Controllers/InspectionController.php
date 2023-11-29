@@ -160,6 +160,10 @@ class InspectionController extends Controller
                 })
                 ->whereNotNull('vehicles.inspection_date')
                 ->whereNull('vehicles.gdn_id')
+                ->where(function ($query) {
+                    $query->where('inspection_status', '!=', 'Pending')
+                        ->orWhereNull('inspection_status');
+                })
                 ->whereNotExists(function ($query) {
                     $query->select(DB::raw(1))
                         ->from('inspection')
@@ -210,6 +214,10 @@ class InspectionController extends Controller
                 ->whereNotNull('vehicles.inspection_date')
                 ->whereNotNull('vehicles.so_id')
                 ->whereNull('vehicles.gdn_id')
+                ->where(function ($query) {
+                    $query->where('inspection_status', '!=', 'Pending')
+                        ->orWhereNull('inspection_status');
+                })
                 ->whereNotExists(function ($query) {
                     $query->select(DB::raw(1))
                         ->from('inspection')
@@ -258,7 +266,48 @@ class InspectionController extends Controller
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
                 ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                ->where(function ($query) {
+                    $query->where('inspection_status', '!=', 'Pending')
+                        ->orWhereNull('inspection_status');
+                })
                 ->where('inspection.status', 'reinspection');
+                $data = $data->groupBy('vehicles.id');
+            }
+            elseif($status === "Spec Re Inspection")
+            {
+            $data = Vehicles::select( [
+                    'vehicles.id',
+                    'warehouse.name as location',
+                    'vehicles.ppmmyyy',
+                    'vehicles.vin',
+                    DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
+                    'so.so_number',
+                    'brands.brand_name',
+                    'varaints.name as variant',
+                    'varaints.model_detail',
+                    'varaints.detail',
+                    'varaints.seat',
+                    'varaints.upholestry',
+                    'varaints.steering',
+                    'varaints.my',
+                    'varaints.fuel_type',
+                    'varaints.gearbox',
+                    'master_model_lines.model_line',
+                    'int_color.name as interior_color',
+                    'ex_color.name as exterior_color',
+                    'purchasing_order.po_number',
+                    'grn.grn_number',
+                ])
+                ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
+                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                ->where('vehicles.inspection_status', 'Pending');
                 $data = $data->groupBy('vehicles.id');
             }
                 return DataTables::of($data)
@@ -1133,5 +1182,276 @@ class InspectionController extends Controller
             ->select('vehicles.id', 'vehicles.vin', 'vehicles.varaints_id', 'master_model_lines.model_line', 'int_color.name as int_colour_name','ex_color.name as ex_colour_name', 'brands.brand_name')
             ->first();
     return view('inspection.pdivehicleview', compact('itemsWithQuantities', 'vehicleDetails'));
+    }
+    public function reinspectionspec($id) 
+{
+    (new UserActivityController)->createActivity('Re Inspection The Spec Update');
+    $vehicle = Vehicles::find($id);
+    $int_colours = ColorCode::where('belong_to', 'int')->where('id', $vehicle->int_colour)->get();
+    $ext_colours = ColorCode::where('belong_to', 'ex')->where('id', $vehicle->ex_colour)->get();
+    $variant = Varaint::find($vehicle->varaints_id);
+    $brandname = Brand::find($variant->brands_id);
+    $model_line = MasterModelLines::find($variant->master_model_lines_id);
+    $variantId = DB::table('vehicles')->where('id', $id)->value('varaints_id');
+    $masterModelLinesId = DB::table('varaints')->where('id', $variantId)->value('master_model_lines_id');
+    $allSpecifications = DB::table('model_specification')->where('master_model_lines_id', $masterModelLinesId)->get()->toArray();
+    $existingSpecifications = DB::table('variant_items')
+        ->where('varaint_id', $variantId)
+        ->pluck('model_specification_id')
+        ->toArray();
+        $filteredSpecifications = DB::table('model_specification')
+        ->where('master_model_lines_id', $masterModelLinesId)
+        ->get()
+        ->toArray();
+        foreach ($filteredSpecifications as $key => $specification) {
+            $options = DB::table('model_specification_options')
+                ->where('model_specification_id', $specification->id)
+                ->get()
+                ->toArray();
+    
+            $filteredSpecifications[$key]->options = $options;
+            
+        }    
+    return view('inspection.reinspectionspec', compact('filteredSpecifications', 'vehicle', 'int_colours', 'ext_colours', 'brandname', 'model_line'));
+    }
+    public function reupdatespec(Request $request, $id)
+    {
+        $createnew = false;
+        $variant_id = $request->input('variant_id');
+        $existingSpecifications = VariantItems::where('varaint_id', $request->input('variant_id'))
+            ->pluck('model_specification_options_id', 'model_specification_id')
+            ->toArray();
+        $incomingSpecifications = [];
+        foreach ($request->all() as $key => $value) {
+            if (strpos($key, 'specification_') === 0) {
+                $specificationId = str_replace('specification_', '', $key);
+                $incomingSpecifications[$specificationId] = $value;
+            }
+        }
+        if (count(array_diff_assoc($incomingSpecifications, $existingSpecifications)) === 0) {
+        //Not Change Variant update the inspection status
+        $inspection = New Inspection();
+        $inspection->status = "Approved";
+        $inspection->vehicle_id = $id;
+        $inspection->created_by = Auth::id();
+        $inspection->stage = "Re Inspection Spec";
+        $inspection->save();
+        $vehicle = Vehicles::find($id);
+        $vehicle->inspection_status = "Approved";
+        $vehicle->save();
+        return redirect()->route('inspection.index')->with('success', 'Variant details updated successfully');
+        } else {
+            // Check if there is a variant that matches all specifications and options
+            $matchingVariant = VariantItems::whereIn('model_specification_id', array_keys($incomingSpecifications))
+                ->whereIn('model_specification_options_id', array_values($incomingSpecifications))
+                ->havingRaw('COUNT(DISTINCT model_specification_id) = ?', [count($incomingSpecifications)])
+                ->pluck('varaint_id');
+                if ($matchingVariant->isNotEmpty()) { 
+                    $matchingVariantId = $matchingVariant->first();
+                //Change the variant of the vehicle and change the status of the vehicle
+                $inspection = New Inspection();
+                $inspection->status = "Approved";
+                $inspection->vehicle_id = $id;
+                $inspection->created_by = Auth::id();
+                $inspection->stage = "Re Inspection Spec";
+                $inspection->save();
+                $vehicle = Vehicles::find($id);
+                $vehicle->inspection_status = "Approved";
+                $vehicle->varaints_id = $matchingVariantId;
+                $vehicle->save();
+                return redirect()->route('inspection.index')->with('success', 'Variant details updated successfully');
+            } else {
+                dd("de");
+                foreach ($incomingSpecifications as $specificationId => $optionId) {
+                    if (!array_key_exists($specificationId, $existingSpecifications) || $existingSpecifications[$specificationId] === $optionId) {
+                        //Adding more options into current variant
+                        VariantItems::create([
+                            'varaint_id' => $request->input('variant_id'),
+                            'model_specification_id' => $specificationId,
+                            'model_specification_options_id' => $optionId,
+                        ]);
+                    }
+                    else{
+                        $createnew = true;   
+                    }
+                }
+                if($createnew){
+                    $variantsdf = Varaint::find($variant_id);
+                    $maxVariant = Varaint::where('brands_id', $variantsdf->brands_id)
+                    ->where('master_model_lines_id', $variantsdf->master_model_lines_id)
+                    ->where('fuel_type', $variantsdf->fuel_type)
+                    ->where('engine', $variantsdf->engine)
+                    ->where('steering', $variantsdf->steering)
+                    ->orderBy('name', 'desc')
+                    ->first();
+                    $master_model_lines_id = $variantsdf->master_model_lines_id;
+                    $steering = $variantsdf->steering;
+                    if($steering == "LHD"){
+                        $steeringn = "L";
+                    }
+                    else{
+                        $steeringn = "R";
+                    }
+                    $engine = $variantsdf->engine;
+                    $fuel_type = $variantsdf->fuel_type;
+                    if($fuel_type == "Petrol")
+                    {
+                        $f = "P";
+                    }
+                    else if($fuel_type == "Diesel") 
+                    {
+                        $f = "D";
+                    }
+                    else if($fuel_type == "PHEV") 
+                    {
+                        $f = "P";
+                    }
+                    else if($fuel_type == "MHEV") 
+                    {
+                        $f = "M";
+                    }
+                    else
+                    {
+                        $f = "E";
+                    }
+                    $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+                    if ($maxVariant) {
+                    $existingName = $maxVariant->name;
+                    $parts = explode('_', $existingName);
+                    if (count($parts) > 1) {
+                        $lastNumber = end($parts);
+                        if (is_numeric($lastNumber)) {
+                            $newNumber = (int)$lastNumber + 1;
+                            array_pop($parts);
+                            $name = implode('_', $parts) . '_' . $newNumber;
+                        } else {
+                            $NewexistingName = substr($existingName, 0, -1);
+                            $parts = explode('_', $NewexistingName);
+                            if (count($parts) > 1) {
+                                $lastNumber = end($parts);
+                                if (is_numeric($lastNumber)) {
+                                    $newNumber = (int)$lastNumber + 1;
+                                    array_pop($parts);
+                                    $name = implode('_', $parts) . '_' . $newNumber;
+                                } 
+                            }
+                        }
+                    } else {
+                            $name = $existingName . '_1';
+                    }
+                    } 
+                    else {
+                            $name = $steeringn . $model_line . $engine . $f . '_1';
+                    }
+                    $model_details= $request->input('model_detail');
+    if($model_details == null){
+    $steering = $variantsdf->steering;
+    $master_model_lines_id = $variantsdf->master_model_lines_id;
+    $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+    $engine = $variantsdf->engine;
+    $gearbox = $variantsdf->gearbox;
+    $fuel_type = $variantsdf->fuel_type;
+    if($fuel_type == "Petrol")
+    {
+        $f = "P";
+    }
+    else if($fuel_type == "Diesel") 
+    {
+        $f = "D";
+    }
+    else if($fuel_type == "PHEV") 
+    {
+        $f = "P";
+    }
+    else if($fuel_type == "MHEV") 
+    {
+        $f = "M";
+    }
+    else
+    {
+        $f = "E";
+    }
+    $model_details = $steering . ' ' . $model_line . ' ' . $engine . ' ' . $gearbox . ' ' . $fuel_type;
+    }
+    $variant_details= $request->input('variant');
+    if($variant_details == null)
+    {
+        $steering = $variantsdf->steering;
+        $master_model_lines_id = $variantsdf->master_model_lines_id;
+        $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+        $engine = $variantsdf->engine;
+        $gearbox = $variantsdf->gearbox;
+        $coo = $variantsdf->coo;
+        $my = $variantsdf->my;
+        $drive_train = $variantsdf->drive_train;
+        $upholestry = $variantsdf->upholestry;
+        $fuel_type = $variantsdf->fuel_type;
+        if($fuel_type == "Petrol")
+        {
+            $f = "P";
+        }
+        else if($fuel_type == "Diesel") 
+        {
+            $f = "D";
+        }
+        else if($fuel_type == "PHEV") 
+        {
+            $f = "P";
+        }
+        else if($fuel_type == "MHEV") 
+        {
+            $f = "M";
+        }
+        else
+        {
+            $f = "E";
+        }
+        $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
+    }
+                    $variant = new Varaint();
+                    $variant->brands_id = $variantsdf->brands_id;
+                    $variant->master_model_lines_id = $variantsdf->master_model_lines_id;
+                    $variant->steering = $variantsdf->steering;
+                    $variant->fuel_type = $variantsdf->fuel_type;
+                    $variant->engine = $variantsdf->engine;
+                    $variant->upholestry = $variantsdf->upholestry;
+                    $variant->coo = $variantsdf->coo;
+                    $variant->drive_train = $variantsdf->drive_train;
+                    $variant->gearbox = $variantsdf->gearbox;
+                    $variant->name = $name;
+                    $variant->model_detail = $model_details;
+                    $variant->detail = $variant_details;
+                    $variant->my = $variantsdf->my;
+                    $variant->save();
+                    $variantIds = $variant->id;
+                    foreach ($incomingSpecifications as $specificationId => $optionId) {
+                    VariantItems::create([
+                        'varaint_id' => $variantIds,
+                        'model_specification_id' => $specificationId,
+                        'model_specification_options_id' => $optionId,
+                    ]);
+                }
+                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                    $currentDateTime = Carbon::now($dubaiTimeZone);
+                    $variantlog = new Variantlog();
+                    $variantlog->time = $currentDateTime->toTimeString();
+                    $variantlog->date = $currentDateTime->toDateString();
+                    $variantlog->status = 'New Created';
+                    $variantlog->variant_id = $variantIds;
+                    $variantlog->created_by = auth()->user()->id;
+                    $variantlog->save();
+                }
+                $inspection = New Inspection();
+                $inspection->status = "Approved";
+                $inspection->vehicle_id = $id;
+                $inspection->created_by = Auth::id();
+                $inspection->stage = "Re Inspection Spec";
+                $inspection->save();
+                $vehicle = Vehicles::find($id);
+                $vehicle->inspection_status = "Approved";
+                $vehicle->save();
+                return redirect()->route('inspection.index')->with('success', 'Variant details updated successfully');
+            }
+        }
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Calls;
 use App\Models\CallsRequirement;
 use Illuminate\Http\Request;
-use App\Models\quotation;
+use App\Models\Quotation;
 use App\Models\Rejection;
 use App\Models\Closed;
 use App\Models\LeadSource;
