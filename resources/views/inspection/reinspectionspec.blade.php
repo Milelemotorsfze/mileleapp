@@ -47,7 +47,7 @@
 <hr>
 <h5>Variant Specifications</h5>
 <br>
-<input type="text" name="variant_id" value="{{$vehicle->varaints_id}}" />
+<input type="hidden" name="variant_id" value="{{$vehicle->varaints_id}}" />
 <div class="row">
         @foreach($filteredSpecifications as $specification)
             <div class="col-lg-2 col-md-6 col-sm-12">

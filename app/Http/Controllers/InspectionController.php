@@ -1239,6 +1239,7 @@ class InspectionController extends Controller
         $vehicle = Vehicles::find($id);
         $vehicle->inspection_status = "Approved";
         $vehicle->save();
+        return redirect()->route('inspection.index')->with('success', 'Variant details updated successfully');
         } else {
             // Check if there is a variant that matches all specifications and options
             $matchingVariant = VariantItems::whereIn('model_specification_id', array_keys($incomingSpecifications))
@@ -1260,6 +1261,7 @@ class InspectionController extends Controller
                 $vehicle->save();
                 return redirect()->route('inspection.index')->with('success', 'Variant details updated successfully');
             } else {
+                dd("de");
                 foreach ($incomingSpecifications as $specificationId => $optionId) {
                     if (!array_key_exists($specificationId, $existingSpecifications) || $existingSpecifications[$specificationId] === $optionId) {
                         //Adding more options into current variant
