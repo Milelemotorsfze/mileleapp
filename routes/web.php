@@ -250,7 +250,7 @@ Route::get('/d', function () {
         // Employee Job Description
     Route::resource('job_description', JobDescriptionController::class);
     Route::controller(JobDescriptionController::class)->group(function(){
-        Route::get('employee-hiring-job-description/create-or-edit/{id}', 'createOrEdit')->name('employee-hiring-job-description.create-or-edit');
+        Route::get('employee-hiring-job-description/create-or-edit/{id}/{hiring_id}', 'createOrEdit')->name('employee-hiring-job-description.create-or-edit');
         Route::post('employee-hiring-job-description/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-job-description.store-or-update');
         Route::post('employee-hiring-job-description/request-action', 'requestAction')->name('employee-hiring-job-description.request-action');
     });

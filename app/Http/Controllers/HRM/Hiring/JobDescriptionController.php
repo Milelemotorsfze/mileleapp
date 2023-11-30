@@ -34,12 +34,17 @@ class JobDescriptionController extends Controller
     public function show(string $id) {
         return view('hrm.hiring.job_description.show');
     }
-    public function createOrEdit($id) {
+    public function createOrEdit($id, $hiring_id) {
         $jobDescription = JobDescription::where('id',$id)->first();
         if(!$jobDescription) {
             $jobDescription = new JobDescription();
-            $jobDescriptionId = 'new';
-            $currentHiringRequest ='';
+            $jobDescriptionId = 'new';           
+            if($hiring_id != 'new') {
+                $currentHiringRequest = EmployeeHiringRequest::where('id',$hiring_id)->first();
+            }
+            else {
+                $currentHiringRequest ='';
+            }
         }
         else {
             $jobDescriptionId = $jobDescription->id;
@@ -50,6 +55,7 @@ class JobDescriptionController extends Controller
         return view('hrm.hiring.job_description.create',compact('jobDescriptionId','currentHiringRequest','jobDescription','masterOfficeLocations','allHiringRequests'));
     }
     public function storeOrUpdate(Request $request, $id) { 
+        dd('hi');
         $validator = Validator::make($request->all(), [
             'location_id' => 'required',
             'job_purpose' => 'required',

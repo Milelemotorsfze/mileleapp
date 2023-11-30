@@ -29,12 +29,67 @@ class InterviewSummaryReportController extends Controller
             ['date_of_third_round',NULL],
             ['date_of_second_round',NULL],
             ['date_of_first_round',NULL],
+            ['date_of_telephonic_interview',NULL],
+            ['status','pending'],
+        ])->latest()->get();
+        $telephonics = InterviewSummaryReport::where([
+            ['date_of_fifth_round',NULL],
+            ['date_of_forth_round',NULL],
+            ['date_of_third_round',NULL],
+            ['date_of_second_round',NULL],
+            ['date_of_first_round',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
+            ['status','pending'],
+        ])->latest()->get();
+        $firsts = InterviewSummaryReport::where([
+            ['date_of_fifth_round',NULL],
+            ['date_of_forth_round',NULL],
+            ['date_of_third_round',NULL],
+            ['date_of_second_round',NULL],
+            ['date_of_first_round','!=',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
+            ['status','pending'],
+        ])->latest()->get();
+        $seconds = InterviewSummaryReport::where([
+            ['date_of_fifth_round',NULL],
+            ['date_of_forth_round',NULL],
+            ['date_of_third_round',NULL],
+            ['date_of_second_round','!=',NULL],
+            ['date_of_first_round','!=',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
+            ['status','pending'],
+        ])->latest()->get();
+        $thirds = InterviewSummaryReport::where([
+            ['date_of_fifth_round',NULL],
+            ['date_of_forth_round',NULL],
+            ['date_of_third_round','!=',NULL],
+            ['date_of_second_round','!=',NULL],
+            ['date_of_first_round','!=',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
+            ['status','pending'],
+        ])->latest()->get();
+        $forths = InterviewSummaryReport::where([
+            ['date_of_fifth_round',NULL],
+            ['date_of_forth_round','!=',NULL],
+            ['date_of_third_round','!=',NULL],
+            ['date_of_second_round','!=',NULL],
+            ['date_of_first_round','!=',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
+            ['status','pending'],
+        ])->latest()->get();
+        $fifths = InterviewSummaryReport::where([
+            ['date_of_fifth_round','!=',NULL],
+            ['date_of_forth_round','!=',NULL],
+            ['date_of_third_round','!=',NULL],
+            ['date_of_second_round','!=',NULL],
+            ['date_of_first_round','!=',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
             ['status','pending'],
         ])->latest()->get();
         $pendings = InterviewSummaryReport::where('status','pending')->latest()->get();
         $approved = InterviewSummaryReport::where('status','approved')->latest()->get();
         $rejected = InterviewSummaryReport::where('status','rejected')->latest()->get();
-        return view('hrm.hiring.interview_summary_report.index',compact('shortlists','pendings','approved','rejected'));
+        return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','pendings','approved','rejected'));
     }
     public function createOrEdit($id) {
         $currentInterviewReport = InterviewSummaryReport::with('interviewers')->where('id',$id)->first();
@@ -108,7 +163,7 @@ class InterviewSummaryReportController extends Controller
             'candidate_name' => 'required',
             'nationality' => 'required',
             'gender' => 'required',
-            'resume_file_name' => 'required',
+            // 'resume_file_name' => 'required',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
@@ -120,7 +175,7 @@ class InterviewSummaryReportController extends Controller
                 $input = $request->all();
                 $update = InterviewSummaryReport::where('id',$id)->first();
                 if($request->resume_file_name) {
-                    $fileName = $authId . '_' . time() . '.'. $request->resume_file_name->extension();
+                $fileName = $authId . '_' . time() . '.'. $request->resume_file_name->extension();
                     $type = $request->resume_file_name->getClientMimeType();
                     $size = $request->resume_file_name->getSize();
                     $request->resume_file_name->move(public_path('resume'), $fileName);
@@ -134,7 +189,9 @@ class InterviewSummaryReportController extends Controller
                     $update->date_of_telephonic_interview  = $request->date_of_telephonic_interview ;
                     $update->rate_dress_appearance  = $request->rate_dress_appearance ;
                     $update->rate_body_language_appearance  = $request->rate_body_language_appearance ;
-                    $update->resume_file_name  = $fileName; ;
+                    if($request->resume_file_name) {
+                        $update->resume_file_name  = $fileName;
+                    }
                     $update->updated_by = $authId;
                     $update->update();
                     $previousInterviewers = Interviewers::where('interview_summary_report_id',$update->id)->where('round',$request->round)->get();
@@ -160,16 +217,20 @@ class InterviewSummaryReportController extends Controller
                     (new UserActivityController)->createActivity('Interview Summary updated');
                     $successMessage = "Interview Summary updated Successfully";
                 }
-                else {                   
-                    $input['resume_file_name'] = $fileName;
+                else {    
+                    if($request->resume_file_name) {
+                        $input['resume_file_name'] = $fileName;
+                    }
                     $input['created_by'] = $authId;  
                     $createRequest = InterviewSummaryReport::create($input);
                     $createInterviewer['interview_summary_report_id'] = $createRequest->id;
                     $createInterviewer['round'] = $request->round;
-                    if(count($request->interviewer_id) > 0) {
-                        foreach($request->interviewer_id as $interviewer_id) {
-                            $createInterviewer['interviewer_id'] = $interviewer_id;
-                            $intervierCreated = Interviewers::create($createInterviewer);
+                    if(isset($request->interviewer_id)) {
+                        if(count($request->interviewer_id) > 0) {
+                            foreach($request->interviewer_id as $interviewer_id) {
+                                $createInterviewer['interviewer_id'] = $interviewer_id;
+                                $intervierCreated = Interviewers::create($createInterviewer);
+                            }
                         }
                     }
                     $history['hiring_request_id'] = $createRequest->hiring_request_id;

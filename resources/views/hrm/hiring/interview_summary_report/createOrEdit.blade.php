@@ -289,10 +289,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
                         </fieldset>
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
-						<span class="error">* </span>
 						<label for="resume_file_name" class="col-form-label text-md-end">{{ __('Upload Resume PDF') }}</label>
-						<input type="file" class="form-control" id="documents" name="resume_file_name"
-                                           placeholder="Upload Other Document" accept="application/pdf" value="s">
+						<input type="file" class="form-control" id="resume_file_name" name="resume_file_name"
+                                           placeholder="Upload Other Document" accept="application/pdf">
 					</div>
 				</div>
 			</div>
@@ -403,6 +402,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 				<div class="row">
 					<div class="col-lg-12 col-md-12 col-sm-12">
 						<div id="file4-preview">
+							@if($currentInterviewReport->resume_file_name)
+								<h6 class="fw-bold text-center mb-1">Resume</h6>
+								<iframe src="{{ url('resume/' . $currentInterviewReport->resume_file_name) }}" alt="Resume" style="height:1000;"></iframe>
+								<button  type="button" class="btn btn-sm btn-info mt-3 ">
+									<a href="{{ url('resume/' . $currentInterviewReport->resume_file_name) }}" download class="text-white">
+										Download
+									</a>
+								</button>
+								<!-- <button  type="button" class="btn btn-sm btn-danger mt-3 delete-button"
+											data-file-type="Resume"> Delete
+								</button> -->
+							@endif
 						</div>
 					</div>
 				</div>
@@ -420,22 +431,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
-	const file4InputLicense = document.querySelector("#documents");
+	const file4InputLicense = document.querySelector("#resume_file_name");
 	const previewFile4 = document.querySelector("#file4-preview");
 	var hiringrequests = {!! json_encode($hiringrequests) !!};
 	var currentInterviewReport = {!! json_encode($currentInterviewReport) !!};
 	var interviewersArr =[];
 	$(document).ready(function () {
+		if(currentInterviewReport.resume_file_name != undefined) {
+			$('.preview-div').attr('hidden', false);
+		}
 		$("#hiring_request_id").val(currentInterviewReport.hiring_request_id);
 		$("#candidate_name").val(currentInterviewReport.candidate_name);
 		$("#nationality").val(currentInterviewReport.nationality);
 		$('#' + currentInterviewReport.gender).prop('checked',true);
-		// alert(currentInterviewReport.resume_file_name);
 		// $("#resume_file_name").val(currentInterviewReport.resume_file_name);
 		$("#date_of_telephonic_interview").val(currentInterviewReport.date_of_telephonic_interview);
-		if(currentInterviewReport.interviewers.length >0) {
-			for(var i=0; i<currentInterviewReport.interviewers.length; i++) {
-				interviewersArr.push(currentInterviewReport.interviewers[i].interviewer_id);
+		if(currentInterviewReport.interviewers != undefined) {
+			if(currentInterviewReport.interviewers.length > 0) {
+				for(var i=0; i<currentInterviewReport.interviewers.length; i++) {
+					interviewersArr.push(currentInterviewReport.interviewers[i].interviewer_id);
+				}
 			}
 		}
 		$("#interviewer_id").val(interviewersArr);
@@ -511,9 +526,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
             gender: {
                 required: true,
             },
-			resume_file_name: {
-                required: true,
-            },
+			// resume_file_name: {
+            //     required: true,
+            // },
 			hiring_request_id: {
 				required: true,
 			}
