@@ -68,6 +68,10 @@ class AgentsController extends Controller
         ->where('id_category', $request->id_category)
         ->first();
     if ($existingAgent) {
+        $agentcreate = new AgentsCreating;
+    $agentcreate->agents_id = $existingAgent->id;
+    $agentcreate->created_by = Auth::id();
+    $agentcreate->save();
         return response()->json([
             'agent_id' => $existingAgent->id,
             'name' => $request->name,
@@ -79,6 +83,10 @@ class AgentsController extends Controller
         ->where('phone', $request->phone)
         ->first();
     if ($existingAgent) {
+        $agentcreate = new AgentsCreating;
+    $agentcreate->agents_id = $existingAgent->id;
+    $agentcreate->created_by = Auth::id();
+    $agentcreate->save();
         return response()->json([
             'agent_id' => $existingAgent->id,
             'name' => $request->name,
@@ -88,6 +96,10 @@ class AgentsController extends Controller
     // Check if an agent with the same phone exists
     $existingAgent = Agents::where('phone', $request->phone)->first();
     if ($existingAgent) {
+        $agentcreate = new AgentsCreating;
+    $agentcreate->agents_id = $existingAgent->id;
+    $agentcreate->created_by = Auth::id();
+    $agentcreate->save();
         return response()->json([
             'agent_id' => $existingAgent->id,
             'name' => $request->name,
