@@ -91,6 +91,64 @@
 	<br>
 </div>
 <div class="card-body">
+<div class="modal fade" id="addAgentModal" tabindex="-1" role="dialog" aria-labelledby="addAgentModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form id="form-update2_492" method="POST">
+      @csrf
+      <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title fs-5" id="adoncode">Add New Agent</h5>
+          <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="name">Name:</label>
+            <input type="text" name="name" id="name" class="form-control mb-3" placeholder="Name">
+        </div>
+
+        <div class="col-md-6 form-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" class="form-control mb-3" placeholder="Email">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="phone">Phone:</label>
+            <input type="number" name="phone" id="phone" class="form-control mb-3" placeholder="Phone">
+        </div>
+
+        <div class="col-md-6 form-group">
+            <label for="id_category">ID Category:</label>
+            <select name="id_category" id="id_category" class="form-control mb-3">
+                <option value="national_id">National ID</option>
+                <option value="emirates_id">Emirates ID</option>
+                <option value="passport_number">Passport Number</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="number">ID Number:</label>
+            <input type="text" name="id_number" id="number" class="form-control mb-3" placeholder="Id NUmber">
+        </div>
+
+        <div class="col-md-6 form-group">
+            <label for="document">Upload Document:</label>
+            <input type="file" name="identification_file" id="document" class="form-control-file mb-3">
+        </div>
+    </div>
+</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="submit_b_492" class="btn btn-primary btn-sm">Submit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  </div>
     <form action="{{ route('quotation-items.store') }}" id="form-create" method="POST" >
         @csrf
         <div class="row">
@@ -281,8 +339,14 @@
                             Incoterm :
                         </div>
                         <div class="col-sm-6">
-                            <input type="text" name="incoterm" id="incoterm" class="form-control form-control-xs" placeholder="Incoterm">
-                        </div>
+                        <select name="incoterm" id="incoterm" class="form-control form-control-xs">
+                            <option value="EXW">EXW</option>
+                            <option value="CNF">CNF</option>
+                            <option value="CIF">CIF</option>
+                            <option value="FOB">FOB</option>
+                            <option value="Local Registration">Local Registration</option>
+                        </select>
+                    </div>
                     </div>
                     <div class="row mt-2">
                         <div class="col-sm-6">
@@ -320,7 +384,7 @@
                         System Code :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="system_code" id="system_code" class="form-control form-control-xs" placeholder="System Code">
+                        <input type="number" name="system_code" id="system_code" class="form-control form-control-xs" placeholder="System Code">
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -353,18 +417,26 @@
             <div class="col-sm-4">
                 <div class="row mt-2">
                     <div class="col-sm-6">
-                        CB Name :
+                        CB Name:
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="cb_name" id="cb_name" class="form-control form-control-xs" placeholder="CB Name">
+                    <div class="input-group">
+                        <select name="cb_name" id="cb_name" class="form-control form-control-xs">
+                        </select>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" onclick="addAgentModal()">
+                                +
+                            </button>
+                        </div>
                     </div>
+                </div>
                 </div>
                 <div class="row mt-2">
                     <div class="col-sm-6">
-                        CB No :
+                        CB No:
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="cb_number" id="cb_number" class="form-control form-control-xs" placeholder="CB Number">
+                        <input type="text" name="cb_number" id="cb_number" class="form-control form-control-xs" placeholder="CB Number" readonly>
                     </div>
                 </div>
             </div>
@@ -538,9 +610,9 @@
                                 <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
                                     <thead class="bg-soft-secondary">
                                     <tr>
-                                        {{--                                    <th>ID</th>--}}
-                                        {{--                                    <th>Status</th>--}}
-                                        {{--                                    <th>VIN</th>--}}
+                                        {{--<th>ID</th>--}}
+                                        {{--<th>Status</th>--}}
+                                        {{--<th>VIN</th>--}}
                                         <th>Brand Name</th>
                                         <th>Model Line</th>
                                         <th>Model Details</th>
@@ -1040,6 +1112,73 @@
 </div>
 @endsection
 @push('scripts')
+<script>
+     function addAgentModal() {
+  $('#addAgentModal').modal('show');
+}
+$(document).ready(function () {
+    // Fetch agent names dynamically on page load
+    fetchAgentData();
+
+    // Function to fetch agent names via AJAX
+    function fetchAgentData() {
+        $.ajax({
+            url: "{{ route('agents.getAgentNames') }}",
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                // Clear existing options
+                $('#cb_name').empty();
+
+                // Add fetched options
+                $.each(data, function (index, agent) {
+                    $('#cb_name').append('<option value="' + agent.id + '">' + agent.name + '</option>');
+                });
+
+                // Update CB No on change
+                $('#cb_name').change(function () {
+                    var selectedAgentId = $(this).val();
+                    var selectedAgent = data.find(agent => agent.id == selectedAgentId);
+
+                    if (selectedAgent) {
+                        $('#cb_number').val(selectedAgent.phone).trigger('change');
+                    } else {
+                        $('#cb_number').val('').trigger('change');
+                    }
+                });
+            },
+            error: function (error) {
+                console.error('Error fetching agent data:', error);
+            }
+        });
+    }
+
+    // Intercept form submission and handle it through AJAX
+    $('#form-update2_492').submit(function (e) {
+        e.preventDefault();
+
+        var formData = new FormData($(this)[0]);
+
+        $.ajax({
+            url: "{{ route('agents.store') }}",
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                $('#cb_name').append('<option value="' + response.agent_id + '">' + response.name + '</option>');
+                $('#cb_name').val(response.agent_id).trigger('change');
+                $('#cb_number').val(response.phone).trigger('change');
+                $('#form-update2_492')[0].reset();
+                $('#addAgentModal').modal('hide');
+            },
+            error: function (error) {
+                console.error('Error submitting form:', error);
+            }
+        });
+    });
+});
+</script>
 <script>
         var radioButtons = document.querySelectorAll('input[type="radio"]');
         var contentDivs = document.querySelectorAll('.contentveh');
