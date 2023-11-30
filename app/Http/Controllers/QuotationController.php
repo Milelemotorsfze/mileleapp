@@ -230,11 +230,28 @@ class QuotationController extends Controller
         $directlyAddedAddons =  QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
             ->where('quotation_id', $quotation->id)
             ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('is_enable', true)
             ->where('is_addon', true)->get();
+        $hidedDirectlyAddedAddonSum =  QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
+            ->where('quotation_id', $quotation->id)
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('is_enable', false)
+            ->where('is_addon', true)
+            ->sum('total_amount');
 
         $addons = QuotationItem::where('reference_type','App\Models\AddonDetails')
             ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
+
+        $hidedAddonSum = QuotationItem::where('reference_type','App\Models\AddonDetails')
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)
+            ->where('is_enable', false)->sum('total_amount');
+
+        $addonsTotalAmount = $hidedDirectlyAddedAddonSum + $hidedAddonSum;
+
         $shippingCharges = QuotationItem::where('reference_type','App\Models\Shipping')
             ->where('quotation_id', $quotation->id)->get();
         $shippingDocuments = QuotationItem::where('reference_type','App\Models\ShippingDocuments')
@@ -243,8 +260,7 @@ class QuotationController extends Controller
             ->where('quotation_id', $quotation->id)->get();
         $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
             ->where('quotation_id', $quotation->id)->get();
-//        return view('proforma.proforma_invoice', compact('quotationItem','quotation','call','quotationDetail',
-//            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications'));
+
         $salesPersonDetail = EmployeeProfile::where('user_id', Auth::id())->first();
 
         $data = [];
@@ -266,9 +282,10 @@ class QuotationController extends Controller
         }
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
-
+//        return view('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
+//            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons','addonsTotalAmount'));
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
-            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons'));
+            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons','addonsTotalAmount'));
 //        return $pdfFile->stream('test.pdf');
         $filename = 'quotation_'.$quotation->id.'.pdf';
         $generatedPdfDirectory = public_path('Quotations');
