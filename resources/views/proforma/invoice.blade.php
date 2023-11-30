@@ -431,6 +431,8 @@
                     </div>
                 </div>
                 </div>
+                <input type="hidden" name="agents_id" id="agents_id" value="">
+            <input type="hidden" name="selected_cb_name" id="selected_cb_name" value="">
                 <div class="row mt-2">
                     <div class="col-sm-6">
                         CB No:
@@ -1117,6 +1119,13 @@
   $('#addAgentModal').modal('show');
 }
 $(document).ready(function () {
+    $('#cb_name').change(function () {
+        var selectedAgentId = $(this).val();
+        var selectedAgentName = $(this).find(':selected').text();
+
+        $('#agents_id').val(selectedAgentId);
+        $('#selected_cb_name').val(selectedAgentName);
+    });
     // Fetch agent names dynamically on page load
     fetchAgentData();
 
@@ -1129,7 +1138,7 @@ $(document).ready(function () {
             success: function (data) {
                 // Clear existing options
                 $('#cb_name').empty();
-
+                $('#cb_name').append('<option value="" disabled selected>Select Agent</option>');
                 // Add fetched options
                 $.each(data, function (index, agent) {
                     $('#cb_name').append('<option value="' + agent.id + '">' + agent.name + '</option>');
