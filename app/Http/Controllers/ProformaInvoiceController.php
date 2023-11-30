@@ -29,21 +29,7 @@ class ProformaInvoiceController extends Controller {
         $kitsDesc = AddonDescription::whereHas('Addon', function($q) {
             $q->where('addon_type','K');
         })->get();
-        $accessoriesBrands = Brand::whereHas('addons', function($q) {
-            $q->whereHas('Addons', function($query) {
-                $query->where('addon_type_name','P');
-            });
-        })->get();
-        $sparePartsBrands = Brand::whereHas('addons', function($q) {
-            $q->whereHas('Addons', function($query) {
-                $query->where('addon_type_name','SP');
-            });
-        })->get();
-        $kitsBrands = Brand::whereHas('addons', function($q) {
-            $q->whereHas('Addons', function($query) {
-                $query->where('addon_type_name','K');
-            });
-        })->get();
+
         $shippings = Shipping::all();
         $shippingDocuments = ShippingDocuments::all();
         $certifications = ShippingCertification::all();
@@ -53,7 +39,7 @@ class ProformaInvoiceController extends Controller {
         $usd_to_eru_rate = Setting::where('key', 'usd_to_euro_convertion_rate')->first();
 
         return view('proforma.invoice', compact('callDetails', 'brands','assessoriesDesc',
-            'sparePartsDesc','kitsDesc','accessoriesBrands','sparePartsBrands', 'kitsBrands','shippings','certifications',
+            'sparePartsDesc','kitsDesc','shippings','certifications',
            'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate'));
     }
     public function getaddonModels(Request $request, $brandId, $type) {

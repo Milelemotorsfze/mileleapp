@@ -598,6 +598,7 @@ Route::get('/d', function () {
     Route::resource('dm-customers', CustomerController::class);
     Route::get('master-model/getLoiDescription', [MasterModelController::class,'getLoiDescription'])
         ->name('master-model.get-loi-description');
+    Route::post('quotation/new-model-line', [ModelLinesController::class,'StoreModellineOrBrand'])->name('modelline-or-brand.store');
 
     // DASHBOARD PARTS AND PROCURMENT
 

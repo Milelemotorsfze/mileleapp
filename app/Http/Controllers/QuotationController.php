@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AddonDetails;
+use App\Models\AgentCommission;
 use App\Models\HRM\Employee\EmployeeProfile;
 use App\Models\OtherLogisticsCharges;
 use App\Models\Quotation;
@@ -106,10 +107,19 @@ class QuotationController extends Controller
         $quotationDetail->payment_terms  = $request->payment_terms;
         $quotationDetail->representative_name = $request->representative_name;
         $quotationDetail->representative_number = $request->representative_number;
-        $quotationDetail->cb_name = $request->cb_name;
+        $quotationDetail->cb_name = $request->selected_cb_name;
         $quotationDetail->cb_number = $request->cb_number;
+        $quotationDetail->agents_id = $request->agents_id;
         $quotationDetail->advance_amount = $request->advance_amount;
         $quotationDetail->save();
+
+        $agentCommission = new AgentCommission();
+        $agentCommission->commission = $request->system_code ?? '';
+        $agentCommission->status = 'Quotation';
+        $agentCommission->agents_id  =  $request->agents_id ?? '';
+        $agentCommission->quotation_id  = $quotation->id;
+        $agentCommission->created_by = Auth::id();
+        $agentCommission->save();
 
         $quotationItemIds = [];
         $quotationSubItemKeys = [];
