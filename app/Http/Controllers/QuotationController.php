@@ -191,7 +191,6 @@ class QuotationController extends Controller
                             ->whereNotIn('id', $alreadyaddedquotationIds)
                             ->where('is_addon', true)
                             ->first();
-//                        array_push($referenceIds,$request->reference_ids[$itemKey]);
                     }
                 }else if($request->types[$itemKey] == 'Accessory' || $request->types[$itemKey] == 'SparePart' || $request->types[$itemKey] == 'Kit') {
 
@@ -213,11 +212,10 @@ class QuotationController extends Controller
         }
         DB::commit();
 
-
 //        $quotationItem = QuotationItem::where('quotation_id', $quotation->id)->first();
-//        $quotation = Quotation::find(7);
+//        $quotation = Quotation::find(15);
 //        $call = Calls::find($quotation->calls_id);
-//        $quotationDetail = QuotationDetail::where('quotation_id', 7)->first();
+//        $quotationDetail = QuotationDetail::where('quotation_id', 15)->first();
 
         $vehicles =  QuotationItem::where("reference_type", 'App\Models\Varaint')
             ->where('quotation_id', $quotation->id)->get();
@@ -298,6 +296,7 @@ class QuotationController extends Controller
         $pdf->Output($directory.'/'.$file,'F');
         $quotation->file_path = 'quotation_files/'.$file;
         $quotation->save();
+
         return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation created successfully.');
     }
     public function pdfMerge($quotationId)
