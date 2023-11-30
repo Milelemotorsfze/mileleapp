@@ -71,10 +71,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			<a class="nav-link" data-bs-toggle="pill" href="#fifth_round">Fifth Round</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#selected_candidates">Selected Candidates</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#not_selected_candidates">Not Selected Candidates</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#not_selected_candidates">Not Selected Candidates</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#selected_candidates">Selected Candidates</a>
 		</li>
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#pending-hiring-requests">Pending</a>
@@ -108,33 +108,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>Candidate Name</th>
 							<th>Nationality</th>
 							<th>Gender</th>
-							<th>Name Of Interviewer</th>
-							<!-- <th>Date Of Interview</th> -->
-							<th>Date Of Telephonic Interview</th>
-							<th>Telephonic Interview Summary</th>
 							<th>Rate Dress Appearance</th>
 							<th>Rate Body Language Appearance</th>
-							<!-- <th>Date Of First Round</th>
-							<th>First Round</th>
-                            <th>Date Of Second Round</th>
-							<th>Second Round</th>
-                            <th>Date Of Third Round</th>
-							<th>Third Round</th>
-                            <th>Date Of Forth Round</th>
-							<th>Forth Round</th>
-                            <th>Date Of Fifth Round</th>
-							<th>Fifth Round</th>
-                            <th>Final Evaluation Of Candidate</th>
-                            <th>Candidate Selected</th> -->
-                            <!-- status -->
-							<!-- <th>Team Lead/ Manager Name</th> -->
-							<!-- <th>Team Lead/ Manager Action</th>
-							<th>Team Lead/ Manager Action At</th>
-							<th>Team Lead/ Manager Comment</th> -->
-							<!-- <th>Division Head Name</th> -->
-							<!-- <th>Division Head Action</th>
-							<th>Division Head Action At</th>
-							<th>Division Head Comment</th> -->
+
                             <th>Created By</th>
                             <th>Created At</th>
 							<th>Action</th>
@@ -150,21 +126,637 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{ $data->candidate_name ?? '' }}</td>
 							<td>{{ $data->nationalities->name ?? '' }}</td>
 							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+
+                            <td>{{ $data->createdBy->name ?? ''}}</td>
+                            <td>{{ $data->created_at ?? ''}}</td>
 							<td>
-								@if(isset($data->interviewers))
-  									@if(count($data->interviewers) > 0)
-  										@foreach($data->interviewers as $interviewers)
-											{{ $interviewers->interviewerName->name ?? '' }},
+							<div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+										</a>
+									</li>
+									<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+										</a>
+									</li>
+                                    <li>
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+										</a>
+									</li>
+                                    <li>
+										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+											data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+											<i class="fa fa-plus" aria-hidden="true"></i> First Round
+										</button>
+									</li>
+                                </ul>
+                            </div>
+							</td>
+							@include('hrm.hiring.interview_summary_report.approve_reject_modal')					
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="telephonic_interview">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="pending-hiring-requests-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th>Sl No</th>
+							<th>Hiring Request UUID</th>
+							<th>Job Position</th>
+							<th>Candidate Name</th>
+							<th>Nationality</th>
+							<th>Gender</th>
+							<th>Rate Dress Appearance</th>
+							<th>Rate Body Language Appearance</th>
+
+							
+							<th>Date Of Telephonic Interview</th>
+							<th>Name Of Telephonic Interviewers</th>
+							<th>Telephonic Interview Summary</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($telephonics as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+
+							
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if(isset($data->telephonicInterviewers))
+  									@if(count($data->telephonicInterviewers) > 0)
+  										@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+											{{ $telephonicInterviewers->interviewerName->name ?? '' }},
 										@endforeach
 									@endif
 								@endif
 							</td>
-							<!-- <td>{{ $data->date_of_interview ?? '' }}</td> -->
-							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
+                            <td>{{ $data->createdBy->name ?? ''}}</td>
+                            <td>{{ $data->created_at ?? ''}}</td>
+							<td>
+							<div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+										</a>
+									</li>
+									<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+										</a>
+									</li>
+                                    <li>
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+										</a>
+									</li>
+                                    <li>
+										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+											data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+											<i class="fa fa-plus" aria-hidden="true"></i> First Round
+										</button>
+									</li>
+                                </ul>
+                            </div>
+							</td>
+							@include('hrm.hiring.interview_summary_report.approve_reject_modal')					
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="first_round">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="pending-hiring-requests-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th>Sl No</th>
+							<th>Hiring Request UUID</th>
+							<th>Job Position</th>
+							<th>Candidate Name</th>
+							<th>Nationality</th>
+							<th>Gender</th>
+							<th>Rate Dress Appearance</th>
+							<th>Rate Body Language Appearance</th>
+
+							
+							<th>Date Of Telephonic Interview</th>
+							<th>Telephonic Interview Summary</th>
+							<th>Date Of First Round</th>
+							<th>First Round</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($firsts as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-							<!-- <td>{{$data->date_of_first_round ?? ''}}</td>
+
+							
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>{{$data->first_round ?? ''}}</td>
+                            <td>{{ $data->createdBy->name ?? ''}}</td>
+                            <td>{{ $data->created_at ?? ''}}</td>
+							<td>
+							<div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+										</a>
+									</li>
+									<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+										</a>
+									</li>
+                                    <li>
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+										</a>
+									</li>
+                                    <li>
+										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+											data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+											<i class="fa fa-plus" aria-hidden="true"></i> First Round
+										</button>
+									</li>
+                                </ul>
+                            </div>
+							</td>
+							@include('hrm.hiring.interview_summary_report.approve_reject_modal')					
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="second_round">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="pending-hiring-requests-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th>Sl No</th>
+							<th>Hiring Request UUID</th>
+							<th>Job Position</th>
+							<th>Candidate Name</th>
+							<th>Nationality</th>
+							<th>Gender</th>
+							<th>Rate Dress Appearance</th>
+							<th>Rate Body Language Appearance</th>
+
+							<th>Date Of Telephonic Interview</th>
+							<th>Telephonic Interview Summary</th>
+							<th>Date Of First Round</th>
+							<th>First Round</th>
+                            <th>Date Of Second Round</th>
+							<th>Second Round</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($seconds as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+
+							
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>{{$data->second_round ?? ''}}</td>
+                            <td>{{ $data->createdBy->name ?? ''}}</td>
+                            <td>{{ $data->created_at ?? ''}}</td>
+							<td>
+							<div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+										</a>
+									</li>
+									<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+										</a>
+									</li>
+                                    <li>
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+										</a>
+									</li>
+                                    <li>
+										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+											data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+											<i class="fa fa-plus" aria-hidden="true"></i> First Round
+										</button>
+									</li>
+                                </ul>
+                            </div>
+							</td>
+							@include('hrm.hiring.interview_summary_report.approve_reject_modal')					
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="third_round">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="pending-hiring-requests-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th>Sl No</th>
+							<th>Hiring Request UUID</th>
+							<th>Job Position</th>
+							<th>Candidate Name</th>
+							<th>Nationality</th>
+							<th>Gender</th>
+							<th>Rate Dress Appearance</th>
+							<th>Rate Body Language Appearance</th>
+							
+							<th>Name Of Telephonic Interviewer</th>
+							<th>Date Of Telephonic Interview</th>
+							<th>Telephonic Interview Summary</th>
+							<th>Date Of First Round</th>
+							<th>First Round</th>
+                            <th>Date Of Second Round</th>
+							<th>Second Round</th>
+                            <th>Date Of Third Round</th>
+							<th>Third Round</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($thirds as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+
+							<td>
+								@if(isset($data->telephonicInterviewers))
+  									@if(count($data->telephonicInterviewers) > 0)
+  										@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+											{{ $telephonicInterviewers->interviewerName->name ?? '' }},
+										@endforeach
+									@endif
+								@endif
+							</td>
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>{{$data->third_round ?? ''}}</td>
+                            <td>{{ $data->createdBy->name ?? ''}}</td>
+                            <td>{{ $data->created_at ?? ''}}</td>
+							<td>
+							<div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+										</a>
+									</li>
+									<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+										</a>
+									</li>
+                                    <li>
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+										</a>
+									</li>
+                                    <li>
+										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+											data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+											<i class="fa fa-plus" aria-hidden="true"></i> First Round
+										</button>
+									</li>
+                                </ul>
+                            </div>
+							</td>
+							@include('hrm.hiring.interview_summary_report.approve_reject_modal')					
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="forth_round">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="pending-hiring-requests-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th>Sl No</th>
+							<th>Hiring Request UUID</th>
+							<th>Job Position</th>
+							<th>Candidate Name</th>
+							<th>Nationality</th>
+							<th>Gender</th>
+							<th>Rate Dress Appearance</th>
+							<th>Rate Body Language Appearance</th>
+
+							
+							<th>Date Of Telephonic Interview</th>
+							<th>Telephonic Interview Summary</th>
+							<th>Date Of First Round</th>
+							<th>First Round</th>
+                            <th>Date Of Second Round</th>
+							<th>Second Round</th>
+                            <th>Date Of Third Round</th>
+							<th>Third Round</th>
+                            <th>Date Of Forth Round</th>
+							<th>Forth Round</th>
+                            <th>Date Of Fifth Round</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($telephonics as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+							
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>{{$data->third_round ?? ''}}</td>
+							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>{{$data->forth_round ?? ''}}</td>
+                            <td>{{ $data->createdBy->name ?? ''}}</td>
+                            <td>{{ $data->created_at ?? ''}}</td>
+							<td>
+							<div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+										</a>
+									</li>
+									<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+										</a>
+									</li>
+                                    <li>
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+										</a>
+									</li>
+                                    <li>
+										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+											data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+											<i class="fa fa-plus" aria-hidden="true"></i> First Round
+										</button>
+									</li>
+                                </ul>
+                            </div>
+							</td>
+							@include('hrm.hiring.interview_summary_report.approve_reject_modal')					
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="fifth_round">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="pending-hiring-requests-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th>Sl No</th>
+							<th>Hiring Request UUID</th>
+							<th>Job Position</th>
+							<th>Candidate Name</th>
+							<th>Nationality</th>
+							<th>Gender</th>
+							<th>Rate Dress Appearance</th>
+							<th>Rate Body Language Appearance</th>
+
+							
+							<th>Date Of Telephonic Interview</th>
+							<th>Telephonic Interview Summary</th>
+							<th>Date Of First Round</th>
+							<th>First Round</th>
+                            <th>Date Of Second Round</th>
+							<th>Second Round</th>
+                            <th>Date Of Third Round</th>
+							<th>Third Round</th>
+                            <th>Date Of Forth Round</th>
+							<th>Forth Round</th>
+                            <th>Date Of Fifth Round</th>
+							<th>Fifth Round</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($telephonics as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+
+							
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>{{$data->third_round ?? ''}}</td>
+							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>{{$data->forth_round ?? ''}}</td>
+							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>{{$data->fifth_round ?? ''}}</td>
+                            <td>{{ $data->createdBy->name ?? ''}}</td>
+                            <td>{{ $data->created_at ?? ''}}</td>
+							<td>
+							<div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+										</a>
+									</li>
+									<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+										</a>
+									</li>
+                                    <li>
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+										</a>
+									</li>
+                                    <li>
+										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+											data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+											<i class="fa fa-plus" aria-hidden="true"></i> First Round
+										</button>
+									</li>
+                                </ul>
+                            </div>
+							</td>
+							@include('hrm.hiring.interview_summary_report.approve_reject_modal')					
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="not_selected_candidates">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="pending-hiring-requests-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th>Sl No</th>
+							<th>Hiring Request UUID</th>
+							<th>Job Position</th>
+							<th>Candidate Name</th>
+							<th>Nationality</th>
+							<th>Gender</th>
+							<th>Rate Dress Appearance</th>
+							<th>Rate Body Language Appearance</th>
+
+							
+							<th>Date Of Telephonic Interview</th>
+							<th>Telephonic Interview Summary</th>
+							<th>Date Of First Round</th>
+							<th>First Round</th>
+                            <th>Date Of Second Round</th>
+							<th>Second Round</th>
+                            <th>Date Of Third Round</th>
+							<th>Third Round</th>
+                            <th>Date Of Forth Round</th>
+							<th>Forth Round</th>
+                            <th>Date Of Fifth Round</th>
+							<th>Fifth Round</th>
+                            <th>Final Evaluation Of Candidate</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($telephonics as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+
+							
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
 							<td>{{$data->first_round ?? ''}}</td>
 							<td>{{$data->date_of_second_round ?? ''}}</td>
 							<td>{{$data->second_round ?? ''}}</td>
@@ -175,16 +767,105 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{$data->date_of_fifth_round ?? ''}}</td>
 							<td>{{$data->fifth_round ?? ''}}</td>
                             <td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
-                            <td>{{$data->candidate_selected ?? ''}}</td> -->
+                            <td>{{ $data->createdBy->name ?? ''}}</td>
+                            <td>{{ $data->created_at ?? ''}}</td>
+							<td>
+							<div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+										</a>
+									</li>
+									<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+										</a>
+									</li>
+                                    <li>
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+										</a>
+									</li>
+                                    <li>
+										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+											data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+											<i class="fa fa-plus" aria-hidden="true"></i> First Round
+										</button>
+									</li>
+                                </ul>
+                            </div>
+							</td>
+							@include('hrm.hiring.interview_summary_report.approve_reject_modal')					
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="selected_candidates">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="pending-hiring-requests-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th>Sl No</th>
+							<th>Hiring Request UUID</th>
+							<th>Job Position</th>
+							<th>Candidate Name</th>
+							<th>Nationality</th>
+							<th>Gender</th>
+							<th>Rate Dress Appearance</th>
+							<th>Rate Body Language Appearance</th>
 
-                            <!-- <td>{{$data->action_by_department_head ?? ''}}</td> -->
-							<!-- <td>{{$data->departmentHeadName->name ?? ''}}</td>
-							<td>{{$data->department_head_action_at ?? ''}}</td>
-							<td>{{$data->comments_by_department_head ?? ''}}</td> -->
-							<!-- <td>{{$data->action_by_division_head ?? ''}}</td> -->
-							<!-- <td>{{$data->divisionHeadName->name ?? ''}}</td>
-                            <td>{{$data->division_head_action_at ?? ''}}</td>
-                            <td>{{$data->comments_by_division_head ?? ''}}</td> -->
+							
+							<th>Date Of Telephonic Interview</th>
+							<th>Telephonic Interview Summary</th>
+							<th>Date Of First Round</th>
+							<th>First Round</th>
+                            <th>Date Of Second Round</th>
+							<th>Second Round</th>
+                            <th>Date Of Third Round</th>
+							<th>Third Round</th>
+                            <th>Date Of Forth Round</th>
+							<th>Forth Round</th>
+                            <th>Date Of Fifth Round</th>
+							<th>Fifth Round</th>
+                            <th>Final Evaluation Of Candidate</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($telephonics as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+
+							
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>{{$data->third_round ?? ''}}</td>
+							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>{{$data->forth_round ?? ''}}</td>
+							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>{{$data->fifth_round ?? ''}}</td>
+                            <td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
                             <td>{{ $data->createdBy->name ?? ''}}</td>
                             <td>{{ $data->created_at ?? ''}}</td>
 							<td>
@@ -234,12 +915,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>Candidate Name</th>
 							<th>Nationality</th>
 							<th>Gender</th>
-							<th>Name Of Interviewer</th>
-							<th>Date Of Interview</th>
-							<th>Date Of Telephonic Interview</th>
-							<th>Telephonic Interview</th>
 							<th>Rate Dress Appearance</th>
 							<th>Rate Body Language Appearance</th>
+							
+							<th>Date Of Telephonic Interview</th>
+							<th>Telephonic Interview</th>
 							<th>Date Of First Round</th>
 							<th>First Round</th>
                             <th>Date Of Second Round</th>
@@ -252,7 +932,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>Fifth Round</th>
                             <th>Final Evaluation Of Candidate</th>
                             <th>Candidate Selected</th>
-                            <!-- status -->
 							<th>Team Lead/ Manager Name</th>
 							<th>Team Lead/ Manager Action</th>
 							<th>Team Lead/ Manager Action At</th>
@@ -276,11 +955,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{ $data->nationalities->name ?? '' }}</td>
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td>{{ $data->nameOfInterviewer->name ?? '' }}</td>
-							<td>{{ $data->date_of_interview ?? '' }}</td>
-							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
 							<td>{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td>{{ $data->rate_body_language_appearance ?? ''}}</td>
+
+							<td>{{ $data->date_of_interview ?? '' }}</td>
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
 							<td>{{$data->date_of_first_round ?? ''}}</td>
 							<td>{{$data->first_round ?? ''}}</td>
 							<td>{{$data->date_of_second_round ?? ''}}</td>
@@ -293,7 +973,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{$data->fifth_round ?? ''}}</td>
                             <td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
                             <td>{{$data->candidate_selected ?? ''}}</td>
-
                             <td>{{$data->action_by_department_head ?? ''}}</td>
 							<td>{{$data->departmentHeadName->name ?? ''}}</td>
 							<td>{{$data->department_head_action_at ?? ''}}</td>
@@ -373,12 +1052,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>candidate_name</th>
 							<th>Nationality</th>
 							<th>Gender</th>
-							<th>Name Of Interviewer</th>
-							<th>Date Of Interview</th>
-							<th>Date Of Telephonic Interview</th>
-							<th>Telephonic Interview</th>
 							<th>Rate Dress Appearance</th>
 							<th>Rate Body Language Appearance</th>
+
+							
+							<th>Date Of Telephonic Interview</th>
+							<th>Telephonic Interview</th>
 							<th>Date Of First Round</th>
 							<th>First Round</th>
                             <th>Date Of Second Round</th>
@@ -625,7 +1304,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>candidate_name</th>
 							<th>Nationality</th>
 							<th>Gender</th>
-							<th>Name Of Interviewer</th>
 							<th>Date Of Interview</th>
 							<th>Date Of Telephonic Interview</th>
 							<th>Duties and Responsibilities (Generic) of the position</th>

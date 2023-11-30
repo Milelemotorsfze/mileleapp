@@ -94,8 +94,22 @@ class InterviewSummaryReport extends Model
     public function createdBy() {
         return $this->hasOne(User::class,'id','created_by');
     }
-    public function interviewers()
-    {
-        return $this->hasMany(Interviewers::class,'interview_summary_report_id','id');
+    public function telephonicInterviewers() {
+        return $this->hasMany(Interviewers::class,'interview_summary_report_id','id')->where('round','telephonic');
+    }
+    public function firstRoundInterviewers() {
+        return $this->hasMany(Interviewers::class,'interview_summary_report_id','id')->where('round','firstRound');
+    }
+    public function secondRoundInterviewers() {
+        return $this->hasMany(Interviewers::class,'interview_summary_report_id','id')->where('round','second');
+    }
+    public function thirdRoundInterviewers() {
+        return $this->hasMany(Interviewers::class,'interview_summary_report_id','id')->where('round','third');
+    }
+    public function forthRoundInterviewers() {
+        return $this->hasMany(Interviewers::class,'interview_summary_report_id','id')->where('round','forth');
+    }
+    public function fifthRoundInterviewers() {
+        return $this->hasMany(Interviewers::class,'interview_summary_report_id','id')->where('round','fifth');
     }
 }
