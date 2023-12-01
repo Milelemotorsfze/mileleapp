@@ -18,7 +18,6 @@
         padding-bottom: 0px;
     }
 
-    .dropdown-section-div,
     .dep-section-div,
     .title-section-div,
     .reporting-section-div {
@@ -48,16 +47,16 @@
 
 
 
-    /* @media (min-width: 767px) {
-    .location-reporting-dic{
-        margin-top: 15px;
-    }
-} */
-
     @media (max-width: 767px) {
-        /* .dropdown-section-div {
-            padding-top: 20px;
-        } */
+        .date-section-div {
+            padding-top: 10px;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .location-section-div {
+            padding-top: 10px;
+        }
     }
 
     .error {
@@ -104,28 +103,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     <!-- {!! Form::open(array('route' => 'calls.store','method'=>'POST', 'id' => 'calls')) !!} -->
     <!-- <div>JD iD: {{ $currentHiringRequest }} </div> -->
 
+    <div class="row">
+        <p><span style="float:right;" class="error">* Required Field</span></p>
+    </div>
+
     <form id="employeeJobDescriptionForm" name="employeeJobDescriptionForm" enctype="multipart/form-data" method="POST" action="{{route('employee-hiring-job-description.store-or-update', $jobDescriptionId )}}">
-    @csrf
-
-        <div class="row">
-
-            <div class="col-lg-6 col-md-6 col-sm-10 col-12">
-                <div class="row">
-                    <div class="col-xxl-5 col-lg-4 col-md-6 col-sm-6 col-12 job-description-lable-name">
-                        <label for="request_date" class="col-form-label text-md-end"><span class="error">* </span> {{ __('Choose Date') }}</label>
-                    </div>
-                    <div class="col-xxl-7 col-lg-6 col-md-6 col-sm-6 col-12">
-                        <input type="date" name="request_date" id="request_date" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6 col-md-6 col-sm-10 col-12">
-                <p><span style="float:right;" class="error">* Required Field</span></p>
-            </div>
-        </div>
-
-        <br />
+        @csrf
 
         <div class="row">
 
@@ -133,14 +116,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <div class="row">
                     <!-- UUID Section -->
 
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 dropdown-section-div">
+                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 dropdown-section-div">
                         <div class="row">
-                            <div class="col-xxl-5 col-lg-4 col-md-6 col-sm-6 col-12 job-description-lable-name">
+                            <div class="col-xxl-5 col-lg-4 col-md-5 col-sm-6 col-12 job-description-lable-name">
                                 <label for="uuid" class="form-label heading-name"><span class="error">* </span>{{ __('UUID Number:') }}</label>
                             </div>
-                            <div class="col-xxl-7 col-lg-6 col-md-6 col-sm-6 col-12">
+                            <div class="col-xxl-7 col-lg-7 col-md-7 col-sm-6 col-12">
                                 <div class="dropdown-option-div">
-                                    <select name="uuid" id="uuid_value" class="form-control widthinput" multiple="true" autofocus>
+                                    <select name="hiring_request_id" id="uuid_value" class="form-control widthinput" multiple="true" autofocus>
                                         @foreach($allHiringRequests as $hiringRequests)
                                         <option value="{{$hiringRequests->id}}">{{$hiringRequests->uuid}}</option>
                                         @endforeach
@@ -151,14 +134,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
 
 
+                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 date-section-div">
+                        <div class="row">
+                            <div class="col-xxl-5 col-lg-4 col-md-5 col-sm-6 col-12 job-description-lable-name">
+                                <label for="request_date" class="col-form-label text-md-end"><span class="error">* </span> {{ __('Choose Date') }}</label>
+                            </div>
+                            <div class="col-xxl-7 col-lg-7 col-md-7 col-sm-6 col-12">
+                                <input type="date" name="request_date" id="request_date" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
+                            </div>
+                        </div>
+                    </div>
+
+
                     <!-- Location Section -->
 
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 dropdown-section-div">
+                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 dropdown-section-div location-section-div">
                         <div class="row">
-                            <div class="col-xxl-5 col-lg-4 col-md-6 col-sm-6 col-12 job-description-lable-name">
+                            <div class="col-xxl-5 col-lg-4 col-md-5 col-sm-6 col-12 job-description-lable-name">
                                 <label for="location_id" class="col-form-label widthinput heading-name"><span class="error">* </span>Location:</label>
                             </div>
-                            <div class="col-xxl-7 col-lg-6 col-md-6 col-sm-6 col-12 ">
+                            <div class="col-xxl-7 col-lg-7 col-md-7 col-sm-6 col-12 ">
                                 <div class="dropdown-option-div">
                                     <select name="location_id" id="location_name" class="form-control widthinput" multiple="true" autofocus>
                                         @foreach($masterOfficeLocations as $masterOfficeLocation)
@@ -171,13 +166,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row job-description-details-div" style="display: none;">
 
                     <!-- Job Title Section -->
-                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 title-section-div">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-12 title-section-div">
                         <div class="col-12 job-description-textfield-lable">
 
-                            <label for="job_title" class="col-form-label widthinput heading-name">Job Title</label>
+                            <label for="job_title" class="col-form-label widthinput heading-name"><b>Job Title</b></label>
                         </div>
                         <div class="col-12 job-description-text-value">
                             <div name="job_title" class="job-title"></div>
@@ -192,9 +187,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     @endforeach
 
                     <!-- Department Section -->
-                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 dep-section-div">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-12 dep-section-div">
                         <div class="col-12 job-description-textfield-lable">
-                            <label for="department_id" class="col-form-label widthinput heading-name">Department</label>
+                            <label for="department_id" class="col-form-label widthinput heading-name"><b>Department</b></label>
                         </div>
                         <div class="col-12 job-description-text-value">
                             <div name="department_id" class="department-id"></div>
@@ -203,9 +198,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <!-- </div> -->
 
                     <!-- Reporting Section -->
-                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 reporting-section-div">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-12 reporting-section-div">
                         <div class="col-12 job-description-textfield-lable">
-                            <label for="reporting_to" class="col-form-label widthinput heading-name">Reporting To</label>
+                            <label for="reporting_to" class="col-form-label widthinput heading-name"><b>Reporting To</b></label>
                         </div>
                         <div class="job-description-text-value">
                             <div name="reporting_to" class="reporting-to"></div>
@@ -324,25 +319,40 @@ redirect()->route('home')->send();
             placeholder: "Choose uuid",
         });
 
+        // Execute with changing uuid value 
+
+        function toggleJobDescriptionDetailsDiv() {
+            console.log("In div hidden section")
+            var selectedUUID = $('#uuid_value').val();
+            console.log("Selected uuid value in hidden shown div is : ", selectedUUID)
+
+            if (selectedUUID && selectedUUID.length > 0) {
+                $('.job-description-details-div').show();
+            } else {
+                $('.job-description-details-div').hide();
+            }
+        }
+
         // Execute function when there is data in currentHiringRequestId
         function setUUIDValueOnReload() {
-        if (currentHiringRequestId) {
-            for (var i = 0; i < data.length; i++) {
-                if (data[i].id == currentHiringRequestId) {
-                    $('#uuid_value').val([data[i].id]).trigger('change');
-                    $('.job-title').text(data[i].questionnaire.designation.name || '');
-                    $('.department-id').text(data[i].questionnaire.department.name || '');
-                    $('.reporting-to').text(data[i].department_head_name || '');
+            if (currentHiringRequestId) {
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].id == currentHiringRequestId) {
+                        $('#uuid_value').val([data[i].id]).trigger('change');
+                        $('.job-title').text(data[i].questionnaire.designation.name || '');
+                        $('.department-id').text(data[i].questionnaire.department.name || '');
+                        $('.reporting-to').text(data[i].department_head_name || '');
 
-                    var workLocationId = data[i].questionnaire.work_location.id;
-                    updateLocationDropdown(workLocationId);
+                        var workLocationId = data[i].questionnaire.work_location.id;
+                        updateLocationDropdown(workLocationId);
 
-                    break;
+                        toggleJobDescriptionDetailsDiv();
+                        break;
+                    }
                 }
             }
         }
-    }
-    setUUIDValueOnReload();
+        setUUIDValueOnReload();
 
         // Execute function when there is change in uuid value
 
@@ -359,6 +369,8 @@ redirect()->route('home')->send();
                 }
             }
         }
+
+        // Update the location from dropdown
 
         function updateLocationDropdown(locationId) {
             $('#location_name').val([locationId]).trigger('change');
@@ -384,8 +396,8 @@ redirect()->route('home')->send();
         });
 
 
-
         $('#uuid_value').on('change', function() {
+            toggleJobDescriptionDetailsDiv();
             var fieldName = $(this).attr('name');
             $('#employeeJobDescriptionForm').validate().element('[name="' + fieldName + '"]');
         });
@@ -400,7 +412,7 @@ redirect()->route('home')->send();
                 request_date: {
                     required: true,
                 },
-                uuid: {
+                hiring_request_id: {
                     required: true,
                 },
                 location_id: {
