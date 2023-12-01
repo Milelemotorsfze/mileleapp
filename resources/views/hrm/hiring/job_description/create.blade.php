@@ -132,8 +132,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-
-
                     <!-- Location Section -->
                     <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
                         <div class="dropdown-option-div">
@@ -149,8 +147,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <!-- date section -->
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 date-section-div">
-                            <label for="request_date" class="form-label text-md-end"><span class="error">* </span> {{ __('Choose Date') }}</label>
-                        <input type="date" name="request_date" id="request_date" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
+                        <label for="request_date" class="form-label text-md-end"><span class="error">* </span> {{ __('Choose Date') }}</label>
+                        <input type="date" name="request_date" id="request_date" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2" value="{{$jobDescription->request_date}}">
                     </div>
 
 
@@ -172,8 +170,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     @foreach($allHiringRequests as $a)
                     <!-- JobTitle :: {{$a->questionnaire->designation->name ?? ''}} -->
                     <!-- Dep Name :: {{$a->questionnaire->department->name ?? ''}}, -->
-                    <!-- Work Location :: {{$a->questionnaire->workLocation->name ?? ''}} -->
-                    <!-- Dep Head :: {{$a->department_head_name ?? ''}} -->
                     @endforeach
 
                     <!-- Department Section -->
@@ -206,7 +202,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <label for="job_purpose" class="form-label heading-name"><span class="error">* </span>Job Purpose</label>
                 </div>
                 <div class="col-lg-12  ">
-                    <textarea cols="25" rows="3" class="form-control" name="job_purpose" placeholder="Job Purpose"></textarea>
+                    <textarea cols="25" rows="3" class="form-control" name="job_purpose" placeholder="Job Purpose">{{$jobDescription->job_purpose}}</textarea>
                 </div>
             </div>
 
@@ -215,7 +211,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <label for="duties_and_responsibilities" class="form-label heading-name"><span class="error">* </span>Duties and Responsibilities (Generic) of the position </label>
                 </div>
                 <div class="col-lg-12  ">
-                    <textarea cols="25" rows="7" class="form-control" name="duties_and_responsibilities" placeholder="Duties and Responsibilities"></textarea>
+                    <textarea cols="25" rows="7" class="form-control" name="duties_and_responsibilities" placeholder="Duties and Responsibilities">{{$jobDescription->duties_and_responsibilities}}</textarea>
                 </div>
             </div>
 
@@ -225,7 +221,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <label for="skills_required" class="form-label heading-name"><span class="error">* </span>Skills required to fulfil the position </label>
                 </div>
                 <div class="col-lg-12  ">
-                    <textarea cols="25" rows="7" class="form-control" name="skills_required" placeholder="Required Skills"></textarea>
+                    <textarea cols="25" rows="7" class="form-control" name="skills_required" placeholder="Required Skills">{{$jobDescription->skills_required}}</textarea>
                 </div>
             </div>
 
@@ -235,7 +231,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <label for="position_qualification" class="form-label heading-name"><span class="error">* </span>Position Qualification (Academic & Professional) </label>
                 </div>
                 <div class="col-lg-12  ">
-                    <textarea cols="25" rows="7" class="form-control" name="position_qualification" placeholder="Position Qualification"></textarea>
+                    <textarea cols="25" rows="7" class="form-control" name="position_qualification" placeholder="Position Qualification">{{$jobDescription->position_qualification}}</textarea>
                 </div>
             </div>
 
@@ -285,7 +281,10 @@ redirect()->route('home')->send();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
     var data = <?php echo json_encode($allHiringRequests); ?>;
-    console.log("Data iiis -----", data)
+    var jobDescriptionss = <?php echo json_encode($jobDescription); ?>;
+    var jobDescriptionLocationId = jobDescriptionss.location_id
+    console.log("JD iiis -----", jobDescriptionLocationId)
+
     var currentHiringRequestValue = <?php echo json_encode($currentHiringRequest); ?>;
     var currentHiringRequestId = currentHiringRequestValue.id;
     var uuidValue = currentHiringRequestValue.uuid
@@ -295,8 +294,6 @@ redirect()->route('home')->send();
 
         var selectedUUID = $('#uuid_value').val();
         updateFieldsBasedOnUUID(selectedUUID);
-
-
 
         $('#location_name').select2({
             allowClear: true,
@@ -312,7 +309,6 @@ redirect()->route('home')->send();
         // Execute with changing uuid value 
 
         function toggleJobDescriptionDetailsDiv() {
-            console.log("In div hidden section")
             var selectedUUID = $('#uuid_value').val();
             console.log("Selected uuid value in hidden shown div is : ", selectedUUID)
 
@@ -333,7 +329,14 @@ redirect()->route('home')->send();
                         $('.department-id').text(data[i].questionnaire.department.name || '');
                         $('.reporting-to').text(data[i].department_head_name || '');
 
-                        var workLocationId = data[i].questionnaire.work_location.id;
+                        if (jobDescriptionLocationId) {
+                            console.log("in JD location value of updated location")
+                            var workLocationId = jobDescriptionLocationId;
+                        } else {
+                            console.log("In old data tbale location value")
+                            var workLocationId = data[i].questionnaire.work_location.id;
+
+                        }
                         updateLocationDropdown(workLocationId);
 
                         toggleJobDescriptionDetailsDiv();
