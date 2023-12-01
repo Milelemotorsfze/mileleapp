@@ -2,9 +2,13 @@
 <div id="csrf-token" data-token="{{ csrf_token() }}"></div>
 @section('content')
 <style>
-/*.dataTables_wrapper .table>thead>tr>th.sorting {*/
-/*  vertical-align: middle;*/
-/*}*/
+    .widthinput
+    {
+        height:32px!important;
+    }
+    .select2-container .select2-selection--single {
+        height: unset !important;
+    }
   div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
@@ -91,6 +95,64 @@
 	<br>
 </div>
 <div class="card-body">
+<div class="modal fade" id="addAgentModal" tabindex="-1" role="dialog" aria-labelledby="addAgentModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form id="form-update2_492" method="POST">
+      @csrf
+      <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title fs-5" id="adoncode">Add New Agent</h5>
+          <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="name">Name:</label>
+            <input type="text" name="name" id="name" class="form-control mb-3" placeholder="Name">
+        </div>
+
+        <div class="col-md-6 form-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" class="form-control mb-3" placeholder="Email">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="phone">Phone:</label>
+            <input type="number" name="phone" id="phone" class="form-control mb-3" placeholder="Phone">
+        </div>
+
+        <div class="col-md-6 form-group">
+            <label for="id_category">ID Category:</label>
+            <select name="id_category" id="id_category" class="form-control mb-3">
+                <option value="national_id">National ID</option>
+                <option value="emirates_id">Emirates ID</option>
+                <option value="passport_number">Passport Number</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="number">ID Number:</label>
+            <input type="text" name="id_number" id="number" class="form-control mb-3" placeholder="Id NUmber">
+        </div>
+
+        <div class="col-md-6 form-group">
+            <label for="document">Upload Document:</label>
+            <input type="file" name="identification_file" id="document" class="form-control-file mb-3">
+        </div>
+    </div>
+</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="submit_b_492" class="btn btn-primary btn-sm">Submit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  </div>
     <form action="{{ route('quotation-items.store') }}" id="form-create" method="POST" >
         @csrf
         <div class="row">
@@ -281,8 +343,14 @@
                             Incoterm :
                         </div>
                         <div class="col-sm-6">
-                            <input type="text" name="incoterm" id="incoterm" class="form-control form-control-xs" placeholder="Incoterm">
-                        </div>
+                        <select name="incoterm" id="incoterm" class="form-control form-control-xs">
+                            <option value="EXW">EXW</option>
+                            <option value="CNF">CNF</option>
+                            <option value="CIF">CIF</option>
+                            <option value="FOB">FOB</option>
+                            <option value="Local Registration">Local Registration</option>
+                        </select>
+                    </div>
                     </div>
                     <div class="row mt-2">
                         <div class="col-sm-6">
@@ -320,7 +388,7 @@
                         System Code :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="system_code" id="system_code" class="form-control form-control-xs" placeholder="System Code">
+                        <input type="number" name="system_code" id="system_code" class="form-control form-control-xs" placeholder="System Code">
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -353,18 +421,28 @@
             <div class="col-sm-4">
                 <div class="row mt-2">
                     <div class="col-sm-6">
-                        CB Name :
+                        CB Name:
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="cb_name" id="cb_name" class="form-control form-control-xs" placeholder="CB Name">
+                    <div class="input-group">
+                        <select name="cb_name" id="cb_name" class="form-control form-control-xs">
+                        </select>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" onclick="addAgentModal()">
+                                +
+                            </button>
+                        </div>
                     </div>
                 </div>
+                </div>
+                <input type="hidden" name="agents_id" id="agents_id" value="">
+            <input type="hidden" name="selected_cb_name" id="selected_cb_name" value="">
                 <div class="row mt-2">
                     <div class="col-sm-6">
-                        CB No :
+                        CB No:
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="cb_number" id="cb_number" class="form-control form-control-xs" placeholder="CB Number">
+                        <input type="text" name="cb_number" id="cb_number" class="form-control form-control-xs" placeholder="CB Number" readonly>
                     </div>
                 </div>
             </div>
@@ -406,7 +484,7 @@
                                 <thead class="bg-soft-secondary">
                                     <tr>
                                         <th>Description</th>
-                                        <th>Code</th>
+                                        <th style="margin-left: 10px;">Code</th>
                                         <th>Unit Price</th>
                                         <th>Quantity</th>
                                         <th>Total Amount</th>
@@ -538,9 +616,9 @@
                                 <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
                                     <thead class="bg-soft-secondary">
                                     <tr>
-                                        {{--                                    <th>ID</th>--}}
-                                        {{--                                    <th>Status</th>--}}
-                                        {{--                                    <th>VIN</th>--}}
+                                        {{--<th>ID</th>--}}
+                                        {{--<th>Status</th>--}}
+                                        {{--<th>VIN</th>--}}
                                         <th>Brand Name</th>
                                         <th>Model Line</th>
                                         <th>Model Details</th>
@@ -580,7 +658,7 @@
                                 <select class="form-select col" id="accessories_brand" name="accessories_brand" style="width: 100%">
                                     <option value="">Select Brand</option>
                                     <!-- <option value="allbrands">ALL BRANDS</option> -->
-                                    @foreach($accessoriesBrands as $brand)
+                                    @foreach($brands as $brand)
                                         <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
                                     @endforeach
                                 </select>
@@ -638,13 +716,14 @@
                                @foreach($sparePartsDesc as $spareParts)
                                    <option value="{{ $spareParts->id }}">{{ $spareParts->Addon->name ?? '' }}@if($spareParts->description!='') - {{$spareParts->description}}@endif</option>
                                @endforeach
+                               <option value="Other">Other</option>
                            </select>
                        </div>
                        <div class="col-lg-2 col-md-6">
                            <label for="brand"> Brand</label>
                            <select class="form-select" id="spare_parts_brand" name="spare_parts_brand" style="width: 100%">
                                <option value="">Select Brand</option>
-                               @foreach($sparePartsBrands as $brand)
+                               @foreach($brands as $brand)
                                    <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
                                @endforeach
                            </select>
@@ -712,13 +791,14 @@
                                     @foreach($kitsDesc as $kit)
                                         <option value="{{ $kit->id }}">{{ $kit->Addon->name ?? '' }}@if($kit->description!='') - {{$kit->description}}@endif</option>
                                     @endforeach
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-6">
                                 <label for="brand"> Brand</label>
                                 <select class="form-control col" id="kit_brand" name="kit_brand" style="width: 100%">
                                     <option value="">Select Brand</option>
-                                    @foreach($kitsBrands as $brand)
+                                    @foreach($brands as $brand)
                                         <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
                                     @endforeach
                                 </select>
@@ -905,7 +985,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
         <div id="otherContent" class="contentveh">
             <hr>
@@ -951,53 +1030,51 @@
                     </div>
                 </div>
             </div>
-
         </div>
         <br>
         <input type="hidden" id="old-currency-type" value="">
         <input type="hidden" id="current-currency-type" value="AED">
-
         <button type="submit" class="btn btn-primary" id="submit-button" disabled>Submit</button>
     </form>
     <div class="overlay">
-        <div class="modal" id="createNewBrand" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Create New Brand </h5>
-                        <button type="button" class="btn btn-secondary btn-sm close form-control modal-close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">X</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <div class="row modal-row">
-                                <div class="col-xxl-12 col-lg-12 col-md-12">
-                                    <span class="error">* </span>
-                                    <label for="name" class="col-form-label text-md-end ">Brand Name</label>
-                                </div>
-                                <div class="col-xxl-12 col-lg-12 col-md-12">
-								<input type="text" id="new_brand_name" class="form-control @error('brand_name') is-invalid @enderror" name="brand_name"
-                                          placeholder="Enter Brand Name" value="{{ old('brand_name') }}" oninput="checkValidation()" autofocus>
-                                    <span id="newBrandError" class="is-invalid"></span>
-                                    @error('brand_name')
-                                    <span class="invalid-feedback" role="alert">
-								<strong>{{ $message }}</strong>
-								</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm modal-close" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
-                        <button type="button" class="btn btn-primary btn-sm" id="createBrandId" style="float: right;">
-                            <i class="fa fa-check" aria-hidden="true"></i> Submit</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+{{--        <div class="modal" id="createNewBrand" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">--}}
+{{--            <div class="modal-dialog modal-dialog-centered" role="document">--}}
+{{--                <div class="modal-content">--}}
+{{--                    <div class="modal-header">--}}
+{{--                        <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Create New Brand </h5>--}}
+{{--                        <button type="button" class="btn btn-secondary btn-sm close form-control modal-close" data-dismiss="modal" aria-label="Close">--}}
+{{--                            <span aria-hidden="true">X</span>--}}
+{{--                        </button>--}}
+{{--                    </div>--}}
+{{--                    <div class="modal-body">--}}
+{{--                        <form method="POST" enctype="multipart/form-data">--}}
+{{--                            @csrf--}}
+{{--                            <div class="row modal-row">--}}
+{{--                                <div class="col-xxl-12 col-lg-12 col-md-12">--}}
+{{--                                    <span class="error">* </span>--}}
+{{--                                    <label for="name" class="col-form-label text-md-end ">Brand Name</label>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-xxl-12 col-lg-12 col-md-12">--}}
+{{--								<input type="text" id="new_brand_name" class="form-control @error('brand_name') is-invalid @enderror" name="brand_name"--}}
+{{--                                          placeholder="Enter Brand Name" value="{{ old('brand_name') }}" oninput="checkValidation()" autofocus>--}}
+{{--                                    <span id="newBrandError" class="is-invalid"></span>--}}
+{{--                                    @error('brand_name')--}}
+{{--                                    <span class="invalid-feedback" role="alert">--}}
+{{--								<strong>{{ $message }}</strong>--}}
+{{--								</span>--}}
+{{--                                    @enderror--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                        </form>--}}
+{{--                    </div>--}}
+{{--                    <div class="modal-footer">--}}
+{{--                        <button type="button" class="btn btn-secondary btn-sm modal-close" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>--}}
+{{--                        <button type="button" class="btn btn-primary btn-sm" id="createBrandId" style="float: right;">--}}
+{{--                            <i class="fa fa-check" aria-hidden="true"></i> Submit</button>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        </div>--}}
         <div class="modal" id="createNewModelLine" tabindex="-1" role="dialog" aria-labelledby="exampleModalLineCenteredLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -1013,10 +1090,32 @@
                             <div class="row modal-row">
                                 <div class="col-xxl-12 col-lg-12 col-md-12">
                                     <span class="error">* </span>
+                                    <label for="name" class="col-form-label text-md-end" >Brand</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-9 col-md-9 col-sm-12">
+                                    <input type="text" class="form-control new_brand  @error('brand_name') is-invalid @enderror" oninput="checkBrandValidation()" placeholder="Enter Brand Name" id="new-brand"  name="brand_name" hidden>
+                                    <div id="brand-list-div">
+                                        <select onchange="checkBrandValidation()" class="form-control new_brand @error('brand_name') is-invalid @enderror"
+                                                name="brand_name" id="brand-from-list" style="width: 100%">
+                                            <option></option>
+                                            @foreach($brands as $brand)
+                                                <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <span id="newBrandError" class="is-invalid" style="margin-top: 20px" ></span>
+                                </div>
+
+                                <div class="col-xxl-3 col-lg-3 col-md-3 col-sm-12">
+                                    <a> <button type="button" class="btn btn-info add-new-button" >Add New</button> </a>
+                                    <a> <button type="button" class="btn btn-info add-existing-brand-button" hidden>Add From List</button> </a>
+                                </div>
+                                <div class="col-xxl-12 col-lg-12 col-md-12 mt-2">
+                                    <span class="error">* </span>
                                     <label for="name" class="col-form-label text-md-end">Model Line</label>
                                 </div>
                                 <div class="col-xxl-12 col-lg-12 col-md-12">
-                                    <input type="text" id="new_model_line_name" class="form-control @error('model_line') is-invalid @enderror" name="model_line"
+                                    <input type="text" id="new_model_line_name" class="form-control  @error('model_line') is-invalid @enderror" name="model_line"
                                            placeholder="Enter Model Line Name" value="{{ old('model_line') }}" oninput="checkModelLine()" autofocus>
                                     <span id="newModelLineError" class="is-invalid"></span>
                                     @error('model_line')
@@ -1041,6 +1140,79 @@
 @endsection
 @push('scripts')
 <script>
+     function addAgentModal() {
+  $('#addAgentModal').modal('show');
+}
+$(document).ready(function () {
+    $('#cb_name').change(function () {
+        var selectedAgentId = $(this).val();
+        var selectedAgentName = $(this).find(':selected').text();
+
+        $('#agents_id').val(selectedAgentId);
+        $('#selected_cb_name').val(selectedAgentName);
+    });
+    // Fetch agent names dynamically on page load
+    fetchAgentData();
+
+    // Function to fetch agent names via AJAX
+    function fetchAgentData() {
+        $.ajax({
+            url: "{{ route('agents.getAgentNames') }}",
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                // Clear existing options
+                $('#cb_name').empty();
+                $('#cb_name').append('<option value="" disabled selected>Select Agent</option>');
+                // Add fetched options
+                $.each(data, function (index, agent) {
+                    $('#cb_name').append('<option value="' + agent.id + '">' + agent.name + '</option>');
+                });
+
+                // Update CB No on change
+                $('#cb_name').change(function () {
+                    var selectedAgentId = $(this).val();
+                    var selectedAgent = data.find(agent => agent.id == selectedAgentId);
+
+                    if (selectedAgent) {
+                        $('#cb_number').val(selectedAgent.phone).trigger('change');
+                    } else {
+                        $('#cb_number').val('').trigger('change');
+                    }
+                });
+            },
+            error: function (error) {
+                console.error('Error fetching agent data:', error);
+            }
+        });
+    }
+
+    // Intercept form submission and handle it through AJAX
+    $('#form-update2_492').submit(function (e) {
+        e.preventDefault();
+        var formData = new FormData($(this)[0]);
+
+        $.ajax({
+            url: "{{ route('agents.store') }}",
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                $('#cb_name').append('<option value="' + response.agent_id + '">' + response.name + '</option>');
+                $('#cb_name').val(response.agent_id).trigger('change');
+                $('#cb_number').val(response.phone).trigger('change');
+                $('#form-update2_492')[0].reset();
+                $('#addAgentModal').modal('hide');
+            },
+            error: function (error) {
+                console.error('Error submitting form:', error);
+            }
+        });
+    });
+});
+</script>
+<script>
         var radioButtons = document.querySelectorAll('input[type="radio"]');
         var contentDivs = document.querySelectorAll('.contentveh');
         radioButtons.forEach(function (radioButton, index) {
@@ -1057,17 +1229,21 @@
     </script>
 <script>
 
-    function checkValidation()
+    function checkBrandValidation()
     {
-        var value = $('#new_brand_name').val();
-        if(value == '')
+        var value = $("#brand-from-list").val();
+        var newBrand = $('#new-brand').val();
+        // alert(value);
+        if(value == '' || newBrand == '')
         {
             $msg = 'Brand Name is Required';
             showNewBrandError($msg);
         }
         else
         {
-            removeNewBrandError();
+            // alert("ok");
+            $msg=""
+            removeNewBrandError($msg);
         }
     }
     function checkModelLine() {
@@ -1096,17 +1272,38 @@
     function showNewBrandError($msg)
     {
         document.getElementById("newBrandError").textContent=$msg;
-        document.getElementById("new_brand_name").classList.add("is-invalid");
+        document.getElementById("brand-from-list").classList.add("is-invalid");
+        document.getElementById("new-brand").classList.remove("is-invalid");
         document.getElementById("newBrandError").classList.add("paragraph-class");
     }
-    function removeNewBrandError()
+    function removeNewBrandError($msg)
     {
-        document.getElementById("newBrandError").textContent="";
-        document.getElementById("new_brand_name").classList.remove("is-invalid");
+        document.getElementById("newBrandError").textContent=$msg;
+        document.getElementById("brand-from-list").classList.remove("is-invalid");
+        document.getElementById("new-brand").classList.remove("is-invalid");
         document.getElementById("newBrandError").classList.remove("paragraph-class");
     }
 
     $(document).ready(function() {
+        $('.add-new-button').on('click', function(){
+
+            $('#brand-list-div').attr('hidden', true);
+            $('#new-brand').attr('hidden', false);
+            $('.add-existing-brand-button').attr('hidden', false);
+            $('.add-new-button').hide();
+            $("#brand-from-list option:selected").prop("selected", false);
+            $("#brand-from-list").trigger('change.select2');
+
+        });
+        $('.add-existing-brand-button').on('click', function(){
+            $('#new-brand').attr('hidden', true);
+            $('#new-brand').val("");
+            $('#brand-list-div').attr('hidden', false);
+            $('.add-new-button').show();
+            $('.add-existing-brand-button').attr('hidden', true);
+
+        });
+
         $('#dtBasicExample2 tbody').on('click', '.checkbox-hide', function(e) {
             var id = this.id;
             if($(this).is(':unchecked')) {
@@ -1172,48 +1369,53 @@
         {
             // create new addon and list new addon in addon list
             var model_line = $('#new_model_line_name').val();
-            var brand = $('#brand').val();
-
-            if(model_line == '')
-            {
-                $msg = 'Model Line Name is Required';
-                showNewModelLineError($msg);
+            var brand = $("input[name=brand_name]").val();
+            var existingBrand = $("#brand-from-list").val();
+            var newBrand = $('#new-brand').val();
+            checkBrandValidation();
+            checkModelLine();
+            if(existingBrand != "") {
+                var barnd = existingBrand;
+            }else{
+                var brand = newBrand;
             }
-            else
-            {
-                $.ajax
-                ({
-                    url:"{{route('model-lines.store')}}",
-                    type: "POST",
-                    data:
+
+             if(model_line != "" && brand != "") {
+                 alert("ok");
+                    $.ajax
+                    ({
+                        url:"{{route('model-lines.store')}}",
+                        type: "POST",
+                        data:
+                            {
+                                model_line: model_line,
+                                brand_id: brand,
+                                request_from: 'Quotation',
+                                _token: '{{csrf_token()}}'
+                            },
+                        dataType : 'json',
+                        success: function(result)
                         {
-                            model_line: model_line,
-                            brand_id: brand,
-                            request_from: 'Quotation',
-                            _token: '{{csrf_token()}}'
-                        },
-                    dataType : 'json',
-                    success: function(result)
-                    {
-                        if(result.error) {
-                            $msg = result.error;
-                            showNewModelLineError($msg);
-                        }else{
-                            $('.overlay').hide();
-                            $('.modal').removeClass('modalshow');
-                            $('.modal').addClass('modalhide');
-                            $('#model_line').append("<option value='" + result.id + "'>" + result.model_line + "</option>");
-                            $('#model_line').val(result.id);
-                            $('#model_line').prop('disabled', false);
+                            if(result.error) {
+                                $msg = result.error;
+                                showNewModelLineError($msg);
+                            }else{
+                                $('.overlay').hide();
+                                $('.modal').removeClass('modalshow');
+                                $('.modal').addClass('modalhide');
+                                $('#model_line').append("<option value='" + result.id + "'>" + result.model_line + "</option>");
+                                $('#model_line').val(result.id);
+                                $('#model_line').prop('disabled', false);
 
-                            $('#new_model_line_name').val("");
-                            $msg = "";
-                            removeNewModelLineError();
+                                $('#new_model_line_name').val("");
+                                $msg = "";
+                                removeNewModelLineError();
+                            }
                         }
-                    }
-                });
+                    });
 
-            }
+                }
+
         });
 
         $('.modal-button').on('click', function()
@@ -1238,6 +1440,10 @@
         var otherTable = $('#other-document-table').DataTable();
 
         $('#brand').select2();
+
+        $('#brand-from-list').select2({
+            placeholder: "Select Brand"
+        });
         $('#model_line').select2();
         $('#variant').select2();
         $('#interior_color').select2();
@@ -1568,8 +1774,8 @@
                 render: function (data, type, row) {
                     var directAdd = "";
                     var directAdd = 'Direct-Add';
-                    var arrayIndex = row['index'] - 1;
-                    return ' <input type="checkbox" name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide" checked id="checkbox-'+ row['index'] +'"> <button class="circle-buttonr remove-button"  data-button-type="'+ directAdd +'">Remove</button>';
+
+                    return '<button class="circle-buttonr remove-button"  data-button-type="'+ directAdd +'">Remove</button>';
 
             }
             // defaultContent: '<button class="circle-buttonr remove-button" >Remove</button>'
@@ -1613,7 +1819,6 @@
                 targets: -6,
                 data: null,
                 render: function (data, type, row) {
-
                     var combinedValue = "";
                     if(row['button_type'] == 'Vehicle') {
                         var brand = row[0];
@@ -1648,17 +1853,23 @@
                         if(row[6] == "") {
                             var comma5 = " ";
                         }
-                        combinedValue =  row[0] + comma0 + row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5]+ comma5 + row[6];
+                        combinedValue =  row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5]+ comma5 + row[6];
+                        if(row['table_type'] !== 'vehicle-table') {
+                            combinedValue = row[0] + comma0 + combinedValue;
+                        }
                     }
-
-                    return '<input type="text" name="descriptions[]" required class="combined-value-editable form-control" value="' + combinedValue + '"/>';
+                    var arrayIndex = row['index'] - 1;
+                    return '<div class="row" style="flex-wrap: unset">' +
+                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;" name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide" checked id="checkbox-'+ row['index'] +'"> ' +
+                        '<input type="text" name="descriptions[]" required class="combined-value-editable form-control" value="' + combinedValue + '"/>' +
+                        '</div> ';
                 }
             },
             {
                 targets: -5,
                 data: null,
                 render: function (data, type, row) {
-                    console.log(row);
+
                     var code = "";
                     if(row['button_type'] == 'Vehicle') {
                         var code = row[3];
@@ -1667,16 +1878,16 @@
 
                         var code = row[1];
                     }else if(row['button_type'] == 'Direct-Add') {
-                        var code = row[6];
-                        if(row['table_type'] == 'vehicle-table') {
-                            var code = row[2]
-                        }
+                        var code = row[2];
+                        // if(row['table_type'] == 'vehicle-table') {
+                        //     var code = row[2]
+                        // }
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         code = row[1];
                     }
 
-                    return code;
+                    return '<span style="margin-left: 10px;">'+ code +'</span>';
                 }
             },
             {

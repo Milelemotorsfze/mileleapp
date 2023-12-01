@@ -35,6 +35,17 @@
         align-items: center;
     }
 
+    .job-description-textfield-lable, .job-description-text-value
+    /* .reporting-section-div, .dep-section-div, .title-section-div */
+    {
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    
+
     /* @media (min-width: 767px) {
     .location-reporting-dic{
         margin-top: 15px;
@@ -57,7 +68,10 @@
 
     @media (max-width: 425px) {
         .heading-name {
-            font-size: smaller !important;
+            font-size: 14px !important;
+        }
+     .job-description-text-value {
+            font-size: 13px !important;
         }
     }
 </style>
@@ -131,62 +145,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <!-- ID Number Section -->
 
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 dropdown-section-div">
-                        <div class="row">
-                            <div class="col-xxl-5 col-lg-4 col-md-6 col-sm-6 col-12 job-description-lable-name">
-                                <label for="sl_no" class="form-label heading-name"><span class="error">* </span>{{ __('Sl. Number:') }}</label>
-                            </div>
-                            <div class="col-xxl-7 col-lg-6 col-md-6 col-sm-6 col-12">
-                                <div class="dropdown-option-div">
-                                    <select name="sl_no" id="sl_number" class="form-control widthinput" multiple="true" autofocus>
-                                        @foreach($allHiringRequests as $hiringRequests)
-                                        <option value="{{$hiringRequests->id}}">{{$hiringRequests->id}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- </div> -->
-                    <br />
-                    <!-- <div class="row"> -->
-
-                    <!-- Job Title Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 title-section-div">
-                        <div class="row">
-                            <div class="col-xxl-5 col-lg-4 col-md-6 col-sm-6 col-12 job-description-lable-name">
-
-                                <label for="job_title" class="col-form-label widthinput heading-name"><span class="error">* </span>Job Title:</label>
-                            </div>
-                            <div class="col-xxl-7 col-lg-6 col-md-6 col-sm-6 col-12 ">
-                                <input type="text" class="form-control " name="job_title" id="job_title" value="" readonly>
-                            </div>
-                        </div>
-                    </div>
-
-                    @foreach($allHiringRequests as $a)
-                    <!-- JobTitle :: {{$a->questionnaire->designation->name ?? ''}} -->
-                    <!-- Dep Name :: {{$a->questionnaire->department->name ?? ''}}, -->
-                    <!-- Work Location :: {{$a->questionnaire->workLocation->name ?? ''}} -->
-                    <!-- Dep Head :: {{$a->department_head_name ?? ''}} -->
-                    @endforeach
-
-                    <!-- Department Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 dep-section-div">
-                        <div class="row">
-                            <div class="col-xxl-5 col-lg-4 col-md-6 col-sm-6 col-12 job-description-lable-name">
-                                <label for="department_id" class="col-form-label widthinput heading-name"><span class="error">* </span>Department:</label>
-                            </div>
-                            <div class="col-xxl-7 col-lg-6 col-md-6 col-sm-6 col-12">
-                                <input type="text" class="form-control " name="department_id" id="department_id" readonly>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- </div> -->
-                    <!-- <div class="row location-reporting-div"> -->
                     <!-- Location Section -->
 
                     <div class="col-lg-6 col-md-6 col-sm-10 col-12 dropdown-section-div">
@@ -205,16 +164,46 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="row">
+
+                    <!-- Job Title Section -->
+                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 title-section-div">
+                        <div class="col-12 job-description-textfield-lable">
+
+                            <label for="job_title" class="col-form-label widthinput heading-name">Job Title</label>
+                        </div>
+                        <div class="col-12 job-description-text-value">
+                            <div name="job_title" class="job-title"></div>
+                        </div>
+                    </div>
+
+                    @foreach($allHiringRequests as $a)
+                    <!-- JobTitle :: {{$a->questionnaire->designation->name ?? ''}} -->
+                    <!-- Dep Name :: {{$a->questionnaire->department->name ?? ''}}, -->
+                    <!-- Work Location :: {{$a->questionnaire->workLocation->name ?? ''}} -->
+                    <!-- Dep Head :: {{$a->department_head_name ?? ''}} -->
+                    @endforeach
+
+                    <!-- Department Section -->
+                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 dep-section-div">
+                        <div class="col-12 job-description-textfield-lable">
+                            <label for="department_id" class="col-form-label widthinput heading-name">Department</label>
+                        </div>
+                        <div class="col-12 job-description-text-value">
+                            <div name="department_id" class="department-id"></div>
+                        </div>
+                    </div>
+                    <!-- </div> -->
 
                     <!-- Reporting Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 reporting-section-div">
-                        <div class="row">
-                            <div class="col-xxl-5 col-lg-4 col-md-6 col-sm-6 col-12 job-description-lable-name">
-                                <label for="reporting_to" class="col-form-label widthinput heading-name"><span class="error">* </span>Reporting To:</label>
-                            </div>
-                            <div class="col-xxl-7 col-lg-6 col-md-6 col-sm-6 col-12">
-                                <input type="text" class="form-control " name="reporting_to" id="reporting_to" readonly>
-                            </div>
+                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 reporting-section-div">
+                        <div class="col-12 job-description-textfield-lable">
+                            <label for="reporting_to" class="col-form-label widthinput heading-name">Reporting To</label>
+                        </div>
+                        <div class="job-description-text-value">
+                            <div name="reporting_to" class="reporting-to"></div>
                         </div>
                     </div>
                 </div>
@@ -302,36 +291,32 @@ redirect()->route('home')->send();
 @endsection
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
+<script type="text/javascript">
+    var data = {!!json_encode($allHiringRequests) !!};
+    console.log("JD Data --- ;");
 
-<script>
-    $(document).ready(function() {
+        $(document).ready(function() {
 
         function updateFields(selectedRequest, selectedDropdown) {
             if (selectedRequest) {
 
                 $('#uuid_display').text(selectedRequest.uuid);
-                $('#sl_number_display').text(selectedRequest.id);
-                $('input[name="job_title"]').val(selectedRequest.questionnaire?.designation?.name);
-                $('input[name="department_id"]').val(selectedRequest.questionnaire?.department?.name);
+                console.log("Title job: ---", selectedRequest.questionnaire?.designation?.name)
+                $('div[name="job_title"]').text(selectedRequest.questionnaire?.designation?.name);
+                $('div[name="department_id"]').text(selectedRequest.questionnaire?.department?.name);
                 $('#location_name').val(selectedRequest.questionnaire?.work_location?.id).trigger('change.select2');
-                $('input[name="reporting_to"]').val(selectedRequest.department_head_name);
+                $('div[name="reporting_to"]').text(selectedRequest.department_head_name);
 
                 $('#employeeJobDescriptionForm').validate().resetForm();
                 $('#employeeJobDescriptionForm').find('.error').removeClass('select-error other-error');
-
-
-                if (selectedDropdown === 'uuid_value' && $('#sl_number').val() != selectedRequest.id) {
-                    $('#sl_number').val(selectedRequest.id).trigger('change');
-                } else if (selectedDropdown === 'sl_number' && $('#uuid_value').val() != selectedRequest.id) {
-                    $('#uuid_value').val(selectedRequest.id).trigger('change');
-                }
             } else {
                 $('#uuid_display').text('');
-                $('#sl_number_display').text('');
-                $('input[name="job_title"]').val('');
-                $('input[name="department_id"]').val('');
+                $('div[name="job_title"]').text('');
+                $('div[name="department_id"]').text('');
                 $('#location_name').val('');
-                $('input[name="reporting_to"]').val('');
+                $('div[name="reporting_to"]').text('');
             }
         }
 
@@ -344,12 +329,6 @@ redirect()->route('home')->send();
             return location ? location.name : '';
         }
 
-
-        $('#sl_number').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose Sl Number",
-        });
         $('#uuid_value').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -378,23 +357,6 @@ redirect()->route('home')->send();
             }
         });
 
-        $('#sl_number').on('change', function() {
-            var selectedSlNumber = $(this).val();
-
-            if (selectedSlNumber !== null && selectedSlNumber !== undefined) {
-                var hiringRequest = <?php echo json_encode($allHiringRequests); ?>;
-                var selectedRequest = hiringRequest.find(function(request) {
-                    return request.id == selectedSlNumber;
-                });
-
-                updateFields(selectedRequest, 'sl_number');
-            } else {
-                console.log("Else in Sl Number");
-                updateFields(null, 'sl_number');
-            }
-
-        });
-
         $('#location_id').on('change', function() {
             var selectedLocationName = $(this).val();
 
@@ -417,11 +379,6 @@ redirect()->route('home')->send();
             $('#employeeJobDescriptionForm').validate().element('[name="' + fieldName + '"]');
         });
 
-        $('#sl_number').on('change', function() {
-            var fieldName = $(this).attr('name');
-            $('#employeeJobDescriptionForm').validate().element('[name="' + fieldName + '"]');
-        });
-
         $('#location_name').on('change', function() {
             var fieldName = $(this).attr('name');
             $('#employeeJobDescriptionForm').validate().element('[name="' + fieldName + '"]');
@@ -435,19 +392,7 @@ redirect()->route('home')->send();
                 uuid: {
                     required: true,
                 },
-                sl_no: {
-                    required: true,
-                },
-                job_title: {
-                    required: true,
-                },
-                department_id: {
-                    required: true,
-                },
                 location_id: {
-                    required: true,
-                },
-                reporting_to: {
                     required: true,
                 },
                 job_purpose: {

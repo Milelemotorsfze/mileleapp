@@ -676,6 +676,16 @@
                                             </a>
                                         </div>
                                         @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('agents');
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('agents.index') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Agents </span>
+                                            </a>
+                                        </div>
+                                        @endif
+                                        @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('vendor-view');
                                         @endphp
                                         @if ($hasPermission)
@@ -936,9 +946,7 @@
     </div>
     <!-- </div> -->
 </div>
-
 @include('partials/pushveh')
-
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         function moveMenuItems() {

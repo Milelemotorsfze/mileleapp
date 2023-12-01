@@ -114,4 +114,12 @@ class ModelLinesController extends Controller
     {
         //
     }
+    public function StoreModellineOrBrand(Request $request) {
+        $this->validate($request, [
+            'brand' => 'required|unique:master_brands,brand',
+            'model_line' => 'required|unique:master_model_lines,model_line'
+        ]);
+
+
+    }
 }

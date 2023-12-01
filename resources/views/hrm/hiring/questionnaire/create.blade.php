@@ -914,6 +914,8 @@ redirect()->route('home')->send();
             placeholder: "Choose Additional Languages",
         });
 
+    });
+
     $('select[multiple="true"]').on('change', function() {
         var fieldName = $(this).attr('name');
         $('#employeeQuestionnaireForm').validate().element('[name="' + fieldName + '"]');
@@ -1329,10 +1331,9 @@ redirect()->route('home')->send();
                 error.insertAfter(element);
             }
         },
-    }),
 
-});
-    
+
+    });
 </script>
 
 <script>

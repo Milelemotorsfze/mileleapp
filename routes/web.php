@@ -76,6 +76,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\HRM\Hiring\EmployeeLeaveController;
 use App\Http\Controllers\HRM\Hiring\EmployeeLiabilityController;
 use App\Http\Controllers\HRM\Hiring\InterviewSummaryReportController;
+use App\Http\Controllers\AgentsController;
 /*
 /*
 |--------------------------------------------------------------------------
@@ -598,6 +599,7 @@ Route::get('/d', function () {
     Route::resource('dm-customers', CustomerController::class);
     Route::get('master-model/getLoiDescription', [MasterModelController::class,'getLoiDescription'])
         ->name('master-model.get-loi-description');
+    Route::post('quotation/new-model-line', [ModelLinesController::class,'StoreModellineOrBrand'])->name('modelline-or-brand.store');
 
     // DASHBOARD PARTS AND PROCURMENT
 
@@ -610,5 +612,7 @@ Route::get('/d', function () {
     Route::resource('Shipping', ShippingController::class);
     Route::post('shipping/updateprice', [ShippingController::class, 'updateprice'])->name('shipping.updateprice');
 
-
+    //Agents
+    Route::resource('agents', AgentsController::class);
+    Route::get('/get-agent-names', [AgentsController::class, 'getAgentNames'])->name('agents.getAgentNames');
     });

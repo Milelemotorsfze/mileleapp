@@ -36,6 +36,7 @@ class JobDescriptionController extends Controller
     }
     public function createOrEdit($id, $hiring_id) {
         $jobDescription = JobDescription::where('id',$id)->first();
+        // dd($jobDescription);
         if(!$jobDescription) {
             $jobDescription = new JobDescription();
             $jobDescriptionId = 'new';           
@@ -51,13 +52,16 @@ class JobDescriptionController extends Controller
             $currentHiringRequest = EmployeeHiringRequest::where('id',$jobDescription->hiring_request_id)->first();
         }
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
-        $allHiringRequests = EmployeeHiringRequest::whereHas('questionnaire')->with('questionnaire.department','questionnaire.designation')->get();
+        $allHiringRequests = EmployeeHiringRequest::all();
         return view('hrm.hiring.job_description.create',compact('jobDescriptionId','currentHiringRequest','jobDescription','masterOfficeLocations','allHiringRequests'));
     }
     public function storeOrUpdate(Request $request, $id) { 
         dd('hi');
         $validator = Validator::make($request->all(), [
+            // 'job_title' => 'required',
+            // 'department_id' => 'required',
             'location_id' => 'required',
+            // 'reporting_to' => 'required',
             'job_purpose' => 'required',
             'duties_and_responsibilities' => 'required',
             'skills_required' => 'required',
@@ -92,7 +96,10 @@ class JobDescriptionController extends Controller
                 else {
                     $update = JobDescription::find($id);
                     if($update) {
+                        $update->job_title = $request->job_title;
+                        $update->department_id = $request->department_id;
                         $update->location_id = $request->location_id;
+                        $update->reporting_to = $request->reporting_to;
                         $update->job_purpose = $request->job_purpose;
                         $update->duties_and_responsibilities = $request->duties_and_responsibilities;
                         $update->skills_required = $request->skills_required;
@@ -113,7 +120,6 @@ class JobDescriptionController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
             }
         }
     }
