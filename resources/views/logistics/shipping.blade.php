@@ -105,8 +105,7 @@
                   <th>Addon Code No</th>
                   <th>Name</th>
                   <th>Description</th>
-                  <th>Price</th>
-                  <th>Action</th>
+                  <th>View</th>
                 </tr>
               </thead>
               <tbody>
@@ -183,22 +182,23 @@
             columns: [
               {
                     data: 'id',
-                    name: 'shipping_charges.id',
+                    name: 'shipping_medium.id',
                     render: function (data) {
                         return 'S-' + data.toString().padStart(3, '0');
                     }
                 },
-                { data: 'name', name: 'shipping_charges.name' },
-                { data: 'description', name: 'shipping_charges.description' },
-                { data: 'price', name: 'shipping_charges.price' },
+                { data: 'name', name: 'shipping_medium.name' },
+                { data: 'description', name: 'shipping_medium.description' },
                 {
-            data: null,
-            render: function (data) {
-                return `<button class="btn btn-warning price-update" data-id="${data.id}" data-table-id="dtBasicExample1" data-current-price="${data.price}">
-                            <i class="fa fa-plus"></i>
-                        </button>`;
-            }
-        }
+    data: null,
+    render: function (data) {
+        var editRoute = "{{ route('shipping_medium.openmedium', ':id') }}";
+        editRoute = editRoute.replace(':id', data.id);
+        return `<a href="${editRoute}" class="btn btn-info btn-sm">
+        <i class="fa fa-arrow-circle-right"></i>
+                </a>`;
+    }
+}
             ]
         });
         $('#dtBasicExample2').DataTable({

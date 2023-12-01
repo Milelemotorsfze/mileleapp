@@ -611,7 +611,8 @@ Route::get('/d', function () {
     Route::post('logisticsdocuments/sendingbl', [DocumentController::class, 'updatedocbl'])->name('logisticsdocuments.updatedocbl');
     Route::resource('Shipping', ShippingController::class);
     Route::post('shipping/updateprice', [ShippingController::class, 'updateprice'])->name('shipping.updateprice');
-
+    Route::get('shipping_medium/{id}', [ShippingController::class, 'openmedium'])->name('shipping_medium.openmedium');
+    Route::get('/shipping_rates/{id}', [ShippingController::class, 'shippingrates'])->name('shipping_medium.shippingrates');
     //Agents
     Route::resource('agents', AgentsController::class);
     Route::get('/get-agent-names', [AgentsController::class, 'getAgentNames'])->name('agents.getAgentNames');

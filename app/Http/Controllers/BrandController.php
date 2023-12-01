@@ -43,7 +43,6 @@ class BrandController extends Controller
             ['data' => 'action', 'name' => 'action','title' => 'Action'],
 
         ]);
-
         return view('brands.index', compact('html'));
     }
 

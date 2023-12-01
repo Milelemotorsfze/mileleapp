@@ -128,6 +128,7 @@ input[type=number]::-webkit-outer-spin-button {
                     @foreach ($countries as $country)
                     <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
                     @endforeach
+                    <option value="Not Mentioned" data-value="Not Mentioned">Not Mentioned</option>
                     </datalist>
                         </div>
                         <div class="col-lg-4 col-md-6">
