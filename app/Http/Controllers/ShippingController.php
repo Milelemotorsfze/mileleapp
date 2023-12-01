@@ -266,8 +266,8 @@ class ShippingController extends Controller
     // Retrieve vendor names for each shipping record
     $vendorNames = [];
     foreach ($shipping as $record) {
-        $vendor = DB::table('vendors')->where('id', $record->vendors_id)->first();
-        $vendorNames[$record->id] = $vendor->trade_name_or_individual_name ?? '';
+        $vendor = DB::table('suppliers')->where('id', $record->suppliers_id)->first();
+        $vendorNames[$record->id] = $vendor->supplier ?? '';
     }
     // Retrieve port names for each shipping record
     $toPortNames = [];
@@ -329,9 +329,9 @@ public function shippingrates (Builder $builder, $id)
         ->get();
     if (request()->ajax()) {
         return DataTables::of($shippingRates)
-            ->editColumn('vendors_id', function ($query) {
-                $vendor = DB::table('vendors')->where('id', $query->vendors_id)->first();
-                return $vendor->trade_name_or_individual_name ?? '';
+            ->editColumn('suppliers_id', function ($query) {
+                $vendor = DB::table('suppliers')->where('id', $query->suppliers_id)->first();
+                return $vendor->supplier ?? '';
             })
             ->editColumn('created_by', function ($query) {
                 $creator = DB::table('users')->where('id', $query->created_by)->first();
@@ -354,7 +354,7 @@ public function shippingrates (Builder $builder, $id)
             ->toJson();
     }
     $html = $builder->columns([
-        ['data' => 'vendors_id', 'name' => 'vendors_id', 'title' => 'Vendor Name'],
+        ['data' => 'suppliers_id', 'name' => 'suppliers_id', 'title' => 'Vendor Name'],
         ['data' => 'cost_price', 'name' => 'cost_price', 'title' => 'Cost Price'],
         ['data' => 'selling_price', 'name' => 'selling_price', 'title' => 'Selling Price'],
         ['data' => 'created_by', 'name' => 'created_by', 'title' => 'Created By'],

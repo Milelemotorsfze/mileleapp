@@ -111,17 +111,19 @@ class InterviewSummaryReportController extends Controller
         'masterGender','interviewersNames','hiringrequests'));
     }
     public function updateRoundSummary(Request $request) {
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'id' => 'required',
             'round' => 'required',         
             'date' => 'required',
-            'interviewers_id' => 'required',
+            'interviewer_id' => 'required',
             'comment' => 'required',
         ]);
         if ($validator->fails()) {
-            $data['error'] = true;
-            $data['msg'] = $validator->messages()->all();
-            return response()->json($data);
+            // $data['error'] = true;
+            // $data['msg'] = $validator->messages()->all();
+            // return response()->json($data);
+            return redirect()->back()->withInput()->withErrors($validator);
         }
         else {
             DB::beginTransaction();
@@ -165,7 +167,9 @@ class InterviewSummaryReportController extends Controller
                     }
                 }
                 DB::commit();
-                return response()->json('success');
+                // return response()->json('success');
+                return redirect()->route('interview-summary-report.index')
+                                    ->with('success',$request->round.' Round Interview Summary Report Created Successfully');
             } 
             catch (\Exception $e) {
                 DB::rollback();
