@@ -179,61 +179,73 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 								<div class="modal-dialog ">
 									<div class="modal-content">
-										<div class="modal-header">
-											<h1 class="modal-title fs-5" id="exampleModalLabel">Telephonic Interview Summary</h1>
-											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-										</div>
-										<div class="modal-body p-3">
-											<div class="col-lg-12">
-												<div class="row">
-													<div class="col-12">
-														<div class="row">
-															<div class="col-xxl-6 col-lg-6 col-md-6">
-																<label for="date" class="form-label font-size-13">{{ __('Telephonic Interview Date') }}</label>
-															</div>
-															<div class="col-xxl-6 col-lg-6 col-md-6">
-																<!-- <input type="text" name="round" id="round-{{$data->id}}" value="telephonic" hidden> -->
-																<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2" required>
-																<span id="date_error_{{$data->id}}" class="required-class paragraph-class"></span>
+										<form method="POST" action="{{route('interview-summary-report.round-summary')}}" id="form_{{$data->id}}">
+											@csrf
+											<div class="modal-header">
+												<h1 class="modal-title fs-5" id="exampleModalLabel">Telephonic Interview Summary {{$data->id}}</h1>
+												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+											</div>
+											<div class="modal-body p-3">
+												<div class="col-lg-12">
+													<div class="row">
+														<div class="col-12">
+															<div class="row">
+																<div class="col-xxl-6 col-lg-6 col-md-6">
+																	<label for="date" class="form-label font-size-13">{{ __('Telephonic Interview Date') }}</label>
+																</div>
+																<div class="col-xxl-6 col-lg-6 col-md-6">
+																<input type="text" name="id" value="{{$data->id}}" hidden>
 
+																<input type="text" name="round" value="telephonic" hidden>
+
+																	<!-- <input type="text" name="round" id="round-{{$data->id}}" value="telephonic" hidden> -->
+																	<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
+																	<span id="date_error_{{$data->id}}" class="required-class paragraph-class"></span>
+
+																</div>
 															</div>
-														</div>
-														<div class="row">
-															@if(isset($interviewersNames))
-																@if(count($interviewersNames) > 0)
-																	<div class="col-lg-12 col-md-12 col-sm-12">
-																		<label class="form-label font-size-13">Choose Telephonic Interviewers Names</label>
-																	</div>
-																	<div class="col-lg-12 col-md-12 col-sm-12">
-																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
-																		class="interviewer_id form-control widthinput" autofocus required>
-																			@foreach($interviewersNames as $interviewer)
-																				<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
-																			@endforeach
-																		</select>
-																		<span id="interviewer_id_error_{{$data->id}}" class="required-class paragraph-class"></span>
-																	</div>
+															<div class="row">
+																@if(isset($interviewersNames))
+																	@if(count($interviewersNames) > 0)
+																		<div class="col-lg-12 col-md-12 col-sm-12">
+																			<label class="form-label font-size-13">Choose Telephonic Interviewers Names</label>
+																		</div>
+																		<div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
+																		<div class="dropdown-option-div">
+																			<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
+																			class="interviewer_id form-control widthinput" autofocus>
+																				@foreach($interviewersNames as $interviewer)
+																					<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
+																				@endforeach
+																			</select>
+																			<span id="interviewer_id_error_{{$data->id}}" class="required-class paragraph-class"></span>
+																		</div>
+																		</div>
+																	@endif
 																@endif
-															@endif
-															<div class="col-lg-12 col-md-12 col-sm-12">
-																<label class="form-label font-size-13">Comments</label>
-															</div>
-															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="interview_summary" required>
-																</textarea>
-																<span id="comment-error-{{$data->id}}" class="required-class paragraph-class"></span>
+																<div class="col-lg-12 col-md-12 col-sm-12">
+																	<label class="form-label font-size-13">Comments</label>
+																</div>
+																<div class="col-lg-12 col-md-12 col-sm-12">
+																	<!-- <textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment1">
+																	</textarea> -->
+																	<textarea rows="5" id="comment-{{$data->id}}" type="text" class="form-control @error('comment') is-invalid @enderror"
+						name="comment" placeholder="" value="{{ old('comment') }}"  autocomplete="comment"
+						autofocus></textarea>
+																	<span id="comment-error-{{$data->id}}" class="required-class paragraph-class"></span>
 
+																</div>
 															</div>
 														</div>
 													</div>
 												</div>
 											</div>
-										</div>
-										<div class="modal-footer">
-											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-											<button type="button" class="btn btn-primary add-interview-summary"
-												data-id="{{ $data->id }}" data-status="telephonic">Submit</button>
-										</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+												<button type="submit" class="btn btn-primary add-interview-summary"
+													data-id="{{ $data->id }}" data-status="telephonic">Submit</button>
+											</div>
+										</form>
 									</div>
 								</div>
 							</div>
@@ -546,8 +558,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="interview_summary">
-																</textarea>
+																<!-- <textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="interview_summary">
+																</textarea> -->
+																<textarea rows="5" id="comment" type="text" class="form-control @error('comment') is-invalid @enderror"
+						name="comment" placeholder="Enter Detailed Explanation Of New Hiring" value="{{ old('comment') }}"  autocomplete="comment"
+						autofocus></textarea>
 															</div>
 														</div>
 													</div>
@@ -595,7 +610,42 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 		$('.add-interview-summary').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
-	        addInterviewSummary(id, status)
+	        // addInterviewSummary(id, status)
+			$('#form_'+id).validate({ // initialize the plugin
+			// alert($('#resume_file_name').val());
+			rules: {
+				date: {
+					required: true,
+				},
+				comment: {
+					required: true,
+				},
+				round: {
+					required: true,
+				},
+				id: {
+				    required: true,
+				},
+				'interviewer_id[]': {
+					required: true,
+				}
+			},
+			// errorPlacement: function ( error, element ) {
+			// 	error.addClass( "invalid-feedback font-size-13" );
+			// 	if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+			// 		if (!element.val() || element.val().length === 0) {
+			// 			console.log("Error is here with length", element.val().length);
+			// 			error.addClass('select-error');
+			// 			error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+			// 		} else {
+			// 			console.log("No error");
+			// 		}
+			// 	}
+			// 	else {
+			// 		error.insertAfter( element );
+			// 	}
+			// }
+		});
 	    })
 		// $('.status-onhold-button').click(function (e) {
 	    //     var id = $(this).attr('data-id');
@@ -611,6 +661,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			var comment = $("#comment-"+id).val();
 			var date = $("#date-"+id).val();
 			var interviewers_id = $("#interviewer_id_"+id).val();
+
 	        let url = '{{ route('interview-summary-report.round-summary') }}';
 	        // if(status == 'closed') {
 	        //     var message = 'Closed';
