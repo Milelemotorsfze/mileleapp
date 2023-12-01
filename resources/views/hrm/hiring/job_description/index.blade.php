@@ -10,7 +10,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 		Job Description Info
 	</h4>
 	<!-- <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> -->
-	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('employee-hiring-job-description.create-or-edit','new')}}">
+	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('employee-hiring-job-description.create-or-edit', ['id' => 'new', 'hiring_id' => 'new']) }}">
       <i class="fa fa-plus" aria-hidden="true"></i> New Job Description
     </a>
 	@if (count($errors) > 0)

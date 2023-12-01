@@ -35,16 +35,18 @@
         align-items: center;
     }
 
-    .job-description-textfield-lable, .job-description-text-value
+    .job-description-textfield-lable,
+    .job-description-text-value
+
     /* .reporting-section-div, .dep-section-div, .title-section-div */
-    {
+        {
         font-size: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
-    
+
 
     /* @media (min-width: 767px) {
     .location-reporting-dic{
@@ -70,7 +72,8 @@
         .heading-name {
             font-size: 14px !important;
         }
-     .job-description-text-value {
+
+        .job-description-text-value {
             font-size: 13px !important;
         }
     }
@@ -99,8 +102,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     </div>
     @endif
     <!-- {!! Form::open(array('route' => 'calls.store','method'=>'POST', 'id' => 'calls')) !!} -->
+    <!-- <div>JD iD: {{ $currentHiringRequest }} </div> -->
 
-    <form id="employeeJobDescriptionForm" name="employeeJobDescriptionForm" enctype="multipart/form-data" method="POST" action="{{route('employee-hiring-job-description.store-or-update',$jobDescriptionId)}}">
+    <form id="employeeJobDescriptionForm" name="employeeJobDescriptionForm" enctype="multipart/form-data" method="POST" action="{{route('employee-hiring-job-description.store-or-update', $jobDescriptionId )}}">
 
         <div class="row">
 
@@ -294,85 +298,91 @@ redirect()->route('home')->send();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
-    var data = {!!json_encode($allHiringRequests) !!};
-    console.log("JD Data --- ;");
+    var data = <?php echo json_encode($allHiringRequests); ?>;
+    console.log("Data iiis -----", data)
+    var currentHiringRequestValue = <?php echo json_encode($currentHiringRequest); ?>;
+    var currentHiringRequestId = currentHiringRequestValue.id;
+    var uuidValue = currentHiringRequestValue.uuid
+    console.log("Current Data --- ;", uuidValue);
 
-        $(document).ready(function() {
+    $(document).ready(function() {
 
-        function updateFields(selectedRequest, selectedDropdown) {
-            if (selectedRequest) {
+        var selectedUUID = $('#uuid_value').val();
+        updateFieldsBasedOnUUID(selectedUUID);
 
-                $('#uuid_display').text(selectedRequest.uuid);
-                console.log("Title job: ---", selectedRequest.questionnaire?.designation?.name)
-                $('div[name="job_title"]').text(selectedRequest.questionnaire?.designation?.name);
-                $('div[name="department_id"]').text(selectedRequest.questionnaire?.department?.name);
-                $('#location_name').val(selectedRequest.questionnaire?.work_location?.id).trigger('change.select2');
-                $('div[name="reporting_to"]').text(selectedRequest.department_head_name);
 
-                $('#employeeJobDescriptionForm').validate().resetForm();
-                $('#employeeJobDescriptionForm').find('.error').removeClass('select-error other-error');
-            } else {
-                $('#uuid_display').text('');
-                $('div[name="job_title"]').text('');
-                $('div[name="department_id"]').text('');
-                $('#location_name').val('');
-                $('div[name="reporting_to"]').text('');
-            }
-        }
 
-        function getLocationName(locationId) {
-            var masterLocations = <?php echo json_encode($masterOfficeLocations); ?>;
-            var location = masterLocations.find(function(masterLocation) {
-                return masterLocation.id == locationId;
-            });
-
-            return location ? location.name : '';
-        }
-
-        $('#uuid_value').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder: "Choose uuid",
-        });
         $('#location_name').select2({
             allowClear: true,
             maximumSelectionLength: 1,
             placeholder: "Location",
         });
+        $('#uuid_value').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder: "Choose uuid",
+        });
+
+        // Execute function when there is data in currentHiringRequestId
+        function setUUIDValueOnReload() {
+        if (currentHiringRequestId) {
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].id == currentHiringRequestId) {
+                    $('#uuid_value').val([data[i].id]).trigger('change');
+                    $('.job-title').text(data[i].questionnaire.designation.name || '');
+                    $('.department-id').text(data[i].questionnaire.department.name || '');
+                    $('.reporting-to').text(data[i].department_head_name || '');
+
+                    var workLocationId = data[i].questionnaire.work_location.id;
+                    updateLocationDropdown(workLocationId);
+
+                    break;
+                }
+            }
+        }
+    }
+    setUUIDValueOnReload();
+
+        // Execute function when there is change in uuid value
+
+        function updateFieldsBasedOnUUID(selectedUUID) {
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].id == selectedUUID) {
+                    $('.job-title').text(data[i].questionnaire.designation.name || '');
+                    $('.department-id').text(data[i].questionnaire.department.name || '');
+                    $('.reporting-to').text(data[i].department_head_name || '');
+
+                    var workLocationId = data[i].questionnaire.work_location.id;
+                    updateLocationDropdown(workLocationId);
+                    break;
+                }
+            }
+        }
+
+        function updateLocationDropdown(locationId) {
+            $('#location_name').val([locationId]).trigger('change');
+        }
+
+        function clearFields() {
+            $('.job-title').text('');
+            $('.department-id').text('');
+            $('.reporting-to').text('');
+            $('#location_name').val(null).trigger('change');
+        }
 
         $('#uuid_value').on('change', function() {
-
             var selectedUUID = $(this).val();
+            console.log("selected value of uuid -------------------- in loop is ", selectedUUID)
 
-            if (selectedUUID !== null && selectedUUID !== undefined) {
-                var hiringRequest = <?php echo json_encode($allHiringRequests); ?>;
-                var selectedRequest = hiringRequest.find(function(request) {
-                    return request.id == selectedUUID;
-                });
-
-                updateFields(selectedRequest, 'uuid_value');
+            if (!selectedUUID || selectedUUID.length === 0) {
+                console.log("In Null uuid")
+                clearFields();
             } else {
-                console.log("Else in uuid");
-                updateFields(null, 'uuid_value');
+                updateFieldsBasedOnUUID(selectedUUID);
             }
         });
 
-        $('#location_id').on('change', function() {
-            var selectedLocationName = $(this).val();
 
-            if (selectedLocationName !== null && selectedLocationName !== undefined) {
-                var hiringRequest = <?php echo json_encode($allHiringRequests); ?>;
-                var selectedRequest = hiringRequest.find(function(request) {
-                    return request.id == selectedLocationName;
-                });
-
-                updateFields(selectedRequest, 'location_id');
-            } else {
-                console.log("Else in Location ");
-                updateFields(null, 'location_id');
-            }
-
-        });
 
         $('#uuid_value').on('change', function() {
             var fieldName = $(this).attr('name');
