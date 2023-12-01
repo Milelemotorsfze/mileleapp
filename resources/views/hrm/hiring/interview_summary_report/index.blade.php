@@ -11,6 +11,11 @@
 	background-color:#d9d9d9!important;
 	font-weight: 700!important;
   }
+  .paragraph-class 
+    {
+        color: red;
+        font-size:11px;
+    }
 	</style>
 @section('content')
 <!-- @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price'])
@@ -189,6 +194,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 															<div class="col-xxl-6 col-lg-6 col-md-6">
 																<!-- <input type="text" name="round" id="round-{{$data->id}}" value="telephonic" hidden> -->
 																<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2" required>
+																<span id="date_error_{{$data->id}}" class="required-class paragraph-class"></span>
+
 															</div>
 														</div>
 														<div class="row">
@@ -204,6 +211,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 																				<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
 																			@endforeach
 																		</select>
+																		<span id="interviewer_id_error_{{$data->id}}" class="required-class paragraph-class"></span>
 																	</div>
 																@endif
 															@endif
@@ -213,6 +221,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 															<div class="col-lg-12 col-md-12 col-sm-12">
 																<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="interview_summary" required>
 																</textarea>
+																<span id="comment-error-{{$data->id}}" class="required-class paragraph-class"></span>
+
 															</div>
 														</div>
 													</div>
@@ -633,15 +643,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 								window.location.reload();
 								alertify.success(status + " Successfully")
 							}
-							else if(data['error'] == true) {
-								alert('hi');
-								$msg = result.msg;
-								// console.log($msg);
+							else if(data['error'] == true) { 
+								$msg = data['msg'];
 								for(var i=0; i<$msg.length; i++) {
-									console.log($msg[i]);
+									if($msg[i] == 'The date field is required.') {
+										showDateError($msg[i], id)
+									}
+									if($msg[i] == 'The interviewers id field is required.') {
+										showInterviewrsError($msg[i], id)
+									}
+									if($msg[i] == 'The comment field is required.') {
+										showCommentError($msg[i], id)
+									}
 								}
-								// dd(result.error.length)
-	                    		// roundSummaryError($msg);
 							}
 	                    }
 	                });
@@ -650,14 +664,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 	        // }).set({title:"Confirmation"})
 	    }
 	})
-	// function roundSummaryError($msg) {
-	// 	document.getElementById("newIndustryExperienceError").textContent=$msg;
-	//     document.getElementById("new_industry_experience").classList.add("is-invalid");
-	//     document.getElementById("newIndustryExperienceError").classList.add("paragraph-class");
-		
-	// 	document.getElementById("newIndustryExperienceError").style.color = "red";
-
-	// }
+	function showDateError($msg, id) {
+		document.getElementById("date_error_"+id).textContent=$msg;
+	    document.getElementById("date-"+id).classList.add("is-invalid");
+	    document.getElementById("date_error_"+id).classList.add("paragraph-class");
+		document.getElementById("date_error_"+id).style.color = "red";
+	}
+	function showInterviewrsError($msg, id) {
+		document.getElementById("interviewer_id_error_"+id).textContent=$msg;
+	    document.getElementById("interviewer_id_"+id).classList.add("is-invalid");
+	    document.getElementById("interviewer_id_error_"+id).classList.add("paragraph-class");
+		document.getElementById("interviewer_id_error_"+id).style.color = "red";
+	}
+	function showCommentError($msg, id) {
+		document.getElementById("comment-error-"+id).textContent=$msg;
+	    document.getElementById("comment-"+id).classList.add("is-invalid");
+	    document.getElementById("comment-error-"+id).classList.add("paragraph-class");
+		document.getElementById("comment-error-"+id).style.color = "red";
+	}
 	function inputNumberAbs(currentPriceInput) 
 	{
 	    var id = currentPriceInput.id;

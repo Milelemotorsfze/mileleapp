@@ -16,6 +16,9 @@ use DB;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use App\Models\HRM\Hiring\EmployeeHiringRequest;
+use App\Models\HRM\Approvals\DepartmentHeadApprovals;
+use Validator;
+use App\Models\HRM\Approvals\ApprovalByPositions;
 
 class JobDescriptionController extends Controller
 {
@@ -55,13 +58,11 @@ class JobDescriptionController extends Controller
         $allHiringRequests = EmployeeHiringRequest::all();
         return view('hrm.hiring.job_description.create',compact('jobDescriptionId','currentHiringRequest','jobDescription','masterOfficeLocations','allHiringRequests'));
     }
-    public function storeOrUpdate(Request $request, $id) { 
-        dd('hi');
+    public function storeOrUpdate(Request $request, $id) {
         $validator = Validator::make($request->all(), [
-            // 'job_title' => 'required',
-            // 'department_id' => 'required',
+            'hiring_request_id' => 'required',
             'location_id' => 'required',
-            // 'reporting_to' => 'required',
+            'request_date' => 'required',
             'job_purpose' => 'required',
             'duties_and_responsibilities' => 'required',
             'skills_required' => 'required',
@@ -74,21 +75,24 @@ class JobDescriptionController extends Controller
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
-                $departmentHead = DepartmentHeadApprovals::where('department_id',$request->department_id)->first();
+                // $departmentHead = DepartmentHeadApprovals::where('department_id',$request->department_id)->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $input = $request->all();
                 if($id == 'new') {
                     $input['created_by'] = $authId;
-                    $input['department_head_id'] = $departmentHead->approval_by_id;
+                    // $input['department_head_id'] = $departmentHead->approval_by_id;
+                    $input['department_head_id'] = 10;
                     $input['hr_manager_id'] = $HRManager->handover_to_id;
                     $createRequest = JobDescription::create($input);
-                    $history['hiring_request_id'] = $id;
+                    $history['hiring_request_id'] = $request->hiring_request_id;
                     $history['icon'] = 'icons8-document-30.png';
                     $history['message'] = 'Employee hiring job description created by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
                     $createHistory = EmployeeHiringRequestHistory::create($history);
-                    $history2['hiring_request_id'] = $id;
+                    $history2['hiring_request_id'] = $request->hiring_request_id;
                     $history2['icon'] = 'icons8-send-30.png';
-                    $history2['message'] = 'Employee hiring job description send to '.$departmentHead->approved_by_position_name.' ( '.$departmentHead->handover_to_name.' - '.$departmentHead->handover_to_email.' ) for approval';
+                    // $history2['message'] = 'Employee hiring job description send to '.$departmentHead->approved_by_position_name.' ( '.$departmentHead->handover_to_name.' - '.$departmentHead->handover_to_email.' ) for approval';
+
+                    $history2['message'] = 'Employee hiring job description send for approval';
                     $createHistory2 = EmployeeHiringRequestHistory::create($history2);
                     (new UserActivityController)->createActivity('New Employee Hiring Job Description Created');
                     $successMessage = "New Employee Hiring Job Description Created Successfully";
@@ -96,6 +100,8 @@ class JobDescriptionController extends Controller
                 else {
                     $update = JobDescription::find($id);
                     if($update) {
+                        $update->hiring_request_id = $request->hiring_request_id;
+                        $update->request_date = $request->request_date;
                         $update->job_title = $request->job_title;
                         $update->department_id = $request->department_id;
                         $update->location_id = $request->location_id;
@@ -106,7 +112,7 @@ class JobDescriptionController extends Controller
                         $update->position_qualification = $request->position_qualification;
                         $update->updated_by = $authId;
                         $update->update();
-                        $history['hiring_request_id'] = $id;
+                        $history['hiring_request_id'] = $request->hiring_request_id;
                         $history['icon'] = 'icons8-edit-30.png';
                         $history['message'] = 'Employee hiring questionnaire edited by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
                         $createHistory = EmployeeHiringRequestHistory::create($history);
@@ -120,6 +126,7 @@ class JobDescriptionController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
+                dd($e);
             }
         }
     }
