@@ -73,9 +73,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>Hiring Request UUID</th>
 							<th>Request Date</th>
 							<th>Job Title</th>
-							<th>Department</th>
+							<!-- <th>Department</th> -->
 							<th>Department Location</th>
-							<th>Reporting To</th>
+							<!-- <th>Reporting To</th> -->
 							<th>Job Purpose</th>
 							<th>Duties and Responsibilities (Generic) of the position</th>
 							<th>Skills required at fulfill the position</th>
@@ -83,13 +83,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>Created By</th>
 							<th>Created At</th>
 							<th>Team Lead/ Manager Name</th>
-							<th>Team Lead/ Manager Action</th>
+							<!-- <th>Team Lead/ Manager Action</th>
 							<th>Team Lead/ Manager Action At</th>
-							<th>Team Lead/ Manager Comment</th>
+							<th>Team Lead/ Manager Comment</th> -->
 							<th>HR Manager Name</th>
-							<th>HR Manager Action</th>
+							<!-- <th>HR Manager Action</th>
 							<th>HR Manager Action At</th>
-							<th>HR Manager Comment</th>
+							<th>HR Manager Comment</th> -->
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -100,23 +100,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
 							<td>{{ $data->request_date ?? '' }}</td>
-							<td>{{ $data->jobTitle->name ?? '' }}</td>
-							<td>{{ $data->department->name ?? '' }}</td>
-							<td>{{ $data->location->name ?? '' }}, {{$data->location->address ?? ''}}</td>
-							<td>{{ $data->reportingTo->name ?? '' }}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<!-- <td>{{ $data->department->name ?? '' }}</td> -->
+							<td>{{ $data->location->name ?? '' }}</td>
+							<!-- <td>{{ $data->reportingTo->name ?? '' }}</td> -->
 							<td>{{ $data->job_purpose ?? ''}}</td>
 							<td>{{ $data->duties_and_responsibilities ?? ''}}</td>
 							<td>{{ $data->skills_required ?? ''}}</td>
 							<td>{{ $data->position_qualification ?? ''}}</td>
 							<td>{{$data->createdBy->name ?? ''}}</td>
 							<td>{{$data->departmentHeadName->name ?? ''}}</td>
-							<td>{{$data->action_by_department_head ?? ''}}</td>
+							<!-- <td>{{$data->action_by_department_head ?? ''}}</td>
 							<td>{{$data->department_head_action_at ?? ''}}</td>
-							<td>{{$data->comments_by_department_head ?? ''}}</td>
+							<td>{{$data->comments_by_department_head ?? ''}}</td> -->
 							<td>{{$data->hrManagerName->name ?? ''}}</td>
-							<td>{{$data->action_by_hr_manager ?? ''}}</td>
+							<!-- <td>{{$data->action_by_hr_manager ?? ''}}</td>
 							<td>{{$data->hr_manager_action_at ?? ''}}</td>
-							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
+							<td>{{$data->comments_by_hr_manager ?? ''}}</td> -->
 							<td>{{$data->created_at ?? ''}}</td>
 							<td>
 							<div class="dropdown">
