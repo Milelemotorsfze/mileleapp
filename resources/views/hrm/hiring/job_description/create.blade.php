@@ -45,6 +45,11 @@
         justify-content: center;
     }
 
+    @media (max-width: 991px) {
+        .date-section-div {
+            padding-top: 10px;
+        }
+    }
 
 
     @media (max-width: 767px) {
@@ -116,54 +121,39 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <div class="row">
                     <!-- UUID Section -->
 
-                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 dropdown-section-div">
-                        <div class="row">
-                            <div class="col-xxl-5 col-lg-4 col-md-5 col-sm-6 col-12 job-description-lable-name">
-                                <label for="uuid" class="form-label heading-name"><span class="error">* </span>{{ __('UUID Number:') }}</label>
-                            </div>
-                            <div class="col-xxl-7 col-lg-7 col-md-7 col-sm-6 col-12">
-                                <div class="dropdown-option-div">
-                                    <select name="hiring_request_id" id="uuid_value" class="form-control widthinput" multiple="true" autofocus>
-                                        @foreach($allHiringRequests as $hiringRequests)
-                                        <option value="{{$hiringRequests->id}}">{{$hiringRequests->uuid}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
+                    <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
+                        <div class="dropdown-option-div">
+                            <label for="uuid" class="form-label heading-name"><span class="error">* </span>{{ __('UUID Number:') }}</label>
+                            <select name="hiring_request_id" id="uuid_value" class="form-control widthinput" multiple="true" autofocus>
+                                @foreach($allHiringRequests as $hiringRequests)
+                                <option value="{{$hiringRequests->id}}">{{$hiringRequests->uuid}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
 
-
-                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 date-section-div">
-                        <div class="row">
-                            <div class="col-xxl-5 col-lg-4 col-md-5 col-sm-6 col-12 job-description-lable-name">
-                                <label for="request_date" class="col-form-label text-md-end"><span class="error">* </span> {{ __('Choose Date') }}</label>
-                            </div>
-                            <div class="col-xxl-7 col-lg-7 col-md-7 col-sm-6 col-12">
-                                <input type="date" name="request_date" id="request_date" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
-                            </div>
-                        </div>
-                    </div>
 
 
                     <!-- Location Section -->
-
-                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 dropdown-section-div location-section-div">
-                        <div class="row">
-                            <div class="col-xxl-5 col-lg-4 col-md-5 col-sm-6 col-12 job-description-lable-name">
-                                <label for="location_id" class="col-form-label widthinput heading-name"><span class="error">* </span>Location:</label>
-                            </div>
-                            <div class="col-xxl-7 col-lg-7 col-md-7 col-sm-6 col-12 ">
-                                <div class="dropdown-option-div">
-                                    <select name="location_id" id="location_name" class="form-control widthinput" multiple="true" autofocus>
-                                        @foreach($masterOfficeLocations as $masterOfficeLocation)
-                                        <option value="{{$masterOfficeLocation->id}}">{{$masterOfficeLocation->name}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
+                    <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
+                        <div class="dropdown-option-div">
+                            <label for="location_id" class="form-label widthinput heading-name"><span class="error">* </span>Location:</label>
+                            <select name="location_id" id="location_name" class="form-control widthinput" multiple="true" autofocus>
+                                @foreach($masterOfficeLocations as $masterOfficeLocation)
+                                <option value="{{$masterOfficeLocation->id}}">{{$masterOfficeLocation->name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
+
+                    <!-- date section -->
+
+                    <div class=" col-lg-4 col-md-6 col-sm-6 date-section-div">
+                            <label for="request_date" class="form-label text-md-end"><span class="error">* </span> {{ __('Choose Date') }}</label>
+                        <input type="date" name="request_date" id="request_date" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
+                    </div>
+
+
                 </div>
 
                 <div class="row job-description-details-div" style="display: none;">
@@ -435,11 +425,11 @@ redirect()->route('home')->send();
             errorPlacement: function(error, element) {
                 console.log("Error placement function called");
 
-                if (element.is('select') && element.closest('.dropdown-section-div').length > 0) {
+                if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
                     if (!element.val() || element.val().length === 0) {
                         console.log("Error is here with length", element.val().length);
                         error.addClass('select-error');
-                        error.insertAfter(element.closest('.dropdown-option-div'));
+                        error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
                     } else {
                         console.log("No error");
                     }
