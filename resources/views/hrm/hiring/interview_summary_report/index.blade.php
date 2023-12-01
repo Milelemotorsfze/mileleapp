@@ -188,7 +188,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 															</div>
 															<div class="col-xxl-6 col-lg-6 col-md-6">
 																<!-- <input type="text" name="round" id="round-{{$data->id}}" value="telephonic" hidden> -->
-																<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
+																<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2" required>
 															</div>
 														</div>
 														<div class="row">
@@ -199,7 +199,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 																	</div>
 																	<div class="col-lg-12 col-md-12 col-sm-12">
 																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
-																		class="interviewer_id form-control widthinput" autofocus>
+																		class="interviewer_id form-control widthinput" autofocus required>
 																			@foreach($interviewersNames as $interviewer)
 																				<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
 																			@endforeach
@@ -211,7 +211,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="interview_summary">
+																<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="interview_summary" required>
 																</textarea>
 															</div>
 														</div>
@@ -274,9 +274,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{ $data->nationalities->name ?? '' }}</td>
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
-							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-
-							
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>							
 							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
@@ -446,12 +444,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-
-							
 							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if(isset($data->telephonicInterviewers))
+  									@if(count($data->telephonicInterviewers) > 0)
+  										@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+											{{ $telephonicInterviewers->interviewerName->name ?? '' }},
+										@endforeach
+									@endif
+								@endif
+							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
-							<td>{{$data->date_of_first_round ?? ''}}</td>
-							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{ $data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if(isset($data->firstRoundInterviewers))
+  									@if(count($data->firstRoundInterviewers) > 0)
+  										@foreach($data->firstRoundInterviewers as $firstRoundInterviewer)
+											{{ $firstRoundInterviewer->interviewerName->name ?? '' }},
+										@endforeach
+									@endif
+								@endif
+							</td>
+							<td>{{ $data->first_round ?? ''}}</td>
                             <td>{{ $data->createdBy->name ?? ''}}</td>
                             <td>{{ $data->created_at ?? ''}}</td>
 							<td>
@@ -615,12 +629,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 	                        _token: '{{ csrf_token() }}'
 	                    },
 	                    success: function (data) {
-							if(data == 'success') {
+							if(data == 'success') { 
 								window.location.reload();
 								alertify.success(status + " Successfully")
 							}
-							else if(data == 'error') {
-
+							else if(data['error'] == true) {
+								alert('hi');
+								$msg = result.msg;
+								// console.log($msg);
+								for(var i=0; i<$msg.length; i++) {
+									console.log($msg[i]);
+								}
+								// dd(result.error.length)
+	                    		// roundSummaryError($msg);
 							}
 	                    }
 	                });
@@ -629,6 +650,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 	        // }).set({title:"Confirmation"})
 	    }
 	})
+	// function roundSummaryError($msg) {
+	// 	document.getElementById("newIndustryExperienceError").textContent=$msg;
+	//     document.getElementById("new_industry_experience").classList.add("is-invalid");
+	//     document.getElementById("newIndustryExperienceError").classList.add("paragraph-class");
+		
+	// 	document.getElementById("newIndustryExperienceError").style.color = "red";
+
+	// }
 	function inputNumberAbs(currentPriceInput) 
 	{
 	    var id = currentPriceInput.id;
