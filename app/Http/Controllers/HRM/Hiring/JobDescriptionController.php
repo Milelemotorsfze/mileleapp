@@ -19,6 +19,7 @@ use App\Models\HRM\Hiring\EmployeeHiringRequest;
 use App\Models\HRM\Approvals\DepartmentHeadApprovals;
 use Validator;
 use App\Models\HRM\Approvals\ApprovalByPositions;
+use App\Models\HRM\Employee\EmployeeProfile;
 
 class JobDescriptionController extends Controller
 {
@@ -39,7 +40,6 @@ class JobDescriptionController extends Controller
     }
     public function createOrEdit($id, $hiring_id) {
         $jobDescription = JobDescription::where('id',$id)->first();
-        // dd($jobDescription);
         if(!$jobDescription) {
             $jobDescription = new JobDescription();
             $jobDescriptionId = 'new';           
@@ -75,13 +75,13 @@ class JobDescriptionController extends Controller
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
-                // $departmentHead = DepartmentHeadApprovals::where('department_id',$request->department_id)->first();
+                $hiringRequest = EmployeeHiringRequest::where('id',$request->hiring_request_id)->first();
+                $teamLeadOrReportingManager = EmployeeProfile::where('user_id',$hiringRequest->requested_by)->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $input = $request->all();
                 if($id == 'new') {
                     $input['created_by'] = $authId;
-                    // $input['department_head_id'] = $departmentHead->approval_by_id;
-                    $input['department_head_id'] = 10;
+                    $input['department_head_id'] = $teamLeadOrReportingManager->team_lead_or_reporting_manager;
                     $input['hr_manager_id'] = $HRManager->handover_to_id;
                     $createRequest = JobDescription::create($input);
                     $history['hiring_request_id'] = $request->hiring_request_id;
@@ -90,9 +90,7 @@ class JobDescriptionController extends Controller
                     $createHistory = EmployeeHiringRequestHistory::create($history);
                     $history2['hiring_request_id'] = $request->hiring_request_id;
                     $history2['icon'] = 'icons8-send-30.png';
-                    // $history2['message'] = 'Employee hiring job description send to '.$departmentHead->approved_by_position_name.' ( '.$departmentHead->handover_to_name.' - '.$departmentHead->handover_to_email.' ) for approval';
-
-                    $history2['message'] = 'Employee hiring job description send for approval';
+                    $history2['message'] = 'Employee hiring job description send to Team Lead / Reporting Manager ( '.$teamLeadOrReportingManager->teamLeadOrReportingManager->name.' - '.$teamLeadOrReportingManager->teamLeadOrReportingManager->email.' ) for approval';
                     $createHistory2 = EmployeeHiringRequestHistory::create($history2);
                     (new UserActivityController)->createActivity('New Employee Hiring Job Description Created');
                     $successMessage = "New Employee Hiring Job Description Created Successfully";
@@ -102,10 +100,7 @@ class JobDescriptionController extends Controller
                     if($update) {
                         $update->hiring_request_id = $request->hiring_request_id;
                         $update->request_date = $request->request_date;
-                        $update->job_title = $request->job_title;
-                        $update->department_id = $request->department_id;
                         $update->location_id = $request->location_id;
-                        $update->reporting_to = $request->reporting_to;
                         $update->job_purpose = $request->job_purpose;
                         $update->duties_and_responsibilities = $request->duties_and_responsibilities;
                         $update->skills_required = $request->skills_required;
@@ -121,7 +116,7 @@ class JobDescriptionController extends Controller
                     }
                 }
                 DB::commit();
-                return redirect()->route('employee-hiring-request.index')
+                return redirect()->route('job_description.index')
                                     ->with('success',$successMessage);
             } 
             catch (\Exception $e) {

@@ -119,7 +119,7 @@ class EmployeeHiringRequestController extends Controller
                     // Approvals =>  Team Lead/Manager -------> Recruitement(Hiring) manager -----------> Division head ---------> HR manager
                     $input['created_by'] = $authId;
                     // $input['department_head_id'] = $department->approval_by_id;
-                    $input['department_head_id'] = $department->approval_by_id;
+                    $input['department_head_id'] = $teamLeadOrReportingManager->team_lead_or_reporting_manager;
                     $input['action_by_department_head'] = 'pending';
                     $input['hiring_manager_id'] = $hiringManager->handover_to_id;
                     $input['division_head_id'] = $department->division->approval_handover_to;

@@ -84,7 +84,7 @@ class EmployeeHiringRequest extends Model
         'department_location',
         'requested_by_name',
         'requested_job_name',
-        'reporting_to_name',
+        // 'reporting_to_name',
         'experience_level_name',
         'type_of_role_name',
         'replacement_for_employee_name',
@@ -129,14 +129,14 @@ class EmployeeHiringRequest extends Model
         }
         return $requestedJobName;
     }
-    public function getReportingToNameAttribute() {
-        $reportingToName = '';
-        $reportingTo = User::find($this->reporting_to);
-        if($reportingTo) {
-            $reportingToName = $reportingTo->name;
-        }
-        return $reportingToName;
-    }
+    // public function getReportingToNameAttribute() {
+    //     $reportingToName = '';
+    //     $reportingTo = User::find($this->reporting_to);
+    //     if($reportingTo) {
+    //         $reportingToName = $reportingTo->name;
+    //     }
+    //     return $reportingToName;
+    // }
     public function getExperienceLevelNameAttribute() {
         $experienceLevelName = '';
         $experienceLevel = MasterExperienceLevel::find($this->experience_level);
