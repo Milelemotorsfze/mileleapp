@@ -435,7 +435,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 	const previewFile4 = document.querySelector("#file4-preview");
 	var hiringrequests = {!! json_encode($hiringrequests) !!};
 	var currentInterviewReport = {!! json_encode($currentInterviewReport) !!};
-	var interviewersArr =[];
+	var telephonicInterviewersArr =[];
 	$(document).ready(function () {
 		if(currentInterviewReport.resume_file_name != undefined) {
 			$('.preview-div').attr('hidden', false);
@@ -446,14 +446,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 		$('#' + currentInterviewReport.gender).prop('checked',true);
 		// $("#resume_file_name").val(currentInterviewReport.resume_file_name);
 		$("#date_of_telephonic_interview").val(currentInterviewReport.date_of_telephonic_interview);
-		if(currentInterviewReport.interviewers != undefined) {
-			if(currentInterviewReport.interviewers.length > 0) {
-				for(var i=0; i<currentInterviewReport.interviewers.length; i++) {
-					interviewersArr.push(currentInterviewReport.interviewers[i].interviewer_id);
+		if(currentInterviewReport.telephonicInterviewers != undefined) {
+			if(currentInterviewReport.telephonicInterviewers.length > 0) {
+				for(var i=0; i<currentInterviewReport.telephonicInterviewers.length; i++) {
+					telephonicInterviewersArr.push(currentInterviewReport.telephonicInterviewers[i].interviewer_id);
 				}
 			}
 		}
-		$("#interviewer_id").val(interviewersArr);
+		$("#interviewer_id").val(telephonicInterviewersArr);
 		$("#telephonic_interview").val(currentInterviewReport.telephonic_interview);
 		$('#dress_' + currentInterviewReport.rate_dress_appearance).prop('checked',true);
 		$('#body_language_' + currentInterviewReport.rate_body_language_appearance).prop('checked',true);

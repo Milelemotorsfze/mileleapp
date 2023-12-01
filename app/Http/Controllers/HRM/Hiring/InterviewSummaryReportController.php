@@ -89,10 +89,12 @@ class InterviewSummaryReportController extends Controller
         $pendings = InterviewSummaryReport::where('status','pending')->latest()->get();
         $approved = InterviewSummaryReport::where('status','approved')->latest()->get();
         $rejected = InterviewSummaryReport::where('status','rejected')->latest()->get();
-        return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','pendings','approved','rejected'));
+        $interviewersNames = User::whereNot('id',16)->select('id','name')->get();
+        return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','pendings',
+        'approved','rejected','interviewersNames'));
     }
     public function createOrEdit($id) {
-        $currentInterviewReport = InterviewSummaryReport::with('interviewers')->where('id',$id)->first();
+        $currentInterviewReport = InterviewSummaryReport::with('telephonicInterviewers')->where('id',$id)->first();
         if(!$currentInterviewReport) {
             $currentInterviewReport = new InterviewSummaryReport();
             $interviewSummaryId = 'new';
@@ -107,6 +109,54 @@ class InterviewSummaryReportController extends Controller
         $interviewersNames = User::whereNot('id',16)->select('id','name')->get();
         return view('hrm.hiring.interview_summary_report.createOrEdit',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
         'masterGender','interviewersNames','hiringrequests'));
+    }
+    public function updateRoundSummary(Request $request) {
+        DB::beginTransaction();
+        try {
+            $update = InterviewSummaryReport::where('id',$request->id)->first();
+            if($update) {
+                if($request->round == 'telephonic') {
+                    $update->date_of_telephonic_interview = $request->date;
+                    $update->telephonic_interview = $request->comment;
+                }
+                elseif($request->round == 'first') {
+                    $update->date_of_first_round = $request->date;
+                    $update->first_round = $request->comment;
+                }
+                elseif($request->round == 'second') {
+                    $update->date_of_second_round = $request->date;
+                    $update->second_round = $request->comment;
+                }
+                elseif($request->round == 'third') {
+                    $update->date_of_third_round = $request->date;
+                    $update->third_round = $request->comment;
+                }
+                elseif($request->round == 'forth') {
+                    $update->date_of_forth_round = $request->date;
+                    $update->forth_round = $request->comment;
+                }
+                elseif($request->round == 'fifth') {
+                    $update->date_of_fifth_round = $request->date;
+                    $update->fifth_round = $request->comment;
+                }
+            }
+            $update->update();
+            if(isset($request->interviewers_id)) {
+                if(count($request->interviewers_id) > 0) {
+                    foreach($request->interviewers_id as $interviewer) {
+                        $createInterviewer['interview_summary_report_id'] = $request->id;
+                        $createInterviewer['interviewer_id'] = $interviewer;
+                        $createInterviewerData = Interviewers::create($createInterviewer);
+                    }
+                }
+            }
+            DB::commit();
+            return response()->json('success');
+        } 
+        catch (\Exception $e) {
+            DB::rollback();
+            dd($e);
+        }
     }
     public function requestAction(Request $request) {
         DB::beginTransaction();

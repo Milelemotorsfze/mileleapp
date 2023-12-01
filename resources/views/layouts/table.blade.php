@@ -42,6 +42,17 @@
 
             alertify.set('notifier','position', 'top-right','delay', 40);
 			// datatables
+            $('#shortlisted-table').DataTable();
+            $('#telephonic-interview-round-table').DataTable();
+            $('#first-round-table').DataTable();
+            $('#second-round-table').DataTable();
+            $('#third-round-table').DataTable();
+            $('#forth-round-table').DataTable();
+            $('#fifth-round-table').DataTable();
+            $('#selected-candidates-table').DataTable();
+            $('#not-selected-candidates-table').DataTable();
+            $('#fifth-round-table').DataTable();
+            // $('#telephonic-interview-round-table').DataTable();
             $('#dtBasicExample').DataTable();
             $('#dtBasicSupplierInventory').DataTable();
             $('#dtBasicExample1').DataTable();
