@@ -186,15 +186,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>Hiring Request UUID</th>
 							<th>Request Date</th>
 							<th>Job Title</th>
-							<th>Department</th>
+							<!-- <th>Department</th> -->
 							<th>Department Location</th>
-							<th>Reporting To</th>
+							<!-- <th>Reporting To</th> -->
 							<th>Job Purpose</th>
 							<th>Duties and Responsibilities (Generic) of the position</th>
 							<th>Skills required at fulfill the position</th>
 							<th>Position Qualifications (Academic & Professional)</th>
-							<th>Created By</th>
-							<th>Created At</th>
 							<th>Team Lead/ Manager Name</th>
 							<th>Team Lead/ Manager Action</th>
 							<th>Team Lead/ Manager Action At</th>
@@ -203,6 +201,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>HR Manager Action</th>
 							<th>HR Manager Action At</th>
 							<th>HR Manager Comment</th>
+							
+							<th>Created By</th>
+							<th>Created At</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -213,16 +214,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						<td>{{ ++$i }}</td>
 							<td>{{ $approvedOne->employeeHiringRequest->uuid ?? ''}}</td>
 							<td>{{ $approvedOne->request_date ?? '' }}</td>
-							<td>{{ $approvedOne->jobTitle->name ?? '' }}</td>
-							<td>{{ $approvedOne->department->name ?? '' }}</td>
-							<td>{{ $approvedOne->location->name ?? '' }}, {{$approvedOne->location->address ?? ''}}</td>
-							<td>{{ $approvedOne->reportingTo->name ?? '' }}</td>
+							<td>{{ $approvedOne->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<!-- <td>{{ $approvedOne->department->name ?? '' }}</td> -->
+							<td>{{ $approvedOne->location->name ?? '' }}</td>
+							<!-- <td>{{ $approvedOne->reportingTo->name ?? '' }}</td> -->
 							<td>{{ $approvedOne->job_purpose ?? ''}}</td>
 							<td>{{ $approvedOne->duties_and_responsibilities ?? ''}}</td>
 							<td>{{ $approvedOne->skills_required ?? ''}}</td>
 							<td>{{ $approvedOne->position_qualification ?? ''}}</td>
-							<td>{{$approvedOne->createdBy->name ?? ''}}</td>
-							<td>{{$approvedOne->created_at ?? ''}}</td>
 							<td>{{$approvedOne->departmentHeadName->name ?? ''}}</td>
 							<td>{{$approvedOne->action_by_department_head ?? ''}}</td>
 							<td>{{$approvedOne->department_head_action_at ?? ''}}</td>
@@ -231,6 +230,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{$approvedOne->action_by_hr_manager ?? ''}}</td>
 							<td>{{$approvedOne->hr_manager_action_at ?? ''}}</td>
 							<td>{{$approvedOne->comments_by_hr_manager ?? ''}}</td>
+							
+							<td>{{$approvedOne->createdBy->name ?? ''}}</td>
+							<td>{{$approvedOne->created_at ?? ''}}</td>
 							<td>
 							<!-- <div class="dropdown"> -->
                                 <!-- <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -413,9 +415,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>Hiring Request UUID</th>
 							<th>Request Date</th>
 							<th>Job Title</th>
-							<th>Department</th>
+							<!-- <th>Department</th> -->
 							<th>Department Location</th>
-							<th>Reporting To</th>
+							<!-- <th>Reporting To</th> -->
 							<th>Job Purpose</th>
 							<th>Duties and Responsibilities (Generic) of the position</th>
 							<th>Skills required at fulfill the position</th>
@@ -440,10 +442,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						<td>{{ ++$i }}</td>
 						<td>{{ $rejectedOne->employeeHiringRequest->uuid ?? ''}}</td>
 							<td>{{ $rejectedOne->request_date ?? '' }}</td>
-							<td>{{ $rejectedOne->jobTitle->name ?? '' }}</td>
-							<td>{{ $rejectedOne->department->name ?? '' }}</td>
-							<td>{{ $rejectedOne->location->name ?? '' }}, {{$rejectedOne->location->address ?? ''}}</td>
-							<td>{{ $rejectedOne->reportingTo->name ?? '' }}</td>
+							<td>{{ $rejectedOne->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<!-- <td>{{ $rejectedOne->department->name ?? '' }}</td> -->
+							<td>{{ $rejectedOne->location->name ?? '' }}</td>
+							<!-- <td>{{ $rejectedOne->reportingTo->name ?? '' }}</td> -->
 							<td>{{ $rejectedOne->job_purpose ?? ''}}</td>
 							<td>{{ $rejectedOne->duties_and_responsibilities ?? ''}}</td>
 							<td>{{ $rejectedOne->skills_required ?? ''}}</td>

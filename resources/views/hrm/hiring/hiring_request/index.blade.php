@@ -1,4 +1,14 @@
 @extends('layouts.table')
+<style>
+  .light {
+	background-color:#e6e6e6!important;
+	font-weight: 700!important;
+  }
+  .dark {
+	background-color:#d9d9d9!important;
+	font-weight: 700!important;
+  }
+	</style>
 @section('content')
 <!-- @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price'])
 @php
@@ -211,6 +221,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>Created At</th>
 							<!-- <th>Current Status</th> -->
 							<th>Action</th>
+							
 						</tr>
 					</thead>
 					<tbody>
