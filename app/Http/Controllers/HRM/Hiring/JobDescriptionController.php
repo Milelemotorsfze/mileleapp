@@ -44,17 +44,19 @@ class JobDescriptionController extends Controller
             $jobDescription = new JobDescription();
             $jobDescriptionId = 'new';           
             if($hiring_id != 'new') {
-                $currentHiringRequest = EmployeeHiringRequest::where('id',$hiring_id)->first();
+                $currentHiringRequest = EmployeeHiringRequest::whereDoesntHave('jobDescription')->where('id',$hiring_id)->where('status','approved')->first();
             }
             else {
                 $currentHiringRequest ='';
             }    
-            $allHiringRequests = EmployeeHiringRequest::whereDoesntHave('jobDescription')->get();
+            $allHiringRequests = EmployeeHiringRequest::whereDoesntHave('jobDescription')->where('status','approved')->get();
         }
         else {
             $jobDescriptionId = $jobDescription->id;
             $currentHiringRequest = EmployeeHiringRequest::where('id',$jobDescription->hiring_request_id)->first();
-            $allHiringRequests = EmployeeHiringRequest::whereDoesntHave('jobDescription')->orWhere('id',$jobDescription->hiring_request_id)->get();
+            $allHiringRequests1 = EmployeeHiringRequest::where('status','approved')->whereDoesntHave('jobDescription')->get();
+            $allHiringRequests2 = EmployeeHiringRequest::where('status','approved')->where('id',$jobDescription->hiring_request_id)->get();
+            $allHiringRequests = $allHiringRequests1->merge($allHiringRequests2);
         }
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
         return view('hrm.hiring.job_description.create',compact('jobDescriptionId','currentHiringRequest','jobDescription','masterOfficeLocations','allHiringRequests'));
