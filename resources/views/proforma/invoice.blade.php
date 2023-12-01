@@ -571,17 +571,17 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-lg-1 col-md-6" style="margin-top: 26px;">
-                        <a id="addnewBrandButton" data-toggle="popover" data-trigger="hover" title="Create New Brand" data-placement="top" style="float: right;"
-                           class="btn btn-info modal-button" data-modal-id="createNewBrand"><i class="fa fa-plus" aria-hidden="true"></i> Add Brand</a>
-                    </div>
+{{--                    <div class="col-lg-1 col-md-6" style="margin-top: 26px;">--}}
+{{--                        <a id="addnewBrandButton" data-toggle="popover" data-trigger="hover" title="Create New Brand" data-placement="top" style="float: right;"--}}
+{{--                           class="btn btn-info modal-button" data-modal-id="createNewBrand"><i class="fa fa-plus" aria-hidden="true"></i> Add Brand</a>--}}
+{{--                    </div>--}}
                     <div class="col-lg-2 col-md-6 col-sm-12">
                         <label class="form-label"> Model Line</label>
                         <select class="form-control col" id="model_line" style="width: 100%" name="model_line" disabled >
                             <option value="">Select Model Line</option>
                         </select>
                     </div>
-                    <div class="col-lg-1 col-md-6 add-new-model-line-div" style="margin-top: 26px;" hidden>
+                    <div class="col-lg-1 col-md-6 add-new-model-line-div" style="margin-top: 26px;" >
                         <a id="createNewModelLineButton" data-toggle="popover" data-trigger="hover" title="Create New Model Line" data-placement="top" style="float: right;"
                            class="btn btn-info modal-model-line-button" data-modal-id="createNewModelLine"><i class="fa fa-plus" aria-hidden="true"></i> Add Model Line</a>
 
@@ -1085,27 +1085,27 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form method="POST" enctype="multipart/form-data">
+                        <form method="POST" enctype="multipart/form-data" id="create-model-line-form">
                             @csrf
                             <div class="row modal-row">
                                 <div class="col-xxl-12 col-lg-12 col-md-12">
                                     <span class="error">* </span>
                                     <label for="name" class="col-form-label text-md-end" >Brand</label>
                                 </div>
-                                <div class="col-xxl-9 col-lg-9 col-md-9 col-sm-12">
-                                    <input type="text" class="form-control new_brand  @error('brand_name') is-invalid @enderror" oninput="checkBrandValidation()" placeholder="Enter Brand Name" id="new-brand"  name="brand_name" hidden>
-                                    <div id="brand-list-div">
-                                        <select onchange="checkBrandValidation()" class="form-control new_brand @error('brand_name') is-invalid @enderror"
-                                                name="brand_name" id="brand-from-list" style="width: 100%">
-                                            <option></option>
-                                            @foreach($brands as $brand)
-                                                <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                <div class="col-xxl-9 col-lg-9 col-md-9 col-sm-12" id="new-brand-div" hidden>
+                                    <input type="text" class="form-control new_brand  @error('brand_name') is-invalid @enderror" oninput="checkBrandValidation()" placeholder="Enter Brand Name" id="new-brand"  name="brand_name" >
                                     <span id="newBrandError" class="is-invalid" style="margin-top: 20px" ></span>
                                 </div>
-
+                                <div class="col-xxl-9 col-lg-9 col-md-9 col-sm-12" id="brand-list-div">
+                                    <select onchange="checkBrandValidation()" class="form-control new_brand @error('brand_name') is-invalid @enderror"
+                                            name="brand_name" id="brand-from-list" style="width: 100%">
+                                        <option></option>
+                                        @foreach($brands as $brand)
+                                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span id="existingBrandError" class="is-invalid" style="margin-top: 20px" ></span>
+                                </div>
                                 <div class="col-xxl-3 col-lg-3 col-md-3 col-sm-12">
                                     <a> <button type="button" class="btn btn-info add-new-button" >Add New</button> </a>
                                     <a> <button type="button" class="btn btn-info add-existing-brand-button" hidden>Add From List</button> </a>
@@ -1233,15 +1233,22 @@ $(document).ready(function () {
     {
         var value = $("#brand-from-list").val();
         var newBrand = $('#new-brand').val();
-        // alert(value);
-        if(value == '' || newBrand == '')
+
+        if(value == '')
         {
+            $msg = 'Brand Name is Required';
+            showExisingBrandError($msg);
+        }else
+        {
+            $msg="";
+            removeExistingBrandError($msg);
+        }
+       if(newBrand == '') {
             $msg = 'Brand Name is Required';
             showNewBrandError($msg);
         }
         else
         {
-            // alert("ok");
             $msg=""
             removeNewBrandError($msg);
         }
@@ -1272,23 +1279,36 @@ $(document).ready(function () {
     function showNewBrandError($msg)
     {
         document.getElementById("newBrandError").textContent=$msg;
-        document.getElementById("brand-from-list").classList.add("is-invalid");
+        document.getElementById("new-brand").classList.add("is-invalid");
         document.getElementById("new-brand").classList.remove("is-invalid");
         document.getElementById("newBrandError").classList.add("paragraph-class");
     }
     function removeNewBrandError($msg)
     {
         document.getElementById("newBrandError").textContent=$msg;
-        document.getElementById("brand-from-list").classList.remove("is-invalid");
+        document.getElementById("new-brand").classList.remove("is-invalid");
         document.getElementById("new-brand").classList.remove("is-invalid");
         document.getElementById("newBrandError").classList.remove("paragraph-class");
     }
-
+    function showExisingBrandError($msg)
+    {
+        document.getElementById("existingBrandError").textContent=$msg;
+        document.getElementById("brand-from-list").classList.add("is-invalid");
+        document.getElementById("brand-from-list").classList.remove("is-invalid");
+        document.getElementById("existingBrandError").classList.add("paragraph-class");
+    }
+    function removeExistingBrandError($msg)
+    {
+        document.getElementById("existingBrandError").textContent=$msg;
+        document.getElementById("brand-from-list").classList.remove("is-invalid");
+        document.getElementById("brand-from-list").classList.remove("is-invalid");
+        document.getElementById("existingBrandError").classList.remove("paragraph-class");
+    }
     $(document).ready(function() {
         $('.add-new-button').on('click', function(){
 
             $('#brand-list-div').attr('hidden', true);
-            $('#new-brand').attr('hidden', false);
+            $('#new-brand-div').attr('hidden', false);
             $('.add-existing-brand-button').attr('hidden', false);
             $('.add-new-button').hide();
             $("#brand-from-list option:selected").prop("selected", false);
@@ -1296,7 +1316,7 @@ $(document).ready(function () {
 
         });
         $('.add-existing-brand-button').on('click', function(){
-            $('#new-brand').attr('hidden', true);
+            $('#new-brand-div').attr('hidden', true);
             $('#new-brand').val("");
             $('#brand-list-div').attr('hidden', false);
             $('.add-new-button').show();
@@ -1321,101 +1341,86 @@ $(document).ready(function () {
             removeNewBrandError();
             removeNewModelLineError();
         });
-        $('#createBrandId').on('click', function()
+
+        $('#createModelLineId').on('click', function()
         {
             // create new addon and list new addon in addon list
-            var value = $('#new_brand_name').val();
-            if(value == '')
-            {
-                $msg = 'Brand Name is Required';
-                showNewBrandError($msg);
+            var model_line = $('#new_model_line_name').val();
+            var existingBrand = $("#brand-from-list").val();
+            var newBrand = $('#new-brand').val();
+            checkBrandValidation();
+            checkModelLine();
+            var brand = newBrand;
+            var brandType = 'NEW';
+            if(existingBrand) {
+                var brand = existingBrand;
+                var brandType = 'EXISTING';
             }
-            else
-            {
+
+            console.log(model_line);
+            console.log(existingBrand);
+            console.log(newBrand);
+
+             if(model_line != "" && brand != "") {
                 $.ajax
                 ({
-                    url:"{{route('brands.store')}}",
+                    url:"{{route('modelline-or-brand.store')}}",
                     type: "POST",
                     data:
                         {
-                            brand_name: value,
-                            request_from: 'Quotation',
+                            model_line: model_line,
+                            brand: brand,
+                            brandType: brandType,
                             _token: '{{csrf_token()}}'
                         },
                     dataType : 'json',
                     success: function(result)
                     {
                         console.log(result);
-                        if(result.error) {
-                            $msg = result.error;
+                        if(result.brand_error) {
+                            $msg = result.brand_error;
                             showNewBrandError($msg);
-                        }else{
-                            $('.overlay').hide();
-                            $('.modal').removeClass('modalshow');
-                            $('.modal').addClass('modalhide');
-                            $('#brand').append("<option value='" + result.id + "'>" + result.brand_name + "</option>");
-                            $('#brand').val(result.id);
-                            $('#new_brand_name').val("");
-                            $('.add-new-model-line-div').prop('hidden', false);
-                            $('#model_line').attr('disabled', false)
-                            $msg = "";
-                            removeNewBrandError();
                         }
-                    }
-                });
-            }
-        });
-        $('#createModelLineId').on('click', function()
-        {
-            // create new addon and list new addon in addon list
-            var model_line = $('#new_model_line_name').val();
-            var brand = $("input[name=brand_name]").val();
-            var existingBrand = $("#brand-from-list").val();
-            var newBrand = $('#new-brand').val();
-            checkBrandValidation();
-            checkModelLine();
-            if(existingBrand != "") {
-                var barnd = existingBrand;
-            }else{
-                var brand = newBrand;
-            }
+                        if(result.model_line_error) {
+                            $msg = result.model_line_error;
+                            showNewModelLineError($msg);
+                        }
+                        if(result.model_line_error == "" ){
+                            if(result.brand_error == "") {
 
-             if(model_line != "" && brand != "") {
-                 alert("ok");
-                    $.ajax
-                    ({
-                        url:"{{route('model-lines.store')}}",
-                        type: "POST",
-                        data:
-                            {
-                                model_line: model_line,
-                                brand_id: brand,
-                                request_from: 'Quotation',
-                                _token: '{{csrf_token()}}'
-                            },
-                        dataType : 'json',
-                        success: function(result)
-                        {
-                            if(result.error) {
-                                $msg = result.error;
-                                showNewModelLineError($msg);
-                            }else{
                                 $('.overlay').hide();
                                 $('.modal').removeClass('modalshow');
                                 $('.modal').addClass('modalhide');
-                                $('#model_line').append("<option value='" + result.id + "'>" + result.model_line + "</option>");
-                                $('#model_line').val(result.id);
+                                var id = result.model_line.brand_id;
+                                if(brandType == 'NEW') {
+                                    $('#brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");
+                                    $('#accessories_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");
+                                    $('#spare_parts_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");
+                                    $('#kit_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");
+
+                                }
+                                $('#brand').val(id);
+                                $('#brand').trigger('change.select2');
+
+                                $('#model_line').append("<option  value='" + result.model_line.id + "'>" + result.model_line.model_line + "</option>");
+                                $('#model_line').val(result.model_line.id);
+                                // $('#model_line').trigger('change');
+
                                 $('#model_line').prop('disabled', false);
 
-                                $('#new_model_line_name').val("");
+                                $('#new_model_line_name').val(" ");
+                                $('#brand-from-list').val(" ");
+                                $('#new-brand').val(" ");
+                                $('#brand-from-list').trigger('change.select2');
+
                                 $msg = "";
                                 removeNewModelLineError();
+                                removeNewBrandError();
                             }
                         }
-                    });
-
-                }
-
+                    }
+                });
+             }
         });
 
         $('.modal-button').on('click', function()
@@ -1580,7 +1585,6 @@ $(document).ready(function () {
         var brandId = $(this).val();
         if (brandId ) {
             $('#model_line').prop('disabled', false);
-            $('.add-new-model-line-div').prop('hidden', false);
             $('#model_line').empty().append('<option value="">Select Model Line</option>');
 
             $.ajax({
@@ -1596,7 +1600,6 @@ $(document).ready(function () {
         } else {
             $('#model_line').prop('disabled', true);
             $('#variant').prop('disabled', true);
-            $('.add-new-model-line-div').prop('hidden', true);
             $('#model_line').empty().append('<option value="">Select Model Line</option>');
             $('#variant').empty().append('<option value="">Select Variant</option>');
         }
