@@ -279,14 +279,6 @@
                 </div>
             </div>
             <div class="col-sm-4">
-{{--                <div class="row">--}}
-{{--                    <div class="col-sm-6">--}}
-{{--                        Customer ID :--}}
-{{--                    </div>--}}
-{{--                    <div class="col-sm-6">--}}
-{{--                        {{ $empProfile->id }}--}}
-{{--                    </div>--}}
-{{--                </div>--}}
                 <div class="row mt-2">
                     <div class="col-sm-6">
                         Company :
@@ -335,7 +327,12 @@
                             Final Destination :
                         </div>
                         <div class="col-sm-6">
-                            <input type="text" class="form-control form-control-xs" placeholder="Destination" name="final_destination" id="final_destination">
+                            <select class="form-control col" id="country" name="country_id" style="width: 100%">
+                                <option ></option>
+                                @foreach($countries as $country)
+                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -357,7 +354,10 @@
                             Place of Delivery :
                         </div>
                         <div class="col-sm-6">
-                            <input type="text" name="place_of_delivery" id="place_of_delivery" class="form-control form-control-xs" placeholder="Place of Delivery">
+                            <select class="form-control col" id="shipping_port" name="shipping_port_id" style="width: 100%">
+                                <option></option>
+                            </select>
+
                         </div>
                     </div>
                 </div>
@@ -877,10 +877,10 @@
                                         @foreach($shippings as $shipping)
                                             <tr>
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $shipping->code }} </td>
+                                            <td> </td>
                                             <td>{{ $shipping->name }}</td>
                                             <td>{{ $shipping->description  }}</td>
-                                            <td>{{ $shipping->price }}</td>
+                                            <td></td>
                                             <td>
                                                 <button class="add-button circle-button" data-button-type="Shipping" data-shipping-id="{{ $shipping->id }}"></button>
                                             </td>
@@ -1037,44 +1037,6 @@
         <button type="submit" class="btn btn-primary" id="submit-button" disabled>Submit</button>
     </form>
     <div class="overlay">
-{{--        <div class="modal" id="createNewBrand" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">--}}
-{{--            <div class="modal-dialog modal-dialog-centered" role="document">--}}
-{{--                <div class="modal-content">--}}
-{{--                    <div class="modal-header">--}}
-{{--                        <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Create New Brand </h5>--}}
-{{--                        <button type="button" class="btn btn-secondary btn-sm close form-control modal-close" data-dismiss="modal" aria-label="Close">--}}
-{{--                            <span aria-hidden="true">X</span>--}}
-{{--                        </button>--}}
-{{--                    </div>--}}
-{{--                    <div class="modal-body">--}}
-{{--                        <form method="POST" enctype="multipart/form-data">--}}
-{{--                            @csrf--}}
-{{--                            <div class="row modal-row">--}}
-{{--                                <div class="col-xxl-12 col-lg-12 col-md-12">--}}
-{{--                                    <span class="error">* </span>--}}
-{{--                                    <label for="name" class="col-form-label text-md-end ">Brand Name</label>--}}
-{{--                                </div>--}}
-{{--                                <div class="col-xxl-12 col-lg-12 col-md-12">--}}
-{{--								<input type="text" id="new_brand_name" class="form-control @error('brand_name') is-invalid @enderror" name="brand_name"--}}
-{{--                                          placeholder="Enter Brand Name" value="{{ old('brand_name') }}" oninput="checkValidation()" autofocus>--}}
-{{--                                    <span id="newBrandError" class="is-invalid"></span>--}}
-{{--                                    @error('brand_name')--}}
-{{--                                    <span class="invalid-feedback" role="alert">--}}
-{{--								<strong>{{ $message }}</strong>--}}
-{{--								</span>--}}
-{{--                                    @enderror--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        </form>--}}
-{{--                    </div>--}}
-{{--                    <div class="modal-footer">--}}
-{{--                        <button type="button" class="btn btn-secondary btn-sm modal-close" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>--}}
-{{--                        <button type="button" class="btn btn-primary btn-sm" id="createBrandId" style="float: right;">--}}
-{{--                            <i class="fa fa-check" aria-hidden="true"></i> Submit</button>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
         <div class="modal" id="createNewModelLine" tabindex="-1" role="dialog" aria-labelledby="exampleModalLineCenteredLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -1305,6 +1267,60 @@ $(document).ready(function () {
         document.getElementById("existingBrandError").classList.remove("paragraph-class");
     }
     $(document).ready(function() {
+        $('#brand').select2();
+
+        $('#brand-from-list').select2({
+            placeholder: "Select Brand"
+        });
+        $('#country').select2({
+            placeholder: "Select Final Destination"
+        });
+        $('#shipping_port').select2({
+            placeholder: "Select Place Of Delivery"
+        });
+        $('#model_line').select2();
+        $('#variant').select2();
+        $('#interior_color').select2();
+        $('#exterior_color').select2();
+
+        $('#accessories_addon').select2();
+        $('#accessories_brand').select2();
+        $('#accessories_model_line').select2();
+
+        $('#spare_parts_addon').select2();
+        $('#spare_parts_brand').select2();
+        $('#spare_parts_model_line').select2();
+        $('#spare_parts_model_description').select2();
+
+        $('#kit_addon').select2();
+        $('#kit_brand').select2();
+        $('#kit_model_line').select2();
+        $('#kits_model_description').select2();
+
+        $('#country').on('change',function(){
+            let country = $(this).val();
+            let url = '{{ route('quotation.shipping_ports') }}';
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    country_id: country,
+                },
+                success:function (data) {
+                    $('#shipping_port').empty();
+                    $('#shipping_port').html('<option value=""> Select Shipping Port </option>');
+                    jQuery.each(data, function(key,value){
+                        $('#shipping_port').append('<option value="'+ value.id +'">'+ value.name +'</option>');
+                    });
+                }
+            });
+        });
+        // $('#shipping_port').on('change',function(){
+        //     appendShippingPrice();
+        //
+        // });
+
         $('.add-new-button').on('click', function(){
 
             $('#brand-list-div').attr('hidden', true);
@@ -1356,11 +1372,6 @@ $(document).ready(function () {
                 var brand = existingBrand;
                 var brandType = 'EXISTING';
             }
-
-            console.log(model_line);
-            console.log(existingBrand);
-            console.log(newBrand);
-
              if(model_line != "" && brand != "") {
                 $.ajax
                 ({
@@ -1444,29 +1455,7 @@ $(document).ready(function () {
         var certificationTable = $('#certification-table').DataTable();
         var otherTable = $('#other-document-table').DataTable();
 
-        $('#brand').select2();
 
-        $('#brand-from-list').select2({
-            placeholder: "Select Brand"
-        });
-        $('#model_line').select2();
-        $('#variant').select2();
-        $('#interior_color').select2();
-        $('#exterior_color').select2();
-
-        $('#accessories_addon').select2();
-        $('#accessories_brand').select2();
-        $('#accessories_model_line').select2();
-
-        $('#spare_parts_addon').select2();
-        $('#spare_parts_brand').select2();
-        $('#spare_parts_model_line').select2();
-        $('#spare_parts_model_description').select2();
-
-        $('#kit_addon').select2();
-        $('#kit_brand').select2();
-        $('#kit_model_line').select2();
-        $('#kits_model_description').select2();
 
         $('input[name="document_type"]').on('change', function() {
             $('input[name="' + this.name + '"]').not(this).prop('checked', false);

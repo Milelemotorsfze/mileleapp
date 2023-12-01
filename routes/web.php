@@ -219,6 +219,7 @@ Route::get('/d', function () {
         Route::get('/get-booking-accessories/{addonId}/{brandId}/{modelLineId}', 'getbookingAccessories')->name('booking.getbookingAccessories');
         Route::get('/get-booking-spare-parts/{addonId}/{brandId}/{modelLineId}/{ModelDescriptionId}', 'getbookingSpareParts')->name('booking.getbookingSpareParts');
         Route::get('/get-booking-kits/{addonId}/{brandId}/{modelLineId}/{ModelDescriptionId}', 'getbookingKits')->name('booking.getbookingKits');
+
     });
     // ApprovalAwaitingController
     Route::controller(ApprovalAwaitingController::class)->group(function(){
@@ -372,7 +373,10 @@ Route::get('/d', function () {
     Route::get('quotation-data/get-sub-model', [QuotationController::class,'getsubmodel'])->name('quotation.get-sub-model');
     Route::resource('quotation-items', QuotationController::class);
     Route::post('quotation-data/vehicles-insert', [QuotationController::class,'addvehicles'])->name('quotation.vehicles-insert');
-    Route::get('/get-vehicle-count/{userId}', function($userId) {
+    Route::get('/quotation/shipping-port', [QuotationController::class,'getShippingPort'])->name('quotation.shipping_ports');
+    Route::get('/quotation/shipping-charges', [QuotationController::class,'getShippingCharges'])->name('quotation.shipping_charges');
+
+        Route::get('/get-vehicle-count/{userId}', function($userId) {
     $count = DB::table('vehiclescarts')->where('created_by', $userId)->count();
     return $count;
     });

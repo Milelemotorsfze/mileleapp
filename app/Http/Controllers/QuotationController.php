@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\AddonDetails;
 use App\Models\AgentCommission;
+use App\Models\Country;
 use App\Models\HRM\Employee\EmployeeProfile;
+use App\Models\MasterShippingPort;
 use App\Models\OtherLogisticsCharges;
 use App\Models\Quotation;
 use App\Models\Calls;
@@ -98,9 +100,9 @@ class QuotationController extends Controller
 
         $quotationDetail = new QuotationDetail();
         $quotationDetail->quotation_id  = $quotation->id;
-        $quotationDetail->final_destination  = $request->final_destination;
+        $quotationDetail->country_id  = $request->country_id;
         $quotationDetail->incoterm  = $request->incoterm;
-        $quotationDetail->place_of_delivery  = $request->place_of_delivery;
+        $quotationDetail->shipping_port_id   = $request->shipping_port_id ;
         $quotationDetail->place_of_supply  = $request->place_of_supply;
         $quotationDetail->document_validity  = $request->document_validity;
         $quotationDetail->system_code  = $request->system_code;
@@ -457,5 +459,12 @@ public function addqaddone(Request $request)
              ->get();
          return $results;
          }
+    }
+    public function getShippingPort(Request $request) {
+        $shippingPorts = MasterShippingPort::where('country_id', $request->country_id)
+                         ->get();
+        info($shippingPorts);
+
+        return $shippingPorts;
     }
 }
