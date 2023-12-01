@@ -82,6 +82,7 @@ class JobDescriptionController extends Controller
                 if($id == 'new') {
                     $input['created_by'] = $authId;
                     $input['department_head_id'] = $teamLeadOrReportingManager->team_lead_or_reporting_manager;
+                    $input['action_by_department_head'] = 'pending';
                     $input['hr_manager_id'] = $HRManager->handover_to_id;
                     $createRequest = JobDescription::create($input);
                     $history['hiring_request_id'] = $request->hiring_request_id;
