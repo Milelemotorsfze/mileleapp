@@ -105,6 +105,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     <!-- <div>JD iD: {{ $currentHiringRequest }} </div> -->
 
     <form id="employeeJobDescriptionForm" name="employeeJobDescriptionForm" enctype="multipart/form-data" method="POST" action="{{route('employee-hiring-job-description.store-or-update', $jobDescriptionId )}}">
+    @csrf
 
         <div class="row">
 
