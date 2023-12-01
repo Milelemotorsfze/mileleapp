@@ -45,10 +45,10 @@
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Summary</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Agents Into Qoutations</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Agents With Qoutations</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Agents Into SO</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Agents With SOs</a>
       </li>
     </ul>      
   </div>
@@ -81,12 +81,12 @@
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
             <tr>
+                  <th>Qoutations ID</th>
                   <th>Agent ID</th>
                   <th>Name</th>
                   <th>Phone</th>
                   <th>Email</th>
                   <th>Detail With</th>
-                  <th>Qoutations ID</th>
                   <th>Commission</th>
                 </tr>
               </thead>
@@ -102,13 +102,13 @@
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
             <tr>
+            <th>SO ID</th>
             <th>Agent ID</th>
                   <th>Name</th>
                   <th>Phone</th>
                   <th>Email</th>
                   <th>Detail With</th>
                   <th>Qoutations ID</th>
-                  <th>SO ID</th>
                   <th>Commission</th>
                 </tr>
               </thead>
@@ -141,29 +141,30 @@
         $('#dtBasicExample2').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('agents.index', ['status' => 'summary']) }}",
+            ajax: "{{ route('agents.index', ['status' => 'quotationwise']) }}",
             columns: [
+                { data: 'quotation_id', name: 'agents_commission.quotation_id' },
                 { data: 'id', name: 'agents.id' },
                 { data: 'name', name: 'agents.name' },
                 { data: 'email', name: 'agents.email' },
                 { data: 'phone', name: 'agents.phone' },
-                { data: 'phone', name: 'agents.phone' },
-                { data: 'phone', name: 'agents.phone' },
-                { data: 'total_commission', name: 'agents_commission.commission' },
+                { data: 'names', name: 'users.name' },
+                { data: 'commission', name: 'agents_commission.commission' },
             ]
         });
         $('#dtBasicExample3').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('agents.index', ['status' => 'summary']) }}",
+            ajax: "{{ route('agents.index', ['status' => 'sowise']) }}",
             columns: [
+              { data: 'so_id', name: 'agents_commission.so_id' },
                 { data: 'id', name: 'agents.id' },
                 { data: 'name', name: 'agents.name' },
                 { data: 'email', name: 'agents.email' },
                 { data: 'phone', name: 'agents.phone' },
-                { data: 'phone', name: 'agents.phone' },
-                { data: 'phone', name: 'agents.phone' },
-                { data: 'total_commission', name: 'agents_commission.commission' },
+                { data: 'names', name: 'users.name' },
+                { data: 'quotation_id', name: 'agents_commission.quotation_id' },
+                { data: 'commission', name: 'agents_commission.commission' },
             ]
         });
 });

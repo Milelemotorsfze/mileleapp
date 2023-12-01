@@ -6,6 +6,7 @@ use App\Models\Agents;
 use Yajra\DataTables\DataTables;
 use App\Models\UserActivities;
 use App\Models\AgentsCreating;
+use App\Models\AgentCommission;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -40,6 +41,37 @@ class AgentsController extends Controller
                 ->leftJoin('users', 'users.id', '=', 'quotations.created_by')
                 ->groupBy('agents.id', 'agents.name', 'agents.email', 'agents.phone');
             }
+            if ($status === "quotationwise") {
+                $data = Agents::select([
+                    'agents.id',
+                    'agents.name',
+                    'agents.email',
+                    'agents.phone',
+                    'agents_commission.commission',
+                    'agents_commission.quotation_id',
+                    'users.name as names',
+                ])
+                ->leftJoin('agents_commission', 'agents_commission.agents_id', '=', 'agents.id')
+                ->leftJoin('users', 'users.id', '=', 'agents_commission.created_by')
+                ->where('agents_commission.status', "Quotation")
+                ->groupBy('agents_commission.id');
+            }
+            if ($status === "sowise") {
+                $data = Agents::select([
+                    'agents.id',
+                    'agents.name',
+                    'agents.email',
+                    'agents.phone',
+                    'agents_commission.commission',
+                    'agents_commission.quotation_id',
+                    'agents_commission.so_id',
+                    'users.name as names',
+                ])
+                ->leftJoin('agents_commission', 'agents_commission.agents_id', '=', 'agents.id')
+                ->leftJoin('users', 'users.id', '=', 'agents_commission.created_by')
+                ->where('agents_commission.status', "SO")
+                ->groupBy('agents_commission.id');
+            }
             return Datatables::of($data)
                 ->addColumn('action', function ($row) {
                     // Add any additional columns or actions here
@@ -63,7 +95,6 @@ class AgentsController extends Controller
      */
     public function store(Request $request)
 {
-    // Check if an agent with the same id_number and id_category exists
     $existingAgent = Agents::where('id_number', $request->id_number)
         ->where('id_category', $request->id_category)
         ->first();
@@ -78,7 +109,6 @@ class AgentsController extends Controller
             'phone' => $request->phone,
         ]);
     }
-    // Check if an agent with the same name and phone exists
     $existingAgent = Agents::where('name', $request->name)
         ->where('phone', $request->phone)
         ->first();
@@ -93,7 +123,6 @@ class AgentsController extends Controller
             'phone' => $request->phone,
         ]);
     }
-    // Check if an agent with the same phone exists
     $existingAgent = Agents::where('phone', $request->phone)->first();
     if ($existingAgent) {
         $agentcreate = new AgentsCreating;
@@ -106,7 +135,6 @@ class AgentsController extends Controller
             'phone' => $request->phone,
         ]);
     }
-    // If no existing agent is found, create a new one
     $agent = new Agents;
     $agent->name = $request->name;
     $agent->email = $request->email;
@@ -114,7 +142,11 @@ class AgentsController extends Controller
     $agent->id_category = $request->id_category;
     $agent->id_number = $request->id_number;
     if ($request->hasFile('identification_file')) {
-        // Process file upload here
+        $file = $request->file('identification_file');
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $filePath = 'agent_document/' . $fileName;
+        $file->move(public_path('agent_document'), $fileName);
+        $agent->identification_file = $filePath;
     }
     $agent->save();
     $agentcreate = new AgentsCreating;
@@ -165,7 +197,6 @@ class AgentsController extends Controller
             ->where('agents_creating.created_by', $userId)
             ->select('agents.id', 'agents.name', 'agents.phone')
             ->get();
-info($userId);
         return response()->json($agentData);
     }
 }

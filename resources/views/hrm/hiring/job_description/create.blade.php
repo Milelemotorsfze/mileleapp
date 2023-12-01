@@ -149,6 +149,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <div class=" col-lg-4 col-md-6 col-sm-6 date-section-div">
                         <label for="request_date" class="form-label text-md-end"><span class="error">* </span> {{ __('Choose Date') }}</label>
                         <input type="date" name="request_date" id="request_date" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2" value="{{$jobDescription->request_date}}">
+                        <span id="formatted_date"></span>
                     </div>
 
 
@@ -170,6 +171,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     @foreach($allHiringRequests as $a)
                     <!-- JobTitle :: {{$a->questionnaire->designation->name ?? ''}} -->
                     <!-- Dep Name :: {{$a->questionnaire->department->name ?? ''}}, -->
+                    <!-- Work Location :: {{$a->questionnaire->workLocation->name ?? ''}}, -->
+                    <!-- Reporting To :: {{$a->department_head_name ?? ''}}, -->
+
                     @endforeach
 
                     <!-- Department Section -->
@@ -283,7 +287,7 @@ redirect()->route('home')->send();
     var data = <?php echo json_encode($allHiringRequests); ?>;
     var jobDescriptionss = <?php echo json_encode($jobDescription); ?>;
     var jobDescriptionLocationId = jobDescriptionss.location_id
-    console.log("JD iiis -----", jobDescriptionLocationId)
+    console.log("JD iiis -----", data)
 
     var currentHiringRequestValue = <?php echo json_encode($currentHiringRequest); ?>;
     var currentHiringRequestId = currentHiringRequestValue.id;
@@ -305,6 +309,15 @@ redirect()->route('home')->send();
             maximumSelectionLength: 1,
             placeholder: "Choose uuid",
         });
+
+        var requestDate = new Date(jobDescriptionss.request_date);
+        var formattedDate = requestDate.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+        $('#formatted_date').text(formattedDate);
+
 
         // Execute with changing uuid value 
 
@@ -379,6 +392,9 @@ redirect()->route('home')->send();
         $('#uuid_value').on('change', function() {
             var selectedUUID = $(this).val();
             console.log("selected value of uuid -------------------- in loop is ", selectedUUID)
+            toggleJobDescriptionDetailsDiv();
+            var fieldName = $(this).attr('name');
+            $('#employeeJobDescriptionForm').validate().element('[name="' + fieldName + '"]');
 
             if (!selectedUUID || selectedUUID.length === 0) {
                 console.log("In Null uuid")
