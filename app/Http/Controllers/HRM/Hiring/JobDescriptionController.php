@@ -48,14 +48,15 @@ class JobDescriptionController extends Controller
             }
             else {
                 $currentHiringRequest ='';
-            }
+            }    
+            $allHiringRequests = EmployeeHiringRequest::whereDoesntHave('jobDescription')->get();
         }
         else {
             $jobDescriptionId = $jobDescription->id;
             $currentHiringRequest = EmployeeHiringRequest::where('id',$jobDescription->hiring_request_id)->first();
+            $allHiringRequests = EmployeeHiringRequest::whereDoesntHave('jobDescription')->orWhere('id',$jobDescription->hiring_request_id)->get();
         }
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
-        $allHiringRequests = EmployeeHiringRequest::all();
         return view('hrm.hiring.job_description.create',compact('jobDescriptionId','currentHiringRequest','jobDescription','masterOfficeLocations','allHiringRequests'));
     }
     public function storeOrUpdate(Request $request, $id) {
