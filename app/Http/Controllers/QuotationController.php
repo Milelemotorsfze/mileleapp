@@ -115,13 +115,15 @@ class QuotationController extends Controller
         $quotationDetail->advance_amount = $request->advance_amount;
         $quotationDetail->save();
 
-        $agentCommission = new AgentCommission();
-        $agentCommission->commission = $request->system_code ?? '';
-        $agentCommission->status = 'Quotation';
-        $agentCommission->agents_id  =  $request->agents_id ?? '';
-        $agentCommission->quotation_id  = $quotation->id;
-        $agentCommission->created_by = Auth::id();
-        $agentCommission->save();
+        if($request->agents_id) {
+            $agentCommission = new AgentCommission();
+            $agentCommission->commission = $request->system_code ?? '';
+            $agentCommission->status = 'Quotation';
+            $agentCommission->agents_id  =  $request->agents_id ?? '';
+            $agentCommission->quotation_id  = $quotation->id;
+            $agentCommission->created_by = Auth::id();
+            $agentCommission->save();
+        }
 
         $quotationItemIds = [];
         $quotationSubItemKeys = [];
@@ -458,13 +460,19 @@ public function addqaddone(Request $request)
              ->where('addon_details.id', '=', $addonid)
              ->get();
          return $results;
+
          }
     }
     public function getShippingPort(Request $request) {
         $shippingPorts = MasterShippingPort::where('country_id', $request->country_id)
                          ->get();
-        info($shippingPorts);
 
         return $shippingPorts;
+    }
+    public function getShippingCharges(Request $request) {
+        $shippingCharges = Shipping::with('shippingMedium')
+                            ->where('from_port', $request->shipping_port_id)
+                            ->get();
+        return $shippingCharges;
     }
 }

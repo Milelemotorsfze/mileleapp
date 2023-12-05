@@ -861,31 +861,17 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="table-responsive">
-                                <table id="shipping-table" class="table table-striped table-editable table-edits table">
+                                <table id="shipping-table" class="table table-striped table-editable table-edits table" width="100%">
                                     <thead class="bg-soft-secondary">
                                     <tr>
-                                        <th>S.No</th>
                                         <th>Code</th>
-                                        <th>Addon Name</th>
+                                        <th>Name</th>
                                         <th>Description</th>
                                         <th>Price</th>
                                         <th style="width:30px;">Add Into Quotation</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <div hidden>{{$i=0;}}
-                                        @foreach($shippings as $shipping)
-                                            <tr>
-                                            <td>{{ ++$i }}</td>
-                                            <td> </td>
-                                            <td>{{ $shipping->name }}</td>
-                                            <td>{{ $shipping->description  }}</td>
-                                            <td></td>
-                                            <td>
-                                                <button class="add-button circle-button" data-button-type="Shipping" data-shipping-id="{{ $shipping->id }}"></button>
-                                            </td>
-                                            </tr>
-                                    @endforeach
                                     </tbody>
                                 </table>
                             </div>
@@ -893,7 +879,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
         <div id="shippingDocumentContent" class="contentveh">
             <hr>
@@ -909,9 +894,9 @@
                                 <table id="shipping-document-table" class="table table-striped table-editable table-edits table">
                                     <thead class="bg-soft-secondary">
                                     <tr>
-                                        <th>S.No</th>
+
                                         <th>Code</th>
-                                        <th>Addon Name</th>
+                                        <th> Name</th>
                                         <th>Description</th>
                                         <th>Price</th>
                                         <th style="width:30px;">Add Into Quotation</th>
@@ -921,7 +906,6 @@
                                     <div hidden>{{$i=0;}}
                                         @foreach($shippingDocuments as $shippingDocument)
                                             <tr>
-                                                <td>{{ ++$i }}</td>
                                                 <td>{{ $shippingDocument->code }}</td>
                                                 <td>{{ $shippingDocument->name }}</td>
                                                 <td>{{ $shippingDocument->description  }}</td>
@@ -955,9 +939,8 @@
                                 <table id="certification-table" class="table table-striped table-editable table-edits table">
                                     <thead class="bg-soft-secondary">
                                     <tr>
-                                        <th>S.No</th>
                                         <th>Code</th>
-                                        <th>Addon Name</th>
+                                        <th> Name</th>
                                         <th>Description</th>
                                         <th>Price</th>
                                         <th style="width:30px;">Add Into Quotation</th>
@@ -967,7 +950,6 @@
                                     <div hidden>{{$i=0;}}
                                         @foreach($certifications as $certification)
                                             <tr>
-                                                <td>{{ ++$i }}</td>
                                                 <td>{{ $certification->code }}</td>
                                                 <td>{{ $certification->name }}</td>
                                                 <td>{{ $certification->description  }}</td>
@@ -1000,9 +982,8 @@
                                 <table id="other-document-table" class="table table-striped table-editable table-edits table">
                                     <thead class="bg-soft-secondary">
                                     <tr>
-                                        <th>S.No</th>
                                         <th>Code</th>
-                                        <th>Addon Name</th>
+                                        <th> Name</th>
                                         <th>Description</th>
                                         <th>Price</th>
                                         <th style="width:30px;">Add Into Quotation</th>
@@ -1012,7 +993,6 @@
                                     <div hidden>{{$i=0;}}
                                         @foreach($otherDocuments as $otherDocument)
                                             <tr>
-                                                <td>{{ ++$i }}</td>
                                                 <td>{{ $otherDocument->code }}</td>
                                                 <td>{{ $otherDocument->name }}</td>
                                                 <td>{{ $otherDocument->description  }}</td>
@@ -1103,8 +1083,8 @@
 @push('scripts')
 <script>
      function addAgentModal() {
-  $('#addAgentModal').modal('show');
-}
+        $('#addAgentModal').modal('show');
+    }
 $(document).ready(function () {
     $('#cb_name').change(function () {
         var selectedAgentId = $(this).val();
@@ -1190,6 +1170,7 @@ $(document).ready(function () {
 
     </script>
 <script>
+    // get the shipping medium charges based on port selected
 
     function checkBrandValidation()
     {
@@ -1266,6 +1247,12 @@ $(document).ready(function () {
         document.getElementById("brand-from-list").classList.remove("is-invalid");
         document.getElementById("existingBrandError").classList.remove("paragraph-class");
     }
+    function showPriceError($msg,i)
+    {
+        document.getElementById("priceError"+i).textContent=$msg;
+        document.getElementById("price"+i).classList.add("is-invalid");
+        document.getElementById("priceError"+i).classList.add("paragraph-class");
+    }
     $(document).ready(function() {
         $('#brand').select2();
 
@@ -1316,10 +1303,51 @@ $(document).ready(function () {
                 }
             });
         });
-        // $('#shipping_port').on('change',function(){
-        //     appendShippingPrice();
-        //
-        // });
+        $('#shipping_port').on('change',function(){
+            let shippingPortId = $('#shipping_port').val();
+            var table = $('#shipping-table').DataTable();
+
+            let url = '{{ route('quotation.shipping_charges') }}';
+                if(shippingPortId) {
+                    $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        shipping_port_id: shippingPortId,
+                    },
+                    success:function (response) {
+
+                        var data = response.map(function(response) {
+
+                            var addButton = '<div class="add-button circle-button" data-button-type="Shipping" data-shipping-id="'+ response.id +'" ></div>';
+
+                            return [
+                                response.shipping_medium.code,
+                                response.shipping_medium.name,
+                                response.shipping_medium.description,
+                                response.price,
+                                addButton
+                            ];
+                        });
+                        if ($.fn.dataTable.isDataTable('#shipping-table')) {
+                            table.destroy();
+                        }
+                        $('#shipping-table').DataTable({
+                            data: data,
+                            columns: [
+                                { title: 'Code' },
+                                { title: 'Name' },
+                                { title: 'Description' },
+                                { title: 'Price' },
+                                { title: 'Add Into Quotation' }
+                            ]
+                        });
+                    }
+                });
+            }
+
+        });
 
         $('.add-new-button').on('click', function(){
 
@@ -1454,8 +1482,6 @@ $(document).ready(function () {
         var shippingDocumentTable = $('#shipping-document-table').DataTable();
         var certificationTable = $('#certification-table').DataTable();
         var otherTable = $('#other-document-table').DataTable();
-
-
 
         $('input[name="document_type"]').on('change', function() {
             $('input[name="' + this.name + '"]').not(this).prop('checked', false);
@@ -1776,13 +1802,14 @@ $(document).ready(function () {
                 targets: -2,
                 data: null,
                 render: function (data, type, row) {
+                    console.log(row);
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
                         var price = row[7];
 
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
-                        var price = row[4];
+                        var price = row[3];
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         var price = row[4];
@@ -1820,7 +1847,7 @@ $(document).ready(function () {
                         var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
-                        combinedValue = row[2]+', '+row[3];
+                        combinedValue = row[1]+', '+row[2];
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         combinedValue = row[2] + ' , ' + row[3];
@@ -1868,7 +1895,7 @@ $(document).ready(function () {
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
 
-                        var code = row[1];
+                        var code = row[0];
                     }else if(row['button_type'] == 'Direct-Add') {
                         var code = row[2];
                         // if(row['table_type'] == 'vehicle-table') {
@@ -1889,6 +1916,8 @@ $(document).ready(function () {
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
                         var price = row[7];
+                    }else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
+                        var price = row[3];
                     }else{
                         var price = row[4];
                     }
@@ -1912,37 +1941,38 @@ $(document).ready(function () {
         let row = secondTable.row(e.target.closest('tr')).data();
         // var row = $(this).closest('tr');
         if(row['button_type'] == 'Shipping') {
+
             var table = $('#shipping-table').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping"  data-shipping-id="'+ row['id']+'"></button>']).draw();
+            table.row.add([row[0],row[1],row[2],row[3],'<button class="add-button circle-button" data-button-type="Shipping"  data-shipping-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
-            table.row.add(['', row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
+            table.row.add([ row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
                 '<button class="add-button circle-button" data-button-type="Vehicle" data-variant-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Shipping-Document') {
             var table = shippingDocumentTable;
-            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping-Document"  data-shipping-document-id="'+ row['id']+'"></button>']).draw();
+            table.row.add([row[0],row[1],row[2],row[3],'<button class="add-button circle-button" data-button-type="Shipping-Document"  data-shipping-document-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Certification') {
             var table = certificationTable;
-            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Certification" data-certification-id="'+ row['id']+'" ></button>']).draw();
+            table.row.add([row[0],row[1],row[2],row[3],'<button class="add-button circle-button" data-button-type="Certification" data-certification-id="'+ row['id']+'" ></button>']).draw();
         }
         else if(row['button_type'] == 'Other') {
             var table = otherTable;
-            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Other" data-other-id="'+ row['id']+'" ></button>']).draw();
+            table.row.add([row[0],row[1],row[2],row[3], '<button class="add-button circle-button" data-button-type="Other" data-other-id="'+ row['id']+'" ></button>']).draw();
         }
         else if(row['button_type'] == 'Accessory') {
             var table = $('#dtBasicExample5').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],'<button class="add-button circle-button" data-button-type="Accessory"  data-accessory-id="'+ row['id']+'" ></button>']).draw();
+            table.row.add([ row[1],row[2],row[3],row[4],row[5],row[6],'<button class="add-button circle-button" data-button-type="Accessory"  data-accessory-id="'+ row['id']+'" ></button>']).draw();
         }
         else if(row['button_type'] == 'SparePart') {
             var table = $('#dtBasicExample3').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],'<button class="add-button circle-button" data-sparepart-id="'+ row['id']+'" data-button-type="SparePart" ></button>']).draw();
+            table.row.add([ row[1],row[2],row[3],row[4],row[5],row[6],row[7],'<button class="add-button circle-button" data-sparepart-id="'+ row['id']+'" data-button-type="SparePart" ></button>']).draw();
         }
         else if(row['button_type'] == 'Kit') {
             var table = $('#dtBasicExample4').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],row[5],'<button class="add-button circle-button" data-kit-id="'+ row['id'] +'"  data-button-type="Kit" ></button>']).draw();
+            table.row.add([ row[1],row[2],row[3],row[4],row[5],'<button class="add-button circle-button" data-kit-id="'+ row['id'] +'"  data-button-type="Kit" ></button>']).draw();
         }
 
         var index = $(this).closest('tr').index();
@@ -1956,9 +1986,9 @@ $(document).ready(function () {
            $(this).find('td input.total-amount-editable').attr('id','total-amount-'+ i);
         });
 
-        if(row['button_type'] != 'Direct-Add') {
-            resetSerialNumber(table);
-        }
+        // if(row['button_type'] != 'Direct-Add') {
+        //     resetSerialNumber(table);
+        // }
 
         // total div logic
         var tableLength = secondTable.data().length;
@@ -2010,12 +2040,7 @@ $(document).ready(function () {
             //     e.preventDefault();
             // }
     });
-    function showPriceError($msg,i)
-    {
-        document.getElementById("priceError"+i).textContent=$msg;
-        document.getElementById("price"+i).classList.add("is-invalid");
-        document.getElementById("priceError"+i).classList.add("paragraph-class");
-    }
+
     var dateValue = $('#name').val();
     var callIdValue = $('#call_id').val();
     var etd = $('#etd').val();
@@ -2197,7 +2222,7 @@ $(document).ready(function () {
 
         enableOrDisableSubmit();
         showPriceInSelectedValue();
-        console.log(row);
+
     });
     $(document).on('click', '.add-button', function() {
         var secondTable = $('#dtBasicExample2').DataTable();
@@ -2217,9 +2242,8 @@ $(document).ready(function () {
         var secondTable = $('#dtBasicExample2').DataTable();
 
         if(buttonType == 'Shipping') {
-            var table = shippingTable;
+            var table = $('#shipping-table').DataTable();
             var id = $(this).data('shipping-id');
-
         }
         else if(buttonType == 'Shipping-Document') {
             var table = shippingDocumentTable;
@@ -2259,7 +2283,7 @@ $(document).ready(function () {
         rowData['id'] = id;
         secondTable.row.add(rowData).draw();
         table.row(row).remove().draw();
-        resetSerialNumber(table);
+        // resetSerialNumber(table);
         // total amount div logic
         $('.total-div').attr('hidden', false);
         CalculateTotalAmount(index);
@@ -2269,11 +2293,11 @@ $(document).ready(function () {
         console.log(rowData);
     });
 
-    function resetSerialNumber(table) {
-        table.$('tbody tr').each(function(i){
-            $($(this).find('td')[0]).html(i+1);
-        });
-    }
+    // function resetSerialNumber(table) {
+    //     table.$('tbody tr').each(function(i){
+    //         $($(this).find('td')[0]).html(i+1);
+    //     });
+    // }
         $('#dtBasicExample2 tbody').on('input', '.price-editable', function(e) {
             var index =  $(this).closest('tr').index() + 1;
             CalculateTotalAmount(index);
@@ -2447,38 +2471,9 @@ $(document).ready(function () {
                     else {
                         var accessoryName = accessory.addon_description.addon.name;
                     }
-                    // if(accessory.is_all_brands == 'yes') {
-                    //     var accessoryBrand = 'All Brands'
-                    // }
-                    // else {
+
                         var accessoryBrand = accessory.brandModelLine;
-                        // var size = 0;
-                        // size = (accessory.brandModelLine).length;
-                        // if(size > 0) {
-                        //     var accessoryBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Brand</th><th style="border: 1px solid #c4c4d4">Model Line</th></tr></thead><tbody>';
-                        //     for(var i=0; i < size; i++) {
-                        //         accessoryBrand = accessoryBrand +'<tr><td style="border: 1px solid #c4c4d4">'+accessory.brandModelLine[i].brands.brand_name+'</td>';
-                        //         if(accessory.brandModelLine[i].is_all_model_lines == 'yes') {
-                        //             accessoryBrand = accessoryBrand +'<td style="border: 1px solid #c4c4d4">All Model Lines</td>';
-                        //         }
-                        //         else {
-                        //             accessoryBrand = accessoryBrand +'<td style="border: 1px solid #c4c4d4">';
-                        //             var modelLineSize = 0;
-                        //             modelLineSize = (accessory.brandModelLine[i].ModelLine).length;
-                        //             if(modelLineSize > 0) {
-                        //                 accessoryBrand = accessoryBrand + '<table><tbody>';
-                        //                 for(var j=0; j < modelLineSize; j++) {
-                        //                     accessoryBrand = accessoryBrand + '<tr><td>'+ accessory.brandModelLine[i].ModelLine[j].model_lines.model_line +'</td></tr>';
-                        //                 }
-                        //                 accessoryBrand = accessoryBrand + '</tbody></table>';
-                        //             }
-                        //             accessoryBrand = accessoryBrand +'</td>';
-                        //         }
-                        //         accessoryBrand = accessoryBrand +'</tr>';
-                        //     }
-                        //     accessoryBrand = accessoryBrand +'</tbody></table>';
-                        // }
-                    // }
+
                     if(accessory.additional_remarks != null) {
                         var accessoryAdditionalRemarks = '';
                     }
@@ -2496,16 +2491,7 @@ $(document).ready(function () {
                             var accessorySellingPrice = accessory.selling_price.selling_price;
                         }
                     }
-                    // else if(accessory.pending_selling_price != null) {
-                    //     if(accessory.pending_selling_price != null) {
-                    //         if(accessory.pending_selling_price != '0.00' || accessory.pending_selling_price.selling_price != null) {
-                    //             var accessorySellingPrice = accessory.pending_selling_price.selling_price + ' (Approval Awaiting)';
-                    //         }
-                    //     }
-                    // }
-                    // else {
-                    //     var accessorySellingPrice = 'Not Added';
-                    // }
+
                     else {
                         var accessorySellingPrice = '';
                     }
@@ -2592,36 +2578,7 @@ $(document).ready(function () {
                     else {
                         var sparePartName = sparePart.addon_description.addon.name;
                     }
-                    // if(sparePart.is_all_brands == 'no') {
-                    //     var sparePartBrandName = sparePart.brandModelLine[0].brands.brand_name;
-                    //     var sparePartBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Model Line</th><th style="border: 1px solid #c4c4d4">Model Description</th><th style="border: 1px solid #c4c4d4">Model year</th></tr></thead><tbody>';
-                    //     var modelLineSize = 0;
-                    //     modelLineSize = (sparePart.brandModelLine[0].ModelLine).length;
-                    //     if(modelLineSize > 0) {
-                    //         for(var j=0; j < modelLineSize; j++) {
-                    //             sparePartBrand = sparePartBrand +'<tr><td style="border: 1px solid #c4c4d4">'+sparePart.brandModelLine[0].ModelLine[j].model_lines.model_line+'</td><td style="border: 1px solid #c4c4d4">';
-                    //             var modelDescSize = 0;
-                    //             modelDescSize = (sparePart.brandModelLine[0].ModelLine[j].allDes).length;
-                    //             if(modelDescSize > 0) {
-                    //                 sparePartBrand = sparePartBrand +'<table><tbody>';
-                    //                 for(var i=0; i < modelDescSize; i++) {
-                    //                     sparePartBrand = sparePartBrand +'<tr><td>';
-                    //                     if(i != 0) {
-                    //                         sparePartBrand = sparePartBrand +'<br style="line-height: 3px">';
-                    //                     }
-                    //                     sparePartBrand = sparePartBrand +sparePart.brandModelLine[0].ModelLine[j].allDes[i].model_description+'</td></tr>';
-                    //                 }
-                    //                 sparePartBrand = sparePartBrand +'</tbody></table>';
-                    //             }
-                    //             sparePartBrand = sparePartBrand +'</td><td style="border: 1px solid #c4c4d4">'+sparePart.brandModelLine[0].ModelLine[j].model_year_start;
-                    //             if(sparePart.brandModelLine[0].ModelLine[j].model_year_end != null) {
-                    //                 sparePartBrand = sparePartBrand +' - '+sparePart.brandModelLine[0].ModelLine[j].model_year_end;
-                    //             }
-                    //             sparePartBrand = sparePartBrand +'</td></tr>';
-                    //         }
-                    //     }
-                    //     sparePartBrand = sparePartBrand +'</tbody></table>';
-                    // }
+
                     var sparePartBrandName = sparePart.brandModelLineModelDescription;
                     var sparePartNumber = '';
                     var partNumbersSize = 0;
@@ -2653,16 +2610,7 @@ $(document).ready(function () {
                             var sparePartSellingPrice = sparePart.selling_price.selling_price;
                         }
                     }
-                    // else if(sparePart.pending_selling_price != null) {
-                    //     if(sparePart.pending_selling_price != null) {
-                    //         if(sparePart.pending_selling_price != '0.00' || sparePart.pending_selling_price.selling_price != null) {
-                    //             var sparePartSellingPrice = sparePart.pending_selling_price.selling_price + ' (Approval Awaiting)';
-                    //         }
-                    //     }
-                    // }
-                    // else {
-                    //     var sparePartSellingPrice = 'Not Added';
-                    // }
+
                     else {
                         var sparePartSellingPrice = '';
                     }
