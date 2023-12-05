@@ -1533,6 +1533,7 @@ $(document).ready(function () {
                 }
             }
         }
+
         $('#currency').on('change', function() {
             var currency = $(this).val();
             showPriceInSelectedValue();
@@ -1793,7 +1794,7 @@ $(document).ready(function () {
                     var directAdd = "";
                     var directAdd = 'Direct-Add';
 
-                    return '<button class="circle-buttonr remove-button"  data-button-type="'+ directAdd +'">Remove</button>';
+                    return '<button class="circle-buttonr remove-button "  data-button-type="'+ directAdd +'">Remove</button>';
 
             }
             // defaultContent: '<button class="circle-buttonr remove-button" >Remove</button>'
@@ -1802,7 +1803,6 @@ $(document).ready(function () {
                 targets: -2,
                 data: null,
                 render: function (data, type, row) {
-                    console.log(row);
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
                         var price = row[7];
@@ -1879,7 +1879,7 @@ $(document).ready(function () {
                     }
                     var arrayIndex = row['index'] - 1;
                     return '<div class="row" style="flex-wrap: unset">' +
-                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;" name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide" checked id="checkbox-'+ row['index'] +'"> ' +
+                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;"  name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide" checked id="checkbox-'+ row['index'] +'"> ' +
                         '<input type="text" name="descriptions[]" required class="combined-value-editable form-control" value="' + combinedValue + '"/>' +
                         '</div> ';
                 }
@@ -1936,12 +1936,12 @@ $(document).ready(function () {
             }
         ]
     });
+
     $('#dtBasicExample2 tbody').on('click', '.remove-button', function(e) {
         // var row = secondTable.row($(this).parents('tr'));
         let row = secondTable.row(e.target.closest('tr')).data();
         // var row = $(this).closest('tr');
         if(row['button_type'] == 'Shipping') {
-
             var table = $('#shipping-table').DataTable();
             table.row.add([row[0],row[1],row[2],row[3],'<button class="add-button circle-button" data-button-type="Shipping"  data-shipping-id="'+ row['id']+'"></button>']).draw();
         }
