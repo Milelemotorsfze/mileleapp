@@ -108,16 +108,13 @@ class ShippingController extends Controller
         $price = $request->input('price');
         $description = $request->input('description');
         if($category == "Shipping"){
-        $shipping = New Shipping;
+        $shipping = New ShippingMedium;
         $shipping->name = $addon_name;
         $shipping->description = $description;
-        $shipping->price = $price;
         $shipping->created_by = Auth::id();
-
-        $latestCode = Shipping::withTrashed()->orderBy('id', 'desc')->first();
+        $latestCode = ShippingMedium::withTrashed()->orderBy('id', 'desc')->first();
         $code = $this->generateUUID($latestCode, $category);
         $shipping->code = $code;
-
         $shipping->save();
         }
         else if($category == "Shipping Documents"){
@@ -357,12 +354,12 @@ public function shippingrates (Builder $builder, $id)
         ['data' => 'suppliers_id', 'name' => 'suppliers_id', 'title' => 'Vendor Name'],
         ['data' => 'cost_price', 'name' => 'cost_price', 'title' => 'Cost Price'],
         ['data' => 'selling_price', 'name' => 'selling_price', 'title' => 'Selling Price'],
-        ['data' => 'created_by', 'name' => 'created_by', 'title' => 'Created By'],
         ['data' => 'updated_by', 'name' => 'updated_by', 'title' => 'Updated By'],
-        ['data' => 'created_at', 'name' => 'created_at', 'title' => 'Created At'],
         ['data' => 'updated_at', 'name' => 'updated_at', 'title' => 'Updated At'],
+        ['data' => 'created_by', 'name' => 'created_by', 'title' => 'Created By'],
+        ['data' => 'created_at', 'name' => 'created_at', 'title' => 'Created At'],
         ['data' => 'status', 'name' => 'status', 'title' => 'Status'],
     ]);
-return view('logistics.shipping_vendor_rates', compact('html'));
+return view('logistics.shipping_vendor_rates', compact('html', 'id'));
 }
 }

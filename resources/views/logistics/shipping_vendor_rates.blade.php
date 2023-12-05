@@ -35,7 +35,7 @@
   <div class="card-header">
     <h4 class="card-title">
      Shipping Rates Info
-     <a  class="btn btn-sm btn-info float-end" href="{{ route('Shipping.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+     <a  class="btn btn-sm btn-info float-end" href="{{ route('shipping_medium.openmedium', ['id' => $id]) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
                 <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
      <a class="btn btn-sm btn-success float-end" href="{{ route('Shipping.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New
