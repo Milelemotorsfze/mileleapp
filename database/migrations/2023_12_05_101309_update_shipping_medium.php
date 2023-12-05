@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('shipping_medium', function (Blueprint $table) {
-            $table->string('code')->nullable();
+            DB::statement('ALTER TABLE shipping_medium MODIFY id BIGINT UNSIGNED AUTO_INCREMENT');
         });
     }
 
@@ -21,8 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('shipping_medium', function (Blueprint $table) {
-        $table->dropColumn('code');
-    });
+        //
     }
 };
