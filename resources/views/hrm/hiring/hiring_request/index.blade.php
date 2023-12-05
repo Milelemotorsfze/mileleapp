@@ -22,9 +22,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 	<!-- <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> -->
 	@if(isset($page))
 	@if($page == 'listing')
+	@canany(['create-employee-hiring-request'])
+	@php
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request']);
+	@endphp
+	@if ($hasPermission)
 	<a style="float: right;" class="btn btn-sm btn-success" href="{{ route('employee-hiring-request.create-or-edit','new') }}">
       <i class="fa fa-plus" aria-hidden="true"></i> New Hiring Request
     </a>
+	@endif
+	@endcanany
 	@endif
 	@endif
 	@if (count($errors) > 0)
@@ -122,7 +129,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->uuid ?? ''}}</td>
-							<td>{{ $data->request_date ?? '' }}</td>
+							<td>
+								<!-- {{ $data->request_date ?? '' }} -->
+								{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								<!-- @if($data->request_date) -->
+                                    <!-- {{ \Carbon\Carbon::parse($data->request_date)->format('d M y') }} -->
+                                <!-- @endif -->
+							</td>
 							<td>{{ $data->department_name ?? '' }}</td>
 							<td>{{ $data->department_location ?? '' }}</td>
 							<td>{{ $data->requested_by_name ?? '' }}</td>

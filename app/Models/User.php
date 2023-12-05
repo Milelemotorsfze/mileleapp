@@ -10,6 +10,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB; // Import the DB facade here
 use App\Models\HRM\Employee\EmployeeProfile;
+use App\Models\HRM\Employee\PassportRequest;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
@@ -27,6 +28,18 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    protected $appends = [
+        'passport_with',
+    ];
+    public function getPassportWithAttribute()
+    {
+        $passportWith = 'with_employee';
+        $passportRequest = PassportRequest::where('employee_id',$this->id)->where('passport_status','with_company')->latest('id')->first();
+        if($passportRequest) {
+            $passportWith = 'with_company';
+        }
+        return $passportWith;
+    }
     public function getSelectedRoleAttribute()
     {
         return $this->attributes['selected_role'] ?? $this->roles()->first()->name;
