@@ -276,9 +276,9 @@
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <select class="widthinput form-control" name="categories[]" id="category" multiple  autofocus>
                                         <option></option>
-                                        <option value="{{ \App\Models\Supplier::SUPPLIER_CATEGORY_VEHICLES }}">Vehicles</option>
-                                        <option value="{{ \App\Models\Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES }}">Parts and Accessories</option>
-                                        <option value="{{ \App\Models\Supplier::SUPPLIER_CATEGORY_OTHER }}">Other</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->name }}">{{ $category->name }}</option>
+                                        @endforeach
                                     </select>
                                     @error('category')
                                     <span class="invalid-feedback" role="alert">
@@ -297,23 +297,23 @@
                                     <label for="supplier_types" class="col-form-label text-md-end">{{ __('Sub Category') }}</label>
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12" id="mainSelect">
-                                    <select name="supplier_types[]" hidden="hidden" id="supplier_type" multiple="true" style="width: 100%;"
+                                    <select name="supplier_types[]"  id="supplier_type" multiple="true" style="width: 100%;"
                                             class="form-control widthinput" autofocus
                                             onchange="validationOnKeyUp(this)">
                                             <option value="">Choose Sub Category</option>
                                     </select>
                                     <span id="supplierTypeError" class=" invalid-feedback"></span>
                                 </div>
-                                <div class="col-xxl-9 col-lg-6 col-md-12" id="subSelect" hidden onclick="showAlert()">
-                                    <div id="supplier_type_sub" style="width: 100%; background-color:#e4e4e4;" class="form-control widthinput">
-                                        <span id="accessories" class="spanSub" hidden>Accessories</span>
-                                        <span id="freelancer" class="spanSub" hidden>Freelancer</span>
-                                        <span id="garage" class="spanSub" hidden>Garage</span>
-                                        <span id="spare_parts" class="spanSub" hidden>Spare Parts</span>
-                                        <span id="warranty" class="spanSub" hidden>Warranty</span>
+{{--                                <div class="col-xxl-9 col-lg-6 col-md-12" id="subSelect" hidden onclick="showAlert()">--}}
+{{--                                    <div id="supplier_type_sub" style="width: 100%; background-color:#e4e4e4;" class="form-control widthinput">--}}
+{{--                                        <span id="accessories" class="spanSub" hidden>Accessories</span>--}}
+{{--                                        <span id="freelancer" class="spanSub" hidden>Freelancer</span>--}}
+{{--                                        <span id="garage" class="spanSub" hidden>Garage</span>--}}
+{{--                                        <span id="spare_parts" class="spanSub" hidden>Spare Parts</span>--}}
+{{--                                        <span id="warranty" class="spanSub" hidden>Warranty</span>--}}
 
-                                    </div>
-                                </div>
+{{--                                    </div>--}}
+{{--                                </div>--}}
                             </div>
                         </div>
                         <div class="col-xxl-6 col-lg-6 col-md-12">
@@ -1215,58 +1215,35 @@
                 placeholder:"Choose Vendor Type",
             });
             $(document.body).on('select2:unselect', "#category", function (e) {
-                var category =  e.params.data.id;
-                if( category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_VEHICLES }}' )
-                {
-                    removeSubCategoryVehicle()
+                getSubCategories();
 
-                }else if(category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES }}') {
-                    removeSubCategoryParts();
-                }else if(category == 'Other') {
-                    $("#supplier_type option[value='Other']").remove();
-                    $("#supplier_type option[value='demand_planning']").remove();
-                }
             })
             $(document.body).on('select2:select', "#category", function (e) {
-                removeSupplierCategoryError()
-                var category =  e.params.data.text;
-                if( category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_VEHICLES }}' )
-                {
-                    appendSubCategoryVehicle()
+                getSubCategories();
+            });
 
-                }else if(category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES }}')
-                {
-                    appendSubCategoryParts();
-                }else if(category == 'Other')
-                {
-                    $('#supplier_type').append($('<option>', { value: 'Other', text: 'Other' }));
-                    $('#supplier_type').append($('<option>', { value: 'demand_planning', text: 'Demand Planning' }));
+            function getSubCategories() {
+                var categories =  $('#category').val();
+                let url = '{{ route('vendor.sub-categories') }}';
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        categories: categories,
+                    },
+                    success:function (data) {
+                        $('#supplier_type').empty();
+                        $('#supplier_type').html('<option value="">Select Sub Category</option>');
+                        if(data) {
+                            jQuery.each(data, function(key,value){
+                                $('#supplier_type').append('<option value="'+ value.slug +'">'+ value.name +'</option>');
+                            });
+                        }
+                    }
+                });
+            }
 
-                }
-            })
-            function appendSubCategoryVehicle() {
-                $('#supplier_type').append($('<option>', { value: 'Bulk', text: 'Bulk' }));
-                $('#supplier_type').append($('<option>', { value:'Small Segment', text: 'Small Segment' }));
-            }
-            function removeSubCategoryVehicle() {
-                $("#supplier_type option[value='Bulk']").remove();
-                $("#supplier_type option[value='Small Segment']").remove();
-            }
-            function appendSubCategoryParts() {
-                $('#supplier_type').append($('<option>', { value: 'accessories', text: 'Accessories' }));
-                $('#supplier_type').append($('<option>', { value: 'freelancer', text: 'Freelancer' }));
-                $('#supplier_type').append($('<option>', { value: 'garage', text: 'Garage' }));
-                $('#supplier_type').append($('<option>', { value: 'spare_parts', text: 'Spare Parts' }));
-                $('#supplier_type').append($('<option>', { value: 'warranty', text: 'Warranty' }));
-            }
-            function removeSubCategoryParts() {
-
-                $("#supplier_type option[value='accessories']").remove();
-                $("#supplier_type option[value='freelancer']").remove();
-                $("#supplier_type option[value='garage']").remove();
-                $("#supplier_type option[value='spare_parts']").remove();
-                $("#supplier_type option[value='warranty']").remove();
-            }
             $('#addon_1').select2({
                 allowClear: true,
                 minimumResultsForSearch: -1,

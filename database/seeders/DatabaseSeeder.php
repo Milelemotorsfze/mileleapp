@@ -31,9 +31,9 @@ class DatabaseSeeder extends Seeder
 //         $this->call(KitSeeder::class);
         // $this->call(BrandRegionsSeeder::class);
 //        $this->call(PermissionSettingSeeder::class);
-        $this->call(SettingsSeeder::class);
-
-
+//        $this->call(SettingsSeeder::class);
+        $this->call(MasterVendorCategorySeeder::class);
+        $this->call(MasterVendorSubCategorySeeder::class);
 
     }
 }

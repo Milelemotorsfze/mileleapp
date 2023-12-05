@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MasterVendorCategory;
+use App\Models\MasterVendorSubCategory;
 use App\Models\PaymentMethods;
 use App\Models\Supplier;
 use App\Models\User;
@@ -63,10 +65,6 @@ class SupplierController extends Controller
          }
         return view('suppliers.index',compact('suppliers','inactiveSuppliers'));
     }
-    public function getVendorAddonList(Request $request) {
-
-
-    }
 
     /**
      * Show the form for creating a new resource.
@@ -81,8 +79,9 @@ class SupplierController extends Controller
 //        {
 //            return view('demand_planning_suppliers.create');
 //        }
+        $categories = MasterVendorCategory::all();
         $users = User::where('id','!=','16')->select('id','name')->get();
-        return view('suppliers.create',compact('paymentMethods','addons','users'));
+        return view('suppliers.create',compact('paymentMethods','addons','users','categories'));
     }
 
     /**
@@ -318,7 +317,12 @@ class SupplierController extends Controller
             }
         }
 
+        $masterVendorCategories = MasterVendorCategory::all();
         $vendorCategories = VendorCategory::where('supplier_id', $supplier->id)->pluck('category')->toArray();
+        $vendorCategoyIds = MasterVendorCategory::whereIn('name', $vendorCategories)->pluck('id')->toArray();
+
+        $masterSubCategories = MasterVendorSubCategory::whereIn('master_vendor_category_id', $vendorCategoyIds)->get();
+
         $vendorSubCategories = SupplierType::where('supplier_id', $supplier->id)->pluck('supplier_type')->toArray();
         $vendorPaymentMethods = SupplierAvailablePayments::where('supplier_id', $supplier->id)->pluck('payment_methods_id')->toArray();
 
@@ -327,8 +331,8 @@ class SupplierController extends Controller
         $users = User::select('id','name')->get();
 
         return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods',
-            'addons','paymentMethods','array','supplierTypes','supAddTypesName','supplierAddons','vendorCategories',
-            'vendorSubCategories','vendorPaymentMethods','nonRemovableVendorCategories','users'));
+            'addons','paymentMethods','array','supplierTypes','supAddTypesName','supplierAddons','vendorCategories','masterSubCategories',
+            'vendorSubCategories','vendorPaymentMethods','nonRemovableVendorCategories','users','masterVendorCategories'));
     }
     public function destroy($id)
     {
@@ -409,7 +413,8 @@ class SupplierController extends Controller
     }
     public function store(Request $request)
     {
-        // dd($request->all());
+        info($request->supplier_types);
+
         $payment_methods_id = $addon_id = [];
         (new UserActivityController)->createActivity('Created Vendor');
 
@@ -930,6 +935,7 @@ class SupplierController extends Controller
         }
         if($request->supplier_types)
         {
+            info($request->supplier_types);
             if($request->form_action == 'UPDATE') {
                 $existingSupplierTypes = SupplierType::where('supplier_id', $request->supplier_id)->delete();
             }
@@ -1436,5 +1442,15 @@ class SupplierController extends Controller
             return response($data);
         }
         // dd($data);
+    }
+    public function getVendorSubCategories(Request $request) {
+        if($request->categories) {
+            $categoryIds  = MasterVendorCategory::whereIn('name', $request->categories)->pluck('id')->toArray();
+            $subCategories = MasterVendorSubCategory::whereIn('master_vendor_category_id', $categoryIds)->get();
+        }else{
+            $subCategories = [];
+        }
+
+        return $subCategories;
     }
 }
