@@ -180,13 +180,7 @@
             serverSide: true,
             ajax: "{{ route('Shipping.index', ['status' => 'Shipping']) }}",
             columns: [
-              {
-                    data: 'id',
-                    name: 'shipping_medium.id',
-                    render: function (data) {
-                        return 'S-' + data.toString().padStart(3, '0');
-                    }
-                },
+              { data: 'code', name: 'shipping_medium.code' },
                 { data: 'name', name: 'shipping_medium.name' },
                 { data: 'description', name: 'shipping_medium.description' },
                 {
