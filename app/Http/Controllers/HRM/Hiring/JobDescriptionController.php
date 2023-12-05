@@ -113,10 +113,10 @@ class JobDescriptionController extends Controller
                         $update->update();
                         $history['hiring_request_id'] = $request->hiring_request_id;
                         $history['icon'] = 'icons8-edit-30.png';
-                        $history['message'] = 'Employee hiring questionnaire edited by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
+                        $history['message'] = 'Employee hiring Job Description edited by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
                         $createHistory = EmployeeHiringRequestHistory::create($history);
-                        (new UserActivityController)->createActivity('Employee Hiring Questionnaire Edited');
-                        $successMessage = "Employee Hiring Questionnaire Updated Successfully";
+                        (new UserActivityController)->createActivity('Employee Hiring Job Description Edited');
+                        $successMessage = "Employee Hiring Job Description Updated Successfully";
                     }
                 }
                 DB::commit();

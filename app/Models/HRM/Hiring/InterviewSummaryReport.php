@@ -57,21 +57,39 @@ class InterviewSummaryReport extends Model
     ];
     protected $appends = [
         'is_auth_user_can_approve',
+        'current_status',
     ];
     public function getIsAuthUserCanApproveAttribute() {
         $isAuthUserCanApprove = [];
         $authId = Auth::id();
-        if($this->action_by_department_head =='pending' && $this->department_head_id == $authId) {
+        if($this->action_by_hr_manager =='pending' && $this->hr_manager_id == $authId) {
             $isAuthUserCanApprove['can_approve'] = true;
-            $isAuthUserCanApprove['current_approve_position'] = 'Team Lead / Reporting Manager';
-            $isAuthUserCanApprove['current_approve_person'] = $this->departmentHeadName->name;
+            $isAuthUserCanApprove['current_approve_position'] = 'HR Manager';
+            $isAuthUserCanApprove['current_approve_person'] = $this->hrManager->name;
         }
-        else if($this->action_by_department_head =='approved' && $this->division_head_id == $authId) {
+        else if($this->action_by_hr_manager =='approved' && $this->action_by_division_head =='pending' && $this->division_head_id == $authId) {
             $isAuthUserCanApprove['can_approve'] = true;
             $isAuthUserCanApprove['current_approve_position'] = 'Division Head';
             $isAuthUserCanApprove['current_approve_person'] = $this->divisionHeadName->name;
         }
         return $isAuthUserCanApprove;
+    }
+    public function getCurrentStatusAttribute() {
+        $currentStatus = '';
+        if($this->status == 'approved') {
+            $currentStatus = 'Approved';
+        }
+        else if($this->status == 'rejected') {
+            $currentStatus = 'Rejected';
+        }
+        // Approvals =>  HR manager -----------> Division head 
+        else if($this->status == 'pending' && $this->action_by_hr_manager == 'pending') {
+            $currentStatus = "HR Manager's Approval Awaiting";
+        }
+        else if($this->status == 'pending' && $this->action_by_division_head == 'pending') {
+            $currentStatus = "Division Head's Approval Awaiting";
+        }  
+        return $currentStatus;
     }
     public function nationalities() {
         return $this->hasOne(Country::class,'id','nationality');
@@ -85,8 +103,8 @@ class InterviewSummaryReport extends Model
     public function nameOfInterviewer() {
         return $this->hasOne(User::class,'id','name_of_interviewer');
     }
-    public function departmentHeadName() {
-        return $this->hasOne(User::class,'id','department_head_id');
+    public function hrManager() {
+        return $this->hasOne(User::class,'id','hr_manager_id');
     }
     public function divisionHeadName() {
         return $this->hasOne(User::class,'id','division_head_id');
@@ -98,7 +116,7 @@ class InterviewSummaryReport extends Model
         return $this->hasMany(Interviewers::class,'interview_summary_report_id','id')->where('round','telephonic');
     }
     public function firstRoundInterviewers() {
-        return $this->hasMany(Interviewers::class,'interview_summary_report_id','id')->where('round','firstRound');
+        return $this->hasMany(Interviewers::class,'interview_summary_report_id','id')->where('round','first');
     }
     public function secondRoundInterviewers() {
         return $this->hasMany(Interviewers::class,'interview_summary_report_id','id')->where('round','second');

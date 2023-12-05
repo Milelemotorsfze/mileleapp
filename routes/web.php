@@ -262,6 +262,7 @@ Route::get('/d', function () {
         Route::post('interview-summary-report/store-or-update/{id}', 'storeOrUpdate')->name('interview-summary-report.store-or-update');
         Route::post('interview-summary-report/request-action', 'requestAction')->name('interview-summary-report.request-action');
         Route::post('interview-summary-report/round-summary', 'updateRoundSummary')->name('interview-summary-report.round-summary');
+        Route::post('interview-summary-report/final-evaluation', 'finalEvaluation')->name('interview-summary-report.final-evaluation');
     });
     // Employee Passport Request
     Route::resource('passport_request', PassportRequestController::class);
