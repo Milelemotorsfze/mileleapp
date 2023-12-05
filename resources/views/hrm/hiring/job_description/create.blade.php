@@ -316,6 +316,11 @@ redirect()->route('home')->send();
 
             $("#requested_date").datepicker({
                 dateFormat: "dd-M-yy",
+                minDate: 0, 
+                changeMonth: true,
+                // showAnim: "explode",
+                showAnim: "slideDown",
+                autoSize: true,
                 onSelect: function(selectedDate) {
                     console.log("Selected Date: ", selectedDate);
                 }
@@ -328,6 +333,11 @@ redirect()->route('home')->send();
         } else {
             $("#requested_date").datepicker({
                 dateFormat: "dd-M-yy",
+                minDate: 0, 
+                changeMonth: true,
+                // showAnim: "explode",
+                showAnim: "slideDown",
+                autoSize: true,
                 onSelect: function(selectedDate) {
                     console.log("Selected Date: ", selectedDate);
                 }
