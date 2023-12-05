@@ -38,7 +38,7 @@
 									<label class="form-label font-size-13">Comments</label>
 								</div>
 								<div class="col-lg-12 col-md-12 col-sm-12">
-									<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment">
+									<textarea rows="5" id="comments{{$data->id}}" class="form-control" name="comment">
 									</textarea>
 								</div>
 							</div>
@@ -94,7 +94,7 @@
 									<label class="form-label font-size-13">Comments</label>
 								</div>
 								<div class="col-lg-12 col-md-12 col-sm-12">
-									<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment">
+									<textarea rows="5" id="comments{{$data->id}}" class="form-control" name="comment">
 									</textarea>
 								</div>
 							</div>
@@ -123,7 +123,7 @@
 	        approveOrRejectHiringrequest(id, status)
 	    })
         function approveOrRejectHiringrequest(id, status) {
-			var comment = $("#comment-"+id).val();
+			var comments = $("#comments"+id).val();
 			var current_approve_position = $("#current_approve_position_"+id).val();
 	        let url = '{{ route('interview-summary-report.request-action') }}';
 	        if(status == 'rejected') {
@@ -140,11 +140,11 @@
 	                    data: {
 	                        id: id,
 	                        status: status,
-	                        comment: comment,
+	                        comment: comments,
 							current_approve_position: current_approve_position,
 	                        _token: '{{ csrf_token() }}'
 	                    },
-	                    success: function (data) {
+	                    success: function (data) {console.log(data);
 							if(data == 'success') {
 								window.location.reload();
 								alertify.success(status + " Successfully")

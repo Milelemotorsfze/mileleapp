@@ -29,8 +29,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 	</h4>
 	<!-- <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> -->
 	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('interview-summary-report.create-or-edit','new')}}">
-      <i class="fa fa-plus" aria-hidden="true"></i> New Interview Summary Report
-    </a>
+	<i class="fa fa-plus" aria-hidden="true"></i> New Interview Summary Report
+	</a>
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -57,11 +57,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 </div>
 <div class="portfolio">
 	<ul class="nav nav-pills nav-fill" id="my-tab">
-        <!-- @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price'])
-        @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price']);
-        @endphp
-        @if ($hasPermission) -->
+		<!-- @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price'])
+			@php
+			$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price']);
+			@endphp
+			@if ($hasPermission) -->
 		<li class="nav-item">
 			<a class="nav-link active" data-bs-toggle="pill" href="#shortlisted-for-interview">Shortlisted For Interview</a>
 		</li>
@@ -87,10 +87,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			<a class="nav-link" data-bs-toggle="pill" href="#not_selected_candidates">Not Selected Candidates</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#selected_candidates">Selected Candidates</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#pending-hiring-requests">Pending</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#pending-hiring-requests">Selected Candidates & Pending For Approval</a>
 		</li>
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#approved-hiring-requests">Approved</a>
@@ -98,17 +95,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#rejected-hiring-requests">Rejected</a>
 		</li>
-        <!-- @endif
-        @endcanany -->
+		<!-- @endif
+			@endcanany -->
 	</ul>
 </div>
 <div class="tab-content" id="selling-price-histories" >
-    <!-- @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price'])
-    @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price']);
-    @endphp
-    @if ($hasPermission) -->
-	
+	<!-- @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price'])
+		@php
+		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price']);
+		@endphp
+		@if ($hasPermission) -->
 	<div class="tab-pane fade show active" id="shortlisted-for-interview">
 		<div class="card-body">
 			<div class="table-responsive">
@@ -116,11 +112,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
-							<th colspan="2" class="dark"><center>Hiring Request</center></th>
-							<th colspan="3" class="light"><center>Candidate</center></th>
-							<th colspan="2" class="dark"><center>Rate Appearance</center></th>
+							<th colspan="2" class="dark">
+								<center>Hiring Request</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Candidate</center>
+							</th>
+							<th colspan="2" class="dark">
+								<center>Rate Appearance</center>
+							</th>
 							<th rowspan="2" class="light">Created By</th>
-                            <th rowspan="2" class="dark">Created At</th>
+							<th rowspan="2" class="dark">Created At</th>
 							<th rowspan="2" class="light">Action</th>
 						</tr>
 						<tr>
@@ -145,111 +147,103 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-
-                            <td>{{ $data->createdBy->name ?? ''}}</td>
-                            <td>{{ $data->created_at ?? ''}}</td>
+							<td>{{ $data->createdBy->name ?? ''}}</td>
+							<td>{{ $data->created_at ?? ''}}</td>
 							<td>
-							<div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+								<div class="dropdown">
+									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+									<i class="fa fa-bars" aria-hidden="true"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
 											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-										</a>
-									</li>
-									<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											</a>
+										</li>
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
 											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-										</a>
-									</li>
-                                    <li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											</a>
+										</li>
+										<li>
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
-										</a>
-									</li>
-                                    <li>
-										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-											data-bs-target="#shortlisted-candidate-{{$data->id}}">
+											</a>
+										</li>
+										<li>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#shortlisted-candidate-{{$data->id}}">
 											<i class="fa fa-plus" aria-hidden="true"></i> Telephonic Interview
-										</button>
-									</li>
-                                </ul>
-                            </div>
-							<div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
-								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-								<div class="modal-dialog ">
-									<div class="modal-content">
-										<form method="POST" action="{{route('interview-summary-report.round-summary')}}" id="form_{{$data->id}}">
-											@csrf
-											<div class="modal-header">
-												<h1 class="modal-title fs-5" id="exampleModalLabel">Telephonic Interview Summary {{$data->id}}</h1>
-												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-											</div>
-											<div class="modal-body p-3">
-												<div class="col-lg-12">
-													<div class="row">
-														<div class="col-12">
-															<div class="row">
-																<div class="col-xxl-6 col-lg-6 col-md-6">
-																	<label for="date" class="form-label font-size-13">{{ __('Telephonic Interview Date') }}</label>
+											</button>
+										</li>
+									</ul>
+								</div>
+								<div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
+									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog ">
+										<div class="modal-content">
+											<form method="POST" action="{{route('interview-summary-report.round-summary')}}" id="form_{{$data->id}}">
+												@csrf
+												<div class="modal-header">
+													<h1 class="modal-title fs-5" id="exampleModalLabel">Telephonic Interview Summary</h1>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body p-3">
+													<div class="col-lg-12">
+														<div class="row">
+															<div class="col-12">
+																<div class="row">
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<label for="date" class="form-label font-size-13">{{ __('Telephonic Interview Date') }}</label>
+																	</div>
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<input type="text" name="id" value="{{$data->id}}" hidden>
+																		<input type="text" name="round" value="telephonic" hidden>
+																		<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
+																		<span id="date_error_{{$data->id}}" class="required-class paragraph-class"></span>
+																	</div>
 																</div>
-																<div class="col-xxl-6 col-lg-6 col-md-6">
-																<input type="text" name="id" value="{{$data->id}}" hidden>
-
-																<input type="text" name="round" value="telephonic" hidden>
-
-																	<!-- <input type="text" name="round" id="round-{{$data->id}}" value="telephonic" hidden> -->
-																	<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
-																	<span id="date_error_{{$data->id}}" class="required-class paragraph-class"></span>
-
-																</div>
-															</div>
-															<div class="row">
-																@if(isset($interviewersNames))
+																<div class="row">
+																	@if(isset($interviewersNames))
 																	@if(count($interviewersNames) > 0)
-																		<div class="col-lg-12 col-md-12 col-sm-12">
-																			<label class="form-label font-size-13">Choose Telephonic Interviewers Names</label>
-																		</div>
-																		<div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Choose Telephonic Interviewers Names</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
 																		<div class="dropdown-option-div">
 																			<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
-																			class="interviewer_id form-control widthinput" autofocus>
+																				class="interviewer_id form-control widthinput" autofocus>
 																				@foreach($interviewersNames as $interviewer)
-																					<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
+																				<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
 																				@endforeach
 																			</select>
 																			<span id="interviewer_id_error_{{$data->id}}" class="required-class paragraph-class"></span>
 																		</div>
-																		</div>
+																	</div>
 																	@endif
-																@endif
-																<div class="col-lg-12 col-md-12 col-sm-12">
-																	<label class="form-label font-size-13">Comments</label>
-																</div>
-																<div class="col-lg-12 col-md-12 col-sm-12">
-																	<!-- <textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment1">
-																	</textarea> -->
-																	<textarea rows="5" id="comment-{{$data->id}}" type="text" class="form-control @error('comment') is-invalid @enderror"
-						name="comment" placeholder="" value="{{ old('comment') }}"  autocomplete="comment"
-						autofocus></textarea>
-																	<span id="comment-error-{{$data->id}}" class="required-class paragraph-class"></span>
-
+																	@endif
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Comments</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<textarea rows="5" id="comment-{{$data->id}}" type="text" class="form-control @error('comment') is-invalid @enderror"
+																			name="comment" placeholder="" value="{{ old('comment') }}"  autocomplete="comment"
+																			autofocus></textarea>
+																		<span id="comment-error-{{$data->id}}" class="required-class paragraph-class"></span>
+																	</div>
 																</div>
 															</div>
 														</div>
 													</div>
 												</div>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-												<button type="submit" class="btn btn-primary add-interview-summary"
-													data-id="{{ $data->id }}" data-status="telephonic">Submit</button>
-											</div>
-										</form>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary add-interview-summary"
+														data-id="{{ $data->id }}" data-status="telephonic">Submit</button>
+												</div>
+											</form>
+										</div>
 									</div>
 								</div>
-							</div>
-							</td>			
+							</td>
 						</tr>
 						@endforeach
 					</tbody>
@@ -264,12 +258,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
-							<th colspan="2" class="dark"><center>Hiring Request</center></th>
-							<th colspan="3" class="light"><center>Candidate</center></th>
-							<th colspan="2" class="dark"><center>Rate Appearance</center></th>
-							<th colspan="3" class="light"><center>Telephonic Round</center></th>
+							<th colspan="2" class="dark">
+								<center>Hiring Request</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Candidate</center>
+							</th>
+							<th colspan="2" class="dark">
+								<center>Rate Appearance</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Telephonic Round</center>
+							</th>
 							<th rowspan="2" class="dark">Created By</th>
-                            <th rowspan="2" class="light">Created At</th>
+							<th rowspan="2" class="light">Created At</th>
 							<th rowspan="2" class="dark">Action</th>
 						</tr>
 						<tr>
@@ -296,105 +298,109 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{ $data->nationalities->name ?? '' }}</td>
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
-							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>							
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
 							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
-  									@if(count($data->telephonicInterviewers) > 0)
-  										@foreach($data->telephonicInterviewers as $telephonicInterviewers)
-											{{ $telephonicInterviewers->interviewerName->name ?? '' }},
-										@endforeach
-									@endif
+								@if(count($data->telephonicInterviewers) > 0)
+								@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+								{{ $telephonicInterviewers->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
 								@endif
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
-                            <td>{{ $data->createdBy->name ?? ''}}</td>
-                            <td>{{ $data->created_at ?? ''}}</td>
+							<td>{{ $data->createdBy->name ?? ''}}</td>
+							<td>{{ $data->created_at ?? ''}}</td>
 							<td>
-							<div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+								<div class="dropdown">
+									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+									<i class="fa fa-bars" aria-hidden="true"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
 											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-										</a>
-									</li>
-									<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											</a>
+										</li>
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
 											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-										</a>
-									</li>
-                                    <li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											</a>
+										</li>
+										<li>
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
-										</a>
-									</li>
-                                    <li>
-										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-											data-bs-target="#shortlisted-candidate-{{$data->id}}">
+											</a>
+										</li>
+										<li>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#shortlisted-candidate-{{$data->id}}">
 											<i class="fa fa-plus" aria-hidden="true"></i> First Round
-										</button>
-									</li>
-                                </ul>
-                            </div>
-							<div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
-								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-								<div class="modal-dialog ">
-									<div class="modal-content">
-										<div class="modal-header">
-											<h1 class="modal-title fs-5" id="exampleModalLabel">First Round Interview Summary</h1>
-											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-										</div>
-										<div class="modal-body p-3">
-											<div class="col-lg-12">
-												<div class="row">
-													<div class="col-12">
+											</button>
+										</li>
+									</ul>
+								</div>
+								<div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
+									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog ">
+										<div class="modal-content">
+											<form method="POST" action="{{route('interview-summary-report.round-summary')}}" id="form_{{$data->id}}">
+												@csrf
+												<div class="modal-header">
+													<h1 class="modal-title fs-5" id="exampleModalLabel">First Round Interview Summary</h1>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body p-3">
+													<div class="col-lg-12">
 														<div class="row">
-															<div class="col-xxl-6 col-lg-6 col-md-6">
-																<label for="date" class="form-label font-size-13">{{ __('First Round Interview Date') }}</label>
-															</div>
-															<div class="col-xxl-6 col-lg-6 col-md-6">
-																<!-- <input type="text" name="round" id="round-{{$data->id}}" value="telephonic" hidden> -->
-																<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
-															</div>
-														</div>
-														<div class="row">
-															@if(isset($interviewersNames))
-																@if(count($interviewersNames) > 0)
+															<div class="col-12">
+																<div class="row">
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<label for="date" class="form-label font-size-13">{{ __('First Round Interview Date') }}</label>
+																	</div>
+																	<div class="col-xxl-6 col-lg-6 col-md-6"><input type="text" name="id" value="{{$data->id}}" hidden>
+																		<input type="text" name="round" value="first" hidden>
+																		<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
+																	</div>
+																</div>
+																<div class="row">
+																	@if(isset($interviewersNames))
+																	@if(count($interviewersNames) > 0)
 																	<div class="col-lg-12 col-md-12 col-sm-12">
 																		<label class="form-label font-size-13">Choose First Round Interviewers Names</label>
 																	</div>
 																	<div class="col-lg-12 col-md-12 col-sm-12">
 																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
-																		class="interviewer_id form-control widthinput" autofocus>
+																			class="interviewer_id form-control widthinput">
 																			@foreach($interviewersNames as $interviewer)
-																				<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
+																			<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
 																			@endforeach
 																		</select>
 																	</div>
-																@endif
-															@endif
-															<div class="col-lg-12 col-md-12 col-sm-12">
-																<label class="form-label font-size-13">Comments</label>
-															</div>
-															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="interview_summary">
-																</textarea>
+																	@endif
+																	@endif
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Comments</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<textarea rows="5" id="comment-{{$data->id}}" type="text" class="form-control @error('comment') is-invalid @enderror"
+																			name="comment" placeholder="" value="{{ old('comment') }}"  autocomplete="comment"
+																			autofocus></textarea>
+																	</div>
+																</div>
 															</div>
 														</div>
 													</div>
 												</div>
-											</div>
-										</div>
-										<div class="modal-footer">
-											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-											<button type="button" class="btn btn-primary add-interview-summary"
-												data-id="{{ $data->id }}" data-status="first">Submit</button>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary add-interview-summary"
+														data-id="{{ $data->id }}" data-status="first">Submit</button>
+												</div>
+											</form>
 										</div>
 									</div>
 								</div>
-							</div>
-							</td>					
+							</td>
 						</tr>
 						@endforeach
 					</tbody>
@@ -409,13 +415,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
-							<th colspan="2" class="dark"><center>Hiring Request</center></th>
-							<th colspan="3" class="light"><center>Candidate</center></th>
-							<th colspan="2" class="dark"><center>Rate Appearance</center></th>
-							<th colspan="3" class="light"><center>Telephonic Round</center></th>
-							<th colspan="3" class="dark"><center>First Round</center></th>
+							<th colspan="2" class="dark">
+								<center>Hiring Request</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Candidate</center>
+							</th>
+							<th colspan="2" class="dark">
+								<center>Rate Appearance</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Telephonic Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>First Round</center>
+							</th>
 							<th rowspan="2" class="light">Created By</th>
-                            <th rowspan="2" class="dark">Created At</th>
+							<th rowspan="2" class="dark">Created At</th>
 							<th rowspan="2" class="light">Action</th>
 						</tr>
 						<tr>
@@ -433,26 +449,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td class="dark">Name Of Interviewer</td>
 							<td class="dark">Summary</td>
 						</tr>
-						<!-- <tr>
-							<th>Sl No</th>
-							<th>Hiring Request UUID</th>
-							<th>Job Position</th>
-							<th>Candidate Name</th>
-							<th>Nationality</th>
-							<th>Gender</th>
-							<th>Rate Dress Appearance</th>
-							<th>Rate Body Language Appearance</th>
-
-							<th>Date Of Telephonic Interview</th>
-							<th>Name Of Telephonic Interviewers</th>
-							<th>Telephonic Interview Summary</th>
-							<th>Date Of First Round</th>
-							<th>Name Of First Round Interviewers</th>
-							<th>First Round</th>
-                            <th>Created By</th>
-                            <th>Created At</th>
-							<th>Action</th>
-						</tr> -->
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
@@ -469,116 +465,115 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
-  									@if(count($data->telephonicInterviewers) > 0)
-  										@foreach($data->telephonicInterviewers as $telephonicInterviewers)
-											{{ $telephonicInterviewers->interviewerName->name ?? '' }},
-										@endforeach
-									@endif
+								@if(count($data->telephonicInterviewers) > 0)
+								@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+								{{ $telephonicInterviewers->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
 								@endif
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
 							<td>{{ $data->date_of_first_round ?? ''}}</td>
 							<td>
 								@if(isset($data->firstRoundInterviewers))
-  									@if(count($data->firstRoundInterviewers) > 0)
-  										@foreach($data->firstRoundInterviewers as $firstRoundInterviewer)
-											{{ $firstRoundInterviewer->interviewerName->name ?? '' }},
-										@endforeach
-									@endif
+								@if(count($data->firstRoundInterviewers) > 0)
+								@foreach($data->firstRoundInterviewers as $firstRoundInterviewer)
+								{{ $firstRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
 								@endif
 							</td>
 							<td>{{ $data->first_round ?? ''}}</td>
-                            <td>{{ $data->createdBy->name ?? ''}}</td>
-                            <td>{{ $data->created_at ?? ''}}</td>
+							<td>{{ $data->createdBy->name ?? ''}}</td>
+							<td>{{ $data->created_at ?? ''}}</td>
 							<td>
-							<div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+								<div class="dropdown">
+									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+									<i class="fa fa-bars" aria-hidden="true"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
 											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-										</a>
-									</li>
-									<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											</a>
+										</li>
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
 											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-										</a>
-									</li>
-                                    <li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											</a>
+										</li>
+										<li>
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
-										</a>
-									</li>
-                                    <li>
-										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-											data-bs-target="#shortlisted-candidate-{{$data->id}}">
+											</a>
+										</li>
+										<li>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#shortlisted-candidate-{{$data->id}}">
 											<i class="fa fa-plus" aria-hidden="true"></i> Second Round
-										</button>
-									</li>
-                                </ul>
-                            </div>
-							<div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
-								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-								<div class="modal-dialog ">
-									<div class="modal-content">
-										<div class="modal-header">
-											<h1 class="modal-title fs-5" id="exampleModalLabel">Second Round Interview Summary</h1>
-											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-										</div>
-										<div class="modal-body p-3">
-											<div class="col-lg-12">
-												<div class="row">
-													<div class="col-12">
+											</button>
+										</li>
+									</ul>
+								</div>
+								<div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
+									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog ">
+										<div class="modal-content">
+											<form method="POST" action="{{route('interview-summary-report.round-summary')}}" id="form_{{$data->id}}">
+												@csrf
+												<div class="modal-header">
+													<h1 class="modal-title fs-5" id="exampleModalLabel">Second Round Interview Summary</h1>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body p-3">
+													<div class="col-lg-12">
 														<div class="row">
-															<div class="col-xxl-6 col-lg-6 col-md-6">
-																<label for="date" class="form-label font-size-13">{{ __('Second Round Interview Date') }}</label>
-															</div>
-															<div class="col-xxl-6 col-lg-6 col-md-6">
-																<!-- <input type="text" name="round" id="round-{{$data->id}}" value="telephonic" hidden> -->
-																<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
-															</div>
-														</div>
-														<div class="row">
-															@if(isset($interviewersNames))
-																@if(count($interviewersNames) > 0)
+															<div class="col-12">
+																<div class="row">
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<label for="date" class="form-label font-size-13">{{ __('Second Round Interview Date') }}</label>
+																	</div>
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<input type="text" name="id" value="{{$data->id}}" hidden>
+																		<input type="text" name="round" value="second" hidden>
+																		<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
+																	</div>
+																</div>
+																<div class="row">
+																	@if(isset($interviewersNames))
+																	@if(count($interviewersNames) > 0)
 																	<div class="col-lg-12 col-md-12 col-sm-12">
 																		<label class="form-label font-size-13">Choose Second Round Interviewers Names</label>
 																	</div>
 																	<div class="col-lg-12 col-md-12 col-sm-12">
 																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
-																		class="interviewer_id form-control widthinput" autofocus>
+																			class="interviewer_id form-control widthinput" autofocus>
 																			@foreach($interviewersNames as $interviewer)
-																				<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
+																			<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
 																			@endforeach
 																		</select>
 																	</div>
-																@endif
-															@endif
-															<div class="col-lg-12 col-md-12 col-sm-12">
-																<label class="form-label font-size-13">Comments</label>
-															</div>
-															<div class="col-lg-12 col-md-12 col-sm-12">
-																<!-- <textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="interview_summary">
-																</textarea> -->
-																<textarea rows="5" id="comment" type="text" class="form-control @error('comment') is-invalid @enderror"
-						name="comment" placeholder="Enter Detailed Explanation Of New Hiring" value="{{ old('comment') }}"  autocomplete="comment"
-						autofocus></textarea>
+																	@endif
+																	@endif
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Comments</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12"><textarea rows="5" id="comment-{{$data->id}}" type="text" class="form-control @error('comment') is-invalid @enderror"
+																		name="comment" placeholder="" value="{{ old('comment') }}"  autocomplete="comment"
+																		autofocus></textarea>
+																	</div>
+																</div>
 															</div>
 														</div>
 													</div>
 												</div>
-											</div>
-										</div>
-										<div class="modal-footer">
-											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-											<button type="button" class="btn btn-primary add-interview-summary"
-												data-id="{{ $data->id }}" data-status="second">Submit</button>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary add-interview-summary"
+														data-id="{{ $data->id }}" data-status="second">Submit</button>
+												</div>
 										</div>
 									</div>
 								</div>
-							</div>
 							</td>
-												
 						</tr>
 						@endforeach
 					</tbody>
@@ -586,8 +581,1653 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-    <!-- @endif
-    @endcanany -->
+	<div class="tab-pane fade show" id="second_round">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="second-round-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th rowspan="2" class="light">Sl No</th>
+							<th colspan="2" class="dark">
+								<center>Hiring Request</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Candidate</center>
+							</th>
+							<th colspan="2" class="dark">
+								<center>Rate Appearance</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Telephonic Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>First Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Second Round</center>
+							</th>
+							<th rowspan="2" class="dark">Created By</th>
+							<th rowspan="2" class="light">Created At</th>
+							<th rowspan="2" class="dark">Action</th>
+						</tr>
+						<tr>
+							<td class="dark">UUID</td>
+							<td class="dark">Job Position</td>
+							<td class="light">Name</td>
+							<td class="light">Nationality</td>
+							<td class="light">Gender</td>
+							<td class="dark">Dress</td>
+							<td class="dark">Body Language</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($seconds as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if(isset($data->telephonicInterviewers))
+								@if(count($data->telephonicInterviewers) > 0)
+								@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+								{{ $telephonicInterviewers->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if(isset($data->firstRoundInterviewers))
+								@if(count($data->firstRoundInterviewers) > 0)
+								@foreach($data->firstRoundInterviewers as $firstRoundInterviewer)
+								{{ $firstRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if(isset($data->secondRoundInterviewers))
+								@if(count($data->secondRoundInterviewers) > 0)
+								@foreach($data->secondRoundInterviewers as $secondRoundInterviewer)
+								{{ $secondRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{ $data->createdBy->name ?? ''}}</td>
+							<td>{{ $data->created_at ?? ''}}</td>
+							<td>
+								<div class="dropdown">
+									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+									<i class="fa fa-bars" aria-hidden="true"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+											</a>
+										</li>
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+											</a>
+										</li>
+										<li>
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+											</a>
+										</li>
+										<li>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#shortlisted-candidate-{{$data->id}}">
+											<i class="fa fa-plus" aria-hidden="true"></i> Third Round
+											</button>
+										</li>
+									</ul>
+								</div>
+								<div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
+									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog ">
+										<div class="modal-content">
+											<form method="POST" action="{{route('interview-summary-report.round-summary')}}" id="form_{{$data->id}}">
+												@csrf
+												<div class="modal-header">
+													<h1 class="modal-title fs-5" id="exampleModalLabel">Third Round Interview Summary</h1>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body p-3">
+													<div class="col-lg-12">
+														<div class="row">
+															<div class="col-12">
+																<div class="row">
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<label for="date" class="form-label font-size-13">{{ __('Third Round Interview Date') }}</label>
+																	</div>
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<input type="text" name="id" value="{{$data->id}}" hidden>
+																		<input type="text" name="round" value="third" hidden>
+																		<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
+																	</div>
+																</div>
+																<div class="row">
+																	@if(isset($interviewersNames))
+																	@if(count($interviewersNames) > 0)
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Choose Third Round Interviewers Names</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
+																			class="interviewer_id form-control widthinput" autofocus>
+																			@foreach($interviewersNames as $interviewer)
+																			<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
+																			@endforeach
+																		</select>
+																	</div>
+																	@endif
+																	@endif
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Comments</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<textarea rows="5" id="comment-{{$data->id}}" type="text" class="form-control @error('comment') is-invalid @enderror"
+																			name="comment" placeholder="" value="{{ old('comment') }}"  autocomplete="comment"
+																			autofocus></textarea>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary add-interview-summary"
+														data-id="{{ $data->id }}" data-status="third">Submit</button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="third_round">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="third-round-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th rowspan="2" class="light">Sl No</th>
+							<th colspan="2" class="dark">
+								<center>Hiring Request</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Candidate</center>
+							</th>
+							<th colspan="2" class="dark">
+								<center>Rate Appearance</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Telephonic Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>First Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Second Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>Third Round</center>
+							</th>
+							<th rowspan="2" class="light">Created By</th>
+							<th rowspan="2" class="dark">Created At</th>
+							<th rowspan="2" class="light">Action</th>
+						</tr>
+						<tr>
+							<td class="dark">UUID</td>
+							<td class="dark">Job Position</td>
+							<td class="light">Name</td>
+							<td class="light">Nationality</td>
+							<td class="light">Gender</td>
+							<td class="dark">Dress</td>
+							<td class="dark">Body Language</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($thirds as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if(isset($data->telephonicInterviewers))
+								@if(count($data->telephonicInterviewers) > 0)
+								@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+								{{ $telephonicInterviewers->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if(isset($data->firstRoundInterviewers))
+								@if(count($data->firstRoundInterviewers) > 0)
+								@foreach($data->firstRoundInterviewers as $firstRoundInterviewer)
+								{{ $firstRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if(isset($data->secondRoundInterviewers))
+								@if(count($data->secondRoundInterviewers) > 0)
+								@foreach($data->secondRoundInterviewers as $secondRoundInterviewer)
+								{{ $secondRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if(isset($data->thirdRoundInterviewers))
+								@if(count($data->thirdRoundInterviewers) > 0)
+								@foreach($data->thirdRoundInterviewers as $thirdRoundInterviewer)
+								{{ $thirdRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->third_round ?? ''}}</td>
+							<td>{{ $data->createdBy->name ?? ''}}</td>
+							<td>{{ $data->created_at ?? ''}}</td>
+							<td>
+								<div class="dropdown">
+									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+									<i class="fa fa-bars" aria-hidden="true"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+											</a>
+										</li>
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+											</a>
+										</li>
+										<li>
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+											</a>
+										</li>
+										<li>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#shortlisted-candidate-{{$data->id}}">
+											<i class="fa fa-plus" aria-hidden="true"></i> Forth Round
+											</button>
+										</li>
+									</ul>
+								</div>
+								<div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
+									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog ">
+										<div class="modal-content">
+											<form method="POST" action="{{route('interview-summary-report.round-summary')}}" id="form_{{$data->id}}">
+												@csrf
+												<div class="modal-header">
+													<h1 class="modal-title fs-5" id="exampleModalLabel">Forth Round Interview Summary</h1>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body p-3">
+													<div class="col-lg-12">
+														<div class="row">
+															<div class="col-12">
+																<div class="row">
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<label for="date" class="form-label font-size-13">{{ __('Forth Round Interview Date') }}</label>
+																	</div>
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<input type="text" name="id" value="{{$data->id}}" hidden>
+																		<input type="text" name="round" value="forth" hidden>
+																		<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
+																	</div>
+																</div>
+																<div class="row">
+																	@if(isset($interviewersNames))
+																	@if(count($interviewersNames) > 0)
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Choose Forth Round Interviewers Names</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
+																			class="interviewer_id form-control widthinput" autofocus>
+																			@foreach($interviewersNames as $interviewer)
+																			<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
+																			@endforeach
+																		</select>
+																	</div>
+																	@endif
+																	@endif
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Comments</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<textarea rows="5" id="comment-{{$data->id}}" type="text" class="form-control @error('comment') is-invalid @enderror"
+																			name="comment" placeholder="" value="{{ old('comment') }}"  autocomplete="comment"
+																			autofocus></textarea>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary add-interview-summary"
+														data-id="{{ $data->id }}" data-status="forth">Submit</button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="forth_round">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="forth-round-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th rowspan="2" class="light">Sl No</th>
+							<th colspan="2" class="dark">
+								<center>Hiring Request</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Candidate</center>
+							</th>
+							<th colspan="2" class="dark">
+								<center>Rate Appearance</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Telephonic Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>First Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Second Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>Third Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Forth Round</center>
+							</th>
+							<th rowspan="2" class="dark">Created By</th>
+							<th rowspan="2" class="light">Created At</th>
+							<th rowspan="2" class="dark">Action</th>
+						</tr>
+						<tr>
+							<td class="dark">UUID</td>
+							<td class="dark">Job Position</td>
+							<td class="light">Name</td>
+							<td class="light">Nationality</td>
+							<td class="light">Gender</td>
+							<td class="dark">Dress</td>
+							<td class="dark">Body Language</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($forths as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if(isset($data->telephonicInterviewers))
+								@if(count($data->telephonicInterviewers) > 0)
+								@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+								{{ $telephonicInterviewers->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if(isset($data->firstRoundInterviewers))
+								@if(count($data->firstRoundInterviewers) > 0)
+								@foreach($data->firstRoundInterviewers as $firstRoundInterviewer)
+								{{ $firstRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if(isset($data->secondRoundInterviewers))
+								@if(count($data->secondRoundInterviewers) > 0)
+								@foreach($data->secondRoundInterviewers as $secondRoundInterviewer)
+								{{ $secondRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if(isset($data->thirdRoundInterviewers))
+								@if(count($data->thirdRoundInterviewers) > 0)
+								@foreach($data->thirdRoundInterviewers as $thirdRoundInterviewer)
+								{{ $thirdRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->third_round ?? ''}}</td>
+							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>
+								@if(isset($data->forthRoundInterviewers))
+								@if(count($data->forthRoundInterviewers) > 0)
+								@foreach($data->forthRoundInterviewers as $forthRoundInterviewer)
+								{{ $forthRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->forth_round ?? ''}}</td>
+							<td>{{ $data->createdBy->name ?? ''}}</td>
+							<td>{{ $data->created_at ?? ''}}</td>
+							<td>
+								<div class="dropdown">
+									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+									<i class="fa fa-bars" aria-hidden="true"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+											</a>
+										</li>
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+											</a>
+										</li>
+										<li>
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+											</a>
+										</li>
+										<li>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#shortlisted-candidate-{{$data->id}}">
+											<i class="fa fa-plus" aria-hidden="true"></i> Fifth Round
+											</button>
+										</li>
+									</ul>
+								</div>
+								<div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
+									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog ">
+										<div class="modal-content">
+											<form method="POST" action="{{route('interview-summary-report.round-summary')}}" id="form_{{$data->id}}">
+												@csrf
+												<div class="modal-header">
+													<h1 class="modal-title fs-5" id="exampleModalLabel">Fifth Round Interview Summary</h1>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body p-3">
+													<div class="col-lg-12">
+														<div class="row">
+															<div class="col-12">
+																<div class="row">
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<label for="date" class="form-label font-size-13">{{ __('Fifth Round Interview Date') }}</label>
+																	</div>
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<input type="text" name="id" value="{{$data->id}}" hidden>
+																		<input type="text" name="round" value="fifth" hidden>
+																		<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
+																	</div>
+																</div>
+																<div class="row">
+																	@if(isset($interviewersNames))
+																	@if(count($interviewersNames) > 0)
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Choose Fifth Round Interviewers Names</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
+																			class="interviewer_id form-control widthinput" autofocus>
+																			@foreach($interviewersNames as $interviewer)
+																			<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
+																			@endforeach
+																		</select>
+																	</div>
+																	@endif
+																	@endif
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Comments</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<textarea rows="5" id="comment-{{$data->id}}" type="text" class="form-control @error('comment') is-invalid @enderror"
+																			name="comment" placeholder="" value="{{ old('comment') }}"  autocomplete="comment"
+																			autofocus></textarea>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary add-interview-summary"
+														data-id="{{ $data->id }}" data-status="fifth">Submit</button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="fifth_round">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="fifth-round-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th rowspan="2" class="light">Sl No</th>
+							<th colspan="2" class="dark">
+								<center>Hiring Request</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Candidate</center>
+							</th>
+							<th colspan="2" class="dark">
+								<center>Rate Appearance</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Telephonic Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>First Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Second Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>Third Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Forth Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>Fifth Round</center>
+							</th>
+							<th rowspan="2" class="light">Created By</th>
+							<th rowspan="2" class="dark">Created At</th>
+							<th rowspan="2" class="light">Action</th>
+						</tr>
+						<tr>
+							<td class="dark">UUID</td>
+							<td class="dark">Job Position</td>
+							<td class="light">Name</td>
+							<td class="light">Nationality</td>
+							<td class="light">Gender</td>
+							<td class="dark">Dress</td>
+							<td class="dark">Body Language</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($fifths as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if(isset($data->telephonicInterviewers))
+								@if(count($data->telephonicInterviewers) > 0)
+								@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+								{{ $telephonicInterviewers->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if(isset($data->firstRoundInterviewers))
+								@if(count($data->firstRoundInterviewers) > 0)
+								@foreach($data->firstRoundInterviewers as $firstRoundInterviewer)
+								{{ $firstRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if(isset($data->secondRoundInterviewers))
+								@if(count($data->secondRoundInterviewers) > 0)
+								@foreach($data->secondRoundInterviewers as $secondRoundInterviewer)
+								{{ $secondRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if(isset($data->thirdRoundInterviewers))
+								@if(count($data->thirdRoundInterviewers) > 0)
+								@foreach($data->thirdRoundInterviewers as $thirdRoundInterviewer)
+								{{ $thirdRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->third_round ?? ''}}</td>
+							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>
+								@if(isset($data->forthRoundInterviewers))
+								@if(count($data->forthRoundInterviewers) > 0)
+								@foreach($data->forthRoundInterviewers as $forthRoundInterviewer)
+								{{ $forthRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->forth_round ?? ''}}</td>
+							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>
+								@if(isset($data->fifthRoundInterviewers))
+								@if(count($data->fifthRoundInterviewers) > 0)
+								@foreach($data->fifthRoundInterviewers as $fifthRoundInterviewer)
+								{{ $fifthRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->fifth_round ?? ''}}</td>
+							<td>{{ $data->createdBy->name ?? ''}}</td>
+							<td>{{ $data->created_at ?? ''}}</td>
+							<td>
+								<div class="dropdown">
+									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+									<i class="fa fa-bars" aria-hidden="true"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+											</a>
+										</li>
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+											</a>
+										</li>
+										<li>
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+											</a>
+										</li>
+										<li>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#shortlisted-candidate-{{$data->id}}">
+											<i class="fa fa-plus" aria-hidden="true"></i> Final Evaluation
+											</button>
+										</li>
+									</ul>
+								</div>
+								<div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
+									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog ">
+										<div class="modal-content">
+											<form method="POST" action="{{route('interview-summary-report.final-evaluation')}}" id="final_{{$data->id}}">
+												@csrf
+												<div class="modal-header">
+													<h1 class="modal-title fs-5" id="exampleModalLabel">Final Evaluation Of Candidate</h1>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body p-3">
+													<div class="col-lg-12">
+														<div class="row">
+															<div class="col-12">
+																<div class="row">
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<input type="text" name="id" value="{{$data->id}}" hidden>
+																		<input type="text" name="round" value="final" hidden>
+																	</div>
+																</div>
+																<div class="row">
+																	<div class="col-xxl-12 col-lg-12 col-md-12">
+																		<label for="date" class="form-label font-size-13">{{ __('Candidate Selected') }}</label>
+																	</div>
+																	<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
+																		<fieldset style="margin-top:5px;" class="radio-div-container">
+																			<div class="row some-class">
+																				<div class="col-xxl-6 col-lg-6 col-md-6">
+																					<input type="radio" class="candidate_selected" name="candidate_selected" value="yes" id="yes" />
+																					<label for="yes">Yes</label>
+																				</div>
+																				<div class="col-xxl-6 col-lg-6 col-md-6">
+																					<input type="radio" class="candidate_selected" name="candidate_selected" value="no" id="no" />
+																					<label for="no">No</label>
+																				</div>
+																			</div>
+																		</fieldset>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Final Evaluation of Candidate</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<textarea rows="5" id="comment-{{$data->id}}" type="text" class="form-control @error('comment') is-invalid @enderror"
+																			name="comment" placeholder="" value="{{ old('comment') }}"  autocomplete="comment"
+																			autofocus></textarea>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary final-interview-summary"
+														data-id="{{ $data->id }}" data-status="final">Submit</button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="not_selected_candidates">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="not-selected-candidates-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th rowspan="2" class="light">Sl No</th>
+							<th colspan="2" class="dark">
+								<center>Hiring Request</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Candidate</center>
+							</th>
+							<th colspan="2" class="dark">
+								<center>Rate Appearance</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Telephonic Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>First Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Second Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>Third Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Forth Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>Fifth Round</center>
+							</th>
+							<th rowspan="2" class="light">Final Evaluation Of Candidate</th>
+							<th rowspan="2" class="dark">Created By</th>
+							<th rowspan="2" class="light">Created At</th>
+							<th rowspan="2" class="dark">Action</th>
+						</tr>
+						<tr>
+							<td class="dark">UUID</td>
+							<td class="dark">Job Position</td>
+							<td class="light">Name</td>
+							<td class="light">Nationality</td>
+							<td class="light">Gender</td>
+							<td class="dark">Dress</td>
+							<td class="dark">Body Language</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($notSelected as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if(isset($data->telephonicInterviewers))
+								@if(count($data->telephonicInterviewers) > 0)
+								@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+								{{ $telephonicInterviewers->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if(isset($data->firstRoundInterviewers))
+								@if(count($data->firstRoundInterviewers) > 0)
+								@foreach($data->firstRoundInterviewers as $firstRoundInterviewer)
+								{{ $firstRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if(isset($data->secondRoundInterviewers))
+								@if(count($data->secondRoundInterviewers) > 0)
+								@foreach($data->secondRoundInterviewers as $secondRoundInterviewer)
+								{{ $secondRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if(isset($data->thirdRoundInterviewers))
+								@if(count($data->thirdRoundInterviewers) > 0)
+								@foreach($data->thirdRoundInterviewers as $thirdRoundInterviewer)
+								{{ $thirdRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->third_round ?? ''}}</td>
+							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>
+								@if(isset($data->forthRoundInterviewers))
+								@if(count($data->forthRoundInterviewers) > 0)
+								@foreach($data->forthRoundInterviewers as $forthRoundInterviewer)
+								{{ $forthRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->forth_round ?? ''}}</td>
+							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>
+								@if(isset($data->fifthRoundInterviewers))
+								@if(count($data->fifthRoundInterviewers) > 0)
+								@foreach($data->fifthRoundInterviewers as $fifthRoundInterviewer)
+								{{ $fifthRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->fifth_round ?? ''}}</td>
+							<td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
+							<td>{{ $data->createdBy->name ?? ''}}</td>
+							<td>{{ $data->created_at ?? ''}}</td>
+							<td>
+								<div class="dropdown">
+									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+									<i class="fa fa-bars" aria-hidden="true"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+											</a>
+										</li>
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+											</a>
+										</li>
+										<li>
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+											</a>
+										</li>
+									</ul>
+								</div>
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="pending-hiring-requests">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="selected-candidates-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th rowspan="2" class="light">Sl No</th>
+							<th colspan="2" class="dark">
+								<center>Hiring Request</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Candidate</center>
+							</th>
+							<th colspan="2" class="dark">
+								<center>Rate Appearance</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Telephonic Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>First Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Second Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>Third Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Forth Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>Fifth Round</center>
+							</th>
+							<th rowspan="2" class="light">Final Evaluation Of Candidate</th>
+							<th colspan="4" class="dark">
+								<center>HR Manager Approvals</center>
+							</th>
+							<th rowspan="2" class="light">
+								<center>Division Head Name</center>
+							</th>
+							<th rowspan="2" class="dark">Created By</th>
+							<th rowspan="2" class="light">Created At</th>
+							<th rowspan="2" class="dark">Current Status</th>
+							<th rowspan="2" class="light">Action</th>
+						</tr>
+						<tr>
+							<td class="dark">UUID</td>
+							<td class="dark">Job Position</td>
+							<td class="light">Name</td>
+							<td class="light">Nationality</td>
+							<td class="light">Gender</td>
+							<td class="dark">Dress</td>
+							<td class="dark">Body Language</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="dark">Name</td>
+							<td class="dark">Action</td>
+							<td class="dark">Action At</td>
+							<td class="dark">Comments</td>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($pendings as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if(isset($data->telephonicInterviewers))
+								@if(count($data->telephonicInterviewers) > 0)
+								@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+								{{ $telephonicInterviewers->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if(isset($data->firstRoundInterviewers))
+								@if(count($data->firstRoundInterviewers) > 0)
+								@foreach($data->firstRoundInterviewers as $firstRoundInterviewer)
+								{{ $firstRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if(isset($data->secondRoundInterviewers))
+								@if(count($data->secondRoundInterviewers) > 0)
+								@foreach($data->secondRoundInterviewers as $secondRoundInterviewer)
+								{{ $secondRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if(isset($data->thirdRoundInterviewers))
+								@if(count($data->thirdRoundInterviewers) > 0)
+								@foreach($data->thirdRoundInterviewers as $thirdRoundInterviewer)
+								{{ $thirdRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->third_round ?? ''}}</td>
+							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>
+								@if(isset($data->forthRoundInterviewers))
+								@if(count($data->forthRoundInterviewers) > 0)
+								@foreach($data->forthRoundInterviewers as $forthRoundInterviewer)
+								{{ $forthRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->forth_round ?? ''}}</td>
+							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>
+								@if(isset($data->fifthRoundInterviewers))
+								@if(count($data->fifthRoundInterviewers) > 0)
+								@foreach($data->fifthRoundInterviewers as $fifthRoundInterviewer)
+								{{ $fifthRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->fifth_round ?? ''}}</td>
+							<td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
+							<td>{{$data->hrManager->name ?? ''}}</td>
+							<td>{{$data->action_by_hr_manager ?? ''}}</td>
+							<td>{{$data->hr_manager_action_at ?? ''}}</td>
+							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
+							<td>{{$data->divisionHeadName->name ?? ''}}</td>
+							<td>{{ $data->createdBy->name ?? ''}}</td>
+							<td>{{ $data->created_at ?? ''}}</td>
+							<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
+							<td>
+								<div class="dropdown">
+									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+									<i class="fa fa-bars" aria-hidden="true"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+											</a>
+										</li>
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+											</a>
+										</li>
+										<li>
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+											</a>
+										</li>
+										<li>
+											@if(isset($type))
+											@if($type == 'approve')
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+											<i class="fa fa-thumbs-up" aria-hidden="true"></i>  Approve 
+											</button>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+												data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+											<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
+											</button>
+											@endif
+											@elseif(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
+											@if(isset($data->is_auth_user_can_approve['can_approve']))
+											@if($data->is_auth_user_can_approve['can_approve'] == true)
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+											<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
+											</button>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+												data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+											<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
+											</button>
+											@endif
+											@endif
+											@endif
+										</li>
+									</ul>
+								</div>
+							</td>
+							@include('hrm.hiring.interview_summary_report.approve_reject_modal')					
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="approved-hiring-requests">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="approved-hiring-requests-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th rowspan="2" class="light">Sl No</th>
+							<th colspan="2" class="dark">
+								<center>Hiring Request</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Candidate</center>
+							</th>
+							<th colspan="2" class="dark">
+								<center>Rate Appearance</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Telephonic Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>First Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Second Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>Third Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Forth Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>Fifth Round</center>
+							</th>
+							<th rowspan="2" class="light">Final Evaluation Of Candidate</th>
+							<th colspan="4" class="dark">
+								<center>HR Manager Approvals</center>
+							</th>
+							<th colspan="4" class="light">
+								<center>Division Head Approvals</center>
+							</th>
+							<th rowspan="2" class="dark">Created By</th>
+							<th rowspan="2" class="light">Created At</th>
+							<th rowspan="2" class="light">Action</th>
+						</tr>
+						<tr>
+							<td class="dark">UUID</td>
+							<td class="dark">Job Position</td>
+							<td class="light">Name</td>
+							<td class="light">Nationality</td>
+							<td class="light">Gender</td>
+							<td class="dark">Dress</td>
+							<td class="dark">Body Language</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="dark">Name</td>
+							<td class="dark">Action</td>
+							<td class="dark">Action At</td>
+							<td class="dark">Comments</td>
+							<td class="light">Name</td>
+							<td class="light">Action</td>
+							<td class="light">Action At</td>
+							<td class="light">Comments</td>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($approved as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if(isset($data->telephonicInterviewers))
+								@if(count($data->telephonicInterviewers) > 0)
+								@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+								{{ $telephonicInterviewers->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if(isset($data->firstRoundInterviewers))
+								@if(count($data->firstRoundInterviewers) > 0)
+								@foreach($data->firstRoundInterviewers as $firstRoundInterviewer)
+								{{ $firstRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if(isset($data->secondRoundInterviewers))
+								@if(count($data->secondRoundInterviewers) > 0)
+								@foreach($data->secondRoundInterviewers as $secondRoundInterviewer)
+								{{ $secondRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if(isset($data->thirdRoundInterviewers))
+								@if(count($data->thirdRoundInterviewers) > 0)
+								@foreach($data->thirdRoundInterviewers as $thirdRoundInterviewer)
+								{{ $thirdRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->third_round ?? ''}}</td>
+							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>
+								@if(isset($data->forthRoundInterviewers))
+								@if(count($data->forthRoundInterviewers) > 0)
+								@foreach($data->forthRoundInterviewers as $forthRoundInterviewer)
+								{{ $forthRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->forth_round ?? ''}}</td>
+							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>
+								@if(isset($data->fifthRoundInterviewers))
+								@if(count($data->fifthRoundInterviewers) > 0)
+								@foreach($data->fifthRoundInterviewers as $fifthRoundInterviewer)
+								{{ $fifthRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->fifth_round ?? ''}}</td>
+							<td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
+							<td>{{$data->hrManager->name ?? ''}}</td>
+							<td>{{$data->action_by_hr_manager ?? ''}}</td>
+							<td>{{$data->hr_manager_action_at ?? ''}}</td>
+							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
+							<td>{{$data->divisionHeadName->name ?? ''}}</td>
+							<td>{{$data->action_by_division_head ?? ''}}</td>
+							<td>{{$data->division_head_action_at ?? ''}}</td>
+							<td>{{$data->comments_by_division_head ?? ''}}</td>
+							<td>{{ $data->createdBy->name ?? ''}}</td>
+							<td>{{ $data->created_at ?? ''}}</td>
+							<td>
+								<li>
+									<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
+										<i class="fa fa-eye" aria-hidden="true"></i>
+									</a>
+								</li>
+								<li>
+									<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+									<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+									</a>
+								</li>
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="rejected-hiring-requests">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="rejected-hiring-requests-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th rowspan="2" class="light">Sl No</th>
+							<th colspan="2" class="dark">
+								<center>Hiring Request</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Candidate</center>
+							</th>
+							<th colspan="2" class="dark">
+								<center>Rate Appearance</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Telephonic Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>First Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Second Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>Third Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Forth Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>Fifth Round</center>
+							</th>
+							<th rowspan="2" class="light">Final Evaluation Of Candidate</th>
+							<th colspan="4" class="dark">
+								<center>HR Manager Approvals</center>
+							</th>
+							<th colspan="4" class="light">
+								<center>Division Head Approvals</center>
+							</th>
+							<th rowspan="2" class="dark">Created By</th>
+							<th rowspan="2" class="light">Created At</th>
+							<th rowspan="2" class="light">Action</th>
+						</tr>
+						<tr>
+							<td class="dark">UUID</td>
+							<td class="dark">Job Position</td>
+							<td class="light">Name</td>
+							<td class="light">Nationality</td>
+							<td class="light">Gender</td>
+							<td class="dark">Dress</td>
+							<td class="dark">Body Language</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="dark">Name</td>
+							<td class="dark">Action</td>
+							<td class="dark">Action At</td>
+							<td class="dark">Comments</td>
+							<td class="light">Name</td>
+							<td class="light">Action</td>
+							<td class="light">Action At</td>
+							<td class="light">Comments</td>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($rejected as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if(isset($data->telephonicInterviewers))
+								@if(count($data->telephonicInterviewers) > 0)
+								@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+								{{ $telephonicInterviewers->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if(isset($data->firstRoundInterviewers))
+								@if(count($data->firstRoundInterviewers) > 0)
+								@foreach($data->firstRoundInterviewers as $firstRoundInterviewer)
+								{{ $firstRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if(isset($data->secondRoundInterviewers))
+								@if(count($data->secondRoundInterviewers) > 0)
+								@foreach($data->secondRoundInterviewers as $secondRoundInterviewer)
+								{{ $secondRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if(isset($data->thirdRoundInterviewers))
+								@if(count($data->thirdRoundInterviewers) > 0)
+								@foreach($data->thirdRoundInterviewers as $thirdRoundInterviewer)
+								{{ $thirdRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->third_round ?? ''}}</td>
+							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>
+								@if(isset($data->forthRoundInterviewers))
+								@if(count($data->forthRoundInterviewers) > 0)
+								@foreach($data->forthRoundInterviewers as $forthRoundInterviewer)
+								{{ $forthRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->forth_round ?? ''}}</td>
+							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>
+								@if(isset($data->fifthRoundInterviewers))
+								@if(count($data->fifthRoundInterviewers) > 0)
+								@foreach($data->fifthRoundInterviewers as $fifthRoundInterviewer)
+								{{ $fifthRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->fifth_round ?? ''}}</td>
+							<td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
+							<td>{{$data->hrManager->name ?? ''}}</td>
+							<td>{{$data->action_by_hr_manager ?? ''}}</td>
+							<td>{{$data->hr_manager_action_at ?? ''}}</td>
+							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
+							<td>{{$data->divisionHeadName->name ?? ''}}</td>
+							<td>{{$data->action_by_division_head ?? ''}}</td>
+							<td>{{$data->division_head_action_at ?? ''}}</td>
+							<td>{{$data->comments_by_division_head ?? ''}}</td>
+							<td>{{ $data->createdBy->name ?? ''}}</td>
+							<td>{{ $data->created_at ?? ''}}</td>
+							<td>
+								<li>
+									<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
+										<i class="fa fa-eye" aria-hidden="true"></i>
+									</a>
+								</li>
+								<li>
+									<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
+									<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+									</a>
+								</li>
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<!-- @endif
+		@endcanany -->
 </div>
 <!-- @endif
 @endcanany -->
@@ -610,129 +2250,47 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 		$('.add-interview-summary').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
-	        // addInterviewSummary(id, status)
-			$('#form_'+id).validate({ // initialize the plugin
-			// alert($('#resume_file_name').val());
-			rules: {
-				date: {
-					required: true,
+			$('#form_'+id).validate({ 
+				rules: {
+					date: {
+						required: true,
+					},
+					comment: {
+						required: true,
+					},
+					round: {
+						required: true,
+					},
+					id: {
+						required: true,
+					},
+					'interviewer_id[]': {
+						required: true,
+					}
 				},
-				comment: {
-					required: true,
+			});
+		})
+		$('.final-interview-summary').click(function (e) {
+	        var id = $(this).attr('data-id');
+	        var status = $(this).attr('data-status');
+			$('#final_'+id).validate({ 
+				rules: {
+					candidate_selected: {
+						required: true,
+					},
+					comment: {
+						required: true,
+					},
+					round: {
+						required: true,
+					},
+					id: {
+						required: true,
+					},
 				},
-				round: {
-					required: true,
-				},
-				id: {
-				    required: true,
-				},
-				'interviewer_id[]': {
-					required: true,
-				}
-			},
-			// errorPlacement: function ( error, element ) {
-			// 	error.addClass( "invalid-feedback font-size-13" );
-			// 	if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
-			// 		if (!element.val() || element.val().length === 0) {
-			// 			console.log("Error is here with length", element.val().length);
-			// 			error.addClass('select-error');
-			// 			error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
-			// 		} else {
-			// 			console.log("No error");
-			// 		}
-			// 	}
-			// 	else {
-			// 		error.insertAfter( element );
-			// 	}
-			// }
-		});
-	    })
-		// $('.status-onhold-button').click(function (e) {
-	    //     var id = $(this).attr('data-id');
-	    //     var status = $(this).attr('data-status');
-	    //     addInterviewSummary(id, status)
-	    // })
-		// $('.status-cancelled-button').click(function (e) {
-	    //     var id = $(this).attr('data-id');
-	    //     var status = $(this).attr('data-status');
-	    //     addInterviewSummary(id, status)
-	    // })
-		function addInterviewSummary(id, status) {
-			var comment = $("#comment-"+id).val();
-			var date = $("#date-"+id).val();
-			var interviewers_id = $("#interviewer_id_"+id).val();
-
-	        let url = '{{ route('interview-summary-report.round-summary') }}';
-	        // if(status == 'closed') {
-	        //     var message = 'Closed';
-			// 	var selectedCandidates = $("#interviewer_id_"+id).val();
-	        // }
-			// else if(status == 'onhold'){
-	        //     var message = 'On Hold';
-			// 	var selectedCandidates = [];
-	        // }
-			// else if(status =='cancelled'){
-			// 	var message = 'Cancelled';
-			// 	var selectedCandidates = [];
-			// }
-	        // var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee hiring request ?',function (e) {
-	        //     if (e) {
-	                $.ajax({
-	                    type: "POST",
-	                    url: url,
-	                    dataType: "json",
-	                    data: {
-	                        id: id,
-	                        round: status,
-	                        date: date,
-							comment: comment,
-							interviewers_id: interviewers_id,
-	                        _token: '{{ csrf_token() }}'
-	                    },
-	                    success: function (data) {
-							if(data == 'success') { 
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data['error'] == true) { 
-								$msg = data['msg'];
-								for(var i=0; i<$msg.length; i++) {
-									if($msg[i] == 'The date field is required.') {
-										showDateError($msg[i], id)
-									}
-									if($msg[i] == 'The interviewers id field is required.') {
-										showInterviewrsError($msg[i], id)
-									}
-									if($msg[i] == 'The comment field is required.') {
-										showCommentError($msg[i], id)
-									}
-								}
-							}
-	                    }
-	                });
-	        //     }
-	
-	        // }).set({title:"Confirmation"})
-	    }
+			});
+		})
 	})
-	function showDateError($msg, id) {
-		document.getElementById("date_error_"+id).textContent=$msg;
-	    document.getElementById("date-"+id).classList.add("is-invalid");
-	    document.getElementById("date_error_"+id).classList.add("paragraph-class");
-		document.getElementById("date_error_"+id).style.color = "red";
-	}
-	function showInterviewrsError($msg, id) {
-		document.getElementById("interviewer_id_error_"+id).textContent=$msg;
-	    document.getElementById("interviewer_id_"+id).classList.add("is-invalid");
-	    document.getElementById("interviewer_id_error_"+id).classList.add("paragraph-class");
-		document.getElementById("interviewer_id_error_"+id).style.color = "red";
-	}
-	function showCommentError($msg, id) {
-		document.getElementById("comment-error-"+id).textContent=$msg;
-	    document.getElementById("comment-"+id).classList.add("is-invalid");
-	    document.getElementById("comment-error-"+id).classList.add("paragraph-class");
-		document.getElementById("comment-error-"+id).style.color = "red";
-	}
 	function inputNumberAbs(currentPriceInput) 
 	{
 	    var id = currentPriceInput.id;
@@ -745,78 +2303,5 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 	    }
 	    input.value = val;
 	}
-	// $('.hiring-request-delete').on('click',function(){
-    //     let id = $(this).attr('data-id');
-    //     let url =  $(this).attr('data-url');
-    //     var confirm = alertify.confirm('Are you sure you want to Delete this Employee Hiring Request ?',function (e) {
-    //         if (e) {
-    //             $.ajax({
-    //                 type: "POST",
-    //                 url: url,
-    //                 dataType: "json",
-    //                 data: {
-    //                     _method: 'DELETE',
-    //                     id: 'id',
-    //                     _token: '{{ csrf_token() }}'
-    //                 },
-    //                 success:function (data) {
-    //                     location.reload();
-    //                     alertify.success('Employee Hiring Request Deleted successfully.');
-    //                 }
-    //             });
-    //         }
-    //     }).set({title:"Delete Employee Hiring Request"})
-    // });
 </script>
-
-<!-- <script type="text/javascript">
-    $(document).ready(function () {
-        $('.status-reject-button').click(function (e) {
-	        var id = $(this).attr('data-id');
-	        var status = $(this).attr('data-status');
-	        approveOrRejectHiringrequest(id, status)
-	    })
-	    $('.status-approve-button').click(function (e) {
-	        var id = $(this).attr('data-id');
-	        var status = $(this).attr('data-status');
-	        approveOrRejectHiringrequest(id, status)
-	    })
-        function approveOrRejectHiringrequest(id, status) {
-			var comment = $("#comment-"+id).val();
-			var current_approve_position = $("#current_approve_position_"+id).val();
-	        let url = '{{ route('interview-summary-report.request-action') }}';
-	        if(status == 'rejected') {
-	            var message = 'Reject';
-	        }else{
-	            var message = 'Approve';
-	        }
-	        var confirm = alertify.confirm('Are you sure you want to '+ message +' this interview summary report ?',function (e) {
-	            if (e) {
-	                $.ajax({
-	                    type: "POST",
-	                    url: url,
-	                    dataType: "json",
-	                    data: {
-	                        id: id,
-	                        status: status,
-	                        comment: comment,
-							current_approve_position: current_approve_position,
-	                        _token: '{{ csrf_token() }}'
-	                    },
-	                    success: function (data) {
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-
-							}
-	                    }
-	                });
-	            }
-	
-	        }).set({title:"Confirmation"})
-	    }
-    });
-</script> -->
 @endpush

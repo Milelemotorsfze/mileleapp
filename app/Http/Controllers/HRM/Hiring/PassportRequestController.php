@@ -9,10 +9,13 @@ class PassportRequestController extends Controller
 {
     public function index() {
         $page = 'listing';
-        $pendings = PassportRequest::where('status','pending')->latest()->get();
-        $approved = PassportRequest::where('status','approved')->latest()->get();
-        $rejected = PassportRequest::where('status','rejected')->latest()->get();
-        return view('hrm.hiring.passport_request.index',compact('pendings','approved','rejected','page'));
+        $submit_pendings = PassportRequest::where('submit_status','pending')->latest()->get();
+        $submit_approved = PassportRequest::where('submit_status','approved')->latest()->get();
+        $submit_rejected = PassportRequest::where('submit_status','rejected')->latest()->get();
+        $release_pendings = PassportRequest::where('release_submit_status','pending')->latest()->get();
+        $release_approved = PassportRequest::where('release_submit_status','approved')->latest()->get();
+        $release_rejected = PassportRequest::where('release_submit_status','rejected')->latest()->get();
+        return view('hrm.hiring.passport_request.index',compact('submit_pendings','submit_approved','submit_rejected','release_pendings','release_approved','release_rejected','page'));
     }
     public function create() {
         return view('hrm.hiring.passport_request.create');
@@ -33,7 +36,7 @@ class PassportRequestController extends Controller
             $previous = PassportRequest::where('status',$data->status)->where('id', '<', $id)->max('id');
             $next = PassportRequest::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
-        $masterEmployees = User::whereNot('id','16')->select('id','name')->get();
+        $masterEmployees = User::whereNot('id','16')->select('id','name')->first();
         $submissionPurpose = PassportRequestPurpose::where('type','submit')->get();
         $releasePurpose = PassportRequestPurpose::where('type','release')->get();
         return view('hrm.hiring.employee_liability.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));

@@ -9,4 +9,12 @@ class ShippingRate extends Model
 {
     use HasFactory;
     protected $table = 'shipping_rates';
+    protected $fillable = [
+        'cost_price',
+        'selling_price',
+        'status',
+        'shipping_charges_id',
+        'created_by',
+        'suppliers_id',
+    ];
 }

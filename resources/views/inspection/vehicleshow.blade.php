@@ -458,6 +458,7 @@ $(document).ready(function() {
                     options.forEach(function(option) {
                         select.append('<option value="' + option.id + '">' + option.name + '</option>');
                     });
+
                     select.on('change', function() {
                         var selectedValue = $(this).val();
                         selectedSpecifications.push({

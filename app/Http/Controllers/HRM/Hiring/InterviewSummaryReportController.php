@@ -19,6 +19,7 @@ use App\Models\Masters\MasterJobPosition;
 use App\Models\HRM\Hiring\EmployeeHiringRequest;
 use App\Models\User;
 use Validator;
+use App\Models\HRM\Approvals\ApprovalByPositions;
 
 class InterviewSummaryReportController extends Controller
 {
@@ -86,12 +87,32 @@ class InterviewSummaryReportController extends Controller
             ['date_of_telephonic_interview','!=',NULL],
             ['status','pending'],
         ])->latest()->get();
-        $pendings = InterviewSummaryReport::where('status','pending')->latest()->get();
-        $approved = InterviewSummaryReport::where('status','approved')->latest()->get();
+        $notSelected = InterviewSummaryReport::where([
+            ['date_of_fifth_round','!=',NULL],
+            ['date_of_forth_round','!=',NULL],
+            ['date_of_third_round','!=',NULL],
+            ['date_of_second_round','!=',NULL],
+            ['date_of_first_round','!=',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
+            ['status','pending'],
+            ['candidate_selected','no'],
+        ])->latest()->get();
+        $pendings = InterviewSummaryReport::where([
+            ['date_of_fifth_round','!=',NULL],
+            ['date_of_forth_round','!=',NULL],
+            ['date_of_third_round','!=',NULL],
+            ['date_of_second_round','!=',NULL],
+            ['date_of_first_round','!=',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
+            ['status','pending'],
+            ['candidate_selected','yes'],
+        ])->latest()->get();
+        // $pendings = InterviewSummaryReport::where('status','pending')->latest()->get();
+        $approved = InterviewSummaryReport::where('status','approved')->latest()->get(); 
         $rejected = InterviewSummaryReport::where('status','rejected')->latest()->get();
         $interviewersNames = User::whereNot('id',16)->select('id','name')->get();
-        return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','pendings',
-        'approved','rejected','interviewersNames'));
+        return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','notSelected',
+        'pendings','approved','rejected','interviewersNames'));
     }
     public function createOrEdit($id) {
         $currentInterviewReport = InterviewSummaryReport::with('telephonicInterviewers')->where('id',$id)->first();
@@ -110,8 +131,45 @@ class InterviewSummaryReportController extends Controller
         return view('hrm.hiring.interview_summary_report.createOrEdit',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
         'masterGender','interviewersNames','hiringrequests'));
     }
+    public function finalEvaluation(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+            'round' => 'required',         
+            'candidate_selected' => 'required',
+            'comment' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $update = InterviewSummaryReport::where('id',$request->id)->first();
+                if($update) {
+                    if($request->round == 'final') {
+                        $update->candidate_selected = $request->candidate_selected;
+                        $update->final_evaluation_of_candidate = $request->comment;
+                    }
+                    if($request->candidate_selected == 'yes') {
+                        $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                        $update->hr_manager_id = $HRManager->handover_to_id;
+                        $update->action_by_hr_manager = 'pending';
+                        $hiringRequest = EmployeeHiringRequest::where('id',$update->hiring_request_id)->first();
+                        $update->division_head_id = $hiringRequest->division_head_id;
+                    }
+                }
+                $update->update();
+                DB::commit();
+                return redirect()->route('interview-summary-report.index')
+                                    ->with('success','Final Evaluation Of Candidate Created Successfully');
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                dd($e);
+            }
+        }
+    }
     public function updateRoundSummary(Request $request) {
-        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'id' => 'required',
             'round' => 'required',         
@@ -156,9 +214,9 @@ class InterviewSummaryReportController extends Controller
                     }
                 }
                 $update->update();
-                if(isset($request->interviewers_id)) {
-                    if(count($request->interviewers_id) > 0) {
-                        foreach($request->interviewers_id as $interviewer) {
+                if(isset($request->interviewer_id)) {
+                    if(count($request->interviewer_id) > 0) {
+                        foreach($request->interviewer_id as $interviewer) {
                             $createInterviewer['interview_summary_report_id'] = $request->id;
                             $createInterviewer['round'] = $request->round;
                             $createInterviewer['interviewer_id'] = $interviewer;
@@ -182,10 +240,10 @@ class InterviewSummaryReportController extends Controller
         try {
             $message = '';
             $update = InterviewSummaryReport::where('id',$request->id)->first();
-            if($request->current_approve_position == 'Team Lead / Reporting Manager') {
-                $update->comments_by_department_head = $request->comment;
-                $update->department_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
-                $update->action_by_department_head = $request->status;
+            if($request->current_approve_position == 'HR Manager') {
+                $update->comments_by_hr_manager = $request->comment;
+                $update->hr_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->action_by_hr_manager = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_division_head = 'pending';
                     $message = 'Interview Summary Report send to Division Head ( '.$update->divisionHeadName->name.' - '.$update->divisionHeadName->email.' ) for approval';
@@ -203,7 +261,7 @@ class InterviewSummaryReportController extends Controller
                 $update->status = 'rejected';
             }
             $update->update();
-            $history['hiring_request_id'] = $request->id;
+            $history['hiring_request_id'] = $update->hiring_request_id;
             if($request->status == 'approved') {
                 $history['icon'] = 'icons8-thumb-up-30.png';
             }
@@ -224,6 +282,7 @@ class InterviewSummaryReportController extends Controller
         catch (\Exception $e) {
             // info($e);
             DB::rollback();
+            dd($e);
         }
     }
     public function storeOrUpdate(Request $request, $id) {

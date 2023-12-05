@@ -19,9 +19,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 	<!-- <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> -->
 	@if(isset($page))
 	@if($page == 'listing')
-	<a style="float: right;" class="btn btn-sm btn-success" href="{{ route('employee-hiring-request.create-or-edit','new') }}">
+	<!-- <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('employee-hiring-request.create-or-edit','new') }}">
       <i class="fa fa-plus" aria-hidden="true"></i> New Hiring Request
-    </a>
+    </a> -->
 	@endif
 	@endif
 	@if (count($errors) > 0)

@@ -264,6 +264,7 @@ Route::get('/d', function () {
         Route::post('interview-summary-report/store-or-update/{id}', 'storeOrUpdate')->name('interview-summary-report.store-or-update');
         Route::post('interview-summary-report/request-action', 'requestAction')->name('interview-summary-report.request-action');
         Route::post('interview-summary-report/round-summary', 'updateRoundSummary')->name('interview-summary-report.round-summary');
+        Route::post('interview-summary-report/final-evaluation', 'finalEvaluation')->name('interview-summary-report.final-evaluation');
     });
     // Employee Passport Request
     Route::resource('passport_request', PassportRequestController::class);
@@ -620,7 +621,9 @@ Route::get('/d', function () {
     Route::get('/shipping_rates/{id}', [ShippingController::class, 'shippingrates'])->name('shipping_medium.shippingrates');
     Route::get('shipping_medium_create/{id}', [ShippingController::class, 'openmediumcreate'])->name('shipping_medium.openmedium_create');
     Route::get('shipping_rates_create/{id}', [ShippingController::class, 'shippingratescreate'])->name('shipping_rate.shippingrates_create');
-    Route::post('/storeportrates', [ShippingController::class, 'storeportrates'])->name('Shipping.storeportrates');
+    Route::post('/storeportrates', [ShippingController::class, 'storeportrates'])->name('Shipping.storeportrates'); 
+    Route::post('/storevendorrates', [ShippingController::class, 'storevendorrates'])->name('Shipping.storevendorrates');
+    Route::post('/select-shipping-rate/{id}', [ShippingController::class, 'selectShippingRate']);
     //Agents
     Route::resource('agents', AgentsController::class);
     Route::get('/get-agent-names', [AgentsController::class, 'getAgentNames'])->name('agents.getAgentNames');
