@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Shipping;
+use App\Models\Supplier;
 use App\Http\Controllers\UserActivityController;
 use App\Models\ShippingDocuments;
 use App\Models\ShippingCertification;
@@ -257,76 +258,74 @@ class ShippingController extends Controller
         return response()->json(['tableid' => $tableid]);
     }
     public function openmedium(Builder $builder, $id)
-{
-    (new UserActivityController)->createActivity('Open the Shipping Rates');
-    // Get shipping data
-    $shipping = Shipping::where('shipping_medium_id', $id)->get();
-    $shippingmendium = ShippingMedium::find($id);
-    // Retrieve vendor names for each shipping record
-    $vendorNames = [];
-    foreach ($shipping as $record) {
-        $vendor = DB::table('suppliers')->where('id', $record->suppliers_id)->first();
-        $vendorNames[$record->id] = $vendor->supplier ?? '';
-    }
-    // Retrieve port names for each shipping record
-    $toPortNames = [];
-    $fromPortNames = [];
-    foreach ($shipping as $record) {
-        $toPort = DB::table('master_shipping_ports')->where('id', $record->to_port)->first();
-        $fromPort = DB::table('master_shipping_ports')->where('id', $record->from_port)->first();
-        $toPortNames[$record->id] = $toPort->name ?? '';
-        $fromPortNames[$record->id] = $fromPort->name ?? '';
-    }
-    // Retrieve cost_price from shipping_rates
-    $costPrices = [];
-    foreach ($shipping as $record) {
-        $shippingRate = DB::table('shipping_rates')
-            ->where('shipping_charges_id', $record->shipping_medium_id)
-            ->where('status', 'Selected')
-            ->first();
-        $costPrices[$record->id] = $shippingRate->cost_price ?? '';
-    }
-    if (request()->ajax()) {
-        return DataTables::of($shipping)
-            ->editColumn('created_by', function ($query) {
-                return $query->CreatedBy->name ?? '';
-            })
-            ->addColumn('vendor_name', function ($query) use ($vendorNames) {
-                return $vendorNames[$query->id] ?? '';
-            })
-            ->addColumn('to_port_name', function ($query) use ($toPortNames) {
-                return $toPortNames[$query->id] ?? '';
-            })
-            ->addColumn('from_port_name', function ($query) use ($fromPortNames) {
-                return $fromPortNames[$query->id] ?? '';
-            })
-            ->addColumn('cost_price', function ($query) use ($costPrices) {
-                return $costPrices[$query->id] ?? '';
-            })
-            ->addColumn('action', function ($query) {
-                return '<a href="' . route('shipping_medium.shippingrates', ['id' => $query->shipping_medium_id]) . '" class="btn btn-sm btn-info">View Details</a>';
-            })
-            ->rawColumns(['action'])
-            ->toJson();
-    }
-
-    $html = $builder->columns([
-        ['data' => 'to_port_name', 'name' => 'to_port_name', 'title' => 'To Port Name'],
-        ['data' => 'from_port_name', 'name' => 'from_port_name', 'title' => 'From Port Name'],
-        ['data' => 'price', 'name' => 'price', 'title' => 'Sale Price'],
-        ['data' => 'cost_price', 'name' => 'cost_price', 'title' => 'Cost Price'],
-        ['data' => 'vendor_name', 'name' => 'vendor_name', 'title' => 'Vendor Name'],
-        ['data' => 'action', 'name' => 'action', 'title' => 'Action', 'orderable' => false, 'searchable' => false],
-    ]);
-
-    return view('logistics.shipping_rates', compact('html', 'shippingmendium'));
-}
+    {
+        (new UserActivityController)->createActivity('Open the Shipping Rates');
+        // Get shipping data
+        $shipping = Shipping::where('shipping_medium_id', $id)->get();
+        $shippingmendium = ShippingMedium::find($id);
+        // Retrieve vendor names for each shipping record
+        $vendorNames = [];
+        foreach ($shipping as $record) {
+            $vendor = DB::table('suppliers')->where('id', $record->suppliers_id)->first();
+            $vendorNames[$record->id] = $vendor->supplier ?? '';
+        }
+        // Retrieve port names for each shipping record
+        $toPortNames = [];
+        $fromPortNames = [];
+        foreach ($shipping as $record) {
+            $toPort = DB::table('master_shipping_ports')->where('id', $record->to_port)->first();
+            $fromPort = DB::table('master_shipping_ports')->where('id', $record->from_port)->first();
+            $toPortNames[$record->id] = $toPort->name ?? '';
+            $fromPortNames[$record->id] = $fromPort->name ?? '';
+        }
+        if (request()->ajax()) {
+            return DataTables::of($shipping)
+                ->editColumn('created_by', function ($query) {
+                    return $query->CreatedBy->name ?? '';
+                })
+                ->addColumn('vendor_name', function ($query) use ($vendorNames) {
+                    return $vendorNames[$query->id] ?? '';
+                })
+                ->addColumn('to_port_name', function ($query) use ($toPortNames) {
+                    return $toPortNames[$query->id] ?? '';
+                })
+                ->editColumn('updated_by', function ($query) {
+                    $updater = DB::table('users')->where('id', $query->updated_by)->first();
+                    return $updater->name ?? '';
+                })
+                ->addColumn('from_port_name', function ($query) use ($fromPortNames) {
+                    return $fromPortNames[$query->id] ?? '';
+                })
+                ->editColumn('updated_at', function ($query) {
+                    return $query->updated_at ? date('d-m-Y', strtotime($query->updated_at)) : '';
+                })
+                ->addColumn('action', function ($query) {
+                    return '<a href="' . route('shipping_medium.shippingrates', ['id' => $query->id]) . '" class="btn btn-sm btn-info">View Details</a>';
+                })
+                ->rawColumns(['action'])
+                ->toJson();
+        }
+        $html = $builder->columns([
+            ['data' => 'to_port_name', 'name' => 'to_port_name', 'title' => 'To Port Name'],
+            ['data' => 'from_port_name', 'name' => 'from_port_name', 'title' => 'From Port Name'],
+            ['data' => 'price', 'name' => 'price', 'title' => 'Sale Price'],
+            ['data' => 'cost_price', 'name' => 'cost_price', 'title' => 'Cost Price'],
+            ['data' => 'vendor_name', 'name' => 'vendor_name', 'title' => 'Vendor Name'],
+            ['data' => 'updated_by', 'name' => 'updated_by', 'title' => 'Updated By'],
+            ['data' => 'updated_at', 'name' => 'updated_at', 'title' => 'Updated At'],
+            ['data' => 'action', 'name' => 'action', 'title' => 'Action', 'orderable' => false, 'searchable' => false],
+        ]);
+    
+        return view('logistics.shipping_rates', compact('html', 'shippingmendium'));
+    }    
 public function shippingrates (Builder $builder, $id)
 {  
     $shippingRates = DB::table('shipping_rates')
         ->where('shipping_charges_id', $id)
         ->get();
         $shipping = Shipping::find($id);
+        $to_port = MasterShippingPorts::find($shipping->to_port);
+        $from_port = MasterShippingPorts::find($shipping->from_port);
     if (request()->ajax()) {
         return DataTables::of($shippingRates)
             ->editColumn('suppliers_id', function ($query) {
@@ -348,7 +347,12 @@ public function shippingrates (Builder $builder, $id)
                 return date('d-m-Y', strtotime($query->updated_at));
             })
             ->editColumn('status', function ($query) {
-                return $query->status == 'Selected' ? '<span class="badge badge-success">Selected</span>' : '<span class="badge badge-danger">Not Selected</span>';
+                if ($query->status == 'Selected') {
+                    return '<span class="badge badge-success">Selected</span>';
+                } else {
+                    $button = '<button class="btn btn-primary btn-select" data-id="' . $query->id . '">Select</button>';
+                    return $button;
+                }
             })
             ->rawColumns(['status'])
             ->toJson();
@@ -363,7 +367,7 @@ public function shippingrates (Builder $builder, $id)
         ['data' => 'created_at', 'name' => 'created_at', 'title' => 'Created At'],
         ['data' => 'status', 'name' => 'status', 'title' => 'Status'],
     ]);
-return view('logistics.shipping_vendor_rates', compact('html', 'id', 'shipping'));
+return view('logistics.shipping_vendor_rates', compact('html', 'id', 'shipping', 'to_port', 'from_port'));
 }
     public function openmediumcreate ($id)
     {
@@ -384,13 +388,57 @@ return view('logistics.shipping_vendor_rates', compact('html', 'id', 'shipping')
         $shippingrates->shipping_medium_id = $id;
         $shippingrates->save();
         return redirect()->route('shipping_medium.openmedium', ['id' => $id])
-        ->with('success', 'Shipping rates saved successfully');
+        ->with('success', 'Shipping Locations saved successfully');
     }
     public function shippingratescreate ($id)
     {
         $shipping = Shipping::find($id);
-        $allPorts = MasterShippingPorts::all();
-        $ports = $allPorts->pluck('name', 'id');
-        return view('logistics.createportrates' , compact('shippingmedium', 'ports'));
+        $to_port = MasterShippingPorts::find($shipping->to_port);
+        $from_port = MasterShippingPorts::find($shipping->from_port);
+        $existingVendorIds = ShippingRate::where('shipping_charges_id', $id)->pluck('suppliers_id')->toArray();
+        $vendors = Supplier::whereHas('vendorCategories', function ($query) {
+            $query->where('category', 'Shipping');
+        })
+        ->whereNotIn('id', $existingVendorIds)
+        ->get();
+        return view('logistics.createvendorrates' , compact('shipping', 'vendors', 'to_port', 'from_port'));
+    }
+    public function storevendorrates (Request $request)
+    {
+        $shipping_charges_id = $request->input('id');
+        foreach ($request->vendor_id as $key => $value) {
+            ShippingRate::create([
+                'suppliers_id' => $value,
+                'cost_price' => $request->cost_price[$key],
+                'selling_price' => $request->selling_price[$key],
+                'shipping_charges_id' => $shipping_charges_id,
+                'created_by' => Auth::id(),
+                'updated_by' => Auth::id(),
+            ]);
+        }
+        return redirect()->route('shipping_medium.shippingrates', ['id' => $shipping_charges_id])
+        ->with('success', 'Shipping rates saved successfully');
+    }
+    public function selectShippingRate(Request $request, $id)
+    {
+        $shippingId = $request->input('shipping_id');
+        ShippingRate::where('shipping_charges_id', $shippingId)
+                ->where('id', '!=', $id)
+                ->update(['status' => 'Not Selected']);
+        $selectedRate = ShippingRate::find($id);
+        if ($selectedRate) {
+            $selectedRate->update(['status' => 'Selected']);
+        }
+    $shippingRate = ShippingRate::find($id);
+    $shippingCharges = Shipping::find($shippingId);
+    if ($shippingRate && $shippingCharges) {
+        $shippingCharges->update([
+            'cost_price' => $shippingRate->cost_price,
+            'price' => $shippingRate->selling_price,
+            'updated_by' => Auth::id(),
+            'suppliers_id' => $shippingRate->suppliers_id,
+        ]);
+    }
+        return response()->json(['message' => 'Shipping rate selection updated successfully']);
     }
     }

@@ -18,7 +18,7 @@
                             <div class="col-lg-4 col-md-6">
                     <label for="from_port" class="form-label">From Port</label>
                     <select name="from_port" class="form-control" id="from_port">
-                    <option value="" disabled selected>Select Category</option>
+                    <option value="" disabled selected>Select From Port</option>
                     @foreach($ports as $id => $name)
                         <option value="{{ $id }}">{{ $name }}</option>
                     @endforeach
@@ -28,7 +28,7 @@
                 <div class="col-lg-4 col-md-6">
                     <label for="to_port" class="form-label">To Port</label>
                     <select name="to_port" class="form-control" id="to_port">
-                    <option value="" disabled selected>Select Category</option>
+                    <option value="" disabled selected>Select To Port</option>
                     @foreach($ports as $id => $name)
                         <option value="{{ $id }}">{{ $name }}</option>
                     @endforeach

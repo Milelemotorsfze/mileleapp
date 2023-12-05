@@ -10,6 +10,19 @@ class Shipping extends Model
 {
     use HasFactory,SoftDeletes;
     protected $table = 'shipping_charges';
+    protected $fillable = [
+        'price',
+        'created_by',
+        'created_at',
+        'updated_at',
+        'created_by',
+        'to_port',
+        'from_port',
+        'shipping_medium_id',
+        'suppliers_id',
+        'updated_by',
+        'cost_price',
+    ];
     public function quotationItems()
     {
         return $this->morphMany('App\QuotationItem', 'reference');

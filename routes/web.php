@@ -620,7 +620,9 @@ Route::get('/d', function () {
     Route::get('/shipping_rates/{id}', [ShippingController::class, 'shippingrates'])->name('shipping_medium.shippingrates');
     Route::get('shipping_medium_create/{id}', [ShippingController::class, 'openmediumcreate'])->name('shipping_medium.openmedium_create');
     Route::get('shipping_rates_create/{id}', [ShippingController::class, 'shippingratescreate'])->name('shipping_rate.shippingrates_create');
-    Route::post('/storeportrates', [ShippingController::class, 'storeportrates'])->name('Shipping.storeportrates');
+    Route::post('/storeportrates', [ShippingController::class, 'storeportrates'])->name('Shipping.storeportrates'); 
+    Route::post('/storevendorrates', [ShippingController::class, 'storevendorrates'])->name('Shipping.storevendorrates');
+    Route::post('/select-shipping-rate/{id}', [ShippingController::class, 'selectShippingRate']);
     //Agents
     Route::resource('agents', AgentsController::class);
     Route::get('/get-agent-names', [AgentsController::class, 'getAgentNames'])->name('agents.getAgentNames');
