@@ -53,8 +53,8 @@ class ModelLinesController extends Controller
                 return redirect()->back()->withErrors($validator);
 
             }
-
         }
+
         $modelLine = new MasterModelLines();
         $modelLine->brand_id = $request->brand_id;
         $modelLine->model_line = $request->model_line;
@@ -115,11 +115,48 @@ class ModelLinesController extends Controller
         //
     }
     public function StoreModellineOrBrand(Request $request) {
-        $this->validate($request, [
-            'brand' => 'required|unique:master_brands,brand',
-            'model_line' => 'required|unique:master_model_lines,model_line'
+        $validator = Validator::make($request->all(), [
+            'model_line' => 'unique:master_model_lines,model_line',
         ]);
+        $data['brand_error'] = "";
+        $data['model_line_error'] = "";
+        if($validator->fails()) {
+            $data['model_line_error'] = "Model line already existing";
+            return response($data);
+        }
 
+        if($request->brandType == 'EXISTING') {
+            $brand = Brand::find($request->brand);
 
+        }else{
+            if(!$request->brand) {
+                $data['brand_error'] = "Brand Name is required";
+                return response($data);
+            }
+           $isadded = Brand::where('brand_name', $request->brand)->first();
+           if($isadded) {
+               $data['brand_error'] = "Brand Name is already existing.";
+               return response($data);
+           }else{
+                $brand = new Brand();
+           }
+        }
+            if ($request->brandType == 'NEW') {
+
+                $brand->brand_name = $request->brand;
+                $brand->created_by = Auth::id();
+                $brand->save();
+            }
+//            info($request->brandType);
+//            info($brand);
+            $modelLine = new MasterModelLines();
+            $modelLine->brand_id = $brand->id;
+            $modelLine->model_line = $request->model_line;
+            $modelLine->created_by = Auth::id();
+            $modelLine->save();
+            $data['brand_name'] = $brand->brand_name;
+            $data['model_line'] = $modelLine;
+
+        return response( $data);
     }
 }

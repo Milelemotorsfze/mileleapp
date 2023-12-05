@@ -88,7 +88,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-    <h4 class="card-title">Create Job Description Form</h4>
+<h4 class="card-title">{{$jobDescriptionId === 'new' ? "Create" : "Edit"}} Job Description Form</h4>
     <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
@@ -149,9 +149,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <div class=" col-lg-4 col-md-6 col-sm-6 date-section-div">
                         <label for="request_date" class="form-label text-md-end"><span class="error">* </span> {{ __('Choose Date') }}</label>
                         <input type="date" name="request_date" id="request_date" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2" value="{{$jobDescription->request_date}}">
-                        <span id="formatted_date"></span>
                     </div>
-
 
                 </div>
 
@@ -318,7 +316,6 @@ redirect()->route('home')->send();
         });
         $('#formatted_date').text(formattedDate);
 
-
         // Execute with changing uuid value 
 
         function toggleJobDescriptionDetailsDiv() {
@@ -402,13 +399,6 @@ redirect()->route('home')->send();
             } else {
                 updateFieldsBasedOnUUID(selectedUUID);
             }
-        });
-
-
-        $('#uuid_value').on('change', function() {
-            toggleJobDescriptionDetailsDiv();
-            var fieldName = $(this).attr('name');
-            $('#employeeJobDescriptionForm').validate().element('[name="' + fieldName + '"]');
         });
 
         $('#location_name').on('change', function() {

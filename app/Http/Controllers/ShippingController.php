@@ -10,6 +10,7 @@ use App\Models\OtherLogisticsCharges;
 use App\Models\ShippingMedium;
 use App\Models\UserActivities;
 use App\Models\ShippingRate;
+use App\Models\MasterShippingPorts;
 use Illuminate\Http\Request;
 use Psy\Util\Str;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +36,7 @@ class ShippingController extends Controller
                 $data = ShippingMedium::select([
                     'shipping_medium.id',
                     'shipping_medium.name',
+                    'shipping_medium.code',
                     'shipping_medium.description',
                     'shipping_medium.created_at',
                 ]);
@@ -108,16 +110,12 @@ class ShippingController extends Controller
         $price = $request->input('price');
         $description = $request->input('description');
         if($category == "Shipping"){
-        $shipping = New Shipping;
+        $shipping = New ShippingMedium;
         $shipping->name = $addon_name;
         $shipping->description = $description;
-        $shipping->price = $price;
-        $shipping->created_by = Auth::id();
-
-        $latestCode = Shipping::withTrashed()->orderBy('id', 'desc')->first();
+        $latestCode = ShippingMedium::withTrashed()->orderBy('id', 'desc')->first();
         $code = $this->generateUUID($latestCode, $category);
         $shipping->code = $code;
-
         $shipping->save();
         }
         else if($category == "Shipping Documents"){
@@ -263,6 +261,7 @@ class ShippingController extends Controller
     (new UserActivityController)->createActivity('Open the Shipping Rates');
     // Get shipping data
     $shipping = Shipping::where('shipping_medium_id', $id)->get();
+    $shippingmendium = ShippingMedium::find($id);
     // Retrieve vendor names for each shipping record
     $vendorNames = [];
     foreach ($shipping as $record) {
@@ -320,13 +319,14 @@ class ShippingController extends Controller
         ['data' => 'action', 'name' => 'action', 'title' => 'Action', 'orderable' => false, 'searchable' => false],
     ]);
 
-    return view('logistics.shipping_rates', compact('html'));
+    return view('logistics.shipping_rates', compact('html', 'shippingmendium'));
 }
 public function shippingrates (Builder $builder, $id)
 {  
     $shippingRates = DB::table('shipping_rates')
         ->where('shipping_charges_id', $id)
         ->get();
+        $shipping = Shipping::find($id);
     if (request()->ajax()) {
         return DataTables::of($shippingRates)
             ->editColumn('suppliers_id', function ($query) {
@@ -357,12 +357,40 @@ public function shippingrates (Builder $builder, $id)
         ['data' => 'suppliers_id', 'name' => 'suppliers_id', 'title' => 'Vendor Name'],
         ['data' => 'cost_price', 'name' => 'cost_price', 'title' => 'Cost Price'],
         ['data' => 'selling_price', 'name' => 'selling_price', 'title' => 'Selling Price'],
-        ['data' => 'created_by', 'name' => 'created_by', 'title' => 'Created By'],
         ['data' => 'updated_by', 'name' => 'updated_by', 'title' => 'Updated By'],
-        ['data' => 'created_at', 'name' => 'created_at', 'title' => 'Created At'],
         ['data' => 'updated_at', 'name' => 'updated_at', 'title' => 'Updated At'],
+        ['data' => 'created_by', 'name' => 'created_by', 'title' => 'Created By'],
+        ['data' => 'created_at', 'name' => 'created_at', 'title' => 'Created At'],
         ['data' => 'status', 'name' => 'status', 'title' => 'Status'],
     ]);
-return view('logistics.shipping_vendor_rates', compact('html'));
+return view('logistics.shipping_vendor_rates', compact('html', 'id', 'shipping'));
 }
-}
+    public function openmediumcreate ($id)
+    {
+        $shippingmedium = ShippingMedium::find($id);
+        $allPorts = MasterShippingPorts::all();
+        $ports = $allPorts->pluck('name', 'id');
+        return view('logistics.createportrates' , compact('shippingmedium', 'ports'));
+    }
+    public function storeportrates (Request $request)
+    {
+        $fromPortId = $request->input('from_port');
+        $toPortId = $request->input('to_port'); 
+        $id = $request->input('id');
+        $shippingrates = New Shipping();
+        $shippingrates->created_by = Auth::id();
+        $shippingrates->to_port = $toPortId;
+        $shippingrates->from_port = $fromPortId;
+        $shippingrates->shipping_medium_id = $id;
+        $shippingrates->save();
+        return redirect()->route('shipping_medium.openmedium', ['id' => $id])
+        ->with('success', 'Shipping rates saved successfully');
+    }
+    public function shippingratescreate ($id)
+    {
+        $shipping = Shipping::find($id);
+        $allPorts = MasterShippingPorts::all();
+        $ports = $allPorts->pluck('name', 'id');
+        return view('logistics.createportrates' , compact('shippingmedium', 'ports'));
+    }
+    }

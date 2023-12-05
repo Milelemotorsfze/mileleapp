@@ -77,7 +77,7 @@
                     <td style="font-weight: bold;">Customer ID :</td>
                     <td> {{ $data['client_id'] }}</td>
                     <td style="font-weight: bold;"> @if($quotation->shipping_method == 'EXW') Final Destination : @else Place Of Supply :  @endif</td>
-                    <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->final_destination  }} @else
+                    <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->country->name ?? '' }} @else
                         {{ $quotationDetail->place_of_supply }}  @endif </td>
 
                 </tr>
@@ -98,7 +98,7 @@
                     <td>{{  $data['client_name']  }} </td>
                     <td style="font-weight: bold;">
                         @if($quotation->shipping_method == 'EXW') Place Of Delivery :@endif </td>
-                    <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->place_of_delivery  }} @endif </td>
+                    <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->shippingPort->name ??''   }} @endif </td>
 
                 </tr>
 

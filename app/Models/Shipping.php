@@ -14,4 +14,8 @@ class Shipping extends Model
     {
         return $this->morphMany('App\QuotationItem', 'reference');
     }
+    public function shippingMedium()
+    {
+        return $this->belongsTo(ShippingMedium::class, 'shipping_medium_id');
+    }
 }

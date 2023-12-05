@@ -279,14 +279,6 @@
                 </div>
             </div>
             <div class="col-sm-4">
-{{--                <div class="row">--}}
-{{--                    <div class="col-sm-6">--}}
-{{--                        Customer ID :--}}
-{{--                    </div>--}}
-{{--                    <div class="col-sm-6">--}}
-{{--                        {{ $empProfile->id }}--}}
-{{--                    </div>--}}
-{{--                </div>--}}
                 <div class="row mt-2">
                     <div class="col-sm-6">
                         Company :
@@ -335,7 +327,12 @@
                             Final Destination :
                         </div>
                         <div class="col-sm-6">
-                            <input type="text" class="form-control form-control-xs" placeholder="Destination" name="final_destination" id="final_destination">
+                            <select class="form-control col" id="country" name="country_id" style="width: 100%">
+                                <option ></option>
+                                @foreach($countries as $country)
+                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -357,7 +354,10 @@
                             Place of Delivery :
                         </div>
                         <div class="col-sm-6">
-                            <input type="text" name="place_of_delivery" id="place_of_delivery" class="form-control form-control-xs" placeholder="Place of Delivery">
+                            <select class="form-control col" id="shipping_port" name="shipping_port_id" style="width: 100%">
+                                <option></option>
+                            </select>
+
                         </div>
                     </div>
                 </div>
@@ -571,17 +571,17 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-lg-1 col-md-6" style="margin-top: 26px;">
-                        <a id="addnewBrandButton" data-toggle="popover" data-trigger="hover" title="Create New Brand" data-placement="top" style="float: right;"
-                           class="btn btn-info modal-button" data-modal-id="createNewBrand"><i class="fa fa-plus" aria-hidden="true"></i> Add Brand</a>
-                    </div>
+{{--                    <div class="col-lg-1 col-md-6" style="margin-top: 26px;">--}}
+{{--                        <a id="addnewBrandButton" data-toggle="popover" data-trigger="hover" title="Create New Brand" data-placement="top" style="float: right;"--}}
+{{--                           class="btn btn-info modal-button" data-modal-id="createNewBrand"><i class="fa fa-plus" aria-hidden="true"></i> Add Brand</a>--}}
+{{--                    </div>--}}
                     <div class="col-lg-2 col-md-6 col-sm-12">
                         <label class="form-label"> Model Line</label>
                         <select class="form-control col" id="model_line" style="width: 100%" name="model_line" disabled >
                             <option value="">Select Model Line</option>
                         </select>
                     </div>
-                    <div class="col-lg-1 col-md-6 add-new-model-line-div" style="margin-top: 26px;" hidden>
+                    <div class="col-lg-1 col-md-6 add-new-model-line-div" style="margin-top: 26px;" >
                         <a id="createNewModelLineButton" data-toggle="popover" data-trigger="hover" title="Create New Model Line" data-placement="top" style="float: right;"
                            class="btn btn-info modal-model-line-button" data-modal-id="createNewModelLine"><i class="fa fa-plus" aria-hidden="true"></i> Add Model Line</a>
 
@@ -861,31 +861,17 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="table-responsive">
-                                <table id="shipping-table" class="table table-striped table-editable table-edits table">
+                                <table id="shipping-table" class="table table-striped table-editable table-edits table" width="100%">
                                     <thead class="bg-soft-secondary">
                                     <tr>
-                                        <th>S.No</th>
                                         <th>Code</th>
-                                        <th>Addon Name</th>
+                                        <th>Name</th>
                                         <th>Description</th>
                                         <th>Price</th>
                                         <th style="width:30px;">Add Into Quotation</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <div hidden>{{$i=0;}}
-                                        @foreach($shippings as $shipping)
-                                            <tr>
-                                            <td>{{ ++$i }}</td>
-                                            <td>{{ $shipping->code }} </td>
-                                            <td>{{ $shipping->name }}</td>
-                                            <td>{{ $shipping->description  }}</td>
-                                            <td>{{ $shipping->price }}</td>
-                                            <td>
-                                                <button class="add-button circle-button" data-button-type="Shipping" data-shipping-id="{{ $shipping->id }}"></button>
-                                            </td>
-                                            </tr>
-                                    @endforeach
                                     </tbody>
                                 </table>
                             </div>
@@ -893,7 +879,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
         <div id="shippingDocumentContent" class="contentveh">
             <hr>
@@ -909,9 +894,9 @@
                                 <table id="shipping-document-table" class="table table-striped table-editable table-edits table">
                                     <thead class="bg-soft-secondary">
                                     <tr>
-                                        <th>S.No</th>
+
                                         <th>Code</th>
-                                        <th>Addon Name</th>
+                                        <th> Name</th>
                                         <th>Description</th>
                                         <th>Price</th>
                                         <th style="width:30px;">Add Into Quotation</th>
@@ -921,7 +906,6 @@
                                     <div hidden>{{$i=0;}}
                                         @foreach($shippingDocuments as $shippingDocument)
                                             <tr>
-                                                <td>{{ ++$i }}</td>
                                                 <td>{{ $shippingDocument->code }}</td>
                                                 <td>{{ $shippingDocument->name }}</td>
                                                 <td>{{ $shippingDocument->description  }}</td>
@@ -955,9 +939,8 @@
                                 <table id="certification-table" class="table table-striped table-editable table-edits table">
                                     <thead class="bg-soft-secondary">
                                     <tr>
-                                        <th>S.No</th>
                                         <th>Code</th>
-                                        <th>Addon Name</th>
+                                        <th> Name</th>
                                         <th>Description</th>
                                         <th>Price</th>
                                         <th style="width:30px;">Add Into Quotation</th>
@@ -967,7 +950,6 @@
                                     <div hidden>{{$i=0;}}
                                         @foreach($certifications as $certification)
                                             <tr>
-                                                <td>{{ ++$i }}</td>
                                                 <td>{{ $certification->code }}</td>
                                                 <td>{{ $certification->name }}</td>
                                                 <td>{{ $certification->description  }}</td>
@@ -1000,9 +982,8 @@
                                 <table id="other-document-table" class="table table-striped table-editable table-edits table">
                                     <thead class="bg-soft-secondary">
                                     <tr>
-                                        <th>S.No</th>
                                         <th>Code</th>
-                                        <th>Addon Name</th>
+                                        <th> Name</th>
                                         <th>Description</th>
                                         <th>Price</th>
                                         <th style="width:30px;">Add Into Quotation</th>
@@ -1012,7 +993,6 @@
                                     <div hidden>{{$i=0;}}
                                         @foreach($otherDocuments as $otherDocument)
                                             <tr>
-                                                <td>{{ ++$i }}</td>
                                                 <td>{{ $otherDocument->code }}</td>
                                                 <td>{{ $otherDocument->name }}</td>
                                                 <td>{{ $otherDocument->description  }}</td>
@@ -1037,44 +1017,6 @@
         <button type="submit" class="btn btn-primary" id="submit-button" disabled>Submit</button>
     </form>
     <div class="overlay">
-{{--        <div class="modal" id="createNewBrand" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">--}}
-{{--            <div class="modal-dialog modal-dialog-centered" role="document">--}}
-{{--                <div class="modal-content">--}}
-{{--                    <div class="modal-header">--}}
-{{--                        <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Create New Brand </h5>--}}
-{{--                        <button type="button" class="btn btn-secondary btn-sm close form-control modal-close" data-dismiss="modal" aria-label="Close">--}}
-{{--                            <span aria-hidden="true">X</span>--}}
-{{--                        </button>--}}
-{{--                    </div>--}}
-{{--                    <div class="modal-body">--}}
-{{--                        <form method="POST" enctype="multipart/form-data">--}}
-{{--                            @csrf--}}
-{{--                            <div class="row modal-row">--}}
-{{--                                <div class="col-xxl-12 col-lg-12 col-md-12">--}}
-{{--                                    <span class="error">* </span>--}}
-{{--                                    <label for="name" class="col-form-label text-md-end ">Brand Name</label>--}}
-{{--                                </div>--}}
-{{--                                <div class="col-xxl-12 col-lg-12 col-md-12">--}}
-{{--								<input type="text" id="new_brand_name" class="form-control @error('brand_name') is-invalid @enderror" name="brand_name"--}}
-{{--                                          placeholder="Enter Brand Name" value="{{ old('brand_name') }}" oninput="checkValidation()" autofocus>--}}
-{{--                                    <span id="newBrandError" class="is-invalid"></span>--}}
-{{--                                    @error('brand_name')--}}
-{{--                                    <span class="invalid-feedback" role="alert">--}}
-{{--								<strong>{{ $message }}</strong>--}}
-{{--								</span>--}}
-{{--                                    @enderror--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        </form>--}}
-{{--                    </div>--}}
-{{--                    <div class="modal-footer">--}}
-{{--                        <button type="button" class="btn btn-secondary btn-sm modal-close" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>--}}
-{{--                        <button type="button" class="btn btn-primary btn-sm" id="createBrandId" style="float: right;">--}}
-{{--                            <i class="fa fa-check" aria-hidden="true"></i> Submit</button>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
         <div class="modal" id="createNewModelLine" tabindex="-1" role="dialog" aria-labelledby="exampleModalLineCenteredLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -1085,27 +1027,27 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form method="POST" enctype="multipart/form-data">
+                        <form method="POST" enctype="multipart/form-data" id="create-model-line-form">
                             @csrf
                             <div class="row modal-row">
                                 <div class="col-xxl-12 col-lg-12 col-md-12">
                                     <span class="error">* </span>
                                     <label for="name" class="col-form-label text-md-end" >Brand</label>
                                 </div>
-                                <div class="col-xxl-9 col-lg-9 col-md-9 col-sm-12">
-                                    <input type="text" class="form-control new_brand  @error('brand_name') is-invalid @enderror" oninput="checkBrandValidation()" placeholder="Enter Brand Name" id="new-brand"  name="brand_name" hidden>
-                                    <div id="brand-list-div">
-                                        <select onchange="checkBrandValidation()" class="form-control new_brand @error('brand_name') is-invalid @enderror"
-                                                name="brand_name" id="brand-from-list" style="width: 100%">
-                                            <option></option>
-                                            @foreach($brands as $brand)
-                                                <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                <div class="col-xxl-9 col-lg-9 col-md-9 col-sm-12" id="new-brand-div" hidden>
+                                    <input type="text" class="form-control new_brand  @error('brand_name') is-invalid @enderror" oninput="checkBrandValidation()" placeholder="Enter Brand Name" id="new-brand"  name="brand_name" >
                                     <span id="newBrandError" class="is-invalid" style="margin-top: 20px" ></span>
                                 </div>
-
+                                <div class="col-xxl-9 col-lg-9 col-md-9 col-sm-12" id="brand-list-div">
+                                    <select onchange="checkBrandValidation()" class="form-control new_brand @error('brand_name') is-invalid @enderror"
+                                            name="brand_name" id="brand-from-list" style="width: 100%">
+                                        <option></option>
+                                        @foreach($brands as $brand)
+                                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span id="existingBrandError" class="is-invalid" style="margin-top: 20px" ></span>
+                                </div>
                                 <div class="col-xxl-3 col-lg-3 col-md-3 col-sm-12">
                                     <a> <button type="button" class="btn btn-info add-new-button" >Add New</button> </a>
                                     <a> <button type="button" class="btn btn-info add-existing-brand-button" hidden>Add From List</button> </a>
@@ -1141,8 +1083,8 @@
 @push('scripts')
 <script>
      function addAgentModal() {
-  $('#addAgentModal').modal('show');
-}
+        $('#addAgentModal').modal('show');
+    }
 $(document).ready(function () {
     $('#cb_name').change(function () {
         var selectedAgentId = $(this).val();
@@ -1228,20 +1170,28 @@ $(document).ready(function () {
 
     </script>
 <script>
+    // get the shipping medium charges based on port selected
 
     function checkBrandValidation()
     {
         var value = $("#brand-from-list").val();
         var newBrand = $('#new-brand').val();
-        // alert(value);
-        if(value == '' || newBrand == '')
+
+        if(value == '')
         {
+            $msg = 'Brand Name is Required';
+            showExisingBrandError($msg);
+        }else
+        {
+            $msg="";
+            removeExistingBrandError($msg);
+        }
+       if(newBrand == '') {
             $msg = 'Brand Name is Required';
             showNewBrandError($msg);
         }
         else
         {
-            // alert("ok");
             $msg=""
             removeNewBrandError($msg);
         }
@@ -1272,23 +1222,137 @@ $(document).ready(function () {
     function showNewBrandError($msg)
     {
         document.getElementById("newBrandError").textContent=$msg;
-        document.getElementById("brand-from-list").classList.add("is-invalid");
+        document.getElementById("new-brand").classList.add("is-invalid");
         document.getElementById("new-brand").classList.remove("is-invalid");
         document.getElementById("newBrandError").classList.add("paragraph-class");
     }
     function removeNewBrandError($msg)
     {
         document.getElementById("newBrandError").textContent=$msg;
-        document.getElementById("brand-from-list").classList.remove("is-invalid");
+        document.getElementById("new-brand").classList.remove("is-invalid");
         document.getElementById("new-brand").classList.remove("is-invalid");
         document.getElementById("newBrandError").classList.remove("paragraph-class");
     }
-
+    function showExisingBrandError($msg)
+    {
+        document.getElementById("existingBrandError").textContent=$msg;
+        document.getElementById("brand-from-list").classList.add("is-invalid");
+        document.getElementById("brand-from-list").classList.remove("is-invalid");
+        document.getElementById("existingBrandError").classList.add("paragraph-class");
+    }
+    function removeExistingBrandError($msg)
+    {
+        document.getElementById("existingBrandError").textContent=$msg;
+        document.getElementById("brand-from-list").classList.remove("is-invalid");
+        document.getElementById("brand-from-list").classList.remove("is-invalid");
+        document.getElementById("existingBrandError").classList.remove("paragraph-class");
+    }
+    function showPriceError($msg,i)
+    {
+        document.getElementById("priceError"+i).textContent=$msg;
+        document.getElementById("price"+i).classList.add("is-invalid");
+        document.getElementById("priceError"+i).classList.add("paragraph-class");
+    }
     $(document).ready(function() {
+        $('#brand').select2();
+
+        $('#brand-from-list').select2({
+            placeholder: "Select Brand"
+        });
+        $('#country').select2({
+            placeholder: "Select Final Destination"
+        });
+        $('#shipping_port').select2({
+            placeholder: "Select Place Of Delivery"
+        });
+        $('#model_line').select2();
+        $('#variant').select2();
+        $('#interior_color').select2();
+        $('#exterior_color').select2();
+
+        $('#accessories_addon').select2();
+        $('#accessories_brand').select2();
+        $('#accessories_model_line').select2();
+
+        $('#spare_parts_addon').select2();
+        $('#spare_parts_brand').select2();
+        $('#spare_parts_model_line').select2();
+        $('#spare_parts_model_description').select2();
+
+        $('#kit_addon').select2();
+        $('#kit_brand').select2();
+        $('#kit_model_line').select2();
+        $('#kits_model_description').select2();
+
+        $('#country').on('change',function(){
+            let country = $(this).val();
+            let url = '{{ route('quotation.shipping_ports') }}';
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    country_id: country,
+                },
+                success:function (data) {
+                    $('#shipping_port').empty();
+                    $('#shipping_port').html('<option value=""> Select Shipping Port </option>');
+                    jQuery.each(data, function(key,value){
+                        $('#shipping_port').append('<option value="'+ value.id +'">'+ value.name +'</option>');
+                    });
+                }
+            });
+        });
+        $('#shipping_port').on('change',function(){
+            let shippingPortId = $('#shipping_port').val();
+            var table = $('#shipping-table').DataTable();
+
+            let url = '{{ route('quotation.shipping_charges') }}';
+                if(shippingPortId) {
+                    $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        shipping_port_id: shippingPortId,
+                    },
+                    success:function (response) {
+
+                        var data = response.map(function(response) {
+
+                            var addButton = '<div class="add-button circle-button" data-button-type="Shipping" data-shipping-id="'+ response.id +'" ></div>';
+
+                            return [
+                                response.shipping_medium.code,
+                                response.shipping_medium.name,
+                                response.shipping_medium.description,
+                                response.price,
+                                addButton
+                            ];
+                        });
+                        if ($.fn.dataTable.isDataTable('#shipping-table')) {
+                            table.destroy();
+                        }
+                        $('#shipping-table').DataTable({
+                            data: data,
+                            columns: [
+                                { title: 'Code' },
+                                { title: 'Name' },
+                                { title: 'Description' },
+                                { title: 'Price' },
+                                { title: 'Add Into Quotation' }
+                            ]
+                        });
+                    }
+                });
+            }
+
+        });
+
         $('.add-new-button').on('click', function(){
 
             $('#brand-list-div').attr('hidden', true);
-            $('#new-brand').attr('hidden', false);
+            $('#new-brand-div').attr('hidden', false);
             $('.add-existing-brand-button').attr('hidden', false);
             $('.add-new-button').hide();
             $("#brand-from-list option:selected").prop("selected", false);
@@ -1296,7 +1360,7 @@ $(document).ready(function () {
 
         });
         $('.add-existing-brand-button').on('click', function(){
-            $('#new-brand').attr('hidden', true);
+            $('#new-brand-div').attr('hidden', true);
             $('#new-brand').val("");
             $('#brand-list-div').attr('hidden', false);
             $('.add-new-button').show();
@@ -1321,101 +1385,81 @@ $(document).ready(function () {
             removeNewBrandError();
             removeNewModelLineError();
         });
-        $('#createBrandId').on('click', function()
+
+        $('#createModelLineId').on('click', function()
         {
             // create new addon and list new addon in addon list
-            var value = $('#new_brand_name').val();
-            if(value == '')
-            {
-                $msg = 'Brand Name is Required';
-                showNewBrandError($msg);
+            var model_line = $('#new_model_line_name').val();
+            var existingBrand = $("#brand-from-list").val();
+            var newBrand = $('#new-brand').val();
+            checkBrandValidation();
+            checkModelLine();
+            var brand = newBrand;
+            var brandType = 'NEW';
+            if(existingBrand) {
+                var brand = existingBrand;
+                var brandType = 'EXISTING';
             }
-            else
-            {
+             if(model_line != "" && brand != "") {
                 $.ajax
                 ({
-                    url:"{{route('brands.store')}}",
+                    url:"{{route('modelline-or-brand.store')}}",
                     type: "POST",
                     data:
                         {
-                            brand_name: value,
-                            request_from: 'Quotation',
+                            model_line: model_line,
+                            brand: brand,
+                            brandType: brandType,
                             _token: '{{csrf_token()}}'
                         },
                     dataType : 'json',
                     success: function(result)
                     {
                         console.log(result);
-                        if(result.error) {
-                            $msg = result.error;
+                        if(result.brand_error) {
+                            $msg = result.brand_error;
                             showNewBrandError($msg);
-                        }else{
-                            $('.overlay').hide();
-                            $('.modal').removeClass('modalshow');
-                            $('.modal').addClass('modalhide');
-                            $('#brand').append("<option value='" + result.id + "'>" + result.brand_name + "</option>");
-                            $('#brand').val(result.id);
-                            $('#new_brand_name').val("");
-                            $('.add-new-model-line-div').prop('hidden', false);
-                            $('#model_line').attr('disabled', false)
-                            $msg = "";
-                            removeNewBrandError();
                         }
-                    }
-                });
-            }
-        });
-        $('#createModelLineId').on('click', function()
-        {
-            // create new addon and list new addon in addon list
-            var model_line = $('#new_model_line_name').val();
-            var brand = $("input[name=brand_name]").val();
-            var existingBrand = $("#brand-from-list").val();
-            var newBrand = $('#new-brand').val();
-            checkBrandValidation();
-            checkModelLine();
-            if(existingBrand != "") {
-                var barnd = existingBrand;
-            }else{
-                var brand = newBrand;
-            }
+                        if(result.model_line_error) {
+                            $msg = result.model_line_error;
+                            showNewModelLineError($msg);
+                        }
+                        if(result.model_line_error == "" ){
+                            if(result.brand_error == "") {
 
-             if(model_line != "" && brand != "") {
-                 alert("ok");
-                    $.ajax
-                    ({
-                        url:"{{route('model-lines.store')}}",
-                        type: "POST",
-                        data:
-                            {
-                                model_line: model_line,
-                                brand_id: brand,
-                                request_from: 'Quotation',
-                                _token: '{{csrf_token()}}'
-                            },
-                        dataType : 'json',
-                        success: function(result)
-                        {
-                            if(result.error) {
-                                $msg = result.error;
-                                showNewModelLineError($msg);
-                            }else{
                                 $('.overlay').hide();
                                 $('.modal').removeClass('modalshow');
                                 $('.modal').addClass('modalhide');
-                                $('#model_line').append("<option value='" + result.id + "'>" + result.model_line + "</option>");
-                                $('#model_line').val(result.id);
+                                var id = result.model_line.brand_id;
+                                if(brandType == 'NEW') {
+                                    $('#brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");
+                                    $('#accessories_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");
+                                    $('#spare_parts_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");
+                                    $('#kit_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");
+
+                                }
+                                $('#brand').val(id);
+                                $('#brand').trigger('change.select2');
+
+                                $('#model_line').append("<option  value='" + result.model_line.id + "'>" + result.model_line.model_line + "</option>");
+                                $('#model_line').val(result.model_line.id);
+                                // $('#model_line').trigger('change');
+
                                 $('#model_line').prop('disabled', false);
 
-                                $('#new_model_line_name').val("");
+                                $('#new_model_line_name').val(" ");
+                                $('#brand-from-list').val(" ");
+                                $('#new-brand').val(" ");
+                                $('#brand-from-list').trigger('change.select2');
+
                                 $msg = "";
                                 removeNewModelLineError();
+                                removeNewBrandError();
                             }
                         }
-                    });
-
-                }
-
+                    }
+                });
+             }
         });
 
         $('.modal-button').on('click', function()
@@ -1438,30 +1482,6 @@ $(document).ready(function () {
         var shippingDocumentTable = $('#shipping-document-table').DataTable();
         var certificationTable = $('#certification-table').DataTable();
         var otherTable = $('#other-document-table').DataTable();
-
-        $('#brand').select2();
-
-        $('#brand-from-list').select2({
-            placeholder: "Select Brand"
-        });
-        $('#model_line').select2();
-        $('#variant').select2();
-        $('#interior_color').select2();
-        $('#exterior_color').select2();
-
-        $('#accessories_addon').select2();
-        $('#accessories_brand').select2();
-        $('#accessories_model_line').select2();
-
-        $('#spare_parts_addon').select2();
-        $('#spare_parts_brand').select2();
-        $('#spare_parts_model_line').select2();
-        $('#spare_parts_model_description').select2();
-
-        $('#kit_addon').select2();
-        $('#kit_brand').select2();
-        $('#kit_model_line').select2();
-        $('#kits_model_description').select2();
 
         $('input[name="document_type"]').on('change', function() {
             $('input[name="' + this.name + '"]').not(this).prop('checked', false);
@@ -1513,6 +1533,7 @@ $(document).ready(function () {
                 }
             }
         }
+
         $('#currency').on('change', function() {
             var currency = $(this).val();
             showPriceInSelectedValue();
@@ -1580,7 +1601,6 @@ $(document).ready(function () {
         var brandId = $(this).val();
         if (brandId ) {
             $('#model_line').prop('disabled', false);
-            $('.add-new-model-line-div').prop('hidden', false);
             $('#model_line').empty().append('<option value="">Select Model Line</option>');
 
             $.ajax({
@@ -1596,7 +1616,6 @@ $(document).ready(function () {
         } else {
             $('#model_line').prop('disabled', true);
             $('#variant').prop('disabled', true);
-            $('.add-new-model-line-div').prop('hidden', true);
             $('#model_line').empty().append('<option value="">Select Model Line</option>');
             $('#variant').empty().append('<option value="">Select Variant</option>');
         }
@@ -1775,7 +1794,7 @@ $(document).ready(function () {
                     var directAdd = "";
                     var directAdd = 'Direct-Add';
 
-                    return '<button class="circle-buttonr remove-button"  data-button-type="'+ directAdd +'">Remove</button>';
+                    return '<button class="circle-buttonr remove-button "  data-button-type="'+ directAdd +'">Remove</button>';
 
             }
             // defaultContent: '<button class="circle-buttonr remove-button" >Remove</button>'
@@ -1790,7 +1809,7 @@ $(document).ready(function () {
 
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
-                        var price = row[4];
+                        var price = row[3];
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         var price = row[4];
@@ -1828,7 +1847,7 @@ $(document).ready(function () {
                         var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
-                        combinedValue = row[2]+', '+row[3];
+                        combinedValue = row[1]+', '+row[2];
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         combinedValue = row[2] + ' , ' + row[3];
@@ -1860,7 +1879,7 @@ $(document).ready(function () {
                     }
                     var arrayIndex = row['index'] - 1;
                     return '<div class="row" style="flex-wrap: unset">' +
-                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;" name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide" checked id="checkbox-'+ row['index'] +'"> ' +
+                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;"  name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide" checked id="checkbox-'+ row['index'] +'"> ' +
                         '<input type="text" name="descriptions[]" required class="combined-value-editable form-control" value="' + combinedValue + '"/>' +
                         '</div> ';
                 }
@@ -1876,7 +1895,7 @@ $(document).ready(function () {
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
 
-                        var code = row[1];
+                        var code = row[0];
                     }else if(row['button_type'] == 'Direct-Add') {
                         var code = row[2];
                         // if(row['table_type'] == 'vehicle-table') {
@@ -1897,6 +1916,8 @@ $(document).ready(function () {
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
                         var price = row[7];
+                    }else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
+                        var price = row[3];
                     }else{
                         var price = row[4];
                     }
@@ -1915,42 +1936,43 @@ $(document).ready(function () {
             }
         ]
     });
+
     $('#dtBasicExample2 tbody').on('click', '.remove-button', function(e) {
         // var row = secondTable.row($(this).parents('tr'));
         let row = secondTable.row(e.target.closest('tr')).data();
         // var row = $(this).closest('tr');
         if(row['button_type'] == 'Shipping') {
             var table = $('#shipping-table').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping"  data-shipping-id="'+ row['id']+'"></button>']).draw();
+            table.row.add([row[0],row[1],row[2],row[3],'<button class="add-button circle-button" data-button-type="Shipping"  data-shipping-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
-            table.row.add(['', row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
+            table.row.add([ row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
                 '<button class="add-button circle-button" data-button-type="Vehicle" data-variant-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Shipping-Document') {
             var table = shippingDocumentTable;
-            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping-Document"  data-shipping-document-id="'+ row['id']+'"></button>']).draw();
+            table.row.add([row[0],row[1],row[2],row[3],'<button class="add-button circle-button" data-button-type="Shipping-Document"  data-shipping-document-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Certification') {
             var table = certificationTable;
-            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Certification" data-certification-id="'+ row['id']+'" ></button>']).draw();
+            table.row.add([row[0],row[1],row[2],row[3],'<button class="add-button circle-button" data-button-type="Certification" data-certification-id="'+ row['id']+'" ></button>']).draw();
         }
         else if(row['button_type'] == 'Other') {
             var table = otherTable;
-            table.row.add(['', row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Other" data-other-id="'+ row['id']+'" ></button>']).draw();
+            table.row.add([row[0],row[1],row[2],row[3], '<button class="add-button circle-button" data-button-type="Other" data-other-id="'+ row['id']+'" ></button>']).draw();
         }
         else if(row['button_type'] == 'Accessory') {
             var table = $('#dtBasicExample5').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],'<button class="add-button circle-button" data-button-type="Accessory"  data-accessory-id="'+ row['id']+'" ></button>']).draw();
+            table.row.add([ row[1],row[2],row[3],row[4],row[5],row[6],'<button class="add-button circle-button" data-button-type="Accessory"  data-accessory-id="'+ row['id']+'" ></button>']).draw();
         }
         else if(row['button_type'] == 'SparePart') {
             var table = $('#dtBasicExample3').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],row[5],row[6],row[7],'<button class="add-button circle-button" data-sparepart-id="'+ row['id']+'" data-button-type="SparePart" ></button>']).draw();
+            table.row.add([ row[1],row[2],row[3],row[4],row[5],row[6],row[7],'<button class="add-button circle-button" data-sparepart-id="'+ row['id']+'" data-button-type="SparePart" ></button>']).draw();
         }
         else if(row['button_type'] == 'Kit') {
             var table = $('#dtBasicExample4').DataTable();
-            table.row.add(['', row[1],row[2],row[3],row[4],row[5],'<button class="add-button circle-button" data-kit-id="'+ row['id'] +'"  data-button-type="Kit" ></button>']).draw();
+            table.row.add([ row[1],row[2],row[3],row[4],row[5],'<button class="add-button circle-button" data-kit-id="'+ row['id'] +'"  data-button-type="Kit" ></button>']).draw();
         }
 
         var index = $(this).closest('tr').index();
@@ -1964,9 +1986,9 @@ $(document).ready(function () {
            $(this).find('td input.total-amount-editable').attr('id','total-amount-'+ i);
         });
 
-        if(row['button_type'] != 'Direct-Add') {
-            resetSerialNumber(table);
-        }
+        // if(row['button_type'] != 'Direct-Add') {
+        //     resetSerialNumber(table);
+        // }
 
         // total div logic
         var tableLength = secondTable.data().length;
@@ -2018,12 +2040,7 @@ $(document).ready(function () {
             //     e.preventDefault();
             // }
     });
-    function showPriceError($msg,i)
-    {
-        document.getElementById("priceError"+i).textContent=$msg;
-        document.getElementById("price"+i).classList.add("is-invalid");
-        document.getElementById("priceError"+i).classList.add("paragraph-class");
-    }
+
     var dateValue = $('#name').val();
     var callIdValue = $('#call_id').val();
     var etd = $('#etd').val();
@@ -2205,7 +2222,7 @@ $(document).ready(function () {
 
         enableOrDisableSubmit();
         showPriceInSelectedValue();
-        console.log(row);
+
     });
     $(document).on('click', '.add-button', function() {
         var secondTable = $('#dtBasicExample2').DataTable();
@@ -2225,9 +2242,8 @@ $(document).ready(function () {
         var secondTable = $('#dtBasicExample2').DataTable();
 
         if(buttonType == 'Shipping') {
-            var table = shippingTable;
+            var table = $('#shipping-table').DataTable();
             var id = $(this).data('shipping-id');
-
         }
         else if(buttonType == 'Shipping-Document') {
             var table = shippingDocumentTable;
@@ -2267,7 +2283,7 @@ $(document).ready(function () {
         rowData['id'] = id;
         secondTable.row.add(rowData).draw();
         table.row(row).remove().draw();
-        resetSerialNumber(table);
+        // resetSerialNumber(table);
         // total amount div logic
         $('.total-div').attr('hidden', false);
         CalculateTotalAmount(index);
@@ -2277,11 +2293,11 @@ $(document).ready(function () {
         console.log(rowData);
     });
 
-    function resetSerialNumber(table) {
-        table.$('tbody tr').each(function(i){
-            $($(this).find('td')[0]).html(i+1);
-        });
-    }
+    // function resetSerialNumber(table) {
+    //     table.$('tbody tr').each(function(i){
+    //         $($(this).find('td')[0]).html(i+1);
+    //     });
+    // }
         $('#dtBasicExample2 tbody').on('input', '.price-editable', function(e) {
             var index =  $(this).closest('tr').index() + 1;
             CalculateTotalAmount(index);
@@ -2455,38 +2471,9 @@ $(document).ready(function () {
                     else {
                         var accessoryName = accessory.addon_description.addon.name;
                     }
-                    // if(accessory.is_all_brands == 'yes') {
-                    //     var accessoryBrand = 'All Brands'
-                    // }
-                    // else {
+
                         var accessoryBrand = accessory.brandModelLine;
-                        // var size = 0;
-                        // size = (accessory.brandModelLine).length;
-                        // if(size > 0) {
-                        //     var accessoryBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Brand</th><th style="border: 1px solid #c4c4d4">Model Line</th></tr></thead><tbody>';
-                        //     for(var i=0; i < size; i++) {
-                        //         accessoryBrand = accessoryBrand +'<tr><td style="border: 1px solid #c4c4d4">'+accessory.brandModelLine[i].brands.brand_name+'</td>';
-                        //         if(accessory.brandModelLine[i].is_all_model_lines == 'yes') {
-                        //             accessoryBrand = accessoryBrand +'<td style="border: 1px solid #c4c4d4">All Model Lines</td>';
-                        //         }
-                        //         else {
-                        //             accessoryBrand = accessoryBrand +'<td style="border: 1px solid #c4c4d4">';
-                        //             var modelLineSize = 0;
-                        //             modelLineSize = (accessory.brandModelLine[i].ModelLine).length;
-                        //             if(modelLineSize > 0) {
-                        //                 accessoryBrand = accessoryBrand + '<table><tbody>';
-                        //                 for(var j=0; j < modelLineSize; j++) {
-                        //                     accessoryBrand = accessoryBrand + '<tr><td>'+ accessory.brandModelLine[i].ModelLine[j].model_lines.model_line +'</td></tr>';
-                        //                 }
-                        //                 accessoryBrand = accessoryBrand + '</tbody></table>';
-                        //             }
-                        //             accessoryBrand = accessoryBrand +'</td>';
-                        //         }
-                        //         accessoryBrand = accessoryBrand +'</tr>';
-                        //     }
-                        //     accessoryBrand = accessoryBrand +'</tbody></table>';
-                        // }
-                    // }
+
                     if(accessory.additional_remarks != null) {
                         var accessoryAdditionalRemarks = '';
                     }
@@ -2504,16 +2491,7 @@ $(document).ready(function () {
                             var accessorySellingPrice = accessory.selling_price.selling_price;
                         }
                     }
-                    // else if(accessory.pending_selling_price != null) {
-                    //     if(accessory.pending_selling_price != null) {
-                    //         if(accessory.pending_selling_price != '0.00' || accessory.pending_selling_price.selling_price != null) {
-                    //             var accessorySellingPrice = accessory.pending_selling_price.selling_price + ' (Approval Awaiting)';
-                    //         }
-                    //     }
-                    // }
-                    // else {
-                    //     var accessorySellingPrice = 'Not Added';
-                    // }
+
                     else {
                         var accessorySellingPrice = '';
                     }
@@ -2600,36 +2578,7 @@ $(document).ready(function () {
                     else {
                         var sparePartName = sparePart.addon_description.addon.name;
                     }
-                    // if(sparePart.is_all_brands == 'no') {
-                    //     var sparePartBrandName = sparePart.brandModelLine[0].brands.brand_name;
-                    //     var sparePartBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Model Line</th><th style="border: 1px solid #c4c4d4">Model Description</th><th style="border: 1px solid #c4c4d4">Model year</th></tr></thead><tbody>';
-                    //     var modelLineSize = 0;
-                    //     modelLineSize = (sparePart.brandModelLine[0].ModelLine).length;
-                    //     if(modelLineSize > 0) {
-                    //         for(var j=0; j < modelLineSize; j++) {
-                    //             sparePartBrand = sparePartBrand +'<tr><td style="border: 1px solid #c4c4d4">'+sparePart.brandModelLine[0].ModelLine[j].model_lines.model_line+'</td><td style="border: 1px solid #c4c4d4">';
-                    //             var modelDescSize = 0;
-                    //             modelDescSize = (sparePart.brandModelLine[0].ModelLine[j].allDes).length;
-                    //             if(modelDescSize > 0) {
-                    //                 sparePartBrand = sparePartBrand +'<table><tbody>';
-                    //                 for(var i=0; i < modelDescSize; i++) {
-                    //                     sparePartBrand = sparePartBrand +'<tr><td>';
-                    //                     if(i != 0) {
-                    //                         sparePartBrand = sparePartBrand +'<br style="line-height: 3px">';
-                    //                     }
-                    //                     sparePartBrand = sparePartBrand +sparePart.brandModelLine[0].ModelLine[j].allDes[i].model_description+'</td></tr>';
-                    //                 }
-                    //                 sparePartBrand = sparePartBrand +'</tbody></table>';
-                    //             }
-                    //             sparePartBrand = sparePartBrand +'</td><td style="border: 1px solid #c4c4d4">'+sparePart.brandModelLine[0].ModelLine[j].model_year_start;
-                    //             if(sparePart.brandModelLine[0].ModelLine[j].model_year_end != null) {
-                    //                 sparePartBrand = sparePartBrand +' - '+sparePart.brandModelLine[0].ModelLine[j].model_year_end;
-                    //             }
-                    //             sparePartBrand = sparePartBrand +'</td></tr>';
-                    //         }
-                    //     }
-                    //     sparePartBrand = sparePartBrand +'</tbody></table>';
-                    // }
+
                     var sparePartBrandName = sparePart.brandModelLineModelDescription;
                     var sparePartNumber = '';
                     var partNumbersSize = 0;
@@ -2661,16 +2610,7 @@ $(document).ready(function () {
                             var sparePartSellingPrice = sparePart.selling_price.selling_price;
                         }
                     }
-                    // else if(sparePart.pending_selling_price != null) {
-                    //     if(sparePart.pending_selling_price != null) {
-                    //         if(sparePart.pending_selling_price != '0.00' || sparePart.pending_selling_price.selling_price != null) {
-                    //             var sparePartSellingPrice = sparePart.pending_selling_price.selling_price + ' (Approval Awaiting)';
-                    //         }
-                    //     }
-                    // }
-                    // else {
-                    //     var sparePartSellingPrice = 'Not Added';
-                    // }
+
                     else {
                         var sparePartSellingPrice = '';
                     }
