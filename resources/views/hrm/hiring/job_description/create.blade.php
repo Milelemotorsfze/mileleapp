@@ -1,5 +1,6 @@
 @extends('layouts.main')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.css">
+<link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
 <style>
     .select-error,
     .other-error {
@@ -88,7 +89,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-<h4 class="card-title">{{$jobDescriptionId === 'new' ? "Create" : "Edit"}} Job Description Form</h4>
+    <h4 class="card-title">{{$jobDescriptionId === 'new' ? "Create" : "Edit"}} Job Description Form</h4>
     <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
@@ -148,9 +149,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 date-section-div">
                         <label for="request_date" class="form-label text-md-end"><span class="error">* </span> {{ __('Choose Date') }}</label>
-                        <input type="date" name="request_date" id="request_date" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2" value="{{$jobDescription->request_date}}">
+                        <input type="text" name="request_date" id="requested_date" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2" value="{{$jobDescription->request_date}}">
                     </div>
-
                 </div>
 
                 <div class="row job-description-details-div" style="display: none;">
@@ -279,18 +279,22 @@ redirect()->route('home')->send();
 @endsection
 
 @push('scripts')
+<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
-<script type="text/javascript">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script><script type="text/javascript">
     var data = <?php echo json_encode($allHiringRequests); ?>;
     var jobDescriptionss = <?php echo json_encode($jobDescription); ?>;
     var jobDescriptionLocationId = jobDescriptionss.location_id
-    console.log("JD iiis -----", data)
+    console.log("JD iiis -----", jobDescriptionss.re)
+    var requestDate = new Date(jobDescriptionss.request_date);
 
     var currentHiringRequestValue = <?php echo json_encode($currentHiringRequest); ?>;
-    var currentHiringRequestId = currentHiringRequestValue.id;
-    var uuidValue = currentHiringRequestValue.uuid
-    console.log("Current Data --- ;", uuidValue);
+    console.log("Before if current hiring req", currentHiringRequestValue)
+    if (currentHiringRequestValue !== null) {
+        var currentHiringRequestId = currentHiringRequestValue.id;
+        var uuidValue = currentHiringRequestValue.uuid
+        console.log("Current Data --- ;", currentHiringRequestValue);
+    }
 
     $(document).ready(function() {
 
@@ -308,13 +312,34 @@ redirect()->route('home')->send();
             placeholder: "Choose uuid",
         });
 
-        var requestDate = new Date(jobDescriptionss.request_date);
-        var formattedDate = requestDate.toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        });
-        $('#formatted_date').text(formattedDate);
+        if (requestDate) {
+
+            $("#requested_date").datepicker({
+                dateFormat: "dd-M-yy",
+                onSelect: function(selectedDate) {
+                    console.log("Selected Date: ", selectedDate);
+                }
+            }).datepicker('setDate', requestDate);
+            $('#formatted_date').text(requestDate.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }));
+        } else {
+            $("#requested_date").datepicker({
+                dateFormat: "dd-M-yy",
+                onSelect: function(selectedDate) {
+                    console.log("Selected Date: ", selectedDate);
+                }
+            }).datepicker('setDate', '0');
+        }
+
+        function convertToBackendFormat(displayedDate) {
+            var parsedDate = $.datepicker.parseDate('dd-M-yy', displayedDate);
+            var formattedDate = $.datepicker.formatDate('yy-mm-dd', parsedDate);
+            return formattedDate;
+        }
+
 
         // Execute with changing uuid value 
 
@@ -404,6 +429,20 @@ redirect()->route('home')->send();
         $('#location_name').on('change', function() {
             var fieldName = $(this).attr('name');
             $('#employeeJobDescriptionForm').validate().element('[name="' + fieldName + '"]');
+        });
+
+        $('#requested_date').on('change', function() {
+            var newDate = $(this).val();
+            console.log("New Date: ", newDate);
+        });
+
+        $('#employeeJobDescriptionForm').submit(function(event) {
+            var displayedDate = $('#requested_date').val();
+            var formattedDate = convertToBackendFormat(displayedDate);
+            $('#requested_date').val(formattedDate);
+
+            console.log("Data to be sent:", $(this).serialize());
+            // event.preventDefault();
         });
 
         $('#employeeJobDescriptionForm').validate({
