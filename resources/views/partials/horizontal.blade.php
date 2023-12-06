@@ -76,7 +76,8 @@
                                             'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
                                             'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
                                             ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
-                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'])
+                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
+                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action'])
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','view-all-pending-hiring-request-listing',
                                             'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
@@ -85,7 +86,8 @@
                                             'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
                                             'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
                                             ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
-                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user']);
+                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
+                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action']);
                                 @endphp
                                 @if ($hasPermission)
                                 <li class="nav-item dropdown">
@@ -107,7 +109,8 @@
                                             'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
                                             'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
                                             ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
-                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'])
+                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
+                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action'])
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','view-all-pending-hiring-request-listing',
                                             'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
@@ -116,7 +119,8 @@
                                             'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
                                             'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
                                             ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
-                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user']);
+                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
+                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action']);
                                             @endphp
                                             @if ($hasPermission)
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
@@ -131,7 +135,8 @@
                                             'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
                                             'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
                                             ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
-                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'])
+                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
+                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request',
                                                 'view-all-pending-hiring-request-listing','view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing',
@@ -141,7 +146,8 @@
                                                 'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
                                                 'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
                                                 ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
-                                                ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user']);
+                                                ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
+                                                ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('employee-hiring-request.index') }}" class="dropdown-item" data-key="t-login">Hiring Requests</a>
