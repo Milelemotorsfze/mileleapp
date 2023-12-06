@@ -53,7 +53,7 @@ class PassportRequestController extends Controller
         $masterEmployees = User::whereNot('id','16')->select('id','name')->first();
         $submissionPurpose = PassportRequestPurpose::where('type','submit')->get();
         $releasePurpose = PassportRequestPurpose::where('type','release')->get();
-        return view('hrm.hiring.employee_liability.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));
+        return view('hrm.hiring.passport_request.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));
     }
     public function storeOrUpdate(Request $request, $id) { 
         $validator = Validator::make($request->all(), [
