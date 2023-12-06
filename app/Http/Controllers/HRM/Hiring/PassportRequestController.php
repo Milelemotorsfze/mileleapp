@@ -4,6 +4,19 @@ namespace App\Http\Controllers\HRM\Hiring;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\HRM\Employee\PassportRequest;
+use App\Models\Masters\PassportRequestPurpose;
+use Validator;
+use DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\HRM\Employee\EmployeeProfile;
+use App\Models\HRM\Approvals\DepartmentHeadApprovals;
+use App\Models\Masters\MasterDivisionWithHead;
+use App\Models\HRM\Approvals\ApprovalByPositions;
+use App\Models\HRM\Employee\Leave;
+use App\Models\HRM\Employee\LeaveHistory;
+use App\Http\Controllers\UserActivityController;
+use Exception;
 
 class PassportRequestController extends Controller
 {
