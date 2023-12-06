@@ -66,6 +66,10 @@ class QuotationController extends Controller
     public function store(Request $request)
     {
 //        dd($request->all());
+//        $request->validate([
+//            'prices' => 'required'
+//        ]);
+
         DB::beginTransaction();
         $isVehicle = 0;
         $call = Calls::find($request->calls_id);

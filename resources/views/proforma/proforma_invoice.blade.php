@@ -182,7 +182,6 @@
                             {{ $quotation->currency ." ". number_format($totalAmount, 2) }}</td>
                     </tr>
                         @if($vehicle->quotation_addon_items->count() > 0)
-
                             @foreach($vehicle->quotation_addon_items as $key =>  $addon)
                                 <tr style="color: #643702;">
                                     <td style="padding-left: 40px;"><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>
@@ -195,7 +194,7 @@
                         @endif
                 @endforeach
                 @foreach($variants as $key => $variant)
-                    <tr style="background-color: #2468c2;">
+                    <tr style="color: #02023f;">
                         <td> <span style="font-weight: bold;font-size: 14px;" > {{ $vehicles->count() + $key+1 }}. </span> {{ $variant->description }}</td>
                         <td>{{ $variant->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($variant->vehicle_unit_price, 2) }}</td>
@@ -205,7 +204,7 @@
                     @if($variant->quotation_addon_items->count() > 0)
 
                         @foreach($variant->quotation_addon_items as $key => $addon)
-                            <tr style="background-color: #b2ccf1">
+                            <tr style="color: #643702">
                                 <td><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>
                                     {{ $addon->quotationItem->description ?? ''}}</td>
                                 <td>{{ $addon->quotationItem->quantity ?? ''}}</td>
@@ -297,7 +296,7 @@
                 @endforeach
             @endif
                 @if($quotation->document_type == 'Proforma Invoice')
-                    <tr style="background-color: #84b0ea;font-size: 15px;">
+                    <tr style="background-color: #0f2c52;color:#FFFFFF;font-size: 15px;">
                         <th colspan="3"> DEPOSIT / PAYMENT RECEIVED</th>
                         <th>AMOUNT</th>
                     </tr>
