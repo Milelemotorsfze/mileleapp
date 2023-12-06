@@ -10,6 +10,11 @@
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
+    @if(session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
         <div class="row">
         <form action="{{ route('Shipping.storevendorrates') }}" method="post" enctype="multipart/form-data">
                 @csrf
@@ -20,18 +25,18 @@
                     <label for="vendor_id" class="form-label">Vendors</label>
                     <select name="vendor_id[]" class="form-control vendor-select">
                         <option value="" disabled selected>Select Vendor</option>
-                        @foreach($vendors as $id => $supplier)
-                            <option value="{{ $id }}">{{ $supplier }}</option>
-                        @endforeach
+                        @foreach($vendors as $vendors)
+                                    <option value="{{ $vendors->id }}">{{ $vendors->supplier }}</option>
+                                @endforeach
                     </select>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <label class="form-label">Cost Price</label>
-                    <input type="number" class="form-control" name="cost_price[]"/>
+                    <input type="number" class="form-control" name="cost_price[]" required/>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <label class="form-label">Selling Price</label>
-                    <input type="number" class="form-control" name="selling_price[]"/>
+                    <input type="number" class="form-control" name="selling_price[]"required/>
                 </div>
                 <div class="col-lg-2 col-md-1">
                 <button type="button" class="btn btn-danger delete-row" style="margin-top: 30px;">X</button>

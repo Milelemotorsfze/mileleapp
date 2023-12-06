@@ -345,7 +345,7 @@ public function shippingrates (Builder $builder, $id)
             })
             ->editColumn('updated_at', function ($query) {
                 return date('d-m-Y', strtotime($query->updated_at));
-            })
+            })          
             ->editColumn('status', function ($query) {
                 if ($query->status == 'Selected') {
                     return '<span class="badge badge-success">Selected</span>';
@@ -354,7 +354,11 @@ public function shippingrates (Builder $builder, $id)
                     return $button;
                 }
             })
-            ->rawColumns(['status'])
+            ->addColumn('action', function ($query) {
+                $buttons = '<button class="btn btn-warning btn-open-modal" data-id="' . $query->id . '">+</button>';
+                return $buttons;
+            })
+            ->rawColumns(['status', 'action'])
             ->toJson();
     }
     $html = $builder->columns([
@@ -366,6 +370,7 @@ public function shippingrates (Builder $builder, $id)
         ['data' => 'created_by', 'name' => 'created_by', 'title' => 'Created By'],
         ['data' => 'created_at', 'name' => 'created_at', 'title' => 'Created At'],
         ['data' => 'status', 'name' => 'status', 'title' => 'Status'],
+        ['data' => 'action', 'name' => 'action', 'title' => 'Action', 'orderable' => false, 'searchable' => false],
     ]);
 return view('logistics.shipping_vendor_rates', compact('html', 'id', 'shipping', 'to_port', 'from_port'));
 }
@@ -403,9 +408,13 @@ return view('logistics.shipping_vendor_rates', compact('html', 'id', 'shipping',
         ->get();
         return view('logistics.createvendorrates' , compact('shipping', 'vendors', 'to_port', 'from_port'));
     }
-    public function storevendorrates (Request $request)
+    public function storevendorrates(Request $request)
     {
         $shipping_charges_id = $request->input('id');
+        $uniqueVendorIds = array_unique($request->vendor_id);
+        if(count($uniqueVendorIds) < count($request->vendor_id)) {
+            return redirect()->back()->with('error', 'Vendor cannot be repeated');
+        }
         foreach ($request->vendor_id as $key => $value) {
             ShippingRate::create([
                 'suppliers_id' => $value,
@@ -417,8 +426,8 @@ return view('logistics.shipping_vendor_rates', compact('html', 'id', 'shipping',
             ]);
         }
         return redirect()->route('shipping_medium.shippingrates', ['id' => $shipping_charges_id])
-        ->with('success', 'Shipping rates saved successfully');
-    }
+            ->with('success', 'Shipping rates saved successfully');
+    }    
     public function selectShippingRate(Request $request, $id)
     {
         $shippingId = $request->input('shipping_id');
@@ -441,4 +450,30 @@ return view('logistics.shipping_vendor_rates', compact('html', 'id', 'shipping',
     }
         return response()->json(['message' => 'Shipping rate selection updated successfully']);
     }
+    public function getShippingRateDetails($id)
+{
+    $shippingRate = DB::table('shipping_rates')->find($id);
+
+    return response()->json([
+        'currentCostPrice' => $shippingRate->cost_price,
+        'currentSellingPrice' => $shippingRate->selling_price,
+    ]);
+}
+public function updateShippingRate(Request $request)
+{
+    $id = $request->input('id');
+    $newCostPrice = $request->input('cost_price');
+    $newSellingPrice = $request->input('selling_price');
+    $shippingRate = ShippingRate::find($id);
+    if (!is_null($newCostPrice)) {
+        $shippingRate->cost_price = $newCostPrice;
+        $shippingRate->updated_by = Auth::id();
+    }
+    if (!is_null($newSellingPrice)) {
+        $shippingRate->selling_price = $newSellingPrice;
+        $shippingRate->updated_by = Auth::id();
+    }
+    $shippingRate->save();
+    return response()->json(['message' => 'Shipping rate updated successfully']);
+}
     }
