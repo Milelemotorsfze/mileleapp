@@ -192,9 +192,9 @@
 	}
 </style>
 @section('content')
-@canany(['demand-planning-supplier-create', 'addon-supplier-create', 'vendor-edit'])
+@canany(['create-employee-hiring-request','edit-employee-hiring-request'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-create', 'vendor-edit','demand-planning-supplier-create']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
@@ -406,7 +406,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-cre
 @include('hrm.hiring.hiring_request.createJobPosition')
 <div class="overlay"></div>
 @endif
-@endcan
+@endcanany
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
