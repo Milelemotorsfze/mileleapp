@@ -1,6 +1,84 @@
 @extends('layouts.main')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.css">
 <style>
+    .select-error,
+    .other-error {
+        color: red;
+    }
+
+    .btn.btn-success.btncenter {
+        width: 10%;
+    }
+
+    .job-description-label-div {
+        margin-top: 20px !important;
+    }
+
+    .col-form-label {
+        padding-bottom: 0px;
+    }
+
+    .dep-section-div,
+    .title-section-div,
+    .reporting-section-div {
+        margin-top: 20px !important;
+    }
+
+    .job-description-lable-name,
+    .job-description-lable-name-1 {
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+    }
+
+    .job-description-textfield-lable,
+    .job-description-text-value
+
+    /* .reporting-section-div, .dep-section-div, .title-section-div */
+        {
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @media (max-width: 991px) {
+        .date-section-div {
+            padding-top: 10px;
+        }
+    }
+
+
+    @media (max-width: 767px) {
+        .date-section-div {
+            padding-top: 10px;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .location-section-div {
+            padding-top: 10px;
+        }
+    }
+
+    .error {
+        color: #FF0000;
+    }
+
+    .error-text {
+        color: #FF0000;
+    }
+
+    @media (max-width: 425px) {
+        .heading-name {
+            font-size: 14px !important;
+        }
+
+        .job-description-text-value {
+            font-size: 13px !important;
+        }
+    }
+
     .submit-passport-section-div {
         padding: 10px;
     }
@@ -55,12 +133,12 @@
         padding: 10px 0px 13px 20px;
     }
 
-    .amountpercentageDropDownInputContainer,
+    .passportSubmitReleaseDropDownInputContainer,
     .other-container-div {
         margin-left: 18px;
     }
 
-    .amountpercentageDropDownInputContainer {
+    .passportSubmitReleaseDropDownInputContainer {
         margin-top: 30px;
     }
 
@@ -123,7 +201,7 @@
             margin: 20px 0px 0px 0px !important;
         }
 
-        .amountpercentageDropDownInputContainer {
+        .passportSubmitReleaseDropDownInputContainer {
             margin-left: 1px;
         }
 
@@ -185,30 +263,35 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     <!-- Employee name Section -->
                     <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
                         <div class="dropdown-option-div">
-                            <label for="employee_name" class="form-label heading-name"><span class="error">* </span>{{ __('Employee Name') }}</label>
-                            <select name="employee_name" id="employee_name_id" class="form-control widthinput" multiple="true" autofocus>
+                            <label for="employee_id" class="form-label heading-name"><span class="error">* </span>{{ __('Employee Name') }}</label>
+                            <select name="employee_id" id="employee_name_id" class="form-control widthinput" multiple="true" autofocus>
                                 @foreach($masterEmployees as $User)
-                                    <option value="{{ $User->id }}">{{ $User->workLocation }}</option>
+                                <option value="{{ $User->id }}">{{ $User->name ?? ''}}</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
                 </div>
                 <br />
-                <div class="row job-description-details-div" style="display: none;">
+                <!-- <p>Data is: @foreach($masterEmployees as $User)
+                    <text value="{{ $User->id }}">\
+                        {{ $User->empProfile->designation_id ?? ''}} </text>
+                    @endforeach
+                </p> -->
+                <div class="row passport-request-details-div" style="display: none;">
 
                     <!-- Employee ID Section -->
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-12 title-section-div">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-6 title-section-div">
                         <div class="col-12 job-description-textfield-lable">
 
-                            <label for="employee_default_id" class="col-form-label widthinput heading-name"><b>Employee ID</b></label>
+                            <label for="employee_code_id" class="col-form-label widthinput heading-name"><b>Employee ID</b></label>
                         </div>
                         <div class="col-12 job-description-text-value">
-                            <div name="employee_default_id" class="employee-default-id"></div>
+                            <div name="employee_code_id" class="employee-code-id"></div>
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-12 dep-section-div">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-6 dep-section-div">
                         <div class="col-12 job-description-textfield-lable">
                             <label for="emp_designation" class="col-form-label widthinput heading-name"><b>Designation</b></label>
                         </div>
@@ -217,7 +300,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                         </div>
                     </div>
 
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-12 reporting-section-div">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-6 reporting-section-div">
                         <div class="col-12 job-description-textfield-lable">
                             <label for="emp_mobile_num" class="col-form-label widthinput heading-name"><b>Mobile No.</b></label>
                         </div>
@@ -227,7 +310,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
 
                     <!-- Department Section -->
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-12 dep-section-div">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-6 dep-section-div">
                         <div class="col-12 job-description-textfield-lable">
                             <label for="emp_department" class="col-form-label widthinput heading-name"><b>Department</b></label>
                         </div>
@@ -237,7 +320,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
 
                     <!-- Location Section -->
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-12 reporting-section-div">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-6 reporting-section-div">
                         <div class="col-12 job-description-textfield-lable">
                             <label for="emp_job_location" class="col-form-label widthinput heading-name"><b>Location</b></label>
                         </div>
@@ -253,21 +336,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
         <hr />
         <div class="col-lg-6 col-md-12 col-sm-12 col-12">
-            <div class="amountpercentageDropDownInputContainer">
-
+            <div class="passportSubmitReleaseDropDownInputContainer">
                 <label for="choose-passport-req" class="form-label"><span class="error">* </span><b>Choose your option for the passport:</b></label>
                 <div class="col-lg-5 col-md-10 col-sm-9 col-11">
-                    <select name="designation" id="designation" class="form-control widthinput" onchange="showPassportRequestInput(this)">
-                        <option value=""></option>
-                        <option value="1">Submission of Passport</option>
-                        <option value="2">Release of Passport</option>
+                    <select name="passport_request_dropdown" id="passport_request_dropdown" class="form-control widthinput" onchange="showPassportRequestInput(this)" value="{{$data->passport_with}}">
+                        <option value="" >Choose Option</option>
+                        <option value="with_employee">Submission of Passport</option>
+                        <option value="with_company">Release of Passport</option>
                     </select>
                 </div>
             </div>
         </div>
+
         <br />
-
-
+        
         <div class="col-lg-12">
 
             <!-- Passport Submission Input Container -->
@@ -379,7 +461,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
         <!-- Signatures Div -->
         <!-- <div class="col-lg-6 col-md-12 col-sm-12 col-12">
-            <div class="amountpercentageDropDownInputContainer">
+            <div class="passportSubmitReleaseDropDownInputContainer">
                 <h5>Signatures</h5>
             </div>
         </div>
@@ -489,8 +571,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         </div> -->
 
         </br>
-        <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-            <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
         </div>
 
     </form>
@@ -512,8 +594,8 @@ redirect()->route('home')->send();
         var data = <?php echo json_encode($masterEmployees); ?>;
         console.log("Passport Request Form User data  -----", data)
 
-        // var selectedUUID = $('#uuid_value').val();
-        // updateFieldsBasedOnUUID(selectedUUID);
+        // var selectedEmpId = $('#employee_name_id').val();
+        // updateFieldsBasedOnEmpId(selectedEmpId);
 
         $('#employee_name_id').select2({
             allowClear: true,
@@ -521,86 +603,83 @@ redirect()->route('home')->send();
             placeholder: "Choose User Name",
         });
 
-        // Execute with changing uuid value 
+        // Execute with changing emp id value 
 
-        // function toggleJobDescriptionDetailsDiv() {
-        //     var selectedUUID = $('#uuid_value').val();
-        //     console.log("Selected uuid value in hidden shown div is : ", selectedUUID)
+        function togglePassportRequestDetailsDiv() {
+            var selectedEmpId = $('#employee_name_id').val();
+            console.log("Selected emp id value in hidden shown div is : ", selectedEmpId)
 
-        //     if (selectedUUID && selectedUUID.length > 0) {
-        //         $('.job-description-details-div').show();
-        //     } else {
-        //         $('.job-description-details-div').hide();
-        //     }
-        // }
+            if (selectedEmpId && selectedEmpId.length > 0) {
+                $('.passport-request-details-div').show();
+            } else {
+                $('.passport-request-details-div').hide();
+            }
+        }
 
         // Execute function when there is data in currentHiringRequestId
-        // function setUUIDValueOnReload() {
-        //     if (currentHiringRequestId) {
-        //         for (var i = 0; i < data.length; i++) {
-        //             if (data[i].id == currentHiringRequestId) {
-        //                 $('#uuid_value').val([data[i].id]).trigger('change');
-        //                 $('.job-title').text(data[i].questionnaire.designation.name || '');
-        //                 $('.department-id').text(data[i].questionnaire.department.name || '');
-        //                 $('.reporting-to').text(data[i].department_head_name || '');
+        function setEmpNameOnReload() {
+            // if (data) {
+            for (var i = 0; i < data.length; i++) {
+                // if (data[i].id == 2) {
+                $('#employee_name_id').val([data[i].id]).trigger('change');
+                $('.employee-code-id').text(data[i].emp_profile.employee_code || '');
+                $('.emp-designation').text(data[i].emp_profile.designation_id || '');
+                $('.emp-mobile-num').text(data[i].emp_profile.contact_number || '');
+                $('.emp-department').text(data[i].emp_profile.department_id || '');
+                $('.emp-job-location').text(data[i].emp_profile.work_location || '');
+                console.log("Drop down passport request value in set function : ", data[i].passport_with);
+                $('.#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
 
-        //                 if (jobDescriptionLocationId) {
-        //                     console.log("in JD location value of updated location")
-        //                     var workLocationId = jobDescriptionLocationId;
-        //                 } else {
-        //                     console.log("In old data tbale location value")
-        //                     var workLocationId = data[i].questionnaire.work_location.id;
+                togglePassportRequestDetailsDiv();
+                break;
+            }
+            // }
+            // }
+        }
+        // setEmpNameOnReload();
 
-        //                 }
-        //                 updateLocationDropdown(workLocationId);
+        // Execute function when there is change in emp value
 
-        //                 toggleJobDescriptionDetailsDiv();
-        //                 break;
-        //             }
-        //         }
-        //     }
-        // }
-        // setUUIDValueOnReload();
-
-        // Execute function when there is change in uuid value
-
-        // function updateFieldsBasedOnUUID(selectedUUID) {
-        //     for (var i = 0; i < data.length; i++) {
-        //         if (data[i].id == selectedUUID) {
-        //             $('.job-title').text(data[i].questionnaire.designation.name || '');
-        //             $('.department-id').text(data[i].questionnaire.department.name || '');
-        //             $('.reporting-to').text(data[i].department_head_name || '');
-
-        //             var workLocationId = data[i].questionnaire.work_location.id;
-        //             updateLocationDropdown(workLocationId);
-        //             break;
-        //         }
-        //     }
-        // }
+        function updateFieldsBasedOnEmpId(selectedEmpId) {
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].id == selectedEmpId) {
+                    $('.employee-code-id').text(data[i].emp_profile.employee_code || '');
+                    $('.emp-designation').text(data[i].emp_profile.designation_id || '');
+                    $('.emp-mobile-num').text(data[i].emp_profile.contact_number || '');
+                    $('.emp-department').text(data[i].emp_profile.department_id || '');
+                    $('.emp-job-location').text(data[i].emp_profile.work_location || '');
+                    console.log("Drop down passport request value in update function : ", data[i].passport_with);
+                    $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
+                    break;
+                }
+            }
+        }
 
         // Update the location from dropdown
 
-        // function clearFields() {
-        //     $('.job-title').text('');
-        //     $('.department-id').text('');
-        //     $('.reporting-to').text('');
-        //     $('#location_name').val(null).trigger('change');
-        // }
+        function clearFields() {
+            $('.employee-code-id').text('');
+            $('.emp-designation').text('');
+            $('.emp-mobile-num').text('');
+            $('.emp-department').text('');
+            $('.emp-job-location').text('');
+            $('.passport_request_dropdown').val('');
+        }
 
-        // $('#uuid_value').on('change', function() {
-        //     var selectedUUID = $(this).val();
-        //     console.log("selected value of uuid -------------------- in loop is ", selectedUUID)
-        //     toggleJobDescriptionDetailsDiv();
-        //     var fieldName = $(this).attr('name');
-        //     $('#employeePassportRequestForm').validate().element('[name="' + fieldName + '"]');
+        $('#employee_name_id').on('change', function() {
+            var selectedEmpId = $(this).val();
+            console.log("selected value of emp id -------------------- in on change 1 is ", selectedEmpId);
+            togglePassportRequestDetailsDiv();
+            var fieldName = $(this).attr('name');
+            $('#employeePassportRequestForm').validate().element('[name="' + fieldName + '"]');
 
-        //     if (!selectedUUID || selectedUUID.length === 0) {
-        //         console.log("In Null uuid")
-        //         clearFields();
-        //     } else {
-        //         updateFieldsBasedOnUUID(selectedUUID);
-        //     }
-        // });
+            if (!selectedEmpId || selectedEmpId.length === 0) {
+                console.log("In Null emp id")
+                clearFields();
+            } else {
+                updateFieldsBasedOnEmpId(selectedEmpId);
+            }
+        });
 
         $('#employeePassportRequestForm').submit(function(event) {
 
@@ -610,7 +689,7 @@ redirect()->route('home')->send();
 
         $('#employeePassportRequestForm').validate({
             rules: {
-                employee_name: {
+                employee_id: {
                     required: true,
                 },
                 purposes_of_submit: {
@@ -655,8 +734,8 @@ redirect()->route('home')->send();
 <script>
     function showPassportRequestInput(element) {
         var selectedValue = element.value;
-        document.getElementById('submitPassportInputContainer').style.display = selectedValue == '1' ? 'block' : 'none';
-        document.getElementById('releasePassportInputContainer').style.display = selectedValue == '2' ? 'block' : 'none';
+        document.getElementById('submitPassportInputContainer').style.display = selectedValue == 'with_employee' ? 'block' : 'none';
+        document.getElementById('releasePassportInputContainer').style.display = selectedValue == 'with_company' ? 'block' : 'none';
     }
 </script>
 @endpush
