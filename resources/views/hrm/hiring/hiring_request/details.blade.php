@@ -9,6 +9,11 @@
         }
     }
 </style>
+@canany(['view-all-hiring-request-details','view-hiring-request-details-of-current-user'])
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-details-of-current-user']);
+@endphp
+@if ($hasPermission)
 <div class="row">
     <div class="col-xxl-12 col-lg-12 col-md-12">
         <div class="card">
@@ -156,3 +161,5 @@
         </div>
     </div>
 </div>
+@endif
+@endcanany

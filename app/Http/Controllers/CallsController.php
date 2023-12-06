@@ -469,7 +469,7 @@ return view('calls.resultbrand', compact('data'));
             $custom_brand_model = $row[9];
             $remarks = $row[10];
             $errorDescription = '';
-            if ($sales_person === null) {
+            if ($sales_person == null) {
                 $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
 			                $sales_persons = ModelHasRoles::where('role_id', 7)->get();
                             $sales_person_id = null;

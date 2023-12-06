@@ -7,12 +7,15 @@ use App\Models\Vehicles;
 use App\Models\Warehouse;
 use App\Models\Varaint;
 use App\Models\MasterModelLines;
+use App\Models\Vehicleslog;
 use App\Models\Brand;
 use Illuminate\Support\Facades\Auth;
 use App\Models\MovementsReference;
 use App\Models\Grn;
 use App\Models\So;
 use App\Models\Gdn;
+use Carbon\CarbonTimeZone;
+use Carbon\Carbon;
 use App\Models\PurchasingOrder;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -141,7 +144,8 @@ class MovementController extends Controller
      */
     public function store(Request $request)
     {
-        
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $currentDateTime = Carbon::now($dubaiTimeZone);
         $vin = $request->input('vin');
         $from = $request->input('from');
         $to = $request->input('to');
@@ -177,6 +181,17 @@ class MovementController extends Controller
             $grn->grn_number = $grnNumber;
             $grn->save();
             Vehicles::whereIn('vin', $grnVins)->update(['grn_id' => $grnNumber]);
+            $vehicleId = Vehicles::whereIn('vin', $grnVins)->pluck('id');
+            $vehicleslog = new Vehicleslog();
+                            $vehicleslog->time = $currentDateTime->toTimeString();
+                            $vehicleslog->date = $currentDateTime->toDateString();
+                            $vehicleslog->status = 'GRN Done';
+                            $vehicleslog->vehicles_id = $vehicleId;
+                            $vehicleslog->field = "GRN";
+                            $vehicleslog->old_value = "";
+                            $vehicleslog->new_value = "Vehicle Recived GRN Done";
+                            $vehicleslog->created_by = auth()->user()->id;
+                            $vehicleslog->save();
         }
         if (!empty($gdnVins)) {
             $gdn = new Gdn();
@@ -186,6 +201,17 @@ class MovementController extends Controller
             $gdn->gdn_number = $gdnNumber;
             $gdn->save();
             Vehicles::whereIn('vin', $gdnVins)->update(['gdn_id' => $gdnNumber]);
+            $vehicleId = Vehicles::whereIn('vin', $gdnVins)->pluck('id');
+            $vehicleslog = new Vehicleslog();
+                            $vehicleslog->time = $currentDateTime->toTimeString();
+                            $vehicleslog->date = $currentDateTime->toDateString();
+                            $vehicleslog->status = 'GRN Done';
+                            $vehicleslog->vehicles_id = $vehicleId;
+                            $vehicleslog->field = "GDN";
+                            $vehicleslog->old_value = "";
+                            $vehicleslog->new_value = "Vehicle Delivered to the Client";
+                            $vehicleslog->created_by = auth()->user()->id;
+                            $vehicleslog->save();
         }
         foreach ($vin as $index => $value) {
             if (array_key_exists($index, $from) && array_key_exists($index, $to)) {    
@@ -198,12 +224,19 @@ class MovementController extends Controller
             Vehicles::where('vin', $vin[$index])->update(['latest_location' => $to[$index]]);
         }
     }
+        // $newvin = $request->input('newvin');
+        // foreach ($newvin as $index => $value) {
+        //     if ($value !== null && $value !== '') {
+        //         $vehicle = Vehicle::find($index);
+        //         $vehicle->update(['vin' => $value]);
+        //     }
+        // }
         $data = Movement::get();
         $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
         ->pluck('vin', 'varaints_id'); 
         $warehouses = Warehouse::select('id', 'name')->get();
-        $movementreference = MovementsReference::get();  
+        $movementreference = MovementsReference::get(); 
         return view('movement.index', compact('data', 'vehicles', 'warehouses', 'movementreference'));
     }    
     /**

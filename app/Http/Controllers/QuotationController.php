@@ -66,6 +66,10 @@ class QuotationController extends Controller
     public function store(Request $request)
     {
 //        dd($request->all());
+//        $request->validate([
+//            'prices' => 'required'
+//        ]);
+
         DB::beginTransaction();
         $isVehicle = 0;
         $call = Calls::find($request->calls_id);
@@ -225,11 +229,12 @@ class QuotationController extends Controller
             }
         }
         DB::commit();
+        $quotationDetail = QuotationDetail::with('country')->find($quotationDetail->id);
 
-//        $quotationItem = QuotationItem::where('quotation_id', $quotation->id)->first();
-//        $quotation = Quotation::find(15);
+//        $quotation = Quotation::find(26);
 //        $call = Calls::find($quotation->calls_id);
-//        $quotationDetail = QuotationDetail::where('quotation_id', 15)->first();
+//        $quotationDetail = QuotationDetail::with('country')->where('quotation_id', 26)->orderBy('id','DESC')->first();
+//
 
         $vehicles =  QuotationItem::where("reference_type", 'App\Models\Varaint')
             ->where('quotation_id', $quotation->id)->get();
@@ -287,6 +292,7 @@ class QuotationController extends Controller
         $data['client_address'] = $call->address;
         $data['document_number'] = $quotation->id;
         $data['company'] = $call->company_name;
+
         $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
         if($salesPersonDetail) {
             $data['sales_office'] = $salesPersonDetail->office;

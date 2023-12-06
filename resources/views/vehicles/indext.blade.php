@@ -115,16 +115,6 @@
                                     <br>
                                     <input type="text" data-search-column="grn_date" id="grn_date" placeholder="Search">
                                     </th>
-                                    <th data-column="netsuit_grn_number" id="netsuit_grn_number" class="nowrap-td">
-                                    Netsuit GRN Number
-                                    <br>
-                                    <input type="text" data-search-column="netsuit_grn_number" id="netsuit_grn_number" placeholder="Search">
-                                    </th>
-                                    <th data-column="netsuit_grn_date" id="netsuit_grn_date" class="nowrap-td">
-                                    Netsuit GRN Date
-                                    <br>
-                                    <input type="text" data-search-column="netsuit_grn_date" id="netsuit_grn_date" placeholder="Search">
-                                    </th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
@@ -546,8 +536,6 @@ $(document).ready(function() {
             @if (Auth::user()->hasPermissionForSelectedRole('grn-view'))
             { data: 'grn_number', name: 'grn_number' },
             { data: 'grn_date', name: 'grn_date' },
-            { data: 'netsuit_grn_number', name: 'netsuit_grn_number' },
-            { data: 'netsuit_grn_date', name: 'netsuit_grn_date' },
             @endif
             @if (Auth::user()->hasPermissionForSelectedRole('stock-status-view'))
             {

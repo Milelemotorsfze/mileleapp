@@ -99,9 +99,18 @@
                                     @endif
                                 @endif
                             @endif
-                            <a style="float:right; margin-right:5px;" title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$data->id)}}">
-                                <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                            </a>
+                            @canany(['edit-employee-hiring-request'])
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request']);
+                            @endphp
+                            @if ($hasPermission)
+                            <li>
+                                <a style="float:right; margin-right:5px;" title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$data->id)}}">
+                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                </a>
+                            </li>
+                            @endif
+                            @endcanany
                         </div>
                     </div>
                 </div>
@@ -111,10 +120,20 @@
             </div>
 	</div>
 </div>
+@canany(['view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'])
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user']);
+@endphp
+@if ($hasPermission)
 <div class="tab-content">
 	<div class="tab-pane fade show" id="approvals-and-history">
         <br>
         <div class="row">
+        @canany(['view-all-hiring-request-approval-details','view-hiring-request-approval-details-of-current-user'])
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-approval-details','view-hiring-request-approval-details-of-current-user']);
+        @endphp
+        @if ($hasPermission)
         <div class="col-xxl-6 col-lg-6 col-md-6">
             <div class="card">
                 <div class="card-header" style="background-color:#e8f3fd;">
@@ -274,33 +293,44 @@
                 </div>
             </div>
 		</div>
+        @endif
+        @endcanany
+        @canany(['view-all-hiring-request-history','view-hiring-request-history-of-current-user'])
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-history','view-hiring-request-history-of-current-user']);
+        @endphp
+        @if ($hasPermission)
         <div class="col-xxl-6 col-lg-6 col-md-6">
-        <div class="card">
-        <div class="card-header" style="background-color:#e8f3fd;">
-            <h4 class="card-title"><center>History</center></h4>
-        </div>
-        <div class="card-body">
-            <div class="col-xxl-12 col-lg-12 col-md-12">
-            @if(isset($data->history))
-            @foreach($data->history as $history)
-            <div class="row">
-                <div class="col-xxl-1 col-lg-1 col-md-1">
-                <img src="{{ asset('icons/' . $history->icon) }}" style="width:30px;height:30px;">
+            <div class="card">
+                <div class="card-header" style="background-color:#e8f3fd;">
+                    <h4 class="card-title"><center>History</center></h4>
                 </div>
-                <div class="col-xxl-11 col-lg-11 col-md-11">
-                {{$history->message ?? ''}} </br> <span style="color:gray">{{$history->created_at ?? ''}}</span>
+                <div class="card-body">
+                    <div class="col-xxl-12 col-lg-12 col-md-12">
+                    @if(isset($data->history))
+                    @foreach($data->history as $history)
+                    <div class="row">
+                        <div class="col-xxl-1 col-lg-1 col-md-1">
+                        <img src="{{ asset('icons/' . $history->icon) }}" style="width:30px;height:30px;">
+                        </div>
+                        <div class="col-xxl-11 col-lg-11 col-md-11">
+                        {{$history->message ?? ''}} </br> <span style="color:gray">{{$history->created_at ?? ''}}</span>
+                        </div>
+                    </div>
+                    </br>
+                    @endforeach
+                    @endif
+                    </div>
                 </div>
             </div>
-            </br>
-            @endforeach
-            @endif
-            </div>
-        </div>
-        </div>
 		</div>
+        @endif
+        @endcanany
 		</div>
     </div>
 </div>
+@endif
+@endcanany
 <div class="tab-content">
 	<div class="tab-pane fade show" id="questionnaire-and-job-descriptions">
         <br>

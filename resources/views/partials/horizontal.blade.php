@@ -69,11 +69,27 @@
                                     </a>
                                 </li>
                                 <!-- HRM -->
-                                <!-- @canany(['warranty-create', 'warranty-list','addon-create','accessories-list','spare-parts-list','kit-list'])
+                                @canany(['create-employee-hiring-request','edit-employee-hiring-request','view-all-pending-hiring-request-listing',
+                                            'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
+                                            'view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing','view-pending-hiring-request-listing-of-current-user',
+                                            'view-approved-hiring-request-listing-of-current-user','view-closed-hiring-request-listing-of-current-user','view-on-hold-hiring-request-listing-of-current-user',
+                                            'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
+                                            'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
+                                            ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
+                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
+                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action'])
                                 @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create','warranty-list','addon-create','accessories-list','spare-parts-list','kit-list']);
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','view-all-pending-hiring-request-listing',
+                                            'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
+                                            'view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing','view-pending-hiring-request-listing-of-current-user',
+                                            'view-approved-hiring-request-listing-of-current-user','view-closed-hiring-request-listing-of-current-user','view-on-hold-hiring-request-listing-of-current-user',
+                                            'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
+                                            'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
+                                            ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
+                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
+                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action']);
                                 @endphp
-                                @if ($hasPermission) -->
+                                @if ($hasPermission)
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                         <i data-feather="file-text"></i>
@@ -86,17 +102,62 @@
                                             <span data-key="t-utility">Employee Relation</span>
                                         </a>
                                         <div class="dropdown">
+                                            @canany(['create-employee-hiring-request','edit-employee-hiring-request','view-all-pending-hiring-request-listing',
+                                            'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
+                                            'view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing','view-pending-hiring-request-listing-of-current-user',
+                                            'view-approved-hiring-request-listing-of-current-user','view-closed-hiring-request-listing-of-current-user','view-on-hold-hiring-request-listing-of-current-user',
+                                            'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
+                                            'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
+                                            ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
+                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
+                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action'])
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','view-all-pending-hiring-request-listing',
+                                            'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
+                                            'view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing','view-pending-hiring-request-listing-of-current-user',
+                                            'view-approved-hiring-request-listing-of-current-user','view-closed-hiring-request-listing-of-current-user','view-on-hold-hiring-request-listing-of-current-user',
+                                            'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
+                                            'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
+                                            ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
+                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
+                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action']);
+                                            @endphp
+                                            @if ($hasPermission)
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                                 <span data-key="t-utility"> Employee Hiring</span>
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
-
-                                                <a href="{{ route('employee-hiring-request.index') }}" class="dropdown-item" data-key="t-login">Requests</a>
-
+                                                @canany(['create-employee-hiring-request','edit-employee-hiring-request','view-all-pending-hiring-request-listing',
+                                            'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
+                                            'view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing','view-pending-hiring-request-listing-of-current-user',
+                                            'view-approved-hiring-request-listing-of-current-user','view-closed-hiring-request-listing-of-current-user','view-on-hold-hiring-request-listing-of-current-user',
+                                            'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
+                                            'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
+                                            ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
+                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
+                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request',
+                                                'view-all-pending-hiring-request-listing','view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing',
+                                                'view-all-on-hold-hiring-request-listing','view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing',
+                                                'view-pending-hiring-request-listing-of-current-user','view-approved-hiring-request-listing-of-current-user',
+                                                'view-closed-hiring-request-listing-of-current-user','view-on-hold-hiring-request-listing-of-current-user',
+                                                'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
+                                                'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
+                                                ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
+                                                ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
+                                                ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('employee-hiring-request.index') }}" class="dropdown-item" data-key="t-login">Hiring Requests</a>
+                                                @endif
+                                                @endcanany
                                                 <a href="{{ route('job_description.index') }}" class="dropdown-item" data-key="t-login">Job Descriptions</a>
                                                 <a href="{{ route('interview-summary-report.index') }}" class="dropdown-item" data-key="t-login">Interview Summary Report</a>
                                             </div>
+                                            @endif
+                                            @endcanany
                                         </div>
                                         <!-- @canany(['warranty-create', 'warranty-list'])
                                         @php
@@ -133,8 +194,8 @@
                                         @endcanany -->
                                     </div>
                                 </li>
-                                <!-- @endif
-                                @endcanany -->
+                                @endif
+                                @endcanany
                                 <!-- HRM -->
                                 @canany(['addon-supplier-create', 'addon-supplier-list'])
                                 @php
