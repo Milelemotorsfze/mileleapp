@@ -1,10 +1,6 @@
 @extends('layouts.main')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.css">
 <style>
-    .select2-container {
-        width: 100% !important;
-    }
-
     .submit-passport-section-div {
         padding: 10px;
     }
@@ -179,98 +175,77 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     <div class="row">
         <p><span style="float:right;" class="error">* Required Field</span></p>
     </div>
-    <form action="" method="post" enctype="multipart/form-data">
-        <br />
+    <form id="employeePassportRequestForm" name="employeePassportRequestForm" enctype="multipart/form-data" method="POST" action="{{route('employee-passport_request.store-or-update', $id)}}">
+        @csrf
 
         <div class="row">
 
             <div class="col-lg-12 job-desc-top-info">
                 <div class="row">
                     <!-- Employee name Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-name-section-div">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-4 col-sm-5 col-8 passport-request-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Employee Name</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12 top-margin-input">
-                                <input type="text" class="form-control top-margin-input-1" name="empName">
-                            </div>
+                    <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
+                        <div class="dropdown-option-div">
+                            <label for="employee_name" class="form-label heading-name"><span class="error">* </span>{{ __('Employee Name') }}</label>
+                            <select name="employee_name" id="employee_name_id" class="form-control widthinput" multiple="true" autofocus>
+                                @foreach($masterEmployees as $User)
+                                    <option value="{{ $User->id }}">{{ $User->workLocation }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
+                </div>
+                <br />
+                <div class="row job-description-details-div" style="display: none;">
 
                     <!-- Employee ID Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-id-section-div">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-4 col-sm-5 col-8 passport-request-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Employee ID</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                <input type="text" class="form-control top-margin-input-1" name="empId">
-                            </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-12 title-section-div">
+                        <div class="col-12 job-description-textfield-lable">
+
+                            <label for="employee_default_id" class="col-form-label widthinput heading-name"><b>Employee ID</b></label>
                         </div>
-                    </div>
-                </div>
-                <br />
-                <div class="row ">
-                    <!-- Designation Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-designation-section-div">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-4 col-sm-5 col-12 passport-request-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Designation</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12 top-margin-input">
-                                <input type="text" class="form-control top-margin-input-1" name="empDesignation">
-                            </div>
+                        <div class="col-12 job-description-text-value">
+                            <div name="employee_default_id" class="employee-default-id"></div>
                         </div>
                     </div>
 
-                    <!-- Mobile Number Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 mobile-num-section-div">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-4 col-sm-5 col-12 passport-request-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Mobile No.</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                <input type="text" class="form-control top-margin-input-1" name="mobileNum">
-                            </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-12 dep-section-div">
+                        <div class="col-12 job-description-textfield-lable">
+                            <label for="emp_designation" class="col-form-label widthinput heading-name"><b>Designation</b></label>
+                        </div>
+                        <div class="col-12 job-description-text-value">
+                            <div name="emp_designation" class="emp-designation"></div>
                         </div>
                     </div>
-                </div>
-                <br />
 
-                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-12 reporting-section-div">
+                        <div class="col-12 job-description-textfield-lable">
+                            <label for="emp_mobile_num" class="col-form-label widthinput heading-name"><b>Mobile No.</b></label>
+                        </div>
+                        <div class="job-description-text-value">
+                            <div name="emp_mobile_num" class="emp-mobile-num"></div>
+                        </div>
+                    </div>
 
                     <!-- Department Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 dep-section-div">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-4 col-sm-5 col-12 passport-request-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Department:</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                <input type="text" class="form-control top-margin-input-1" name="department">
-                            </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-12 dep-section-div">
+                        <div class="col-12 job-description-textfield-lable">
+                            <label for="emp_department" class="col-form-label widthinput heading-name"><b>Department</b></label>
+                        </div>
+                        <div class="col-12 job-description-text-value">
+                            <div name="emp_department" class="emp-department"></div>
                         </div>
                     </div>
 
                     <!-- Location Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 location-section-div">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-4 col-sm-5 col-12 passport-request-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Location</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12 top-margin-input">
-                                <input type="text" class="form-control top-margin-input-1" name="location">
-                            </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-12 reporting-section-div">
+                        <div class="col-12 job-description-textfield-lable">
+                            <label for="emp_job_location" class="col-form-label widthinput heading-name"><b>Location</b></label>
+                        </div>
+                        <div class="job-description-text-value">
+                            <div name="emp_job_location" class="emp-job-location"></div>
                         </div>
                     </div>
                 </div>
-
             </div>
 
         </div>
@@ -303,23 +278,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
                     <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                            <label for="basicpill-firstname-input" class="form-label"><strong>I, the undersigned,</strong> consent to authorize
+                            <label for="purposes_of_submit" class="form-label"><strong>I, the undersigned,</strong> consent to authorize
                                 the Human Resource Department to take possession of my passport for purposes of :</label>
                             <div class="row">
                                 <!-- First Row of List Items -->
                                 <div class="col-lg-4">
                                     <ul class="list-group">
                                         <li class="list-group-item">
-                                            <input type="checkbox" id="item1" name="item1">
-                                            <label for="item1">Safekeeping</label>
+                                            <input type="checkbox" id="purposes_of_submit" name="passport_submit[]" value="purposes_of_submit">
+                                            <label for="purposes_of_submit">Safekeeping</label>
                                         </li>
                                         <li class="list-group-item">
-                                            <input type="checkbox" id="item2" name="item2">
-                                            <label for="item2">My dealing with Cash</label>
+                                            <input type="checkbox" id="purposes_of_submit" name="passport_submit[]" value="purposes_of_submit">
+                                            <label for="purposes_of_submit">My dealing with Cash</label>
                                         </li>
                                         <li class="list-group-item">
-                                            <input type="checkbox" id="item3" name="item3">
-                                            <label for="item3">My dealing with Sensitive Data</label>
+                                            <input type="checkbox" id="purposes_of_submit" name="passport_submit[]" value="purposes_of_submit">
+                                            <label for="purposes_of_submit">My dealing with Sensitive Data</label>
                                         </li>
                                     </ul>
                                 </div>
@@ -353,7 +328,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                            <label for="basicpill-firstname-input" class="form-label">
+                            <label for="purposes_of_release" class="form-label">
                                 <strong>I, the undersigned,</strong> would like to collect my passport for the following purpose :
                             </label>
                             <div class="row">
@@ -361,8 +336,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                     <div class="col-lg-4 col-md-4">
                                         <ul class="list-group">
                                             <li class="list-group-item">
-                                                <input type="checkbox" id="<?= strtolower(str_replace(' ', '', $item)); ?>" name="<?= strtolower(str_replace(' ', '', $item)); ?>">
-                                                <label for="<?= strtolower(str_replace(' ', '', $item)); ?>"><?= $item; ?></label>
+                                                <input type="checkbox" id="purposes_of_release" name="passport_release[]" value="purposes_of_release">
+                                                <label for="purposes_of_release"><?= $item; ?></label>
                                             </li>
                                         </ul>
                                     </div>
@@ -374,12 +349,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                         <div class="other-checklist-div">
                                             <div class="d-flex align-items-center" style="flex-wrap: wrap">
                                                 <div class="col-lg-3 col-md-3 col-sm-6 col-12 form-check">
-                                                    <input type="checkbox" id="item10" name="item10" class="form-check-input">
-                                                    <label for="item10" class="form-check-label">Other, please specify:</label>
+                                                    <input type="checkbox" id="release_purpose" name="release_purpose" class="form-check-input" value="release_purpose">
+                                                    <label for="release_purpose" class="form-check-label">Other, please specify:</label>
                                                 </div>
                                                 <div class="other-input-container">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                                                        <input type="text" class="form-control" name="otherReason" id="otherReason">
+                                                        <input type="text" class="form-control" name="release_purpose" id="release_purpose">
                                                     </div>
                                                 </div>
                                             </div>
@@ -513,13 +488,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
         </div> -->
 
+        </br>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+            <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
+        </div>
+
     </form>
 
-</div>
-</br>
-</br>
-<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-    <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
 </div>
 </br>
 @else
@@ -528,8 +503,155 @@ redirect()->route('home')->send();
 @endphp
 @endif
 @endsection
-
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        var data = <?php echo json_encode($masterEmployees); ?>;
+        console.log("Passport Request Form User data  -----", data)
+
+        // var selectedUUID = $('#uuid_value').val();
+        // updateFieldsBasedOnUUID(selectedUUID);
+
+        $('#employee_name_id').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder: "Choose User Name",
+        });
+
+        // Execute with changing uuid value 
+
+        // function toggleJobDescriptionDetailsDiv() {
+        //     var selectedUUID = $('#uuid_value').val();
+        //     console.log("Selected uuid value in hidden shown div is : ", selectedUUID)
+
+        //     if (selectedUUID && selectedUUID.length > 0) {
+        //         $('.job-description-details-div').show();
+        //     } else {
+        //         $('.job-description-details-div').hide();
+        //     }
+        // }
+
+        // Execute function when there is data in currentHiringRequestId
+        // function setUUIDValueOnReload() {
+        //     if (currentHiringRequestId) {
+        //         for (var i = 0; i < data.length; i++) {
+        //             if (data[i].id == currentHiringRequestId) {
+        //                 $('#uuid_value').val([data[i].id]).trigger('change');
+        //                 $('.job-title').text(data[i].questionnaire.designation.name || '');
+        //                 $('.department-id').text(data[i].questionnaire.department.name || '');
+        //                 $('.reporting-to').text(data[i].department_head_name || '');
+
+        //                 if (jobDescriptionLocationId) {
+        //                     console.log("in JD location value of updated location")
+        //                     var workLocationId = jobDescriptionLocationId;
+        //                 } else {
+        //                     console.log("In old data tbale location value")
+        //                     var workLocationId = data[i].questionnaire.work_location.id;
+
+        //                 }
+        //                 updateLocationDropdown(workLocationId);
+
+        //                 toggleJobDescriptionDetailsDiv();
+        //                 break;
+        //             }
+        //         }
+        //     }
+        // }
+        // setUUIDValueOnReload();
+
+        // Execute function when there is change in uuid value
+
+        // function updateFieldsBasedOnUUID(selectedUUID) {
+        //     for (var i = 0; i < data.length; i++) {
+        //         if (data[i].id == selectedUUID) {
+        //             $('.job-title').text(data[i].questionnaire.designation.name || '');
+        //             $('.department-id').text(data[i].questionnaire.department.name || '');
+        //             $('.reporting-to').text(data[i].department_head_name || '');
+
+        //             var workLocationId = data[i].questionnaire.work_location.id;
+        //             updateLocationDropdown(workLocationId);
+        //             break;
+        //         }
+        //     }
+        // }
+
+        // Update the location from dropdown
+
+        // function clearFields() {
+        //     $('.job-title').text('');
+        //     $('.department-id').text('');
+        //     $('.reporting-to').text('');
+        //     $('#location_name').val(null).trigger('change');
+        // }
+
+        // $('#uuid_value').on('change', function() {
+        //     var selectedUUID = $(this).val();
+        //     console.log("selected value of uuid -------------------- in loop is ", selectedUUID)
+        //     toggleJobDescriptionDetailsDiv();
+        //     var fieldName = $(this).attr('name');
+        //     $('#employeePassportRequestForm').validate().element('[name="' + fieldName + '"]');
+
+        //     if (!selectedUUID || selectedUUID.length === 0) {
+        //         console.log("In Null uuid")
+        //         clearFields();
+        //     } else {
+        //         updateFieldsBasedOnUUID(selectedUUID);
+        //     }
+        // });
+
+        $('#employeePassportRequestForm').submit(function(event) {
+
+            console.log("Data to be sent:", $(this).serialize());
+            event.preventDefault();
+        });
+
+        $('#employeePassportRequestForm').validate({
+            rules: {
+                employee_name: {
+                    required: true,
+                },
+                purposes_of_submit: {
+                    required: true,
+                },
+                purposes_of_release: {
+                    required: true,
+                },
+                "passport_submit[]": {
+                    required: true,
+                },
+                "passport_release[]": {
+                    required: true,
+                },
+                release_purpose: {
+                    required: true,
+                }
+            },
+
+            errorPlacement: function(error, element) {
+                console.log("Error placement function called");
+
+                if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+                    if (!element.val() || element.val().length === 0) {
+                        console.log("Error is here with length", element.val().length);
+                        error.addClass('select-error');
+                        error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+                    } else {
+                        console.log("No error");
+                    }
+                } else {
+                    error.addClass('other-error');
+                    error.insertAfter(element);
+                }
+            },
+        });
+
+    });
+</script>
+
+
 <script>
     function showPassportRequestInput(element) {
         var selectedValue = element.value;
