@@ -194,12 +194,13 @@ Route::get('/d', function () {
     Route::post('getBranchForWarranty', [WarrantyController::class, 'getBranchForWarranty'])->name('addon.getBranchForWarranty');
     Route::get('getBrandForWarranty', [WarrantyController::class, 'getBrandForWarranty'])->name('addon.getBrandForWarranty');
 
-    // Suppliers
+    // Suppliers or vendor
     Route::resource('suppliers', SupplierController::class);
     Route::post('supplierAddonExcelValidation', [SupplierController::class, 'supplierAddonExcelValidation'])->name('addon.supplierAddonExcelValidation');
     Route::get('suppliers/destroy/{id}', [SupplierController::class,'delete'])->name('suppliers.delete');
     Route::post('suppliers/updateStatus', [SupplierController::class, 'updateStatus'])->name('suppliers.updateStatus');
     Route::post('suppliers/details/update', [SupplierController::class, 'updateDetails'])->name('suppliers.updatedetails');
+    Route::get('/vendor/sub-categories', [SupplierController::class,'getVendorSubCategories'])->name('vendor.sub-categories');
 
     Route::get('supplier/addon/price/{id}', [SupplierController::class, 'addonprice'])->name('suppliers.addonprice');
     Route::post('createNewSupplierAddonPrice', [SupplierController::class, 'createNewSupplierAddonPrice'])->name('addon.createNewSupplierAddonPrice');
