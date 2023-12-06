@@ -616,7 +616,7 @@
                                 <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
                                     <thead class="bg-soft-secondary">
                                     <tr>
-                                        {{--<th>ID</th>--}}
+                                        <th>S.No:</th>
                                         {{--<th>Status</th>--}}
                                         {{--<th>VIN</th>--}}
                                         <th>Brand Name</th>
@@ -684,7 +684,7 @@
                                 <table id="dtBasicExample5" class="table table-striped table-editable table-edits table">
                                     <thead class="bg-soft-secondary">
                                     <tr>
-                                        <th>ID</th>
+                                        <th>S.No:</th>
                                         <th>Accessory Code</th>
                                         <th>Accessory Name</th>
                                         <th>Brand/Model Line</th>
@@ -757,7 +757,7 @@
                                <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
                                    <thead class="bg-soft-secondary">
                                    <tr>
-                                       <th>ID</th>
+                                       <th>S.No: </th>
                                        <th>Spare Part Code</th>
                                        <th>Spare Part Name</th>
                                        <th>Brand/Model Line/Model Description</th>
@@ -830,7 +830,7 @@
                                 <table id="dtBasicExample4" class="table table-striped table-editable table-edits table">
                                     <thead class="bg-soft-secondary">
                                     <tr>
-                                        <th>ID</th>
+                                        <th>S.No:</th>
                                         <th>Kit Code</th>
                                         <th>Kit Name</th>
                                         <th>Brand/Model Line/Model Description</th>
@@ -1805,7 +1805,7 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var price = row[7];
+                        var price = row[8];
 
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
@@ -1840,10 +1840,10 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     var combinedValue = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var brand = row[0];
-                        var modelDescription = row[2];
-                        var interiorColor = row[5];
-                        var exteriorColor = row[6];
+                        var brand = row[1];
+                        var modelDescription = row[3];
+                        var interiorColor = row[6];
+                        var exteriorColor = row[7];
                         var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
@@ -1888,19 +1888,19 @@ $(document).ready(function () {
                 targets: -5,
                 data: null,
                 render: function (data, type, row) {
-
+                    console.log(row);
                     var code = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var code = row[3];
+                        var code = row[4];
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
 
                         var code = row[0];
                     }else if(row['button_type'] == 'Direct-Add') {
                         var code = row[2];
-                        // if(row['table_type'] == 'vehicle-table') {
-                        //     var code = row[2]
-                        // }
+                        if(row['table_type'] == 'vehicle-table') {
+                            var code = row[6]
+                        }
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         code = row[1];
@@ -1915,7 +1915,7 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
-                        var price = row[7];
+                        var price = row[8];
                     }else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                         var price = row[3];
                     }else{
@@ -1946,6 +1946,7 @@ $(document).ready(function () {
             table.row.add([row[0],row[1],row[2],row[3],'<button class="add-button circle-button" data-button-type="Shipping"  data-shipping-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Vehicle') {
+
             var table = $('#dtBasicExample1').DataTable();
             table.row.add([ row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
                 '<button class="add-button circle-button" data-button-type="Vehicle" data-variant-id="'+ row['id']+'"></button>']).draw();
@@ -1964,15 +1965,15 @@ $(document).ready(function () {
         }
         else if(row['button_type'] == 'Accessory') {
             var table = $('#dtBasicExample5').DataTable();
-            table.row.add([ row[1],row[2],row[3],row[4],row[5],row[6],'<button class="add-button circle-button" data-button-type="Accessory"  data-accessory-id="'+ row['id']+'" ></button>']).draw();
+            table.row.add([ row[0],row[1],row[2],row[3],row[4],row[5],row[6],'<button class="add-button circle-button" data-button-type="Accessory"  data-accessory-id="'+ row['id']+'" ></button>']).draw();
         }
         else if(row['button_type'] == 'SparePart') {
             var table = $('#dtBasicExample3').DataTable();
-            table.row.add([ row[1],row[2],row[3],row[4],row[5],row[6],row[7],'<button class="add-button circle-button" data-sparepart-id="'+ row['id']+'" data-button-type="SparePart" ></button>']).draw();
+            table.row.add([ row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],'<button class="add-button circle-button" data-sparepart-id="'+ row['id']+'" data-button-type="SparePart" ></button>']).draw();
         }
         else if(row['button_type'] == 'Kit') {
             var table = $('#dtBasicExample4').DataTable();
-            table.row.add([ row[1],row[2],row[3],row[4],row[5],'<button class="add-button circle-button" data-kit-id="'+ row['id'] +'"  data-button-type="Kit" ></button>']).draw();
+            table.row.add([ row[0],row[1],row[2],row[3],row[4],row[5],'<button class="add-button circle-button" data-kit-id="'+ row['id'] +'"  data-button-type="Kit" ></button>']).draw();
         }
 
         var index = $(this).closest('tr').index();
@@ -1986,9 +1987,9 @@ $(document).ready(function () {
            $(this).find('td input.total-amount-editable').attr('id','total-amount-'+ i);
         });
 
-        // if(row['button_type'] != 'Direct-Add') {
-        //     resetSerialNumber(table);
-        // }
+        if(row['button_type'] != 'Direct-Add') {
+            resetSerialNumber(table);
+        }
 
         // total div logic
         var tableLength = secondTable.data().length;
@@ -2283,21 +2284,21 @@ $(document).ready(function () {
         rowData['id'] = id;
         secondTable.row.add(rowData).draw();
         table.row(row).remove().draw();
-        // resetSerialNumber(table);
+        resetSerialNumber(table);
         // total amount div logic
         $('.total-div').attr('hidden', false);
         CalculateTotalAmount(index);
         calculateTotalSum();
         // enableOrDisableSubmit();
         showPriceInSelectedValue();
-        console.log(rowData);
+        // console.log(rowData);
     });
 
-    // function resetSerialNumber(table) {
-    //     table.$('tbody tr').each(function(i){
-    //         $($(this).find('td')[0]).html(i+1);
-    //     });
-    // }
+    function resetSerialNumber(table) {
+        table.$('tbody tr').each(function(i){
+            $($(this).find('td')[0]).html(i+1);
+        });
+    }
         $('#dtBasicExample2 tbody').on('input', '.price-editable', function(e) {
             var index =  $(this).closest('tr').index() + 1;
             CalculateTotalAmount(index);
@@ -2384,10 +2385,12 @@ $(document).ready(function () {
             type: 'GET',
             url: url,
             success: function(response) {
+                var slNo = 0;
                 var data = response.map(function(vehicle) {
+                    slNo = slNo + 1;
                     var addButton = '<button class="add-button" data-button-type="Vehicle" data-variant-id="'+ variantId +'" >Add</button>';
                     return [
-                        // vehicle.id,
+                        slNo,
                         // vehicle.grn_status,
                         // vehicle.vin,
                         vehicle.brand,
@@ -2407,7 +2410,7 @@ $(document).ready(function () {
                 $('#dtBasicExample1').DataTable({
                     data: data,
                     columns: [
-                        // { title: 'ID' },
+                        { title: 'S.No:' },
                         // { title: 'Status' },
                         // { title: 'VIN' },
                         { title: 'Brand Name' },
@@ -2513,7 +2516,7 @@ $(document).ready(function () {
                 $('#dtBasicExample5').DataTable({
                     data: data,
                     columns: [
-                        { title: 'ID' },
+                        { title: 'S.No:' },
                         { title: 'Accessory Code' },
                         { title: 'Accessory Name' },
                         { title: 'Brand/Model Lines' },
@@ -2634,7 +2637,7 @@ $(document).ready(function () {
                 $('#dtBasicExample3').DataTable({
                     data: data,
                     columns: [
-                        { title: 'ID' },
+                        { title: 'S.No: ' },
                         { title: 'Spare Part Code' },
                         { title: 'Spare Part Name' },
                         { title: 'Brand/Model Lines/Model Description' },
@@ -2777,7 +2780,7 @@ $(document).ready(function () {
                 $('#dtBasicExample4').DataTable({
                     data: data,
                     columns: [
-                        { title: 'ID' },
+                        { title: 'S.No:' },
                         { title: 'Kit Code' },
                         { title: 'Kit Name' },
                         { title: 'Brand/Model Lines/Model Description' },

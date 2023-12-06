@@ -10,7 +10,7 @@ class QuotationDetail extends Model
     use HasFactory;
     public function country()
     {
-        return $this->belongsTo(Country::class);
+        return $this->hasOne(Country::class,'id','country_id');
     }
     public function shippingPort()
     {
