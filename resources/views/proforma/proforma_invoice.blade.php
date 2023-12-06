@@ -167,14 +167,14 @@
         </div>
         <table id="details">
             @if($vehicles->count() > 0 || $variants->count() > 0)
-                <tr style="background-color: #c9c1ea;font-size: 15px;">
-                    <th>VEHICLE</th>
+                <tr style="background-color: #0f2c52;color:#FFFFFF;font-size: 15px;">
+                    <th>VEHICLE & ADDONS</th>
                     <th>QTY</th>
                     <th>PRICE</th>
                     <th>AMOUNT</th>
                 </tr>
                 @foreach($vehicles as $key => $vehicle)
-                    <tr>
+                    <tr style="color: #02023f">
                         <td> <span style="font-weight: bold;font-size: 14px;" > {{ $key+1 }}. </span> {{ $vehicle->description }}</td>
                         <td>{{ $vehicle->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($vehicle->vehicle_unit_price, 2) }} </td>
@@ -182,11 +182,9 @@
                             {{ $quotation->currency ." ". number_format($totalAmount, 2) }}</td>
                     </tr>
                         @if($vehicle->quotation_addon_items->count() > 0)
-                            <tr>
-                                <th colspan="4"><span style="text-align: center;padding-left: 20px;"> ADDONS </span> </th>
-                            </tr>
+
                             @foreach($vehicle->quotation_addon_items as $key =>  $addon)
-                                <tr style="background-color: #e1c7a8;">
+                                <tr style="color: #643702;">
                                     <td style="padding-left: 40px;"><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>
                                         {{ $addon->quotationItem->description ?? ''}}</td>
                                     <td>{{ $addon->quotationItem->quantity ?? ''}}</td>
@@ -197,7 +195,7 @@
                         @endif
                 @endforeach
                 @foreach($variants as $key => $variant)
-                    <tr>
+                    <tr style="background-color: #2468c2;">
                         <td> <span style="font-weight: bold;font-size: 14px;" > {{ $vehicles->count() + $key+1 }}. </span> {{ $variant->description }}</td>
                         <td>{{ $variant->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($variant->vehicle_unit_price, 2) }}</td>
@@ -205,11 +203,9 @@
                             {{ $quotation->currency ." ". number_format($totalAmount, 2) }}</td>
                     </tr>
                     @if($variant->quotation_addon_items->count() > 0)
-                        <tr>
-                            <th colspan="4">ADDON</th>
-                        </tr>
+
                         @foreach($variant->quotation_addon_items as $key => $addon)
-                            <tr style="background-color: #e1c7a8">
+                            <tr style="background-color: #b2ccf1">
                                 <td><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>
                                     {{ $addon->quotationItem->description ?? ''}}</td>
                                 <td>{{ $addon->quotationItem->quantity ?? ''}}</td>
@@ -221,7 +217,7 @@
                 @endforeach
             @endif
             @if($shippingDocuments->count() > 0 || $shippingCharges->count() > 0)
-                <tr style="background-color: #c9c1ea;font-size: 15px;">
+                <tr style="background-color: #0f2c52;color:#FFFFFF;font-size: 15px;">
                     <th> LOGISTICS</th>
                     <th>QTY</th>
                     <th>PRICE</th>
@@ -246,7 +242,7 @@
             @endif
 
             @if($addons->count() > 0 || $directlyAddedAddons->count() > 0)
-                <tr style="background-color: #c9c1ea;font-size: 15px;">
+                <tr style="background-color: #0f2c52;color:#FFFFFF;font-size: 15px;">
                     <th> ADDONS AND EXTRA ITEM </th>
                     <th>QTY</th>
                     <th>PRICE</th>
@@ -277,7 +273,7 @@
 
             @endif
             @if($shippingCertifications->count() > 0 || $otherDocuments->count() > 0)
-                <tr style="background-color: #c9c1ea;font-size: 15px;">
+                <tr style="background-color: #0f2c52;color:#FFFFFF;font-size: 15px;">
                     <th> COMPLIANCE AND CERTIFICATES</th>
                     <th>QTY</th>
                     <th>PRICE</th>
@@ -301,7 +297,7 @@
                 @endforeach
             @endif
                 @if($quotation->document_type == 'Proforma Invoice')
-                    <tr style="background-color: #c9c1ea;font-size: 15px;">
+                    <tr style="background-color: #84b0ea;font-size: 15px;">
                         <th colspan="3"> DEPOSIT / PAYMENT RECEIVED</th>
                         <th>AMOUNT</th>
                     </tr>
