@@ -50,7 +50,7 @@ class PassportRequestController extends Controller
             $previous = PassportRequest::where('status',$data->status)->where('id', '<', $id)->max('id');
             $next = PassportRequest::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
-        $masterEmployees = User::whereNot('id','16')->select('id','name')->get();
+        $masterEmployees = User::whereNot('id','16')->get();
         $submissionPurpose = PassportRequestPurpose::where('type','submit')->get();
         $releasePurpose = PassportRequestPurpose::where('type','release')->get();
         return view('hrm.hiring.passport_request.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));
