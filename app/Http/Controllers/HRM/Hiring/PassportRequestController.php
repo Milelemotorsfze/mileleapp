@@ -17,6 +17,7 @@ use App\Models\HRM\Employee\Leave;
 use App\Models\HRM\Employee\LeaveHistory;
 use App\Http\Controllers\UserActivityController;
 use Exception;
+use App\Models\User;
 
 class PassportRequestController extends Controller
 {
