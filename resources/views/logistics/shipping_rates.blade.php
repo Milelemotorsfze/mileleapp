@@ -45,6 +45,11 @@
   </div>
 
         <div class="card-body">
+        @if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
         {!! $html->table(['class' => 'table table-bordered table-striped table-responsive ']) !!}
         </div>  
 

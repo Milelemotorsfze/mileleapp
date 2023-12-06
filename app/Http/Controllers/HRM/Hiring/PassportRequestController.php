@@ -4,6 +4,20 @@ namespace App\Http\Controllers\HRM\Hiring;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\HRM\Employee\PassportRequest;
+use App\Models\Masters\PassportRequestPurpose;
+use Validator;
+use DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\HRM\Employee\EmployeeProfile;
+use App\Models\HRM\Approvals\DepartmentHeadApprovals;
+use App\Models\Masters\MasterDivisionWithHead;
+use App\Models\HRM\Approvals\ApprovalByPositions;
+use App\Models\HRM\Employee\Leave;
+use App\Models\HRM\Employee\LeaveHistory;
+use App\Http\Controllers\UserActivityController;
+use Exception;
+use App\Models\User;
 
 class PassportRequestController extends Controller
 {
@@ -36,10 +50,10 @@ class PassportRequestController extends Controller
             $previous = PassportRequest::where('status',$data->status)->where('id', '<', $id)->max('id');
             $next = PassportRequest::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
-        $masterEmployees = User::whereNot('id','16')->select('id','name')->first();
+        $masterEmployees = User::whereNot('id','16')->get();
         $submissionPurpose = PassportRequestPurpose::where('type','submit')->get();
         $releasePurpose = PassportRequestPurpose::where('type','release')->get();
-        return view('hrm.hiring.employee_liability.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));
+        return view('hrm.hiring.passport_request.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));
     }
     public function storeOrUpdate(Request $request, $id) { 
         $validator = Validator::make($request->all(), [

@@ -624,6 +624,8 @@ Route::get('/d', function () {
     Route::post('/storeportrates', [ShippingController::class, 'storeportrates'])->name('Shipping.storeportrates'); 
     Route::post('/storevendorrates', [ShippingController::class, 'storevendorrates'])->name('Shipping.storevendorrates');
     Route::post('/select-shipping-rate/{id}', [ShippingController::class, 'selectShippingRate']);
+    Route::get('/getShippingRateDetails/{id}', [ShippingController::class, 'getShippingRateDetails']);
+    Route::post('/updateShippingRate', [ShippingController::class, 'updateShippingRate']);
     //Agents
     Route::resource('agents', AgentsController::class);
     Route::get('/get-agent-names', [AgentsController::class, 'getAgentNames'])->name('agents.getAgentNames');

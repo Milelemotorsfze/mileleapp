@@ -16,5 +16,6 @@ class ShippingRate extends Model
         'shipping_charges_id',
         'created_by',
         'suppliers_id',
+        'updated_by',
     ];
 }
