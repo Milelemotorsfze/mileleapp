@@ -129,8 +129,8 @@ class QuotationController extends Controller
             $agentCommission->save();
         }
 
-        $quotationItemIds = [];
-        $quotationSubItemKeys = [];
+//        $quotationItemIds = [];
+//        $quotationSubItemKeys = [];
         foreach ($request->prices as $key => $price) {
            $quotationItem = new QuotationItem();
            $quotationItem->unit_price = $price;
@@ -158,22 +158,22 @@ class QuotationController extends Controller
                $item = Varaint::find($request->reference_ids[$key]);
                 //confirming it is a vehicle
                     $isVehicle = 1;
-                    $variant = Varaint::find($request->reference_ids[$key]);
-                    if($variant) {
-                        $vehicleModelLineId = $variant->master_model_lines->id ?? '';
-                    }
+//                    $variant = Varaint::find($request->reference_ids[$key]);
+//                    if($variant) {
+//                        $vehicleModelLineId = $variant->master_model_lines->id ?? '';
+//                    }
            }else if($request->types[$key] == 'Other') {
                $item = OtherLogisticsCharges::find($request->reference_ids[$key]);
 
            }else if($request->types[$key] == 'ModelLine') {
                $item = MasterModelLines::find($request->reference_ids[$key]);
-               //confirming it is a vehicle
-               if($request->is_addon[$key] == 0) {
-                   $isVehicle = 1;
-                   $vehicleModelLineId = $request->reference_ids[$key];
-                   info("vehicle - > model line");
-                   info($key);
-               }
+//               //confirming it is a vehicle
+//               if($request->is_addon[$key] == 0) {
+//                   $isVehicle = 1;
+//                   $vehicleModelLineId = $request->reference_ids[$key];
+//                   info("vehicle - > model line");
+//                   info($key);
+//               }
 
            }else if($request->types[$key] == 'Accessory' || $request->types[$key] == 'SparePart' || $request->types[$key] == 'Kit') {
 
@@ -183,58 +183,57 @@ class QuotationController extends Controller
             $quotationItem->reference()->associate($item);
             $quotationItem->save();
 
-            if($isVehicle == 1){
-                $arrayKeys = array_keys($request->model_lines, $vehicleModelLineId);
-                if (count($arrayKeys) > 0) {
-                   array_push($quotationItemIds, $quotationItem->id);
-                    // At least one match...
-                    $quotationSubItemKeys[$quotationItem->id] = $arrayKeys;
-                }
-//               check this model line is existing in addons array, if yes get the array key;
-            }
-            $isVehicle = 0;
+//            if($isVehicle == 1){
+//                $arrayKeys = array_keys($request->model_lines, $vehicleModelLineId);
+//                if (count($arrayKeys) > 0) {
+//                   array_push($quotationItemIds, $quotationItem->id);
+//                    // At least one match...
+//                    $quotationSubItemKeys[$quotationItem->id] = $arrayKeys;
+//                }
+////               check this model line is existing in addons array, if yes get the array key;
+//            }
+//            $isVehicle = 0;
         }
 
-        foreach ($quotationItemIds as $itemId) {
-            $itemKeys = $quotationSubItemKeys[$itemId];
-            foreach ($itemKeys as $itemKey) {
-                if($request->types[$itemKey] == 'ModelLine' ) {
-                     $alreadyaddedquotationIds = QuotationSubItem::where('quotation_id', $quotation->id)
-                         ->pluck('quotation_item_id')->toArray();
-                    if($request->is_addon[$itemKey] == 1) {
-
-                        $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
-                            ->where('reference_id', $request->reference_ids[$itemKey])
-                            ->where('reference_type', 'App\Models\MasterModelLines')
-                            ->whereNotIn('id', $alreadyaddedquotationIds)
-                            ->where('is_addon', true)
-                            ->first();
-                    }
-                }else if($request->types[$itemKey] == 'Accessory' || $request->types[$itemKey] == 'SparePart' || $request->types[$itemKey] == 'Kit') {
-
-                    $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
-                        ->where('reference_id', $request->reference_ids[$itemKey])
-                        ->where('reference_type', 'App\Models\AddonDetails')
-                        ->whereNotIn('id', $alreadyaddedquotationIds)
-                        ->first();
-                }
-                if($quotationItemRow) {
-                    $quotationSubItem = new QuotationSubItem();
-                    $quotationSubItem->quotation_id = $quotation->id;
-                    $quotationSubItem->quotation_item_parent_id = $itemId;
-                    $quotationSubItem->quotation_item_id = $quotationItemRow->id;
-                    $quotationSubItem->save();
-
-                }
-            }
-        }
+//        foreach ($quotationItemIds as $itemId) {
+//            $itemKeys = $quotationSubItemKeys[$itemId];
+//            foreach ($itemKeys as $itemKey) {
+//                if($request->types[$itemKey] == 'ModelLine' ) {
+//                     $alreadyaddedquotationIds = QuotationSubItem::where('quotation_id', $quotation->id)
+//                         ->pluck('quotation_item_id')->toArray();
+//                    if($request->is_addon[$itemKey] == 1) {
+//
+//                        $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
+//                            ->where('reference_id', $request->reference_ids[$itemKey])
+//                            ->where('reference_type', 'App\Models\MasterModelLines')
+//                            ->whereNotIn('id', $alreadyaddedquotationIds)
+//                            ->where('is_addon', true)
+//                            ->first();
+//                    }
+//                }else if($request->types[$itemKey] == 'Accessory' || $request->types[$itemKey] == 'SparePart' || $request->types[$itemKey] == 'Kit') {
+//
+//                    $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
+//                        ->where('reference_id', $request->reference_ids[$itemKey])
+//                        ->where('reference_type', 'App\Models\AddonDetails')
+//                        ->whereNotIn('id', $alreadyaddedquotationIds)
+//                        ->first();
+//                }
+//                if($quotationItemRow) {
+//                    $quotationSubItem = new QuotationSubItem();
+//                    $quotationSubItem->quotation_id = $quotation->id;
+//                    $quotationSubItem->quotation_item_parent_id = $itemId;
+//                    $quotationSubItem->quotation_item_id = $quotationItemRow->id;
+//                    $quotationSubItem->save();
+//
+//                }
+//            }
+//        }
         DB::commit();
         $quotationDetail = QuotationDetail::with('country')->find($quotationDetail->id);
 
 //        $quotation = Quotation::find(26);
 //        $call = Calls::find($quotation->calls_id);
 //        $quotationDetail = QuotationDetail::with('country')->where('quotation_id', 26)->orderBy('id','DESC')->first();
-//
 
         $vehicles =  QuotationItem::where("reference_type", 'App\Models\Varaint')
             ->where('quotation_id', $quotation->id)->get();
@@ -270,12 +269,16 @@ class QuotationController extends Controller
         $addonsTotalAmount = $hidedDirectlyAddedAddonSum + $hidedAddonSum;
 
         $shippingCharges = QuotationItem::where('reference_type','App\Models\Shipping')
+//            ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
         $shippingDocuments = QuotationItem::where('reference_type','App\Models\ShippingDocuments')
+//            ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
         $otherDocuments = QuotationItem::where('reference_type','App\Models\OtherLogisticsCharges')
+//            ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
         $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
+//            ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
 
         $salesPersonDetail = EmployeeProfile::where('user_id', Auth::id())->first();
@@ -300,6 +303,18 @@ class QuotationController extends Controller
         }
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
+//        $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
+//            ->where('quotation_id', $quotation->id)
+//            ->whereIn('reference_type',['App\Models\ShippingDocuments','App\Models\Shipping',
+//                'App\Models\ShippingCertification','App\Models\OtherLogisticsCharges'])
+//            ->sum('total_amount');
+//        $vehicleCount = $vehicles->count() + $variants->count();
+//        if($vehicleCount > 0) {
+//            $shippingChargeDistriAmount = $shippingHidedItemAmount / $vehicleCount;
+//        }else{
+//            $shippingChargeDistriAmount = 0;
+//        }
+
 //        return view('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
 //            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons','addonsTotalAmount'));
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
