@@ -214,10 +214,19 @@
 {{--                        @endforeach--}}
 {{--                    @endif--}}
                 @endforeach
+                @foreach($otherVehicles as $key => $otherVehicle)
+                    <tr style="color: #02023f;">
+                        <td> <span style="font-weight: bold;font-size: 14px;" > {{ $variants->count() + $vehicles->count() + $key+1 }}. </span> {{ $otherVehicle->description }}</td>
+                        <td>{{ $otherVehicle->quantity }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($otherVehicle->unit_price, 2) }}</td>
+                        <td> <?php $totalAmount = $otherVehicle->unit_price * $otherVehicle->quantity ?>
+                            {{ $quotation->currency ." ". number_format($totalAmount, 2) }}</td>
+                    </tr>
+                @endforeach
             @endif
             @if($shippingDocuments->count() > 0 || $shippingCharges->count() > 0)
                 <tr style="background-color: #0f2c52;color:#FFFFFF;font-size: 15px;">
-                    <th> LOGISTICS</th>
+                    <th>LOGISTICS</th>
                     <th>QTY</th>
                     <th>PRICE</th>
                     <th>AMOUNT</th>
@@ -263,12 +272,20 @@
                         <td>{{ $quotation->currency ." ". number_format($directlyAddedAddon->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
-                @if($addonsTotalAmount > 0)
+                    @foreach($OtherAddons as $key => $OtherAddon)
                         <tr>
-                            <td colspan="3">Addons</td>
-                            <td>  {{ $quotation->currency }} {{ number_format($addonsTotalAmount, 2) }}</td>
+                            <td><span style="font-weight: bold;margin-right: 5px;" > {{ $directlyAddedAddons->count() + $addons->count() + $key+1 }}. </span> {{ $OtherAddon->description }}</td>
+                            <td>{{ $OtherAddon->quantity }}</td>
+                            <td>{{ $quotation->currency ." ". number_format($OtherAddon->unit_price, 2) }}</td>
+                            <td>{{ $quotation->currency ." ". number_format($OtherAddon->total_amount, 2) }}</td>
                         </tr>
-                @endif
+                    @endforeach
+{{--                @if($addonsTotalAmount > 0)--}}
+{{--                        <tr>--}}
+{{--                            <td colspan="3">Addons</td>--}}
+{{--                            <td>  {{ $quotation->currency }} {{ number_format($addonsTotalAmount, 2) }}</td>--}}
+{{--                        </tr>--}}
+{{--                @endif--}}
 
             @endif
             @if($shippingCertifications->count() > 0 || $otherDocuments->count() > 0)

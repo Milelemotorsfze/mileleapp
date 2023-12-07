@@ -569,6 +569,7 @@
                             @foreach($brands as $brand)
                             <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
                             @endforeach
+                            <option value="Other"> Other</option>
                         </select>
                     </div>
 {{--                    <div class="col-lg-1 col-md-6" style="margin-top: 26px;">--}}
@@ -581,11 +582,11 @@
                             <option value="">Select Model Line</option>
                         </select>
                     </div>
-                    <div class="col-lg-1 col-md-6 add-new-model-line-div" style="margin-top: 26px;" >
-                        <a id="createNewModelLineButton" data-toggle="popover" data-trigger="hover" title="Create New Model Line" data-placement="top" style="float: right;"
-                           class="btn btn-info modal-model-line-button" data-modal-id="createNewModelLine"><i class="fa fa-plus" aria-hidden="true"></i> Add Model Line</a>
+{{--                    <div class="col-lg-1 col-md-6 add-new-model-line-div" style="margin-top: 26px;" >--}}
+{{--                        <a id="createNewModelLineButton" data-toggle="popover" data-trigger="hover" title="Create New Model Line" data-placement="top" style="float: right;"--}}
+{{--                           class="btn btn-info modal-model-line-button" data-modal-id="createNewModelLine"><i class="fa fa-plus" aria-hidden="true"></i> Add Model Line</a>--}}
 
-                    </div>
+{{--                    </div>--}}
                     <div class="col-lg-2 col-md-6">
                         <label class="form-label"> Variant</label>
                         <select class="form-control col" id="variant" style="width: 100%" name="variant" disabled>
@@ -651,6 +652,8 @@
                                     @foreach($assessoriesDesc as $accessory)
                                         <option value="{{ $accessory->id }}">{{ $accessory->Addon->name ?? '' }}@if($accessory->description!='') - {{$accessory->description}}@endif</option>
                                     @endforeach
+                                    <option value="Other"> Other</option>
+
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-6" style="margin-right: 10px;">
@@ -661,6 +664,7 @@
                                     @foreach($brands as $brand)
                                         <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
                                     @endforeach
+                                    <option value="Other"> Other</option>
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-6" style="margin-right: 10px;">
@@ -726,6 +730,8 @@
                                @foreach($brands as $brand)
                                    <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
                                @endforeach
+                               <option value="Other"> Other</option>
+
                            </select>
                        </div>
                        <div class="col-lg-2 col-md-6">
@@ -801,6 +807,8 @@
                                     @foreach($brands as $brand)
                                         <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
                                     @endforeach
+                                    <option value="Other"> Other</option>
+
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-6">
@@ -1022,68 +1030,68 @@
         <input type="hidden" id="current-currency-type" value="AED">
         <button type="submit" class="btn btn-primary" id="submit-button" disabled>Submit</button>
     </form>
-    <div class="overlay">
-        <div class="modal" id="createNewModelLine" tabindex="-1" role="dialog" aria-labelledby="exampleModalLineCenteredLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLineCenteredLabel" style="text-align:center;"> Create New Model Line </h5>
-                        <button type="button" class="btn btn-secondary btn-sm close form-control modal-close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">X</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="POST" enctype="multipart/form-data" id="create-model-line-form">
-                            @csrf
-                            <div class="row modal-row">
-                                <div class="col-xxl-12 col-lg-12 col-md-12">
-                                    <span class="error">* </span>
-                                    <label for="name" class="col-form-label text-md-end" >Brand</label>
-                                </div>
-                                <div class="col-xxl-9 col-lg-9 col-md-9 col-sm-12" id="new-brand-div" hidden>
-                                    <input type="text" class="form-control new_brand  @error('brand_name') is-invalid @enderror" oninput="checkBrandValidation()" placeholder="Enter Brand Name" id="new-brand"  name="brand_name" >
-                                    <span id="newBrandError" class="is-invalid" style="margin-top: 20px" ></span>
-                                </div>
-                                <div class="col-xxl-9 col-lg-9 col-md-9 col-sm-12" id="brand-list-div">
-                                    <select onchange="checkBrandValidation()" class="form-control new_brand @error('brand_name') is-invalid @enderror"
-                                            name="brand_name" id="brand-from-list" style="width: 100%">
-                                        <option></option>
-                                        @foreach($brands as $brand)
-                                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <span id="existingBrandError" class="is-invalid" style="margin-top: 20px" ></span>
-                                </div>
-                                <div class="col-xxl-3 col-lg-3 col-md-3 col-sm-12">
-                                    <a> <button type="button" class="btn btn-info add-new-button" >Add New</button> </a>
-                                    <a> <button type="button" class="btn btn-info add-existing-brand-button" hidden>Add From List</button> </a>
-                                </div>
-                                <div class="col-xxl-12 col-lg-12 col-md-12 mt-2">
-                                    <span class="error">* </span>
-                                    <label for="name" class="col-form-label text-md-end">Model Line</label>
-                                </div>
-                                <div class="col-xxl-12 col-lg-12 col-md-12">
-                                    <input type="text" id="new_model_line_name" class="form-control  @error('model_line') is-invalid @enderror" name="model_line"
-                                           placeholder="Enter Model Line Name" value="{{ old('model_line') }}" oninput="checkModelLine()" autofocus>
-                                    <span id="newModelLineError" class="is-invalid"></span>
-                                    @error('model_line')
-                                    <span class="invalid-feedback" role="alert">
-								<strong>{{ $message }}</strong>
-								</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm modal-close" data-dismiss="modal" ><i class="fa fa-times"></i> Close</button>
-                        <button type="button" class="btn btn-primary btn-sm" id="createModelLineId" style="float: right;">
-                            <i class="fa fa-check" aria-hidden="true"></i> Submit</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+{{--    <div class="overlay">--}}
+{{--        <div class="modal" id="createNewModelLine" tabindex="-1" role="dialog" aria-labelledby="exampleModalLineCenteredLabel" aria-hidden="true">--}}
+{{--            <div class="modal-dialog modal-dialog-centered" role="document">--}}
+{{--                <div class="modal-content">--}}
+{{--                    <div class="modal-header">--}}
+{{--                        <h5 class="modal-title" id="exampleModalLineCenteredLabel" style="text-align:center;"> Create New Model Line </h5>--}}
+{{--                        <button type="button" class="btn btn-secondary btn-sm close form-control modal-close" data-dismiss="modal" aria-label="Close">--}}
+{{--                            <span aria-hidden="true">X</span>--}}
+{{--                        </button>--}}
+{{--                    </div>--}}
+{{--                    <div class="modal-body">--}}
+{{--                        <form method="POST" enctype="multipart/form-data" id="create-model-line-form">--}}
+{{--                            @csrf--}}
+{{--                            <div class="row modal-row">--}}
+{{--                                <div class="col-xxl-12 col-lg-12 col-md-12">--}}
+{{--                                    <span class="error">* </span>--}}
+{{--                                    <label for="name" class="col-form-label text-md-end" >Brand</label>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-xxl-9 col-lg-9 col-md-9 col-sm-12" id="new-brand-div" hidden>--}}
+{{--                                    <input type="text" class="form-control new_brand  @error('brand_name') is-invalid @enderror" oninput="checkBrandValidation()" placeholder="Enter Brand Name" id="new-brand"  name="brand_name" >--}}
+{{--                                    <span id="newBrandError" class="is-invalid" style="margin-top: 20px" ></span>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-xxl-9 col-lg-9 col-md-9 col-sm-12" id="brand-list-div">--}}
+{{--                                    <select onchange="checkBrandValidation()" class="form-control new_brand @error('brand_name') is-invalid @enderror"--}}
+{{--                                            name="brand_name" id="brand-from-list" style="width: 100%">--}}
+{{--                                        <option></option>--}}
+{{--                                        @foreach($brands as $brand)--}}
+{{--                                            <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>--}}
+{{--                                        @endforeach--}}
+{{--                                    </select>--}}
+{{--                                    <span id="existingBrandError" class="is-invalid" style="margin-top: 20px" ></span>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-xxl-3 col-lg-3 col-md-3 col-sm-12">--}}
+{{--                                    <a> <button type="button" class="btn btn-info add-new-button" >Add New</button> </a>--}}
+{{--                                    <a> <button type="button" class="btn btn-info add-existing-brand-button" hidden>Add From List</button> </a>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-xxl-12 col-lg-12 col-md-12 mt-2">--}}
+{{--                                    <span class="error">* </span>--}}
+{{--                                    <label for="name" class="col-form-label text-md-end">Model Line</label>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-xxl-12 col-lg-12 col-md-12">--}}
+{{--                                    <input type="text" id="new_model_line_name" class="form-control  @error('model_line') is-invalid @enderror" name="model_line"--}}
+{{--                                           placeholder="Enter Model Line Name" value="{{ old('model_line') }}" oninput="checkModelLine()" autofocus>--}}
+{{--                                    <span id="newModelLineError" class="is-invalid"></span>--}}
+{{--                                    @error('model_line')--}}
+{{--                                    <span class="invalid-feedback" role="alert">--}}
+{{--								<strong>{{ $message }}</strong>--}}
+{{--								</span>--}}
+{{--                                    @enderror--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                        </form>--}}
+{{--                    </div>--}}
+{{--                    <div class="modal-footer">--}}
+{{--                        <button type="button" class="btn btn-secondary btn-sm modal-close" data-dismiss="modal" ><i class="fa fa-times"></i> Close</button>--}}
+{{--                        <button type="button" class="btn btn-primary btn-sm" id="createModelLineId" style="float: right;">--}}
+{{--                            <i class="fa fa-check" aria-hidden="true"></i> Submit</button>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        </div>--}}
+{{--    </div>--}}
 </div>
 @endsection
 @push('scripts')
@@ -1394,81 +1402,81 @@ $(document).ready(function () {
             removeNewModelLineError();
         });
 
-        $('#createModelLineId').on('click', function()
-        {
-            // create new addon and list new addon in addon list
-            var model_line = $('#new_model_line_name').val();
-            var existingBrand = $("#brand-from-list").val();
-            var newBrand = $('#new-brand').val();
-            checkBrandValidation();
-            checkModelLine();
-            var brand = newBrand;
-            var brandType = 'NEW';
-            if(existingBrand) {
-                var brand = existingBrand;
-                var brandType = 'EXISTING';
-            }
-             if(model_line != "" && brand != "") {
-                $.ajax
-                ({
-                    url:"{{route('modelline-or-brand.store')}}",
-                    type: "POST",
-                    data:
-                        {
-                            model_line: model_line,
-                            brand: brand,
-                            brandType: brandType,
-                            _token: '{{csrf_token()}}'
-                        },
-                    dataType : 'json',
-                    success: function(result)
-                    {
-                        console.log(result);
-                        if(result.brand_error) {
-                            $msg = result.brand_error;
-                            showNewBrandError($msg);
-                        }
-                        if(result.model_line_error) {
-                            $msg = result.model_line_error;
-                            showNewModelLineError($msg);
-                        }
-                        if(result.model_line_error == "" ){
-                            if(result.brand_error == "") {
+        {{--$('#createModelLineId').on('click', function()--}}
+        {{--{--}}
+        {{--    // create new addon and list new addon in addon list--}}
+        {{--    var model_line = $('#new_model_line_name').val();--}}
+        {{--    var existingBrand = $("#brand-from-list").val();--}}
+        {{--    var newBrand = $('#new-brand').val();--}}
+        {{--    checkBrandValidation();--}}
+        {{--    checkModelLine();--}}
+        {{--    var brand = newBrand;--}}
+        {{--    var brandType = 'NEW';--}}
+        {{--    if(existingBrand) {--}}
+        {{--        var brand = existingBrand;--}}
+        {{--        var brandType = 'EXISTING';--}}
+        {{--    }--}}
+        {{--     if(model_line != "" && brand != "") {--}}
+        {{--        $.ajax--}}
+        {{--        ({--}}
+        {{--            url:"{{route('modelline-or-brand.store')}}",--}}
+        {{--            type: "POST",--}}
+        {{--            data:--}}
+        {{--                {--}}
+        {{--                    model_line: model_line,--}}
+        {{--                    brand: brand,--}}
+        {{--                    brandType: brandType,--}}
+        {{--                    _token: '{{csrf_token()}}'--}}
+        {{--                },--}}
+        {{--            dataType : 'json',--}}
+        {{--            success: function(result)--}}
+        {{--            {--}}
+        {{--                console.log(result);--}}
+        {{--                if(result.brand_error) {--}}
+        {{--                    $msg = result.brand_error;--}}
+        {{--                    showNewBrandError($msg);--}}
+        {{--                }--}}
+        {{--                if(result.model_line_error) {--}}
+        {{--                    $msg = result.model_line_error;--}}
+        {{--                    showNewModelLineError($msg);--}}
+        {{--                }--}}
+        {{--                if(result.model_line_error == "" ){--}}
+        {{--                    if(result.brand_error == "") {--}}
 
-                                $('.overlay').hide();
-                                $('.modal').removeClass('modalshow');
-                                $('.modal').addClass('modalhide');
-                                var id = result.model_line.brand_id;
-                                if(brandType == 'NEW') {
-                                    $('#brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");
-                                    $('#accessories_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");
-                                    $('#spare_parts_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");
-                                    $('#kit_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");
+        {{--                        $('.overlay').hide();--}}
+        {{--                        $('.modal').removeClass('modalshow');--}}
+        {{--                        $('.modal').addClass('modalhide');--}}
+        {{--                        var id = result.model_line.brand_id;--}}
+        {{--                        if(brandType == 'NEW') {--}}
+        {{--                            $('#brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");--}}
+        {{--                            $('#accessories_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");--}}
+        {{--                            $('#spare_parts_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");--}}
+        {{--                            $('#kit_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");--}}
 
-                                }
-                                $('#brand').val(id);
-                                $('#brand').trigger('change.select2');
+        {{--                        }--}}
+        {{--                        $('#brand').val(id);--}}
+        {{--                        $('#brand').trigger('change.select2');--}}
 
-                                $('#model_line').append("<option  value='" + result.model_line.id + "'>" + result.model_line.model_line + "</option>");
-                                $('#model_line').val(result.model_line.id);
-                                // $('#model_line').trigger('change');
+        {{--                        $('#model_line').append("<option  value='" + result.model_line.id + "'>" + result.model_line.model_line + "</option>");--}}
+        {{--                        $('#model_line').val(result.model_line.id);--}}
+        {{--                        // $('#model_line').trigger('change');--}}
 
-                                $('#model_line').prop('disabled', false);
+        {{--                        $('#model_line').prop('disabled', false);--}}
 
-                                $('#new_model_line_name').val(" ");
-                                $('#brand-from-list').val(" ");
-                                $('#new-brand').val(" ");
-                                $('#brand-from-list').trigger('change.select2');
+        {{--                        $('#new_model_line_name').val(" ");--}}
+        {{--                        $('#brand-from-list').val(" ");--}}
+        {{--                        $('#new-brand').val(" ");--}}
+        {{--                        $('#brand-from-list').trigger('change.select2');--}}
 
-                                $msg = "";
-                                removeNewModelLineError();
-                                removeNewBrandError();
-                            }
-                        }
-                    }
-                });
-             }
-        });
+        {{--                        $msg = "";--}}
+        {{--                        removeNewModelLineError();--}}
+        {{--                        removeNewBrandError();--}}
+        {{--                    }--}}
+        {{--                }--}}
+        {{--            }--}}
+        {{--        });--}}
+        {{--     }--}}
+        {{--});--}}
 
         $('.modal-button').on('click', function()
         {
@@ -1610,7 +1618,8 @@ $(document).ready(function () {
         if (brandId ) {
             $('#model_line').prop('disabled', false);
             $('#model_line').empty().append('<option value="">Select Model Line</option>');
-
+            $('#variant').prop('disabled', true);
+            $('#variant').empty().append('<option value="">Select Variant</option>');
             $.ajax({
                 type: 'GET',
                 url: '{{ route('booking.getmodel', ['brandId' => '__brandId__']) }}'
@@ -1619,6 +1628,7 @@ $(document).ready(function () {
                     $.each(response, function(key, value) {
                         $('#model_line').append('<option value="' + key + '">' + value + '</option>');
                     });
+                    $('#model_line').append('<option value="Other">Other</option>');
                 }
             });
         } else {
@@ -1698,6 +1708,7 @@ $(document).ready(function () {
                     $.each(response, function(key, value) {
                         $('#accessories_model_line').append('<option value="' + key + '">' + value + '</option>');
                     });
+                    $('#accessories_model_line').append('<option value="Other">Other</option>');
                 }
             });
         } else {
@@ -1719,6 +1730,7 @@ $(document).ready(function () {
                     $.each(response, function(key, value) {
                         $('#spare_parts_model_line').append('<option value="' + key + '">' + value + '</option>');
                     });
+                    $('#spare_parts_model_line').append('<option value="Other">Other</option>');
                 }
             });
         } else {
@@ -1740,6 +1752,8 @@ $(document).ready(function () {
                     $.each(response, function(key, value) {
                         $('#kit_model_line').append('<option value="' + key + '">' + value + '</option>');
                     });
+                    $('#kit_model_line').append('<option value="Other">Other</option>');
+
                 }
             });
         } else {
@@ -2112,6 +2126,7 @@ $(document).ready(function () {
             }
             var variant = $("#variant option:selected").val();
             if(variant != "") {
+
                 row['id'] = variant;
                 row['model_type'] = 'Vehicle';
                 var variant = $('#variant option:selected').text();
@@ -2156,8 +2171,6 @@ $(document).ready(function () {
 
                 var modelLine = $('#accessories_model_line option:selected').text();
 
-            }else{
-                alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
             }
         }else if(tableType == 'spare-part-table') {
             row['table_type'] = 'addon-table';
@@ -2381,6 +2394,18 @@ $(document).ready(function () {
             alert("Please select a variant before searching.");
             return;
         }
+        // if (!variantId) {
+        //     if (!modelLineId) {
+        //         alert("Please select a modelLine before searching.");
+        //         return;
+        //     } else{
+        //         if(modelLineId != 'Other') {
+        //             alert("Please select a variant before searching.");
+        //             return;
+        //         }
+        //     }
+        //
+        // }
         var url = '{{ route('booking.getbookingvehicles', [':variantId', ':interiorColorId?', ':exteriorColorId?']) }}';
         url = url.replace(':variantId', variantId);
         if (interiorColorId) {
