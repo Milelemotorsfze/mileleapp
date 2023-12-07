@@ -594,9 +594,6 @@ redirect()->route('home')->send();
         var data = <?php echo json_encode($masterEmployees); ?>;
         console.log("Passport Request Form User data  -----", data)
 
-        // var selectedEmpId = $('#employee_name_id').val();
-        // updateFieldsBasedOnEmpId(selectedEmpId);
-
         $('#employee_name_id').select2({
             allowClear: true,
             maximumSelectionLength: 1,
