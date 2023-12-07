@@ -922,6 +922,22 @@ redirect()->route('home')->send();
             $("#salary_range_end_in_aed").val(data.salary_range_end_in_aed)
         };
 
+        var requestedDepartmentName = {{$data -> questionnaire -> department -> id ?? 'null'}};
+        console.log("Updated requested department name : ", requestedDepartmentName);
+        if (requestedDepartmentName !== null) {
+
+            $("#department_id option").each(function() {
+                var optionValue = $(this).val();
+
+                if (optionValue == requestedDepartmentName) {
+                    $(this).prop("selected", true);
+                }
+            });
+        } else {
+            console.log("In else of requested department name id", data.department_id)
+            $("#department_id").val(data.department_id);
+        }
+
 
         var backendCareerLevelId = {{ $data -> questionnaire -> carrerLevel -> id ?? 'null' }};
         console.log("Updated Career Level ID: ", backendCareerLevelId);
