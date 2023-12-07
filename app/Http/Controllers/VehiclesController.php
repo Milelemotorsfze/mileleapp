@@ -2397,7 +2397,14 @@ public function viewalls(Request $request)
         $offset = $request->input('offset', 0);
         $length = $request->input('length', 40);
         $searchParams = $request->input('columns', []);
-        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse']);
+        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse'])->where(function ($subQuery) {
+            $subQuery->where('status', 'Incoming Stock')
+                     ->whereNull('gdn_id');
+            $subQuery->orWhereHas('Gdn', function ($gdnSubQuery) {
+                $gdnSubQuery->whereNotNull('gdn_id')
+                             ->where('date', '>=', now()->subMonths(3)->toDateString());
+            });
+        });
         foreach ($searchParams as $column => $searchValue) {
             if ($searchValue !== null) {
                 if ($column === "po_number") {
@@ -2422,12 +2429,6 @@ public function viewalls(Request $request)
                     $query->whereHas('Grn', function ($subQuery) use ($searchValue) {
                         $subQuery->where('date', 'LIKE', '%' . $searchValue . '%');
                     });
-                }
-                if ($column === "netsuit_grn_number") {
-                    $query->where('netsuit_grn_number', 'LIKE', '%' . $searchValue . '%');
-                }
-                if ($column === "netsuit_grn_date") {
-                    $query->where('netsuit_grn_date', 'LIKE', '%' . $searchValue . '%');
                 }
                 if ($column === "inspection_date") {
                     $query->where('inspection_date', 'LIKE', '%' . $searchValue . '%');
@@ -2596,7 +2597,7 @@ public function viewalls(Request $request)
                 }
             }
         }
-        $vehicles = $query->select('id', 'status', 'vin', 'latest_location', 'ex_colour', 'int_colour','varaints_id', 'so_id', 'purchasing_order_id', 'grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'netsuit_grn_number', 'netsuit_grn_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine', 'extra_features', 'ppmmyyy', 'territory', 'price' )->skip($offset)->take($length)->get();
+        $vehicles = $query->select('id', 'status', 'vin', 'latest_location', 'ex_colour', 'int_colour','varaints_id', 'so_id', 'purchasing_order_id', 'grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine', 'extra_features', 'ppmmyyy', 'territory', 'price' )->skip($offset)->take($length)->get();
             $modifiedVehicles = $vehicles->map(function ($vehicle) {
             $vehicle->so_number = $vehicle->so ? $vehicle->so->so_number : '';
             $vehicle->so_date = $vehicle->so ? $vehicle->so->so_date : '';

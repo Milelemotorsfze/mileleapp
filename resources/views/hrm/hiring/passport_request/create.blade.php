@@ -1,8 +1,82 @@
 @extends('layouts.main')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.css">
 <style>
-    .select2-container {
-        width: 100% !important;
+    .select-error,
+    .other-error {
+        color: red;
+    }
+
+    .btn.btn-success.btncenter {
+        width: 10%;
+    }
+
+    .job-description-label-div {
+        margin-top: 20px !important;
+    }
+
+    .col-form-label {
+        padding-bottom: 0px;
+    }
+
+    .dep-section-div,
+    .title-section-div,
+    .reporting-section-div {
+        margin-top: 20px !important;
+    }
+
+    .job-description-lable-name,
+    .job-description-lable-name-1 {
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+    }
+
+    .job-description-textfield-lable,
+    .job-description-text-value
+
+    /* .reporting-section-div, .dep-section-div, .title-section-div */
+        {
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @media (max-width: 991px) {
+        .date-section-div {
+            padding-top: 10px;
+        }
+    }
+
+
+    @media (max-width: 767px) {
+        .date-section-div {
+            padding-top: 10px;
+        }
+    }
+
+    @media (max-width: 991px) {
+        .location-section-div {
+            padding-top: 10px;
+        }
+    }
+
+    .error {
+        color: #FF0000;
+    }
+
+    .error-text {
+        color: #FF0000;
+    }
+
+    @media (max-width: 425px) {
+        .heading-name {
+            font-size: 14px !important;
+        }
+
+        .job-description-text-value {
+            font-size: 13px !important;
+        }
     }
 
     .submit-passport-section-div {
@@ -59,12 +133,12 @@
         padding: 10px 0px 13px 20px;
     }
 
-    .amountpercentageDropDownInputContainer,
+    .passportSubmitReleaseDropDownInputContainer,
     .other-container-div {
         margin-left: 18px;
     }
 
-    .amountpercentageDropDownInputContainer {
+    .passportSubmitReleaseDropDownInputContainer {
         margin-top: 30px;
     }
 
@@ -127,7 +201,7 @@
             margin: 20px 0px 0px 0px !important;
         }
 
-        .amountpercentageDropDownInputContainer {
+        .passportSubmitReleaseDropDownInputContainer {
             margin-left: 1px;
         }
 
@@ -179,98 +253,82 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     <div class="row">
         <p><span style="float:right;" class="error">* Required Field</span></p>
     </div>
-    <form action="" method="post" enctype="multipart/form-data">
-        <br />
+    <form id="employeePassportRequestForm" name="employeePassportRequestForm" enctype="multipart/form-data" method="POST" action="{{route('employee-passport_request.store-or-update', $id)}}">
+        @csrf
 
         <div class="row">
 
             <div class="col-lg-12 job-desc-top-info">
                 <div class="row">
                     <!-- Employee name Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-name-section-div">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-4 col-sm-5 col-8 passport-request-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Employee Name</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12 top-margin-input">
-                                <input type="text" class="form-control top-margin-input-1" name="empName">
-                            </div>
+                    <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
+                        <div class="dropdown-option-div">
+                            <label for="employee_id" class="form-label heading-name"><span class="error">* </span>{{ __('Employee Name') }}</label>
+                            <select name="employee_id" id="employee_name_id" class="form-control widthinput" multiple="true" autofocus>
+                                @foreach($masterEmployees as $User)
+                                <option value="{{ $User->id }}">{{ $User->name ?? ''}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
+                </div>
+                <br />
+                <!-- <p>Data is: @foreach($masterEmployees as $User)
+                    <text value="{{ $User->id }}">\
+                        {{ $User->empProfile->designation_id ?? ''}} </text>
+                    @endforeach
+                </p> -->
+                <div class="row passport-request-details-div" style="display: none;">
 
                     <!-- Employee ID Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-id-section-div">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-4 col-sm-5 col-8 passport-request-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Employee ID</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                <input type="text" class="form-control top-margin-input-1" name="empId">
-                            </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-6 title-section-div">
+                        <div class="col-12 job-description-textfield-lable">
+
+                            <label for="employee_code_id" class="col-form-label widthinput heading-name"><b>Employee ID</b></label>
                         </div>
-                    </div>
-                </div>
-                <br />
-                <div class="row ">
-                    <!-- Designation Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-designation-section-div">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-4 col-sm-5 col-12 passport-request-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Designation</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12 top-margin-input">
-                                <input type="text" class="form-control top-margin-input-1" name="empDesignation">
-                            </div>
+                        <div class="col-12 job-description-text-value">
+                            <div name="employee_code_id" class="employee-code-id"></div>
                         </div>
                     </div>
 
-                    <!-- Mobile Number Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 mobile-num-section-div">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-4 col-sm-5 col-12 passport-request-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Mobile No.</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                <input type="text" class="form-control top-margin-input-1" name="mobileNum">
-                            </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-6 dep-section-div">
+                        <div class="col-12 job-description-textfield-lable">
+                            <label for="emp_designation" class="col-form-label widthinput heading-name"><b>Designation</b></label>
+                        </div>
+                        <div class="col-12 job-description-text-value">
+                            <div name="emp_designation" class="emp-designation"></div>
                         </div>
                     </div>
-                </div>
-                <br />
 
-                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-6 reporting-section-div">
+                        <div class="col-12 job-description-textfield-lable">
+                            <label for="emp_mobile_num" class="col-form-label widthinput heading-name"><b>Mobile No.</b></label>
+                        </div>
+                        <div class="job-description-text-value">
+                            <div name="emp_mobile_num" class="emp-mobile-num"></div>
+                        </div>
+                    </div>
 
                     <!-- Department Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 dep-section-div">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-4 col-sm-5 col-12 passport-request-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Department:</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                <input type="text" class="form-control top-margin-input-1" name="department">
-                            </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-6 dep-section-div">
+                        <div class="col-12 job-description-textfield-lable">
+                            <label for="emp_department" class="col-form-label widthinput heading-name"><b>Department</b></label>
+                        </div>
+                        <div class="col-12 job-description-text-value">
+                            <div name="emp_department" class="emp-department"></div>
                         </div>
                     </div>
 
                     <!-- Location Section -->
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 location-section-div">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-4 col-sm-5 col-12 passport-request-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Location</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12 top-margin-input">
-                                <input type="text" class="form-control top-margin-input-1" name="location">
-                            </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-6 reporting-section-div">
+                        <div class="col-12 job-description-textfield-lable">
+                            <label for="emp_job_location" class="col-form-label widthinput heading-name"><b>Location</b></label>
+                        </div>
+                        <div class="job-description-text-value">
+                            <div name="emp_job_location" class="emp-job-location"></div>
                         </div>
                     </div>
                 </div>
-
             </div>
 
         </div>
@@ -278,21 +336,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
         <hr />
         <div class="col-lg-6 col-md-12 col-sm-12 col-12">
-            <div class="amountpercentageDropDownInputContainer">
-
+            <div class="passportSubmitReleaseDropDownInputContainer">
                 <label for="choose-passport-req" class="form-label"><span class="error">* </span><b>Choose your option for the passport:</b></label>
                 <div class="col-lg-5 col-md-10 col-sm-9 col-11">
-                    <select name="designation" id="designation" class="form-control widthinput" onchange="showPassportRequestInput(this)">
-                        <option value=""></option>
-                        <option value="1">Submission of Passport</option>
-                        <option value="2">Release of Passport</option>
+                    <select name="passport_request_dropdown" id="passport_request_dropdown" class="form-control widthinput" onchange="showPassportRequestInput(this)" value="{{$data->passport_with}}">
+                        <option value="" >Choose Option</option>
+                        <option value="with_employee">Submission of Passport</option>
+                        <option value="with_company">Release of Passport</option>
                     </select>
                 </div>
             </div>
         </div>
+
         <br />
-
-
+        
         <div class="col-lg-12">
 
             <!-- Passport Submission Input Container -->
@@ -303,23 +360,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
                     <div class="col-lg-12 col-md-12 col-sm-12 col-12">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                            <label for="basicpill-firstname-input" class="form-label"><strong>I, the undersigned,</strong> consent to authorize
+                            <label for="purposes_of_submit" class="form-label"><strong>I, the undersigned,</strong> consent to authorize
                                 the Human Resource Department to take possession of my passport for purposes of :</label>
                             <div class="row">
                                 <!-- First Row of List Items -->
                                 <div class="col-lg-4">
                                     <ul class="list-group">
                                         <li class="list-group-item">
-                                            <input type="checkbox" id="item1" name="item1">
-                                            <label for="item1">Safekeeping</label>
+                                            <input type="checkbox" id="purposes_of_submit" name="passport_submit[]" value="purposes_of_submit">
+                                            <label for="purposes_of_submit">Safekeeping</label>
                                         </li>
                                         <li class="list-group-item">
-                                            <input type="checkbox" id="item2" name="item2">
-                                            <label for="item2">My dealing with Cash</label>
+                                            <input type="checkbox" id="purposes_of_submit" name="passport_submit[]" value="purposes_of_submit">
+                                            <label for="purposes_of_submit">My dealing with Cash</label>
                                         </li>
                                         <li class="list-group-item">
-                                            <input type="checkbox" id="item3" name="item3">
-                                            <label for="item3">My dealing with Sensitive Data</label>
+                                            <input type="checkbox" id="purposes_of_submit" name="passport_submit[]" value="purposes_of_submit">
+                                            <label for="purposes_of_submit">My dealing with Sensitive Data</label>
                                         </li>
                                     </ul>
                                 </div>
@@ -353,7 +410,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                            <label for="basicpill-firstname-input" class="form-label">
+                            <label for="purposes_of_release" class="form-label">
                                 <strong>I, the undersigned,</strong> would like to collect my passport for the following purpose :
                             </label>
                             <div class="row">
@@ -361,8 +418,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                     <div class="col-lg-4 col-md-4">
                                         <ul class="list-group">
                                             <li class="list-group-item">
-                                                <input type="checkbox" id="<?= strtolower(str_replace(' ', '', $item)); ?>" name="<?= strtolower(str_replace(' ', '', $item)); ?>">
-                                                <label for="<?= strtolower(str_replace(' ', '', $item)); ?>"><?= $item; ?></label>
+                                                <input type="checkbox" id="purposes_of_release" name="passport_release[]" value="purposes_of_release">
+                                                <label for="purposes_of_release"><?= $item; ?></label>
                                             </li>
                                         </ul>
                                     </div>
@@ -374,12 +431,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                         <div class="other-checklist-div">
                                             <div class="d-flex align-items-center" style="flex-wrap: wrap">
                                                 <div class="col-lg-3 col-md-3 col-sm-6 col-12 form-check">
-                                                    <input type="checkbox" id="item10" name="item10" class="form-check-input">
-                                                    <label for="item10" class="form-check-label">Other, please specify:</label>
+                                                    <input type="checkbox" id="release_purpose" name="release_purpose" class="form-check-input" value="release_purpose">
+                                                    <label for="release_purpose" class="form-check-label">Other, please specify:</label>
                                                 </div>
                                                 <div class="other-input-container">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                                                        <input type="text" class="form-control" name="otherReason" id="otherReason">
+                                                        <input type="text" class="form-control" name="release_purpose" id="release_purpose">
                                                     </div>
                                                 </div>
                                             </div>
@@ -404,7 +461,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
         <!-- Signatures Div -->
         <!-- <div class="col-lg-6 col-md-12 col-sm-12 col-12">
-            <div class="amountpercentageDropDownInputContainer">
+            <div class="passportSubmitReleaseDropDownInputContainer">
                 <h5>Signatures</h5>
             </div>
         </div>
@@ -513,13 +570,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
         </div> -->
 
+        </br>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+        </div>
+
     </form>
 
-</div>
-</br>
-</br>
-<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-    <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
 </div>
 </br>
 @else
@@ -528,13 +585,157 @@ redirect()->route('home')->send();
 @endphp
 @endif
 @endsection
-
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        var data = <?php echo json_encode($masterEmployees); ?>;
+        console.log("Passport Request Form User data  -----", data)
+
+        // var selectedEmpId = $('#employee_name_id').val();
+        // updateFieldsBasedOnEmpId(selectedEmpId);
+
+        $('#employee_name_id').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder: "Choose User Name",
+        });
+
+        // Execute with changing emp id value 
+
+        function togglePassportRequestDetailsDiv() {
+            var selectedEmpId = $('#employee_name_id').val();
+            console.log("Selected emp id value in hidden shown div is : ", selectedEmpId)
+
+            if (selectedEmpId && selectedEmpId.length > 0) {
+                $('.passport-request-details-div').show();
+            } else {
+                $('.passport-request-details-div').hide();
+            }
+        }
+
+        // Execute function when there is data in currentHiringRequestId
+        function setEmpNameOnReload() {
+            // if (data) {
+            for (var i = 0; i < data.length; i++) {
+                // if (data[i].id == 2) {
+                $('#employee_name_id').val([data[i].id]).trigger('change');
+                $('.employee-code-id').text(data[i].emp_profile.employee_code || '');
+                $('.emp-designation').text(data[i].emp_profile.designation_id || '');
+                $('.emp-mobile-num').text(data[i].emp_profile.contact_number || '');
+                $('.emp-department').text(data[i].emp_profile.department_id || '');
+                $('.emp-job-location').text(data[i].emp_profile.work_location || '');
+                console.log("Drop down passport request value in set function : ", data[i].passport_with);
+                $('.#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
+
+                togglePassportRequestDetailsDiv();
+                break;
+            }
+            // }
+            // }
+        }
+        // setEmpNameOnReload();
+
+        // Execute function when there is change in emp value
+
+        function updateFieldsBasedOnEmpId(selectedEmpId) {
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].id == selectedEmpId) {
+                    $('.employee-code-id').text(data[i].emp_profile.employee_code || '');
+                    $('.emp-designation').text(data[i].emp_profile.designation_id || '');
+                    $('.emp-mobile-num').text(data[i].emp_profile.contact_number || '');
+                    $('.emp-department').text(data[i].emp_profile.department_id || '');
+                    $('.emp-job-location').text(data[i].emp_profile.work_location || '');
+                    console.log("Drop down passport request value in update function : ", data[i].passport_with);
+                    $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
+                    break;
+                }
+            }
+        }
+
+        // Update the location from dropdown
+
+        function clearFields() {
+            $('.employee-code-id').text('');
+            $('.emp-designation').text('');
+            $('.emp-mobile-num').text('');
+            $('.emp-department').text('');
+            $('.emp-job-location').text('');
+            $('.passport_request_dropdown').val('');
+        }
+
+        $('#employee_name_id').on('change', function() {
+            var selectedEmpId = $(this).val();
+            console.log("selected value of emp id -------------------- in on change 1 is ", selectedEmpId);
+            togglePassportRequestDetailsDiv();
+            var fieldName = $(this).attr('name');
+            $('#employeePassportRequestForm').validate().element('[name="' + fieldName + '"]');
+
+            if (!selectedEmpId || selectedEmpId.length === 0) {
+                console.log("In Null emp id")
+                clearFields();
+            } else {
+                updateFieldsBasedOnEmpId(selectedEmpId);
+            }
+        });
+
+        $('#employeePassportRequestForm').submit(function(event) {
+
+            console.log("Data to be sent:", $(this).serialize());
+            event.preventDefault();
+        });
+
+        $('#employeePassportRequestForm').validate({
+            rules: {
+                employee_id: {
+                    required: true,
+                },
+                purposes_of_submit: {
+                    required: true,
+                },
+                purposes_of_release: {
+                    required: true,
+                },
+                "passport_submit[]": {
+                    required: true,
+                },
+                "passport_release[]": {
+                    required: true,
+                },
+                release_purpose: {
+                    required: true,
+                }
+            },
+
+            errorPlacement: function(error, element) {
+                console.log("Error placement function called");
+
+                if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+                    if (!element.val() || element.val().length === 0) {
+                        console.log("Error is here with length", element.val().length);
+                        error.addClass('select-error');
+                        error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+                    } else {
+                        console.log("No error");
+                    }
+                } else {
+                    error.addClass('other-error');
+                    error.insertAfter(element);
+                }
+            },
+        });
+
+    });
+</script>
+
+
 <script>
     function showPassportRequestInput(element) {
         var selectedValue = element.value;
-        document.getElementById('submitPassportInputContainer').style.display = selectedValue == '1' ? 'block' : 'none';
-        document.getElementById('releasePassportInputContainer').style.display = selectedValue == '2' ? 'block' : 'none';
+        document.getElementById('submitPassportInputContainer').style.display = selectedValue == 'with_employee' ? 'block' : 'none';
+        document.getElementById('releasePassportInputContainer').style.display = selectedValue == 'with_company' ? 'block' : 'none';
     }
 </script>
 @endpush
