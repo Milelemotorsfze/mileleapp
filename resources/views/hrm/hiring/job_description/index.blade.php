@@ -1,18 +1,27 @@
 @extends('layouts.table')
 @section('content')
-<!-- @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price'])
+@canany(['create-job-description','edit-job-description','view-pending-job-description-list','view-approved-job-description-list','view-rejected-job-description-list','view-job-description-details','view-job-description-approvals-details'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description','edit-job-description','view-pending-job-description-list','view-approved-job-description-list','view-rejected-job-description-list','view-job-description-details','view-job-description-approvals-details']);
 @endphp
-@if ($hasPermission) -->
+@if ($hasPermission)                                           
 <div class="card-header">
 	<h4 class="card-title">
 		Job Description Info
 	</h4>
 	<!-- <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> -->
+	
+	@canany(['create-job-description'])
+	@php
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
+	@endphp
+	@if ($hasPermission)
 	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('employee-hiring-job-description.create-or-edit', ['id' => 'new', 'hiring_id' => 'new']) }}">
       <i class="fa fa-plus" aria-hidden="true"></i> New Job Description
     </a>
+	@endif
+	@endcanany
+	
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -39,22 +48,36 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 </div>
 <div class="portfolio">
 	<ul class="nav nav-pills nav-fill" id="my-tab">
-        <!-- @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price'])
+        @canany(['edit-job-description','view-pending-job-description-list'])
         @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price']);
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-job-description','view-pending-job-description-list']);
         @endphp
-        @if ($hasPermission) -->
+        @if ($hasPermission)
 		<li class="nav-item">
 			<a class="nav-link active" data-bs-toggle="pill" href="#pending-hiring-requests">Pending</a>
 		</li>
+		@endif
+        @endcanany
+		@canany(['edit-job-description','view-pending-job-description-list'])
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-job-description','view-pending-job-description-list']);
+        @endphp
+        @if ($hasPermission)
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#approved-hiring-requests">Approved</a>
 		</li>
+		@endif
+        @endcanany
+		@canany(['edit-job-description','view-pending-job-description-list'])
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-job-description','view-pending-job-description-list']);
+        @endphp
+        @if ($hasPermission)
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#rejected-hiring-requests">Rejected</a>
 		</li>
-        <!-- @endif
-        @endcanany -->
+        @endif
+        @endcanany
 	</ul>
 </div>
 <div class="tab-content" id="selling-price-histories" >
@@ -479,8 +502,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
     <!-- @endif
     @endcanany -->
 </div>
-<!-- @endif
-@endcanany -->
+@endif
+@endcanany
 @endsection
 @push('scripts')
 <script type="text/javascript">

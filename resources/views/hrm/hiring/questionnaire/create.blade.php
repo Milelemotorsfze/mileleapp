@@ -71,7 +71,7 @@
 </style>
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('create-questionnaire');
 @endphp
 @if ($hasPermission)
 <div class="card-header">

@@ -104,11 +104,9 @@
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request']);
                             @endphp
                             @if ($hasPermission)
-                            <li>
                                 <a style="float:right; margin-right:5px;" title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$data->id)}}">
                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                 </a>
-                            </li>
                             @endif
                             @endcanany
                         </div>
