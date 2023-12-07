@@ -73,7 +73,7 @@
         <label for="QTY" class="form-label">Variant</label>
         </div>
         <div class="col-lg-2 col-md-6">
-            <label for="basicpill-firstname-input" class="form-label">Remarks </label>
+            <label for="basicpill-firstname-input" class="form-label">New VIN & Remarks</label>
         </div>
         </div>
         </div>
@@ -178,15 +178,18 @@
                 <div class="col-lg-1 col-md-6">
                     <input type="text" id="variant${row}" name="variant[]" class="form-control" placeholder="Variant" readonly>
                 </div>
-                <div class="col-lg-2 col-md-6">
-    <div class="d-flex align-items-center">
-        <input type="text" id="remarks" name="remarks[]" class="form-control" placeholder="Remarks">
-        <button type="button" class="btn btn-danger btn-sm ml-2 remove-row-btn" data-row="${row}">
-              <i class="fa fa-times"></i>
-        </button>
-    </div>
-</div>
-            </div>
+                <div class="col-lg-1 col-md-6">
+                    <div class="d-flex align-items-center">
+                        <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                </div>
+                                </div>
+                            </div>
             `;
             $('#rows-container').append(newRow);
             $('#vin' + row).select2();
@@ -271,6 +274,25 @@
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
+                                `;
+        if (vehicle.warehouseNames == 'Supplier') {
+            rowHtml += `
+                <div class="col-lg-1 col-md-6">
+                    <div class="d-flex align-items-center">
+                        <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                </div>
+                                </div>
+                            </div>
+            `;
+        }
+        else{
+            rowHtml += `
                                 <div class="col-lg-2 col-md-6">
                                 <div class="d-flex align-items-center">
                                     <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
@@ -279,7 +301,7 @@
                                 </div>
                             </div>
                         `;
-
+        }
                         $("#rows-containerpo").append(rowHtml);
                     });
 
@@ -348,15 +370,34 @@
                                 <div class="col-lg-1 col-md-6">
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
+                                `;
+        if (vehicle.warehouseNames == 'Supplier') {
+            rowHtml += `
+                <div class="col-lg-1 col-md-6">
+                    <div class="d-flex align-items-center">
+                        <input type="text" name="newvin[]" class="form-control mr-2" placeholder="New VIN">
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
+                                </div>
+                                </div>
+                            </div>
+            `;
+        }
+        else{
+            rowHtml += `
                                 <div class="col-lg-2 col-md-6">
                                 <div class="d-flex align-items-center">
-                                    <input type="text" name="remarks[]" class="form-control" placeholder="Remarks">
+                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
                                     <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
                                 </div>
                                 </div>
                             </div>
                         `;
-
+        }
                         $("#rows-containerpo").append(rowHtml);
                     });
                     $(".remove-row-btn").on("click", function () {

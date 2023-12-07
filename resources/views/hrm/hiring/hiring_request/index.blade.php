@@ -17,7 +17,7 @@
 	'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
 	'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user'
 	,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
-	,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user'])
+	,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','create-job-description'])
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','view-all-pending-hiring-request-listing',
 	'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
@@ -26,7 +26,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 	'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
 	'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user'
 	,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
-	,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user']);
+	,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','create-job-description']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
@@ -264,11 +264,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 											@endif
 										@endif
 									</li>
+									@canany(['all-hiring-request-delete-action','hiring-request-of-current-user-delete-action'])
+									@php
+									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['all-hiring-request-delete-action','hiring-request-of-current-user-delete-action']);
+									@endphp
+									@if ($hasPermission)
                                     <li>
 										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Delete" type="button" class="btn btn-secondary btn-sm hiring-request-delete sm-mt-3" data-id="{{ $data->id }}" data-url="{{ route('employee-hiring-request.destroy', $data->id) }}">
 											<i class="fa fa-trash"></i> Delete
 										</button>
 									</li>
+									@endif
+									@endcanany
                                 </ul>
                             </div>
 							</td>
@@ -356,39 +363,81 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 									@endcanany
                                     <li>
 										@if(isset($approvedOne->questionnaire))
+										@canany(['edit-questionnaire'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-questionnaire']);
+										@endphp
+										@if ($hasPermission)
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
 										<i class="fa fa-list" aria-hidden="true"></i> Edit Questionnaire
 										</a>
+										@endif
+										@endcanany
+										@canany(['create-job-description'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
+										@endphp
+										@if ($hasPermission)
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Job Description" class="btn btn-sm btn-secondary" href="{{ route('employee-hiring-job-description.create-or-edit', ['id' => 'new', 'hiring_id' => $approvedOne->id]) }}">
 										<i class="fa fa-address-card" aria-hidden="true"></i> Add Job Description
 										</a>
+										@endif
+										@endcanany
 										<!-- <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Interview Summary Report" class="btn btn-sm btn-warning" href="{{route('interview-summary-report.create-or-edit',$approvedOne->id)}}">
 										<i class="fa fa-plus" aria-hidden="true"></i> Interview Summary
 										</a> -->
 										@else
+										@canany(['create-questionnaire'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-questionnaire']);
+										@endphp
+										@if ($hasPermission)
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
 										<i class="fa fa-list" aria-hidden="true"></i> Create Questionnaire
 										</a>
+										@endif
+										@endcanany
 									@endif
 									</li>
+									@canany(['hiring-request-close-action'])
+									@php
+									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['hiring-request-close-action']);
+									@endphp
+									@if ($hasPermission)
 									<li>
 										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 											data-bs-target="#closed-hiring-request-{{$approvedOne->id}}">
 											<i class="fa fa-check" aria-hidden="true"></i> Closed
 										</button>
 									</li>
+									@endif
+									@endcanany
+									@canany(['hiring-request-on-hold-action'])
+									@php
+									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['hiring-request-on-hold-action']);
+									@endphp
+									@if ($hasPermission)
                                     <li>
 										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="On Hold" type="button" class="btn btn-primary btn-sm"  data-bs-toggle="modal"
 											data-bs-target="#on-hold-hiring-request-{{$approvedOne->id}}">
 											<i class="fa fa-hand-rock" aria-hidden="true"></i> On Hold
 										</button>
 									</li>
+									@endif
+									@endcanany
+									@canany(['hiring-request-cancel-action'])
+									@php
+									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['hiring-request-cancel-action']);
+									@endphp
+									@if ($hasPermission)
                                     <li>
 										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Cancelled" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
 											data-bs-target="#cancelled-hiring-request-{{$approvedOne->id}}">
 											<i class="fa fa-ban" aria-hidden="true"></i> Cancelled
 										</button>
 									</li>
+									@endif
+									@endcanany
                                 </ul>
                             </div>
 								

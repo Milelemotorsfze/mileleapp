@@ -26,30 +26,83 @@ use App\Http\Controllers\UserActivityController;
 class EmployeeHiringRequestController extends Controller
 {
     public function index() {
+        $authId = Auth::id();
         $page = 'listing';
-        $pendings = EmployeeHiringRequest::where('status','pending')->latest()->get();
+
+        $pendings = EmployeeHiringRequest::where('status','pending');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-all-pending-hiring-request-listing'])) {
+            $pendings = $pendings->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-pending-hiring-request-listing-of-current-user'])) {
+            $pendings = $pendings->where('requested_by',$authId)->latest();
+        }
+        $pendings = $pendings->get();
+
         $approved = EmployeeHiringRequest::where([
             ['status','approved'],
             ['final_status','open'],
-        ])->latest()->get();
-        // dd($approved);
-        // ->with('shortlistedCandidates')
-        // shortlistedCandidates
+        ]);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-all-approved-hiring-request-listing'])) {
+            $approved = $approved->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-approved-hiring-request-listing-of-current-user'])) {
+            $approved = $approved->where('requested_by',$authId)->latest();
+        }
+        $approved =$approved->get();
+        
         $closed = EmployeeHiringRequest::where([
             ['status','approved'],
             ['final_status','closed'],
-        ])->latest()->get();
+        ]);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-all-closed-hiring-request-listing'])) {
+            $closed = $closed->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-closed-hiring-request-listing-of-current-user'])) {
+            $closed = $closed->where('requested_by',$authId)->latest();
+        }
+        $closed = $closed->get();
+
         $onHold = EmployeeHiringRequest::where([
             ['status','approved'],
             ['final_status','onhold'],
-        ])->latest()->get();
+        ]);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-all-closed-hiring-request-listing'])) {
+            $onHold = $onHold->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-closed-hiring-request-listing-of-current-user'])) {
+            $onHold = $onHold->where('requested_by',$authId)->latest();
+        }
+        $onHold = $onHold->get();
+
         $cancelled = EmployeeHiringRequest::where([
             ['status','approved'],
             ['final_status','cancelled'],
-        ])->latest()->get();
-        $rejected = EmployeeHiringRequest::where('status','rejected')->latest()->get();
+        ]);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-all-closed-hiring-request-listing'])) {
+            $cancelled = $cancelled->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-closed-hiring-request-listing-of-current-user'])) {
+            $cancelled = $cancelled->where('requested_by',$authId)->latest();
+        }
+        $cancelled = $cancelled->get();
+
+        $rejected = EmployeeHiringRequest::where('status','rejected');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-all-closed-hiring-request-listing'])) {
+            $rejected = $rejected->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-closed-hiring-request-listing-of-current-user'])) {
+            $rejected = $rejected->where('requested_by',$authId)->latest();
+        }
+        $rejected = $rejected->get();
         $deleted = [];
-        $deleted = EmployeeHiringRequest::onlyTrashed()->get();
+        $deleted = EmployeeHiringRequest::onlyTrashed();
+        if(Auth::user()->hasPermissionForSelectedRole(['view-all-closed-hiring-request-listing'])) {
+            $deleted = $deleted->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-closed-hiring-request-listing-of-current-user'])) {
+            $deleted = $deleted->where('requested_by',$authId)->latest();
+        }
+        $deleted = $deleted->get();
         return view('hrm.hiring.hiring_request.index',compact('pendings','approved','closed','onHold','cancelled','rejected','deleted','page'));
     }
     public function createOrEdit($id) {

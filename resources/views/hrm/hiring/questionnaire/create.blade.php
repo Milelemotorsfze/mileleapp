@@ -71,7 +71,7 @@
 </style>
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('create-questionnaire');
 @endphp
 @if ($hasPermission)
 <div class="card-header">
@@ -586,6 +586,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                                 <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
                                     <input class="form-check-input" name="evaluation[]" type="checkbox" id="internal_department_evaluation" value="internal_department_evaluation" {{ $data && $data->questionnaire && str_contains($data->questionnaire->job_evaluation_stake_holders, 'Internal Departments') ? 'checked' : '' }}>
                                     <label class="form-check-label" for="internal_department_evaluation">Internal Departments</label>
+                                </div>
+                                <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <input class="form-check-input" name="evaluation[]" type="checkbox" id="external_vendor_evaluation" value="external_vendor_evaluation" {{ $data && $data->questionnaire && str_contains($data->questionnaire->job_evaluation_stake_holders, 'External Vendors') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="external_vendor_evaluation">External vendors</label>
                                 </div>
                                 <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
                                     <input class="form-check-input" name="evaluation[]" type="checkbox" id="external_vendor_evaluation" value="external_vendor_evaluation" {{ $data && $data->questionnaire && str_contains($data->questionnaire->job_evaluation_stake_holders, 'External Vendors') ? 'checked' : '' }}>

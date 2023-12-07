@@ -1,3 +1,8 @@
+@canany(['view-questionnaire-details'])
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-questionnaire-details']);
+@endphp
+@if ($hasPermission)
 @if(isset($data->questionnaire))
     <div class="col-xxl-6 col-lg-6 col-md-6">
         <div class="col-xxl-12 col-lg-12 col-md-12">
@@ -356,3 +361,5 @@
         </div>
     </div>
 @endif
+@endif
+@endcanany
