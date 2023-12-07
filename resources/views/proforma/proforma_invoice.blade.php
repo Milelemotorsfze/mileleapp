@@ -208,7 +208,7 @@
 {{--                                <td><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>--}}
 {{--                                    {{ $addon->quotationItem->description ?? ''}}</td>--}}
 {{--                                <td>{{ $addon->quotationItem->quantity ?? ''}}</td>--}}
-{{--                                <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->unit_price, 2) }}</td>--}}
+{{--                                <td>{{ $quotation->currency ." ". number_format($*addon->quotationItem->unit_price, 2) }}</td>--}}
 {{--                                <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->total_amount, 2) }}</td>--}}
 {{--                            </tr>--}}
 {{--                        @endforeach--}}
