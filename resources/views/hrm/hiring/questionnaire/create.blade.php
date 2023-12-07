@@ -459,7 +459,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-questionnair
                                 <div class="amountInputContainer" id="amountInputContainer">
                                     <label for="commission_amount" class="form-label"><span class="error">* </span>{{ __('Amount:') }}</label>
                                     <div class="input-group">
-                                    
+
                                         <input type="number" name="commission_amount" id="commission_amount" class="form-control widthinput" placeholder="amount" aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->questionnaire->commission_amount ?? ''}}">
                                         <div class="input-group-append">
                                             <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -584,15 +584,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-questionnair
                             <label for="job_evaluation_stake_holders" id="job_evaluation_stake_holders" class="form-label"><span class="error">* </span>{{ __('Stakeholders for Job Evaluation') }}</label>
                             <div class="col-lg-12 col-md-12 col-sm-12 col-12" id="internal_or_external_evaluation">
                                 <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
-                                    <input class="form-check-input" name="evaluation[]" type="checkbox" id="internal_department_evaluation" value="internal_department_evaluation" {{ $data && $data->questionnaire && str_contains($data->questionnaire->job_evaluation_stake_holders, 'Internal Departments') ? 'checked' : '' }}>
+                                    <input class="form-check-input" name="internal_department_evaluation" type="checkbox" id="internal_department_evaluation" value="internal_department_evaluation" {{ $data && $data->questionnaire && str_contains($data->questionnaire->job_evaluation_stake_holders, 'Internal Departments') ? 'checked' : '' }}>
                                     <label class="form-check-label" for="internal_department_evaluation">Internal Departments</label>
                                 </div>
                                 <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
-                                    <input class="form-check-input" name="evaluation[]" type="checkbox" id="external_vendor_evaluation" value="external_vendor_evaluation" {{ $data && $data->questionnaire && str_contains($data->questionnaire->job_evaluation_stake_holders, 'External Vendors') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="external_vendor_evaluation">External vendors</label>
-                                </div>
-                                <div class="form-check form-check-inline col-lg-12 col-md-12 col-sm-12 col-12">
-                                    <input class="form-check-input" name="evaluation[]" type="checkbox" id="external_vendor_evaluation" value="external_vendor_evaluation" {{ $data && $data->questionnaire && str_contains($data->questionnaire->job_evaluation_stake_holders, 'External Vendors') ? 'checked' : '' }}>
+                                    <input class="form-check-input" name="external_vendor_evaluation" type="checkbox" id="external_vendor_evaluation" value="external_vendor_evaluation" {{ $data && $data->questionnaire && str_contains($data->questionnaire->job_evaluation_stake_holders, 'External Vendors') ? 'checked' : '' }}>
                                     <label class="form-check-label" for="external_vendor_evaluation">External vendors</label>
                                 </div>
                             </div>
@@ -827,9 +823,45 @@ redirect()->route('home')->send();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
-    var data = {!!json_encode($data) !!};
+    var data = <?php echo json_encode($data); ?>;
+    console.log("Data is ", data)
 
     $(document).ready(function() {
+
+        var requestedDesignationName = {{$data -> questionnaire -> designation -> id ?? 'null'}};
+        console.log("Updated requested designation name : ", requestedDesignationName);
+        if (requestedDesignationName !== null) {
+
+            $("#requested_job_title option").each(function() {
+                var optionValue = $(this).val();
+
+                if (optionValue == requestedDesignationName) {
+                    $(this).prop("selected", true);
+                }
+            });
+        } else {
+            console.log("In else of requested job title designation name id", data.requested_job_title)
+            $("#requested_job_title").val(data.requested_job_title);
+        }
+
+        // Location name validate from Hiring request form
+
+        var requestedLocationName = {{$data -> questionnaire -> workLocation -> id ?? 'null'}};
+           
+        console.log("Updated requested location name : ", requestedLocationName);
+        if (requestedLocationName !== null) {
+
+            $("#location_id option").each(function() {
+                var optionValue = $(this).val();
+
+                if (optionValue == requestedLocationName) {
+                    $(this).prop("selected", true);
+                }
+            });
+        } else {
+            console.log("In else of requested locatio name id")
+            $("#location_id").val(data.location_id);
+        }
 
         var currentNumberOfOpenings = $("#number_of_openings").val();
         console.log("current position opening value is: ", currentNumberOfOpenings)
@@ -890,8 +922,24 @@ redirect()->route('home')->send();
             $("#salary_range_end_in_aed").val(data.salary_range_end_in_aed)
         };
 
+        var requestedDepartmentName = {{$data -> questionnaire -> department -> id ?? 'null'}};
+        console.log("Updated requested department name : ", requestedDepartmentName);
+        if (requestedDepartmentName !== null) {
 
-        var backendCareerLevelId = {{$data->questionnaire->carrerLevel->id ?? 'null'}};
+            $("#department_id option").each(function() {
+                var optionValue = $(this).val();
+
+                if (optionValue == requestedDepartmentName) {
+                    $(this).prop("selected", true);
+                }
+            });
+        } else {
+            console.log("In else of requested department name id", data.department_id)
+            $("#department_id").val(data.department_id);
+        }
+
+
+        var backendCareerLevelId = {{ $data -> questionnaire -> carrerLevel -> id ?? 'null' }};
         console.log("Updated Career Level ID: ", backendCareerLevelId);
         if (backendCareerLevelId !== null) {
 
@@ -1078,6 +1126,17 @@ redirect()->route('home')->send();
         return timeDifference;
     }
 
+    $.validator.addMethod("atLeastOneCheckbox", function(value, element) {
+        return $('input[name="internal_department_evaluation"]').is(':checked') || $('input[name="external_vendor_evaluation"]').is(':checked');
+            }, "Please select at least one value");
+
+
+    $('#employeeQuestionnaireForm').submit(function(event) {
+
+        console.log("Data to be sent:", $(this).serialize());
+        // event.preventDefault();
+    });
+
     $('#employeeQuestionnaireForm').validate({
         rules: {
             designation_type: {
@@ -1227,9 +1286,11 @@ redirect()->route('home')->send();
             trial_work_job_description: {
                 required: true,
             },
-            'evaluation[]': {
-                required: true,
-                minlength: 1
+            'internal_department_evaluation': {
+                atLeastOneCheckbox: true
+            },
+            'external_vendor_evaluation': {
+                atLeastOneCheckbox: true
             },
             recruitment_source_id: {
                 required: true,
@@ -1327,7 +1388,7 @@ redirect()->route('home')->send();
             } else if (element.attr('name') === 'min_age' || element.attr('name') === 'max_age' ||
                 element.attr('name') === 'work_time_start' || element.attr('name') === 'work_time_end' ||
                 element.attr('name') === 'salary_range_start_in_aed' || element.attr('name') === 'salary_range_end_in_aed' ||
-                element.attr('name') === 'current_or_past_employer_size_start' || element.attr('name') === 'current_or_past_employer_size_end' || element.attr('name') === 'commission_amount')  {
+                element.attr('name') === 'current_or_past_employer_size_start' || element.attr('name') === 'current_or_past_employer_size_end' || element.attr('name') === 'commission_amount') {
                 error.addClass('other-error');
                 error.insertAfter(element.closest('.input-group'));
             } else {
