@@ -58,6 +58,7 @@ class InterviewSummaryReport extends Model
     protected $appends = [
         'is_auth_user_can_approve',
         'current_status',
+        'candidate_current_status',
     ];
     public function getIsAuthUserCanApproveAttribute() {
         $isAuthUserCanApprove = [];
@@ -90,6 +91,46 @@ class InterviewSummaryReport extends Model
             $currentStatus = "Division Head's Approval Awaiting";
         }  
         return $currentStatus;
+    }
+    public function getCandidateCurrentStatusAttribute() {
+        $candidateCurrentStatus = '';
+        if($this->status == 'approved' && $this->candidate_selected == 'yes' && $this->seleced_status == 'selected') {
+            $candidateCurrentStatus = 'Candidate Selected And Hiring Request Closed';
+        }
+        else if($this->status == 'approved' && $this->candidate_selected == 'yes' && $this->seleced_status == 'pending') {
+            $candidateCurrentStatus = 'Candidate Selected And Approved';
+        }
+        else if($this->status == 'rejected' && $this->candidate_selected == 'yes' && $this->seleced_status == 'pending') {
+            $candidateCurrentStatus = 'Rejected';
+        }
+        else if($this->status == 'pending' && $this->action_by_hr_manager == 'pending' && $this->candidate_selected == 'yes' && $this->seleced_status == 'pending') {
+            $candidateCurrentStatus = "Candidate Selected And HR Manager's Approval Awaiting";
+        }
+        else if($this->status == 'pending' && $this->action_by_division_head == 'pending' && $this->candidate_selected == 'yes' && $this->seleced_status == 'pending') {
+            $candidateCurrentStatus = "Candidate Selected And Division Head's Approval Awaiting";
+        }  
+        else if($this->candidate_selected == NULL && $this->date_of_fifth_round != NULL && $this->seleced_status == 'pending') {
+            $candidateCurrentStatus = "Fifth Round Interview Completed";
+        }
+        else if($this->candidate_selected == NULL && $this->date_of_forth_round != NULL && $this->seleced_status == 'pending') {
+            $candidateCurrentStatus = "Forth Round Interview Completed";
+        }
+        else if($this->candidate_selected == NULL && $this->date_of_third_round != NULL && $this->seleced_status == 'pending') {
+            $candidateCurrentStatus = "Third Round Interview Completed";
+        }
+        else if($this->candidate_selected == NULL && $this->date_of_second_round != NULL && $this->seleced_status == 'pending') {
+            $candidateCurrentStatus = "Second Round Interview Completed";
+        }
+        else if($this->candidate_selected == NULL && $this->date_of_first_round != NULL && $this->seleced_status == 'pending') {
+            $candidateCurrentStatus = "First Round Interview Completed";
+        }
+        else if($this->candidate_selected == NULL && $this->date_of_telephonic_interview != NULL && $this->seleced_status == 'pending') {
+            $candidateCurrentStatus = "Telephonic Round Interview Completed";
+        }
+        else {
+            $candidateCurrentStatus = "Resume Shortlisted";
+        }
+        return $candidateCurrentStatus;
     }
     public function nationalities() {
         return $this->hasOne(Country::class,'id','nationality');

@@ -327,10 +327,135 @@ class EmployeeHiringRequest extends Model
     public function shortlistedCandidates() {
         return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where('candidate_selected','yes');
     }
-    public function selectedCandidates() {
-        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where('candidate_selected','yes')->where('seleced_status','selected');
-    }
     public function location() {
         return $this->hasOne(MasterOfficeLocation::class,'id','location_id');
+    }
+    public function selectedCandidates() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where([
+            ['status','approved'],
+            ['candidate_selected','yes'],
+            ['seleced_status','selected'],
+        ]);
+    }
+    public function approvedSelectedCandidates() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where([
+            ['status','approved'],
+            ['candidate_selected','yes'],
+            ['seleced_status','pending'],
+        ]);
+    }
+    public function rejectedCandidates() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where([
+            ['status','rejected'],
+            ['candidate_selected','yes'],
+            ['seleced_status','pending'],
+        ]);
+    }
+    public function hrApprovalAwaitingCandidates() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where([
+            ['status','pending'],
+            ['action_by_hr_manager','pending'],
+            ['candidate_selected','yes'],
+            ['seleced_status','pending'],
+        ]);
+    }
+    public function divisionHeadApprovalAwaitingCandidates() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where([
+            ['status','pending'],
+            ['action_by_division_head','pending'],
+            ['candidate_selected','yes'],
+            ['seleced_status','pending'],
+        ]);
+    }
+    public function fifthRoundCompleted() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where([
+            ['candidate_selected',NULL],
+            ['seleced_status','pending'],
+            ['date_of_fifth_round','!=',NULL],
+            ['date_of_forth_round','!=',NULL],
+            ['date_of_third_round','!=',NULL],
+            ['date_of_second_round','!=',NULL],
+            ['date_of_first_round','!=',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
+            ['status','pending'],
+        ]);
+    }
+    public function forthRoundCompleted() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where([
+            ['candidate_selected',NULL],
+            ['seleced_status','pending'],
+            ['date_of_fifth_round',NULL],
+            ['date_of_forth_round','!=',NULL],
+            ['date_of_third_round','!=',NULL],
+            ['date_of_second_round','!=',NULL],
+            ['date_of_first_round','!=',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
+            ['status','pending'],
+        ]);
+    }
+    public function thirdRoundCompleted() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where([
+            ['candidate_selected',NULL],
+            ['seleced_status','pending'],
+            ['date_of_fifth_round',NULL],
+            ['date_of_forth_round',NULL],
+            ['date_of_third_round','!=',NULL],
+            ['date_of_second_round','!=',NULL],
+            ['date_of_first_round','!=',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
+            ['status','pending'],
+        ]);
+    }
+    public function secondRoundCompleted() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where([
+            ['candidate_selected',NULL],
+            ['seleced_status','pending'],
+            ['date_of_fifth_round',NULL],
+            ['date_of_forth_round',NULL],
+            ['date_of_third_round',NULL],
+            ['date_of_second_round','!=',NULL],
+            ['date_of_first_round','!=',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
+            ['status','pending'],
+        ]);
+    }
+    public function firstRoundCompleted() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where([
+            ['candidate_selected',NULL],
+            ['seleced_status','pending'],
+            ['date_of_fifth_round',NULL],
+            ['date_of_forth_round',NULL],
+            ['date_of_third_round',NULL],
+            ['date_of_second_round',NULL],
+            ['date_of_first_round','!=',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
+            ['status','pending'],
+        ]);
+    }
+    public function telephonicRoundCompleted() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where([
+            ['candidate_selected',NULL],
+            ['seleced_status','pending'],
+            ['date_of_fifth_round',NULL],
+            ['date_of_forth_round',NULL],
+            ['date_of_third_round',NULL],
+            ['date_of_second_round',NULL],
+            ['date_of_first_round',NULL],
+            ['date_of_telephonic_interview','!=',NULL],
+            ['status','pending'],
+        ]);
+    }
+    public function selectedForInterview() {
+        return $this->hasMany(InterviewSummaryReport::class,'hiring_request_id','id')->where([
+            ['candidate_selected',NULL],
+            ['seleced_status','pending'],
+            ['date_of_fifth_round',NULL],
+            ['date_of_forth_round',NULL],
+            ['date_of_third_round',NULL],
+            ['date_of_second_round',NULL],
+            ['date_of_first_round',NULL],
+            ['date_of_telephonic_interview',NULL],
+            ['status','pending'],
+        ]);
     }
 }

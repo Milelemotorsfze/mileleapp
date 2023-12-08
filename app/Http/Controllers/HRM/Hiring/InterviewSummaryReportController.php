@@ -85,6 +85,7 @@ class InterviewSummaryReportController extends Controller
             ['date_of_second_round','!=',NULL],
             ['date_of_first_round','!=',NULL],
             ['date_of_telephonic_interview','!=',NULL],
+            ['candidate_selected','==',NULL],
             ['status','pending'],
         ])->latest()->get();
         $notSelected = InterviewSummaryReport::where([
@@ -108,11 +109,12 @@ class InterviewSummaryReportController extends Controller
             ['candidate_selected','yes'],
         ])->latest()->get();
         // $pendings = InterviewSummaryReport::where('status','pending')->latest()->get();
-        $approved = InterviewSummaryReport::where('status','approved')->latest()->get(); 
-        $rejected = InterviewSummaryReport::where('status','rejected')->latest()->get();
+        $approved = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')->latest()->get(); 
+        $rejected = InterviewSummaryReport::where('status','rejected')->where('seleced_status','pending')->latest()->get();
+        $selectedForJob = InterviewSummaryReport::where('status','approved')->where('seleced_status','selected')->latest()->get(); 
         $interviewersNames = User::whereNot('id',16)->select('id','name')->get();
         return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','notSelected',
-        'pendings','approved','rejected','interviewersNames'));
+        'pendings','approved','selectedForJob','rejected','interviewersNames'));
     }
     public function createOrEdit($id) {
         $currentInterviewReport = InterviewSummaryReport::with('telephonicInterviewers')->where('id',$id)->first();
@@ -123,7 +125,9 @@ class InterviewSummaryReportController extends Controller
         else {
             $interviewSummaryId = $currentInterviewReport->id;
         }
-        $hiringrequests = EmployeeHiringRequest::whereHas('questionnaire')->with('questionnaire.department','questionnaire.designation')->get();
+        $hiringrequests = EmployeeHiringRequest::where('final_status','open')->whereHas('questionnaire')->whereHas('jobDescription', function($q){
+            $q->where('status', 'approved');
+        })->with('questionnaire.department','questionnaire.designation')->get();
         $data = EmployeeHiringRequest::where('id',$id)->first();
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterGender = MasterGender::whereIn('id',[1,2])->get();
@@ -226,7 +230,7 @@ class InterviewSummaryReportController extends Controller
                 }
                 DB::commit();
                 // return response()->json('success');
-                return redirect()->route('interview-summary-report.index')
+                return redirect()->route('interview-summary-report.index',)
                                     ->with('success',$request->round.' Round Interview Summary Report Created Successfully');
             } 
             catch (\Exception $e) {
@@ -377,5 +381,11 @@ class InterviewSummaryReportController extends Controller
                 dd($e);
             }
         }
+    }
+    public function show($id) {
+        $data = InterviewSummaryReport::where('id',$id)->first();
+        $previous = InterviewSummaryReport::where('hiring_request_id',$data->hiring_request_id)->where('id', '<', $id)->max('id');
+        $next = InterviewSummaryReport::where('hiring_request_id',$data->hiring_request_id)->where('id', '>', $id)->min('id');
+        return view('hrm.hiring.interview_summary_report.show',compact('data','previous','next')); 
     }
 }

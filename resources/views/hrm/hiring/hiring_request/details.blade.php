@@ -19,22 +19,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-1 col-md-3 col-sm-6 col-12">
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-12">
                         <label for="choices-single-default" class="form-label"> Request Date :</label>
                     </div>
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                    <div class="col-lg-4 col-md-3 col-sm-6 col-12">
                         <span>{{ $data->request_date ?? '' }}</span>
                     </div>
-                    <div class="col-lg-1 col-md-3 col-sm-6 col-12">
-                        <label for="choices-single-default" class="form-label"> UUID :</label>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-12">
-                        <span style="color:#fd625e;"><strong>{{$data->uuid ?? ''}}</strong></span>
-                    </div>
-                    <div class="col-lg-1 col-md-3 col-sm-6 col-12">
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-12">
                         <label for="choices-single-default" class="form-label"> Current Status :</label>
                     </div>
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                    <div class="col-lg-4 col-md-3 col-sm-6 col-12">
                         @if($data->current_status == 'Rejected')
                         <label class="badge badge-soft-danger">{{ $data->current_status ?? '' }}</label>
                         @elseif($data->current_status == 'Approved')

@@ -52,7 +52,7 @@
             $('#selected-candidates-table').DataTable();
             $('#not-selected-candidates-table').DataTable();
             $('#fifth-round-table').DataTable();
-            // $('#telephonic-interview-round-table').DataTable();
+            $('#selected-for-job-table').DataTable();
             $('#dtBasicExample').DataTable();
             $('#dtBasicSupplierInventory').DataTable();
             $('#dtBasicExample1').DataTable();

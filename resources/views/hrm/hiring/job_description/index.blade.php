@@ -263,7 +263,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li> -->
-										<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$approvedOne->id)}}">
+										<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i>
 										</a>
 									<!-- </li>
@@ -484,7 +484,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<td>{{$rejectedOne->hr_manager_action_at ?? ''}}</td>
 							<td>{{$rejectedOne->comments_by_hr_manager ?? ''}}</td>
 							<td>
-							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$rejectedOne->id)}}">
+							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
 							</a>
 							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$rejectedOne->id)}}">

@@ -235,9 +235,30 @@ class EmployeeHiringRequestController extends Controller
     }
     public function show($id) {
         $data = EmployeeHiringRequest::where('id',$id)->first();
+
+        $countSelectedForInterview = count($data->selectedForInterview);
+        $countTelephonicRoundCompleted = count($data->telephonicRoundCompleted);
+        $countFirstRoundCompleted = count($data->firstRoundCompleted);
+        $countSecondRoundCompleted = count($data->secondRoundCompleted);
+        $countThirdRoundCompleted = count($data->thirdRoundCompleted);
+        $countForthRoundCompleted = count($data->forthRoundCompleted);
+        $countFifthRoundCompleted = count($data->fifthRoundCompleted);
+        $countDivisionHeadApprovalAwaitingCandidates = count($data->divisionHeadApprovalAwaitingCandidates);
+        $countHrApprovalAwaitingCandidates = count($data->hrApprovalAwaitingCandidates);
+        $countRejectedCandidates = count($data->rejectedCandidates);
+        $countApprovedSelectedCandidates = count($data->approvedSelectedCandidates);
+        $countSelectedCandidates = count($data->selectedCandidates);
+        
+        $data->allInterview = [];
+        $data->allInterview = $data->selectedCandidates->merge($data->approvedSelectedCandidates)->merge($data->rejectedCandidates)->merge($data->hrApprovalAwaitingCandidates)
+                              ->merge($data->divisionHeadApprovalAwaitingCandidates)->merge($data->fifthRoundCompleted)->merge($data->forthRoundCompleted)
+                              ->merge($data->thirdRoundCompleted)->merge($data->secondRoundCompleted)->merge($data->firstRoundCompleted)->merge($data->telephonicRoundCompleted)
+                              ->merge($data->selectedForInterview);
         $previous = EmployeeHiringRequest::where('status',$data->status)->where('id', '<', $id)->max('id');
         $next = EmployeeHiringRequest::where('status',$data->status)->where('id', '>', $id)->min('id');
-        return view('hrm.hiring.hiring_request.show',compact('data','previous','next'));
+        return view('hrm.hiring.hiring_request.show',compact('data','previous','next','countSelectedForInterview','countTelephonicRoundCompleted','countFirstRoundCompleted',
+        'countSecondRoundCompleted','countThirdRoundCompleted','countForthRoundCompleted','countFifthRoundCompleted','countDivisionHeadApprovalAwaitingCandidates',
+        'countHrApprovalAwaitingCandidates','countRejectedCandidates','countApprovedSelectedCandidates','countSelectedCandidates'));
     }
     public function approvalAwaiting(Request $request) {
         $authId = Auth::id();

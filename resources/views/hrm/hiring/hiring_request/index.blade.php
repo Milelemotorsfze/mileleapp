@@ -404,12 +404,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['hiring-request-close-action']);
 									@endphp
 									@if ($hasPermission)
+									@if(isset($approvedOne->shortlistedCandidates))
+									@if(count($approvedOne->shortlistedCandidates) > 0)
 									<li>
 										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 											data-bs-target="#closed-hiring-request-{{$approvedOne->id}}">
 											<i class="fa fa-check" aria-hidden="true"></i> Closed
 										</button>
 									</li>
+									@endif
+									@endif
 									@endif
 									@endcanany
 									@canany(['hiring-request-on-hold-action'])

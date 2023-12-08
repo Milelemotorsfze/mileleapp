@@ -25,13 +25,28 @@
 @section('content')
 <div class="card-header">
 	<h4 class="card-title"> Employee Hiring Request Details</h4>
-	@if($previous != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('employee-hiring-request.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
-	@endif
-	@if($next != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('employee-hiring-request.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
-	@endif
-	<a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+    <div class="row">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+            @if($previous != '')
+            <a  class="btn btn-sm btn-info float-first" href="{{ route('employee-hiring-request.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+            @endif
+            @if($next != '')
+            <a  class="btn btn-sm btn-info float-first" href="{{ route('employee-hiring-request.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+            @endif
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+            <center><label for="choices-single-default" class="form-label"> UUID :</label>
+            <span style="color:#fd625e;"><strong>{{$data->uuid ?? ''}}</strong></span></center>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-12">
+        <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+
+        </div>
+    </div>
+	
+    
+                        
+
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -70,7 +85,7 @@
 			<a class="nav-link" data-bs-toggle="pill" href="#questionnaire-and-job-descriptions">Questionnaire and Job Description</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#cancelled-hiring-requests">Interview Summary Report</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#interview-summary-report">Interview Summary Report</a>
 		</li>
 	</ul>
 </div>
@@ -335,6 +350,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
         <div class="row">
             @include('hrm.hiring.hiring_request.questionnaire_details')
             @include('hrm.hiring.hiring_request.job_description_details')
+        </div>
+    </div>
+</div>
+<div class="tab-content">
+	<div class="tab-pane fade show" id="interview-summary-report">
+        <br>
+        <div class="row">
+            @include('hrm.hiring.hiring_request.interviewSummaryReport')
         </div>
     </div>
 </div>
