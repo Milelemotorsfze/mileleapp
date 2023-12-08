@@ -220,6 +220,8 @@ Route::get('/d', function () {
         Route::get('/get-booking-accessories/{addonId}/{brandId}/{modelLineId}', 'getbookingAccessories')->name('booking.getbookingAccessories');
         Route::get('/get-booking-spare-parts/{addonId}/{brandId}/{modelLineId}/{ModelDescriptionId}', 'getbookingSpareParts')->name('booking.getbookingSpareParts');
         Route::get('/get-booking-kits/{addonId}/{brandId}/{modelLineId}/{ModelDescriptionId}', 'getbookingKits')->name('booking.getbookingKits');
+        Route::get('/addons-modal-forqoutation/{modelLineId}', [ProformaInvoiceController::class, 'addonsModal'])->name('addonsquotation.modal');
+
 
     });
     // ApprovalAwaitingController

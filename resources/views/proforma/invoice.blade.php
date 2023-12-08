@@ -1094,8 +1094,239 @@
 {{--        </div>--}}
 {{--    </div>--}}
 </div>
+<div class="modal fade addonsModal-modal" id="addonsModal" tabindex="-1" aria-labelledby="addonsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addonsModalLabel">Adding Addons</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <div class="col-lg-12">
+    <!-- ... Your other HTML content ... -->
+    <input type="hidden" name="modelIdInput" id="modelIdInput" />
+    <input type="hidden" name="brandIdInput" id="brandIdInput" />
+    <div class="row">
+    <div class="col-lg-4 col-md-12 col-sm-12">
+        <label class="form-label font-size-13 text-center">Addon Type</label>
+    </div>
+    <div class="col-lg-8 col-md-12 col-sm-12">
+        <select class="form-select" name="addonTypevehicles">
+            <option value="accessories">Accessories</option>
+            <option value="spareParts">Spare Parts</option>
+            <option value="kits">Kits</option>
+        </select>
+    </div>
+</div>
+<div id="accessoriesDropdownDiv" class="row" style="display:none;">
+    <div class="col-lg-12">
+        <label class="form-label">Accessories</label>
+        <select class="form-select" name="accessoriesDropdown">
+            <!-- Populate options dynamically using JavaScript -->
+        </select>
+    </div>
+</div>
+
+<div id="sparePartsDropdownDiv" class="row" style="display:none;">
+    <div class="col-lg-12">
+        <label class="form-label">Spare Parts</label>
+        <select class="form-select" name="sparePartsDropdown">
+            <!-- Populate options dynamically using JavaScript -->
+        </select>
+    </div>
+</div>
+
+<div id="kitsDropdownDiv" class="row" style="display:none;">
+    <div class="col-lg-12">
+        <label class="form-label">Kits</label>
+        <select class="form-select" name="kitsDropdown">
+            <!-- Populate options dynamically using JavaScript -->
+        </select>
+    </div>
+</div>
+<!-- DataTable Container -->
+<hr>
+<div id="addonDataTableContainer" class="row" style="display:none;">
+    <div class="col-lg-12">
+        <table id="addonDataTable" class="display">
+            <!-- DataTable content will be added dynamically -->
+        </table>
+    </div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 @push('scripts')
+<script>
+$('#dtBasicExample2').on('click', '.addons-button', function () {
+    var modelLineId = $(this).data('model-line-id');
+    var RowId = $(this).data('number');
+    $('#addonsModal').modal('show');
+    $.ajax({
+        url: '/addons-modal-forqoutation/' + modelLineId,
+        method: 'GET',
+        success: function (data) {
+            populateDropdowns(data);
+            $('#modelIdInput').val(data.modelLineId);
+            $('#brandIdInput').val(data.brands);
+        },
+        error: function (error) {
+            console.error('Error fetching addons:', error);
+        }
+    });
+    function populateDropdowns(data) {
+    populateDropdown('accessories', data.assessoriesDesc);
+    populateDropdown('spareParts', data.sparePartsDesc);
+    populateDropdown('kits', data.kitsDesc);
+    $('select[name="addonTypevehicles"]').change(function () {
+        var selectedType = $(this).val();
+        $('#accessoriesDropdownDiv, #sparePartsDropdownDiv, #kitsDropdownDiv').hide();
+        $('#' + selectedType + 'DropdownDiv').show();
+    });
+    function populateDropdown(type, options) {
+        var dropdown = $('select[name="' + type + 'Dropdown"]');
+        dropdown.empty();
+        $.each(options, function (index, value) {
+            dropdown.append('<option value="' + value.id + '">' + value.name + '</option>');
+        });
+    }
+// Change event for the second dropdown
+$('select.form-select').change(function () {
+        var selectedId = $(this).val();
+        var selectedType = $('select[name="addonTypevehicles"]').val();
+        var brandId = $('#brandIdInput').val();
+        var modelLineId = $('#modelIdInput').val();
+        // Make an AJAX request to the controller with the selected data
+        $.ajax({
+            url: '/get-booking-accessories/' + selectedId + '/' + brandId + '/' + modelLineId,
+    method: 'GET',
+    success: function (response) {
+                // Update the DataTable with the received data
+                updateDataTable(response);
+            },
+            error: function (error) {
+                console.error('Error fetching addon data:', error);
+            }
+        });
+    });
+    function updateDataTable(response) {
+                var slNo = 0;
+                var data = response.map(function(accessory) {
+                    slNo = slNo + 1;
+                    var addButton = '<button class="add-button" data-button-type="Accessory" data-model-line-id="'+ modelLineId +'" data-accessory-id="' + accessory.id + '">Add</button>';
+                    var accessoryId = accessory.id;
+                    if(accessory.addon_description.description != null) {
+                       var accessoryName = accessory.addon_description.addon.name + ' - ' + accessory.addon_description.description;
+                    }
+                    else {
+                        var accessoryName = accessory.addon_description.addon.name;
+                    }
+                    var accessoryBrand = accessory.brandModelLine;
+                    if(accessory.additional_remarks != null) {
+                        var accessoryAdditionalRemarks = '';
+                    }
+                    else {
+                        var accessoryAdditionalRemarks = accessory.additional_remarks;
+                    }
+                    if(accessory.fixing_charges_included == 'yes') {
+                        var accessoryFixingCharge = 'Included';
+                    }
+                    else {
+                        var accessoryFixingCharge = accessory.fixing_charge_amount + ' AED';
+                    }
+                    if(accessory.selling_price != null) {
+                        if(accessory.selling_price.selling_price != '0.00' || accessory.selling_price.selling_price != null) {
+                            var accessorySellingPrice = accessory.selling_price.selling_price;
+                        }
+                    }
+
+                    else {
+                        var accessorySellingPrice = '';
+                    }
+                    return [
+                            slNo,
+                            accessory.addon_code,
+                            accessoryName,
+                            accessoryBrand,
+                            accessorySellingPrice,
+                            accessoryAdditionalRemarks,
+                            accessoryFixingCharge,
+                            addButton,
+                            accessory.id
+                        ];
+                });
+                            if ($.fn.DataTable.isDataTable('#addonDataTable')) {
+                    $('#addonDataTable').DataTable().destroy();
+                }
+                $('#addonDataTable').DataTable({
+                    data: data,
+                    columns: [
+                        { title: 'S.No:' },
+                        { title: 'Accessory Code' },
+                        { title: 'Accessory Name' },
+                        { title: 'Brand/Model Lines' },
+                        { title: 'Selling Price(AED)'},
+                        { title: 'Additional Remarks' },
+                        { title: 'Fixing Charge'},
+                        {
+                            title: 'Add Into Quotation',
+                            render: function(data, type, row) {
+                                var accessoryId = row[row.length - 1];
+                                return '<div class="circle-button add-button-addonsinner" data-button-type="Accessory" data-row-id="' + RowId + '" data-accessory-id="' + accessoryId + '"></div>';
+                            }
+                        }
+                    ]
+                });
+                $('#addonDataTableContainer').show();
+}
+}
+});
+$('#addonDataTable').on('click', '.add-button-addonsinner', function () {
+    var rowData = [];
+    var mainTable = $('#dtBasicExample2').DataTable();
+    var buttonType = $(this).data('button-type');
+    var index = mainTable.data().length + 1;
+        rowData['button_type'] = buttonType;
+        rowData['index'] = index;
+        if(buttonType == 'Accessory') {
+            var id = $(this).data('accessory-id');
+            var rowId = $(this).data('row-id');
+            
+        }
+        else if(buttonType == 'SparePart') {
+            var id = $(this).data('sparepart-id');
+            var rowId = $(this).data('row-id');
+        }
+        else if(buttonType == 'Kit') {
+            var id = $(this).data('kit-id');
+            var rowId = $(this).data('row-id');
+        }
+        rowData['id'] = id;
+        rowData['rowId'] = rowId;
+    var row = $(this).closest('tr');
+    row.find('td').each(function() {
+    rowData.push($(this).html());
+        });
+    // Get the accessory ID, row ID, and other relevant data
+    var accessoryId = $(this).data('accessory-id');
+    var subRowId = $(this).data('row-id');
+    mainTable.row.add(rowData).draw();
+    var newRowNode = mainTable.row(newRow).node();
+    $(newRowNode).addClass('highlight');
+    $('html, body').animate({
+        scrollTop: $(newRowNode).offset().top
+    }, 1000);
+});
+
+// Event handler for removing a row
+$('#dtBasicExample2').on('click', '.remove-row-button', function () {
+    var row = $(this).closest('tr');
+    var mainTable = $('#dtBasicExample2').DataTable();
+    mainTable.row(row).remove().draw();
+});
+</script>
 <script>
      function addAgentModal() {
         $('#addAgentModal').modal('show');
@@ -1108,10 +1339,7 @@ $(document).ready(function () {
         $('#agents_id').val(selectedAgentId);
         $('#selected_cb_name').val(selectedAgentName);
     });
-    // Fetch agent names dynamically on page load
     fetchAgentData();
-
-    // Function to fetch agent names via AJAX
     function fetchAgentData() {
         $.ajax({
             url: "{{ route('agents.getAgentNames') }}",
@@ -1830,21 +2058,24 @@ $(document).ready(function () {
         sorting: false,
         columnDefs: [
             {
-                targets: -1,
-                data: null,
-                render: function (data, type, row) {
-                    var directAdd = "";
-                    var directAdd = 'Direct-Add';
-
-                    return '<button class="circle-buttonr remove-button "  data-button-type="'+ directAdd +'">Remove</button>';
-
-            }
-            // defaultContent: '<button class="circle-buttonr remove-button" >Remove</button>'
-            },
+    targets: -1,
+    data: null,
+    render: function (data, type, row) {
+        var directAdd = 'Direct-Add';
+        var removeButtonHtml = '<button class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
+        if (row['button_type'] === 'Vehicle') {
+            var addonsButtonHtml = '<button class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '">Addons</button>';
+            return removeButtonHtml + addonsButtonHtml;
+        } else {
+            return removeButtonHtml;  // Only the "Remove" button for non-'Vehicle' rows
+        }
+    }
+},
             {
                 targets: -2,
                 data: null,
                 render: function (data, type, row) {
+                    console.log(row);
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
                         var price = row[8];
@@ -1894,7 +2125,6 @@ $(document).ready(function () {
                 targets: -7,
                 data: null,
                 render: function (data, type, row) {
-                    console.log(row);
                     var combinedValue = "";
                     if(row['button_type'] == 'Vehicle') {
                         var brand = row[1];
@@ -1950,7 +2180,6 @@ $(document).ready(function () {
                 targets: -6,
                 data: null,
                 render: function (data, type, row) {
-                    console.log(row);
                     var code = "";
                     if(row['button_type'] == 'Vehicle') {
                         var code = row[4];
@@ -2058,49 +2287,14 @@ $(document).ready(function () {
                 $('.total-div').attr('hidden', true);
             }
             calculateTotalSum();
-        // alert("inside romove function");
-        // var rowData = row.data();
-        // var vehicleIdToRemove = rowData[0];
-        // moveRowToFirstTable(vehicleIdToRemove);
     });
-    // function moveRowToFirstTable(vehicleId) {
-    //     var firstTable = $('#dtBasicExample1').DataTable();
-    //     var secondTable = $('#dtBasicExample2').DataTable();
-    //     var secondTableRow = secondTable.rows().indexes().filter(function(value, index) {
-    //         return secondTable.cell(value, 0).data() == vehicleId;
-    //     });
-    //     // console.log(secondTableRow.length);
-    //     if (secondTableRow.length > 0) {
-    //         console.log("inside removal");
-    //
-    //         var rowData = secondTable.row(secondTableRow).data();
-    //         firstTable.row.add(rowData).draw();
-    //         secondTable.row(secondTableRow).remove().draw();
-    //     }
-    //
-    // }
     $('#submit-button').on('click', function(e) {
         var selectedData = [];
         secondTable.rows().every(function() {
         var data = this.data();
         var vehicleId = data[0];
         var selectedDays = $(this.node()).find('.days-dropdown').val();
-
         selectedData.push({ vehicleId: vehicleId, days: selectedDays });
-            // let formValid = true;
-            // let rowCount =  secondTable.data().length;
-            // for (let i = 1; i <= rowCount; i++) {
-            //     var inputPrice = $('#price-' + i).val();
-            //     if (inputPrice == '') {
-            //         $msg = "Price is required";
-            //         showPriceError($msg, i);
-            //         formValid = true;
-            //     }
-            // }
-            //
-            // if(formValid == true) {
-            //     e.preventDefault();
-            // }
     });
 
     var dateValue = $('#name').val();
@@ -2287,13 +2481,11 @@ $(document).ready(function () {
     });
     $(document).on('click', '.add-button', function() {
         var secondTable = $('#dtBasicExample2').DataTable();
-
+        var uniqueNumber = new Date().getTime() + '-' + Math.floor(Math.random() * 1000000);
         var rowData = [];
         var buttonType = $(this).data('button-type');
         var index = secondTable.data().length + 1;
-
         var row = $(this).closest('tr');
-
         rowData['button_type'] = buttonType;
         rowData['model_type'] = buttonType;
         rowData['index'] = index;
@@ -2324,6 +2516,7 @@ $(document).ready(function () {
         else if(buttonType == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
             var id = $(this).data('variant-id');
+            var modallineidad = $(this).data('modellineidad');
         }
         else if(buttonType == 'Accessory') {
             var table = $('#dtBasicExample5').DataTable();
@@ -2341,7 +2534,9 @@ $(document).ready(function () {
         }
         var modelLineId = $(this).data('model-line-id');
         rowData['model_line_id'] = modelLineId;
+        rowData['modallineidad'] = modallineidad;
         rowData['id'] = id;
+        rowData['number'] = uniqueNumber;
         secondTable.row.add(rowData).draw();
         table.row(row).remove().draw();
         resetSerialNumber(table);
@@ -2460,7 +2655,7 @@ $(document).ready(function () {
                 var slNo = 0;
                 var data = response.map(function(vehicle) {
                     slNo = slNo + 1;
-                    var addButton = '<button class="add-button" data-button-type="Vehicle" data-variant-id="'+ variantId +'" >Add</button>';
+                    var addButton = '<button class="add-button" data-button-type="Vehicle" data-variant-id="'+ variantId +'" data-modellineidad="'+ modelLineId +'">Add</button>';
                     return [
                         slNo,
                         // vehicle.grn_status,
@@ -2496,7 +2691,7 @@ $(document).ready(function () {
                         {
                             title: 'Actions',
                             render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-variant-id="'+ variantId +'" data-button-type="Vehicle" ></div>';
+                                return '<div class="circle-button add-button" data-variant-id="'+ variantId +'" data-button-type="Vehicle"  data-modellineidad="'+ modelLineId +'"></div>';
                             }
                         }
                     ]
@@ -2775,32 +2970,6 @@ $(document).ready(function () {
                        kitName = kit.addon_name.name;
                     }
                     var kitBrandName = kit.brandModelLineModelDescription;
-                    // if(kit.is_all_brands == 'no') {
-                    //     var kitBrandName = kit.brandModelLine[0].brands.brand_name;
-                    //     var kitBrand = '<table><thead><tr><th style="border: 1px solid #c4c4d4">Model Line</th><th style="border: 1px solid #c4c4d4">Model Description</th></thead><tbody>';
-                    //     var modelLineSize = 0;
-                    //     modelLineSize = (kit.brandModelLine[0].ModelLine).length;
-                    //     if(modelLineSize > 0) {
-                    //         for(var j=0; j < modelLineSize; j++) {
-                    //             kitBrand = kitBrand +'<tr><td style="border: 1px solid #c4c4d4">'+kit.brandModelLine[0].ModelLine[j].model_lines.model_line+'</td><td style="border: 1px solid #c4c4d4">';
-                    //             var modelDescSize = 0;
-                    //             modelDescSize = (kit.brandModelLine[0].ModelLine[j].allDes).length;
-                    //             if(modelDescSize > 0) {
-                    //                 kitBrand = kitBrand +'<table><tbody>';
-                    //                 for(var i=0; i < modelDescSize; i++) {
-                    //                     kitBrand = kitBrand +'<tr><td>';
-                    //                     if(i != 0) {
-                    //                         kitBrand = kitBrand +'<br style="line-height: 3px">';
-                    //                     }
-                    //                     kitBrand = kitBrand +kit.brandModelLine[0].ModelLine[j].allDes[i].model_description+'</td></tr>';
-                    //                 }
-                    //                 kitBrand = kitBrand +'</tbody></table>';
-                    //             }
-                    //             kitBrand = kitBrand +'</td></tr>';
-                    //         }
-                    //     }
-                    //     kitBrand = kitBrand +'</tbody></table>';
-                    // }
                     var kitItems = '';
                     var itemCount = (kit.kit_items).length;
                     if(itemCount > 0) {
@@ -2821,16 +2990,6 @@ $(document).ready(function () {
                             var kitSellingPrice = kit.selling_price.selling_price;
                         }
                     }
-                    // else if(kit.pending_selling_price != null) {
-                    //     if(kit.pending_selling_price != null) {
-                    //         if(kit.pending_selling_price != '0.00' || kit.pending_selling_price.selling_price != null) {
-                    //             var kitSellingPrice = kit.pending_selling_price.selling_price + ' (Approval Awaiting)';
-                    //         }
-                    //     }
-                    // }
-                    // else {
-                    //     var kitSellingPrice = 'Not Added';
-                    // }
                     else {
                         var kitSellingPrice = '';
                     }
@@ -2888,8 +3047,5 @@ $(document).ready(function () {
         return isEditable;
     }
         });
-
-
-
     </script>
 @endpush

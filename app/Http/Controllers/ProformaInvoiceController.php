@@ -18,6 +18,7 @@ use App\Models\MasterModelDescription;
 use App\Models\AddonDetails;
 use App\Models\SupplierAddons;
 use App\Models\AddonTypes;
+use App\Models\Addon;
 class ProformaInvoiceController extends Controller {
     public function proforma_invoice($callId) {
         $brands = Brand::all();
@@ -279,4 +280,20 @@ class ProformaInvoiceController extends Controller {
         }
         return response()->json($kits);
     }
-}
+    public function addonsModal($modelLineId)
+    {
+        info($modelLineId);
+        $modelLineId = $modelLineId;
+        $brands = MasterModelLines::where('id', $modelLineId)->pluck('brand_id')->first();
+        $assessoriesDesc = Addon::where('addon_type','P')->get();
+        $sparePartsDesc = Addon::where('addon_type','SP')->get();
+        $kitsDesc = Addon::where('addon_type','K')->get();
+        return response()->json([
+            'assessoriesDesc' => $assessoriesDesc,
+            'modelLineId' => $modelLineId,
+            'brands' => $brands,
+            'sparePartsDesc' => $sparePartsDesc,
+            'kitsDesc' => $kitsDesc,
+        ]);
+    }
+    }
