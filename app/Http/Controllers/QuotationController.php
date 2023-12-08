@@ -69,9 +69,11 @@ class QuotationController extends Controller
 //        $request->validate([
 //            'prices' => 'required'
 //        ]);
+        $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
+        $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
 
         DB::beginTransaction();
-        $isVehicle = 0;
+
         $call = Calls::find($request->calls_id);
         $call->status = 'Quoted';
         $call->save();
@@ -109,7 +111,7 @@ class QuotationController extends Controller
         $quotationDetail->shipping_port_id   = $request->shipping_port_id ;
         $quotationDetail->place_of_supply  = $request->place_of_supply;
         $quotationDetail->document_validity  = $request->document_validity;
-        $quotationDetail->system_code  = $request->system_code;
+//        $quotationDetail->system_code  = $request->system_code;
         $quotationDetail->payment_terms  = $request->payment_terms;
         $quotationDetail->representative_name = $request->representative_name;
         $quotationDetail->representative_number = $request->representative_number;
@@ -129,18 +131,27 @@ class QuotationController extends Controller
             $agentCommission->save();
         }
 
-//        $quotationItemIds = [];
-//        $quotationSubItemKeys = [];
+        $commissionAED = 0;
         foreach ($request->prices as $key => $price) {
+            if($request->system_code_currency[$key] == 'U') {
+                $amount = $request->system_code_amount[$key] * $aed_to_usd_rate->value;
+            }else{
+                $amount = $request->system_code_amount[$key];
+            }
+            $commissionAED = $commissionAED + $amount;
+
            $quotationItem = new QuotationItem();
            $quotationItem->unit_price = $price;
            $quotationItem->quantity = $request->quantities[$key];
            $quotationItem->description = $request->descriptions[$key];
            $quotationItem->total_amount = $request->total_amounts[$key];
+           $quotationItem->system_code_amount = $request->system_code_amount[$key];
+           $quotationItem->system_code_currency = $request->system_code_currency[$key];
            $quotationItem->quotation_id = $quotation->id;
            $quotationItem->is_addon = $request->is_addon[$key];
            $quotationItem->is_enable = isset($request->is_hide[$key]) ? true : false;
            $quotationItem->created_by = Auth::id();
+
 
            if($request->types[$key] == 'Shipping') {
 
@@ -198,6 +209,9 @@ class QuotationController extends Controller
 //            $isVehicle = 0;
         }
 
+        $quotationDetail->system_code = $commissionAED;
+        $quotationDetail->save();
+
 //        foreach ($quotationItemIds as $itemId) {
 //            $itemKeys = $quotationSubItemKeys[$itemId];
 //            foreach ($itemKeys as $itemKey) {
@@ -234,15 +248,16 @@ class QuotationController extends Controller
         DB::commit();
         $quotationDetail = QuotationDetail::with('country')->find($quotationDetail->id);
 
-//        $quotation = Quotation::find(26);
+//        $quotation = Quotation::find(14);
 //        $call = Calls::find($quotation->calls_id);
-//        $quotationDetail = QuotationDetail::with('country')->where('quotation_id', 26)->orderBy('id','DESC')->first();
+//        $quotationDetail = QuotationDetail::with('country')->where('quotation_id', 14)->orderBy('id','DESC')->first();
 
         $vehicles =  QuotationItem::where("reference_type", 'App\Models\Varaint')
             ->where('quotation_id', $quotation->id)->get();
 
         $otherVehicles = QuotationItem::whereNull('reference_type')
             ->whereNull('reference_id')
+            ->where('quotation_id', $quotation->id)
             ->where('is_enable', true)
             ->where('is_addon', false)
             ->get();
@@ -316,8 +331,7 @@ class QuotationController extends Controller
             $data['sales_office'] = $salesPersonDetail->office;
             $data['sales_phone'] = $salesPersonDetail->contact_number;
         }
-        $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
-        $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
+
 //        $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
 //            ->where('quotation_id', $quotation->id)
 //            ->whereIn('reference_type',['App\Models\ShippingDocuments','App\Models\Shipping',

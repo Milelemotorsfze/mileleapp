@@ -487,6 +487,7 @@
                                         <th style="margin-left: 10px;">Code</th>
                                         <th>Unit Price</th>
                                         <th>Quantity</th>
+                                        <th>System Code</th>
                                         <th>Total Amount</th>
                                         <th>Action</th>
                                     </tr>
@@ -1616,6 +1617,7 @@ $(document).ready(function () {
         $('#brand').on('change', function() {
         var brandId = $(this).val();
         if (brandId ) {
+
             $('#model_line').prop('disabled', false);
             $('#model_line').empty().append('<option value="">Select Model Line</option>');
             $('#variant').prop('disabled', true);
@@ -1629,6 +1631,11 @@ $(document).ready(function () {
                         $('#model_line').append('<option value="' + key + '">' + value + '</option>');
                     });
                     $('#model_line').append('<option value="Other">Other</option>');
+                    if(brandId == 'Other') {
+                        $('#model_line').val('Other');
+                        $('#model_line').trigger('change');
+
+                    }
                 }
             });
         } else {
@@ -1709,6 +1716,11 @@ $(document).ready(function () {
                         $('#accessories_model_line').append('<option value="' + key + '">' + value + '</option>');
                     });
                     $('#accessories_model_line').append('<option value="Other">Other</option>');
+                    if(brandId == 'Other') {
+                        $('#accessories_model_line').val('Other');
+                        $('#accessories_model_line').trigger('change');
+
+                    }
                 }
             });
         } else {
@@ -1731,6 +1743,11 @@ $(document).ready(function () {
                         $('#spare_parts_model_line').append('<option value="' + key + '">' + value + '</option>');
                     });
                     $('#spare_parts_model_line').append('<option value="Other">Other</option>');
+                    if(brandId == 'Other') {
+                        $('#spare_parts_model_line').val('Other');
+                        $('#spare_parts_model_line').trigger('change');
+
+                    }
                 }
             });
         } else {
@@ -1753,7 +1770,10 @@ $(document).ready(function () {
                         $('#kit_model_line').append('<option value="' + key + '">' + value + '</option>');
                     });
                     $('#kit_model_line').append('<option value="Other">Other</option>');
-
+                    if(brandId == 'Other') {
+                        $('#kit_model_line').val('Other');
+                        $('#kit_model_line').trigger('change');
+                    }
                 }
             });
         } else {
@@ -1853,11 +1873,25 @@ $(document).ready(function () {
                 targets: -3,
                 data: null,
                 render: function (data, type, row) {
+                    return '<div class="input-group mb-3"> ' +
+                                '<input type="number" min="0"  value="1" step="1" class="system-code form-control"  name="system_code_amount[]"  id="system-code-amount-'+ row['index'] +'" />' +
+                                '<div class="input-group-append"> ' +
+                                    '<select class="form-control" name="system_code_currency[]"  id="system-code-currency-'+ row['index'] +'">' +
+                                        '<option value="A">A</option><option value="U">U</option>' +
+                                '</select>' +
+                                '</div> ' +
+                            '</div>';
+                }
+            },
+            {
+                targets: -4,
+                data: null,
+                render: function (data, type, row) {
                     return '<input type="number" min="0"  value="1" step="1" class="qty-editable form-control" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)"  required name="quantities[]"  id="quantity-'+ row['index'] +'" />';
                 }
             },
             {
-                targets: -6,
+                targets: -7,
                 data: null,
                 render: function (data, type, row) {
                     console.log(row);
@@ -1913,7 +1947,7 @@ $(document).ready(function () {
                 }
             },
             {
-                targets: -5,
+                targets: -6,
                 data: null,
                 render: function (data, type, row) {
                     console.log(row);
@@ -1938,7 +1972,7 @@ $(document).ready(function () {
                 }
             },
             {
-                targets: -4,
+                targets: -5,
                 data: null,
                 render: function (data, type, row) {
                     var price = "";

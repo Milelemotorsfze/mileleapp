@@ -11,10 +11,10 @@
             font-size: 12px;
         }
         .header{
-            background-color: #0f2c52;
+            /*background-color: #0f2c52;*/
             padding-right: 10px;
             padding-left: 10px;
-            color: #FFFFFF;
+            color: #000000;
             font-weight: bold;
         }
         table {
@@ -45,7 +45,7 @@
             <table style="width: 100%;">
                 <tr>
                     <td>
-                        <img src="{{ public_path('images/proforma/proforma_logo.png') }}" width="300px" height="85px" ><span class="logo-txt"></span>
+                        <img src="{{ public_path('images/proforma/milele_logo.png') }}" width="300px" height="80px" ><span class="logo-txt"></span>
                     </td>
                     <td style="text-align:right;font-size: 10px;">
                         <p style="font-weight: bold;text-align:right;margin-bottom: 5px;font-size: 16px;">
@@ -56,7 +56,7 @@
                             @endif
                         </p>
                         <p class="margin-0" style="text-align:right;"> Office No-AF 07, Block A,Samari Retail </p>
-                        <p class="margin-0"> Ras al khor, United Arab Emirates </p>
+                        <p class="margin-0"> Ras Al khor, United Arab Emirates </p>
                         <p class="margin-0"> Tel.: +97143235991 | Email: info@milele.com </p>
                         <p class="margin-0"> Website: www.milele.com </p>
                         <p style="font-weight: bold;margin-top: 5px;"> VAT TRN NO. 100057588400003 </p>
@@ -66,7 +66,7 @@
         </div>
         <div  style="color: black">
             <table style="border: none;">
-                <tr style="background-color: #0f2c52;color: #FFFFFF;font-weight: bold">
+                <tr style="font-weight: bold;background-color: #bbbbbd">
                     <td colspan="2">Document Details</td>
                     <td colspan="2">Client Details</td>
                     <td colspan="2">Delivery Details</td>
@@ -139,21 +139,20 @@
 
         <div  style="color: black">
             <table style="border: none;">
-                <tr style="background-color: #0f2c52;color: #FFFFFF;font-weight: bold">
+                <tr style="background-color: #bbbbbd;color: #000000;font-weight: bold">
                     <td colspan="2">Payment Details</td>
                     <td colspan="4">Client  Representative</td>
                 </tr>
                 <tr>
-                    <td style="font-weight: bold;">System Code :</td>
-                    <td>{{ $quotationDetail->system_code }}</td>
+                    <td style="font-weight: bold;">Payment Terms :</td>
+                    <td>{{ $quotationDetail->payment_terms }}</td>
                     <td style="font-weight: bold;">Rep Name :</td>
                     <td> {{ $quotationDetail->representative_name }}</td>
                     <td style="font-weight: bold;"> CB Name :</td>
                     <td> {{ $quotationDetail->cb_name }} </td>
                 </tr>
                 <tr>
-                    <td style="font-weight: bold;">Payment Terms :</td>
-                    <td>{{ $quotationDetail->payment_terms }}</td>
+                    <td></td><td></td>
                     <td style="font-weight: bold;">Rep No. :</td>
                     <td> {{ $quotationDetail->representative_number }}</td>
                     <td style="font-weight: bold;"> CB No :</td>
@@ -162,13 +161,11 @@
             </table>
         </div>
 
-        <div class="header">
-            <p style="font-weight: bold;padding-top:10px;padding-bottom: 10px;text-align: center"> I. DESCRIPTION AND BREAKDOWN OF GOODS </p>
-        </div>
         <table id="details">
             @if($vehicles->count() > 0 || $variants->count() > 0)
-                <tr style="background-color: #0f2c52;color:#FFFFFF;font-size: 15px;">
+                <tr style="font-size: 12px;background-color: #bbbbbd;">
                     <th>VEHICLE</th>
+                    <th>SYSTEM CODE</th>
                     <th>QTY</th>
                     <th>PRICE</th>
                     <th>AMOUNT</th>
@@ -176,6 +173,7 @@
                 @foreach($vehicles as $key => $vehicle)
                     <tr style="color: #02023f">
                         <td> <span style="font-weight: bold;font-size: 14px;" > {{ $key+1 }}. </span> {{ $vehicle->description }}</td>
+                        <td> {{$vehicle->system_code_currency ." ". number_format($vehicle->system_code_amount, 2) }}</td>
                         <td>{{ $vehicle->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($vehicle->unit_price, 2) }} </td>
                         <td> <?php $totalAmount = $vehicle->unit_price * $vehicle->quantity ?>
@@ -196,6 +194,7 @@
                 @foreach($variants as $key => $variant)
                     <tr style="color: #02023f;">
                         <td> <span style="font-weight: bold;font-size: 14px;" > {{ $vehicles->count() + $key+1 }}. </span> {{ $variant->description }}</td>
+                        <td> {{$variant->system_code_currency ." ". number_format($variant->system_code_amount, 2) }}</td>
                         <td>{{ $variant->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($variant->unit_price, 2) }}</td>
                         <td> <?php $totalAmount = $variant->unit_price * $variant->quantity ?>
@@ -217,6 +216,7 @@
                 @foreach($otherVehicles as $key => $otherVehicle)
                     <tr style="color: #02023f;">
                         <td> <span style="font-weight: bold;font-size: 14px;" > {{ $variants->count() + $vehicles->count() + $key+1 }}. </span> {{ $otherVehicle->description }}</td>
+                        <td> {{ $otherVehicle->system_code_currency ." ". number_format($otherVehicle->system_code_amount, 2) }}</td>
                         <td>{{ $otherVehicle->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($otherVehicle->unit_price, 2) }}</td>
                         <td> <?php $totalAmount = $otherVehicle->unit_price * $otherVehicle->quantity ?>
@@ -225,15 +225,17 @@
                 @endforeach
             @endif
             @if($shippingDocuments->count() > 0 || $shippingCharges->count() > 0)
-                <tr style="background-color: #0f2c52;color:#FFFFFF;font-size: 15px;">
-                    <th>LOGISTICS</th>
-                    <th>QTY</th>
-                    <th>PRICE</th>
-                    <th>AMOUNT</th>
+                <tr style="font-size: 12px;">
+                    <th colspan="5">LOGISTICS</th>
+{{--                    <th>SYSTEM CODE</th>--}}
+{{--                    <th>QTY</th>--}}
+{{--                    <th>PRICE</th>--}}
+{{--                    <th>AMOUNT</th>--}}
                 </tr>
                 @foreach($shippingCharges as $key => $shippingCharge)
                     <tr>
                         <td><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>{{ $shippingCharge->description }}</td>
+                        <td> {{$shippingCharge->system_code_currency ."". $shippingCharge->system_code_amount }}</td>
                         <td>{{ $shippingCharge->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($shippingCharge->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($shippingCharge->total_amount, 2) }}</td>
@@ -242,6 +244,7 @@
                 @foreach($shippingDocuments as $key => $shippingDocument)
                     <tr>
                         <td><span style="font-weight: bold;margin-right: 5px;" > {{ $shippingCharges->count() + $key+1 }}. </span> {{ $shippingDocument->description }}</td>
+                        <td> {{$shippingDocument->system_code_currency ."". $shippingDocument->system_code_amount }}</td>
                         <td>{{ $shippingDocument->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($shippingDocument->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($shippingDocument->total_amount, 2) }}</td>
@@ -250,15 +253,17 @@
             @endif
 
             @if($addons->count() > 0 || $directlyAddedAddons->count() > 0)
-                <tr style="background-color: #0f2c52;color:#FFFFFF;font-size: 15px;">
-                    <th> ADDONS AND EXTRA ITEM </th>
-                    <th>QTY</th>
-                    <th>PRICE</th>
-                    <th>AMOUNT</th>
+                <tr style="font-size: 12px;">
+                    <th colspan="5"> ADDONS AND EXTRA ITEM </th>
+{{--                    <th>SYSTEM CODE</th>--}}
+{{--                    <th>QTY</th>--}}
+{{--                    <th>PRICE</th>--}}
+{{--                    <th>AMOUNT</th>--}}
                 </tr>
                 @foreach($addons as $key => $addon)
                     <tr>
                         <td> <span style="font-weight: bold;margin-right: 5px;" > {{ $key + 1 }}. </span> {{ $addon->description }}</td>
+                        <td> {{ $addon->system_code_currency ."". $addon->system_code_amount }}</td>
                         <td>{{ $addon->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($addon->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($addon->total_amount, 2) }}</td>
@@ -267,6 +272,7 @@
                 @foreach($directlyAddedAddons as $key => $directlyAddedAddon)
                     <tr>
                         <td><span style="font-weight: bold;margin-right: 5px;" > {{ $addons->count() + $key+1 }}. </span> {{ $directlyAddedAddon->description }}</td>
+                        <td> {{ $directlyAddedAddon->system_code_currency ."". $directlyAddedAddon->system_code_amount }}</td>
                         <td>{{ $directlyAddedAddon->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($directlyAddedAddon->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($directlyAddedAddon->total_amount, 2) }}</td>
@@ -275,6 +281,7 @@
                     @foreach($OtherAddons as $key => $OtherAddon)
                         <tr>
                             <td><span style="font-weight: bold;margin-right: 5px;" > {{ $directlyAddedAddons->count() + $addons->count() + $key+1 }}. </span> {{ $OtherAddon->description }}</td>
+                            <td> {{$OtherAddon->system_code_currency ."". $OtherAddon->system_code_amount }}</td>
                             <td>{{ $OtherAddon->quantity }}</td>
                             <td>{{ $quotation->currency ." ". number_format($OtherAddon->unit_price, 2) }}</td>
                             <td>{{ $quotation->currency ." ". number_format($OtherAddon->total_amount, 2) }}</td>
@@ -289,15 +296,17 @@
 
             @endif
             @if($shippingCertifications->count() > 0 || $otherDocuments->count() > 0)
-                <tr style="background-color: #0f2c52;color:#FFFFFF;font-size: 15px;">
-                    <th> COMPLIANCE AND CERTIFICATES</th>
-                    <th>QTY</th>
-                    <th>PRICE</th>
-                    <th>AMOUNT</th>
+                <tr style="font-size: 12px;">
+                    <th colspan="5"> COMPLIANCE AND CERTIFICATES</th>
+{{--                    <th>SYSTEM CODE</th>--}}
+{{--                    <th>QTY</th>--}}
+{{--                    <th>PRICE</th>--}}
+{{--                    <th>AMOUNT</th>--}}
                 </tr>
                 @foreach($shippingCertifications as $key => $shippingCertification)
                     <tr>
                         <td><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>  {{ $shippingCertification->description }}</td>
+                        <td> {{ $shippingCertification->system_code_currency ."". $shippingCertification->system_code_amount }}</td>
                         <td>{{ $shippingCertification->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($shippingCertification->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($shippingCertification->total_amount, 2) }}</td>
@@ -306,6 +315,7 @@
                 @foreach($otherDocuments as $key => $otherDocument)
                     <tr>
                         <td><span style="font-weight: bold;margin-right: 5px;" > {{ $shippingCertifications->count() + $key+1 }}. </span>  {{ $otherDocument->description }}</td>
+                        <td> {{$otherDocument->system_code_currency ."". $otherDocument->system_code_amount }}</td>
                         <td>{{ $otherDocument->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($otherDocument->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($otherDocument->total_amount, 2) }}</td>
@@ -313,8 +323,8 @@
                 @endforeach
             @endif
                 @if($quotation->document_type == 'Proforma Invoice')
-                    <tr style="background-color: #0f2c52;color:#FFFFFF;font-size: 15px;">
-                        <th colspan="3"> DEPOSIT / PAYMENT RECEIVED</th>
+                    <tr style="background-color: #0f2c52;color:#FFFFFF;font-size: 12px;">
+                        <th colspan="4"> DEPOSIT / PAYMENT RECEIVED</th>
                         <th>AMOUNT</th>
                     </tr>
                     <tr>
@@ -397,8 +407,10 @@
         @endif
         <p>I hereby acknowledge to honor the payment by the agreed due date.</p>
          <p> In case of my failure to clear payment on time, I stand to lose the right to my payments and my order may be delayed or subject to cancellation.</p>
+        @if($quotation->shipping_method == 'CNF')
         <p> Customs clearance, taxes, duty, value added taxes or any other charges related to the above mentioned goods are the sole responsibility of the client.</p>
-        <p style="font-weight: bolder">
+        @endif
+            <p>
             Any payments which are made to Milele Motors FZE are non refundable & the price will be changed based on the new market price, and seller has right to sell the cars
             without prior notice to buyer.
         </p>
@@ -409,15 +421,17 @@
             unilateral acceptance of these terms. Before making any transaction, the buyer has had the full opportunity to review these terms in detail, thereby affirming their understanding and
             acceptance.
         </p>
-        @if($quotation->currency == 'USD')
-           <p style="font-weight: bolder"> Currency Exchange </p>
-            <p> Bank Payments AED transfers at actuals. USD transfer at {{ $aed_to_usd_rate->value }} and customer must remit $50 equivalent extra to cover for bank fees.
-                Cash Payments AED at actuals, USD New Bills $100 at {{ $aed_to_usd_rate->value }}, all other bills at 3.60. </p>
-        @elseif($quotation->currency == 'EURO')
-            <p style="font-weight: bolder"> Currency Exchange </p>
-            <p> Bank Payments AED transfers at actuals. EUR transfer at {{ $aed_to_eru_rate->value }} and customer must remit EUR 50 equivalent extra to cover for bank fees.
-                Cash Payments AED at actuals, USD New Bills EUR 100 at {{ $aed_to_eru_rate->value }}, all other bills at
-                {{ $aed_to_eru_rate }}. </p>
+        @if($quotation->shipping_method == 'EXW')
+
+               <p style="font-weight: bolder"> Currency Exchange </p>
+                <p style="font-size: 12px;"> Bank Payments AED transfers at actuals. USD transfer at  {{ $aed_to_usd_rate->value }} and customer must remit $50 equivalent extra to cover for bank fees.</p>
+            <p style="font-size: 12px;"> Cash Payments AED at actuals, USD New Bills $100 at {{ $aed_to_usd_rate->value }}, all other bills at 3.60. </p>
+            @if($quotation->currency == 'EURO')
+                <p style="font-weight: bolder"> Currency Exchange </p>
+                <p style="font-size: 12px;"> Bank Payments AED transfers at actuals. EUR transfer at {{ $aed_to_eru_rate->value }} and customer must remit EUR 50 equivalent extra to cover for bank fees.</p>
+                <p style="font-size: 12px;"> Cash Payments AED at actuals, USD New Bills EUR 100 at {{ $aed_to_eru_rate->value }}, all other bills at
+                    {{ $aed_to_eru_rate }}. </p>
+            @endif
         @endif
         <table>
             <td style="font-weight: bold">
