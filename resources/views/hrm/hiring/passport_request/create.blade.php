@@ -335,129 +335,77 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         <br />
 
         <hr />
-        <div class="col-lg-6 col-md-12 col-sm-12 col-12">
-            <div class="passportSubmitReleaseDropDownInputContainer">
-                <label for="choose-passport-req" class="form-label"><span class="error">* </span><b>Choose your option for the passport:</b></label>
-                <div class="col-lg-5 col-md-10 col-sm-9 col-11">
-                    <select name="passport_request_dropdown" id="passport_request_dropdown" class="form-control widthinput" onchange="showPassportRequestInput(this)" value="{{$data->passport_with}}">
-                        <option value="" >Choose Option</option>
-                        <option value="with_employee">Submission of Passport</option>
-                        <option value="with_company">Release of Passport</option>
-                    </select>
-                </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-12 passportSubmitReleaseDropDownInputContainer" id="passportSubmitReleaseDropDownInputContainer" style="display: none;">
+            <!-- <div class=""> -->
+            <label for="choose-passport-req" class="form-label"><span class="error">* </span><b>Choose your option for the passport:</b></label>
+            <div class="col-lg-4 col-md-6 col-sm-12 col-12">
+                <select name="passport_request_dropdown" id="passport_request_dropdown" class="form-control widthinput" value="{{$data->passport_with}}">
+                    <option value="">Choose Option</option>
+                    <option value="with_employee">Submission of Passport</option>
+                    <option value="with_company">Release of Passport</option>
+                </select>
             </div>
-        </div>
+            <!-- </div> -->
 
-        <br />
-        
-        <div class="col-lg-12">
+            <br />
 
-            <!-- Passport Submission Input Container -->
-            <div class="submit-passport-section-div">
-                <div class="submitPassportInputContainer" id="submitPassportInputContainer" style="display: none">
-                    <div>
-                        <h5>Submit of Passport:</h5>
-                    </div>
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                            <label for="purposes_of_submit" class="form-label"><strong>I, the undersigned,</strong> consent to authorize
-                                the Human Resource Department to take possession of my passport for purposes of :</label>
-                            <div class="row">
-                                <!-- First Row of List Items -->
-                                <div class="col-lg-4">
-                                    <ul class="list-group">
-                                        <li class="list-group-item">
-                                            <input type="checkbox" id="purposes_of_submit" name="passport_submit[]" value="purposes_of_submit">
-                                            <label for="purposes_of_submit">Safekeeping</label>
-                                        </li>
-                                        <li class="list-group-item">
-                                            <input type="checkbox" id="purposes_of_submit" name="passport_submit[]" value="purposes_of_submit">
-                                            <label for="purposes_of_submit">My dealing with Cash</label>
-                                        </li>
-                                        <li class="list-group-item">
-                                            <input type="checkbox" id="purposes_of_submit" name="passport_submit[]" value="purposes_of_submit">
-                                            <label for="purposes_of_submit">My dealing with Sensitive Data</label>
-                                        </li>
-                                    </ul>
-                                </div>
+            <div class="col-lg-12 ">
 
-                            </div>
+                <!-- Passport Submission Input Container -->
+                <div class="submitPassportInputContainer" id="submitPassportInputContainer" style="display: none;">
+                    <div class="submit-passport-section-div">
+                        <div>
+                            <h6>Submit Passport:</h6>
                         </div>
-                    </div>
-
-                    <div class="col-lg-10 col-md-10 col-sm-10 col-12">
-                        <p class="submit-passport-para">However, I can withdraw my passport when required by fulfilling the necessary requirements</p>
-                    </div>
-                </div>
-
-            </div>
-
-
-            <!-- Passport Release Input Container -->
-
-            @php
-            $listItems = [
-            'Leave', 'Passport Renewal', 'ATM / Bank', 'Embassy Formalities', 'Driving License', 'Car Registration',
-            'Family Visa/Passport Application', 'Visa Applications', 'E-Gate Card'
-            ];
-
-            @endphp
-
-            <div class="release-passport-section-div">
-                <div class="releasePassportInputContainer" id="releasePassportInputContainer" style="display: none;">
-                    <div>
-                        <h5>Release of Passport:</h5>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                            <label for="purposes_of_release" class="form-label">
-                                <strong>I, the undersigned,</strong> would like to collect my passport for the following purpose :
-                            </label>
-                            <div class="row">
-                                <?php foreach ($listItems as $item) : ?>
-                                    <div class="col-lg-4 col-md-4">
-                                        <ul class="list-group">
-                                            <li class="list-group-item">
-                                                <input type="checkbox" id="purposes_of_release" name="passport_release[]" value="purposes_of_release">
-                                                <label for="purposes_of_release"><?= $item; ?></label>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                <?php endforeach; ?>
-
-                                <!-- Other Checkbox and Input -->
-                                <div class="row">
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                                        <div class="other-checklist-div">
-                                            <div class="d-flex align-items-center" style="flex-wrap: wrap">
-                                                <div class="col-lg-3 col-md-3 col-sm-6 col-12 form-check">
-                                                    <input type="checkbox" id="release_purpose" name="release_purpose" class="form-check-input" value="release_purpose">
-                                                    <label for="release_purpose" class="form-check-label">Other, please specify:</label>
-                                                </div>
-                                                <div class="other-input-container">
-                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                                                        <input type="text" class="form-control" name="release_purpose" id="release_purpose">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
+                        <p class="form-label"><span class="error">* </span><strong>I, the undersigned,</strong> consent to authorize
+                            the Human Resource Department to take possession of my passport for purposes of :</p>
+                        <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
+                            <div class="dropdown-option-div">
+                                <select name="purposes_of_submit" id="purposes_of_submit_id" class="form-control widthinput" multiple="true" autofocus>
+                                    @foreach($submissionPurpose as $PassportRequestPurpose)
+                                    <option value="{{ $PassportRequestPurpose->id }}">{{ $PassportRequestPurpose->name ?? ''}}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+                        <div class="col-lg-10 col-md-10 col-sm-10 col-12">
                             <p class="submit-passport-para">However, I can withdraw my passport when required by fulfilling the necessary requirements</p>
                         </div>
                     </div>
                 </div>
+
+
+
+                <!-- Passport Release Input Container -->
+
+                <div class="releasePassportInputContainer" id="releasePassportInputContainer" style="display: none;">
+                    <div class="release-passport-section-div">
+                        <div>
+                            <h6>Release Passport:</h6>
+                        </div>
+                        <p class="form-label"><span class="error">* </span><strong>I, the undersigned,</strong> consent to authorize
+                            the Human Resource Department to take possession of my passport for purposes of :</p>
+                        <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
+                            <div class="dropdown-option-div">
+                                <select name="purposes_of_release" id="purposes_of_release_id" class="form-control widthinput" multiple="true" autofocus>
+                                    @foreach($releasePurpose as $PassportRequestPurpose)
+                                    <option value="{{ $PassportRequestPurpose->id }}">{{ $PassportRequestPurpose->name ?? ''}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-10 col-md-10 col-sm-10 col-12">
+                            <p class="submit-passport-para">However, I can withdraw my passport when required by fulfilling the necessary requirements</p>
+                        </div>
+                    </div>
+                </div>
+                <hr />
             </div>
 
         </div>
 
-
-        <hr />
 
         <!-- Signatures Div -->
         <!-- <div class="col-lg-6 col-md-12 col-sm-12 col-12">
@@ -600,6 +548,18 @@ redirect()->route('home')->send();
             placeholder: "Choose User Name",
         });
 
+        $('#purposes_of_submit_id').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder: "Choose Passport Submission Purpose",
+        });
+
+        $('#purposes_of_release_id').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder: "Choose Passport Release Purpose",
+        });
+
         // Execute with changing emp id value 
 
         function togglePassportRequestDetailsDiv() {
@@ -647,20 +607,51 @@ redirect()->route('home')->send();
                     $('.emp-job-location').text(data[i].emp_profile.work_location || '');
                     console.log("Drop down passport request value in update function : ", data[i].passport_with);
                     $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
+
+                    showPassportRequestInput();
                     break;
                 }
             }
         }
 
+
         // Update the location from dropdown
 
         function clearFields() {
+
+            var container = $('#passportSubmitReleaseDropDownInputContainer');
+            container.hide();
             $('.employee-code-id').text('');
             $('.emp-designation').text('');
             $('.emp-mobile-num').text('');
             $('.emp-department').text('');
             $('.emp-job-location').text('');
             $('.passport_request_dropdown').val('');
+            $('.passport-submit-release-main-div').hide();
+            $('.passportSubmitReleaseDropDownInputContainer').hide();
+
+        }
+
+        function showPassportRequestInput() {
+            console.log("Dropdown changed!");
+
+            var container = $('#passportSubmitReleaseDropDownInputContainer');
+
+            if ($('#passport_request_dropdown').length) {
+                var selectedValue = $('#passport_request_dropdown').val();
+                console.log("Selected value:", selectedValue);
+
+                $('#submitPassportInputContainer').toggle(selectedValue == 'with_employee');
+                $('#releasePassportInputContainer').toggle(selectedValue == 'with_company');
+
+                if (selectedValue == 'with_employee' || selectedValue == 'with_company') {
+                    container.show();
+                } else {
+                    container.hide();
+                }
+            } else {
+                console.error("Dropdown element not found!");
+            }
         }
 
         $('#employee_name_id').on('change', function() {
@@ -677,6 +668,18 @@ redirect()->route('home')->send();
                 updateFieldsBasedOnEmpId(selectedEmpId);
             }
         });
+        $('#passport_request_dropdown').on('change', showPassportRequestInput);
+
+        $('#purposes_of_release_id').on('change', function() {
+            var fieldName = $(this).attr('name');
+            $('#employeePassportRequestForm').validate().element('[name="' + fieldName + '"]');
+        });
+
+        $('#purposes_of_submit_id').on('change', function() {
+            var fieldName = $(this).attr('name');
+            $('#employeePassportRequestForm').validate().element('[name="' + fieldName + '"]');
+        });
+        
 
         $('#employeePassportRequestForm').submit(function(event) {
 
@@ -727,12 +730,4 @@ redirect()->route('home')->send();
     });
 </script>
 
-
-<script>
-    function showPassportRequestInput(element) {
-        var selectedValue = element.value;
-        document.getElementById('submitPassportInputContainer').style.display = selectedValue == 'with_employee' ? 'block' : 'none';
-        document.getElementById('releasePassportInputContainer').style.display = selectedValue == 'with_company' ? 'block' : 'none';
-    }
-</script>
 @endpush
