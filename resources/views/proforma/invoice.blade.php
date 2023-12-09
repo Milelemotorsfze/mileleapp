@@ -302,7 +302,6 @@
                     <div class="col-sm-6">
                         Company :
                     </div>
-{{--                    value="{{ $callDetails->company_name }}"--}}
                     <div class="col-sm-6">
                         <input type="text" class="form-control form-control-xs" name="company_name" id="company" placeholder="Company Name">
                     </div>
@@ -521,6 +520,7 @@
                                         <th>System Code</th>
                                         <th>Unit Price</th>
                                         <th>Quantity</th>
+                                        <th>System Code</th>
                                         <th>Total Amount</th>
                                         <th>Action</th>
                                     </tr>
@@ -969,7 +969,6 @@
             </div>
 
         </div>
-
         <div id="certificateContent" class="contentveh">
             <hr>
             <br>
@@ -1130,7 +1129,7 @@
 {{--    </div>--}}
 </div>
 <div class="modal fade addonsModal-modal" id="addonsModal" tabindex="-1" aria-labelledby="addonsModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="addonsModalLabel">Adding Addons</h5>
@@ -1147,37 +1146,51 @@
     </div>
     <div class="col-lg-8 col-md-12 col-sm-12">
         <select class="form-select" name="addonTypevehicles">
+        <option value="" selected disabled>Select Type</option>
             <option value="accessories">Accessories</option>
             <option value="spareParts">Spare Parts</option>
             <option value="kits">Kits</option>
         </select>
     </div>
 </div>
+<br>
 <div id="accessoriesDropdownDiv" class="row" style="display:none;">
-    <div class="col-lg-12">
+    <div class="row">
+    <div class="col-lg-4 col-md-12 col-sm-12">
         <label class="form-label">Accessories</label>
+        </div>
+    <div class="col-lg-8 col-md-12 col-sm-12">
         <select class="form-select" name="accessoriesDropdown">
             <!-- Populate options dynamically using JavaScript -->
         </select>
     </div>
+    </div>
 </div>
 
 <div id="sparePartsDropdownDiv" class="row" style="display:none;">
-    <div class="col-lg-12">
+    <div class="row">
+    <div class="col-lg-4 col-md-12 col-sm-12">
         <label class="form-label">Spare Parts</label>
+</div>
+<div class="col-lg-8 col-md-12 col-sm-12">
         <select class="form-select" name="sparePartsDropdown">
             <!-- Populate options dynamically using JavaScript -->
         </select>
     </div>
 </div>
+</div>
 
 <div id="kitsDropdownDiv" class="row" style="display:none;">
-    <div class="col-lg-12">
+    <div class="row">
+    <div class="col-lg-4 col-md-12 col-sm-12">
         <label class="form-label">Kits</label>
+        </div>
+<div class="col-lg-8 col-md-12 col-sm-12">
         <select class="form-select" name="kitsDropdown">
             <!-- Populate options dynamically using JavaScript -->
         </select>
     </div>
+     </div>
 </div>
 <!-- DataTable Container -->
 <hr>
@@ -1197,8 +1210,11 @@
 <script>
 $('#dtBasicExample2').on('click', '.addons-button', function () {
     var modelLineId = $(this).data('model-line-id');
+    var Indexdatarows = $(this).data('index');
     var RowId = $(this).data('number');
+
     $('#addonsModal').modal('show');
+    clearDataTable();
     $.ajax({
         url: '/addons-modal-forqoutation/' + modelLineId,
         method: 'GET',
@@ -1211,6 +1227,12 @@ $('#dtBasicExample2').on('click', '.addons-button', function () {
             console.error('Error fetching addons:', error);
         }
     });
+    function clearDataTable() {
+        if ($.fn.DataTable.isDataTable('#addonDataTable')) {
+            $('#addonDataTable').DataTable().clear().destroy();
+            $('#addonDataTableContainer').hide();
+        }
+    }
     function populateDropdowns(data) {
     populateDropdown('accessories', data.assessoriesDesc);
     populateDropdown('spareParts', data.sparePartsDesc);
@@ -1223,6 +1245,7 @@ $('#dtBasicExample2').on('click', '.addons-button', function () {
     function populateDropdown(type, options) {
         var dropdown = $('select[name="' + type + 'Dropdown"]');
         dropdown.empty();
+        dropdown.append('<option value="" selected disabled>Select Please</option>');
         $.each(options, function (index, value) {
             dropdown.append('<option value="' + value.id + '">' + value.name + '</option>');
         });
@@ -1292,7 +1315,7 @@ $('select.form-select').change(function () {
                             accessory.id
                         ];
                 });
-                            if ($.fn.DataTable.isDataTable('#addonDataTable')) {
+                    if ($.fn.DataTable.isDataTable('#addonDataTable')) {
                     $('#addonDataTable').DataTable().destroy();
                 }
                 $('#addonDataTable').DataTable({
@@ -1309,7 +1332,7 @@ $('select.form-select').change(function () {
                             title: 'Add Into Quotation',
                             render: function(data, type, row) {
                                 var accessoryId = row[row.length - 1];
-                                return '<div class="circle-button add-button-addonsinner" data-button-type="Accessory" data-row-id="' + RowId + '" data-accessory-id="' + accessoryId + '"></div>';
+                                return '<div class="circle-button add-button-addonsinner" data-button-type="Accessory" data-row-id="' + RowId + '" data-accessory-id="' + accessoryId + '"data-index-rowas="' + Indexdatarows + '"></div>';
                             }
                         }
                     ]
@@ -1323,6 +1346,7 @@ $('#addonDataTable').on('click', '.add-button-addonsinner', function () {
     var mainTable = $('#dtBasicExample2').DataTable();
     var buttonType = $(this).data('button-type');
     rowData['model_type'] = buttonType;
+    var datainc = $(this).data('index-rowas');
     var index = mainTable.data().length + 1;
         rowData['button_type'] = buttonType;
         rowData['index'] = index;
@@ -1339,27 +1363,25 @@ $('#addonDataTable').on('click', '.add-button-addonsinner', function () {
             var id = $(this).data('kit-id');
             var rowId = $(this).data('row-id');
         }
+    var table = $('#addonDataTable').DataTable();
 
-        var table = $('#addonDataTable').DataTable();
-            rowData['id'] = id;
-            rowData['rowId'] = rowId;
-
-        var row = $(this).closest('tr');
-        row.find('td').each(function() {
+    rowData['id'] = id;
+    rowData['rowId'] = rowId;
+    var row = $(this).closest('tr');
+    row.find('td').each(function() {
         rowData.push($(this).html());
-            });
-        // Get the accessory ID, row ID, and other relevant data
-        var accessoryId = $(this).data('accessory-id');
-        var subRowId = $(this).data('row-id');
-        mainTable.row.add(rowData).draw();
-        table.row(row).remove().draw();
-        resetSerialNumber(table);
-
-        var newRowNode = mainTable.row(newRow).node();
-        $(newRowNode).addClass('highlight');
-        $('html, body').animate({
-            scrollTop: $(newRowNode).offset().top
-        }, 1000);
+    });
+    var accessoryId = $(this).data('accessory-id');
+    var subRowId = $(this).data('row-id');
+    var newIndex = parseInt(datainc) + 1;
+    var addedRow = mainTable.row.add(rowData).draw();
+    var currentIndex = mainTable.row(addedRow.node()).index();
+    if (currentIndex !== newIndex) {
+        var data = mainTable.data().toArray();
+        data.splice(currentIndex, 1);
+        data.splice(newIndex, 0, rowData);
+        mainTable.clear().rows.add(data).draw();
+    }
 });
 
 // Event handler for removing a row
@@ -1824,7 +1846,7 @@ $(document).ready(function () {
             }else{
                 $('#export-shipment').attr('hidden', false);
                 $('#local-shipment').attr('hidden', true);
-                $('#place_of_supply').val('');
+
             }
             showPriceInSelectedValue();
             calculateTotalSum();
@@ -2135,17 +2157,17 @@ $(document).ready(function () {
             {
     targets: -1,
     data: null,
-            render: function (data, type, row) {
-                var directAdd = 'Direct-Add';
-                var removeButtonHtml = '<button class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
-                if (row['button_type'] === 'Vehicle') {
-                    var addonsButtonHtml = '<a><button type="button" class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '">Addons</button></a>';
-                    return removeButtonHtml + addonsButtonHtml;
-                } else {
-                    return removeButtonHtml;  // Only the "Remove" button for non-'Vehicle' rows
-                }
-            }
-        },
+    render: function (data, type, row, index) {
+        var directAdd = 'Direct-Add';
+        var removeButtonHtml = '<button class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
+        if (row['button_type'] === 'Vehicle') {
+            var addonsButtonHtml = '<button class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '">Addons</button>';
+            return removeButtonHtml + addonsButtonHtml;
+        } else {
+            return removeButtonHtml;  // Only the "Remove" button for non-'Vehicle' rows
+        }
+    }
+},
             {
                 targets: -2,
                 data: null,
@@ -2270,7 +2292,7 @@ $(document).ready(function () {
                     }else if(row['button_type'] == 'Direct-Add') {
                         var code = row[2];
                         if(row['table_type'] == 'vehicle-table') {
-                            var code = row[6];
+                            var code = row[6]
                         }
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {

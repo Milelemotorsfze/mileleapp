@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
 use App\Models\Masters\MasterJobPosition;
+use App\Models\Masters\MasterOfficeLocation;
+use App\Models\Masters\MasterDepartment;
 class EmployeeProfile extends Model
 {
     use HasFactory, SoftDeletes;
@@ -116,5 +118,11 @@ class EmployeeProfile extends Model
     }
     public function designation() {
         return $this->hasOne(MasterJobPosition::class,'id','designation_id');
+    }
+    public function location() {
+        return $this->hasOne(MasterOfficeLocation::class,'id','work_location');
+    }
+    public function department() {
+        return $this->hasOne(MasterDepartment::class,'id','department_id');
     }
 }
