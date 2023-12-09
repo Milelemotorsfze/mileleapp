@@ -69,6 +69,7 @@ class QuotationController extends Controller
 //        $request->validate([
 //            'prices' => 'required'
 //        ]);
+
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
 
@@ -132,6 +133,9 @@ class QuotationController extends Controller
         }
 
         $commissionAED = 0;
+        $quotationItemIds = [];
+//        $quotationSubItemKeys = [];
+
         foreach ($request->prices as $key => $price) {
             if($request->system_code_currency[$key] == 'U') {
                 $amount = $request->system_code_amount[$key] * $aed_to_usd_rate->value;
@@ -148,6 +152,7 @@ class QuotationController extends Controller
            $quotationItem->system_code_amount = $request->system_code_amount[$key];
            $quotationItem->system_code_currency = $request->system_code_currency[$key];
            $quotationItem->quotation_id = $quotation->id;
+           $quotationItem->uuid = $request->uuids[$key];
            $quotationItem->is_addon = $request->is_addon[$key];
            $quotationItem->is_enable = isset($request->is_hide[$key]) ? true : false;
            $quotationItem->created_by = Auth::id();
@@ -170,7 +175,7 @@ class QuotationController extends Controller
                    $item = Varaint::find($request->reference_ids[$key]);
                }
                 //confirming it is a vehicle
-//                    $isVehicle = 1;
+                    $isVehicle = 1;
 //                    $variant = Varaint::find($request->reference_ids[$key]);
 //                    if($variant) {
 //                        $vehicleModelLineId = $variant->master_model_lines->id ?? '';
@@ -181,39 +186,54 @@ class QuotationController extends Controller
            }else if($request->types[$key] == 'ModelLine') {
                $item = MasterModelLines::find($request->reference_ids[$key]);
 //               //confirming it is a vehicle
-//               if($request->is_addon[$key] == 0) {
-//                   $isVehicle = 1;
-//                   $vehicleModelLineId = $request->reference_ids[$key];
-//                   info("vehicle - > model line");
+               if($request->is_addon[$key] == 0) {
+                   $isVehicle = 1;
+//                 get the corresponding vehicle unique number from array
+//                   $vehicleUUID = $request->vehicleUUIDs[$key];
+//                   info("vehicle - > UUID");
 //                   info($key);
-//               }
-
-           }else if($request->types[$key] == 'Accessory' || $request->types[$key] == 'SparePart' || $request->types[$key] == 'Kit') {
-               if($request->reference_ids[$key] != 'Other') {
-                   $item = AddonDetails::find($request->reference_ids[$key]);
                }
 
+           }else if($request->types[$key] == 'Accessory' || $request->types[$key] == 'SparePart' || $request->types[$key] == 'Kit') {
+
+               $item = AddonDetails::find($request->reference_ids[$key]);
+
            }
+//           get the unique number in one array for all column
             $quotationItem->reference()->associate($item);
             $quotationItem->save();
 
-//            if($isVehicle == 1){
-//                $arrayKeys = array_keys($request->model_lines, $vehicleModelLineId);
+            if($isVehicle == 1){
+//               $arrayKeys = array_keys($request->addonUUIDs, $vehicleUUID);
 //                if (count($arrayKeys) > 0) {
-//                   array_push($quotationItemIds, $quotationItem->id);
-//                    // At least one match...
+                   array_push($quotationItemIds, $quotationItem->id);
+                    // At least one match...
 //                    $quotationSubItemKeys[$quotationItem->id] = $arrayKeys;
 //                }
-////               check this model line is existing in addons array, if yes get the array key;
-//            }
-//            $isVehicle = 0;
+    //          check this model line is existing in addons array, if yes get the array key;
+            }
+            $isVehicle = 0;
         }
 
         $quotationDetail->system_code = $commissionAED;
         $quotationDetail->save();
 
-//        foreach ($quotationItemIds as $itemId) {
+        foreach ($quotationItemIds as $itemId) {
+            $quotationItemRow = QuotationItem::find($itemId);
+
+            $subItemIds = QuotationItem::where('uuid', $quotationItemRow->uuid)
+                                    ->where('quotation_id', $quotation->id)->pluck('id')->toArray();
+            if($subItemIds) {
+                foreach ($subItemIds as $subItemId) {
+                    $quotationSubItem = new QuotationSubItem();
+                    $quotationSubItem->quotation_id = $quotation->id;
+                    $quotationSubItem->quotation_item_parent_id = $itemId;
+                    $quotationSubItem->quotation_item_id = $subItemId;
+                    $quotationSubItem->save();
+                }
+            }
 //            $itemKeys = $quotationSubItemKeys[$itemId];
+//            info("each item keys");
 //            foreach ($itemKeys as $itemKey) {
 //                if($request->types[$itemKey] == 'ModelLine' ) {
 //                     $alreadyaddedquotationIds = QuotationSubItem::where('quotation_id', $quotation->id)
@@ -244,7 +264,7 @@ class QuotationController extends Controller
 //
 //                }
 //            }
-//        }
+        }
         DB::commit();
         $quotationDetail = QuotationDetail::with('country')->find($quotationDetail->id);
 
@@ -349,7 +369,9 @@ class QuotationController extends Controller
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons',
         'otherVehicles','OtherAddons'));
+
 //        return $pdfFile->stream('test.pdf');
+
         $filename = 'quotation_'.$quotation->id.'.pdf';
         $generatedPdfDirectory = public_path('Quotations');
         $directory = public_path('storage/quotation_files');
@@ -521,9 +543,12 @@ public function addqaddone(Request $request)
         return $shippingPorts;
     }
     public function getShippingCharges(Request $request) {
+        info($request->all());
         $shippingCharges = Shipping::with('shippingMedium')
-                            ->where('from_port', $request->shipping_port_id)
+                            ->where('from_port', $request->from_shipping_port_id)
+                            ->where('to_port', $request->to_shipping_port_id)
                             ->get();
+        info($shippingCharges);
         return $shippingCharges;
     }
 }
