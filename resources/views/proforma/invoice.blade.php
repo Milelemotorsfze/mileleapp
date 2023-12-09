@@ -2156,17 +2156,17 @@ $(document).ready(function () {
             {
     targets: -1,
     data: null,
-    render: function (data, type, row, index) {
-        var directAdd = 'Direct-Add';
-        var removeButtonHtml = '<button class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
-        if (row['button_type'] === 'Vehicle') {
-            var addonsButtonHtml = '<button class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '">Addons</button>';
-            return removeButtonHtml + addonsButtonHtml;
-        } else {
-            return removeButtonHtml;  // Only the "Remove" button for non-'Vehicle' rows
-        }
-    }
-},
+            render: function (data, type, row, index) {
+                var directAdd = 'Direct-Add';
+                var removeButtonHtml = '<button class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
+                if (row['button_type'] === 'Vehicle') {
+                    var addonsButtonHtml = '<button class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '">Addons</button>';
+                    return removeButtonHtml + addonsButtonHtml;
+                } else {
+                    return removeButtonHtml;  // Only the "Remove" button for non-'Vehicle' rows
+                }
+            }
+            },
             {
                 targets: -2,
                 data: null,

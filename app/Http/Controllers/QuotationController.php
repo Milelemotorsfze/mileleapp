@@ -222,6 +222,7 @@ class QuotationController extends Controller
             $quotationItemRow = QuotationItem::find($itemId);
 
             $subItemIds = QuotationItem::where('uuid', $quotationItemRow->uuid)
+                                    ->whereNot('id',$quotationItemRow->id)
                                     ->where('quotation_id', $quotation->id)->pluck('id')->toArray();
             if($subItemIds) {
                 foreach ($subItemIds as $subItemId) {
@@ -286,22 +287,22 @@ class QuotationController extends Controller
             ->where('quotation_id', $quotation->id)
             ->where('is_addon', false)->get();
 
-//        $alreadyAddedQuotationIds = QuotationSubItem::where('quotation_id', $quotation->id)
-//                         ->pluck('quotation_item_id')->toArray();
+        $alreadyAddedQuotationIds = QuotationSubItem::where('quotation_id', $quotation->id)
+                         ->pluck('quotation_item_id')->toArray();
         $directlyAddedAddons =  QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
             ->where('quotation_id', $quotation->id)
-//            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
             ->where('is_enable', true)
             ->where('is_addon', true)->get();
-//        $hidedDirectlyAddedAddonSum =  QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
-//            ->where('quotation_id', $quotation->id)
-//            ->whereNotIn('id', $alreadyAddedQuotationIds)
-//            ->where('is_enable', false)
-//            ->where('is_addon', true)
-//            ->sum('total_amount');
+        $hidedDirectlyAddedAddonSum =  QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
+            ->where('quotation_id', $quotation->id)
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('is_enable', false)
+            ->where('is_addon', true)
+            ->sum('total_amount');
 
         $addons = QuotationItem::where('reference_type','App\Models\AddonDetails')
-//            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
             ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
         $OtherAddons = QuotationItem::whereNull('reference_type')
@@ -310,25 +311,25 @@ class QuotationController extends Controller
             ->where('is_enable', true)
             ->where('is_addon', true)->get();
 
-//        $hidedAddonSum = QuotationItem::where('reference_type','App\Models\AddonDetails')
-//            ->whereNotIn('id', $alreadyAddedQuotationIds)
-//            ->where('is_enable', true)
-//            ->where('quotation_id', $quotation->id)
-//            ->where('is_enable', false)->sum('total_amount');
+        $hidedAddonSum = QuotationItem::where('reference_type','App\Models\AddonDetails')
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)
+            ->where('is_enable', false)->sum('total_amount');
 
-//        $addonsTotalAmount = $hidedDirectlyAddedAddonSum + $hidedAddonSum;
+        $addonsTotalAmount = $hidedDirectlyAddedAddonSum + $hidedAddonSum;
 
         $shippingCharges = QuotationItem::where('reference_type','App\Models\Shipping')
-//            ->where('is_enable', true)
+            ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
         $shippingDocuments = QuotationItem::where('reference_type','App\Models\ShippingDocuments')
-//            ->where('is_enable', true)
+            ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
         $otherDocuments = QuotationItem::where('reference_type','App\Models\OtherLogisticsCharges')
-//            ->where('is_enable', true)
+            ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
         $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
-//            ->where('is_enable', true)
+            ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
 
         $salesPersonDetail = EmployeeProfile::where('user_id', Auth::id())->first();
@@ -367,7 +368,7 @@ class QuotationController extends Controller
 //        return view('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
 //            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons','addonsTotalAmount'));
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
-            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons',
+            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons','addonsTotalAmount',
         'otherVehicles','OtherAddons'));
 
 //        return $pdfFile->stream('test.pdf');

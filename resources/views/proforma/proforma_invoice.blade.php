@@ -179,17 +179,18 @@
                         <td> <?php $totalAmount = $vehicle->unit_price * $vehicle->quantity ?>
                             {{ $quotation->currency ." ". number_format($totalAmount, 2) }}</td>
                     </tr>
-{{--                        @if($vehicle->quotation_addon_items->count() > 0)--}}
-{{--                            @foreach($vehicle->quotation_addon_items as $key =>  $addon)--}}
-{{--                                <tr style="color: #643702;">--}}
-{{--                                    <td style="padding-left: 40px;"><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>--}}
-{{--                                        {{ $addon->quotationItem->description ?? ''}}</td>--}}
-{{--                                    <td>{{ $addon->quotationItem->quantity ?? ''}}</td>--}}
-{{--                                    <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->unit_price, 2) }}</td>--}}
-{{--                                    <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->total_amount, 2) }}</td>--}}
-{{--                                </tr>--}}
-{{--                            @endforeach--}}
-{{--                        @endif--}}
+                        @if($vehicle->quotation_addon_items->count() > 0)
+                            @foreach($vehicle->quotation_addon_items as $key =>  $addon)
+                                <tr style="color: #643702;">
+                                    <td style="padding-left: 40px;"><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>
+                                        {{ $addon->quotationItem->description ?? ''}}</td>
+                                    <td> {{$addon->quotationItem->system_code_currency ." ". number_format($addon->quotationItem->system_code_amount, 2) }}</td>
+                                    <td>{{ $addon->quotationItem->quantity ?? ''}}</td>
+                                    <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->unit_price, 2) }}</td>
+                                    <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->total_amount, 2) }}</td>
+                                </tr>
+                            @endforeach
+                        @endif
                 @endforeach
                 @foreach($variants as $key => $variant)
                     <tr style="color: #02023f;">
@@ -200,18 +201,18 @@
                         <td> <?php $totalAmount = $variant->unit_price * $variant->quantity ?>
                             {{ $quotation->currency ." ". number_format($totalAmount, 2) }}</td>
                     </tr>
-{{--                    @if($variant->quotation_addon_items->count() > 0)--}}
-
-{{--                        @foreach($variant->quotation_addon_items as $key => $addon)--}}
-{{--                            <tr style="color: #643702">--}}
-{{--                                <td><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>--}}
-{{--                                    {{ $addon->quotationItem->description ?? ''}}</td>--}}
-{{--                                <td>{{ $addon->quotationItem->quantity ?? ''}}</td>--}}
-{{--                                <td>{{ $quotation->currency ." ". number_format($*addon->quotationItem->unit_price, 2) }}</td>--}}
-{{--                                <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->total_amount, 2) }}</td>--}}
-{{--                            </tr>--}}
-{{--                        @endforeach--}}
-{{--                    @endif--}}
+                    @if($variant->quotation_addon_items->count() > 0)
+                        @foreach($variant->quotation_addon_items as $key => $addon)
+                            <tr style="color: #643702">
+                                <td><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>
+                                    {{ $addon->quotationItem->description ?? ''}}</td>
+                                <td> {{$addon->quotationItem->system_code_currency ." ". number_format($addon->quotationItem->system_code_amount, 2) }}</td>
+                                <td>{{ $addon->quotationItem->quantity ?? ''}}</td>
+                                <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->unit_price, 2) }}</td>
+                                <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->total_amount, 2) }}</td>
+                            </tr>
+                        @endforeach
+                    @endif
                 @endforeach
                 @foreach($otherVehicles as $key => $otherVehicle)
                     <tr style="color: #02023f;">
@@ -222,6 +223,18 @@
                         <td> <?php $totalAmount = $otherVehicle->unit_price * $otherVehicle->quantity ?>
                             {{ $quotation->currency ." ". number_format($totalAmount, 2) }}</td>
                     </tr>
+                    @if($otherVehicle->quotation_addon_items->count() > 0)
+                        @foreach($otherVehicle->quotation_addon_items as $key => $otherVehicleAddon)
+                            <tr style="color: #643702">
+                                <td><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>
+                                    {{ $otherVehicleAddon->quotationItem->description ?? ''}}</td>
+                                <td> {{$otherVehicleAddon->quotationItem->system_code_currency ." ". number_format($otherVehicleAddon->quotationItem->system_code_amount, 2) }}</td>
+                                <td>{{ $otherVehicleAddon->quotationItem->quantity ?? ''}}</td>
+                                <td>{{ $quotation->currency ." ". number_format($otherVehicleAddon->quotationItem->unit_price, 2) }}</td>
+                                <td>{{ $quotation->currency ." ". number_format($otherVehicleAddon->quotationItem->total_amount, 2) }}</td>
+                            </tr>
+                        @endforeach
+                    @endif
                 @endforeach
             @endif
             @if($shippingDocuments->count() > 0 || $shippingCharges->count() > 0)
@@ -287,12 +300,12 @@
                             <td>{{ $quotation->currency ." ". number_format($OtherAddon->total_amount, 2) }}</td>
                         </tr>
                     @endforeach
-{{--                @if($addonsTotalAmount > 0)--}}
-{{--                        <tr>--}}
-{{--                            <td colspan="3">Addons</td>--}}
-{{--                            <td>  {{ $quotation->currency }} {{ number_format($addonsTotalAmount, 2) }}</td>--}}
-{{--                        </tr>--}}
-{{--                @endif--}}
+                @if($addonsTotalAmount > 0)
+                    <tr>
+                        <td colspan="3">Addons</td>
+                        <td>  {{ $quotation->currency }} {{ number_format($addonsTotalAmount, 2) }}</td>
+                    </tr>
+                @endif
 
             @endif
             @if($shippingCertifications->count() > 0 || $otherDocuments->count() > 0)
