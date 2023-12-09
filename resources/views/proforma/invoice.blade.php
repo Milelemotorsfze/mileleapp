@@ -1204,6 +1204,132 @@
     </div>
   </div>
 </div>
+<div class="modal fade addonsModal-modal" id="addonsModal" tabindex="-1" aria-labelledby="addonsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addonsModalLabel">Adding Addons</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <div class="col-lg-12">
+    <!-- ... Your other HTML content ... -->
+    <input type="hidden" name="modelIdInput" id="modelIdInput" />
+    <input type="hidden" name="brandIdInput" id="brandIdInput" />
+    <div class="row">
+    <div class="col-lg-4 col-md-12 col-sm-12">
+        <label class="form-label font-size-13 text-center">Addon Type</label>
+    </div>
+    <div class="col-lg-8 col-md-12 col-sm-12">
+        <select class="form-select" name="addonTypevehicles">
+            <option value="accessories">Accessories</option>
+            <option value="spareParts">Spare Parts</option>
+            <option value="kits">Kits</option>
+        </select>
+    </div>
+</div>
+<div id="accessoriesDropdownDiv" class="row" style="display:none;">
+    <div class="col-lg-12">
+        <label class="form-label">Accessories</label>
+        <select class="form-select" name="accessoriesDropdown">
+            <!-- Populate options dynamically using JavaScript -->
+        </select>
+    </div>
+</div>
+
+<div id="sparePartsDropdownDiv" class="row" style="display:none;">
+    <div class="col-lg-12">
+        <label class="form-label">Spare Parts</label>
+        <select class="form-select" name="sparePartsDropdown">
+            <!-- Populate options dynamically using JavaScript -->
+        </select>
+    </div>
+</div>
+
+<div id="kitsDropdownDiv" class="row" style="display:none;">
+    <div class="col-lg-12">
+        <label class="form-label">Kits</label>
+        <select class="form-select" name="kitsDropdown">
+            <!-- Populate options dynamically using JavaScript -->
+        </select>
+    </div>
+</div>
+<!-- DataTable Container -->
+<hr>
+<div id="addonDataTableContainer" class="row" style="display:none;">
+    <div class="col-lg-12">
+        <table id="addonDataTable" class="display">
+            <!-- DataTable content will be added dynamically -->
+        </table>
+    </div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade addonsModal-modal" id="addonsModal" tabindex="-1" aria-labelledby="addonsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addonsModalLabel">Adding Addons</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <div class="col-lg-12">
+    <!-- ... Your other HTML content ... -->
+    <input type="hidden" name="modelIdInput" id="modelIdInput" />
+    <input type="hidden" name="brandIdInput" id="brandIdInput" />
+    <div class="row">
+    <div class="col-lg-4 col-md-12 col-sm-12">
+        <label class="form-label font-size-13 text-center">Addon Type</label>
+    </div>
+    <div class="col-lg-8 col-md-12 col-sm-12">
+        <select class="form-select" name="addonTypevehicles">
+            <option value="accessories">Accessories</option>
+            <option value="spareParts">Spare Parts</option>
+            <option value="kits">Kits</option>
+        </select>
+    </div>
+</div>
+<div id="accessoriesDropdownDiv" class="row" style="display:none;">
+    <div class="col-lg-12">
+        <label class="form-label">Accessories</label>
+        <select class="form-select" name="accessoriesDropdown">
+            <!-- Populate options dynamically using JavaScript -->
+        </select>
+    </div>
+</div>
+
+<div id="sparePartsDropdownDiv" class="row" style="display:none;">
+    <div class="col-lg-12">
+        <label class="form-label">Spare Parts</label>
+        <select class="form-select" name="sparePartsDropdown">
+            <!-- Populate options dynamically using JavaScript -->
+        </select>
+    </div>
+</div>
+
+<div id="kitsDropdownDiv" class="row" style="display:none;">
+    <div class="col-lg-12">
+        <label class="form-label">Kits</label>
+        <select class="form-select" name="kitsDropdown">
+            <!-- Populate options dynamically using JavaScript -->
+        </select>
+    </div>
+</div>
+<!-- DataTable Container -->
+<hr>
+<div id="addonDataTableContainer" class="row" style="display:none;">
+    <div class="col-lg-12">
+        <table id="addonDataTable" class="display">
+            <!-- DataTable content will be added dynamically -->
+        </table>
+    </div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 @push('scripts')
 <script>
@@ -1255,6 +1381,8 @@ $('select.form-select').change(function () {
         var selectedType = $('select[name="addonTypevehicles"]').val();
         var brandId = $('#brandIdInput').val();
         var modelLineId = $('#modelIdInput').val();
+        var ModelDescriptionId = '';
+        if(selectedType == "accessories"){
         // Make an AJAX request to the controller with the selected data
         $.ajax({
             url: '/get-booking-accessories/' + selectedId + '/' + brandId + '/' + modelLineId,
@@ -1267,7 +1395,109 @@ $('select.form-select').change(function () {
                 console.error('Error fetching addon data:', error);
             }
         });
+    }
+    else if (selectedType == "spareParts"){
+        var url = '{{ route('booking.getbookingSpareParts', ['selectedId', 'brandId', 'modelLineId', 'ModelDescriptionId']) }}';
+        $.ajax({
+            type: 'GET',
+            url: url,
+    success: function (response) {
+                // Update the DataTable with the received data
+                updateDataTablespareparts(response);
+            },
+            error: function (error) {
+                console.error('Error fetching addon data:', error);
+            }
+        });
+    }
+    else if(selectedType == "kits"){
+
+    }
     });
+    function updateDataTablespareparts(response) {
+        var slNo = 0;
+                var data = response.map(function(sparePart) {
+                    slNo = slNo + 1;
+                    var addButton = '<button class="add-button" data-button-type="SparePart" data-model-line-id="'+ modelLineId +'"  data-sparepart-id="' + sparePart.id + '">Add</button>';
+                    if(sparePart.addon_description.description != null) {
+                       var sparePartName = sparePart.addon_description.addon.name + ' - ' + sparePart.addon_description.description;
+                    }
+                    else {
+                        var sparePartName = sparePart.addon_description.addon.name;
+                    }
+
+                    var sparePartBrandName = sparePart.brandModelLineModelDescription;
+                    var sparePartNumber = '';
+                    var partNumbersSize = 0;
+                    partNumbersSize = (sparePart.part_numbers).length;
+                    if(partNumbersSize > 0) {
+                        for(var k=0; k < partNumbersSize; k++) {
+                            if(sparePart.part_numbers[k]) {
+                                if(k != 0) {
+                                    sparePartNumber = sparePartNumber + '<br>';
+                                }
+                                sparePartNumber = sparePart.part_numbers[k].part_number;
+                            }
+                        }
+                    }
+                    if(sparePart.additional_remarks != null) {
+                        var sparePartAdditionalRemarks = '';
+                    }
+                    else {
+                        var sparePartAdditionalRemarks = sparePart.additional_remarks;
+                    }
+                    if(sparePart.fixing_charges_included == 'yes') {
+                        var sparePartFixingCharge = 'Included';
+                    }
+                    else {
+                        var sparePartFixingCharge = sparePart.fixing_charge_amount + ' AED';
+                    }
+                    if(sparePart.selling_price != null) {
+                        if(sparePart.selling_price.selling_price != '0.00' || sparePart.selling_price.selling_price != null) {
+                            var sparePartSellingPrice = sparePart.selling_price.selling_price;
+                        }
+                    }
+
+                    else {
+                        var sparePartSellingPrice = '';
+                    }
+                    return [
+                            slNo,
+                            sparePart.addon_code,
+                            sparePartName,
+                            sparePartBrandName,
+                            // sparePartBrand,
+                            sparePartSellingPrice,
+                            sparePartNumber,
+                            sparePartAdditionalRemarks,
+                            sparePartFixingCharge,
+                            // sparePart.LeastPurchasePrices.purchase_price_aed,
+                            addButton,
+                        ];
+                });
+                if ($.fn.DataTable.isDataTable('#addonDataTable')) {
+                    $('#addonDataTable').DataTable().destroy();
+                }
+                $('#addonDataTable').DataTable({
+                    data: data,
+                    columns: [
+                        { title: 'S.No: ' },
+                        { title: 'Spare Part Code' },
+                        { title: 'Spare Part Name' },
+                        { title: 'Brand/Model Lines/Model Description' },
+                        { title: 'Selling Price(AED)'},
+                        { title: 'Part Numbers' },
+                        { title: 'Additional Remarks' },
+                        { title: 'Fixing Charge'},
+                        {
+                            title: 'Add Into Quotation',
+                            render: function(data, type, row) {
+                                return '<div class="circle-button add-button" data-button-type="SparePart" data-model-line-id="'+ modelLineId +'"  data-sparepart-id="' + row[0] + '"></div>';
+                            }
+                        }
+                    ]
+                });
+    }
     function updateDataTable(response) {
                 var slNo = 0;
                 var data = response.map(function(accessory) {
@@ -1352,7 +1582,6 @@ $('#addonDataTable').on('click', '.add-button-addonsinner', function () {
         if(buttonType == 'Accessory') {
             var id = $(this).data('accessory-id');
             var rowId = $(this).data('row-id');
-
         }
         else if(buttonType == 'SparePart') {
             var id = $(this).data('sparepart-id');
@@ -1722,81 +1951,80 @@ $(document).ready(function () {
             removeNewModelLineError();
         });
 
-        {{--$('#createModelLineId').on('click', function()--}}
-        {{--{--}}
-        {{--    // create new addon and list new addon in addon list--}}
-        {{--    var model_line = $('#new_model_line_name').val();--}}
-        {{--    var existingBrand = $("#brand-from-list").val();--}}
-        {{--    var newBrand = $('#new-brand').val();--}}
-        {{--    checkBrandValidation();--}}
-        {{--    checkModelLine();--}}
-        {{--    var brand = newBrand;--}}
-        {{--    var brandType = 'NEW';--}}
-        {{--    if(existingBrand) {--}}
-        {{--        var brand = existingBrand;--}}
-        {{--        var brandType = 'EXISTING';--}}
-        {{--    }--}}
-        {{--     if(model_line != "" && brand != "") {--}}
-        {{--        $.ajax--}}
-        {{--        ({--}}
-        {{--            url:"{{route('modelline-or-brand.store')}}",--}}
-        {{--            type: "POST",--}}
-        {{--            data:--}}
-        {{--                {--}}
-        {{--                    model_line: model_line,--}}
-        {{--                    brand: brand,--}}
-        {{--                    brandType: brandType,--}}
-        {{--                    _token: '{{csrf_token()}}'--}}
-        {{--                },--}}
-        {{--            dataType : 'json',--}}
-        {{--            success: function(result)--}}
-        {{--            {--}}
-        {{--                console.log(result);--}}
-        {{--                if(result.brand_error) {--}}
-        {{--                    $msg = result.brand_error;--}}
-        {{--                    showNewBrandError($msg);--}}
-        {{--                }--}}
-        {{--                if(result.model_line_error) {--}}
-        {{--                    $msg = result.model_line_error;--}}
-        {{--                    showNewModelLineError($msg);--}}
-        {{--                }--}}
-        {{--                if(result.model_line_error == "" ){--}}
-        {{--                    if(result.brand_error == "") {--}}
+        // $('#createModelLineId').on('click', function()
+        // {
+        //     // create new addon and list new addon in addon list
+        //     var model_line = $('#new_model_line_name').val();
+        //     var existingBrand = $("#brand-from-list").val();
+        //     var newBrand = $('#new-brand').val();
+        //     checkBrandValidation();
+        //     checkModelLine();
+        //     var brand = newBrand;
+        //     var brandType = 'NEW';
+        //     if(existingBrand) {
+        //         var brand = existingBrand;
+        //         var brandType = 'EXISTING';
+        //     }
+        //      if(model_line != "" && brand != "") {
+        //         $.ajax
+        //         ({
+        //             url:"{{route('modelline-or-brand.store')}}",
+        //             type: "POST",
+        //             data:
+        //                 {
+        //                     model_line: model_line,
+        //                     brand: brand,
+        //                     brandType: brandType,
+        //                     _token: '{{csrf_token()}}'
+        //                 },
+        //             dataType : 'json',
+        //             success: function(result)
+        //             {
+        //                 if(result.brand_error) {
+        //                     $msg = result.brand_error;
+        //                     showNewBrandError($msg);
+        //                 }
+        //                 if(result.model_line_error) {
+        //                     $msg = result.model_line_error;
+        //                     showNewModelLineError($msg);
+        //                 }
+        //                 if(result.model_line_error == "" ){
+        //                     if(result.brand_error == "") {
 
-        {{--                        $('.overlay').hide();--}}
-        {{--                        $('.modal').removeClass('modalshow');--}}
-        {{--                        $('.modal').addClass('modalhide');--}}
-        {{--                        var id = result.model_line.brand_id;--}}
-        {{--                        if(brandType == 'NEW') {--}}
-        {{--                            $('#brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");--}}
-        {{--                            $('#accessories_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");--}}
-        {{--                            $('#spare_parts_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");--}}
-        {{--                            $('#kit_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");--}}
+        // {{--                        $('.overlay').hide();--}}
+        // {{--                        $('.modal').removeClass('modalshow');--}}
+        // {{--                        $('.modal').addClass('modalhide');--}}
+        // {{--                        var id = result.model_line.brand_id;--}}
+        // {{--                        if(brandType == 'NEW') {--}}
+        // {{--                            $('#brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");--}}
+        // {{--                            $('#accessories_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");--}}
+        // {{--                            $('#spare_parts_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");--}}
+        // {{--                            $('#kit_brand').append("<option value='" + result.model_line.brand_id + "'>" + result.brand_name + "</option>");--}}
 
-        {{--                        }--}}
-        {{--                        $('#brand').val(id);--}}
-        {{--                        $('#brand').trigger('change.select2');--}}
+        // {{--                        }--}}
+        // {{--                        $('#brand').val(id);--}}
+        // {{--                        $('#brand').trigger('change.select2');--}}
 
-        {{--                        $('#model_line').append("<option  value='" + result.model_line.id + "'>" + result.model_line.model_line + "</option>");--}}
-        {{--                        $('#model_line').val(result.model_line.id);--}}
-        {{--                        // $('#model_line').trigger('change');--}}
+        // {{--                        $('#model_line').append("<option  value='" + result.model_line.id + "'>" + result.model_line.model_line + "</option>");--}}
+        // {{--                        $('#model_line').val(result.model_line.id);--}}
+        // {{--                        // $('#model_line').trigger('change');--}}
 
-        {{--                        $('#model_line').prop('disabled', false);--}}
+        // {{--                        $('#model_line').prop('disabled', false);--}}
 
-        {{--                        $('#new_model_line_name').val(" ");--}}
-        {{--                        $('#brand-from-list').val(" ");--}}
-        {{--                        $('#new-brand').val(" ");--}}
-        {{--                        $('#brand-from-list').trigger('change.select2');--}}
+        // {{--                        $('#new_model_line_name').val(" ");--}}
+        // {{--                        $('#brand-from-list').val(" ");--}}
+        // {{--                        $('#new-brand').val(" ");--}}
+        // {{--                        $('#brand-from-list').trigger('change.select2');--}}
 
-        {{--                        $msg = "";--}}
-        {{--                        removeNewModelLineError();--}}
-        {{--                        removeNewBrandError();--}}
-        {{--                    }--}}
-        {{--                }--}}
-        {{--            }--}}
-        {{--        });--}}
-        {{--     }--}}
-        {{--});--}}
+        // {{--                        $msg = "";--}}
+        // {{--                        removeNewModelLineError();--}}
+        // {{--                        removeNewBrandError();--}}
+        // {{--                    }--}}
+        // {{--                }--}}
+        // {{--            }--}}
+        // {{--        });--}}
+        // {{--     }--}}
+        // {{--});--}}
 
         $('.modal-button').on('click', function()
         {
