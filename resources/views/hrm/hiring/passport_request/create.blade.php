@@ -273,18 +273,35 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                     </div>
                 </div>
                 <br />
+
                 <!-- <p>Data is: @foreach($masterEmployees as $User)
                     <text value="{{ $User->id }}">\
                         {{ $User->empProfile->designation_id ?? ''}} </text>
                     @endforeach
                 </p> -->
+
+                <!-- <p>
+                    Designation is:
+                    @foreach($masterEmployees as $User)
+                    @if($User->empProfile)
+                    {{ $User->empProfile->designation ? $User->empProfile->designation->name : '' }}/////
+                    {{ $User->empProfile->department ? $User->empProfile->department->name : '' }}///////
+                    {{ $User->empProfile->location ? $User->empProfile->location->name : '' }}////////
+
+                    @else
+                    ---
+                    @endif
+                    @endforeach
+
+                </p> -->
+
                 <div class="row passport-request-details-div" style="display: none;">
 
                     <!-- Employee ID Section -->
                     <div class="col-lg-4 col-md-4 col-sm-4 col-6 title-section-div">
                         <div class="col-12 job-description-textfield-lable">
 
-                            <label for="employee_code_id" class="col-form-label widthinput heading-name"><b>Employee ID</b></label>
+                            <label for="employee_code_id" class="col-form-label widthinput heading-name"><b>Employee Code</b></label>
                         </div>
                         <div class="col-12 job-description-text-value">
                             <div name="employee_code_id" class="employee-code-id"></div>
@@ -334,19 +351,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         </div>
         <br />
 
-        <hr />
         <div class="col-lg-12 col-md-12 col-sm-12 col-12 passportSubmitReleaseDropDownInputContainer" id="passportSubmitReleaseDropDownInputContainer" style="display: none;">
-            <!-- <div class=""> -->
+            <hr />
             <label for="choose-passport-req" class="form-label"><span class="error">* </span><b>Choose your option for the passport:</b></label>
             <div class="col-lg-4 col-md-6 col-sm-12 col-12">
-                <select name="passport_request_dropdown" id="passport_request_dropdown" class="form-control widthinput" value="{{$data->passport_with}}">
-                    <option value="">Choose Option</option>
+                <select name="passport_request_dropdown" id="passport_request_dropdown" class="form-control widthinput" <?php echo isset($masterEmployees[0]->passport_with) ? 'disabled' : ''; ?>>
                     <option value="with_employee">Submission of Passport</option>
                     <option value="with_company">Release of Passport</option>
                 </select>
             </div>
-            <!-- </div> -->
-
             <br />
 
             <div class="col-lg-12 ">
@@ -540,12 +553,12 @@ redirect()->route('home')->send();
     $(document).ready(function() {
 
         var data = <?php echo json_encode($masterEmployees); ?>;
-        console.log("Passport Request Form User data  -----", data)
+        console.log("Passport Request Form User data  -----", data);
 
         $('#employee_name_id').select2({
             allowClear: true,
             maximumSelectionLength: 1,
-            placeholder: "Choose User Name",
+            placeholder: "Choose Employee Name",
         });
 
         $('#purposes_of_submit_id').select2({
@@ -579,13 +592,14 @@ redirect()->route('home')->send();
             for (var i = 0; i < data.length; i++) {
                 // if (data[i].id == 2) {
                 $('#employee_name_id').val([data[i].id]).trigger('change');
+                console.log("Emp code is ; ", data[i].emp_profile.employee_code || '')
                 $('.employee-code-id').text(data[i].emp_profile.employee_code || '');
-                $('.emp-designation').text(data[i].emp_profile.designation_id || '');
+                $('.emp-designation').text(data[i].emp_profile.designation.name || '');
                 $('.emp-mobile-num').text(data[i].emp_profile.contact_number || '');
-                $('.emp-department').text(data[i].emp_profile.department_id || '');
-                $('.emp-job-location').text(data[i].emp_profile.work_location || '');
-                console.log("Drop down passport request value in set function : ", data[i].passport_with);
-                $('.#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
+                $('.emp-department').text(data[i].emp_profile.department.name || '');
+                $('.emp-job-location').text(data[i].emp_profile.location.name || '');
+                console.log("Drop down passport request value in update function : ", data[i].passport_with);
+                $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
 
                 togglePassportRequestDetailsDiv();
                 break;
@@ -601,10 +615,10 @@ redirect()->route('home')->send();
             for (var i = 0; i < data.length; i++) {
                 if (data[i].id == selectedEmpId) {
                     $('.employee-code-id').text(data[i].emp_profile.employee_code || '');
-                    $('.emp-designation').text(data[i].emp_profile.designation_id || '');
+                    $('.emp-designation').text(data[i].emp_profile.designation.name || '');
                     $('.emp-mobile-num').text(data[i].emp_profile.contact_number || '');
-                    $('.emp-department').text(data[i].emp_profile.department_id || '');
-                    $('.emp-job-location').text(data[i].emp_profile.work_location || '');
+                    $('.emp-department').text(data[i].emp_profile.department.name || '');
+                    $('.emp-job-location').text(data[i].emp_profile.location.name || '');
                     console.log("Drop down passport request value in update function : ", data[i].passport_with);
                     $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
 
@@ -613,7 +627,6 @@ redirect()->route('home')->send();
                 }
             }
         }
-
 
         // Update the location from dropdown
 
@@ -679,7 +692,7 @@ redirect()->route('home')->send();
             var fieldName = $(this).attr('name');
             $('#employeePassportRequestForm').validate().element('[name="' + fieldName + '"]');
         });
-        
+
 
         $('#employeePassportRequestForm').submit(function(event) {
 
