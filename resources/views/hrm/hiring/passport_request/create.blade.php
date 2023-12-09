@@ -592,12 +592,12 @@ redirect()->route('home')->send();
             for (var i = 0; i < data.length; i++) {
                 // if (data[i].id == 2) {
                 $('#employee_name_id').val([data[i].id]).trigger('change');
-                console.log("Emp code is ; ", data[i].emp_profile.employee_code || '')
-                $('.employee-code-id').text(data[i].emp_profile.employee_code || '');
-                $('.emp-designation').text(data[i].emp_profile.designation.name || '');
-                $('.emp-mobile-num').text(data[i].emp_profile.contact_number || '');
-                $('.emp-department').text(data[i].emp_profile.department.name || '');
-                $('.emp-job-location').text(data[i].emp_profile.location.name || '');
+                console.log("Emp code is ; ", data[i].emp_profile?.employee_code || '')
+                $('.employee-code-id').text(data[i].emp_profile?.employee_code || '');
+                $('.emp-designation').text(data[i].emp_profile?.designation?.name || '');
+                $('.emp-mobile-num').text(data[i].emp_profile?.contact_number || '');
+                $('.emp-department').text(data[i].emp_profile?.department?.name || '');
+                $('.emp-job-location').text(data[i].emp_profile?.location?.name || '');
                 console.log("Drop down passport request value in update function : ", data[i].passport_with);
                 $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
 
@@ -614,11 +614,11 @@ redirect()->route('home')->send();
         function updateFieldsBasedOnEmpId(selectedEmpId) {
             for (var i = 0; i < data.length; i++) {
                 if (data[i].id == selectedEmpId) {
-                    $('.employee-code-id').text(data[i].emp_profile.employee_code || '');
-                    $('.emp-designation').text(data[i].emp_profile.designation.name || '');
-                    $('.emp-mobile-num').text(data[i].emp_profile.contact_number || '');
-                    $('.emp-department').text(data[i].emp_profile.department.name || '');
-                    $('.emp-job-location').text(data[i].emp_profile.location.name || '');
+                    $('.employee-code-id').text(data[i].emp_profile?.employee_code || '');
+                    $('.emp-designation').text(data[i].emp_profile?.designation?.name || '');
+                    $('.emp-mobile-num').text(data[i].emp_profile?.contact_number || '');
+                    $('.emp-department').text(data[i].emp_profile?.department?.name || '');
+                    $('.emp-job-location').text(data[i].emp_profile?.location?.name || '');
                     console.log("Drop down passport request value in update function : ", data[i].passport_with);
                     $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
 
@@ -697,7 +697,7 @@ redirect()->route('home')->send();
         $('#employeePassportRequestForm').submit(function(event) {
 
             console.log("Data to be sent:", $(this).serialize());
-            event.preventDefault();
+            // event.preventDefault();
         });
 
         $('#employeePassportRequestForm').validate({
