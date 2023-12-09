@@ -520,7 +520,6 @@
                                         <th>System Code</th>
                                         <th>Unit Price</th>
                                         <th>Quantity</th>
-                                        <th>System Code</th>
                                         <th>Total Amount</th>
                                         <th>Action</th>
                                     </tr>
