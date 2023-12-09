@@ -712,7 +712,7 @@ redirect()->route('home')->send();
         $('#employeePassportRequestForm').submit(function(event) {
 
             console.log("Data to be sent:", $(this).serialize());
-            event.preventDefault();
+            // event.preventDefault();
         });
 
         $('#employeePassportRequestForm').validate({
