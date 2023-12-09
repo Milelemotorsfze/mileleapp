@@ -281,15 +281,35 @@
             <div class="col-sm-4">
                 <div class="row mt-2">
                     <div class="col-sm-6">
-                        Company :
+                        Client Category :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text"  class="form-control form-control-xs" value="{{ $callDetails->company_name }}" name="company_name" id="company" placeholder="Company Name">
+                      <select class="form-control" id="client_category" name="client_category">
+                          <option value="Individual"> Individual </option>
+                          <option value="Company"> Company </option>
+                      </select>
+                    </div>
+                </div>
+                <div class="row mt-2" id="contact-person-div" hidden>
+                    <div class="col-sm-6">
+                        Contact Person :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control form-control-xs" name="contact_person" id="contact-person" placeholder="Contact Person">
+                    </div>
+                </div>
+                <div class="row mt-2" id="company-div" hidden>
+                    <div class="col-sm-6">
+                        Company :
+                    </div>
+{{--                    value="{{ $callDetails->company_name }}"--}}
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control form-control-xs" name="company_name" id="company" placeholder="Company Name">
                     </div>
                 </div>
                 <div class="row mt-2">
                     <div class="col-sm-6">
-                        <label for="timeRange">Person :</label>
+                        <label for="timeRange">Customer :</label>
                     </div>
                     <div class="col-sm-6">
                         <input type="text" name="name"  placeholder="Person Name"  class="form-control form-control-xs" id="person" value="{{$callDetails->name}}">
@@ -297,7 +317,7 @@
                 </div>
                 <div class="row mt-2">
                     <div class="col-sm-6">
-                        Contact No :
+                        Contact Number :
                     </div>
                     <div class="col-sm-6">
                         <input type="text" name="phone"  class="form-control form-control-xs" minlength="5" maxlength="15" id="contact_number" value="{{$callDetails->phone}}" placeholder="Phone">
@@ -341,6 +361,7 @@
                         </div>
                         <div class="col-sm-6">
                         <select name="incoterm" id="incoterm" class="form-control form-control-xs">
+                            <option></option>
                             <option value="EXW">EXW</option>
                             <option value="CNF">CNF</option>
                             <option value="CIF">CIF</option>
@@ -351,13 +372,25 @@
                     </div>
                     <div class="row mt-2">
                         <div class="col-sm-6">
-                            Place of Delivery :
+                            Port of Delivery :
                         </div>
                         <div class="col-sm-6">
-                            <select class="form-control col" id="shipping_port" name="shipping_port_id" style="width: 100%">
+                            <select class="form-control col" id="shipping_port" name="from_shipping_port_id" style="width: 100%">
                                 <option></option>
                             </select>
-
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-6">
+                            Port of Load :
+                        </div>
+                        <div class="col-sm-6">
+                            <select class="form-control col" id="to_shipping_port" name="to_shipping_port_id" style="width: 100%">
+                                <option></option>
+                                @foreach($shippingPorts as $shippingPort)
+                                    <option value="{{ $shippingPort->id }}">{{ $shippingPort->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -366,7 +399,7 @@
                         Place of Supply :
                     </div>
                     <div class="col-sm-6">
-                        <input type="text" name="place_of_supply" class="form-control form-control-xs" placeholder="Place Of Supply">
+                        <input type="text" name="place_of_supply" readonly id="place_of_supply" class="form-control form-control-xs" placeholder="Place Of Supply">
                     </div>
                 </div>
             </div>
@@ -383,14 +416,14 @@
         <hr>
         <div class="row">
             <div class="col-sm-4">
-                <div class="row mt-2">
-                    <div class="col-sm-6">
-                        System Code :
-                    </div>
-                    <div class="col-sm-6">
-                        <input type="number" name="system_code" id="system_code" class="form-control form-control-xs" placeholder="System Code">
-                    </div>
-                </div>
+{{--                <div class="row mt-2">--}}
+{{--                    <div class="col-sm-6">--}}
+{{--                        System Code :--}}
+{{--                    </div>--}}
+{{--                    <div class="col-sm-6">--}}
+{{--                        <input type="number" name="system_code" id="system_code" class="form-control form-control-xs" placeholder="System Code">--}}
+{{--                    </div>--}}
+{{--                </div>--}}
                 <div class="row mt-2">
                     <div class="col-sm-6">
                         Payment Terms :
@@ -436,7 +469,7 @@
                 </div>
                 </div>
                 <input type="hidden" name="agents_id" id="agents_id" value="">
-            <input type="hidden" name="selected_cb_name" id="selected_cb_name" value="">
+                <input type="hidden" name="selected_cb_name" id="selected_cb_name" value="">
                 <div class="row mt-2">
                     <div class="col-sm-6">
                         CB No:
@@ -485,9 +518,9 @@
                                     <tr>
                                         <th>Description</th>
                                         <th style="margin-left: 10px;">Code</th>
+                                        <th>System Code</th>
                                         <th>Unit Price</th>
                                         <th>Quantity</th>
-                                        <th>System Code</th>
                                         <th>Total Amount</th>
                                         <th>Action</th>
                                     </tr>
@@ -936,6 +969,7 @@
             </div>
 
         </div>
+
         <div id="certificateContent" class="contentveh">
             <hr>
             <br>
@@ -982,6 +1016,7 @@
             </div>
         </div>
         <div id="otherContent" class="contentveh">
+
             <hr>
             <br>
             <div class="card">
@@ -1287,13 +1322,14 @@ $('#addonDataTable').on('click', '.add-button-addonsinner', function () {
     var rowData = [];
     var mainTable = $('#dtBasicExample2').DataTable();
     var buttonType = $(this).data('button-type');
+    rowData['model_type'] = buttonType;
     var index = mainTable.data().length + 1;
         rowData['button_type'] = buttonType;
         rowData['index'] = index;
         if(buttonType == 'Accessory') {
             var id = $(this).data('accessory-id');
             var rowId = $(this).data('row-id');
-            
+
         }
         else if(buttonType == 'SparePart') {
             var id = $(this).data('sparepart-id');
@@ -1303,21 +1339,27 @@ $('#addonDataTable').on('click', '.add-button-addonsinner', function () {
             var id = $(this).data('kit-id');
             var rowId = $(this).data('row-id');
         }
-        rowData['id'] = id;
-        rowData['rowId'] = rowId;
-    var row = $(this).closest('tr');
-    row.find('td').each(function() {
-    rowData.push($(this).html());
-        });
-    // Get the accessory ID, row ID, and other relevant data
-    var accessoryId = $(this).data('accessory-id');
-    var subRowId = $(this).data('row-id');
-    mainTable.row.add(rowData).draw();
-    var newRowNode = mainTable.row(newRow).node();
-    $(newRowNode).addClass('highlight');
-    $('html, body').animate({
-        scrollTop: $(newRowNode).offset().top
-    }, 1000);
+
+        var table = $('#addonDataTable').DataTable();
+            rowData['id'] = id;
+            rowData['rowId'] = rowId;
+
+        var row = $(this).closest('tr');
+        row.find('td').each(function() {
+        rowData.push($(this).html());
+            });
+        // Get the accessory ID, row ID, and other relevant data
+        var accessoryId = $(this).data('accessory-id');
+        var subRowId = $(this).data('row-id');
+        mainTable.row.add(rowData).draw();
+        table.row(row).remove().draw();
+        resetSerialNumber(table);
+
+        var newRowNode = mainTable.row(newRow).node();
+        $(newRowNode).addClass('highlight');
+        $('html, body').animate({
+            scrollTop: $(newRowNode).offset().top
+        }, 1000);
 });
 
 // Event handler for removing a row
@@ -1506,7 +1548,13 @@ $(document).ready(function () {
             placeholder: "Select Final Destination"
         });
         $('#shipping_port').select2({
-            placeholder: "Select Place Of Delivery"
+            placeholder: "Select Port Of Delivery"
+        });
+        $('#to_shipping_port').select2({
+            placeholder: "Select Port Of Load"
+        });
+        $('#incoterm').select2({
+            placeholder: "Select Incoterm"
         });
         $('#model_line').select2();
         $('#variant').select2();
@@ -1546,23 +1594,46 @@ $(document).ready(function () {
                 }
             });
         });
-        $('#shipping_port').on('change',function(){
-            let shippingPortId = $('#shipping_port').val();
-            var table = $('#shipping-table').DataTable();
 
+        $('#client_category').on('change',function(){
+            let clientCategory = $(this).val();
+            if(clientCategory == 'Company') {
+                let company = '{{ $callDetails->company_name }}';
+                 $('#contact-person-div').attr('hidden', false);
+                 $('#company-div').attr('hidden', false);
+                 $('#company').val(company);
+            }else{
+                $('#contact-person-div').attr('hidden', true);
+                $('#company-div').attr('hidden', true);
+
+                $('#contact-person').val('');
+                $('#company').val('');
+            }
+        });
+        $('#to_shipping_port').on('change',function(){
+            getShippingCharges();
+        });
+        $('#shipping_port').on('change',function(){
+            getShippingCharges();
+        });
+        function getShippingCharges() {
+            let fromShippingPortId = $('#shipping_port').val();
+            let toShippingPortId = $('#to_shipping_port').val();
+            var table = $('#shipping-table').DataTable();
             let url = '{{ route('quotation.shipping_charges') }}';
-                if(shippingPortId) {
-                    $.ajax({
+            if(fromShippingPortId) {
+                $.ajax({
                     type: "GET",
                     url: url,
                     dataType: "json",
                     data: {
-                        shipping_port_id: shippingPortId,
+                        from_shipping_port_id: fromShippingPortId,
+                        to_shipping_port_id: toShippingPortId,
                     },
                     success:function (response) {
-                            var slNo = 0;
-                            var data = response.map(function(response) {
-                                slNo = slNo + 1;
+                        var slNo = 0;
+                        var data = response.map(function(response) {
+                            slNo = slNo + 1;
                             var addButton = '<div class="add-button circle-button" data-button-type="Shipping" data-shipping-id="'+ response.id +'" ></div>';
 
                             return [
@@ -1591,8 +1662,7 @@ $(document).ready(function () {
                     }
                 });
             }
-
-        });
+        }
 
         $('.add-new-button').on('click', function(){
 
@@ -1745,11 +1815,16 @@ $(document).ready(function () {
             if(shippingMethod == 'CNF') {
                 $('#export-shipment').attr('hidden', true);
                 $('#local-shipment').attr('hidden', false);
+                $('#country').val('').trigger('change');
+                $('#incoterm').val('').trigger('change');
+                $('#shipping_port').val('').trigger('change');
+                $('#to_shipping_port').val('').trigger('change');
+                $('#place_of_supply').val('DUCAMZ, FZ');
 
             }else{
                 $('#export-shipment').attr('hidden', false);
                 $('#local-shipment').attr('hidden', true);
-
+                $('#place_of_supply').val('');
             }
             showPriceInSelectedValue();
             calculateTotalSum();
@@ -2060,32 +2135,36 @@ $(document).ready(function () {
             {
     targets: -1,
     data: null,
-    render: function (data, type, row) {
-        var directAdd = 'Direct-Add';
-        var removeButtonHtml = '<button class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
-        if (row['button_type'] === 'Vehicle') {
-            var addonsButtonHtml = '<button class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '">Addons</button>';
-            return removeButtonHtml + addonsButtonHtml;
-        } else {
-            return removeButtonHtml;  // Only the "Remove" button for non-'Vehicle' rows
-        }
-    }
-},
+            render: function (data, type, row) {
+                var directAdd = 'Direct-Add';
+                var removeButtonHtml = '<button class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
+                if (row['button_type'] === 'Vehicle') {
+                    var addonsButtonHtml = '<a><button type="button" class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '">Addons</button></a>';
+                    return removeButtonHtml + addonsButtonHtml;
+                } else {
+                    return removeButtonHtml;  // Only the "Remove" button for non-'Vehicle' rows
+                }
+            }
+        },
             {
                 targets: -2,
                 data: null,
                 render: function (data, type, row) {
                     console.log(row);
                     var price = "";
+                    var uuid = "";
+
+
                     if(row['button_type'] == 'Vehicle') {
                         var price = row[8];
-
+                        var uuid = row['number'];
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                         var price = row[4];
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         var price = row[4];
+                        var uuid = row['rowId'];
                     }
                     // calculate
                     var amount = price * 1;
@@ -2095,13 +2174,14 @@ $(document).ready(function () {
 
                         }
                     var modelLine = row['model_line_id'];
+
                     return '<input type="hidden" name="is_addon[]" value="'+ addon +'" ><input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
-                        '<input type="hidden" name="model_lines[]" value="'+ modelLine +'" > <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
+                        '<input type="hidden" name="uuids[]" value="'+ uuid +'" > <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
                         '<input type="text"  value="'+ amount +'" class="total-amount-editable form-control" name="total_amounts[]" id="total-amount-'+ row['index'] +'" readonly />';
                 }
             },
             {
-                targets: -3,
+                targets: -5,
                 data: null,
                 render: function (data, type, row) {
                     return '<div class="input-group mb-3"> ' +
@@ -2115,7 +2195,7 @@ $(document).ready(function () {
                 }
             },
             {
-                targets: -4,
+                targets: -3,
                 data: null,
                 render: function (data, type, row) {
                     return '<input type="number" min="0"  value="1" step="1" class="qty-editable form-control" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)"  required name="quantities[]"  id="quantity-'+ row['index'] +'" />';
@@ -2190,7 +2270,7 @@ $(document).ready(function () {
                     }else if(row['button_type'] == 'Direct-Add') {
                         var code = row[2];
                         if(row['table_type'] == 'vehicle-table') {
-                            var code = row[6]
+                            var code = row[6];
                         }
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
@@ -2201,7 +2281,7 @@ $(document).ready(function () {
                 }
             },
             {
-                targets: -5,
+                targets: -4,
                 data: null,
                 render: function (data, type, row) {
                     var price = "";

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Country;
+use App\Models\MasterShippingPort;
 use App\Models\OtherLogisticsCharges;
 use App\Models\Setting;
 use App\Models\Shipping;
@@ -34,6 +35,7 @@ class ProformaInvoiceController extends Controller {
         })->get();
 
         $countries = Country::all();
+        $shippingPorts = MasterShippingPort::all();
         $shippings = ShippingMedium::all();
         $shippingDocuments = ShippingDocuments::all();
         $certifications = ShippingCertification::all();
@@ -43,7 +45,7 @@ class ProformaInvoiceController extends Controller {
         $usd_to_eru_rate = Setting::where('key', 'usd_to_euro_convertion_rate')->first();
 
         return view('proforma.invoice', compact('callDetails', 'brands','assessoriesDesc',
-            'sparePartsDesc','kitsDesc','shippings','certifications','countries',
+            'sparePartsDesc','kitsDesc','shippings','certifications','countries','shippingPorts',
            'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate'));
     }
     public function getaddonModels(Request $request, $brandId, $type) {

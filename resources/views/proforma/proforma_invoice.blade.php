@@ -97,9 +97,8 @@
                     <td style="font-weight: bold;">Person :</td>
                     <td>{{  $data['client_name']  }} </td>
                     <td style="font-weight: bold;">
-                        @if($quotation->shipping_method == 'EXW') Place Of Delivery :@endif </td>
+                        @if($quotation->shipping_method == 'EXW') Port Of Delivery :@endif </td>
                     <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->shippingPort->name ??''   }} @endif </td>
-
                 </tr>
 
                 <tr>
@@ -107,8 +106,9 @@
                     <td>{{$data['sales_person'] }}</td>
                     <td style="font-weight: bold;">Phone :</td>
                     <td>{{  $data['client_phone']  }} </td>
-                    <td></td>
-                    <td></td>
+                    <td style="font-weight: bold;">
+                        @if($quotation->shipping_method == 'EXW') Port Of Load :@endif </td>
+                    <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->shippingPortOfLoad->name ??''   }} @endif </td>
                 </tr>
                 <tr>
                     <td style="font-weight: bold;">Sales Office :</td>
