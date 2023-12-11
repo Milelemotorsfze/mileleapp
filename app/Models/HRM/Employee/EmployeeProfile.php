@@ -9,12 +9,15 @@ use App\Models\User;
 use App\Models\Masters\MasterJobPosition;
 use App\Models\Masters\MasterOfficeLocation;
 use App\Models\Masters\MasterDepartment;
+use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 class EmployeeProfile extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = "emp_profile";
     protected $fillable = [
+        'type',
         'user_id',
+        'interview_summary_id',
         'employee_code',
         'first_name',
         'last_name',
@@ -105,7 +108,10 @@ class EmployeeProfile extends Model
         'spouse_dob',
         'spouse_nationality',
         'personal_information_created_at',
+        'personal_information_send_at',
+        'personal_information_verified_at',
         'personal_information_created_by',
+        'personal_information_verified_by',
         
         'image_path',
         'language',
@@ -124,5 +130,8 @@ class EmployeeProfile extends Model
     }
     public function department() {
         return $this->hasOne(MasterDepartment::class,'id','department_id');
+    }
+    public function leadManagerHandover() {
+        return $this->hasOne(TeamLeadOrReportingManagerHandOverTo::class,'lead_or_manager_id','team_lead_or_reporting_manager');
     }
 }

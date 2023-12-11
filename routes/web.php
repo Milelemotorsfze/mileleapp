@@ -5,6 +5,7 @@ use App\Http\Controllers\HRM\Hiring\EmployeeHiringRequestController;
 use App\Http\Controllers\HRM\Hiring\EmployeeHiringQuestionnaireController;
 use App\Http\Controllers\HRM\Hiring\JobDescriptionController;
 use App\Http\Controllers\HRM\Hiring\PassportRequestController;
+use App\Http\Controllers\HRM\Hiring\CandidatePersonalInfoController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -267,6 +268,12 @@ Route::get('/d', function () {
         Route::post('interview-summary-report/request-action', 'requestAction')->name('interview-summary-report.request-action');
         Route::post('interview-summary-report/round-summary', 'updateRoundSummary')->name('interview-summary-report.round-summary');
         Route::post('interview-summary-report/final-evaluation', 'finalEvaluation')->name('interview-summary-report.final-evaluation');
+        Route::post('interview-summary-report/salary', 'salary')->name('interview-summary-report.salary');
+    });
+    // Candidate Personal Information Form
+    Route::resource('personal-info', CandidatePersonalInfoController::class);
+    Route::controller(CandidatePersonalInfoController::class)->group(function(){
+        Route::post('personal-info/send-email', 'sendEmail')->name('personal-info.send-email');
     });
     // Employee Passport Request
     Route::resource('passport_request', PassportRequestController::class);
