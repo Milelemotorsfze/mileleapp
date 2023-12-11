@@ -139,10 +139,13 @@ class ProformaInvoiceController extends Controller {
         return response()->json($accessories);
     }
     public function getbookingSpareParts($addonId, $brandId, $modelLineId, $ModelDescriptionId) {
+        dd($addonId, $brandId, $modelLineId, $ModelDescriptionId);
         $brandName = $modelLine = $modelDescription = '';
         $brandName = Brand::where('id',$brandId)->first();
         $modelLine = MasterModelLines::where('id',$modelLineId)->first();
-        $modelDescription = MasterModelDescription::where('id',$ModelDescriptionId)->first();
+        if($ModelDescriptionId != 'ModelDescriptionId') {
+            $modelDescription = MasterModelDescription::where('id',$ModelDescriptionId)->first(); 
+        }
         $spare_parts = AddonDetails::where('addon_type_name','SP');
         if($addonId != 'addonId') {
             $spare_parts = $spare_parts->where('description',$addonId);
