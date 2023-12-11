@@ -1332,7 +1332,6 @@
 </div>
 @endsection
 @push('scripts')
-
 <script>
      function addAgentModal() {
         $('#addAgentModal').modal('show');
@@ -2114,7 +2113,6 @@ $(document).ready(function () {
                 targets: -2,
                 data: null,
                 render: function (data, type, row) {
-                    console.log(row);
                     var price = "";
                     var uuid = "";
 
@@ -2210,8 +2208,6 @@ $(document).ready(function () {
                     }
                     // $('.checkbox-hide').attr('disabled', true);
                     // $('#checkbox-2').attr('disabled', true);
-                    console.log("rowindex");
-                    console.log(row['index']);
                     var arrayIndex = row['index'] - 1;
 
                     return '<div class="row" style="flex-wrap: unset">' +
@@ -3050,10 +3046,10 @@ $(document).ready(function () {
     </script>
   <script>
             $('#dtBasicExample2').on('click', '.addons-button', function () {
-                var modelLineId = $(this).data('model-line-id');
                 var Indexdatarows = $(this).data('index');
-                var RowId = $(this).data('number');
 
+                var modelLineId = $(this).data('model-line-id');
+                var RowId = $(this).data('number');
                 $('#addonsModal').modal('show');
                 clearDataTable();
                 $.ajax({
@@ -3097,7 +3093,7 @@ $(document).ready(function () {
                         var selectedType = $('select[name="addonTypevehicles"]').val();
                         var brandId = $('#brandIdInput').val();
                         var modelLineId = $('#modelIdInput').val();
-                        var ModelDescriptionId = '';
+                        var ModelDescriptionId = 'ModelDescriptionId';
                         if(selectedType == "accessories"){
                             // Make an AJAX request to the controller with the selected data
                             $.ajax({
@@ -3113,10 +3109,9 @@ $(document).ready(function () {
                             });
                         }
                         else if (selectedType == "spareParts"){
-                            var url = '{{ route('booking.getbookingSpareParts', ['selectedId', 'brandId', 'modelLineId', 'ModelDescriptionId']) }}';
                             $.ajax({
+                                url: '/get-booking-spare-parts/' + selectedId + '/' + brandId + '/' + modelLineId + '/' + ModelDescriptionId,
                                 type: 'GET',
-                                url: url,
                                 success: function (response) {
                                     // Update the DataTable with the received data
                                     updateDataTablespareparts(response);
@@ -3127,14 +3122,92 @@ $(document).ready(function () {
                             });
                         }
                         else if(selectedType == "kits"){
-
+                            $.ajax({
+                                url: '/get-booking-kits/' + selectedId + '/' + brandId + '/' + modelLineId + '/' + ModelDescriptionId,
+                                type: 'GET',
+                                success: function (response) {
+                                    // Update the DataTable with the received data
+                                    updateDataTablekits(response);
+                                },
+                                error: function (error) {
+                                    console.error('Error fetching addon data:', error);
+                                }
+                            });
                         }
                     });
+                    function updateDataTablekits(response) {
+                        var slNo = 0;
+                var data = response.map(function(kit) {
+                    slNo = slNo + 1;
+                    var kitID = kit.id
+                    var addButton = '<div class="circle-button add-button-addonsinner" data-button-type="Kit" data-row-id="' + RowId + '" data-kit-id="' + kitID + '" data-kit-id-test="' + Indexdatarows + '"></div>';
+                    var kitName = '';
+                    if(kit.addon_name.name != null) {
+                       kitName = kit.addon_name.name;
+                    }
+                    var kitBrandName = kit.brandModelLineModelDescription;
+                    var kitItems = '';
+                    var itemCount = (kit.kit_items).length;
+                    if(itemCount > 0) {
+                        kitItems = kitItems + '<table><thead><tr><th style="border: 1px solid #c4c4d4" hidden>Sl No</th><th style="border: 1px solid #c4c4d4">Item</th><th style="border: 1px solid #c4c4d4">Quantity</th></thead><tbody>'
+                        var itemSlNo = 0;
+                        for(var l=0; l<itemCount; l++) {
+                            itemSlNo = itemSlNo+1;
+                            kitItems = kitItems + '<tr><td style="border: 1px solid #c4c4d4" hidden>'+itemSlNo+'</td><td style="border: 1px solid #c4c4d4">'+kit.kit_items[l].item.addon.name;
+                            if(kit.kit_items[l].item.description != null) {
+                                kitItems = kitItems + ' - '+kit.kit_items[l].item.description;
+                            }
+                            kitItems = kitItems +'</td><td style="border: 1px solid #c4c4d4">'+kit.kit_items[l].quantity+'</td></tr>'
+                        }
+                        kitItems = kitItems + '</tbody></table>'
+                    }
+                    if(kit.selling_price != null) {
+                        if(kit.selling_price.selling_price != '0.00' || kit.selling_price.selling_price != null) {
+                            var kitSellingPrice = kit.selling_price.selling_price;
+                        }
+                    }
+                    else {
+                        var kitSellingPrice = '';
+                    }
+                    return [
+                            slNo,
+                            kit.addon_code,
+                            kitName,
+                            kitBrandName,
+                            // kitBrand,
+                            kitSellingPrice,
+                            kitItems,
+                            // kit.LeastPurchasePrices.purchase_price_aed,
+                            addButton,
+                        ];
+                });
+                if ($.fn.dataTable.isDataTable('#addonDataTable')) {
+                    $('#addonDataTable').DataTable().destroy();
+                }
+                $('#addonDataTable').DataTable({
+                    data: data,
+                    columns: [
+                        { title: 'S.No:' },
+                        { title: 'Kit Code' },
+                        { title: 'Kit Name' },
+                        { title: 'Brand/Model Lines/Model Description' },
+                        { title: 'Selling Price(AED)'},
+                        // { title: 'Model Lines/Model Description' },
+                        { title: 'Items/ Quantity'},
+                        // { title: 'Least Purchase Price(AED)'}
+                        {
+                                    title: 'Add Into Quotation',
+                                }
+                    ]
+                });
+                        $('#addonDataTableContainer').show();
+                    }
                     function updateDataTablespareparts(response) {
                         var slNo = 0;
                         var data = response.map(function(sparePart) {
                             slNo = slNo + 1;
-                            var addButton = '<button class="add-button" data-button-type="SparePart" data-model-line-id="'+ modelLineId +'"  data-sparepart-id="' + sparePart.id + '">Add</button>';
+                            var sparePartID = sparePart.id;
+                            var addButton = '<div class="circle-button add-button-addonsinner" data-button-type="SparePart" data-row-id="' + RowId + '" data-sparepart-id="' + sparePartID + '" data-sparepart-id-test="' + Indexdatarows + '"></div>';
                             if(sparePart.addon_description.description != null) {
                                 var sparePartName = sparePart.addon_description.addon.name + ' - ' + sparePart.addon_description.description;
                             }
@@ -3182,12 +3255,10 @@ $(document).ready(function () {
                                 sparePart.addon_code,
                                 sparePartName,
                                 sparePartBrandName,
-                                // sparePartBrand,
                                 sparePartSellingPrice,
                                 sparePartNumber,
                                 sparePartAdditionalRemarks,
                                 sparePartFixingCharge,
-                                // sparePart.LeastPurchasePrices.purchase_price_aed,
                                 addButton,
                             ];
                         });
@@ -3207,12 +3278,10 @@ $(document).ready(function () {
                                 { title: 'Fixing Charge'},
                                 {
                                     title: 'Add Into Quotation',
-                                    render: function(data, type, row) {
-                                        return '<div class="circle-button add-button" data-button-type="SparePart" data-model-line-id="'+ modelLineId +'"  data-sparepart-id="' + row[0] + '"></div>';
-                                    }
                                 }
                             ]
                         });
+                        $('#addonDataTableContainer').show();
                     }
                     function updateDataTable(response) {
                         var slNo = 0;
@@ -3287,39 +3356,35 @@ $(document).ready(function () {
                 }
             });
             $('#addonDataTable').on('click', '.add-button-addonsinner', function () {
-
                 var table = $('#addonDataTable').DataTable();
-
-
                 var rowData = [];
                 var mainTable = $('#dtBasicExample2').DataTable();
                 var buttonType = $(this).data('button-type');
                 rowData['model_type'] = buttonType;
-                var datainc = $(this).data('index-rowas');
                 var index = mainTable.data().length + 1;
                 rowData['button_type'] = buttonType;
                 rowData['index'] = index;
                 if(buttonType == 'Accessory') {
+                    var datainc = $(this).data('index-rowas');
                     var id = $(this).data('accessory-id');
                     var rowId = $(this).data('row-id');
                 }
                 else if(buttonType == 'SparePart') {
+                    var datainc = $(this).data('sparepart-id-test');
                     var id = $(this).data('sparepart-id');
                     var rowId = $(this).data('row-id');
                 }
                 else if(buttonType == 'Kit') {
+                    var datainc = $(this).data('kit-id-test');
                     var id = $(this).data('kit-id');
                     var rowId = $(this).data('row-id');
                 }
-
-
                 rowData['id'] = id;
                 rowData['rowId'] = rowId;
                 var row = $(this).closest('tr');
                 row.find('td').each(function() {
                     rowData.push($(this).html());
                 });
-                var accessoryId = $(this).data('accessory-id');
                 var subRowId = $(this).data('row-id');
                 var newIndex = parseInt(datainc) + 1;
                 var addedRow = mainTable.row.add(rowData).draw();
@@ -3398,10 +3463,10 @@ $(document).ready(function () {
                     $('#submit-button').attr("disabled", true);
                 }
             }
-            // function resetIndex() {
+            function resetIndex() {
             //     var secondTable = $('#dtBasicExample2').DataTable();
             //     var count = secondTable.data().length;
             //
-            // }
+             }
         </script>
 @endpush

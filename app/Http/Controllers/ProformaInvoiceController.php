@@ -7,6 +7,7 @@ use App\Models\MasterShippingPort;
 use App\Models\OtherLogisticsCharges;
 use App\Models\Setting;
 use App\Models\Shipping;
+use Illuminate\Support\Facades\DB;
 use App\Models\ShippingCertification;
 use App\Models\ShippingDocuments;
 use App\Models\ShippingMedium;
@@ -142,7 +143,9 @@ class ProformaInvoiceController extends Controller {
         $brandName = $modelLine = $modelDescription = '';
         $brandName = Brand::where('id',$brandId)->first();
         $modelLine = MasterModelLines::where('id',$modelLineId)->first();
-        $modelDescription = MasterModelDescription::where('id',$ModelDescriptionId)->first();
+        if($ModelDescriptionId != 'ModelDescriptionId') {
+            $modelDescription = MasterModelDescription::where('id',$ModelDescriptionId)->first(); 
+        }
         $spare_parts = AddonDetails::where('addon_type_name','SP');
         if($addonId != 'addonId') {
             $spare_parts = $spare_parts->where('description',$addonId);
@@ -198,11 +201,15 @@ class ProformaInvoiceController extends Controller {
                 if($brandName != '' && $modelLine != '' && $modelDescription != '') {
                     $addon->brandModelLineModelDescription = $brandName->brand_name.' - '.$modelLine->model_line.' , '.$modelDescription->model_description;
                 }
+                else {
+                    $addon->brandModelLineModelDescription = $brandName->brand_name.' - '.$modelLine->model_line;
+                }
             }
         }
         return response()->json($spare_parts);
     }
     public function getbookingKits($addonId, $brandId, $modelLineId, $ModelDescriptionId) {
+       
         $brandName = $modelLine = $modelDescription = '';
         $brandName = Brand::where('id',$brandId)->first();
         $modelLine = MasterModelLines::where('id',$modelLineId)->first();
@@ -279,17 +286,32 @@ class ProformaInvoiceController extends Controller {
             if($brandName != '' && $modelLine != '' && $modelDescription != '') {
                 $addon->brandModelLineModelDescription = $brandName->brand_name.' , '.$modelLine->model_line.' , '.$modelDescription->model_description;
             }
+            else
+            {
+                $addon->brandModelLineModelDescription = $brandName->brand_name.' , '.$modelLine->model_line;  
+            }
         }
         return response()->json($kits);
     }
     public function addonsModal($modelLineId)
     {
-        info($modelLineId);
         $modelLineId = $modelLineId;
         $brands = MasterModelLines::where('id', $modelLineId)->pluck('brand_id')->first();
-        $assessoriesDesc = Addon::where('addon_type','P')->get();
-        $sparePartsDesc = Addon::where('addon_type','SP')->get();
-        $kitsDesc = Addon::where('addon_type','K')->get();
+        $assessoriesDesc = DB::table('addon_descriptions')
+        ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
+        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->where('addons.addon_type', 'P')
+        ->get();
+        $sparePartsDesc = DB::table('addon_descriptions')
+        ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
+        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->where('addons.addon_type', 'SP')
+        ->get();
+        $kitsDesc = DB::table('addon_descriptions')
+        ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
+        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->where('addons.addon_type', 'K')
+        ->get();
         return response()->json([
             'assessoriesDesc' => $assessoriesDesc,
             'modelLineId' => $modelLineId,
