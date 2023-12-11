@@ -409,6 +409,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             </div>
                         </div>
 
+                        <div class="other-specific-passport-release-option" style="display: none;">
+                            <div class=" col-lg-4 col-md-6 col-sm-6 ">
+
+                                <label for="release_purpose" class="form-label"> </label>
+                                <input type="text" placeholder="Please Specify Other" name="release_purpose" class="form-control" id="other_release_purpose" value="">
+                            </div>
+                        </div>
+
                         <div class="col-lg-10 col-md-10 col-sm-10 col-12">
                             <p class="submit-passport-para">However, I can withdraw my passport when required by fulfilling the necessary requirements</p>
                         </div>
@@ -684,6 +692,13 @@ redirect()->route('home')->send();
         $('#passport_request_dropdown').on('change', showPassportRequestInput);
 
         $('#purposes_of_release_id').on('change', function() {
+            var selectedValue = $(this).val();
+            if (selectedValue == 13) {
+                $('.other-specific-passport-release-option').show();
+            } else {
+                $('.other-specific-passport-release-option').hide();
+            }
+
             var fieldName = $(this).attr('name');
             $('#employeePassportRequestForm').validate().element('[name="' + fieldName + '"]');
         });

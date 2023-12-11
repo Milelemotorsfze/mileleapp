@@ -69,10 +69,10 @@ class QuotationController extends Controller
 //        $request->validate([
 //            'prices' => 'required'
 //        ]);
-
+        $isVehicle = 0;
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
-
+//
         DB::beginTransaction();
 
         $call = Calls::find($request->calls_id);
@@ -269,9 +269,9 @@ class QuotationController extends Controller
         DB::commit();
         $quotationDetail = QuotationDetail::with('country')->find($quotationDetail->id);
 
-//        $quotation = Quotation::find(14);
+//        $quotation = Quotation::find(8);
 //        $call = Calls::find($quotation->calls_id);
-//        $quotationDetail = QuotationDetail::with('country')->where('quotation_id', 14)->orderBy('id','DESC')->first();
+//        $quotationDetail = QuotationDetail::with('country')->where('quotation_id', 8)->orderBy('id','DESC')->first();
 
         $vehicles =  QuotationItem::where("reference_type", 'App\Models\Varaint')
             ->where('quotation_id', $quotation->id)->get();
@@ -313,7 +313,7 @@ class QuotationController extends Controller
 
         $hidedAddonSum = QuotationItem::where('reference_type','App\Models\AddonDetails')
             ->whereNotIn('id', $alreadyAddedQuotationIds)
-            ->where('is_enable', true)
+//            ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)
             ->where('is_enable', false)->sum('total_amount');
 
