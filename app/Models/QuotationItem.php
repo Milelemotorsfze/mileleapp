@@ -14,7 +14,7 @@ class QuotationItem extends Model
     }
     public $appends = [
         'quotation_addon_items',
-//        'vehicle_unit_price',
+        'vehicle_unit_price',
     ];
     public function quotationSubItems() {
 

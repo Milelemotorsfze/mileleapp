@@ -2100,9 +2100,9 @@ $(document).ready(function () {
     data: null,
             render: function (data, type, row, index) {
                 var directAdd = 'Direct-Add';
-                var removeButtonHtml = '<button class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
+                var removeButtonHtml = '<button type="button" class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
                 if (row['button_type'] === 'Vehicle') {
-                    var addonsButtonHtml = '<button class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '">Addons</button>';
+                    var addonsButtonHtml = '<button type="button" class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '">Addons</button>';
                     return removeButtonHtml + addonsButtonHtml;
                 } else {
                     return removeButtonHtml;  // Only the "Remove" button for non-'Vehicle' rows
@@ -2115,8 +2115,6 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     var price = "";
                     var uuid = "";
-
-
                     if(row['button_type'] == 'Vehicle') {
                         var price = row[8];
                         var uuid = row['number'];
@@ -2149,7 +2147,7 @@ $(document).ready(function () {
                     return '<div class="input-group mb-3"> ' +
                                 '<input type="number" min="0"  value="1" step="1" class="system-code form-control"  name="system_code_amount[]"  id="system-code-amount-'+ row['index'] +'" />' +
                                 '<div class="input-group-append"> ' +
-                                    '<select class="form-control" name="system_code_currency[]"  id="system-code-currency-'+ row['index'] +'">' +
+                                    '<select class="form-control system-code-currency" name="system_code_currency[]"  id="system-code-currency-'+ row['index'] +'">' +
                                         '<option value="A">A</option><option value="U">U</option>' +
                                 '</select>' +
                                 '</div> ' +
@@ -2174,6 +2172,8 @@ $(document).ready(function () {
                         var interiorColor = row[6];
                         var exteriorColor = row[7];
                         var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
+
+                        // $('#checkbox-'+data['index']).attr('disabled', true);
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                         combinedValue = row[2]+', '+row[3];
@@ -2204,6 +2204,7 @@ $(document).ready(function () {
                         combinedValue =  row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5]+ comma5 + row[6];
                         if(row['table_type'] !== 'vehicle-table') {
                             combinedValue = row[0] + comma0 + combinedValue;
+                            // $('#checkbox-'+data['index']).attr('disabled', true);
                         }
                     }
                     // $('.checkbox-hide').attr('disabled', true);
@@ -2211,7 +2212,7 @@ $(document).ready(function () {
                     var arrayIndex = row['index'] - 1;
 
                     return '<div class="row" style="flex-wrap: unset">' +
-                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;"  name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide"' +
+                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;"   name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide"' +
                         ' checked id="checkbox-'+ row['index'] +'"> ' +
                         '<input type="text" name="descriptions[]" required class="combined-value-editable form-control" value="' + combinedValue + '"/>' +
                         '</div> ';
@@ -2263,7 +2264,7 @@ $(document).ready(function () {
                         var price = price / parseFloat(value);
                     }
                     return '<input type="number" min="0" name="prices[]" required class="price-editable form-control" id="price-'+ row['index'] +'" value="' + price + '"/>' +
-                        '    <span id="priceError' +  row['index'] +'" class=" invalid-feedback"></span>';
+                        '    <span id="priceError' +  row['index'] +'" class="price-error invalid-feedback"></span>';
                 }
             }
         ]
@@ -2311,12 +2312,12 @@ $(document).ready(function () {
         secondTable.row(index).remove().draw();
         // var data = secondTable.rows().data();
 
-        $('#dtBasicExample2 tr').each(function(i){
-
-           $(this).find('td input.price-editable').attr('id','price-'+ i);
-           $(this).find('td input.qty-editable').attr('id','quantity-'+ i);
-           $(this).find('td input.total-amount-editable').attr('id','total-amount-'+ i);
-        });
+        // $('#dtBasicExample2 tr').each(function(i){
+        //
+        //    $(this).find('td input.price-editable').attr('id','price-'+ i);
+        //    $(this).find('td input.qty-editable').attr('id','quantity-'+ i);
+        //    $(this).find('td input.total-amount-editable').attr('id','total-amount-'+ i);
+        // });
 
         if(row['button_type'] != 'Direct-Add') {
             resetSerialNumber(table);
@@ -2328,6 +2329,7 @@ $(document).ready(function () {
                 $('.total-div').attr('hidden', true);
             }
             calculateTotalSum();
+            resetIndex();
     });
     $('#submit-button').on('click', function(e) {
         var selectedData = [];
@@ -3388,6 +3390,8 @@ $(document).ready(function () {
                 var subRowId = $(this).data('row-id');
                 var newIndex = parseInt(datainc) + 1;
                 var addedRow = mainTable.row.add(rowData).draw();
+                table.row(row).remove().draw();
+
                 var currentIndex = mainTable.row(addedRow.node()).index();
                 if (currentIndex !== newIndex) {
                     var data = mainTable.data().toArray();
@@ -3399,6 +3403,7 @@ $(document).ready(function () {
                 // total amount div logic
                 CalculateTotalAmount(index);
                 calculateTotalSum();
+                resetIndex();
                 // enableOrDisableSubmit();
             });
 
@@ -3407,6 +3412,16 @@ $(document).ready(function () {
                 var row = $(this).closest('tr');
                 var mainTable = $('#dtBasicExample2').DataTable();
                 mainTable.row(row).remove().draw();
+                // if(row['button_type'] != 'Direct-Add') {
+                //     resetSerialNumber(table);
+                // }
+
+                // total div logic
+                var tableLength = secondTable.data().length;
+                if(tableLength == 0) {
+                    $('.total-div').attr('hidden', true);
+                }
+                calculateTotalSum();
             });
 
             function resetSerialNumber(table) {
@@ -3464,9 +3479,26 @@ $(document).ready(function () {
                 }
             }
             function resetIndex() {
-            //     var secondTable = $('#dtBasicExample2').DataTable();
-            //     var count = secondTable.data().length;
-            //
-             }
+                var table = $("#dtBasicExample2 tr");
+                table.each(function(i){
+                    var checkboxIndex = i - 1;
+                   $(this).find(".total-amount-editable").attr('id','total-amount-' + i);
+                   $(this).find(".qty-editable").attr('id','quantity-' + i);
+                   $(this).find(".price-editable").attr('id','price-' + i);
+                    $(this).find(".system-code").attr('id','system-code-amount-' + i);
+                    $(this).find(".price-editable").attr('id','price-' + i);
+                    $(this).find(".system-code-currency").attr('id','system-code-currency-' + i);
+                    $(this).find(".checkbox-hide").attr('id','checkbox-' + i);
+                    $(this).find(".checkbox-hide").attr('name','is_hide['+ checkboxIndex +']');
+                    $(this).find(".price-error").attr('id','priceError'+ checkboxIndex);
+
+                });
+            }
+            function disableCheckBox() {
+                var table = $("#dtBasicExample2 tr");
+                table.each(function(i){
+                    $(this).find("checkbox-"+i).attr('disabled', true);
+                });
+            }
         </script>
 @endpush

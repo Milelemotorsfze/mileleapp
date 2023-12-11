@@ -205,11 +205,11 @@ class QuotationController extends Controller
 
             if($isVehicle == 1){
 //               $arrayKeys = array_keys($request->addonUUIDs, $vehicleUUID);
-//                if (count($arrayKeys) > 0) {
+                if ($request->uuids[$key]) {
                    array_push($quotationItemIds, $quotationItem->id);
                     // At least one match...
 //                    $quotationSubItemKeys[$quotationItem->id] = $arrayKeys;
-//                }
+                }
     //          check this model line is existing in addons array, if yes get the array key;
             }
             $isVehicle = 0;
@@ -223,6 +223,7 @@ class QuotationController extends Controller
 
             $subItemIds = QuotationItem::where('uuid', $quotationItemRow->uuid)
                                     ->whereNot('id',$quotationItemRow->id)
+                                    ->whereNotNull('uuid')
                                     ->where('quotation_id', $quotation->id)->pluck('id')->toArray();
             if($subItemIds) {
                 foreach ($subItemIds as $subItemId) {
@@ -353,23 +354,23 @@ class QuotationController extends Controller
             $data['sales_phone'] = $salesPersonDetail->contact_number;
         }
 
-//        $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
-//            ->where('quotation_id', $quotation->id)
-//            ->whereIn('reference_type',['App\Models\ShippingDocuments','App\Models\Shipping',
-//                'App\Models\ShippingCertification','App\Models\OtherLogisticsCharges'])
-//            ->sum('total_amount');
-//        $vehicleCount = $vehicles->count() + $variants->count();
-//        if($vehicleCount > 0) {
-//            $shippingChargeDistriAmount = $shippingHidedItemAmount / $vehicleCount;
-//        }else{
-//            $shippingChargeDistriAmount = 0;
-//        }
+        $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
+            ->where('quotation_id', $quotation->id)
+            ->whereIn('reference_type',['App\Models\ShippingDocuments','App\Models\Shipping',
+                'App\Models\ShippingCertification','App\Models\OtherLogisticsCharges'])
+            ->sum('total_amount');
+        $vehicleCount = $vehicles->count() + $variants->count() + $otherVehicles->count();
+        if($vehicleCount > 0) {
+            $shippingChargeDistriAmount = $shippingHidedItemAmount / $vehicleCount;
+        }else{
+            $shippingChargeDistriAmount = 0;
+        }
 
 //        return view('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
 //            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons','addonsTotalAmount'));
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons','addonsTotalAmount',
-        'otherVehicles','OtherAddons'));
+        'otherVehicles','OtherAddons','shippingChargeDistriAmount'));
 
 //        return $pdfFile->stream('test.pdf');
 
