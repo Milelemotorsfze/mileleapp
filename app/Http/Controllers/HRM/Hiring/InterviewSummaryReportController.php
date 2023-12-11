@@ -389,4 +389,30 @@ class InterviewSummaryReportController extends Controller
         $next = InterviewSummaryReport::where('hiring_request_id',$data->hiring_request_id)->where('id', '>', $id)->min('id');
         return view('hrm.hiring.interview_summary_report.show',compact('data','previous','next')); 
     }
+    public function salary(Request $request) { 
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $update = InterviewSummaryReport::where('id',$request->id)->first();
+                if($update) {
+                    $update->candidate_expected_salary = $request->candidate_expected_salary;
+                    $update->total_salary = $request->total_salary;
+                }
+                $update->update();
+                DB::commit();
+                return redirect()->route('interview-summary-report.index')
+                                    ->with('success','Salary Details Of Candidate Created Successfully');
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                dd($e);
+            }
+        }
+    }
 }

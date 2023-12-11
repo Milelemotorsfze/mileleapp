@@ -16,6 +16,12 @@
         color: red;
         font-size:11px;
     }
+	.other-error {
+        color: red;
+    }
+	.table-edits input, .table-edits select {
+		height:38px!important;
+	}
 	</style>
 @section('content')
 <div class="card-header">
@@ -82,10 +88,10 @@
 			<a class="nav-link" data-bs-toggle="pill" href="#approved-hiring-requests">Approved</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#selected_for_job">Selected For Job</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#personalinfo_docs">Personal Info & Docs</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#personalinfo_docs">Personal Info & Docs</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#selected_for_job">Selected For Job</a>
 		</li>
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#rejected-hiring-requests">Rejected</a>
@@ -2041,7 +2047,128 @@
 											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
 											</a>
 										</li>
+										<li>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Salary Details" type="button" class="btn btn-info btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#shortlisted-candidate-{{$data->id}}">
+												<i class="fa fa-plus" aria-hidden="true"></i> Salary Details
+											</button>
+										</li>
+										@if($data->candidate_expected_salary != 0.00 && $data->total_salary != 0.00)
+										<li>
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Add Personal Info" class="btn btn-sm btn-secondary" href="{{route('personal-info.create')}}">
+											<i class="fa fa-user-plus" aria-hidden="true"></i> Add Personal Info
+											</a>
+										</li>
+										<li>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Salary Details" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#send-personal-info-form-{{$data->id}}">
+												<i class="fa fa-paper-plane" aria-hidden="true"></i> Send Form
+											</button>
+										</li>
+										@endif
 									</ul>
+								</div>
+								<div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
+									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog ">
+										<div class="modal-content">
+											<form method="POST" action="{{route('interview-summary-report.salary')}}" id="salary_{{$data->id}}">
+												@csrf
+												<div class="modal-header">
+													<h1 class="modal-title fs-5" id="exampleModalLabel">Update Salary Details</h1>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body p-3">
+													<div class="col-lg-12">
+														<div class="row">
+															<div class="col-12">
+																<div class="row">
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<input type="text" name="id" value="{{$data->id}}" hidden>
+																	</div>
+																</div>
+																<div class="row">
+																	<div class="col-xxl-12 col-lg-12 col-md-12">
+																		<label for="candidate_expected_salary" class="form-label font-size-13">{{ __('Candidate Expected Salary') }}</label>
+																	</div>
+																	<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
+																		<div class="input-group">
+																			<input name="candidate_expected_salary" id="candidate_expected_salary_{{$data->id}}" class="form-control" required
+																			oninput="inputNumberAbs(this)" placeholder="Enter Candidate Expected Salary" value="@if($data->candidate_expected_salary != '0.00') {{$data->candidate_expected_salary}} @endif">
+																			<div class="input-group-append">
+																				<span class="input-group-text widthinput" id="basic-addon2">AED</span>
+																			</div>
+																		</div>
+																	</div>
+																	<div class="col-xxl-12 col-lg-12 col-md-12">
+																		<label for="total_salary" class="form-label font-size-13">{{ __('Finalised Salary') }}</label>
+																	</div>
+																	<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
+																		<div class="input-group">
+																			<input name="total_salary" id="total_salary_{{$data->id}}" class="form-control" required
+																			oninput="inputNumberAbs(this)" placeholder="Enter Finalised Salary" value="@if($data->total_salary != '0.00') {{$data->total_salary ?? ''}} @endif">
+																			<div class="input-group-append">
+																				<span class="input-group-text widthinput" id="basic-addon2">AED</span>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary candidate-salary"
+														data-id="{{ $data->id }}" data-status="final">Submit</button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+								<div class="modal fade" id="send-personal-info-form-{{$data->id}}"
+									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog ">
+										<div class="modal-content">
+											<form method="POST" action="{{route('personal-info.send-email')}}" id="send_email_{{$data->id}}">
+												@csrf
+												<div class="modal-header">
+													<h1 class="modal-title fs-5" id="exampleModalLabel">Send Personal Information Form To candodates
+
+													</h1>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body p-3">
+													<div class="col-lg-12">
+														<div class="row">
+															<div class="col-12">
+																<div class="row">
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<input type="text" name="id" value="{{$data->id}}" hidden>
+																	</div>
+																</div>
+																<div class="row">
+																	<div class="col-xxl-12 col-lg-12 col-md-12">
+																		<label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
+																	</div>
+																	<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
+																			<input name="email" id="email_{{$data->id}}" class="form-control" required
+																			placeholder="Enter Candidate Expected Salary" value="@if($data->email) {{$data->email}} @endif">
+																			
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary send-email"
+														data-id="{{ $data->id }}" data-status="final">Submit</button>
+												</div>
+											</form>
+										</div>
+									</div>
 								</div>
 							</td>
 						</tr>
@@ -2672,6 +2799,32 @@
 				},
 			});
 		})
+		$('.candidate-salary').click(function (e) {
+	        var id = $(this).attr('data-id');
+	        var status = $(this).attr('data-status');
+			$('#salary_'+id).validate({ 
+				rules: {
+					candidate_expected_salary: {
+						required: true,
+					},
+					total_salary: {
+						required: true,
+					},
+					id: {
+						required: true,
+					}
+				},
+				errorPlacement: function(error, element) {
+            if (element.attr('name') === 'candidate_expected_salary' || element.attr('name') === 'total_salary') {
+                error.addClass('other-error');
+                error.insertAfter(element.closest('.input-group'));
+            } else {
+                error.addClass('other-error');
+                error.insertAfter(element);
+            }
+        },
+			});
+		})
 		$('.final-interview-summary').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
@@ -2692,9 +2845,20 @@
 				},
 			});
 		})
+		$('.send-email').click(function (e) {
+	        var id = $(this).attr('data-id');
+			$('#send_email_'+id).validate({ 
+				rules: {
+					email: {
+						required: true,
+						email: true,
+                        accept:"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}"
+					},
+				},
+			});
+		})		
 	})
-	function inputNumberAbs(currentPriceInput) 
-	{
+	function inputNumberAbs(currentPriceInput) {
 	    var id = currentPriceInput.id;
 	    var input = document.getElementById(id);
 	    var val = input.value;

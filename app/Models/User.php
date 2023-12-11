@@ -30,15 +30,75 @@ class User extends Authenticatable
     ];
     protected $appends = [
         'passport_with',
+        'can_submit_or_release_passport',
     ];
-    public function getPassportWithAttribute()
-    {
+    public function getPassportWithAttribute() {
         $passportWith = 'with_employee';
-        $passportRequest = PassportRequest::where('employee_id',$this->id)->where('passport_status','with_company')->latest('id')->first();
-        if($passportRequest) {
+        // $passportRequest = PassportRequest::where('employee_id',$this->id)->where('passport_status','with_company')->latest('id')->first();
+        // if($passportRequest) {
+        //     $passportWith = 'with_company';
+        // }
+        if($this->passport_status == 'with_milele') {
             $passportWith = 'with_company';
         }
         return $passportWith;
+    }
+    public function getCanSubmitOrReleasePassportAttribute() {
+        if($this->type == 'employee' && $this->passport_status == NULL) {
+            $submitRequestExist = PassportRequest::where('employee_id',$this->id)->first();
+            $isSubmitPending = PassportRequest::where([
+                ['employee_id',$this->id],
+                ['submit_status','pending'],
+            ])->first();
+        }
+        else if($this->type == 'employee' && $this->passport_status == 'with_milele') {
+
+        }
+        else if($this->type == 'employee' && $this->passport_status == 'with_employee') {
+            
+        }
+        // $submitRequestExist = PassportRequest::where('employee_id',$this->id)->first();
+        // $isSubmitPending = PassportRequest::where([
+        //     ['employee_id',$this->id],
+        //     ['submit_status','pending'],
+        // ])->first();
+        // $isSubmited = PassportRequest::where([
+        //     ['employee_id',$this->id],
+        //     ['passport_status','with_company'],
+        //     ['submit_status','approved'],
+        //     ['release_submit_status',NULL]
+        // ])->first();
+        // $isReleasePending = PassportRequest::where([
+        //     ['employee_id',$this->id],
+        //     ['passport_status','with_company'],
+        //     ['submit_status','approved'],
+        //     ['release_submit_status','pending']
+        // ])->first();
+        // $canSubmitOrReleasePassport = true;
+        
+        // if($empExist) {
+            
+
+            // $isRelease = PassportRequest::where([
+            //     ['employee_id',$this->id],
+            //     ['passport_status','with_company'],
+            //     ['passport_status','with_company'],
+            //     ['release_submit_status','!=',NULL]
+            // ])->first();
+            // if(!$isSubmit) {
+            //     $canSubmitOrReleasePassport = true;
+            // }
+                // ['passport_status','with_company'],
+                // ['submit_status','!=','rejected'],
+                // ['release_submit_status','!=',NULL],
+            // )->where('submit_status','!=','rejected')->orWhereNotIn('release_submit_status',[NULL,'rejected'])->get();
+
+            
+        // }
+        // else {
+        //     $canSubmitOrReleasePassport = true;
+        // }
+        return $canSubmitOrReleasePassport;
     }
     public function getSelectedRoleAttribute()
     {
