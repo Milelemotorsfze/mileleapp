@@ -45,7 +45,7 @@ class EmployeeLiabilityController extends Controller
             $previous = Liability::where('status',$data->status)->where('id', '<', $id)->max('id');
             $next = Liability::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
-        $masterEmployees = User::whereNot('id','16')->select('id','name')->get();
+        $masterEmployees = User::whereHas('empProfile')->select('id','name')->get();
         return view('hrm.hiring.employee_liability.create',compact('id','data','previous','next','masterEmployees'));
     }
     public function storeOrUpdate(Request $request, $id) { 

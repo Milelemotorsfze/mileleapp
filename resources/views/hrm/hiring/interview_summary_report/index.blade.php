@@ -2054,11 +2054,11 @@
 											</button>
 										</li>
 										@if($data->candidate_expected_salary != 0.00 && $data->total_salary != 0.00)
-										<li>
+										<!-- <li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Add Personal Info" class="btn btn-sm btn-secondary" href="{{route('personal-info.create')}}">
 											<i class="fa fa-user-plus" aria-hidden="true"></i> Add Personal Info
 											</a>
-										</li>
+										</li> -->
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Salary Details" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#send-personal-info-form-{{$data->id}}">
@@ -2153,7 +2153,7 @@
 																	</div>
 																	<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
 																			<input name="email" id="email_{{$data->id}}" class="form-control" required
-																			placeholder="Enter Candidate Expected Salary" value="@if($data->email) {{$data->email}} @endif">
+																			placeholder="Enter Candidate Email" value="@if($data->email) {{$data->email}} @endif">
 																			
 																	</div>
 																</div>

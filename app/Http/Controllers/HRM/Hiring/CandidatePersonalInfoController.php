@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\HRM\Hiring;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Validator;
+use App\Models\HRM\Hiring\InterviewSummaryReport;
 
 class CandidatePersonalInfoController extends Controller
 {
