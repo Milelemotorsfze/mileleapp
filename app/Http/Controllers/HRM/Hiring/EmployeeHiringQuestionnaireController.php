@@ -42,7 +42,7 @@ class EmployeeHiringQuestionnaireController extends Controller
         $masterVisaTypes = MasterVisaType::where('status','active')->select('id','name')->get();
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterLanguages = Language::select('id','name')->get();
-        $interviewdByUsers = User::whereNot('id',16)->select('id','name')->get();
+        $interviewdByUsers = User::whereHas('empProfile')->select('id','name')->get();
         $masterRecuritmentSources = MasterRecuritmentSource::select('id','name')->get();
         $masterDepartments = MasterDepartment::select('id','name')->get();
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();

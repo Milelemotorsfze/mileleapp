@@ -49,14 +49,13 @@ class PassportRequestController extends Controller
             $previous = PassportRequest::where('status',$data->status)->where('id', '<', $id)->max('id');
             $next = PassportRequest::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
-        $Users = User::whereNot('id','16')->get();
+        $Users = User::whereHas('empProfile')->get();
         $masterEmployees = [];
         foreach($Users as $User) {
             if($User->can_submit_or_release_passport == true) {
                 array_push($masterEmployees,$User);  
             }
         }
-        // $masterEmployees = 
         $submissionPurpose = PassportRequestPurpose::where('type','submit')->get();
         $releasePurpose = PassportRequestPurpose::where('type','release')->get();
         return view('hrm.hiring.passport_request.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));
@@ -82,7 +81,7 @@ class PassportRequestController extends Controller
                         $input['submit_hr_manager_id'] = $HRManager->handover_to_id;                
                         $input['submit_department_head_id'] = $employee->leadManagerHandover->approval_by_id;
                         $input['submit_division_head_id'] = $divisionHead->division_head_id;
-                        $input['passport_status'] = 'with_company';
+                        // $input['passport_status'] = 'with_company';
                         $createRequest = PassportRequest::create($input);
                         $history['passport_request_id'] = $createRequest->id;
                         $history2['passport_request_id'] = $createRequest->id;
@@ -91,7 +90,7 @@ class PassportRequestController extends Controller
                     else if(isset($request->purposes_of_release)) {
                         $update = PassportRequest::where([
                             ['employee_id',$request->employee_id],
-                            ['passport_status','with_company'],
+                            // ['passport_status','with_company'],
                             ['submit_action_by_hr_manager','approved'],
                             ['purposes_of_release',NULL],
                             ['submit_status','approved'],

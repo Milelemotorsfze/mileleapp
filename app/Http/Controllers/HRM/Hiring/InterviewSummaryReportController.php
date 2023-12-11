@@ -113,7 +113,7 @@ class InterviewSummaryReportController extends Controller
         $rejected = InterviewSummaryReport::where('status','rejected')->where('seleced_status','pending')->latest()->get();
         $selectedForJob = InterviewSummaryReport::where('status','approved')->where('seleced_status','selected')->latest()->get(); 
         $personalInfo = [];
-        $interviewersNames = User::whereNot('id',16)->select('id','name')->get();
+        $interviewersNames = User::whereHas('empProfile')->select('id','name')->get();
         return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','notSelected',
         'pendings','approved','selectedForJob','personalInfo','rejected','interviewersNames'));
     }
@@ -132,7 +132,7 @@ class InterviewSummaryReportController extends Controller
         $data = EmployeeHiringRequest::where('id',$id)->first();
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterGender = MasterGender::whereIn('id',[1,2])->get();
-        $interviewersNames = User::whereNot('id',16)->select('id','name')->get();
+        $interviewersNames = User::whereHas('empProfile')->select('id','name')->get();
         return view('hrm.hiring.interview_summary_report.createOrEdit',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
         'masterGender','interviewersNames','hiringrequests'));
     }
