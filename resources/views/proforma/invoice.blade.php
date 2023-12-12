@@ -2,6 +2,35 @@
 <div id="csrf-token" data-token="{{ csrf_token() }}"></div>
 @section('content')
 <style>
+     div.dataTables_wrapper div.dataTables_info {
+  padding-top: 0px;
+}
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+  padding: 4px 8px 4px 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+.table-wrapper {
+      position: relative;
+    }
+    thead th {
+      position: sticky!important;
+      top: 0;
+      background-color: rgb(194, 196, 204)!important;
+      z-index: 1;
+    }
+    #table-responsive {
+      height: 100vh;
+      overflow-y: auto;
+    }
+    #dtBasicSupplierInventory {
+      width: 100%;
+      font-size: 12px;
+    }
+    th.nowrap-td {
+      white-space: nowrap;
+      height: 10px;
+    }
     .widthinput
     {
         height:32px!important;
@@ -1195,133 +1224,7 @@
 <hr>
 <div id="addonDataTableContainer" class="row" style="display:none;">
     <div class="col-lg-12">
-        <table id="addonDataTable" class="display">
-            <!-- DataTable content will be added dynamically -->
-        </table>
-    </div>
-</div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="modal fade addonsModal-modal" id="addonsModal" tabindex="-1" aria-labelledby="addonsModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addonsModalLabel">Adding Addons</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-      <div class="col-lg-12">
-    <!-- ... Your other HTML content ... -->
-    <input type="hidden" name="modelIdInput" id="modelIdInput" />
-    <input type="hidden" name="brandIdInput" id="brandIdInput" />
-    <div class="row">
-    <div class="col-lg-4 col-md-12 col-sm-12">
-        <label class="form-label font-size-13 text-center">Addon Type</label>
-    </div>
-    <div class="col-lg-8 col-md-12 col-sm-12">
-        <select class="form-select" name="addonTypevehicles">
-            <option value="accessories">Accessories</option>
-            <option value="spareParts">Spare Parts</option>
-            <option value="kits">Kits</option>
-        </select>
-    </div>
-</div>
-<div id="accessoriesDropdownDiv" class="row" style="display:none;">
-    <div class="col-lg-12">
-        <label class="form-label">Accessories</label>
-        <select class="form-select" name="accessoriesDropdown">
-            <!-- Populate options dynamically using JavaScript -->
-        </select>
-    </div>
-</div>
-
-<div id="sparePartsDropdownDiv" class="row" style="display:none;">
-    <div class="col-lg-12">
-        <label class="form-label">Spare Parts</label>
-        <select class="form-select" name="sparePartsDropdown">
-            <!-- Populate options dynamically using JavaScript -->
-        </select>
-    </div>
-</div>
-
-<div id="kitsDropdownDiv" class="row" style="display:none;">
-    <div class="col-lg-12">
-        <label class="form-label">Kits</label>
-        <select class="form-select" name="kitsDropdown">
-            <!-- Populate options dynamically using JavaScript -->
-        </select>
-    </div>
-</div>
-<!-- DataTable Container -->
-<hr>
-<div id="addonDataTableContainer" class="row" style="display:none;">
-    <div class="col-lg-12">
-        <table id="addonDataTable" class="display">
-            <!-- DataTable content will be added dynamically -->
-        </table>
-    </div>
-</div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="modal fade addonsModal-modal" id="addonsModal" tabindex="-1" aria-labelledby="addonsModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addonsModalLabel">Adding Addons</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-      <div class="col-lg-12">
-    <!-- ... Your other HTML content ... -->
-    <input type="hidden" name="modelIdInput" id="modelIdInput" />
-    <input type="hidden" name="brandIdInput" id="brandIdInput" />
-    <div class="row">
-    <div class="col-lg-4 col-md-12 col-sm-12">
-        <label class="form-label font-size-13 text-center">Addon Type</label>
-    </div>
-    <div class="col-lg-8 col-md-12 col-sm-12">
-        <select class="form-select" name="addonTypevehicles">
-            <option value="accessories">Accessories</option>
-            <option value="spareParts">Spare Parts</option>
-            <option value="kits">Kits</option>
-        </select>
-    </div>
-</div>
-<div id="accessoriesDropdownDiv" class="row" style="display:none;">
-    <div class="col-lg-12">
-        <label class="form-label">Accessories</label>
-        <select class="form-select" name="accessoriesDropdown">
-            <!-- Populate options dynamically using JavaScript -->
-        </select>
-    </div>
-</div>
-
-<div id="sparePartsDropdownDiv" class="row" style="display:none;">
-    <div class="col-lg-12">
-        <label class="form-label">Spare Parts</label>
-        <select class="form-select" name="sparePartsDropdown">
-            <!-- Populate options dynamically using JavaScript -->
-        </select>
-    </div>
-</div>
-
-<div id="kitsDropdownDiv" class="row" style="display:none;">
-    <div class="col-lg-12">
-        <label class="form-label">Kits</label>
-        <select class="form-select" name="kitsDropdown">
-            <!-- Populate options dynamically using JavaScript -->
-        </select>
-    </div>
-</div>
-<!-- DataTable Container -->
-<hr>
-<div id="addonDataTableContainer" class="row" style="display:none;">
-    <div class="col-lg-12">
-        <table id="addonDataTable" class="display">
+        <table id="addonDataTable" class="display table table-striped table-editable table-edits table-bordered">
             <!-- DataTable content will be added dynamically -->
         </table>
     </div>
@@ -2105,7 +2008,8 @@ $(document).ready(function () {
                     var addonsButtonHtml = '<button type="button" class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '">Addons</button>';
                     return removeButtonHtml + addonsButtonHtml;
                 } else {
-                    return removeButtonHtml;  // Only the "Remove" button for non-'Vehicle' rows
+                    var addonsButtonHtml = '<button class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '">Addons</button>';
+                    return removeButtonHtml + addonsButtonHtml;
                 }
             }
             },
@@ -2381,12 +2285,10 @@ $(document).ready(function () {
         var variant = "";
         var interiorColor = "";
         var exteriorColor = "";
-
         if(tableType == 'vehicle-table') {
             row['table_type'] = 'vehicle-table';
             var brand = $('#brand option:selected').val();
             if(brand != "") {
-
                 var brand = $('#brand option:selected').text();
             }
             var modelLine = $('#model_line option:selected').val();
@@ -3096,6 +2998,7 @@ $(document).ready(function () {
                         var brandId = $('#brandIdInput').val();
                         var modelLineId = $('#modelIdInput').val();
                         var ModelDescriptionId = 'ModelDescriptionId';
+                        clearDataTable();
                         if(selectedType == "accessories"){
                             // Make an AJAX request to the controller with the selected data
                             $.ajax({
@@ -3141,8 +3044,8 @@ $(document).ready(function () {
                         var slNo = 0;
                 var data = response.map(function(kit) {
                     slNo = slNo + 1;
-                    var kitID = kit.id
-                    var addButton = '<div class="circle-button add-button-addonsinner" data-button-type="Kit" data-row-id="' + RowId + '" data-kit-id="' + kitID + '" data-kit-id-test="' + Indexdatarows + '"></div>';
+                    var kitid = kit.id;
+                    var addButton = '<div class="circle-button add-button-addonsinner" data-button-type="Kit" data-row-id="' + RowId + '" data-kit-id="' + kitid + '" data-kit-id-test="' + Indexdatarows + '"></div>';
                     var kitName = '';
                     if(kit.addon_name.name != null) {
                        kitName = kit.addon_name.name;
@@ -3176,10 +3079,8 @@ $(document).ready(function () {
                             kit.addon_code,
                             kitName,
                             kitBrandName,
-                            // kitBrand,
                             kitSellingPrice,
                             kitItems,
-                            // kit.LeastPurchasePrices.purchase_price_aed,
                             addButton,
                         ];
                 });
@@ -3194,12 +3095,10 @@ $(document).ready(function () {
                         { title: 'Kit Name' },
                         { title: 'Brand/Model Lines/Model Description' },
                         { title: 'Selling Price(AED)'},
-                        // { title: 'Model Lines/Model Description' },
                         { title: 'Items/ Quantity'},
-                        // { title: 'Least Purchase Price(AED)'}
                         {
                                     title: 'Add Into Quotation',
-                                }
+                        }
                     ]
                 });
                         $('#addonDataTableContainer').show();
@@ -3258,8 +3157,6 @@ $(document).ready(function () {
                                 sparePartName,
                                 sparePartBrandName,
                                 sparePartSellingPrice,
-                                sparePartNumber,
-                                sparePartAdditionalRemarks,
                                 sparePartFixingCharge,
                                 addButton,
                             ];
@@ -3275,8 +3172,6 @@ $(document).ready(function () {
                                 { title: 'Spare Part Name' },
                                 { title: 'Brand/Model Lines/Model Description' },
                                 { title: 'Selling Price(AED)'},
-                                { title: 'Part Numbers' },
-                                { title: 'Additional Remarks' },
                                 { title: 'Fixing Charge'},
                                 {
                                     title: 'Add Into Quotation',
@@ -3289,8 +3184,8 @@ $(document).ready(function () {
                         var slNo = 0;
                         var data = response.map(function(accessory) {
                             slNo = slNo + 1;
-                            var addButton = '<button class="add-button" data-button-type="Accessory" data-model-line-id="'+ modelLineId +'" data-accessory-id="' + accessory.id + '">Add</button>';
                             var accessoryId = accessory.id;
+                            var addButton = '<div class="circle-button add-button-addonsinner" data-button-type="Accessory" data-row-id="' + RowId + '" data-accessory-id="' + accessoryId + '"data-index-rowas="' + Indexdatarows + '"></div>';
                             if(accessory.addon_description.description != null) {
                                 var accessoryName = accessory.addon_description.addon.name + ' - ' + accessory.addon_description.description;
                             }
@@ -3325,10 +3220,8 @@ $(document).ready(function () {
                                 accessoryName,
                                 accessoryBrand,
                                 accessorySellingPrice,
-                                accessoryAdditionalRemarks,
                                 accessoryFixingCharge,
                                 addButton,
-                                accessory.id
                             ];
                         });
                         if ($.fn.DataTable.isDataTable('#addonDataTable')) {
@@ -3342,14 +3235,9 @@ $(document).ready(function () {
                                 { title: 'Accessory Name' },
                                 { title: 'Brand/Model Lines' },
                                 { title: 'Selling Price(AED)'},
-                                { title: 'Additional Remarks' },
                                 { title: 'Fixing Charge'},
                                 {
                                     title: 'Add Into Quotation',
-                                    render: function(data, type, row) {
-                                        var accessoryId = row[row.length - 1];
-                                        return '<div class="circle-button add-button-addonsinner" data-button-type="Accessory" data-row-id="' + RowId + '" data-accessory-id="' + accessoryId + '"data-index-rowas="' + Indexdatarows + '"></div>';
-                                    }
                                 }
                             ]
                         });
