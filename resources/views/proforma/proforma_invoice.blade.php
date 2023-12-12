@@ -97,7 +97,7 @@
                     <td style="font-weight: bold;">Person :</td>
                     <td>{{  $data['client_name']  }} </td>
                     <td style="font-weight: bold;">
-                        @if($quotation->shipping_method == 'EXW') Port Of Delivery :@endif </td>
+                        @if($quotation->shipping_method == 'EXW') Port Of Discharge :@endif </td>
                     <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->shippingPort->name ??''   }} @endif </td>
                 </tr>
 
@@ -107,7 +107,7 @@
                     <td style="font-weight: bold;">Phone :</td>
                     <td>{{  $data['client_phone']  }} </td>
                     <td style="font-weight: bold;">
-                        @if($quotation->shipping_method == 'EXW') Port Of Load :@endif </td>
+                        @if($quotation->shipping_method == 'EXW') Port Of Loading :@endif </td>
                     <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->shippingPortOfLoad->name ??''   }} @endif </td>
                 </tr>
                 <tr>
@@ -162,7 +162,7 @@
         </div>
 
         <table id="details">
-            @if($vehicles->count() > 0 || $variants->count() > 0)
+            @if($vehicles->count() > 0 || $variants->count() || $otherVehicles->count() || $vehicleWithBrands->cont() > 0)
                 <tr style="font-size: 12px;background-color: #bbbbbd;">
                     <th>VEHICLE</th>
                     <th>SYSTEM CODE</th>
@@ -235,6 +235,28 @@
                                 <td>{{ $otherVehicleAddon->quotationItem->quantity ?? ''}}</td>
                                 <td>{{ $quotation->currency ." ". number_format($otherVehicleAddon->quotationItem->unit_price, 2) }}</td>
                                 <td>{{ $quotation->currency ." ". number_format($otherVehicleAddon->quotationItem->total_amount, 2) }}</td>
+                            </tr>
+                        @endforeach
+                    @endif
+                @endforeach
+                @foreach($vehicleWithBrands as $key => $vehicleWithBrand)
+                    <tr style="color: #02023f;">
+                        <td> <span style="font-weight: bold;font-size: 14px;" > {{ $variants->count() + $vehicles->count() + $otherVehicles->count() + $key+1 }}. </span> {{ $vehicleWithBrand->description }}</td>
+                        <td> {{ $vehicleWithBrand->system_code_currency ."". $vehicleWithBrand->system_code_amount }}</td>
+                        <td>{{ $vehicleWithBrand->quantity }}</td>
+                        <td>{{ $quotation->currency ." ". number_format($vehicleWithBrand->vehicle_unit_price, 2) }}</td>
+                        <td> <?php $totalAmount = $vehicleWithBrand->vehicle_unit_price * $vehicleWithBrand->quantity ?>
+                            {{ $quotation->currency ." ". number_format($totalAmount, 2) }}</td>
+                    </tr>
+                    @if($vehicleWithBrand->quotation_addon_items->count() > 0)
+                        @foreach($vehicleWithBrand->quotation_addon_items as $key => $otherVehicleWithBrandAddon)
+                            <tr style="color: #643702">
+                                <td><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>
+                                    {{ $otherVehicleWithBrandAddon->quotationItem->description ?? ''}}</td>
+                                <td> {{$otherVehicleWithBrandAddon->quotationItem->system_code_currency ."". $otherVehicleWithBrandAddon->quotationItem->system_code_amount }}</td>
+                                <td>{{ $otherVehicleWithBrandAddon->quotationItem->quantity ?? ''}} </td>
+                                <td>{{ $quotation->currency ." ". number_format($otherVehicleWithBrandAddon->quotationItem->unit_price, 2) }}</td>
+                                <td>{{ $quotation->currency ." ". number_format($otherVehicleWithBrandAddon->quotationItem->total_amount, 2) }}</td>
                             </tr>
                         @endforeach
                     @endif

@@ -271,7 +271,7 @@
                     </div>
                 </div>
                 @php
-                $user = Auth::user();
+                $user = \Illuminate\Support\Facades\Auth::user();
                 $empProfile = $user->empProfile;
                 @endphp
                 <div class="row mt-2">
@@ -400,7 +400,7 @@
                     </div>
                     <div class="row mt-2">
                         <div class="col-sm-6">
-                            Port of Delivery :
+                            Port of Discharge :
                         </div>
                         <div class="col-sm-6">
                             <select class="form-control col" id="shipping_port" name="from_shipping_port_id" style="width: 100%">
@@ -410,7 +410,7 @@
                     </div>
                     <div class="row mt-2">
                         <div class="col-sm-6">
-                            Port of Load :
+                            Port of Loading :
                         </div>
                         <div class="col-sm-6">
                             <select class="form-control col" id="to_shipping_port" name="to_shipping_port_id" style="width: 100%">
@@ -1414,10 +1414,10 @@ $(document).ready(function () {
             placeholder: "Select Final Destination"
         });
         $('#shipping_port').select2({
-            placeholder: "Select Port Of Delivery"
+            placeholder: "Select Port Of Discharge"
         });
         $('#to_shipping_port').select2({
-            placeholder: "Select Port Of Load"
+            placeholder: "Select Port Of Loading"
         });
         $('#incoterm').select2({
             placeholder: "Select Incoterm"
@@ -1871,6 +1871,7 @@ $(document).ready(function () {
     });
     $('#accessories_brand').on('change', function() {
         var brandId = $(this).val();
+
         if (brandId) {
             $('#accessories_model_line').prop('disabled', false);
             $('#accessories_model_line').empty().append('<option value="">Select Model Line</option>');
@@ -2037,7 +2038,6 @@ $(document).ready(function () {
                             var addon = 1;
 
                         }
-                    var modelLine = row['model_line_id'];
 
                     return '<input type="hidden" name="is_addon[]" value="'+ addon +'" ><input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
                         '<input type="hidden" name="uuids[]" value="'+ uuid +'" > <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
@@ -2048,7 +2048,7 @@ $(document).ready(function () {
                 targets: -5,
                 data: null,
                 render: function (data, type, row) {
-                    return '<div class="input-group mb-3"> ' +
+                    return '<div class="input-group"> ' +
                                 '<input type="number" min="0"  value="1" step="1" class="system-code form-control"  name="system_code_amount[]"  id="system-code-amount-'+ row['index'] +'" />' +
                                 '<div class="input-group-append"> ' +
                                     '<select class="form-control system-code-currency" name="system_code_currency[]"  id="system-code-currency-'+ row['index'] +'">' +
@@ -2306,8 +2306,23 @@ $(document).ready(function () {
 
             }else{
                 var modelId = $('#model_line option:selected').val();
-                row['id'] = modelId;
-                row['model_type'] = 'ModelLine';
+                var brandId =  $('#brand option:selected').val();
+                if(brandId == "Other") {
+                    // brand and model line is not known
+                    if(modelId == 'Other') {
+
+                        row['id'] =  brandId;
+                        row['model_type'] = 'Other-Vehicle';
+                    }
+                }else{
+                    if(modelId == 'Other') {
+                        row['id'] =  $('#brand option:selected').val();
+                        row['model_type'] = 'Brand';
+                    }else{
+                        row['id'] = modelId;
+                        row['model_type'] = 'ModelLine';
+                    }
+                }
             }
             var interiorColor = $('#interior_color option:selected').val();
             if(interiorColor != "") {
@@ -2415,6 +2430,8 @@ $(document).ready(function () {
         row.push(variant);
         row['button_type'] = 'Direct-Add';
         row['index'] = index;
+        console.log(row);
+
         if(modelLine != "") {
             table.row.add(row).draw();
         }
@@ -3000,11 +3017,11 @@ $(document).ready(function () {
                         clearDataTable();
                         if(modelLineId === "undefined")
                         {
-                            var modelLineId = 'modelLineId'; 
+                            var modelLineId = 'modelLineId';
                         }
                         if(brandId === "")
                         {
-                            var brandId = 'brandId'; 
+                            var brandId = 'brandId';
                         }
                         if(selectedType == "accessories"){
                             // Make an AJAX request to the controller with the selected data
