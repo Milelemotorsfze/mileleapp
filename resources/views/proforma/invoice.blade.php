@@ -2951,7 +2951,6 @@ $(document).ready(function () {
   <script>
             $('#dtBasicExample2').on('click', '.addons-button', function () {
                 var Indexdatarows = $(this).data('index');
-
                 var modelLineId = $(this).data('model-line-id');
                 var RowId = $(this).data('number');
                 $('#addonsModal').modal('show');
@@ -2999,6 +2998,14 @@ $(document).ready(function () {
                         var modelLineId = $('#modelIdInput').val();
                         var ModelDescriptionId = 'ModelDescriptionId';
                         clearDataTable();
+                        if(modelLineId === "undefined")
+                        {
+                            var modelLineId = 'modelLineId'; 
+                        }
+                        if(brandId === "")
+                        {
+                            var brandId = 'brandId'; 
+                        }
                         if(selectedType == "accessories"){
                             // Make an AJAX request to the controller with the selected data
                             $.ajax({
@@ -3117,6 +3124,7 @@ $(document).ready(function () {
                             }
 
                             var sparePartBrandName = sparePart.brandModelLineModelDescription;
+                            console.log(sparePart.brandModelLineModelDescription);
                             var sparePartNumber = '';
                             var partNumbersSize = 0;
                             partNumbersSize = (sparePart.part_numbers).length;

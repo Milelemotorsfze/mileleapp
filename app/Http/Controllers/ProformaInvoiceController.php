@@ -136,6 +136,14 @@ class ProformaInvoiceController extends Controller {
             if($brandName != '' && $modelLine != '') {
                 $addon->brandModelLine = $brandName->brand_name.' - '.$modelLine->model_line;
             }
+            else if($brandName != '')
+                    {
+                        $addon->brandModelLine = $brandName->brand_name;
+                    }
+                    else
+                    {
+                        $addon->brandModelLine = "All Brands";
+                    }
         }
         return response()->json($accessories);
     }
@@ -201,9 +209,17 @@ class ProformaInvoiceController extends Controller {
                 if($brandName != '' && $modelLine != '' && $modelDescription != '') {
                     $addon->brandModelLineModelDescription = $brandName->brand_name.' - '.$modelLine->model_line.' , '.$modelDescription->model_description;
                 }
-                else {
+                else if($brandName != '' && $modelLine != '') {
                     $addon->brandModelLineModelDescription = $brandName->brand_name.' - '.$modelLine->model_line;
                 }
+                else if($brandName != '')
+                    {
+                        $addon->brandModelLineModelDescription = $brandName->brand_name;
+                    }
+                    else
+                    {
+                        $addon->brandModelLineModelDescription = "All Brands";
+                    }
             }
         }
         return response()->json($spare_parts);
@@ -286,10 +302,17 @@ class ProformaInvoiceController extends Controller {
             if($brandName != '' && $modelLine != '' && $modelDescription != '') {
                 $addon->brandModelLineModelDescription = $brandName->brand_name.' , '.$modelLine->model_line.' , '.$modelDescription->model_description;
             }
-            else
-            {
-                $addon->brandModelLineModelDescription = $brandName->brand_name.' , '.$modelLine->model_line;  
+            else if($brandName != '' && $modelLine != '') {
+                $addon->brandModelLineModelDescription = $brandName->brand_name.' - '.$modelLine->model_line;
             }
+            else if($brandName != '')
+                {
+                    $addon->brandModelLineModelDescription = $brandName->brand_name;
+                }
+                else
+                {
+                    $addon->brandModelLineModelDescription = "All Brands";
+                }
         }
         return response()->json($kits);
     }
