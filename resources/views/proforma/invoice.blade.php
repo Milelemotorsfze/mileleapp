@@ -1173,7 +1173,7 @@
         <label class="form-label font-size-13 text-center">Addon Type</label>
     </div>
     <div class="col-lg-8 col-md-12 col-sm-12">
-        <select class="form-select" name="addonTypevehicles">
+        <select class="form-select" name="addonTypevehicles" id="addontypes">
         <option value="" selected disabled>Select Type</option>
             <option value="accessories">Accessories</option>
             <option value="spareParts">Spare Parts</option>
@@ -1220,6 +1220,11 @@
     </div>
      </div>
 </div>
+<div class="row">
+    <div class="col-lg-12 text-end mt-3">
+        <button type="button" class="btn btn-outline-warning" data-model-line-id = "" data-index-rowstt = "" data-brand-id = "" id="directadding-button-ad" sparepart-id-directad = "">Directly Adding Into Quotation</button>
+    </div>
+    </div>
 <!-- DataTable Container -->
 <hr>
 <div id="addonDataTableContainer" class="row" style="display:none;">
@@ -1685,7 +1690,7 @@ $(document).ready(function () {
                 $('#incoterm').val('').trigger('change');
                 $('#shipping_port').val('').trigger('change');
                 $('#to_shipping_port').val('').trigger('change');
-                $('#place_of_supply').val('DUCAMZ, FZ');
+                $('#place_of_supply').val('DUCAMZ, Free Zone');
 
             }else{
                 $('#export-shipment').attr('hidden', false);
@@ -2076,7 +2081,6 @@ $(document).ready(function () {
                         var interiorColor = row[6];
                         var exteriorColor = row[7];
                         var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
-
                         // $('#checkbox-'+data['index']).attr('disabled', true);
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
@@ -2358,7 +2362,6 @@ $(document).ready(function () {
                 row['model_line_id'] = modelLine;
 
                 var modelLine = $('#accessories_model_line option:selected').text();
-
             }
         }else if(tableType == 'spare-part-table') {
             row['table_type'] = 'addon-table';
@@ -2420,7 +2423,6 @@ $(document).ready(function () {
             }
         }
         var index = secondTable.data().length + 1;
-
         row.push(addon);
         row.push(brand);
         row.push(modelLine);
@@ -2979,6 +2981,10 @@ $(document).ready(function () {
                         populateDropdowns(data);
                         $('#modelIdInput').val(data.modelLineId);
                         $('#brandIdInput').val(data.brands);
+                        // If the button data attributes don't exist, set default values
+                        $('#directadding-button-ad').data('model-line-id', data.modelLineIdname);
+                        $('#directadding-button-ad').data('brand-id', data.brand_name);
+                        $('#directadding-button-ad').data('index-rowstt', Indexdatarows);
                     },
                     error: function (error) {
                         console.error('Error fetching addons:', error);
@@ -3007,7 +3013,7 @@ $(document).ready(function () {
                             dropdown.append('<option value="' + value.id + '">' + value.name + '</option>');
                         });
                     }
-// Change event for the second dropdown
+                    // Change event for the second dropdown
                     $('select.form-select').change(function () {
                         var selectedId = $(this).val();
                         var selectedType = $('select[name="addonTypevehicles"]').val();
@@ -3210,7 +3216,7 @@ $(document).ready(function () {
                         var data = response.map(function(accessory) {
                             slNo = slNo + 1;
                             var accessoryId = accessory.id;
-                            var addButton = '<div class="circle-button add-button-addonsinner" data-button-type="Accessory" data-row-id="' + RowId + '" data-accessory-id="' + accessoryId + '"data-index-rowas="' + Indexdatarows + '"></div>';
+                            var addButtonadn = '<div class="circle-button add-button-addonsinner" data-button-type="Accessory" data-row-id="' + RowId + '" data-accessory-id="' + accessoryId + '"data-index-rowas="' + Indexdatarows + '"></div>';
                             if(accessory.addon_description.description != null) {
                                 var accessoryName = accessory.addon_description.addon.name + ' - ' + accessory.addon_description.description;
                             }
@@ -3246,7 +3252,7 @@ $(document).ready(function () {
                                 accessoryBrand,
                                 accessorySellingPrice,
                                 accessoryFixingCharge,
-                                addButton,
+                                addButtonadn,
                             ];
                         });
                         if ($.fn.DataTable.isDataTable('#addonDataTable')) {
@@ -3319,7 +3325,79 @@ $(document).ready(function () {
                 resetIndex();
                 // enableOrDisableSubmit();
             });
-
+            $(document).on('click', '#directadding-button-ad', function () {
+                var brandId = $(this).data('brand-id');
+                var selectedAddonType = $('#addontypes').val();
+                console.log(selectedAddonType);
+                var modelLineId = $(this).data('model-line-id');
+                var tableType = $(this).attr('data-table');
+                var table = $('#addonDataTable').DataTable();
+                var modelLine = "";
+                var modelNumber = "";
+                var variant = "";
+                var interiorColor = "";
+                var exteriorColor = "";
+                var rowData = [];
+                var mainTable = $('#dtBasicExample2').DataTable();
+                rowData['table_type'] = 'addon-table';
+                rowData['button_type'] = 'Direct-Add';
+                var index = mainTable.data().length + 1;
+                rowData['index'] = index;
+                rowData['brand'] = brandId;
+                rowData['modelLine'] = modelLineId;
+                var datainc = $(this).data('index-rowstt');
+                if(selectedAddonType == "accessories")
+                {
+                var selectedOption = $('select[name="accessoriesDropdown"] option:selected');
+                var id = selectedOption.val();
+                var addons = selectedOption.text();
+                var rowId = $(this).data('row-id');
+                }
+                else if ( selectedAddonType == "spareParts")
+                {
+                var selectedOption = $('select[name="sparePartsDropdown"] option:selected');
+                var id = selectedOption.val();
+                var addons = selectedOption.text();
+                var rowId = $(this).data('row-id'); 
+                }
+                else
+                {
+                var selectedOption = $('select[name="kitsDropdown"] option:selected');
+                var id = selectedOption.val();
+                var addons = selectedOption.text();
+                var rowId = $(this).data('row-id');  
+                }
+                rowData['id'] = id;
+                rowData['rowId'] = rowId;
+                var row = $(this).closest('tr');
+                rowData.push(addons);
+                rowData.push(brandId);
+                rowData.push(modelLineId);
+                rowData.push(modelNumber);
+                rowData.push(interiorColor);
+                rowData.push(exteriorColor);
+                rowData.push(variant);
+                rowData.push(id);
+                rowData['button_type'] = 'Direct-Add';
+                rowData['table_type'] = 'addon-table';
+                var subRowId = $(this).data('row-id');
+                var newIndex = parseInt(datainc) + 1;
+                var addedRow = mainTable.row.add(rowData).draw();
+                table.row(row).remove().draw();
+                var currentIndex = mainTable.row(addedRow.node()).index();
+                if (currentIndex !== newIndex) {
+                    var data = mainTable.data().toArray();
+                    data.splice(currentIndex, 1);
+                    data.splice(newIndex, 0, rowData);
+                    mainTable.clear().rows.add(data).draw();
+                }
+                resetSerialNumber(table);
+                // total amount div logic
+                CalculateTotalAmount(index);
+                calculateTotalSum();
+                resetIndex();
+                // enableOrDisableSubmit();
+            });
             // Event handler for removing a row
             $('#dtBasicExample2').on('click', '.remove-row-button', function () {
                 var row = $(this).closest('tr');

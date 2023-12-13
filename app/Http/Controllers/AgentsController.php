@@ -105,8 +105,8 @@ class AgentsController extends Controller
     $agentcreate->save();
         return response()->json([
             'agent_id' => $existingAgent->id,
-            'name' => $request->name,
-            'phone' => $request->phone,
+            'name' => $existingAgent->name,
+            'phone' => $existingAgent->phone,
         ]);
     }
     $existingAgent = Agents::where('name', $request->name)
@@ -119,8 +119,20 @@ class AgentsController extends Controller
     $agentcreate->save();
         return response()->json([
             'agent_id' => $existingAgent->id,
-            'name' => $request->name,
-            'phone' => $request->phone,
+            'name' => $existingAgent->name,
+            'phone' => $existingAgent->phone,
+        ]);
+    }
+    $existingAgent = Agents::where('email', $request->email)->first();
+    if ($existingAgent) {
+        $agentcreate = new AgentsCreating;
+    $agentcreate->agents_id = $existingAgent->id;
+    $agentcreate->created_by = Auth::id();
+    $agentcreate->save();
+        return response()->json([
+            'agent_id' => $existingAgent->id,
+            'name' => $existingAgent->name,
+            'phone' => $existingAgent->phone,
         ]);
     }
     $existingAgent = Agents::where('phone', $request->phone)->first();
@@ -131,10 +143,11 @@ class AgentsController extends Controller
     $agentcreate->save();
         return response()->json([
             'agent_id' => $existingAgent->id,
-            'name' => $request->name,
-            'phone' => $request->phone,
+            'name' => $existingAgent->name,
+            'phone' => $existingAgent->phone,
         ]);
     }
+    else{
     $agent = new Agents;
     $agent->name = $request->name;
     $agent->email = $request->email;
@@ -158,6 +171,7 @@ class AgentsController extends Controller
         'name' => $agent->name,
         'phone' => $agent->phone,
     ]);
+}
 }
     /**
      * Display the specified resource.

@@ -30,7 +30,41 @@
   </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @section('content')
-
+@php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-log-activity');
+        @endphp
+        @if ($hasPermission)
+<div class="card">
+                            <div class="card-body px-0">
+                                <div class="table-responsive px-3">
+                                <div class="card-header align-items-center ">
+                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Sales Persons Pending Leads</h4>
+</div>
+                                <table id="dtBasicExample2" class="table table-striped table-bordered">
+                                                <thead class="bg-soft-secondary">
+                                            <tr>
+                                                <th>Sales Person</th>
+                                                <th>Pending Leads</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($leadsCount as $lead)
+                                                <tr>
+                                                    <td>{{ $lead->name }}</td>
+                                                    <td>{{ $lead->lead_count }}</td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="2" class="text-center">No pending leads found.</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- end card body -->
+                        </div>
+                        @endif
 {{--   @can('parts-procurement-dashboard-view')--}}
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('parts-procurement-dashboard-view');
@@ -668,7 +702,7 @@
                             </div>
                             <!-- end card -->
                         </div>
-                        <!-- end col -->
+<!-- end card -->
 <!-- @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
                     @endphp
