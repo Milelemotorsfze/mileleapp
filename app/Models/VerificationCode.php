@@ -9,5 +9,5 @@ class VerificationCode extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['old_vin', 'new_vin', 'vehicle_id', 'created_by'];
+    protected $fillable = ['user_id', 'otp', 'expire_at'];
 }
