@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::table('passport_requests', function (Blueprint $table) {
             $table->dropColumn(['passport_status']);
-
             $table->dropForeign(['purposes_of_release']);
             $table->dropColumn('purposes_of_release');
             $table->dropColumn('release_purpose');

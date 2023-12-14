@@ -346,7 +346,6 @@
                                                         <a href="{{route('addon.list','SP')}}" class="dropdown-item" data-key="t-login">Spare Parts</a>
                                                         @endif
                                                         @endcan
-
                                                         @can('kit-list')
                                                         @php
                                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['kit-list']);

@@ -1,7 +1,5 @@
 @extends('layouts.main')
 @section('content')
-
-@can('master-brand-edit')
 @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-edit');
 @endphp
@@ -53,7 +51,6 @@
     </div>
     </div>
 @endif
-@endcan
 @endsection
 @push('scripts')
     <script>
