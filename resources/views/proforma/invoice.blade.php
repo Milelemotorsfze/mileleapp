@@ -2011,10 +2011,10 @@ $(document).ready(function () {
                 var directAdd = 'Direct-Add';
                 var removeButtonHtml = '<button type="button" class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
                 if (row['button_type'] === 'Vehicle') {
-                    var addonsButtonHtml = '<button type="button" class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '">Addons</button>';
+                    var addonsButtonHtml = '<button type="button" class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-type="'+ row.model_type +'" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '" data-row-id="'+ row.id +'">Addons</button>';
                     return removeButtonHtml + addonsButtonHtml;
                 } else {
-                    var addonsButtonHtml = '<button class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '">Addons</button>';
+                    var addonsButtonHtml = '<button class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-type="'+ row.model_type +'" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '" data-row-id="'+ row.id +'">Addons</button>';
                     return removeButtonHtml + addonsButtonHtml;
                 }
             }
@@ -2970,13 +2970,23 @@ $(document).ready(function () {
   <script>
             $('#dtBasicExample2').on('click', '.addons-button', function () {
                 var Indexdatarows = $(this).data('index');
-                var modelLineId = $(this).data('model-line-id');
+                var modaltype = $(this).data('model-type');
+                var rowbmid = $(this).data('row-id');
                 var RowId = $(this).data('number');
+                if(modaltype == "ModelLine" || modaltype == "Brand")
+                {
+                var modelLineId = rowbmid;
+                }
+                else
+                {
+                var modelLineId = $(this).data('model-line-id');
+                }
                 $('#addonsModal').modal('show');
                 clearDataTable();
                 $.ajax({
                     url: '/addons-modal-forqoutation/' + modelLineId,
                     method: 'GET',
+                    data: { modaltype: modaltype },
                     success: function (data) {
                         populateDropdowns(data);
                         $('#modelIdInput').val(data.modelLineId);
