@@ -2036,9 +2036,7 @@ $(document).ready(function () {
                     var addon = 0;
                         if(row['table_type'] == 'addon-table') {
                             var addon = 1;
-
                         }
-
                     return '<input type="hidden" name="is_addon[]" value="'+ addon +'" ><input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
                         '<input type="hidden" name="uuids[]" value="'+ uuid +'" > <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
                         '<input type="text"  value="'+ amount +'" class="total-amount-editable form-control" name="total_amounts[]" id="total-amount-'+ row['index'] +'" readonly />';
@@ -2134,9 +2132,12 @@ $(document).ready(function () {
 
                         var code = row[1];
                     }else if(row['button_type'] == 'Direct-Add') {
-                        var code = row[2];
-                        if(row['table_type'] == 'vehicle-table') {
-                            var code = row[6]
+
+                        if(row[2] != 'Other') {
+                            var code = row[2];
+                        }
+                        if(row['table_type'] == 'vehicle-table' && row[6] != "") {
+                            var code = row[6];
                         }
                     }
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
@@ -2310,7 +2311,6 @@ $(document).ready(function () {
                 if(brandId == "Other") {
                     // brand and model line is not known
                     if(modelId == 'Other') {
-
                         row['id'] =  brandId;
                         row['model_type'] = 'Other-Vehicle';
                     }
@@ -2339,25 +2339,37 @@ $(document).ready(function () {
         }else if(tableType == 'accessories-table') {
             row['table_type'] = 'addon-table';
 
-            var addon =  $('#accessories_addon option:selected').val();
-            if(addon != "") {
+            var addonId =  $('#accessories_addon option:selected').val();
+            if(addonId != "") {
 
                 var addon = $('#accessories_addon option:selected').text();
 
             }
-            var brand = $('#accessories_brand option:selected').val();
-            if(brand != "") {
-
+            var brandId = $('#accessories_brand option:selected').val();
+            if(brandId != "") {
+                if(brandId != "Other") {
+                    row['brand_id'] = brandId;
+                }
                 var brand = $('#accessories_brand option:selected').text();
-
             }
-            var modelLine = $('#accessories_model_line option:selected').val();
-            if(modelLine != "") {
-                row['id'] = modelLine;
-                row['model_type'] = 'ModelLine';
-                row['model_line_id'] = modelLine;
+            var modelLineId = $('#accessories_model_line option:selected').val();
+            if(modelLineId != "") {
 
+                if(modelLineId != "Other") {
+                    row['model_line_id'] = modelLineId;
+                }
                 var modelLine = $('#accessories_model_line option:selected').text();
+            }
+            if(addonId != "") {
+                if(addonId == "Other" && modelLineId == "Other" && brandId == "Other") {
+                    row['model_type'] = 'Other';
+                }else{
+                    row['model_type'] = 'Addon';
+                }
+                row['id'] = addonId;
+
+            }else{
+                alertify.confirm('Please Choose addon to add this in quotation!').set({title:"Alert !"});
 
             }
         }else if(tableType == 'spare-part-table') {
@@ -2430,6 +2442,7 @@ $(document).ready(function () {
         row.push(variant);
         row['button_type'] = 'Direct-Add';
         row['index'] = index;
+
         console.log(row);
 
         if(modelLine != "") {
