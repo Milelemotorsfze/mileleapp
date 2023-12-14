@@ -2023,8 +2023,10 @@ $(document).ready(function () {
                 targets: -2,
                 data: null,
                 render: function (data, type, row) {
+
                     var price = "";
                     var uuid = "";
+                    var addon = 0;
                     if(row['button_type'] == 'Vehicle') {
                         var price = row[8];
                         var uuid = row['number'];
@@ -2035,16 +2037,19 @@ $(document).ready(function () {
                     else if(row['button_type'] == 'Accessory' || row['button_type'] == 'SparePart' || row['button_type'] == 'Kit') {
                         var price = row[4];
                         var uuid = row['rowId'];
+                        var addon = 1;
                     }
                     // calculate
                     var amount = price * 1;
-                    var addon = 0;
-                        if(row['table_type'] == 'addon-table') {
-                            var addon = 1;
 
-                        }
+                    if(row['table_type'] == 'addon-table') {
+                        var addon = 1;
+                    }
 
-                    return '<input type="hidden" name="is_addon[]" value="'+ addon +'" ><input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
+                    return '<input type="hidden" name="addon_types[]" value="'+ row['addon_type'] +'" > <input type="hidden" name="addon_brand_ids[]" value="'+ row['brand_id'] +'" >' +
+                        '<input type="hidden" name="addon_model_line_ids[]" value="'+ row['model_line_id'] +'" >' +
+                        '<input type="hidden" name="addon_model_description_ids[]" value="'+ row['model_description_id'] +'" >' +
+                        '<input type="hidden" name="is_addon[]" value="'+ addon +'" ><input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
                         '<input type="hidden" name="uuids[]" value="'+ uuid +'" > <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
                         '<input type="text"  value="'+ amount +'" class="total-amount-editable form-control" name="total_amounts[]" id="total-amount-'+ row['index'] +'" readonly />';
                 }
@@ -2208,7 +2213,8 @@ $(document).ready(function () {
         }
         else if(row['button_type'] == 'Accessory') {
             var table = $('#dtBasicExample5').DataTable();
-            table.row.add([ row[0],row[1],row[2],row[3],row[4],row[5],row[6],'<button class="add-button circle-button" data-button-type="Accessory"  data-accessory-id="'+ row['id']+'" ></button>']).draw();
+            table.row.add([ row[0],row[1],row[2],row[3],row[4],row[5],row[6],'<button class="add-button circle-button" data-button-type="Accessory" ' +
+            ' data-brand-id="' + row['brand_id'] + '" data-model-line-id="'+  row['model_line_id'] +'" data-accessory-id="'+ row['id']+'" ></button>']).draw();
         }
         else if(row['button_type'] == 'SparePart') {
             var table = $('#dtBasicExample3').DataTable();
@@ -2292,6 +2298,10 @@ $(document).ready(function () {
         var variant = "";
         var interiorColor = "";
         var exteriorColor = "";
+        row['brand_id'] = "";
+        row['model_line_id'] = "";
+        row['model_description_id'] = "";
+
         if(tableType == 'vehicle-table') {
             row['table_type'] = 'vehicle-table';
             var brand = $('#brand option:selected').val();
@@ -2344,6 +2354,7 @@ $(document).ready(function () {
 
         }else if(tableType == 'accessories-table') {
             row['table_type'] = 'addon-table';
+            row['addon_type'] = 'P';
 
             var addonId =  $('#accessories_addon option:selected').val();
             if(addonId != "") {
@@ -2360,18 +2371,14 @@ $(document).ready(function () {
             }
             var modelLineId = $('#accessories_model_line option:selected').val();
             if(modelLineId != "") {
-
                 if(modelLineId != "Other") {
                     row['model_line_id'] = modelLineId;
                 }
                 var modelLine = $('#accessories_model_line option:selected').text();
             }
             if(addonId != "") {
-                if(addonId == "Other" && modelLineId == "Other" && brandId == "Other") {
-                    row['model_type'] = 'Other';
-                }else{
-                    row['model_type'] = 'Addon';
-                }
+
+                row['model_type'] = 'Addon';
                 row['id'] = addonId;
 
             }else{
@@ -2380,6 +2387,8 @@ $(document).ready(function () {
             }
         }else if(tableType == 'spare-part-table') {
             row['table_type'] = 'addon-table';
+            row['addon_type'] = 'SP';
+
             var addon =  $('#spare_parts_addon option:selected').val();
             if(addon != "") {
                 var addon = $('#spare_parts_addon option:selected').text();
@@ -2407,6 +2416,8 @@ $(document).ready(function () {
 
         }else if(tableType == 'kit-table') {
             row['table_type'] = 'addon-table';
+            row['addon_type'] = 'K';
+
             var addon =  $('#kit_addon option:selected').val();
             if(addon != "") {
 
@@ -2449,10 +2460,8 @@ $(document).ready(function () {
         row['index'] = index;
 
         console.log(row);
+        table.row.add(row).draw();
 
-        if(modelLine != "") {
-            table.row.add(row).draw();
-        }
         $('.total-div').attr('hidden', false);
 
         enableOrDisableSubmit();
@@ -2473,6 +2482,11 @@ $(document).ready(function () {
             rowData.push($(this).html());
         });
         var secondTable = $('#dtBasicExample2').DataTable();
+
+        rowData['brand_id'] = "";
+        rowData['model_line_id'] = "";
+        rowData['model_description_id'] = "";
+        rowData['rowId'] = "";
 
         if(buttonType == 'Shipping') {
             var table = $('#shipping-table').DataTable();
@@ -2501,19 +2515,33 @@ $(document).ready(function () {
         else if(buttonType == 'Accessory') {
             var table = $('#dtBasicExample5').DataTable();
             var id = $(this).data('accessory-id');
+            rowData['addon_type'] = 'P';
+            rowData['brand_id'] = $(this).data('brand-id');
+            rowData['model_line_id'] = $(this).data('model-line-id');
 
         }
         else if(buttonType == 'SparePart') {
             var table = $('#dtBasicExample3').DataTable();
             var id = $(this).data('sparepart-id');
+            rowData['addon_type'] = 'SP';
+            rowData['brand_id'] = $(this).data('brand-id');
+            rowData['model_line_id'] = $(this).data('model-line-id');
+            rowData['model_description_id'] = $(this).data('model-description-id');
 
         }
         else if(buttonType == 'Kit') {
             var table = $('#dtBasicExample4').DataTable();
             var id = $(this).data('kit-id');
+            rowData['addon_type'] = 'K';
+            rowData['brand_id'] = $(this).data('brand-id');
+            rowData['model_line_id'] = $(this).data('model-line-id');
+            rowData['model_description_id'] = $(this).data('model-description-id');
         }
+
+
+
         var modelLineId = $(this).data('model-line-id');
-        rowData['model_line_id'] = modelLineId;
+
         rowData['modallineidad'] = modallineidad;
         rowData['id'] = id;
         rowData['number'] = uniqueNumber;
@@ -2665,11 +2693,12 @@ $(document).ready(function () {
             type: 'GET',
             url: url,
             success: function(response) {
-
+                console.log(response);
                 var slNo = 0;
                 var data = response.map(function(accessory) {
                     slNo = slNo + 1;
-                    var addButton = '<button class="add-button" data-button-type="Accessory" data-model-line-id="'+ modelLineId +'" data-accessory-id="' + accessory.id + '">Add</button>';
+                    var addButton = '<div class="circle-button add-button" data-button-type="Accessory" data-brand-id="'+ brandId +'"' +
+                        ' data-model-line-id="'+ modelLineId +'" data-accessory-id="' + accessory.id + '">Add</div>';
                     if(accessory.addon_description.description != null) {
                        var accessoryName = accessory.addon_description.addon.name + ' - ' + accessory.addon_description.description;
                     }
@@ -2728,9 +2757,9 @@ $(document).ready(function () {
                         // { title: 'Least Purchase Price(AED)'}
                         {
                             title: 'Add Into Quotation',
-                            render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-button-type="Accessory" data-model-line-id="'+ modelLineId +'" data-accessory-id="' + row[0] + '"></div>';
-                            }
+                            // render: function(data, type, row) {
+                            //     return '<div class="circle-button add-button" data-button-type="Accessory" data-model-line-id="'+ modelLineId +'" data-accessory-id="' + row[0] + '"></div>';
+                            // }
                         }
                     ]
                 });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Addon;
 use App\Models\AddonDetails;
 use App\Models\AgentCommission;
 use App\Models\Country;
@@ -137,6 +138,7 @@ class QuotationController extends Controller
 //        $quotationSubItemKeys = [];
 
         foreach ($request->prices as $key => $price) {
+            $item = "";
             if($request->system_code_currency[$key] == 'U') {
                 $amount = $request->system_code_amount[$key] * $aed_to_usd_rate->value;
             }else{
@@ -192,9 +194,29 @@ class QuotationController extends Controller
            } else if($request->types[$key] == 'Accessory' || $request->types[$key] == 'SparePart' || $request->types[$key] == 'Kit') {
 
                $item = AddonDetails::find($request->reference_ids[$key]);
+
+               $quotationItem->addon_type = $request->addon_types[$key];
+               $quotationItem->brand_id = $request->addon_brand_ids[$key];
+               $quotationItem->model_line_id = $request->addon_model_line_ids[$key];
+               $quotationItem->model_description_id = $request->addon_model_description_ids[$key];
+
+           }else if($request->types[$key] == 'Addon') {
+
+               if($request->reference_ids[$key] != 'Other') {
+
+                   $item = Addon::find($request->reference_ids[$key]);
+               }
+               $quotationItem->addon_type = $request->addon_types[$key];
+               $quotationItem->brand_id = $request->addon_brand_ids[$key];
+               $quotationItem->model_line_id = $request->addon_model_line_ids[$key];
+               $quotationItem->model_description_id = $request->addon_model_description_ids[$key];
+
            }
 //           get the unique number in one array for all column
-            $quotationItem->reference()->associate($item);
+            if($item) {
+                $quotationItem->reference()->associate($item);
+
+            }
             $quotationItem->save();
 
             if($isVehicle == 1){

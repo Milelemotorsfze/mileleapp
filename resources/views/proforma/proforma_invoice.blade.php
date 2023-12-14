@@ -162,7 +162,7 @@
         </div>
 
         <table id="details">
-            @if($vehicles->count() > 0 || $variants->count() || $otherVehicles->count() || $vehicleWithBrands->cont() > 0)
+            @if($vehicles->count() > 0 || $variants->count() || $otherVehicles->count() || $vehicleWithBrands->count() > 0)
                 <tr style="font-size: 12px;background-color: #bbbbbd;">
                     <th>VEHICLE</th>
                     <th>SYSTEM CODE</th>
