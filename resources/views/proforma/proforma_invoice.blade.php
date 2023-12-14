@@ -290,7 +290,7 @@
                 @endforeach
             @endif
 
-            @if($addons->count() > 0 || $directlyAddedAddons->count() > 0)
+            @if($addons->count() > 0 )
                 <tr style="font-size: 12px;">
                     <th colspan="5"> ADDONS AND EXTRA ITEM </th>
 {{--                    <th>SYSTEM CODE</th>--}}
@@ -307,18 +307,18 @@
                         <td>{{ $quotation->currency ." ". number_format($addon->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
-                @foreach($directlyAddedAddons as $key => $directlyAddedAddon)
-                    <tr>
-                        <td><span style="font-weight: bold;margin-right: 5px;" > {{ $addons->count() + $key+1 }}. </span> {{ $directlyAddedAddon->description }}</td>
-                        <td> {{ $directlyAddedAddon->system_code_currency ."". $directlyAddedAddon->system_code_amount }}</td>
-                        <td>{{ $directlyAddedAddon->quantity }}</td>
-                        <td>{{ $quotation->currency ." ". number_format($directlyAddedAddon->unit_price, 2) }}</td>
-                        <td>{{ $quotation->currency ." ". number_format($directlyAddedAddon->total_amount, 2) }}</td>
-                    </tr>
-                @endforeach
+{{--                @foreach($directlyAddedAddons as $key => $directlyAddedAddon)--}}
+{{--                    <tr>--}}
+{{--                        <td><span style="font-weight: bold;margin-right: 5px;" > {{ $addons->count() + $key+1 }}. </span> {{ $directlyAddedAddon->description }}</td>--}}
+{{--                        <td> {{ $directlyAddedAddon->system_code_currency ."". $directlyAddedAddon->system_code_amount }}</td>--}}
+{{--                        <td>{{ $directlyAddedAddon->quantity }}</td>--}}
+{{--                        <td>{{ $quotation->currency ." ". number_format($directlyAddedAddon->unit_price, 2) }}</td>--}}
+{{--                        <td>{{ $quotation->currency ." ". number_format($directlyAddedAddon->total_amount, 2) }}</td>--}}
+{{--                    </tr>--}}
+{{--                @endforeach--}}
                     @foreach($OtherAddons as $key => $OtherAddon)
                         <tr>
-                            <td><span style="font-weight: bold;margin-right: 5px;" > {{ $directlyAddedAddons->count() + $addons->count() + $key+1 }}. </span> {{ $OtherAddon->description }}</td>
+                            <td><span style="font-weight: bold;margin-right: 5px;" > {{ $addons->count() + $key+1 }}. </span> {{ $OtherAddon->description }}</td>
                             <td> {{$OtherAddon->system_code_currency ."". $OtherAddon->system_code_amount }}</td>
                             <td>{{ $OtherAddon->quantity }}</td>
                             <td>{{ $quotation->currency ." ". number_format($OtherAddon->unit_price, 2) }}</td>

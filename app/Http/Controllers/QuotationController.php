@@ -201,10 +201,13 @@ class QuotationController extends Controller
                $quotationItem->model_description_id = $request->addon_model_description_ids[$key];
 
            }else if($request->types[$key] == 'Addon') {
-
+                info("it is an directly addon");
+                info($request->reference_ids[$key]);
                if($request->reference_ids[$key] != 'Other') {
+                   info("not other");
 
                    $item = Addon::find($request->reference_ids[$key]);
+                   info($item);
                }
                $quotationItem->addon_type = $request->addon_types[$key];
                $quotationItem->brand_id = $request->addon_brand_ids[$key];
@@ -214,6 +217,7 @@ class QuotationController extends Controller
            }
 //           get the unique number in one array for all column
             if($item) {
+                info("item not found");
                 $quotationItem->reference()->associate($item);
 
             }
@@ -324,7 +328,7 @@ class QuotationController extends Controller
             ->where('is_addon', true)
             ->sum('total_amount');
 
-        $addons = QuotationItem::where('reference_type','App\Models\AddonDetails')
+        $addons = QuotationItem::whereIn('reference_type',['App\Models\AddonDetails','App\Models\Addon'])
             ->whereNotIn('id', $alreadyAddedQuotationIds)
             ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();

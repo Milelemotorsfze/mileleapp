@@ -2357,6 +2357,7 @@ $(document).ready(function () {
             row['addon_type'] = 'P';
 
             var addonId =  $('#accessories_addon option:selected').val();
+            alert(addonId);
             if(addonId != "") {
 
                 var addon = $('#accessories_addon option:selected').text();
