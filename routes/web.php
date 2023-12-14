@@ -639,3 +639,6 @@ Route::get('/d', function () {
     Route::resource('agents', AgentsController::class);
     Route::get('/get-agent-names', [AgentsController::class, 'getAgentNames'])->name('agents.getAgentNames');
     });
+    Route::get('candidate/personal_info/{id}', [CandidatePersonalInfoController::class, 'sendForm'])->name('candidate_personal_info.send_form');
+    Route::post('candidate/store_personal_info', [CandidatePersonalInfoController::class, 'storePersonalinfo'])->name('candidate.storePersonalinfo');
+    

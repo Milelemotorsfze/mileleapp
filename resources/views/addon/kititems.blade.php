@@ -412,6 +412,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 		</div>
 	</div>
 	</br>
+	
+	@canany(['view-addon-supplier-info'])
+	@php
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-addon-supplier-info']);
+	@endphp
+	@if ($hasPermission)
 	<center>
 		<h5 class="card-title">
 			@if($supplierAddonDetails->addon_type_name == 'K')
@@ -603,6 +609,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 	</div>
 	</br>
 	@endforeach
+	@endif
+	@endcanany
+	
 </div>
 <div id="myModal" class="modal modalForImage">
 	<span class="closeImage close">&times;</span>
