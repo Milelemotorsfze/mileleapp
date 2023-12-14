@@ -212,12 +212,24 @@ $totalvariantss = [
             ->orderBy('id','DESC')
             ->take(10)
             ->get();
-
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-log-activity');
+        if ($hasPermission)
+        {
+            $leadsCount = DB::table('calls')
+    ->join('users', 'calls.sales_person', '=', 'users.id')
+    ->where('calls.status', '=', 'New')
+    ->groupBy('users.name')
+    ->select('users.name', DB::raw('count(*) as lead_count'))
+    ->get();
+        }
+        else{
+            $leadsCount = [];
+        }
        return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData',
            'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
            'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
            'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
-            'recentlyAddedSpareParts','recentlyAddedKits'));
+            'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount'));
     }
     public function marketingupdatechart(Request $request)
     {

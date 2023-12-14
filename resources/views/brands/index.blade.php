@@ -1,6 +1,5 @@
 @extends('layouts.table')
 @section('content')
-    @can('master-brand-list')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-list');
         @endphp
@@ -41,9 +40,7 @@
             {!! $html->table(['class' => 'table table-bordered table-striped table-responsive ']) !!}
         </div>
         @endif
-    @endcan
 @endsection
-
     @push('scripts')
         {!! $html->scripts() !!}
     @endpush

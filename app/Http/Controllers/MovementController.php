@@ -14,6 +14,7 @@ use App\Models\MovementsReference;
 use App\Models\Grn;
 use App\Models\So;
 use App\Models\Gdn;
+use App\Models\VinChange;
 use Carbon\CarbonTimeZone;
 use Carbon\Carbon;
 use App\Models\PurchasingOrder;
@@ -224,13 +225,34 @@ class MovementController extends Controller
             Vehicles::where('vin', $vin[$index])->update(['latest_location' => $to[$index]]);
         }
     }
-        // $newvin = $request->input('newvin');
-        // foreach ($newvin as $index => $value) {
-        //     if ($value !== null && $value !== '') {
-        //         $vehicle = Vehicle::find($index);
-        //         $vehicle->update(['vin' => $value]);
-        //     }
-        // }
+    $newvin = $request->input('newvin');
+    $vin = $request->input('vin');
+    foreach ($newvin as $index => $value) {
+        if ($value !== null && $value !== '' && isset($vin[$index])) {
+            $vehicle = Vehicles::where('vin', $vin[$index])->first();
+            if ($vehicle) {
+                $vinchange = New VinChange();
+                $vinchange->old_vin = $vehicle->vin;
+                $vinchange->new_vin = $value;
+                $vinchange->vehicles_id = $vehicle->id;
+                $vinchange->created_by = auth()->user()->id;
+                $vinchange->save();
+                $vehicleslog = new Vehicleslog();
+                $vehicleslog->time = $currentDateTime->toTimeString();
+                $vehicleslog->date = $currentDateTime->toDateString();
+                $vehicleslog->status = 'VIN Change';
+                $vehicleslog->vehicles_id = $vehicle->id;
+                $vehicleslog->field = "VIN Change";
+                $vehicleslog->old_value = $vehicle->vin;
+                $vehicleslog->new_value = $value;
+                $vehicleslog->created_by = auth()->user()->id;
+                $vehicleslog->save();
+                $updatevin = Vehicles::find($vehicle->id);
+                $updatevin->vin = $value;
+                $updatevin->save();
+            }
+        }
+    }    
         $data = Movement::get();
         $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
