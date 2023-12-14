@@ -376,69 +376,62 @@
                                 </li>
                                 @endif
                                 @endcanany
-                                @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price',
-                        'warranty-selling-price-histories-list','warranty-selling-price-histories-edit','warranty-selling-price-approve',
-                        'warranty-selling-price-edit'])
-                        @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price',
-                        'reject-addon-new-selling-price','warranty-selling-price-histories-list','warranty-selling-price-histories-edit',
-                        'warranty-selling-price-approve','warranty-selling-price-edit']);
-                        @endphp
-                        @if ($hasPermission)
-                        <li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                            <i data-feather="grid"></i>
-                            <span data-key="t-extra-pages">Approvals</span>
-                            <div class="arrow-down"></div>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price'])
+                            @canany(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action'])
                             @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price',
-                            'reject-addon-new-selling-price']);
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action']);
                             @endphp
                             @if ($hasPermission)
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.approval','P') }}" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Accessories</span>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                    <i data-feather="grid"></i>
+                                    <span data-key="t-extra-pages">Approvals</span>
+                                    <div class="arrow-down"></div>
                                 </a>
-                            </div>
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.approval','SP') }}" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">Spare Parts</span>
-                                </a>
-                            </div>
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.approval','K') }}" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">Kits</span>
-                                </a>
-                            </div>
-                            @endif
-                            @endcanany
+                                <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                    @canany(['approve-addon-new-selling-price','supplier-price-action'])
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-price-action','approve-addon-new-selling-price',]);
+                                    @endphp
+                                    @if ($hasPermission)
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.approval','P') }}" id="topnav-auth" role="button">
+                                            <span data-key="t-authentication">Accessories</span>
+                                        </a>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.approval','SP') }}" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Spare Parts</span>
+                                        </a>
+                                    </div>
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.approval','K') }}" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Kits</span>
+                                        </a>
+                                    </div>
+                                    @endif
+                                    @endcanany
 
-                            @canany(['edit-addon-new-selling-price','warranty-selling-price-histories-list','warranty-selling-price-histories-edit',
-                            'warranty-selling-price-approve','warranty-selling-price-edit'])
-                            @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price',
-                            'warranty-selling-price-histories-list','warranty-selling-price-histories-edit','warranty-selling-price-approve','warranty-selling-price-edit']);
-                            @endphp
-                            @if ($hasPermission)
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty-selling-price-histories.index') }}" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">Warranties</span>
-                                </a>
-                            </div>
+                                    @canany(['warranty-selling-price-approve'])
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve']);
+                                    @endphp
+                                    @if ($hasPermission)
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty-selling-price-histories.index') }}" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Warranties</span>
+                                        </a>
+                                    </div>
+                                    @endif
+                                    @endcanany
+                                    <!-- <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee-hiring-request.approval-awaiting') }}" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Employee Hiring</span>
+                                        </a>
+                                    </div> -->
+                                </div>
+                            </li>
                             @endif
                             @endcanany
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee-hiring-request.approval-awaiting') }}" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">Employee Hiring</span>
-                                </a>
-                            </div>
-                        </div>
-                    </li>
-                    @endif
-                    @endcanany
 
                                 @can('Calls-view')
                                 @php
