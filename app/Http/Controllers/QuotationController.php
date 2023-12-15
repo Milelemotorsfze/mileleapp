@@ -66,7 +66,7 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
-//        dd($request->all());
+        dd($request->all());
 //        $request->validate([
 //            'prices' => 'required'
 //        ]);
@@ -156,7 +156,7 @@ class QuotationController extends Controller
            $quotationItem->quotation_id = $quotation->id;
            $quotationItem->uuid = $request->uuids[$key];
            $quotationItem->is_addon = $request->is_addon[$key];
-           $quotationItem->is_enable = isset($request->is_hide[$key]) ? true : false;
+           $quotationItem->is_enable = isset($request->is_enable[$key]) ? true : false;
            $quotationItem->created_by = Auth::id();
 
 

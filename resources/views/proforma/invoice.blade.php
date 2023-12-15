@@ -2009,12 +2009,11 @@ $(document).ready(function () {
             render: function (data, type, row, index) {
                 var directAdd = 'Direct-Add';
                 var removeButtonHtml = '<button type="button" class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
-                if (row['button_type'] === 'Vehicle') {
-                    var addonsButtonHtml = '<button type="button" class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-type="'+ row.model_type +'" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '" data-row-id="'+ row.id +'">Addons</button>';
+                if (row['button_type'] === 'Vehicle' || row['table_type'] === 'vehicle-table') {
+                    var addonsButtonHtml = '<button type="button" class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-type="' + row.model_type + '" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '" data-row-id="' + row.id + '">Addons</button>';
                     return removeButtonHtml + addonsButtonHtml;
                 } else {
-                    var addonsButtonHtml = '<button class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-type="'+ row.model_type +'" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '" data-row-id="'+ row.id +'">Addons</button>';
-                    return removeButtonHtml + addonsButtonHtml;
+                    return removeButtonHtml;
                 }
             }
             },
@@ -2029,6 +2028,7 @@ $(document).ready(function () {
                     if(row['button_type'] == 'Vehicle') {
                         var price = row[8];
                         var uuid = row['number'];
+                        // $('#checkbox-'+ row['index']).prop('disabled', true);
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                         var price = row[4];
@@ -2042,9 +2042,11 @@ $(document).ready(function () {
                     var amount = price * 1;
                     if(row['table_type'] == 'vehicle-table') {
                         var uuid = row['number'];
+                        // $('#checkbox-'+ row['index']).prop('disabled', true);
                     }
                     if(row['table_type'] == 'addon-table') {
                         var addon = 1;
+                        var uuid = row['rowId'];
                     }
 
                     return '<input type="hidden" name="addon_types[]" value="'+ row['addon_type'] +'" > <input type="hidden" name="brand_ids[]" value="'+ row['brand_id'] +'" >' +
@@ -2082,12 +2084,13 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     var combinedValue = "";
                     if(row['button_type'] == 'Vehicle') {
+
                         var brand = row[1];
                         var modelDescription = row[3];
                         var interiorColor = row[6];
                         var exteriorColor = row[7];
                         var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
-                        // $('#checkbox-'+data['index']).attr('disabled', true);
+
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                         combinedValue = row[2]+', '+row[3];
@@ -2117,16 +2120,17 @@ $(document).ready(function () {
                         }
                         combinedValue =  row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5]+ comma5 + row[6];
                         if(row['table_type'] !== 'vehicle-table') {
+
                             combinedValue = row[0] + comma0 + combinedValue;
                             // $('#checkbox-'+data['index']).attr('disabled', true);
                         }
                     }
-                    // $('.checkbox-hide').attr('disabled', true);
+
                     // $('#checkbox-2').attr('disabled', true);
                     var arrayIndex = row['index'] - 1;
 
-                    return '<div class="row" style="flex-wrap: unset">' +
-                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;"   name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide"' +
+                    return '<div class="row" style="flex-wrap: unset;margin-left: 2px;">' +
+                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;" name="is_enable['+ arrayIndex  +']" value="yes" class="checkbox-hide"' +
                         ' checked id="checkbox-'+ row['index'] +'"> ' +
                         '<input type="text" name="descriptions[]" required class="combined-value-editable form-control" value="' + combinedValue + '"/>' +
                         '</div> ';
@@ -2198,7 +2202,8 @@ $(document).ready(function () {
         else if(row['button_type'] == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
             table.row.add([ row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
-                '<button class="add-button circle-button" data-button-type="Vehicle" data-variant-id="'+ row['id']+'"></button>']).draw();
+                '<button class="add-button circle-button" data-button-type="Vehicle" data-brand-id="'+ row['brand_id'] +'" data-modellineidad="'+ row['model_line_id'] +'"' +
+                '   data-variant-id="'+ row['id']+'"></button>']).draw();
         }
         else if(row['button_type'] == 'Shipping-Document') {
             var table = shippingDocumentTable;
@@ -2552,6 +2557,9 @@ $(document).ready(function () {
             var table = $('#dtBasicExample1').DataTable();
             var id = $(this).data('variant-id');
             var modallineidad = $(this).data('modellineidad');
+            rowData['brand_id'] = $(this).data('brand-id');
+            rowData['model_line_id'] = modallineidad;
+
         }
         else if(buttonType == 'Accessory') {
             var table = $('#dtBasicExample5').DataTable();
@@ -2595,6 +2603,7 @@ $(document).ready(function () {
         calculateTotalSum();
         // enableOrDisableSubmit();
         showPriceInSelectedValue();
+
         // console.log(rowData);
     });
 
@@ -2620,6 +2629,8 @@ $(document).ready(function () {
 
     $('#search-button').on('click', function() {
         var modelLineId = $('#model_line').val();
+        var brandId = $('#brand').val();
+
         var variantId = $('#variant').val();
         var interiorColorId = $('#interior_color').val();
         var exteriorColorId = $('#exterior_color').val();
@@ -2659,7 +2670,7 @@ $(document).ready(function () {
                 var slNo = 0;
                 var data = response.map(function(vehicle) {
                     slNo = slNo + 1;
-                    var addButton = '<button class="add-button" data-button-type="Vehicle" data-variant-id="'+ variantId +'" data-modellineidad="'+ modelLineId +'">Add</button>';
+                    var addButton = '<button class="circle-button add-button" data-button-type="Vehicle" data-brand-id="'+ brandId +'" data-variant-id="'+ variantId +'" data-modellineidad="'+ modelLineId +'">Add</button>';
                     return [
                         slNo,
                         // vehicle.grn_status,
@@ -2694,9 +2705,9 @@ $(document).ready(function () {
                         { title: 'Price' },
                         {
                             title: 'Actions',
-                            render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-variant-id="'+ variantId +'" data-button-type="Vehicle"  data-modellineidad="'+ modelLineId +'"></div>';
-                            }
+                            // render: function(data, type, row) {
+                            //     return '<div class="circle-button add-button" data-variant-id="'+ variantId +'" data-button-type="Vehicle"  data-modellineidad="'+ modelLineId +'"></div>';
+                            // }
                         }
                     ]
                 });
@@ -3390,6 +3401,12 @@ $(document).ready(function () {
                 var index = mainTable.data().length + 1;
                 rowData['button_type'] = buttonType;
                 rowData['index'] = index;
+
+                rowData['brand_id'] = "";
+                rowData['model_line_id'] = "";
+                rowData['model_description_id'] = "";
+                rowData['addon_type'] = "";
+
                 if(buttonType == 'Accessory') {
                     var datainc = $(this).data('index-rowas');
                     var id = $(this).data('accessory-id');
@@ -3601,10 +3618,14 @@ $(document).ready(function () {
                 });
             }
             // function disableCheckBox() {
+            //     alert("Ok");
             //     var table = $("#dtBasicExample2 tr");
             //     table.each(function(i){
-            //         $(this).find("checkbox-"+i).attr('disabled', true);
+            //         alert(i);
+            //      var checkbox =  $(this).find("checkbox-"+i).attr('id');
+            //         alert(checkbox);
             //     });
+            //
             // }
         </script>
 @endpush
