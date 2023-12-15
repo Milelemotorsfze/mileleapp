@@ -712,10 +712,9 @@
                                 <select class="form-select col" id="accessories_addon" name="accessories_addon" style="width: 100%">
                                     <option value="">Select Accessory Name</option>
                                     @foreach($assessoriesDesc as $accessory)
-                                        <option value="{{ $accessory->id }}">{{ $accessory->Addon->name ?? '' }}@if($accessory->description!='') - {{$accessory->description}}@endif</option>
+                                        <option value="{{ $accessory->id }}" data-id="{{ $accessory->Addon->id }}" >{{ $accessory->Addon->name ?? '' }}@if($accessory->description!='') - {{$accessory->description}}@endif</option>
                                     @endforeach
-                                    <option value="Other"> Other</option>
-
+                                    <option value="Other" data-id="Other"> Other</option>
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-6" style="margin-right: 10px;">
@@ -780,9 +779,9 @@
                            <select class="form-control full-width" id="spare_parts_addon" name="spare_parts_addon" style="width: 100%">
                                <option value="">Select Spare Part Name</option>
                                @foreach($sparePartsDesc as $spareParts)
-                                   <option value="{{ $spareParts->id }}">{{ $spareParts->Addon->name ?? '' }}@if($spareParts->description!='') - {{$spareParts->description}}@endif</option>
+                                   <option value="{{ $spareParts->id }}" data-id="{{ $spareParts->Addon->id }}"  >{{ $spareParts->Addon->name ?? '' }}@if($spareParts->description!='') - {{$spareParts->description}}@endif</option>
                                @endforeach
-                               <option value="Other">Other</option>
+                               <option value="Other" data-id="Other">Other</option>
                            </select>
                        </div>
                        <div class="col-lg-2 col-md-6">
@@ -857,9 +856,9 @@
                                 <select class="form-control col" id="kit_addon" name="kit_addon" style="width: 100%">
                                     <option value="">Select Kit Name</option>
                                     @foreach($kitsDesc as $kit)
-                                        <option value="{{ $kit->id }}">{{ $kit->Addon->name ?? '' }}@if($kit->description!='') - {{$kit->description}}@endif</option>
+                                        <option value="{{ $kit->id }}" data-id="{{ $kit->Addon->id }}">{{ $kit->Addon->name ?? '' }}@if($kit->description!='') - {{$kit->description}}@endif</option>
                                     @endforeach
-                                    <option value="Other">Other</option>
+                                    <option value="Other" data-id="Other">Other</option>
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-6">
@@ -2218,11 +2217,15 @@ $(document).ready(function () {
         }
         else if(row['button_type'] == 'SparePart') {
             var table = $('#dtBasicExample3').DataTable();
-            table.row.add([ row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],'<button class="add-button circle-button" data-sparepart-id="'+ row['id']+'" data-button-type="SparePart" ></button>']).draw();
+            table.row.add([ row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],'<button class="add-button circle-button" data-brand-id="'+  row['brand_id'] +'"' +
+            ' data-model-description-id="'+  row['model_description_id'] +'"' +
+            ' data-model-line-id="'+  row['model_line_id'] +'" data-sparepart-id="'+ row['id']+'" data-button-type="SparePart" ></button>']).draw();
         }
         else if(row['button_type'] == 'Kit') {
             var table = $('#dtBasicExample4').DataTable();
-            table.row.add([ row[0],row[1],row[2],row[3],row[4],row[5],'<button class="add-button circle-button" data-kit-id="'+ row['id'] +'"  data-button-type="Kit" ></button>']).draw();
+            table.row.add([ row[0],row[1],row[2],row[3],row[4],row[5],'<button class="add-button circle-button" data-brand-id="'+ row['brand_id'] +'"' +
+            ' data-model-line-id="'+  row['model_line_id'] +'"  data-model-description-id="'+ row['model_description_id'] +'" data-kit-id="'+ row['id'] +'"  ' +
+            'data-button-type="Kit" ></button>']).draw();
         }
 
         var index = $(this).closest('tr').index();
@@ -2293,6 +2296,7 @@ $(document).ready(function () {
         var table = $('#dtBasicExample2').DataTable();
         var row = [];
         var addon = "";
+        var brand = "";
         var modelLine = "";
         var modelNumber = "";
         var variant = "";
@@ -2357,12 +2361,7 @@ $(document).ready(function () {
             row['addon_type'] = 'P';
 
             var addonId =  $('#accessories_addon option:selected').val();
-            alert(addonId);
-            if(addonId != "") {
 
-                var addon = $('#accessories_addon option:selected').text();
-
-            }
             var brandId = $('#accessories_brand option:selected').val();
             if(brandId != "") {
                 if(brandId != "Other") {
@@ -2378,9 +2377,10 @@ $(document).ready(function () {
                 var modelLine = $('#accessories_model_line option:selected').text();
             }
             if(addonId != "") {
-
+                var Id =  $('#accessories_addon option:selected').attr('data-id');
+                var addon = $('#accessories_addon option:selected').text();
                 row['model_type'] = 'Addon';
-                row['id'] = addonId;
+                row['id'] = Id;
 
             }else{
                 alertify.confirm('Please Choose addon to add this in quotation!').set({title:"Alert !"});
@@ -2390,28 +2390,42 @@ $(document).ready(function () {
             row['table_type'] = 'addon-table';
             row['addon_type'] = 'SP';
 
-            var addon =  $('#spare_parts_addon option:selected').val();
-            if(addon != "") {
+            var addonId =  $('#spare_parts_addon option:selected').val();
+
+            if(addonId != "") {
+                var Id =  $('#spare_parts_addon option:selected').attr('data-id');
                 var addon = $('#spare_parts_addon option:selected').text();
 
+                row['model_type'] = 'Addon';
+                row['id'] = Id;
+            }else{
+                alertify.confirm('Please Choose addon to add this in quotation!').set({title:"Alert !"});
             }
-            var brand = $('#spare_parts_brand option:selected').val();
-            if(brand != "") {
 
+            var brandId = $('#spare_parts_brand option:selected').val();
+
+            if(brandId != "") {
+                if(brandId != "Other") {
+                    row['brand_id'] = brandId;
+                }
                 var brand = $('#spare_parts_brand option:selected').text();
             }
-            var modelLine = $('#spare_parts_model_line option:selected').val();
-            if(modelLine != "") {
-                row['id'] = modelLine;
-                row['model_type'] = 'ModelLine';
-                row['model_line_id'] = modelLine;
-                var modelLine = $('#spare_parts_model_line option:selected').text();
-            }else{
-                alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
-            }
-            var modelNumber = $('#spare_parts_model_description option:selected').val();
-            if(modelNumber != "") {
 
+            var modelLineId = $('#spare_parts_model_line option:selected').val();
+
+            if(modelLineId != "") {
+                if(modelLineId != "Other") {
+                    row['model_line_id'] = modelLineId;
+                }
+                var modelLine = $('#spare_parts_model_line option:selected').text();
+            }
+
+            var modelDescriptionId = $('#spare_parts_model_description option:selected').val();
+
+            if(modelDescriptionId != "") {
+                if(modelDescriptionId != "Other") {
+                    row['model_description_id'] = modelDescriptionId;
+                }
                 var modelNumber = $('#spare_parts_model_description option:selected').text();
             }
 
@@ -2419,34 +2433,40 @@ $(document).ready(function () {
             row['table_type'] = 'addon-table';
             row['addon_type'] = 'K';
 
-            var addon =  $('#kit_addon option:selected').val();
-            if(addon != "") {
-
+            var addonId =  $('#kit_addon option:selected').val();
+            if(addonId != "") {
+                var Id =  $('#kit_addon option:selected').attr('data-id');
                 var addon = $('#kit_addon option:selected').text();
 
+                row['model_type'] = 'Addon';
+                row['id'] = Id;
+            }else{
+                alertify.confirm('Please Choose addon to add this in quotation!').set({title:"Alert !"});
             }
-            var brand = $('#kit_brand option:selected').val();
-            if(brand != "") {
 
+            var brandId = $('#kit_brand option:selected').val();
+            if(brandId != "") {
+                if(brandId != "Other") {
+                    row['brand_id'] = brandId;
+                }
                 var brand = $('#kit_brand option:selected').text();
 
             }
-            var modelLine = $('#kit_model_line option:selected').val();
-            if(modelLine != "") {
-                row['id'] = modelLine;
-                row['model_type'] = 'ModelLine';
-                row['model_line_id'] = modelLine;
-
+            var modelLineId = $('#kit_model_line option:selected').val();
+            if(modelLineId != "") {
+                if(modelLineId != "Other") {
+                    row['model_line_id'] = modelLineId;
+                }
                 var modelLine = $('#kit_model_line option:selected').text();
 
-            }else{
-                alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
-
             }
-            var modelNumber = $('#kit_model_description option:selected').val();
-            if(modelNumber != "") {
+            var modelDescriptionId = $('#kits_model_description option:selected').val();
 
-                var modelNumber = $('#kit_model_description option:selected').text();
+            if(modelDescriptionId != "") {
+                if(modelDescriptionId != "Other") {
+                    row['model_description_id'] = modelDescriptionId;
+                }
+                var modelNumber = $('#kits_model_description option:selected').text();
             }
         }
         var index = secondTable.data().length + 1;
@@ -2461,7 +2481,15 @@ $(document).ready(function () {
         row['index'] = index;
 
         console.log(row);
-        table.row.add(row).draw();
+        if(tableType == 'kit-table' || tableType == 'spare-part-table' || tableType == 'accessories-table'){
+            if(addonId != "") {
+                table.row.add(row).draw();
+            }
+        }else{
+            if(modelLine != "") {
+                table.row.add(row).draw();
+            }
+        }
 
         $('.total-div').attr('hidden', false);
 
@@ -2806,7 +2834,9 @@ $(document).ready(function () {
                 var slNo = 0;
                 var data = response.map(function(sparePart) {
                     slNo = slNo + 1;
-                    var addButton = '<button class="add-button" data-button-type="SparePart" data-model-line-id="'+ modelLineId +'"  data-sparepart-id="' + sparePart.id + '">Add</button>';
+                    var addButton = '<button class="circle-button add-button" data-button-type="SparePart" data-brand-id="'+ brandId +'"' +
+                        ' data-model-description-id="'+ ModelDescriptionId +'"' +
+                        ' data-model-line-id="'+ modelLineId +'"  data-sparepart-id="' + sparePart.id + '">Add</button>';
                     if(sparePart.addon_description.description != null) {
                        var sparePartName = sparePart.addon_description.addon.name + ' - ' + sparePart.addon_description.description;
                     }
@@ -2881,9 +2911,9 @@ $(document).ready(function () {
                         // { title: 'Least Purchase Price(AED)'}
                         {
                             title: 'Add Into Quotation',
-                            render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-button-type="SparePart" data-model-line-id="'+ modelLineId +'"  data-sparepart-id="' + row[0] + '"></div>';
-                            }
+                            // render: function(data, type, row) {
+                            //     return '<div class="circle-button add-button" data-button-type="SparePart" data-model-line-id="'+ modelLineId +'"  data-sparepart-id="' + row[0] + '"></div>';
+                            // }
                         }
                     ]
                 });
@@ -2929,7 +2959,8 @@ $(document).ready(function () {
                 var slNo = 0;
                 var data = response.map(function(kit) {
                     slNo = slNo + 1;
-                    var addButton = '<button class="add-button" data-button-type="Kit" data-model-line-id="'+ modelLineId +'" data-kit-id="' + kit.id + '">Add</button>';
+                    var addButton = '<button class="circle-button add-button" data-button-type="Kit" data-brand-id="'+ brandId +'"' +
+                        ' data-model-description-id="'+ ModelDescriptionId +'" data-model-line-id="'+ modelLineId +'" data-kit-id="' + kit.id + '">Add</button>';
                     var kitName = '';
                     if(kit.addon_name.name != null) {
                        kitName = kit.addon_name.name;
@@ -2986,9 +3017,9 @@ $(document).ready(function () {
                         // { title: 'Least Purchase Price(AED)'}
                         {
                             title: 'Add Into Quotation',
-                            render: function(data, type, row) {
-                                return '<div class="circle-button add-button" data-button-type="Kit" data-model-line-id="'+ modelLineId +'" data-kit-id="' + row[0] + '"></div>';
-                            }
+                            // render: function(data, type, row) {
+                            //     return '<div class="circle-button add-button" data-button-type="Kit" data-model-line-id="'+ modelLineId +'" data-kit-id="' + row[0] + '"></div>';
+                            // }
                         }
                     ]
                 });

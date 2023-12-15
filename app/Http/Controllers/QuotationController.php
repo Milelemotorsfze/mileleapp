@@ -201,7 +201,7 @@ class QuotationController extends Controller
                $quotationItem->model_description_id = $request->addon_model_description_ids[$key];
 
            }else if($request->types[$key] == 'Addon') {
-                info("it is an directly addon");
+//                info("it is an directly addon which refer the master addon table id with reference id");
                 info($request->reference_ids[$key]);
                if($request->reference_ids[$key] != 'Other') {
                    info("not other");
