@@ -2040,14 +2040,16 @@ $(document).ready(function () {
                     }
                     // calculate
                     var amount = price * 1;
-
+                    if(row['table_type'] == 'vehicle-table') {
+                        var uuid = row['number'];
+                    }
                     if(row['table_type'] == 'addon-table') {
                         var addon = 1;
                     }
 
-                    return '<input type="hidden" name="addon_types[]" value="'+ row['addon_type'] +'" > <input type="hidden" name="addon_brand_ids[]" value="'+ row['brand_id'] +'" >' +
-                        '<input type="hidden" name="addon_model_line_ids[]" value="'+ row['model_line_id'] +'" >' +
-                        '<input type="hidden" name="addon_model_description_ids[]" value="'+ row['model_description_id'] +'" >' +
+                    return '<input type="hidden" name="addon_types[]" value="'+ row['addon_type'] +'" > <input type="hidden" name="brand_ids[]" value="'+ row['brand_id'] +'" >' +
+                        '<input type="hidden" name="model_line_ids[]" value="'+ row['model_line_id'] +'" >' +
+                        '<input type="hidden" name="model_description_ids[]" value="'+ row['model_description_id'] +'" >' +
                         '<input type="hidden" name="is_addon[]" value="'+ addon +'" ><input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
                         '<input type="hidden" name="uuids[]" value="'+ uuid +'" > <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
                         '<input type="text"  value="'+ amount +'" class="total-amount-editable form-control" name="total_amounts[]" id="total-amount-'+ row['index'] +'" readonly />';
@@ -2306,16 +2308,24 @@ $(document).ready(function () {
         row['brand_id'] = "";
         row['model_line_id'] = "";
         row['model_description_id'] = "";
+        row['addon_type'] = "";
 
         if(tableType == 'vehicle-table') {
             row['table_type'] = 'vehicle-table';
-            var brand = $('#brand option:selected').val();
-            if(brand != "") {
+            var brandId = $('#brand option:selected').val();
+            if(brandId != "") {
                 var brand = $('#brand option:selected').text();
+                if(brandId != "Other") {
+                    row['brand_id'] = brandId;
+                }
             }
-            var modelLine = $('#model_line option:selected').val();
-            if(modelLine != "") {
+            var modelLineId = $('#model_line option:selected').val();
+            if(modelLineId != "") {
+                if(modelLineId != "Other") {
+                    row['model_line_id'] = modelLineId;
+                }
                 var modelLine = $('#model_line option:selected').text();
+
             }else{
                 alertify.confirm('Please Choose Model line to add this in quotation!').set({title:"Alert !"});
             }
@@ -2517,6 +2527,7 @@ $(document).ready(function () {
         rowData['model_line_id'] = "";
         rowData['model_description_id'] = "";
         rowData['rowId'] = "";
+        rowData['addon_type'] = "";
 
         if(buttonType == 'Shipping') {
             var table = $('#shipping-table').DataTable();
@@ -3582,11 +3593,11 @@ $(document).ready(function () {
 
                 });
             }
-            function disableCheckBox() {
-                var table = $("#dtBasicExample2 tr");
-                table.each(function(i){
-                    $(this).find("checkbox-"+i).attr('disabled', true);
-                });
-            }
+            // function disableCheckBox() {
+            //     var table = $("#dtBasicExample2 tr");
+            //     table.each(function(i){
+            //         $(this).find("checkbox-"+i).attr('disabled', true);
+            //     });
+            // }
         </script>
 @endpush
