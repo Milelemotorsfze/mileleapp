@@ -3439,6 +3439,7 @@ $(document).ready(function () {
                 var datainc = $(this).data('index-rowstt');
                 if(selectedAddonType == "accessories")
                 {
+                rowData['addon_type'] = 'P';
                 var selectedOption = $('select[name="accessoriesDropdown"] option:selected');
                 var id = selectedOption.val();
                 var addons = selectedOption.text();
@@ -3446,6 +3447,7 @@ $(document).ready(function () {
                 }
                 else if ( selectedAddonType == "spareParts")
                 {
+                rowData['addon_type'] = 'SP';
                 var selectedOption = $('select[name="sparePartsDropdown"] option:selected');
                 var id = selectedOption.val();
                 var addons = selectedOption.text();
@@ -3453,6 +3455,7 @@ $(document).ready(function () {
                 }
                 else
                 {
+                rowData['addon_type'] = 'K';
                 var selectedOption = $('select[name="kitsDropdown"] option:selected');
                 var id = selectedOption.val();
                 var addons = selectedOption.text();
@@ -3469,10 +3472,13 @@ $(document).ready(function () {
                 rowData.push(exteriorColor);
                 rowData.push(variant);
                 rowData.push(id);
+                rowData['model_description_id'] = '';
+                rowData['model_type'] = 'Addon';
                 rowData['button_type'] = 'Direct-Add';
                 rowData['table_type'] = 'addon-table';
                 var subRowId = $(this).data('row-id');
                 var newIndex = parseInt(datainc) + 1;
+                console.log(rowData);
                 var addedRow = mainTable.row.add(rowData).draw();
                 table.row(row).remove().draw();
                 var currentIndex = mainTable.row(addedRow.node()).index();
