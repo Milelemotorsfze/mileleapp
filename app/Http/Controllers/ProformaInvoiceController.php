@@ -20,6 +20,7 @@ use App\Models\MasterModelDescription;
 use App\Models\AddonDetails;
 use App\Models\SupplierAddons;
 use App\Models\AddonTypes;
+use App\Models\Varaint;
 use App\Models\Addon;
 class ProformaInvoiceController extends Controller {
     public function proforma_invoice($callId) {
@@ -377,8 +378,70 @@ class ProformaInvoiceController extends Controller {
             'modelLineIdname' => $modelLineIdname,
         ]);
     }
+    else if ($modaltype == "Vehicle")
+        {
+        $modelLineId = $modelLineId;
+        $variantID = Varaint::where('id', $modelLineId)->pluck('master_model_lines_id')->first();
+        $modelLineIdname = MasterModelLines::where('id', $variantID)->pluck('model_line')->first();
+        $brands = MasterModelLines::with('brand')->find($variantID);
+        $assessoriesDesc = DB::table('addon_descriptions')
+        ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
+        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->where('addons.addon_type', 'P')
+        ->get();
+        $sparePartsDesc = DB::table('addon_descriptions')
+        ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
+        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->where('addons.addon_type', 'SP')
+        ->get();
+        $kitsDesc = DB::table('addon_descriptions')
+        ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
+        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->where('addons.addon_type', 'K')
+        ->get();
+        return response()->json([
+            'assessoriesDesc' => $assessoriesDesc,
+            'modelLineId' => $variantID,
+            'brands' => $brands->brand->id,
+            'sparePartsDesc' => $sparePartsDesc,
+            'kitsDesc' => $kitsDesc,
+            'brand_name' => $brands->brand->brand_name,
+            'modelLineIdname' => $modelLineIdname,
+        ]);
+    }
     else
     {
+        if($modelLineId != "undefined")
+        {
+            $modelLineId = $modelLineId;
+            $modelLineIdname = MasterModelLines::where('id', $modelLineId)->pluck('model_line')->first();
+            $brands = MasterModelLines::with('brand')->find($modelLineId);
+            $assessoriesDesc = DB::table('addon_descriptions')
+            ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
+            ->select('addons.name as name', 'addon_descriptions.id as id')
+            ->where('addons.addon_type', 'P')
+            ->get();
+            $sparePartsDesc = DB::table('addon_descriptions')
+            ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
+            ->select('addons.name as name', 'addon_descriptions.id as id')
+            ->where('addons.addon_type', 'SP')
+            ->get();
+            $kitsDesc = DB::table('addon_descriptions')
+            ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
+            ->select('addons.name as name', 'addon_descriptions.id as id')
+            ->where('addons.addon_type', 'K')
+            ->get();
+            return response()->json([
+                'assessoriesDesc' => $assessoriesDesc,
+                'modelLineId' => $modelLineId,
+                'brands' => $brands->brand->id,
+                'sparePartsDesc' => $sparePartsDesc,
+                'kitsDesc' => $kitsDesc,
+                'brand_name' => $brands->brand->brand_name,
+                'modelLineIdname' => $modelLineIdname,
+            ]);
+        }
+        else{
         $assessoriesDesc = DB::table('addon_descriptions')
         ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
         ->select('addons.name as name', 'addon_descriptions.id as id')
@@ -403,6 +466,7 @@ class ProformaInvoiceController extends Controller {
             'brand_name' => "Other",
             'modelLineIdname' => "Other",
         ]);  
+    }
     }
     }
     }

@@ -3019,12 +3019,15 @@ $(document).ready(function () {
                 var modaltype = $(this).data('model-type');
                 var rowbmid = $(this).data('row-id');
                 var RowId = $(this).data('number');
-                if(modaltype == "ModelLine" || modaltype == "Brand")
+                if(modaltype == "ModelLine" || modaltype == "Brand" || modaltype == "Vehicle")
                 {
                 var modelLineId = rowbmid;
+                console.log(modelLineId);
+                console.log(modaltype);
                 }
                 else
                 {
+                console.log($(this).data('model-line-id'));
                 var modelLineId = $(this).data('model-line-id');
                 }
                 $('#addonsModal').modal('show');
