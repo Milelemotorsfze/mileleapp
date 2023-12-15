@@ -1221,7 +1221,7 @@
 </div>
 <div class="row">
     <div class="col-lg-12 text-end mt-3">
-        <button type="button" class="btn btn-outline-warning" data-model-line-id = "" data-model-line-ids = "" data-index-rowstt = "" data-brand-ids = "" data-brand-id = "" id="directadding-button-ad" sparepart-id-directad = "">Directly Adding Into Quotation</button>
+        <button type="button" class="btn btn-outline-warning" data-row-id = "" data-model-line-id = "" data-model-line-ids = "" data-index-rowstt = "" data-brand-ids = "" data-brand-id = "" id="directadding-button-ad" sparepart-id-directad = "">Directly Adding Into Quotation</button>
     </div>
     </div>
 <!-- DataTable Container -->
@@ -3089,6 +3089,7 @@ $(document).ready(function () {
                         $('#directadding-button-ad').data('model-line-ids', data.modelLineId);
                         $('#directadding-button-ad').data('brand-ids', data.brands);
                         $('#directadding-button-ad').data('index-rowstt', Indexdatarows);
+                        $('#directadding-button-ad').data('row-id', RowId);
                     },
                     error: function (error) {
                         console.error('Error fetching addons:', error);
