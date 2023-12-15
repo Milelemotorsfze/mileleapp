@@ -78,6 +78,7 @@ use App\Http\Controllers\HRM\Hiring\EmployeeLeaveController;
 use App\Http\Controllers\HRM\Hiring\EmployeeLiabilityController;
 use App\Http\Controllers\HRM\Hiring\InterviewSummaryReportController;
 use App\Http\Controllers\AgentsController;
+use App\Http\Controllers\SalesPersonStatusController;
 /*
 /*
 |--------------------------------------------------------------------------
@@ -222,8 +223,6 @@ Route::get('/d', function () {
         Route::get('/get-booking-spare-parts/{addonId}/{brandId}/{modelLineId}/{ModelDescriptionId}', 'getbookingSpareParts')->name('booking.getbookingSpareParts');
         Route::get('/get-booking-kits/{addonId}/{brandId}/{modelLineId}/{ModelDescriptionId}', 'getbookingKits')->name('booking.getbookingKits');
         Route::get('/addons-modal-forqoutation/{modelLineId}', [ProformaInvoiceController::class, 'addonsModal'])->name('addonsquotation.modal');
-
-
     });
     // ApprovalAwaitingController
     Route::controller(ApprovalAwaitingController::class)->group(function(){
@@ -377,6 +376,7 @@ Route::get('/d', function () {
     Route::get('new-leads/addnewleads', [CallsController::class, 'addnewleads'])->name('calls.addnewleads');
     Route::post('new-leads/storeleads', [CallsController::class, 'storeleads'])->name('calls.storeleads');
     Route::post('new-variants/storenewvarinats', [CallsController::class, 'storenewvarinats'])->name('calls.storenewvarinats');
+    Route::resource('sale_person_status', SalesPersonStatusController::class);
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
     Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');
@@ -398,7 +398,7 @@ Route::get('/d', function () {
      Route::post('getVinForVehicle', [VehiclePicturesController::class, 'getVinForVehicle']);
      Route::get('vehicle_pictures/pending', [VehiclePicturesController::class,'pending'])->name('vehicle_pictures.pending');
      Route::post('vehicle_pictures/saving', [VehiclePicturesController::class,'saving'])->name('vehicle_pictures.saving');
-
+    
 
      // Variants
     Route::resource('variants', VariantController::class);

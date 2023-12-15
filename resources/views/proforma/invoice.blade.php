@@ -2293,6 +2293,7 @@ $(document).ready(function () {
 
     $(document).on('click', '#directadding-button', function() {
         var tableType = $(this).attr('data-table');
+        var uniqueNumber = new Date().getTime() + '-' + Math.floor(Math.random() * 1000000);
         var table = $('#dtBasicExample2').DataTable();
         var row = [];
         var addon = "";
@@ -2479,7 +2480,7 @@ $(document).ready(function () {
         row.push(variant);
         row['button_type'] = 'Direct-Add';
         row['index'] = index;
-
+        row['number'] = uniqueNumber;
         console.log(row);
         if(tableType == 'kit-table' || tableType == 'spare-part-table' || tableType == 'accessories-table'){
             if(addonId != "") {

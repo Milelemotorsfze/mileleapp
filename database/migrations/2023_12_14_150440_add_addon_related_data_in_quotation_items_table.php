@@ -13,13 +13,10 @@ return new class extends Migration
     {
         Schema::table('quotation_items', function (Blueprint $table) {
             $table->enum('addon_type',['P','SP','K'])->nullable();
-
             $table->bigInteger('brand_id')->unsigned()->index()->after('quotation_id')->nullable();
             $table->foreign('brand_id')->references('id')->on('brands');
-
             $table->bigInteger('model_line_id')->unsigned()->index()->after('quotation_id')->nullable();
             $table->foreign('model_line_id')->references('id')->on('master_model_lines');
-
             $table->bigInteger('model_description_id')->unsigned()->index()->after('quotation_id')->nullable();
             $table->foreign('model_description_id')->references('id')->on('master_model_descriptions');
 

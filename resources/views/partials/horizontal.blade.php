@@ -354,7 +354,6 @@
                                                         <a href="{{route('addon.list','K')}}" class="dropdown-item" data-key="t-login">Kits</a>
                                                         @endif
                                                         @endcan
-
                                                         @canany(['accessories-list','spare-parts-list','kit-list'])
                                                         @php
                                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list','spare-parts-list','kit-list']);
@@ -441,6 +440,12 @@
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-more" role="button">
                                         <i data-feather="phone-call"></i>
                                         <span data-key="t-extra-pages">Messages & Calls</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('sale_person_status.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="user"></i>
+                                        <span data-key="t-extra-pages">Sales Persons</span>
                                     </a>
                                 </li>
                                 @endif
