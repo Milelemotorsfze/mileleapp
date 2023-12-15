@@ -1221,7 +1221,7 @@
 </div>
 <div class="row">
     <div class="col-lg-12 text-end mt-3">
-        <button type="button" class="btn btn-outline-warning" data-model-line-id = "" data-index-rowstt = "" data-brand-id = "" id="directadding-button-ad" sparepart-id-directad = "">Directly Adding Into Quotation</button>
+        <button type="button" class="btn btn-outline-warning" data-model-line-id = "" data-model-line-ids = "" data-index-rowstt = "" data-brand-ids = "" data-brand-id = "" id="directadding-button-ad" sparepart-id-directad = "">Directly Adding Into Quotation</button>
     </div>
     </div>
 <!-- DataTable Container -->
@@ -3086,6 +3086,8 @@ $(document).ready(function () {
                         // If the button data attributes don't exist, set default values
                         $('#directadding-button-ad').data('model-line-id', data.modelLineIdname);
                         $('#directadding-button-ad').data('brand-id', data.brand_name);
+                        $('#directadding-button-ad').data('model-line-ids', data.modelLineId);
+                        $('#directadding-button-ad').data('brand-ids', data.brands);
                         $('#directadding-button-ad').data('index-rowstt', Indexdatarows);
                     },
                     error: function (error) {
@@ -3429,9 +3431,11 @@ $(document).ready(function () {
             });
             $(document).on('click', '#directadding-button-ad', function () {
                 var brandId = $(this).data('brand-id');
+                var brandIds = $(this).data('brand-ids');
                 var selectedAddonType = $('#addontypes').val();
                 console.log(selectedAddonType);
                 var modelLineId = $(this).data('model-line-id');
+                var modelLineIds = $(this).data('model-line-ids');
                 var tableType = $(this).attr('data-table');
                 var table = $('#addonDataTable').DataTable();
                 var modelLine = "";
@@ -3447,6 +3451,8 @@ $(document).ready(function () {
                 rowData['index'] = index;
                 rowData['brand'] = brandId;
                 rowData['modelLine'] = modelLineId;
+                rowData['brand_id'] = brandIds;
+                rowData['model_line_id'] = modelLineIds;
                 var datainc = $(this).data('index-rowstt');
                 if(selectedAddonType == "accessories")
                 {
