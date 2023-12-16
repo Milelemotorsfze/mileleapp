@@ -1,7 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\SalesPersonStatus;
+use App\Models\UserActivities;
+use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class SalesPersonStatusController extends Controller
@@ -9,9 +12,26 @@ class SalesPersonStatusController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Sales Persons status";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        if ($request->ajax()) { 
+            $data = SalesPersonStatus::select( [
+                    'user.name as salespersonname',
+                    'sales_person_status.remarks',
+                    'sales_person_status.status',
+                    'sales_person_status.created_by',
+                    DB::raw("DATE_FORMAT(sales_person_status.created_at, '%d-%b-%Y') as created_at"),
+                ])
+                ->leftJoin('users', 'users.id', '=', 'sales_person_status.sale_person_id')
+                ->groupBy('sales_person_status.sale_person_id');
+                return DataTables::of($data)
+                ->toJson();
+        }
+        return view('calls.salespersonstatus');
     }
 
     /**

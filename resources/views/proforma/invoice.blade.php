@@ -3115,7 +3115,7 @@ $(document).ready(function () {
                         dropdown.empty();
                         dropdown.append('<option value="" selected disabled>Select Please</option>');
                         $.each(options, function (index, value) {
-                            dropdown.append('<option value="' + value.id + '">' + value.name + '</option>');
+                            dropdown.append('<option value="' + value.id + '" data-id="' + value.ids + '">' + value.name + '</option>');
                         });
                     }
                     // Change event for the second dropdown
@@ -3459,7 +3459,8 @@ $(document).ready(function () {
                 {
                 rowData['addon_type'] = 'P';
                 var selectedOption = $('select[name="accessoriesDropdown"] option:selected');
-                var id = selectedOption.val();
+                // var id = selectedOption.val();
+                var id = selectedOption.data('id');
                 var addons = selectedOption.text();
                 var rowId = $(this).data('row-id');
                 }
@@ -3467,7 +3468,8 @@ $(document).ready(function () {
                 {
                 rowData['addon_type'] = 'SP';
                 var selectedOption = $('select[name="sparePartsDropdown"] option:selected');
-                var id = selectedOption.val();
+                // var id = selectedOption.val();
+                var id = selectedOption.data('id');
                 var addons = selectedOption.text();
                 var rowId = $(this).data('row-id');
                 }
@@ -3475,7 +3477,8 @@ $(document).ready(function () {
                 {
                 rowData['addon_type'] = 'K';
                 var selectedOption = $('select[name="kitsDropdown"] option:selected');
-                var id = selectedOption.val();
+                // var id = selectedOption.val();
+                var id = selectedOption.data('id');
                 var addons = selectedOption.text();
                 var rowId = $(this).data('row-id');
                 }

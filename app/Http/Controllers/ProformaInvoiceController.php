@@ -226,7 +226,6 @@ class ProformaInvoiceController extends Controller {
         return response()->json($spare_parts);
     }
     public function getbookingKits($addonId, $brandId, $modelLineId, $ModelDescriptionId) {
-       
         $brandName = $modelLine = $modelDescription = '';
         $brandName = Brand::where('id',$brandId)->first();
         $modelLine = MasterModelLines::where('id',$modelLineId)->first();
@@ -325,17 +324,17 @@ class ProformaInvoiceController extends Controller {
             $brands = Brand::where('id', $modelLineId)->first();
             $assessoriesDesc = DB::table('addon_descriptions')
             ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-            ->select('addons.name as name', 'addon_descriptions.id as id')
+            ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
             ->where('addons.addon_type', 'P')
             ->get();
             $sparePartsDesc = DB::table('addon_descriptions')
             ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-            ->select('addons.name as name', 'addon_descriptions.id as id')
+            ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
             ->where('addons.addon_type', 'SP')
             ->get();
             $kitsDesc = DB::table('addon_descriptions')
             ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-            ->select('addons.name as name', 'addon_descriptions.id as id')
+            ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
             ->where('addons.addon_type', 'K')
             ->get();
             return response()->json([
@@ -355,17 +354,17 @@ class ProformaInvoiceController extends Controller {
         $brands = MasterModelLines::with('brand')->find($modelLineId);
         $assessoriesDesc = DB::table('addon_descriptions')
         ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
         ->where('addons.addon_type', 'P')
         ->get();
         $sparePartsDesc = DB::table('addon_descriptions')
         ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
         ->where('addons.addon_type', 'SP')
         ->get();
         $kitsDesc = DB::table('addon_descriptions')
         ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
         ->where('addons.addon_type', 'K')
         ->get();
         return response()->json([
@@ -386,17 +385,17 @@ class ProformaInvoiceController extends Controller {
         $brands = MasterModelLines::with('brand')->find($variantID);
         $assessoriesDesc = DB::table('addon_descriptions')
         ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
         ->where('addons.addon_type', 'P')
         ->get();
         $sparePartsDesc = DB::table('addon_descriptions')
         ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
         ->where('addons.addon_type', 'SP')
         ->get();
         $kitsDesc = DB::table('addon_descriptions')
         ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
         ->where('addons.addon_type', 'K')
         ->get();
         return response()->json([
@@ -418,17 +417,17 @@ class ProformaInvoiceController extends Controller {
             $brands = MasterModelLines::with('brand')->find($modelLineId);
             $assessoriesDesc = DB::table('addon_descriptions')
             ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-            ->select('addons.name as name', 'addon_descriptions.id as id')
+            ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
             ->where('addons.addon_type', 'P')
             ->get();
             $sparePartsDesc = DB::table('addon_descriptions')
             ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-            ->select('addons.name as name', 'addon_descriptions.id as id')
+            ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
             ->where('addons.addon_type', 'SP')
             ->get();
             $kitsDesc = DB::table('addon_descriptions')
             ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-            ->select('addons.name as name', 'addon_descriptions.id as id')
+            ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
             ->where('addons.addon_type', 'K')
             ->get();
             return response()->json([
@@ -444,17 +443,17 @@ class ProformaInvoiceController extends Controller {
         else{
         $assessoriesDesc = DB::table('addon_descriptions')
         ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
         ->where('addons.addon_type', 'P')
         ->get();
         $sparePartsDesc = DB::table('addon_descriptions')
         ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
         ->where('addons.addon_type', 'SP')
         ->get();
         $kitsDesc = DB::table('addon_descriptions')
         ->join('addons', 'addons.id', '=', 'addon_descriptions.addon_id')
-        ->select('addons.name as name', 'addon_descriptions.id as id')
+        ->select('addons.name as name', 'addon_descriptions.id as id', 'addons.id as ids')
         ->where('addons.addon_type', 'K')
         ->get();
         return response()->json([
