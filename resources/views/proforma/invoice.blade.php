@@ -2130,7 +2130,7 @@ $(document).ready(function () {
                     var arrayIndex = row['index'] - 1;
 
                     return '<div class="row" style="flex-wrap: unset;margin-left: 2px;">' +
-                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;" name="is_enable['+ arrayIndex  +']" value="yes" class="checkbox-hide"' +
+                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;" name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide"' +
                         ' checked id="checkbox-'+ row['index'] +'"> ' +
                         '<input type="text" name="descriptions[]" required class="combined-value-editable form-control" value="' + combinedValue + '"/>' +
                         '</div> ';
@@ -2314,6 +2314,7 @@ $(document).ready(function () {
         row['model_line_id'] = "";
         row['model_description_id'] = "";
         row['addon_type'] = "";
+        row['rowId'] = "";
 
         if(tableType == 'vehicle-table') {
             row['table_type'] = 'vehicle-table';
@@ -2557,34 +2558,34 @@ $(document).ready(function () {
             var table = $('#dtBasicExample1').DataTable();
             var id = $(this).data('variant-id');
             var modallineidad = $(this).data('modellineidad');
-            rowData['brand_id'] = $(this).data('brand-id');
-            rowData['model_line_id'] = modallineidad;
+            // rowData['brand_id'] = $(this).data('brand-id');
+            // rowData['model_line_id'] = modallineidad;
 
         }
         else if(buttonType == 'Accessory') {
             var table = $('#dtBasicExample5').DataTable();
             var id = $(this).data('accessory-id');
-            rowData['addon_type'] = 'P';
-            rowData['brand_id'] = $(this).data('brand-id');
-            rowData['model_line_id'] = $(this).data('model-line-id');
+            // rowData['addon_type'] = 'P';
+            // rowData['brand_id'] = $(this).data('brand-id');
+            // rowData['model_line_id'] = $(this).data('model-line-id');
 
         }
         else if(buttonType == 'SparePart') {
             var table = $('#dtBasicExample3').DataTable();
             var id = $(this).data('sparepart-id');
-            rowData['addon_type'] = 'SP';
-            rowData['brand_id'] = $(this).data('brand-id');
-            rowData['model_line_id'] = $(this).data('model-line-id');
-            rowData['model_description_id'] = $(this).data('model-description-id');
+            // rowData['addon_type'] = 'SP';
+            // rowData['brand_id'] = $(this).data('brand-id');
+            // rowData['model_line_id'] = $(this).data('model-line-id');
+            // rowData['model_description_id'] = $(this).data('model-description-id');
 
         }
         else if(buttonType == 'Kit') {
             var table = $('#dtBasicExample4').DataTable();
             var id = $(this).data('kit-id');
-            rowData['addon_type'] = 'K';
-            rowData['brand_id'] = $(this).data('brand-id');
-            rowData['model_line_id'] = $(this).data('model-line-id');
-            rowData['model_description_id'] = $(this).data('model-description-id');
+            // rowData['addon_type'] = 'K';
+            // rowData['brand_id'] = $(this).data('brand-id');
+            // rowData['model_line_id'] = $(this).data('model-line-id');
+            // rowData['model_description_id'] = $(this).data('model-description-id');
         }
 
 
