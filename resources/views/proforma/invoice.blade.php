@@ -3127,8 +3127,15 @@ $(document).ready(function () {
                         dropdown.empty();
                         dropdown.append('<option value="" selected disabled>Select Please</option>');
                         $.each(options, function (index, value) {
-                            dropdown.append('<option value="' + value.id + '" data-id="' + value.ids + '">' + value.name + '</option>');
+                            if(value.description != null){
+                                dropdown.append('<option value="' + value.id + '" data-id="' + value.ids + '">' + value.name + ' - ' + value.description + '</option>');
+                            }
+                            else{
+                                dropdown.append('<option value="' + value.id + '" data-id="' + value.ids + '">' + value.name + '</option>');
+                            }
+                           
                         });
+                        dropdown.append('<option value="" data-id="">Other</option>');
                     }
                     // Change event for the second dropdown
                     $('select.form-select').change(function () {

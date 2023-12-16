@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 use App\Models\SalesPersonStatus;
+use App\Models\User;
 use App\Models\UserActivities;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -19,15 +21,16 @@ class SalesPersonStatusController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         if ($request->ajax()) { 
-            $data = SalesPersonStatus::select( [
-                    'user.name as salespersonname',
+            $data = User::select( [
+                    'users.name as salespersonname',
                     'sales_person_status.remarks',
                     'sales_person_status.status',
                     'sales_person_status.created_by',
                     DB::raw("DATE_FORMAT(sales_person_status.created_at, '%d-%b-%Y') as created_at"),
                 ])
-                ->leftJoin('users', 'users.id', '=', 'sales_person_status.sale_person_id')
-                ->groupBy('sales_person_status.sale_person_id');
+                ->leftJoin('sales_person_status', 'sales_person_status.sale_person_id', '=', 'users.id')
+                ->where('selected_role', "7")
+                ->groupBy('users.id');
                 return DataTables::of($data)
                 ->toJson();
         }
