@@ -59,10 +59,6 @@
         {{ session('success') }}
     </div>
 @endif
-<a class="btn btn-sm btn-Success float-end" href="{{ route('approvalsinspection.index') }}" text-align: right>
-        <i class="fa fa-check" aria-hidden="true"></i> Vehicle Approvals
-      </a>
-      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
     <h4 class="card-title">
      Sales Person Info
     </h4>
@@ -73,26 +69,11 @@
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
             <thead class="bg-soft-secondary">
                 <tr>
-                  <th>PO Date</th>
-                  <th>PO Number</th>
-                  <th>GRN Date</th>
-                  <th>GRN Number</th>
-                  <th>Location</th>
-                  <th>VIN</th>
-                  <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Model Description</th>
-                  <th>Variant Name</th>
-                  <th>Variant Detail</th>
-                  <th>Model Year</th>
-                  <th>Steering</th>
-                  <th>Seats</th>
-                  <th>Fuel Type</th>
-                  <th>Transmission</th>
-                  <th>Upholstery</th>
-                  <th>Production Year</th>
-                  <th>Interior Color</th>
-                  <th>Exterior Color</th> 
+                  <th>Sales Person</th>
+                  <th>Remarks</th>
+                  <th>Last Updated By</th>
+                  <th>Last Updated On</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -105,28 +86,13 @@
           var table1 =  $('#dtBasicExample1').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ route('inspection.index', ['status' => 'Pending']) }}",
+            ajax: "{{ route('sale_person_status.index')}}",
             columns: [
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'location', name: 'warehouse.name' },
-                { data: 'vin', name: 'vehicles.vin' },
-                { data: 'brand_name', name: 'brands.brand_name' },
-                { data: 'model_line', name: 'master_model_lines.model_line' },
-                { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
-                { data: 'my', name: 'varaints.my' },
-                { data: 'steering', name: 'varaints.steering' },
-                { data: 'seat', name: 'varaints.seat' },
-                { data: 'fuel_type', name: 'varaints.fuel_type' },
-                { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'upholestry', name: 'varaints.upholestry' },
-                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'interior_color', name: 'int_color.name' },
-                { data: 'exterior_color', name: 'ex_color.name' },
+                { data: 'salespersonname', name: 'salespersonname' },
+                { data: 'remarks', name: 'sales_person_status.remarks' },
+                { data: 'created_by', name: 'sales_person_status.created_by' },
+                { data: 'created_at', name: 'sales_person_status.created_at' },
+                { data: 'status', name: 'sales_person_status.status' },
             ]
         });
   });
