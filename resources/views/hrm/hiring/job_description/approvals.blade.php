@@ -1,6 +1,6 @@
 @extends('layouts.table')
 @section('content')
-@if(Auth::user()->job_description_approval == true)
+@if(Auth::user()->job_description_approval['can'] == true)
 @if(count($deptHeadPendings) > 0 || count($deptHeadApproved) > 0 || count($deptHeadRejected) > 0)
 <div class="card-header">
 	<h4 class="card-title">
