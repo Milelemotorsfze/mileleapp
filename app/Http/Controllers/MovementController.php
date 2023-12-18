@@ -214,6 +214,8 @@ class MovementController extends Controller
                             $vehicleslog->created_by = auth()->user()->id;
                             $vehicleslog->save();
         }
+        $newvin = $request->input('newvin');
+        $vin = $request->input('vin');
         foreach ($vin as $index => $value) {
             if (array_key_exists($index, $from) && array_key_exists($index, $to)) {    
             $movement = new Movement();
@@ -221,20 +223,23 @@ class MovementController extends Controller
             $movement->from = $from[$index];
             $movement->to = $to[$index];
             $movement->reference_id = $movementsReferenceId;
+            if (isset($newvin[$index]) && $newvin[$index] !== null && $newvin[$index] !== '') {
+                $movement->vin = $newvin[$index];
+            }
             $movement->save();
             Vehicles::where('vin', $vin[$index])->update(['latest_location' => $to[$index]]);
         }
     }
-    $newvin = $request->input('newvin');
-    $vin = $request->input('vin');
     foreach ($newvin as $index => $value) {
         if ($value !== null && $value !== '' && isset($vin[$index])) {
             $vehicle = Vehicles::where('vin', $vin[$index])->first();
+            $movements = Movement::where('vin', $value)->first();
             if ($vehicle) {
                 $vinchange = New VinChange();
                 $vinchange->old_vin = $vehicle->vin;
                 $vinchange->new_vin = $value;
                 $vinchange->vehicles_id = $vehicle->id;
+                $vinchange->movements_id = $movements->id;
                 $vinchange->created_by = auth()->user()->id;
                 $vinchange->save();
                 $vehicleslog = new Vehicleslog();
