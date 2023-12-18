@@ -10,8 +10,9 @@ namespace App\Http\Controllers;
     use Spatie\Permission\Models\Role;
     use DB;
     use Hash;
-    use App\Models\Profile;
+    use App\Models\SalesPersonStatus;
     use Illuminate\Support\Facades\Auth;
+    use App\Models\Profile;
     use Illuminate\Support\Facades\Session;
     use Illuminate\Support\Arr;
     use Illuminate\Support\Str;
@@ -62,6 +63,12 @@ namespace App\Http\Controllers;
             $empJob->designation = $request->input('designation');
             $empJob->save();
             if ($user->sales_rap === 'Yes') {
+                $salesmanstatus = New SalesPersonStatus();
+                $salesmanstatus->sale_person_id = $user->id;
+                $salesmanstatus->status = "Active";
+                $salesmanstatus->remarks = "Account Created";
+                $salesmanstatus->created_by = Auth::user();
+                $salesmanstatus->save();
                 $languages = $request->input('lauguages');
                 foreach ($languages as $language) {
                     $salesPersonLanguage = new SalesPersonLaugauges();

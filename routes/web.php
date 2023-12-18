@@ -641,4 +641,4 @@ Route::get('/d', function () {
     });
     Route::get('candidate/personal_info/{id}', [CandidatePersonalInfoController::class, 'sendForm'])->name('candidate_personal_info.send_form');
     Route::post('candidate/store_personal_info', [CandidatePersonalInfoController::class, 'storePersonalinfo'])->name('candidate.storePersonalinfo');
-    
+    Route::get('candidate/success_personal_info', [CandidatePersonalInfoController::class, 'successPersonalinfo'])->name('candidate.successPersonalinfo');

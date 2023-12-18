@@ -742,11 +742,16 @@
                                             </a>
                                         </div>
                                         @endif
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('shipping-master');
+                                        @endphp
+                                        @if ($hasPermission)
                                         <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('Shipping.index') }}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Shipping </span>
                                             </a>
                                         </div>
+                                        @endif
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('agents');
                                         @endphp
