@@ -78,7 +78,8 @@
                                             ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
                                             ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
                                             ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action','create-job-description'
-                                            ,'edit-job-description','view-pending-job-description-list','view-approved-job-description-list','view-rejected-job-description-list','view-job-description-details','view-job-description-approvals-details'])
+                                            ,'edit-job-description','view-pending-job-description-list','view-approved-job-description-list','view-rejected-job-description-list','view-job-description-details','view-job-description-approvals-details',
+                                            'view-interview-summary-report-listing','create-interview-summary-report'])
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','view-all-pending-hiring-request-listing',
                                             'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
@@ -90,7 +91,8 @@
                                             ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
                                             ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action',
                                             'hiring-request-cancel-action','create-job-description'
-                                            ,'edit-job-description','view-pending-job-description-list','view-approved-job-description-list','view-rejected-job-description-list','view-job-description-details','view-job-description-approvals-details']);
+                                            ,'edit-job-description','view-pending-job-description-list','view-approved-job-description-list','view-rejected-job-description-list','view-job-description-details','view-job-description-approvals-details',
+                                            'view-interview-summary-report-listing','create-interview-summary-report']);
                                 @endphp
                                 @if ($hasPermission)
                                 <li class="nav-item dropdown">
@@ -168,7 +170,14 @@
                                                 <a href="{{ route('job_description.index') }}" class="dropdown-item" data-key="t-login">Job Descriptions</a>
                                                 @endif
                                                 @endcanany
+                                                @canany(['view-interview-summary-report-listing','create-interview-summary-report'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing','create-interview-summary-report']);
+                                                @endphp
+                                                @if ($hasPermission)
                                                 <a href="{{ route('interview-summary-report.index') }}" class="dropdown-item" data-key="t-login">Interview Summary</a>
+                                                @endif
+                                                @endcanany
                                             </div>
                                             @endif
                                             @endcanany
@@ -378,7 +387,7 @@
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action']);
                             @endphp
-                            @if ($hasPermission)
+                            @if ($hasPermission OR Auth::user()->hiring_request_approval == true OR Auth::user()->job_description_approval == true)
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                     <i data-feather="grid"></i>
@@ -421,11 +430,27 @@
                                     </div>
                                     @endif
                                     @endcanany
-                                    <!-- <div class="dropdown">
+                                    @if(Auth::user()->hiring_request_approval == true)
+                                    <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee-hiring-request.approval-awaiting') }}" id="topnav-utility" role="button">
                                             <span data-key="t-utility">Employee Hiring</span>
                                         </a>
-                                    </div> -->
+                                    </div>
+                                    @endif
+                                    @if(Auth::user()->job_description_approval == true)
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee-hiring-job-description.approval-awaiting') }}" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Job Descriptions</span>
+                                        </a>
+                                    </div>
+                                    @endif
+                                    @if(Auth::user()->job_description_approval == true)
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('interview-summary-report.approval-awaiting') }}" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Interview Summary</span>
+                                        </a>
+                                    </div>
+                                    @endif
                                 </div>
                             </li>
                             @endif

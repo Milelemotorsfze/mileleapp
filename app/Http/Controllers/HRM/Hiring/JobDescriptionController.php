@@ -178,4 +178,46 @@ class JobDescriptionController extends Controller
             DB::rollback();
         }
     }
+    public function approvalAwaiting(Request $request) {
+        $authId = Auth::id();
+        $page = 'approval';
+        $HRManager = '';
+        $deptHeadPendings = $deptHeadApproved = $deptHeadRejected = 
+        $HRManagerPendings = $HRManagerApproved = $HRManagerRejected = [];
+        $HRManager = ApprovalByPositions::where([
+            ['approved_by_position','HR Manager'],
+            ['handover_to_id',$authId]
+        ])->first();
+        $deptHeadPendings = JobDescription::where([
+            ['action_by_department_head','pending'],
+            ['department_head_id',$authId],
+            ])->latest()->get();
+        $deptHeadApproved = JobDescription::where([
+            ['action_by_department_head','approved'],
+            ['department_head_id',$authId],
+            ])->latest()->get();
+        $deptHeadRejected = JobDescription::where([
+            ['action_by_department_head','rejected'],
+            ['department_head_id',$authId],
+            ])->latest()->get();
+        if($HRManager) {
+            $HRManagerPendings = JobDescription::where([
+                ['action_by_department_head','approved'],
+                ['action_by_hr_manager','pending'],
+                ['hr_manager_id',$authId],
+                ])->latest()->get();
+            $HRManagerApproved = JobDescription::where([
+                ['action_by_department_head','approved'],
+                ['action_by_hr_manager','approved'],
+                ['hr_manager_id',$authId],
+                ])->latest()->get();
+            $HRManagerRejected = JobDescription::where([
+                ['action_by_department_head','approved'],                
+                ['action_by_hr_manager','rejected'],
+                ['hr_manager_id',$authId],
+                ])->latest()->get();
+        }
+        return view('hrm.hiring.job_description.approvals',compact('page','deptHeadPendings',
+        'deptHeadApproved','deptHeadRejected','HRManagerPendings','HRManagerApproved','HRManagerRejected',));
+    }
 }

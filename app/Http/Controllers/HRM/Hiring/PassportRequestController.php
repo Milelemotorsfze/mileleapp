@@ -56,6 +56,7 @@ class PassportRequestController extends Controller
                 array_push($masterEmployees,$User);  
             }
         }
+        // dd($Users);
         $submissionPurpose = PassportRequestPurpose::where('type','submit')->get();
         $releasePurpose = PassportRequestPurpose::where('type','release')->get();
         return view('hrm.hiring.passport_request.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));

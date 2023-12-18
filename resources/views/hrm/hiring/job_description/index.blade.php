@@ -8,9 +8,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 <div class="card-header">
 	<h4 class="card-title">
 		Job Description Info
-	</h4>
-	<!-- <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> -->
-	
+	</h4>	
 	@canany(['create-job-description'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
@@ -81,11 +79,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 	</ul>
 </div>
 <div class="tab-content" id="selling-price-histories" >
-    <!-- @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price'])
-    @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price']);
-    @endphp
-    @if ($hasPermission) -->
 	<div class="tab-pane fade show active" id="pending-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
@@ -96,9 +89,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<th>Hiring Request UUID</th>
 							<th>Request Date</th>
 							<th>Job Title</th>
-							<!-- <th>Department</th> -->
 							<th>Department Location</th>
-							<!-- <th>Reporting To</th> -->
 							<th>Job Purpose</th>
 							<th>Duties and Responsibilities (Generic) of the position</th>
 							<th>Skills required at fulfill the position</th>
@@ -106,13 +97,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<th>Created By</th>
 							<th>Created At</th>
 							<th>Team Lead/ Manager Name</th>
-							<!-- <th>Team Lead/ Manager Action</th>
-							<th>Team Lead/ Manager Action At</th>
-							<th>Team Lead/ Manager Comment</th> -->
 							<th>HR Manager Name</th>
-							<!-- <th>HR Manager Action</th>
-							<th>HR Manager Action At</th>
-							<th>HR Manager Comment</th> -->
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -124,22 +109,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
 							<td>{{ $data->request_date ?? '' }}</td>
 							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
-							<!-- <td>{{ $data->department->name ?? '' }}</td> -->
 							<td>{{ $data->location->name ?? '' }}</td>
-							<!-- <td>{{ $data->reportingTo->name ?? '' }}</td> -->
 							<td>{{ $data->job_purpose ?? ''}}</td>
 							<td>{{ $data->duties_and_responsibilities ?? ''}}</td>
 							<td>{{ $data->skills_required ?? ''}}</td>
 							<td>{{ $data->position_qualification ?? ''}}</td>
 							<td>{{$data->createdBy->name ?? ''}}</td>
 							<td>{{$data->departmentHeadName->name ?? ''}}</td>
-							<!-- <td>{{$data->action_by_department_head ?? ''}}</td>
-							<td>{{$data->department_head_action_at ?? ''}}</td>
-							<td>{{$data->comments_by_department_head ?? ''}}</td> -->
 							<td>{{$data->hrManagerName->name ?? ''}}</td>
-							<!-- <td>{{$data->action_by_hr_manager ?? ''}}</td>
-							<td>{{$data->hr_manager_action_at ?? ''}}</td>
-							<td>{{$data->comments_by_hr_manager ?? ''}}</td> -->
 							<td>{{$data->created_at ?? ''}}</td>
 							<td>
 							<div class="dropdown">

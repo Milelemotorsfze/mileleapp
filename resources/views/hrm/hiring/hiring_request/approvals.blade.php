@@ -11,6 +11,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 		Approvals By Recruiting Manager
 	</h4>
 </div> -->
+@if(Auth::user()->hiring_request_approval == true)
 @if(count($hiringManagerPendings) > 0 || count($hiringManagerApproved) > 0 || count($hiringManagerRejected) > 0)
 <div class="card-header">
 	<h4 class="card-title">
@@ -56,13 +57,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
         @endphp
         @if ($hasPermission) -->
 		<li class="nav-item">
-			<a class="nav-link active" data-bs-toggle="pill" href="#pending-selling-prices">Pending </a>
+			<a class="nav-link active" data-bs-toggle="pill" href="#hiring-manager-pending-hiring-requests">Pending </a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#approved-selling-prices">Approved </a>
+			<a class="nav-link" data-bs-toggle="pill" href="#hiring-manager-approved-hiring-requests">Approved </a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#rejected-selling-prices">Rejected </a>
+			<a class="nav-link" data-bs-toggle="pill" href="#hiring-manager-rejected-hiring-requests">Rejected </a>
 		</li>
         <!-- @endif
         @endcanany -->
@@ -74,7 +75,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price']);
     @endphp
     @if ($hasPermission) -->
-	<div class="tab-pane fade show active" id="pending-selling-prices">
+	<div class="tab-pane fade show active" id="hiring-manager-pending-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
 				<table id="pending-selling-price-histories-table" class="table table-striped table-editable table-edits table">
@@ -317,7 +318,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-    <div class="tab-pane fade show" id="approved-selling-prices">
+    <div class="tab-pane fade show" id="hiring-manager-approved-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
 				<table id="approved-selling-price-histories-table" class="table table-striped table-editable table-edits table">
@@ -378,9 +379,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 								<a title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
 								<i class="fa fa-list" aria-hidden="true"></i>
 								</a>
-								<a title="Create Job Description" class="btn btn-sm btn-secondary" href="{{route('employee-hiring-job-description.create-or-edit',$approvedOne->id)}}">
-								<i class="fa fa-address-card" aria-hidden="true"></i>
-								</a>
 								@endif -->
 							</td>
 						</tr>
@@ -390,7 +388,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade show" id="rejected-selling-prices">
+	<div class="tab-pane fade show" id="hiring-manager-rejected-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
 				<table id="rejected-selling-price-histories-table" class="table table-striped table-editable table-edits table">
@@ -470,13 +468,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
         @endphp
         @if ($hasPermission) -->
 		<li class="nav-item">
-			<a class="nav-link active" data-bs-toggle="pill" href="#pending-selling-prices">Pending </a>
+			<a class="nav-link active" data-bs-toggle="pill" href="#team-lead-pending-hiring-requests">Pending </a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#approved-selling-prices">Approved </a>
+			<a class="nav-link" data-bs-toggle="pill" href="#team-lead-approved-hiring-requests">Approved </a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#rejected-selling-prices">Rejected </a>
+			<a class="nav-link" data-bs-toggle="pill" href="#team-lead-rejected-hiring-requests">Rejected </a>
 		</li>
         <!-- @endif
         @endcanany -->
@@ -488,7 +486,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price']);
     @endphp
     @if ($hasPermission) -->
-	<div class="tab-pane fade show active" id="pending-selling-prices">
+	<div class="tab-pane fade show active" id="team-lead-pending-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
 				<table id="pending-selling-price-histories-table" class="table table-striped table-editable table-edits table">
@@ -731,7 +729,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-    <div class="tab-pane fade show" id="approved-selling-prices">
+    <div class="tab-pane fade show" id="team-lead-approved-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
 				<table id="approved-selling-price-histories-table" class="table table-striped table-editable table-edits table">
@@ -804,7 +802,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade show" id="rejected-selling-prices">
+	<div class="tab-pane fade show" id="team-lead-rejected-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
 				<table id="rejected-selling-price-histories-table" class="table table-striped table-editable table-edits table">
@@ -878,31 +876,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 </div>
 <div class="portfolio">
 	<ul class="nav nav-pills nav-fill" id="my-tab">
-        <!-- @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price'])
-        @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price']);
-        @endphp
-        @if ($hasPermission) -->
 		<li class="nav-item">
-			<a class="nav-link active" data-bs-toggle="pill" href="#pending-selling-prices">Pending </a>
+			<a class="nav-link active" data-bs-toggle="pill" href="#hr-pending-hiring-requests">Pending </a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#approved-selling-prices">Approved </a>
+			<a class="nav-link" data-bs-toggle="pill" href="#hr-approved-hiring-requests">Approved </a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#rejected-selling-prices">Rejected </a>
+			<a class="nav-link" data-bs-toggle="pill" href="#hr-rejected-hiring-requests">Rejected </a>
 		</li>
-        <!-- @endif
-        @endcanany -->
 	</ul>
 </div>
 <div class="tab-content" id="selling-price-histories" >
-    <!-- @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price'])
-    @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price']);
-    @endphp
-    @if ($hasPermission) -->
-	<div class="tab-pane fade show active" id="pending-selling-prices">
+	<div class="tab-pane fade show active" id="hr-pending-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
 				<table id="pending-selling-price-histories-table" class="table table-striped table-editable table-edits table">
@@ -953,9 +939,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$pending->id)}}">
 									<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
-								<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$pending->id)}}">
-									<i class="fa fa-edit" aria-hidden="true"></i>
-								</a> -->
 								@if(isset($type))
 									@if($type == 'approve')
 										<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
@@ -1145,7 +1128,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-    <div class="tab-pane fade show" id="approved-selling-prices">
+    <div class="tab-pane fade show" id="hr-approved-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
 				<table id="approved-selling-price-histories-table" class="table table-striped table-editable table-edits table">
@@ -1167,7 +1150,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>Detailed Explanation Of New Hiring</th>
 							<th>Created By</th>
 							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -1195,21 +1177,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$approvedOne->id)}}">
 									<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
-								<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$approvedOne->id)}}">
-									<i class="fa fa-edit" aria-hidden="true"></i>
-								</a> -->
-								<!-- @if(isset($approvedOne->questionnaire))
-								<a title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
-								<i class="fa fa-list" aria-hidden="true"></i>
-								</a>
-								@else
-								<a title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
-								<i class="fa fa-list" aria-hidden="true"></i>
-								</a>
-								<a title="Create Job Description" class="btn btn-sm btn-secondary" href="{{route('employee-hiring-job-description.create-or-edit',$approvedOne->id)}}">
-								<i class="fa fa-address-card" aria-hidden="true"></i>
-								</a>
-								@endif -->
 							</td>
 						</tr>
 						@endforeach
@@ -1218,7 +1185,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade show" id="rejected-selling-prices">
+	<div class="tab-pane fade show" id="hr-rejected-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
 				<table id="rejected-selling-price-histories-table" class="table table-striped table-editable table-edits table">
@@ -1240,7 +1207,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>Detailed Explanation Of New Hiring</th>
 							<th>Created By</th>
 							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -1268,9 +1234,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$rejectedOne->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
 							</a>
-							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$rejectedOne->id)}}">
-								<i class="fa fa-edit" aria-hidden="true"></i>
-							</a> -->
 							</td>
 						</tr>
 						@endforeach
@@ -1279,12 +1242,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-    <!-- @endif
-    @endcanany -->
 </div>
 @endif
-<!-- @endif
-@endcanany -->
+@endif
 @endsection
 @push('scripts')
 <script type="text/javascript">

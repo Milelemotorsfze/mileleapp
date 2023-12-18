@@ -41,7 +41,15 @@
         {
 
             alertify.set('notifier','position', 'top-right','delay', 40);
-			// datatables
+			// datatables  
+
+            $('#teamlead-pending-hiring-requests-table').DataTable();
+            $('#teamlead-approved-hiring-requests-table').DataTable();
+            $('#teamlead-rejected-hiring-requests-table').DataTable();
+            $('#hr-pending-hiring-requests-table').DataTable();
+            $('#hr-approved-hiring-requests-table').DataTable();
+            $('#hr-rejected-hiring-requests-table').DataTable();
+
             $('#shortlisted-table').DataTable();
             $('#telephonic-interview-round-table').DataTable();
             $('#first-round-table').DataTable();
