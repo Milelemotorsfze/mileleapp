@@ -1,4 +1,11 @@
 <style>
+    .approval-count {
+        color:white!important;
+        background-color:#fd625e!important;
+        border-radius:50%!important;
+        padding-right:3px!important;
+        padding-left:3px!important;
+    }
     @media only screen and (max-device-width: 280px) {
         .responsiveButton {
             position: absolute;
@@ -387,11 +394,14 @@
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action']);
                             @endphp
-                            @if ($hasPermission OR Auth::user()->hiring_request_approval == true OR Auth::user()->job_description_approval == true)
+                            @if ($hasPermission OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can'] == true)
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                     <i data-feather="grid"></i>
-                                    <span data-key="t-extra-pages">Approvals</span>
+                                    <span data-key="t-extra-pages">Approvals @if((Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']) > 0)
+                                    <span class="approval-count">{{Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']}}</span>
+                                                @endif
+                                            </span>
                                     <div class="arrow-down"></div>
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="topnav-more">
@@ -430,25 +440,33 @@
                                     </div>
                                     @endif
                                     @endcanany
-                                    @if(Auth::user()->hiring_request_approval == true)
+
+                                    @if(Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can']  == true OR Auth::user()->interview_summary_report_approval == true)
                                     <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee-hiring-request.approval-awaiting') }}" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Employee Hiring</span>
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                            <span data-key="t-utility"> Employee Hiring @if((Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']) > 0)
+                                            <span class="approval-count">{{Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']}}</span>
+                                                @endif
+                                            </span>
+                                            <div class="arrow-down"></div>
                                         </a>
-                                    </div>
-                                    @endif
-                                    @if(Auth::user()->job_description_approval == true)
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee-hiring-job-description.approval-awaiting') }}" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Job Descriptions</span>
-                                        </a>
-                                    </div>
-                                    @endif
-                                    @if(Auth::user()->job_description_approval == true)
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('interview-summary-report.approval-awaiting') }}" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Interview Summary</span>
-                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                            @if(Auth::user()->hiring_request_approval['can'] == true)
+                                            <a href="{{ route('employee-hiring-request.approval-awaiting') }}" class="dropdown-item" data-key="t-login">Hiring Requests
+                                                @if(Auth::user()->hiring_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->hiring_request_approval['count']}}</span> @endif
+                                            </a>
+                                            @endif
+                                            @if(Auth::user()->job_description_approval['can']  == true)
+                                            <a href="{{ route('employee-hiring-job-description.approval-awaiting') }}" class="dropdown-item" data-key="t-login">Job Descriptions
+                                            @if(Auth::user()->job_description_approval['count'] > 0) <span class="approval-count">{{Auth::user()->job_description_approval['count']}}<span> @endif
+                                            </a>
+                                            @endif
+                                            @if(Auth::user()->interview_summary_report_approval == true)
+                                            <a href="{{ route('interview-summary-report.approval-awaiting') }}" class="dropdown-item" data-key="t-login">Interview Summary
+                                            @if(Auth::user()->interview_summary_report_approval['count'] > 0) <span class="approval-count">{{Auth::user()->interview_summary_report_approval['count']}}</span> @endif
+                                            </a>
+                                            @endif
+                                        </div>
                                     </div>
                                     @endif
                                 </div>

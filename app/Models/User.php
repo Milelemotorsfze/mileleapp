@@ -75,7 +75,8 @@ class User extends Authenticatable
         return $canSubmitOrReleasePassport;
     }
     public function getHiringRequestApprovalAttribute() {
-        $hiringRequestApproval = false;
+        $hiringRequestApproval['can'] = false;
+        $hiringRequestApproval['count'] = 0;
         $hiringManagerPendings = $hiringManagerApproved = $hiringManagerRejected = $deptHeadPendings = $deptHeadApproved = $deptHeadRejected = $HRManagerPendings 
         = $HRManagerApproved = $HRManagerRejected = [];
         $hiringManagerPendings = EmployeeHiringRequest::where([
@@ -125,12 +126,14 @@ class User extends Authenticatable
             ])->latest()->get();
         if(count($hiringManagerPendings) > 0 OR count($hiringManagerApproved) > 0 OR count($hiringManagerRejected) > 0 OR count($deptHeadPendings) > 0 OR 
         count($deptHeadApproved) > 0 OR count($deptHeadRejected) > 0 OR count($HRManagerPendings) > 0 OR count($HRManagerApproved) > 0 OR count($HRManagerRejected) > 0) {
-            $hiringRequestApproval = true;
+            $hiringRequestApproval['can'] = true;
+            $hiringRequestApproval['count'] = count($hiringManagerPendings) + count($deptHeadPendings) + count($HRManagerPendings);
         }
         return $hiringRequestApproval;
     }
     public function getJobDescriptionApprovalAttribute() {
-        $jobDescriptionApproval = false;
+        $jobDescriptionApproval['can'] = false;
+        $jobDescriptionApproval['count'] = 0;
         $deptHeadPendings = $deptHeadApproved = $deptHeadRejected = $HRManagerPendings = $HRManagerApproved = $HRManagerRejected = [];
         $deptHeadPendings = JobDescription::where([
             ['action_by_department_head','pending'],
@@ -161,12 +164,14 @@ class User extends Authenticatable
             ])->latest()->get();
         if(count($deptHeadPendings) > 0 OR count($deptHeadApproved) > 0 OR count($deptHeadRejected) > 0 OR count($HRManagerPendings) > 0 OR 
             count($HRManagerApproved) > 0 OR count($HRManagerRejected) > 0) {
-                $jobDescriptionApproval = true;
+                $jobDescriptionApproval['can'] = true;
+                $jobDescriptionApproval['count'] = count($deptHeadPendings) + count($HRManagerPendings);
             }
         return $jobDescriptionApproval;
     }
     public function getInterviewSummaryReportApprovalAttribute() {
-        $interviewSummaryReportApproval = false;
+        $interviewSummaryReportApproval['can'] = false;
+        $interviewSummaryReportApproval['count'] = 0;
         $divisionHeadPendings = $divisionHeadApproved = $divisionHeadRejected = $HRManagerPendings = $HRManagerApproved = $HRManagerRejected = [];
         $HRManagerPendings = InterviewSummaryReport::where([
             ['action_by_hr_manager','pending'],
@@ -197,7 +202,8 @@ class User extends Authenticatable
             ])->latest()->get();
         if(count($HRManagerPendings) > 0 OR count($HRManagerApproved) > 0 OR count($HRManagerRejected) > 0 OR count($divisionHeadPendings) > 0 OR 
         count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0) {
-            $interviewSummaryReportApproval = true;
+            $interviewSummaryReportApproval['can'] = true;
+            $interviewSummaryReportApproval['count'] = count($HRManagerPendings) + count($divisionHeadPendings);
         }
         return $interviewSummaryReportApproval;
     }

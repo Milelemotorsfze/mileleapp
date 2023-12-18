@@ -160,11 +160,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 											@endif
 										@endif
 									</li>
-                                    <!-- <li>
-										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Delete" type="button" class="btn btn-secondary btn-sm hiring-request-delete sm-mt-3" data-id="{{ $data->id }}" data-url="{{ route('employee-hiring-request.destroy', $data->id) }}">
-											<i class="fa fa-trash"></i> Delete
-										</button>
-									</li> -->
                                 </ul>
                             </div>
 							</td>
@@ -186,9 +181,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<th>Hiring Request UUID</th>
 							<th>Request Date</th>
 							<th>Job Title</th>
-							<!-- <th>Department</th> -->
 							<th>Department Location</th>
-							<!-- <th>Reporting To</th> -->
 							<th>Job Purpose</th>
 							<th>Duties and Responsibilities (Generic) of the position</th>
 							<th>Skills required at fulfill the position</th>
@@ -215,9 +208,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<td>{{ $approvedOne->employeeHiringRequest->uuid ?? ''}}</td>
 							<td>{{ $approvedOne->request_date ?? '' }}</td>
 							<td>{{ $approvedOne->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
-							<!-- <td>{{ $approvedOne->department->name ?? '' }}</td> -->
 							<td>{{ $approvedOne->location->name ?? '' }}</td>
-							<!-- <td>{{ $approvedOne->reportingTo->name ?? '' }}</td> -->
 							<td>{{ $approvedOne->job_purpose ?? ''}}</td>
 							<td>{{ $approvedOne->duties_and_responsibilities ?? ''}}</td>
 							<td>{{ $approvedOne->skills_required ?? ''}}</td>
@@ -234,55 +225,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<td>{{$approvedOne->createdBy->name ?? ''}}</td>
 							<td>{{$approvedOne->created_at ?? ''}}</td>
 							<td>
-							<!-- <div class="dropdown"> -->
-                                <!-- <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li> -->
 										<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i>
 										</a>
-									<!-- </li>
-                                    <li>
-										@if(isset($approvedOne->questionnaire))
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
-										<i class="fa fa-list" aria-hidden="true"></i> Edit Questionnaire
-										</a>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Job Description" class="btn btn-sm btn-secondary" href="{{route('employee-hiring-job-description.create-or-edit',$approvedOne->id)}}">
-										<i class="fa fa-address-card" aria-hidden="true"></i> Add Job Description
-										</a>
-										@else
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
-										<i class="fa fa-list" aria-hidden="true"></i> Create Questionnaire
-										</a>
-									@endif
-									</li>
-									<li>
-										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-											data-bs-target="#closed-hiring-request-{{$approvedOne->id}}">
-											<i class="fa fa-check" aria-hidden="true"></i> Closed
-										</button>
-									</li>
-                                    <li>
-										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="On Hold" type="button" class="btn btn-primary btn-sm"  data-bs-toggle="modal"
-											data-bs-target="#on-hold-hiring-request-{{$approvedOne->id}}">
-											<i class="fa fa-hand-rock" aria-hidden="true"></i> On Hold
-										</button>
-									</li>
-                                    <li>
-										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Cancelled" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-											data-bs-target="#cancelled-hiring-request-{{$approvedOne->id}}">
-											<i class="fa fa-ban" aria-hidden="true"></i> Cancelled
-										</button>
-									</li>
-                                </ul>
-                            </div> -->
-								
-								<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$approvedOne->id)}}">
-									<i class="fa fa-edit" aria-hidden="true"></i>
-								</a> -->
-								
 							</td>
 							<div class="modal fade" id="cancelled-hiring-request-{{$approvedOne->id}}"
 								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -415,9 +360,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<th>Hiring Request UUID</th>
 							<th>Request Date</th>
 							<th>Job Title</th>
-							<!-- <th>Department</th> -->
 							<th>Department Location</th>
-							<!-- <th>Reporting To</th> -->
 							<th>Job Purpose</th>
 							<th>Duties and Responsibilities (Generic) of the position</th>
 							<th>Skills required at fulfill the position</th>
@@ -443,9 +386,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 						<td>{{ $rejectedOne->employeeHiringRequest->uuid ?? ''}}</td>
 							<td>{{ $rejectedOne->request_date ?? '' }}</td>
 							<td>{{ $rejectedOne->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
-							<!-- <td>{{ $rejectedOne->department->name ?? '' }}</td> -->
 							<td>{{ $rejectedOne->location->name ?? '' }}</td>
-							<!-- <td>{{ $rejectedOne->reportingTo->name ?? '' }}</td> -->
 							<td>{{ $rejectedOne->job_purpose ?? ''}}</td>
 							<td>{{ $rejectedOne->duties_and_responsibilities ?? ''}}</td>
 							<td>{{ $rejectedOne->skills_required ?? ''}}</td>
@@ -464,9 +405,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
 							</a>
-							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$rejectedOne->id)}}">
-								<i class="fa fa-edit" aria-hidden="true"></i>
-							</a> -->
 							</td>
 						</tr>
 						@endforeach
@@ -475,9 +413,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 			</div>
 		</div>
 	</div>
-	
-    <!-- @endif
-    @endcanany -->
 </div>
 @endif
 @endcanany
