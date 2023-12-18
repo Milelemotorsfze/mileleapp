@@ -3486,6 +3486,10 @@ $(document).ready(function () {
                 var selectedOption = $('select[name="accessoriesDropdown"] option:selected');
                 // var id = selectedOption.val();
                 var id = selectedOption.data('id');
+                if(id == "")
+                {
+                 id = "Other";
+                }
                 var addons = selectedOption.text();
                 var rowId = $(this).data('row-id');
                 }
@@ -3495,6 +3499,10 @@ $(document).ready(function () {
                 var selectedOption = $('select[name="sparePartsDropdown"] option:selected');
                 // var id = selectedOption.val();
                 var id = selectedOption.data('id');
+                if(id == "")
+                {
+                 id = "Other";
+                }
                 var addons = selectedOption.text();
                 var rowId = $(this).data('row-id');
                 }
@@ -3504,6 +3512,10 @@ $(document).ready(function () {
                 var selectedOption = $('select[name="kitsDropdown"] option:selected');
                 // var id = selectedOption.val();
                 var id = selectedOption.data('id');
+                if(id == "")
+                {
+                 id = "Other";
+                }
                 var addons = selectedOption.text();
                 var rowId = $(this).data('row-id');
                 }
