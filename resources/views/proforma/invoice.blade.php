@@ -1621,6 +1621,12 @@ $(document).ready(function () {
             }else{
                 $('#'+ id).val("yes");
             }
+            var tableType = $('#'+id).attr('data-table-type');
+            if(tableType == "Vehicle") {
+                this.checked=!this.checked;
+                alertify.confirm('Vehicle cannot be hide!').set({title:"Alert !"});
+            }
+
         });
         $('.modal-close').on('click', function(){
             $('.overlay').hide();
@@ -2082,7 +2088,6 @@ $(document).ready(function () {
                 targets: -2,
                 data: null,
                 render: function (data, type, row) {
-
                     var price = "";
                     var uuid = "";
                     var addon = 0;
@@ -2144,8 +2149,8 @@ $(document).ready(function () {
                 data: null,
                 render: function (data, type, row) {
                     var combinedValue = "";
+                    var tableType = row['button_type'];
                     if(row['button_type'] == 'Vehicle') {
-
                         var brand = row[1];
                         var modelDescription = row[3];
                         var interiorColor = row[6];
@@ -2183,7 +2188,10 @@ $(document).ready(function () {
                         if(row['table_type'] !== 'vehicle-table') {
 
                             combinedValue = row[0] + comma0 + combinedValue;
-                            // $('#checkbox-'+data['index']).attr('disabled', true);
+                        }
+
+                        if(row['table_type'] == 'vehicle-table') {
+                            var tableType = "Vehicle";
                         }
                     }
 
@@ -2191,7 +2199,7 @@ $(document).ready(function () {
                     var arrayIndex = row['index'] - 1;
 
                     return '<div class="row" style="flex-wrap: unset;margin-left: 2px;">' +
-                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;" name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide"' +
+                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;" data-table-type="'+ tableType +'" name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide"' +
                         ' checked id="checkbox-'+ row['index'] +'"> ' +
                         '<input type="text" name="descriptions[]" required class="combined-value-editable form-control" value="' + combinedValue + '"/>' +
                         '</div> ';
