@@ -1241,17 +1241,6 @@
 @endsection
 @push('scripts')
 <script>
-
-    // $(document.body).on('select2:select', "#country", function (e) {
-    //     var shippingAddedCount = $('#is-shipping-charge-added').val();
-    //     if(shippingAddedCount > 0) {
-    //         $("#country option:selected").prop("selected", false);
-    //         $("#country").trigger('change');
-    //         alertify.confirm('Please remove already added shipping to change the Delivery Details!').set({title:"Alert !"});
-    //
-    //     }
-    //
-    // });
      function addAgentModal() {
         $('#addAgentModal').modal('show');
     }
@@ -1632,6 +1621,12 @@ $(document).ready(function () {
             }else{
                 $('#'+ id).val("yes");
             }
+            var tableType = $('#'+id).attr('data-table-type');
+            if(tableType == "Vehicle") {
+                this.checked=!this.checked;
+                alertify.confirm('Vehicle cannot be hide!').set({title:"Alert !"});
+            }
+
         });
         $('.modal-close').on('click', function(){
             $('.overlay').hide();
@@ -2093,7 +2088,6 @@ $(document).ready(function () {
                 targets: -2,
                 data: null,
                 render: function (data, type, row) {
-
                     var price = "";
                     var uuid = "";
                     var addon = 0;
@@ -2155,8 +2149,8 @@ $(document).ready(function () {
                 data: null,
                 render: function (data, type, row) {
                     var combinedValue = "";
+                    var tableType = row['button_type'];
                     if(row['button_type'] == 'Vehicle') {
-
                         var brand = row[1];
                         var modelDescription = row[3];
                         var interiorColor = row[6];
@@ -2194,7 +2188,10 @@ $(document).ready(function () {
                         if(row['table_type'] !== 'vehicle-table') {
 
                             combinedValue = row[0] + comma0 + combinedValue;
-                            // $('#checkbox-'+data['index']).attr('disabled', true);
+                        }
+
+                        if(row['table_type'] == 'vehicle-table') {
+                            var tableType = "Vehicle";
                         }
                     }
 
@@ -2202,7 +2199,7 @@ $(document).ready(function () {
                     var arrayIndex = row['index'] - 1;
 
                     return '<div class="row" style="flex-wrap: unset;margin-left: 2px;">' +
-                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;" name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide"' +
+                        '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;" data-table-type="'+ tableType +'" name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide"' +
                         ' checked id="checkbox-'+ row['index'] +'"> ' +
                         '<input type="text" name="descriptions[]" required class="combined-value-editable form-control" value="' + combinedValue + '"/>' +
                         '</div> ';
@@ -2315,19 +2312,9 @@ $(document).ready(function () {
 
         var index = $(this).closest('tr').index();
         secondTable.row(index).remove().draw();
-        // var data = secondTable.rows().data();
-
-        // $('#dtBasicExample2 tr').each(function(i){
-        //
-        //    $(this).find('td input.price-editable').attr('id','price-'+ i);
-        //    $(this).find('td input.qty-editable').attr('id','quantity-'+ i);
-        //    $(this).find('td input.total-amount-editable').attr('id','total-amount-'+ i);
-        // });
-
         if(row['button_type'] != 'Direct-Add') {
             resetSerialNumber(table);
         }
-
         // total div logic
         var tableLength = secondTable.data().length;
             if(tableLength == 0) {
@@ -2575,7 +2562,7 @@ $(document).ready(function () {
         row['button_type'] = 'Direct-Add';
         row['index'] = index;
         row['number'] = uniqueNumber;
-        console.log(row);
+
         if(tableType == 'kit-table' || tableType == 'spare-part-table' || tableType == 'accessories-table'){
             if(addonId != "") {
                 table.row.add(row).draw();
@@ -2670,9 +2657,6 @@ $(document).ready(function () {
             // rowData['model_line_id'] = $(this).data('model-line-id');
             // rowData['model_description_id'] = $(this).data('model-description-id');
         }
-
-
-
         var modelLineId = $(this).data('model-line-id');
 
         rowData['modallineidad'] = modallineidad;
@@ -2691,12 +2675,6 @@ $(document).ready(function () {
         // console.log(rowData);
     });
 
-    // function resetSerialNumber(table) {
-    //     alert("ok");
-    //     table.$('tbody tr').each(function(i){
-    //         $($(this).find('td')[0]).html(i+1);
-    //     });
-    // }
         $('#dtBasicExample2 tbody').on('input', '.price-editable', function(e) {
             var index =  $(this).closest('tr').index() + 1;
             CalculateTotalAmount(index);
