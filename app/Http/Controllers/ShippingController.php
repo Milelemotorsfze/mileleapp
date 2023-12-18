@@ -474,6 +474,19 @@ public function updateShippingRate(Request $request)
         $shippingRate->updated_by = Auth::id();
     }
     $shippingRate->save();
+    if($shippingRate->status == "Selected")
+    {
+        $shippingcharges = Shipping::find($shippingRate->shipping_charges_id); 
+        if (!is_null($newCostPrice)) 
+        {
+            $shippingcharges->cost_price = $newCostPrice;
+        }
+        if (!is_null($newSellingPrice)) 
+        {
+            $shippingcharges->price = $newSellingPrice;
+        }
+        $shippingcharges->save();
+    }
     return response()->json(['message' => 'Shipping rate updated successfully']);
 }
     }

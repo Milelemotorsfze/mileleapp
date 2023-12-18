@@ -375,10 +375,10 @@
                             Final Destination :
                         </div>
                         <div class="col-sm-6">
-                            <select class="form-control col" id="country" name="country_id" style="width: 100%">
+                            <select class="form-control col" id="country" name="country_id" multiple style="width: 100%">
                                 <option ></option>
                                 @foreach($countries as $country)
-                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    <option value="{{ $country->id }}" >{{ $country->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -403,7 +403,7 @@
                             Port of Discharge :
                         </div>
                         <div class="col-sm-6">
-                            <select class="form-control col" id="shipping_port" name="from_shipping_port_id" style="width: 100%">
+                            <select class="form-control col" id="shipping_port" multiple name="from_shipping_port_id" style="width: 100%">
                                 <option></option>
                             </select>
                         </div>
@@ -413,7 +413,7 @@
                             Port of Loading :
                         </div>
                         <div class="col-sm-6">
-                            <select class="form-control col" id="to_shipping_port" name="to_shipping_port_id" style="width: 100%">
+                            <select class="form-control col" id="to_shipping_port" multiple name="to_shipping_port_id" style="width: 100%">
                                 <option></option>
                                 @foreach($shippingPorts as $shippingPort)
                                     <option value="{{ $shippingPort->id }}">{{ $shippingPort->name }}</option>
@@ -1237,9 +1237,21 @@
     </div>
   </div>
 </div>
+ <input type="hidden" name="is_shipping_charge_added" value="0" id="is-shipping-charge-added">
 @endsection
 @push('scripts')
 <script>
+
+    // $(document.body).on('select2:select', "#country", function (e) {
+    //     var shippingAddedCount = $('#is-shipping-charge-added').val();
+    //     if(shippingAddedCount > 0) {
+    //         $("#country option:selected").prop("selected", false);
+    //         $("#country").trigger('change');
+    //         alertify.confirm('Please remove already added shipping to change the Delivery Details!').set({title:"Alert !"});
+    //
+    //     }
+    //
+    // });
      function addAgentModal() {
         $('#addAgentModal').modal('show');
     }
@@ -1415,13 +1427,72 @@ $(document).ready(function () {
             placeholder: "Select Brand"
         });
         $('#country').select2({
-            placeholder: "Select Final Destination"
+            placeholder: "Select Final Destination",
+            tags:true,
+            maximumSelectionLength: 1,
+
+        }).on('select2:unselecting', function(e){
+            // before removing tag we check option element of tag and
+            // if it has property 'locked' we will create error to prevent all select2 functionality
+            var shippingAddedCount = $('#is-shipping-charge-added').val();
+                if(shippingAddedCount > 0) {
+                    $("#country option:selected").attr("locked", true);
+                    if ($(e.params.args.data.element).attr('locked', true)) {
+                        var confirm = alertify.confirm('Please remove selected Shipping Charges to change delivery details', function (e) {
+                        }).set({title: "Not Able to Remove"})
+                        e.preventDefault();
+                    }
+                }else{
+                    $("#country option:selected").attr("locked", false);
+                    $('#shipping_port').empty();
+                    var table = $('#shipping-table').DataTable();
+                    table.clear().draw();
+                }
         });
         $('#shipping_port').select2({
-            placeholder: "Select Port Of Discharge"
+            placeholder: "Select Port Of Discharge",
+            tags:true,
+            maximumSelectionLength: 1,
+
+        }).on('select2:unselecting', function(e){
+            // before removing tag we check option element of tag and
+            // if it has property 'locked' we will create error to prevent all select2 functionality
+            var shippingAddedCount = $('#is-shipping-charge-added').val();
+            if(shippingAddedCount > 0) {
+                $("#shipping_port option:selected").attr("locked", true);
+                if ($(e.params.args.data.element).attr('locked', true)) {
+                    var confirm = alertify.confirm('Please remove selected Shipping Charges to change delivery details', function (e) {
+                    }).set({title: "Not Able to Remove"})
+                    e.preventDefault();
+                }
+            }else{
+                $("#shipping_port option:selected").attr("locked", false);
+                var table = $('#shipping-table').DataTable();
+                table.clear().draw();
+            }
         });
+
         $('#to_shipping_port').select2({
-            placeholder: "Select Port Of Loading"
+            placeholder: "Select Port Of Loading",
+            tags:true,
+            maximumSelectionLength: 1,
+
+        }).on('select2:unselecting', function(e){
+            // before removing tag we check option element of tag and
+            // if it has property 'locked' we will create error to prevent all select2 functionality
+            var shippingAddedCount = $('#is-shipping-charge-added').val();
+            if(shippingAddedCount > 0) {
+                $("#to_shipping_port option:selected").attr("locked", true);
+                if ($(e.params.args.data.element).attr('locked', true)) {
+                    var confirm = alertify.confirm('Please remove selected Shipping Charges to change delivery details', function (e) {
+                    }).set({title: "Not Able to Remove"})
+                    e.preventDefault();
+                }
+            }else{
+                $("#to_shipping_port option:selected").attr("locked", false);
+                var table = $('#shipping-table').DataTable();
+                table.clear().draw();
+            }
         });
         $('#incoterm').select2({
             placeholder: "Select Incoterm"
@@ -1445,7 +1516,8 @@ $(document).ready(function () {
         $('#kit_model_line').select2();
         $('#kits_model_description').select2();
 
-        $('#country').on('change',function(){
+
+        $('#country').on('select2:select', function(e){
             let country = $(this).val();
             let url = '{{ route('quotation.shipping_ports') }}';
             $.ajax({
@@ -2198,6 +2270,12 @@ $(document).ready(function () {
         if(row['button_type'] == 'Shipping') {
             var table = $('#shipping-table').DataTable();
             table.row.add([row[0],row[1],row[2],row[3],row[4],'<button class="add-button circle-button" data-button-type="Shipping"  data-shipping-id="'+ row['id']+'"></button>']).draw();
+            var shipppingAddedCount =   $('#is-shipping-charge-added').val();
+            var count = shipppingAddedCount - 1;
+            $('#is-shipping-charge-added').val(count);
+            // if(count <= 0) {
+            //     $('#country').attr('disabled', false);
+            // }
         }
         else if(row['button_type'] == 'Vehicle') {
             var table = $('#dtBasicExample1').DataTable();
@@ -2538,6 +2616,11 @@ $(document).ready(function () {
         if(buttonType == 'Shipping') {
             var table = $('#shipping-table').DataTable();
             var id = $(this).data('shipping-id');
+
+            var shipppingAddedCount =   $('#is-shipping-charge-added').val();
+            var count = +shipppingAddedCount + +1;
+            $('#is-shipping-charge-added').val(count);
+            // $('#country').attr('disabled', true);
         }
         else if(buttonType == 'Shipping-Document') {
             var table = shippingDocumentTable;
@@ -3133,7 +3216,7 @@ $(document).ready(function () {
                             else{
                                 dropdown.append('<option value="' + value.id + '" data-id="' + value.ids + '">' + value.name + '</option>');
                             }
-                           
+
                         });
                         dropdown.append('<option value="" data-id="">Other</option>');
                     }
@@ -3486,6 +3569,10 @@ $(document).ready(function () {
                 var selectedOption = $('select[name="accessoriesDropdown"] option:selected');
                 // var id = selectedOption.val();
                 var id = selectedOption.data('id');
+                if(id == "")
+                {
+                 id = "Other";
+                }
                 var addons = selectedOption.text();
                 var rowId = $(this).data('row-id');
                 }
@@ -3495,6 +3582,10 @@ $(document).ready(function () {
                 var selectedOption = $('select[name="sparePartsDropdown"] option:selected');
                 // var id = selectedOption.val();
                 var id = selectedOption.data('id');
+                if(id == "")
+                {
+                 id = "Other";
+                }
                 var addons = selectedOption.text();
                 var rowId = $(this).data('row-id');
                 }
@@ -3504,6 +3595,10 @@ $(document).ready(function () {
                 var selectedOption = $('select[name="kitsDropdown"] option:selected');
                 // var id = selectedOption.val();
                 var id = selectedOption.data('id');
+                if(id == "")
+                {
+                 id = "Other";
+                }
                 var addons = selectedOption.text();
                 var rowId = $(this).data('row-id');
                 }
@@ -3628,15 +3723,6 @@ $(document).ready(function () {
 
                 });
             }
-            // function disableCheckBox() {
-            //     alert("Ok");
-            //     var table = $("#dtBasicExample2 tr");
-            //     table.each(function(i){
-            //         alert(i);
-            //      var checkbox =  $(this).find("checkbox-"+i).attr('id');
-            //         alert(checkbox);
-            //     });
-            //
-            // }
+
         </script>
 @endpush

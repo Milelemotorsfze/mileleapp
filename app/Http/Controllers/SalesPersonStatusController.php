@@ -21,16 +21,15 @@ class SalesPersonStatusController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         if ($request->ajax()) { 
-            $data = User::select( [
+            $data = SalesPersonStatus::select( [
                     'users.name as salespersonname',
                     'sales_person_status.remarks',
                     'sales_person_status.status',
                     'sales_person_status.created_by',
                     DB::raw("DATE_FORMAT(sales_person_status.created_at, '%d-%b-%Y') as created_at"),
                 ])
-                ->leftJoin('sales_person_status', 'sales_person_status.sale_person_id', '=', 'users.id')
-                ->where('selected_role', "7")
-                ->groupBy('users.id');
+                ->leftJoin('users', 'users.id', '=', 'sales_person_status.sale_person_id')
+                ->groupBy('sales_person_status.sale_person_id');
                 return DataTables::of($data)
                 ->toJson();
         }
