@@ -1241,17 +1241,6 @@
 @endsection
 @push('scripts')
 <script>
-
-    // $(document.body).on('select2:select', "#country", function (e) {
-    //     var shippingAddedCount = $('#is-shipping-charge-added').val();
-    //     if(shippingAddedCount > 0) {
-    //         $("#country option:selected").prop("selected", false);
-    //         $("#country").trigger('change');
-    //         alertify.confirm('Please remove already added shipping to change the Delivery Details!').set({title:"Alert !"});
-    //
-    //     }
-    //
-    // });
      function addAgentModal() {
         $('#addAgentModal').modal('show');
     }
@@ -2315,19 +2304,9 @@ $(document).ready(function () {
 
         var index = $(this).closest('tr').index();
         secondTable.row(index).remove().draw();
-        // var data = secondTable.rows().data();
-
-        // $('#dtBasicExample2 tr').each(function(i){
-        //
-        //    $(this).find('td input.price-editable').attr('id','price-'+ i);
-        //    $(this).find('td input.qty-editable').attr('id','quantity-'+ i);
-        //    $(this).find('td input.total-amount-editable').attr('id','total-amount-'+ i);
-        // });
-
         if(row['button_type'] != 'Direct-Add') {
             resetSerialNumber(table);
         }
-
         // total div logic
         var tableLength = secondTable.data().length;
             if(tableLength == 0) {
@@ -2575,7 +2554,7 @@ $(document).ready(function () {
         row['button_type'] = 'Direct-Add';
         row['index'] = index;
         row['number'] = uniqueNumber;
-        console.log(row);
+
         if(tableType == 'kit-table' || tableType == 'spare-part-table' || tableType == 'accessories-table'){
             if(addonId != "") {
                 table.row.add(row).draw();
@@ -2670,9 +2649,6 @@ $(document).ready(function () {
             // rowData['model_line_id'] = $(this).data('model-line-id');
             // rowData['model_description_id'] = $(this).data('model-description-id');
         }
-
-
-
         var modelLineId = $(this).data('model-line-id');
 
         rowData['modallineidad'] = modallineidad;
@@ -2691,12 +2667,6 @@ $(document).ready(function () {
         // console.log(rowData);
     });
 
-    // function resetSerialNumber(table) {
-    //     alert("ok");
-    //     table.$('tbody tr').each(function(i){
-    //         $($(this).find('td')[0]).html(i+1);
-    //     });
-    // }
         $('#dtBasicExample2 tbody').on('input', '.price-editable', function(e) {
             var index =  $(this).closest('tr').index() + 1;
             CalculateTotalAmount(index);

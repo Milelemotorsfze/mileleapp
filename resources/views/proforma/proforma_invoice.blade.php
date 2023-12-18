@@ -175,7 +175,7 @@
                             <?php $shippingPerVehiclequantityPrice = $shippingChargeDistriAmount / $vehicle->quantity;
                             $vehicleUnitPrice = $vehicle->vehicle_unit_price + $shippingPerVehiclequantityPrice;
                             $totalAmount = $vehicleUnitPrice * $vehicle->quantity ?>
-                        <td> <span style="font-weight: bold;font-size: 14px;" > {{ $key+1 }}. </span> {{ $vehicle->description }}</td>
+                        <td>  {{ $vehicle->vehicle_unit_price }}<span style="font-weight: bold;font-size: 14px;" > {{ $key+1 }}. </span> {{ $vehicle->description }}</td>
                         <td> {{$vehicle->system_code_currency ."". $vehicle->system_code_amount }}</td>
                         <td>{{ $vehicle->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($vehicleUnitPrice, 2) }} </td>
@@ -219,11 +219,15 @@
 {{--                @endforeach--}}
                 @foreach($otherVehicles as $key => $otherVehicle)
                     <tr style="color: #02023f;">
+                            <?php $shippingPerVehiclequantityPrice = $shippingChargeDistriAmount / $otherVehicle->quantity;
+                            $vehicleUnitPrice = $otherVehicle->vehicle_unit_price + $shippingPerVehiclequantityPrice;
+                            $totalAmount = $vehicleUnitPrice * $otherVehicle->quantity ?>
                         <td> <span style="font-weight: bold;font-size: 14px;" > {{  $vehicles->count() + $key+1 }}. </span> {{ $otherVehicle->description }}</td>
                         <td> {{ $otherVehicle->system_code_currency ."". $otherVehicle->system_code_amount }}</td>
                         <td>{{ $otherVehicle->quantity }}</td>
-                        <td>{{ $quotation->currency ." ". number_format($otherVehicle->vehicle_unit_price, 2) }}</td>
-                        <td> <?php $totalAmount = $otherVehicle->vehicle_unit_price * $otherVehicle->quantity ?>
+                        <td>{{ $quotation->currency ." ". number_format($vehicleUnitPrice, 2) }}</td>
+                        <td>
+{{--                                <?php $totalAmount = $otherVehicle->vehicle_unit_price * $otherVehicle->quantity ?>--}}
                             {{ $quotation->currency ." ". number_format($totalAmount, 2) }}</td>
                     </tr>
                     @if($otherVehicle->quotation_addon_items->count() > 0)
@@ -241,11 +245,15 @@
                 @endforeach
                 @foreach($vehicleWithBrands as $key => $vehicleWithBrand)
                     <tr style="color: #02023f;">
+                            <?php $shippingPerVehiclequantityPrice = $shippingChargeDistriAmount / $vehicleWithBrand->quantity;
+                            $vehicleUnitPrice = $vehicleWithBrand->vehicle_unit_price + $shippingPerVehiclequantityPrice;
+                            $totalAmount = $vehicleUnitPrice * $vehicleWithBrand->quantity ?>
                         <td> <span style="font-weight: bold;font-size: 14px;" > {{$vehicles->count() + $otherVehicles->count() + $key+1 }}. </span> {{ $vehicleWithBrand->description }}</td>
                         <td> {{ $vehicleWithBrand->system_code_currency ."". $vehicleWithBrand->system_code_amount }}</td>
                         <td>{{ $vehicleWithBrand->quantity }}</td>
-                        <td>{{ $quotation->currency ." ". number_format($vehicleWithBrand->vehicle_unit_price, 2) }}</td>
-                        <td> <?php $totalAmount = $vehicleWithBrand->vehicle_unit_price * $vehicleWithBrand->quantity ?>
+                        <td>{{ $quotation->currency ." ". number_format($vehicleUnitPrice, 2) }}</td>
+                        <td>
+{{--                                <?php $totalAmount = $vehicleWithBrand->vehicle_unit_price * $vehicleWithBrand->quantity ?>--}}
                             {{ $quotation->currency ." ". number_format($totalAmount, 2) }}</td>
                     </tr>
                     @if($vehicleWithBrand->quotation_addon_items->count() > 0)
@@ -361,12 +369,12 @@
                 @endforeach
             @endif
                 @if($quotation->document_type == 'Proforma Invoice')
-                    <tr style="background-color: #0f2c52;color:#FFFFFF;font-size: 12px;">
+                    <tr style="font-size: 12px;">
                         <th colspan="4"> DEPOSIT / PAYMENT RECEIVED</th>
                         <th>AMOUNT</th>
                     </tr>
                     <tr>
-                        <td colspan="3">Deposit</td>
+                        <td colspan="4">Deposit</td>
                         <td> {{ $quotation->currency ." ". number_format($quotationDetail->advance_amount, 2) }}</td>
                     </tr>
                 @endif
@@ -376,11 +384,13 @@
             <tr>
                 <td style="font-weight: bold;text-align: left">Note:- Third Party Payments will not be accepted.</td>
                 <td> </td>
+                <td> </td>
                 <td style="font-weight: bold"> SUB TOTAL</td>
                 <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }} </td>
             </tr>
             @if($quotation->document_type == 'Proforma Invoice')
                 <tr>
+                    <td> </td>
                     <td> </td>
                     <td> </td>
                     <td style="font-weight: bold">Discount</td>
@@ -389,10 +399,12 @@
                 <tr>
                     <td> </td>
                     <td> </td>
+                    <td> </td>
                     <td style="font-weight: bold">Net Amount</td>
                     <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }}</td>
                 </tr>
                 <tr>
+                    <td> </td>
                     <td> </td>
                     <td> </td>
                     <td style="font-weight: bold">VAT:(0%)</td>
@@ -401,10 +413,12 @@
                 <tr>
                     <td> </td>
                     <td> </td>
+                    <td> </td>
                     <td style="font-weight: bold">Gross Amount</td>
                     <td> </td>
                 </tr>
                 <tr>
+                    <td> </td>
                     <td> </td>
                     <td> </td>
                     <td style="font-weight: bold"> Advance Paid</td>
@@ -413,11 +427,13 @@
                 <tr>
                     <td> </td>
                     <td> </td>
+                    <td> </td>
                     <td style="font-weight: bold"> Remaining Amount({{ $quotation->currency }})</td>
                     <td> {{ $quotation->currency ." ". number_format($quotation->deal_value - $quotationDetail->advance_amount) }} </td>
                 </tr>
                 @if($quotation->currency != 'AED' && $quotation->shippingDocument == 'EXW')
                 <tr>
+                    <td> </td>
                     <td> </td>
                     <td> </td>
                     <td style="font-weight: bold"> Remaining Amount(AED)</td>
@@ -436,6 +452,7 @@
                     <td> </td>
                     <td> </td>
                     <td>  </td>
+                    <td> </td>
                     <td style="color: #de2121">  * VAT is not applicable for Export Bill </td>
                 </tr>
             @endif

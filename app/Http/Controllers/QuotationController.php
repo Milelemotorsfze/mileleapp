@@ -135,7 +135,6 @@ class QuotationController extends Controller
 
         $commissionAED = 0;
         $quotationItemIds = [];
-//        $quotationSubItemKeys = [];
 
         foreach ($request->prices as $key => $price) {
             $item = "";
@@ -245,13 +244,9 @@ class QuotationController extends Controller
 
         $quotationDetail->system_code = $commissionAED;
         $quotationDetail->save();
-        info($quotationItemIds);
-        info("quotation items");
-
         foreach ($quotationItemIds as $itemId) {
             $quotationItemRow = QuotationItem::find($itemId);
-            info($quotationItemRow);
-            info("vehicle row");
+
             $subItemIds = QuotationItem::where('uuid', $quotationItemRow->uuid)
                                     ->whereNot('id',$quotationItemRow->id)
                                     ->whereNotNull('uuid')
@@ -265,38 +260,7 @@ class QuotationController extends Controller
                     $quotationSubItem->save();
                 }
             }
-//            $itemKeys = $quotationSubItemKeys[$itemId];
-//            info("each item keys");
-//            foreach ($itemKeys as $itemKey) {
-//                if($request->types[$itemKey] == 'ModelLine' ) {
-//                     $alreadyaddedquotationIds = QuotationSubItem::where('quotation_id', $quotation->id)
-//                         ->pluck('quotation_item_id')->toArray();
-//                    if($request->is_addon[$itemKey] == 1) {
-//
-//                        $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
-//                            ->where('reference_id', $request->reference_ids[$itemKey])
-//                            ->where('reference_type', 'App\Models\MasterModelLines')
-//                            ->whereNotIn('id', $alreadyaddedquotationIds)
-//                            ->where('is_addon', true)
-//                            ->first();
-//                    }
-//                }else if($request->types[$itemKey] == 'Accessory' || $request->types[$itemKey] == 'SparePart' || $request->types[$itemKey] == 'Kit') {
-//
-//                    $quotationItemRow = QuotationItem::where('quotation_id', $quotation->id)
-//                        ->where('reference_id', $request->reference_ids[$itemKey])
-//                        ->where('reference_type', 'App\Models\AddonDetails')
-//                        ->whereNotIn('id', $alreadyaddedquotationIds)
-//                        ->first();
-//                }
-//                if($quotationItemRow) {
-//                    $quotationSubItem = new QuotationSubItem();
-//                    $quotationSubItem->quotation_id = $quotation->id;
-//                    $quotationSubItem->quotation_item_parent_id = $itemId;
-//                    $quotationSubItem->quotation_item_id = $quotationItemRow->id;
-//                    $quotationSubItem->save();
-//
-//                }
-//            }
+
         }
         DB::commit();
         $quotationDetail = QuotationDetail::with('country')->find($quotationDetail->id);
@@ -399,6 +363,7 @@ class QuotationController extends Controller
                 'App\Models\ShippingCertification','App\Models\OtherLogisticsCharges'])
             ->sum('total_amount');
         $vehicleCount = $vehicles->count() + $otherVehicles->count() + $vehicleWithBrands->count();
+
         if($vehicleCount > 0) {
             $shippingChargeDistriAmount = $shippingHidedItemAmount / $vehicleCount;
         }else{
