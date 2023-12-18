@@ -36,7 +36,7 @@
                 <thead class="bg-soft-secondary">
                 <tr>
                     <th>VIN</th>
-                    <th>Model</th>
+                    <th>Model Line</th>
                     <th>From</th>
                     <th>To</th>
                     <th>SO</th>
@@ -49,7 +49,20 @@
                         @foreach ($movement as $movements)
                         <tr data-id="1">
                         <td>{{ $movements->vin }}</td>
-                        <td>{{ $movements->vin }}</td>
+                        @php
+                        $modellines = "";
+                        $vehicles = DB::table('vehicles')->where('vin', $movements->vin)->first();
+                        if($vehicles->varaints_id)
+                        {
+                        $varaints = DB::table('varaints')->where('id', $vehicles->varaints_id)->first();
+                        if($varaints->master_model_lines_id)
+                        {
+                        $modellines = DB::table('master_model_lines')->where('id', $varaints->master_model_lines_id)->first();
+                        $modellines = $modellines ? $modellines->model_line : '';
+                        }
+                         }
+                         @endphp
+                        <td>{{ $modellines }}</td>
                         @php
                         $locationfrom = DB::table('warehouse')->where('id', $movements->from)->first();
                         $from = $locationfrom ? $locationfrom->name : '';
