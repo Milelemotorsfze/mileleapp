@@ -258,6 +258,7 @@ Route::get('/d', function () {
         Route::get('employee-hiring-job-description/create-or-edit/{id}/{hiring_id}', 'createOrEdit')->name('employee-hiring-job-description.create-or-edit');
         Route::post('employee-hiring-job-description/store-or-update/{id}', 'storeOrUpdate')->name('employee-hiring-job-description.store-or-update');
         Route::post('employee-hiring-job-description/request-action', 'requestAction')->name('employee-hiring-job-description.request-action');
+        Route::get('employee-hiring-job-description-approval-awaiting', 'approvalAwaiting')->name('employee-hiring-job-description.approval-awaiting');
     });
     // Interview Summary Report
     Route::resource('interview-summary-report', InterviewSummaryReportController::class);
@@ -268,6 +269,7 @@ Route::get('/d', function () {
         Route::post('interview-summary-report/round-summary', 'updateRoundSummary')->name('interview-summary-report.round-summary');
         Route::post('interview-summary-report/final-evaluation', 'finalEvaluation')->name('interview-summary-report.final-evaluation');
         Route::post('interview-summary-report/salary', 'salary')->name('interview-summary-report.salary');
+        Route::get('interview-summary-report-approval-awaiting', 'approvalAwaiting')->name('interview-summary-report.approval-awaiting');
     });
     // Candidate Personal Information Form
     Route::resource('personal-info', CandidatePersonalInfoController::class);

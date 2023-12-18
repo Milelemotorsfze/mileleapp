@@ -200,9 +200,9 @@
 	}
 </style>
 @section('content')
-@canany(['demand-planning-supplier-create', 'addon-supplier-create', 'vendor-edit'])
+@canany(['create-interview-summary-report','edit-interview-summary-report'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-create', 'vendor-edit','demand-planning-supplier-create']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','edit-interview-summary-report']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">

@@ -9,9 +9,9 @@
         }
     }
 </style>
-@canany(['view-all-hiring-request-details','view-hiring-request-details-of-current-user'])
+@canany(['view-interview-summary-report-listing'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-details-of-current-user']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing']);
 @endphp
 @if ($hasPermission)
 <div class="card-body">

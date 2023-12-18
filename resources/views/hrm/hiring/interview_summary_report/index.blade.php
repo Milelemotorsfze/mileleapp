@@ -25,12 +25,26 @@
 	</style>
 @section('content')
 <div class="card-header">
+	@canany(['view-interview-summary-report-listing'])
+	@php
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing']);
+	@endphp
+	@if ($hasPermission)
 	<h4 class="card-title">
 		Interview Summary Report Info
 	</h4>
+	@endif
+	@endcanany
+	@canany(['create-interview-summary-report'])
+	@php
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report']);
+	@endphp
+	@if ($hasPermission)
 	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('interview-summary-report.create-or-edit','new')}}">
 	    <i class="fa fa-plus" aria-hidden="true"></i> New Interview Summary Report
 	</a>
+	@endif
+	@endcanany
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -55,6 +69,11 @@
 	</div>
 	@endif
 </div>
+@canany(['view-interview-summary-report-listing'])
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing']);
+@endphp
+@if ($hasPermission)
 <div class="portfolio">
 	<ul class="nav nav-pills nav-fill" id="my-tab">
 		<li class="nav-item">
@@ -149,26 +168,33 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-											</a>
-										</li>
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="{{route('interview-summary-report.show', $data->id)}}">
-											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-											</a>
-										</li>
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
+										@canany(['edit-interview-summary-report'])
+										@php
+											$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 											</a>
 										</li>
+										@endif
+										@endcanany
+										@canany(['create-interview-summary-report'])
+										@php
+											$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#shortlisted-candidate-{{$data->id}}">
 											<i class="fa fa-plus" aria-hidden="true"></i> Telephonic Interview
 											</button>
 										</li>
+										@endif
+										@endcanany
 										@endif
 									</ul>
 								</div>
@@ -314,26 +340,36 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-											</a>
-										</li>
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="{{route('interview-summary-report.show', $data->id)}}">
-											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-											</a>
-										</li>
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
+
+										@canany(['edit-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 											</a>
 										</li>
+										@endif
+										@endcanany
+
+										@canany(['create-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#shortlisted-candidate-{{$data->id}}">
 											<i class="fa fa-plus" aria-hidden="true"></i> First Round
 											</button>
 										</li>
+										@endif
+										@endcanany
+
 										@endif
 									</ul>
 								</div>
@@ -490,26 +526,37 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-											</a>
-										</li>
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="{{route('interview-summary-report.show', $data->id)}}">
-											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-											</a>
-										</li>
+									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
+										
 										@if($data->employeeHiringRequest->final_status != 'closed')
+										@canany(['edit-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
+										
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 											</a>
 										</li>
+										@endif
+										@endcanany
+
+										@canany(['create-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#shortlisted-candidate-{{$data->id}}">
 											<i class="fa fa-plus" aria-hidden="true"></i> Second Round
 											</button>
 										</li>
+										@endif
+										@endcanany
+										
 										@endif
 									</ul>
 								</div>
@@ -683,26 +730,37 @@
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
-                                            <i class="fa fa-eye" aria-hidden="true"></i> View Details
-                                            </a>
-                                        </li>
-                                        <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="{{route('interview-summary-report.show', $data->id)}}">
-                                            <i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-                                            </a>
-                                        </li>
+									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
+										
 										@if($data->employeeHiringRequest->final_status != 'closed')
-                                        <li>
+										@canany(['edit-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
+										
+										<li>
                                             <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
                                             <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                             </a>
                                         </li>
-                                        <li>
+										@endif
+										@endcanany
+
+										@canany(['create-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
+										<li>
                                             <button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
                                                 data-bs-target="#shortlisted-candidate-{{$data->id}}">
                                             <i class="fa fa-plus" aria-hidden="true"></i> Third Round
                                             </button>
                                         </li>
+										@endif
+										@endcanany
+										
 										@endif
                                     </ul>
                                 </div>
@@ -894,26 +952,37 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-											</a>
-										</li>
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="{{route('interview-summary-report.show', $data->id)}}">
-											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-											</a>
-										</li>
+									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
+										
 										@if($data->employeeHiringRequest->final_status != 'closed')
+										@canany(['edit-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
+										
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 											</a>
 										</li>
+										@endif
+										@endcanany
+
+										@canany(['create-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#shortlisted-candidate-{{$data->id}}">
 											<i class="fa fa-plus" aria-hidden="true"></i> Forth Round
 											</button>
 										</li>
+										@endif
+										@endcanany
+										
 										@endif
 									</ul>
 								</div>
@@ -1122,26 +1191,37 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-											</a>
-										</li>
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="{{route('interview-summary-report.show', $data->id)}}">
-											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-											</a>
-										</li>
+									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
+										
 										@if($data->employeeHiringRequest->final_status != 'closed')
+										@canany(['edit-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
+										
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 											</a>
 										</li>
+										@endif
+										@endcanany
+
+										@canany(['create-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#shortlisted-candidate-{{$data->id}}">
 											<i class="fa fa-plus" aria-hidden="true"></i> Fifth Round
 											</button>
 										</li>
+										@endif
+										@endcanany
+										
 										@endif
 									</ul>
 								</div>
@@ -1367,26 +1447,37 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-											</a>
-										</li>
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="{{route('interview-summary-report.show', $data->id)}}">
-											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-											</a>
-										</li>
+									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
+										
 										@if($data->employeeHiringRequest->final_status != 'closed')
+										@canany(['edit-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
+										
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 											</a>
 										</li>
+										@endif
+										@endcanany
+
+										@canany(['create-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#shortlisted-candidate-{{$data->id}}">
 											<i class="fa fa-plus" aria-hidden="true"></i> Final Evaluation
 											</button>
 										</li>
+										@endif
+										@endcanany
+										
 										@endif
 									</ul>
 								</div>
@@ -1612,20 +1703,23 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-											</a>
-										</li>
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="{{route('interview-summary-report.show', $data->id)}}">
-											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-											</a>
-										</li>
+									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
+										
 										@if($data->employeeHiringRequest->final_status != 'closed')
+										@canany(['edit-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
+										
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 											</a>
 										</li>
+										@endif
+										@endcanany
+										
 										@endif
 									</ul>
 								</div>
@@ -1808,20 +1902,23 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id ?? '')}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-											</a>
-										</li>
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="{{route('interview-summary-report.show', $data->id)}}">
-											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-											</a>
-										</li>
+									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
+										
 										@if($data->employeeHiringRequest->final_status != 'closed')
+										@canany(['edit-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
+										
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 											</a>
 										</li>
+										@endif
+										@endcanany
+										
 										<li>
 											@if(isset($type))
 											@if($type == 'approve')
@@ -2037,34 +2134,60 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
+									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
+										
+										@if($data->employeeHiringRequest->final_status != 'closed')
+
+										@canany(['edit-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
+										
 										<li>
-											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->hiring_request_id)}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 											</a>
 										</li>
-										<li>
-											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="{{route('interview-summary-report.show',$data->id)}}">
-											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-											</a>
-										</li>
+										@endif
+										@endcanany
+
+										@canany(['create-interview-summary-report'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report']);
+										@endphp
+										@if ($hasPermission)
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Salary Details" type="button" class="btn btn-info btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#shortlisted-candidate-{{$data->id}}">
 												<i class="fa fa-plus" aria-hidden="true"></i> Salary Details
 											</button>
 										</li>
+										@endif
+										@endcanany
+
 										@if($data->candidate_expected_salary != 0.00 && $data->total_salary != 0.00)
 										<!-- <li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Add Personal Info" class="btn btn-sm btn-secondary" href="{{route('personal-info.create')}}">
 											<i class="fa fa-user-plus" aria-hidden="true"></i> Add Personal Info
 											</a>
 										</li> -->
+										@canany(['send-personal-info-form-action'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-personal-info-form-action']);
+										@endphp
+										@if ($hasPermission)
+										
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Salary Details" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#send-personal-info-form-{{$data->id}}">
 												<i class="fa fa-paper-plane" aria-hidden="true"></i> Send Form
 											</button>
 										</li>
+										@endif
+										@endcanany
+
+										@endif
 										@endif
 									</ul>
 								</div>
@@ -2354,16 +2477,7 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-										<li>
-											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->hiring_request_id)}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-											</a>
-										</li>
-										<li>
-											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="{{route('interview-summary-report.show',$data->id)}}">
-											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-											</a>
-										</li>
+									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 									</ul>
 								</div>
 							</td>
@@ -2550,16 +2664,7 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-										<li>
-											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->hiring_request_id)}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-											</a>
-										</li>
-										<li>
-											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="{{route('interview-summary-report.show',$data->id)}}">
-											<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-											</a>
-										</li>
+									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 									</ul>
 								</div>
 							</td>
@@ -2741,16 +2846,7 @@
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>{{ $data->created_at ?? ''}}</td>
 							<td>
-								<li>
-									<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->hiring_request_id)}}">
-									<i class="fa fa-eye" aria-hidden="true"></i>
-									</a>
-								</li>
-								<li>
-									<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-primary" href="">
-									<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
-									</a>
-								</li>
+							@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 							</td>
 						</tr>
 						@endforeach
@@ -2760,6 +2856,8 @@
 		</div>
 	</div>
 </div>
+@endif
+@endcanany
 @endsection
 @push('scripts')
 <script type="text/javascript">

@@ -270,9 +270,9 @@ class EmployeeHiringRequestController extends Controller
             ['approved_by_position','Recruiting Manager'],
             ['handover_to_id',$authId]
         ])->first();
-        $deptHead = DepartmentHeadApprovals::where([
-            ['approval_by_id',$authId],
-        ])->pluck('department_id');
+        // $deptHead = DepartmentHeadApprovals::where([
+        //     ['approval_by_id',$authId],
+        // ])->pluck('department_id');
         $HRManager = ApprovalByPositions::where([
             ['approved_by_position','HR Manager'],
             ['handover_to_id',$authId]
@@ -291,7 +291,7 @@ class EmployeeHiringRequestController extends Controller
                 ['hiring_manager_id',$authId],
                 ])->latest()->get();
         }
-        if(count($deptHead) > 0) {
+        // if(count($deptHead) > 0) {
             $deptHeadPendings = EmployeeHiringRequest::where([
                 ['action_by_hiring_manager','approved'],
                 ['action_by_department_head','pending'],
@@ -307,7 +307,7 @@ class EmployeeHiringRequestController extends Controller
                 ['action_by_department_head','pending'],
                 ['department_head_id',$authId],
                 ])->latest()->get();
-        }
+        // }
         if($HRManager) {
             $HRManagerPendings = EmployeeHiringRequest::where([
                 ['action_by_hiring_manager','approved'],

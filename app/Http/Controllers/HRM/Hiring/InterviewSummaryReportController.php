@@ -415,4 +415,44 @@ class InterviewSummaryReportController extends Controller
             }
         }
     }
+    public function approvalAwaiting(Request $request) {
+        $authId = Auth::id();
+        $page = 'approval';
+        $HRManager = '';
+        $HRManagerPendings = $HRManagerApproved = $HRManagerRejected = $divisionHeadPendings = $divisionHeadApproved = $divisionHeadRejected = [];     
+        $HRManager = ApprovalByPositions::where([
+            ['approved_by_position','HR Manager'],
+            ['handover_to_id',$authId]
+        ])->first();
+        if($HRManager) {
+            $HRManagerPendings = InterviewSummaryReport::where([
+                ['action_by_hr_manager','pending'],
+                ['hr_manager_id',$authId],
+                ])->latest()->get();
+            $HRManagerApproved = InterviewSummaryReport::where([
+                ['action_by_hr_manager','approved'],
+                ['hr_manager_id',$authId],
+                ])->latest()->get();
+            $HRManagerRejected = InterviewSummaryReport::where([
+                ['action_by_hr_manager','rejected'],
+                ['hr_manager_id',$authId],
+                ])->latest()->get();
+        }
+        $divisionHeadPendings = InterviewSummaryReport::where([
+            ['action_by_hr_manager','approved'],
+            ['action_by_division_head','pending'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
+        $divisionHeadApproved = InterviewSummaryReport::where([
+            ['action_by_hr_manager','approved'],
+            ['action_by_division_head','approved'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
+        $divisionHeadRejected = InterviewSummaryReport::where([
+            ['action_by_hr_manager','approved'],
+            ['action_by_division_head','rejected'],                
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
+        return view('hrm.hiring.interview_summary_report.approvals',compact('page','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','HRManagerPendings','HRManagerApproved','HRManagerRejected',));
+    }
 }
