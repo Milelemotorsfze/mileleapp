@@ -118,6 +118,10 @@ class EmployeeProfile extends Model
         'office',
         'phone',
         'visa_status',
+
+        'resume',
+        'visa',
+        'emirates_id_file',
     ];
     public function teamLeadOrReportingManager() {
         return $this->hasOne(User::class,'id','team_lead_or_reporting_manager');

@@ -60,6 +60,7 @@ class InterviewSummaryReport extends Model
         'created_by',
         'updated_by',
         'deleted_by',
+        'pif_sign',
     ];
     protected $appends = [
         'is_auth_user_can_approve',
