@@ -1616,17 +1616,17 @@ $(document).ready(function () {
 
         $('#dtBasicExample2 tbody').on('click', '.checkbox-hide', function(e) {
             var id = this.id;
-            if($(this).is(':unchecked')) {
-                $('#'+ id).val(null);
-            }else{
-                $('#'+ id).val("yes");
-            }
+
             var tableType = $('#'+id).attr('data-table-type');
             if(tableType == "Vehicle") {
                 this.checked=!this.checked;
                 alertify.confirm('Vehicle cannot be hide!').set({title:"Alert !"});
             }
-
+            if($(this).is(':unchecked')) {
+                $('#'+ id).val(null);
+            }else{
+                $('#'+ id).val("yes");
+            }
         });
         $('.modal-close').on('click', function(){
             $('.overlay').hide();

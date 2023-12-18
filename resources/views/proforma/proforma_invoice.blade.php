@@ -98,7 +98,7 @@
                     <td>{{  $data['client_name']  }} </td>
                     <td style="font-weight: bold;">
                         @if($quotation->shipping_method == 'EXW') Port Of Discharge :@endif </td>
-                    <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->shippingPort->name ??''   }} @endif </td>
+                    <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->shippingPort->name ?? ''   }} @endif </td>
                 </tr>
 
                 <tr>

@@ -110,7 +110,8 @@ class QuotationController extends Controller
         $quotationDetail->quotation_id  = $quotation->id;
         $quotationDetail->country_id  = $request->country_id;
         $quotationDetail->incoterm  = $request->incoterm;
-        $quotationDetail->shipping_port_id   = $request->shipping_port_id ;
+        $quotationDetail->shipping_port_id   = $request->from_shipping_port_id;
+        $quotationDetail->to_shipping_port_id   = $request->to_shipping_port_id;
         $quotationDetail->place_of_supply  = $request->place_of_supply;
         $quotationDetail->document_validity  = $request->document_validity;
 //        $quotationDetail->system_code  = $request->system_code;
