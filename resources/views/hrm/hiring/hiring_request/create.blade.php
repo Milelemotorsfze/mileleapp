@@ -413,7 +413,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 	var data = {!! json_encode($data) !!};
 	$(document).ready(function () {
 		$("#replacement_for_employee_div").hide();
-		if(data.request_date){
+		if(data.request_date) {
 			document.getElementById('request_date').value = data.request_date;
 		}
 		else {

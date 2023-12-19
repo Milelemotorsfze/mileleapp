@@ -357,7 +357,7 @@
                                                             <label for="language_id" class="col-form-label text-md-end">{{ __('Choose Spoken Languages') }}</label>
                                                             <select name="language_id[]" id="language_id" multiple="true" class="form-control widthinput" autofocus>
                                                                 @foreach($masterLanguages as $masterLanguage)
-                                                                <option value="{{$masterLanguage->id}}">{{$masterLanguage->name}}</option>
+                                                                <option value="{{$masterLanguage->id}}" {{ $candidate && $candidate->candidateDetails && $candidate->candidateDetails->candidateLanguages && in_array($masterLanguage->id, $candidate->candidateDetails->candidateLanguages->pluck('language_id')->toArray()) ? 'selected' : '' }}>{{$masterLanguage->name}}</option>
                                                                 @endforeach
                                                             </select>
                                                         </div>
@@ -386,16 +386,17 @@
                                                                     <label for="residence_telephone_number" class="col-form-label text-md-end">{{ __('Residence Telephone Number') }}</label>
                                                                 </div>
                                                                 <div class="col-xxl-8 col-lg-8 col-md-8 mt-2">
-                                                                    <input id="residence_telephone_number" type="number" class="widthinput form-control @error('residence_telephone_number[full]') is-invalid @enderror"
-                                                                        name="residence_telephone_number[main]" placeholder="Residence Telephone Number" value="{{old('hiddencontact')}}"
-                                                                        autocomplete="residence_telephone_number[main]" autofocus>
+                                                                <input id="residence_telephone_number" type="tel" class="widthinput contact form-control @error('residence_telephone_number[full]')
+                                                                    is-invalid @enderror" name="residence_telephone_number[main]" placeholder="Enter Alternative Contact Number"
+                                                                    value="{{$candidate->candidateDetails->residence_telephone_number}}" autocomplete="residence_telephone_number[full]" autofocus
+                                                                    onkeyup="validationOnKeyUp(this)">
                                                                 </div>
                                                                 <div class="col-xxl-4 col-lg-4 col-md-4 mt-2">
                                                                     <span class="error">* </span>
                                                                     <label for="contact_number" class="col-form-label text-md-end">{{ __('Mobile Number:') }}</label>
                                                                 </div>
                                                                 <div class="col-xxl-8 col-lg-8 col-md-8 mt-2">
-                                                                    <input id="contact_number" type="number" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
+                                                                    <input id="contact_number" type="tel" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
                                                                         name="contact_number[main]" placeholder="Mobile Number" value="{{old('hiddencontact')}}"
                                                                         autocomplete="contact_number[main]" autofocus>
                                                                 </div>
@@ -494,12 +495,12 @@
                                                             <div class="col-xxl-2 col-lg-6 col-md-6">
                                                                 <span class="error">* </span>
                                                                 <label for="ecu_contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
-                                                                <input id="ecu_contact_number_1" type="number" class="form-control widthinput @error('ecu_contact_number[main]') is-invalid @enderror" 
+                                                                <input id="ecu_contact_number_1" type="tel" class="form-control widthinput @error('ecu_contact_number[main]') is-invalid @enderror" 
                                                                 name="ecu[1][contact_number][main]" data-index=1 placeholder="Contact Number" value="" autocomplete="ecu_contact_number[main]" autofocus>
                                                             </div>
                                                             <div class="col-xxl-2 col-lg-6 col-md-6">
                                                                 <label for="ecu_alternative_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
-                                                                <input id="ecu_alternative_number_1" type="number" class="form-control widthinput @error('ecu_alternative_number[main]') is-invalid @enderror" 
+                                                                <input id="ecu_alternative_number_1" type="tel" class="form-control widthinput @error('ecu_alternative_number[main]') is-invalid @enderror" 
                                                                 name="ecu[1][alternative_contact_number][main]" data-index=1 placeholder="Alternative Number" value="" autocomplete="ecu_alternative_number[main]" autofocus>
                                                             </div>
                                                         </div>
@@ -563,7 +564,7 @@
                                                                         <label for="ech_contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                                                                     </div>
                                                                     <div class="col-xxl-9 col-lg-9 col-md-9">
-                                                                        <input id="ech_contact_number_1" type="text" class="form-control widthinput @error('ech_contact_number') is-invalid @enderror" 
+                                                                        <input id="ech_contact_number_1" type="tel" class="form-control widthinput @error('ech_contact_number') is-invalid @enderror" 
                                                                         name="ech[1][contact_number][main]" data-index=1
                                                                             placeholder="Contact Number" value="" autocomplete="ech_contact_number" autofocus>
                                                                     </div>
@@ -572,7 +573,7 @@
                                                                         <label for="ech_alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Number') }}</label>
                                                                     </div>
                                                                     <div class="col-xxl-9 col-lg-9 col-md-9">
-                                                                        <input id="ech_alternative_contact_number_1" type="text" class="form-control widthinput @error('ech_alternative_contact_number') is-invalid @enderror" 
+                                                                        <input id="ech_alternative_contact_number_1" type="tel" class="form-control widthinput @error('ech_alternative_contact_number') is-invalid @enderror" 
                                                                         name="ech[1][alternative_contact_number][main]" data-index=1
                                                                             placeholder="Alternative Contact Number" value="" autocomplete="ech_alternative_contact_number" autofocus>
                                                                     </div>
@@ -645,6 +646,36 @@
                                                             <div class="row">
                                                                 <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
                                                                     <span class="col-form-label text-md-end" id="passport-size-photograph-label"></span>
+                                                                    <!-- @if($candidate->candidateDetails->candidatePassport->count() > 0)
+                                                                        <h6 class="fw-bold text-center">Other Documents</h6>
+                                                                        @foreach($candidate->candidateDetails->candidatePassport as $document)
+                                                                            <div class="col-lg-4 col-md-12 col-sm-12 text-center" id="preview-div-{{$document->id}}">
+                                                                                <div>
+                                                                                    <iframe src="{{ url('hrm/employee/passport/' . $document->document_path) }}"
+                                                                                        class="mt-2" alt="Other Document"></iframe>
+                                                                                    <button  type="button" class="btn btn-sm btn-info mt-3 ">
+                                                                                        <a href="{{url('hrm/employee/passport/' . $document->document_path)}}" download class="text-white">
+                                                                                            Download
+                                                                                        </a>
+                                                                                    </button>
+                                                                                    <button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button"
+                                                                                        data-id="{{ $document->id }}"> Delete</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        @endforeach
+                                                                    @endif -->
+                                                                    @if($candidate->candidateDetails->image_path)
+                                                                        <h6 class="fw-bold text-center mb-1">Passport</h6>
+                                                                        <iframe src="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" alt="Passport"></iframe>
+                                                                        <button  type="button" class="btn btn-sm btn-info mt-3 ">
+                                                                            <a href="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" download class="text-white">
+                                                                                Download
+                                                                            </a>
+                                                                        </button>
+                                                                        <button  type="button" class="btn btn-sm btn-danger mt-3 delete-button"
+                                                                                data-file-type="PASSPORT"> Delete</button>
+
+                                                                    @endif
                                                                     <div id="passport-size-photograph-preview">
                                                                     </div>
                                                                 </div>
@@ -740,6 +771,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js" defer></script>
         <script type="text/javascript">
+            var candidate = {!! json_encode($candidate) !!};
             var indexVal = 1;
 
             let canvas = document.querySelector('.signature-pad');
@@ -956,7 +988,80 @@
                     }
                 }
             });
-            $(document).ready(function() {
+            $(document).ready(function() { console.log(candidate);
+                if(candidate.candidate_details != null) {
+                $("#first_name").val(candidate.candidate_details.first_name);
+                $("#last_name").val(candidate.candidate_details.last_name);
+                $("#name_of_father").val(candidate.candidate_details.name_of_father);
+                $("#name_of_mother").val(candidate.candidate_details.name_of_mother);
+                $("#marital_status").val(candidate.candidate_details.marital_status);
+                $("#passport_number").val(candidate.candidate_details.passport_number);
+                $("#passport_expiry_date").val(candidate.candidate_details.passport_expiry_date);
+                $("#educational_qualification").val(candidate.candidate_details.educational_qualification);
+                $("#religion").val(candidate.candidate_details.religion);
+                $("#dob").val(candidate.candidate_details.dob);
+                $("#address_uae").val(candidate.candidate_details.address_uae);
+                $("#residence_telephone_number").val(candidate.candidate_details.residence_telephone_number);
+                $("#contact_number").val(candidate.candidate_details.contact_number);
+                $("#personal_email_address").val(candidate.candidate_details.personal_email_address);
+                $("#spouse_name").val(candidate.candidate_details.spouse_name);
+                $("#spouse_passport_number").val(candidate.candidate_details.spouse_passport_number);
+                $("#spouse_passport_expiry_date").val(candidate.candidate_details.spouse_passport_expiry_date);
+                $("#spouse_dob").val(candidate.candidate_details.spouse_dob);
+                $("#spouse_nationality").val(candidate.candidate_details.spouse_nationality);
+                if(candidate.candidate_details.candidate_children.length > 0) {
+                    for(var i=1; i<=candidate.candidate_details.candidate_children.length; i++) {
+                        addChild();
+                        $("#child_name_"+i).val(candidate.candidate_details.candidate_children[i-1].child_name);
+                        $("#child_passport_number_"+i).val(candidate.candidate_details.candidate_children[i-1].child_passport_number);
+                        $("#child_passport_expiry_date_"+i).val(candidate.candidate_details.candidate_children[i-1].child_passport_expiry_date);
+                        $("#child_dob_"+i).val(candidate.candidate_details.candidate_children[i-1].child_dob);
+                        $("#child_nationality_"+i).val(candidate.candidate_details.candidate_children[i-1].child_nationality);
+                    }
+                }
+                else {
+                    addChild();
+                }
+                if(candidate.candidate_details.emergency_contact_u_a_e.length > 0) {
+                    for(var i=1; i<=candidate.candidate_details.emergency_contact_u_a_e.length; i++) {
+                        if(i !=1) {
+                            addContactUAE();
+                        }
+                        $("#ecu_name_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].name);
+                        $("#ecu_relation_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].relation);
+                        $("#ecu_contact_number_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].contact_number);
+                        $("#ecu_alternative_contact_number_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].alternative_contact_number);
+                        $("#ecu_email_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].email_address);
+                    }
+                }
+                if(candidate.candidate_details.emergency_contact_home_country.length > 0) {
+                    for(var i=1; i<=candidate.candidate_details.emergency_contact_home_country.length; i++) {
+                        if(i !=1) {
+                            addContactHome();
+                        }
+                        $("#ech_name_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].name);
+                        $("#ech_relation_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].relation);
+                        $("#ech_contact_number_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].contact_number);
+                        $("#ech_alternative_contact_number_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].alternative_contact_number);
+                        $("#ech_email_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].email_address);
+                        $("#ech_home_country_address_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].home_country_address);
+                    }
+                }
+                if(candidate.candidate_details.image_path != '' || candidate.candidate_details.resume != '' || candidate.candidate_details.visa ||
+                candidate.candidate_details.emirates_id_file || candidate.candidate_details.candidate_passport.length > 0 ||
+                candidate.candidate_details.candidate_national_id.length > 0 || candidate.candidate_details.candidate_pro_dip_certi.length > 0 ||
+                candidate.candidate_details.candidate_edu_docs.length > 0) {
+                    $('.preview-div').attr('hidden', false);
+                }
+                
+                // $("#passport-size-photograph").val(candidate.candidate_details.image_path);
+                // $("#resume").val(candidate.candidate_details.resume);
+                // $("#visa").val(candidate.candidate_details.visa);
+                // $("#emirates_id_file").val(candidate.candidate_details.emirates_id_file);
+                }
+
+               
+
                 // main layout
                 alertify.set('notifier','position', 'top-right','delay', 40);
                 $('.close').on('click', function() {
@@ -1011,11 +1116,21 @@
                 document.getElementById("dob").max = dobMax;
                 document.getElementById("dob").min = dobMin;
                 document.getElementById("spouse_dob").max = dobMax;
-                document.getElementById("spouse_dob").min = dobMin;
-                $("#year_of_completion").yearpicker({
-                    startYear: 1950,
-                    endYear: yyyy,
-                });
+                document.getElementById("spouse_dob").min = dobMin;               
+                if(candidate.candidate_details.year_of_completion != '') {
+                    var yearOfCompletion = candidate.candidate_details.year_of_completion;
+                    $("#year_of_completion").yearpicker({
+                        year: yearOfCompletion,
+                        startYear: 1950,
+                        endYear: yyyy,
+                    }); 
+                }
+                else {
+                    $("#year_of_completion").yearpicker({
+                        startYear: 1950,
+                        endYear: yyyy,
+                    });
+                }
                 $('#religion').select2({
 					allowClear: true,
 					maximumSelectionLength: 1,
@@ -1030,18 +1145,17 @@
 					placeholder:"Choose Spouse Nationality",
 				});	
                 var residence_telephone_number = window.intlTelInput(document.querySelector("#residence_telephone_number"), {
-					separateDialCode: true,
-					preferredCountries:["ae"],
-					hiddenInput: "full",
-					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-				});
+                    separateDialCode: true,
+                    preferredCountries:["ae"],
+                    hiddenInput: "full",
+                    utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+                });
 				var contact_number = window.intlTelInput(document.querySelector("#contact_number"), {
 					separateDialCode: true,
 					preferredCountries:["ae"],
 					hiddenInput: "full",
 					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
 				});
-                addChild();
                 emergencyContactUAE(1);
                 emergencyContactHome(1);
 				///======Clone method
@@ -1210,12 +1324,12 @@
                             <div class="col-xxl-2 col-lg-6 col-md-6">
                                 <span class="error">* </span>
                                 <label for="ecu_contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
-                                <input id="ecu_contact_number_${index}" type="number" class="form-control widthinput @error('ecu_contact_number[main]') is-invalid @enderror" 
+                                <input id="ecu_contact_number_${index}" type="tel" class="form-control widthinput @error('ecu_contact_number[main]') is-invalid @enderror" 
                                 name="ecu[${index}][contact_number][main]" data-index=${index} placeholder="Contact Number"  value="" autocomplete="ecu_contact_number[main]" autofocus>
                             </div>
                             <div class="col-xxl-2 col-lg-6 col-md-6">
                                 <label for="ecu_alternative_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
-                                <input id="ecu_alternative_number_${index}" type="number" class="form-control widthinput @error('ecu_alternative_number[main]') is-invalid @enderror" 
+                                <input id="ecu_alternative_number_${index}" type="tel" class="form-control widthinput @error('ecu_alternative_number[main]') is-invalid @enderror" 
                                 name="ecu[${index}][alternative_contact_number][main]" data-index=${index} placeholder="Alternative Number"  value="" autocomplete="ecu_alternative_number[main]" autofocus>
                             </div>
                             <div class="col-xxl-1 col-lg-6 col-md-6 add_del_btn_outer">
@@ -1275,7 +1389,7 @@
                                         <label for="ech_contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                                     </div>
                                     <div class="col-xxl-9 col-lg-9 col-md-9">
-                                        <input id="ech_contact_number_${index}" type="text" class="form-control widthinput @error('ech_contact_number') is-invalid @enderror" 
+                                        <input id="ech_contact_number_${index}" type="tel" class="form-control widthinput @error('ech_contact_number') is-invalid @enderror" 
                                         name="ech[${index}][contact_number][main]" data-index=${index}
                                             placeholder="Contact Number" value="" autocomplete="ech_contact_number" autofocus>
                                     </div>
@@ -1283,7 +1397,7 @@
                                         <label for="ech_alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Number') }}</label>
                                     </div>
                                     <div class="col-xxl-9 col-lg-9 col-md-9">
-                                        <input id="ech_alternative_contact_number_${index}" type="text" class="form-control widthinput @error('ech_alternative_contact_number') is-invalid @enderror" 
+                                        <input id="ech_alternative_contact_number_${index}" type="tel" class="form-control widthinput @error('ech_alternative_contact_number') is-invalid @enderror" 
                                         name="ech[${index}][alternative_contact_number][main]" data-index=${index}
                                             placeholder="Alternative Contact Number" value="" autocomplete="ech_alternative_contact_number" autofocus>
                                     </div>

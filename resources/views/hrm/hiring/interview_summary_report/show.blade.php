@@ -24,7 +24,7 @@
 </style>
 @section('content')
 <div class="card-header">
-	<h4 class="card-title"> Candidate Details Details</h4>
+	<h4 class="card-title"> Candidate Details</h4>
 	@if($previous != '')
 	<a  class="btn btn-sm btn-info float-first" href="{{ route('interview-summary-report.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
 	@endif
@@ -103,7 +103,7 @@
 				</div> -->
 				<div class="col-lg-4 col-md-4 col-sm-4 col-12">
 					<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-						<center><label for="choices-single-default" class="form-label"> <strong> Hiring Request UUID</strong></label></center>
+						<center><label for="choices-single-default" class="form-label"> <strong> Hiring Request UUID </strong></label></center>
 					</div>
 					<div class="col-lg-6 col-md-6 col-sm-6 col-12">
 					<center><span>{{ $data->employeeHiringRequest->uuid ?? '' }}</span></center>

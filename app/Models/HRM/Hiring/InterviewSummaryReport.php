@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Country;
 use App\Models\Masters\MasterGender;
 use App\Models\User;
+use App\Models\HRM\Employee\EmployeeProfile;
 use Illuminate\Support\Facades\Auth;
 
 class InterviewSummaryReport extends Model
@@ -177,5 +178,8 @@ class InterviewSummaryReport extends Model
     }
     public function fifthRoundInterviewers() {
         return $this->hasMany(Interviewers::class,'interview_summary_report_id','id')->where('round','fifth');
+    }
+    public function candidateDetails() {
+        return $this->hasOne(EmployeeProfile::class,'interview_summary_id','id');
     }
 }

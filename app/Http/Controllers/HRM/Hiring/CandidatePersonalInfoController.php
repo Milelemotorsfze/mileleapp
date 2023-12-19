@@ -72,7 +72,9 @@ class CandidatePersonalInfoController extends Controller
     }
     public function sendForm($id) {
         $id = Crypt::decrypt($id);
-        $candidate = InterviewSummaryReport::where('id',$id)->first();
+        $candidate = InterviewSummaryReport::where('id',$id)->with('candidateDetails.candidateChildren','candidateDetails.emergencyContactUAE'
+        ,'candidateDetails.emergencyContactHomeCountry','candidateDetails.candidatePassport','candidateDetails.candidateNationalId'
+        ,'candidateDetails.candidateEduDocs','candidateDetails.candidateProDipCerti')->first();
         $masterMaritalStatus = MasterMaritalStatus::whereNot('name','Other')->select('id','name')->get();
         $masterReligion = MasterReligion::select('id','name')->get();
         $masterLanguages = Language::select('id','name')->get();
@@ -81,6 +83,7 @@ class CandidatePersonalInfoController extends Controller
         return view('hrm.hiring.personal_info.create',compact('candidate','masterMaritalStatus','masterReligion','masterLanguages','masterNationality','masterRelations'));
     }
     public function storePersonalinfo(Request $request) {
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'id' => 'required|integer',
             'first_name' => 'required',
@@ -152,8 +155,8 @@ class CandidatePersonalInfoController extends Controller
                             $input['emirates_id_file'] = $emiratesIdFileName;
                         }
                         $input['personal_information_created_by'] = $request->id;
-                        $input['residence_telephone_number'] = $request->residence_telephone_number['main'];
-                        $input['contact_number'] = $request->contact_number['main'];
+                        $input['residence_telephone_number'] = $request->residence_telephone_number['full'];
+                        $input['contact_number'] = $request->contact_number['full'];
                         $input['type'] = 'candidate';
                         $input['interview_summary_id'] = $request->id;
                         $input['designation_id'] = $candidate->employeeHiringRequest->questionnaire->designation->id;
@@ -165,7 +168,7 @@ class CandidatePersonalInfoController extends Controller
                         $createEmp = EmployeeProfile::create($input);
                         if(isset($request->language_id)) {
                             if(count($request->language_id) > 0) {
-                                $inputLang['employee_id'] = $request->id;
+                                $inputLang['candidate_id'] = $createEmp->id;
                                 foreach($request->language_id as $language_id) {
                                     $inputLang['language_id'] = $language_id;
                                     $createLang = EmployeeSpokenLanguage::create($inputLang);                            
@@ -176,7 +179,7 @@ class CandidatePersonalInfoController extends Controller
                             if(count($request->child) > 0) {
                                 foreach($request->child as $child) {  
                                     $inputChild = [];  
-                                    $inputChild['employee_id'] = $request->id;                      
+                                    $inputChild['candidate_id'] = $createEmp->id;                      
                                     $inputChild['child_name'] = $child['child_name'];
                                     $inputChild['child_passport_number'] = $child['child_passport_number'];
                                     $inputChild['child_passport_expiry_date'] = $child['child_passport_expiry_date'];
@@ -190,11 +193,11 @@ class CandidatePersonalInfoController extends Controller
                             if(count($request->ecu) > 0) {
                                 foreach($request->ecu as $ecu) {  
                                     $inputEcu = [];  
-                                    $inputEcu['employee_id'] = $request->id;                      
+                                    $inputEcu['candidate_id'] = $createEmp->id;                      
                                     $inputEcu['name'] = $ecu['name'];
                                     $inputEcu['relation'] = $ecu['relation'];
-                                    $inputEcu['contact_number'] = $ecu['contact_number']['main'];
-                                    $inputEcu['alternative_contact_number'] = $ecu['alternative_contact_number']['main'];
+                                    $inputEcu['contact_number'] = $ecu['contact_number']['full'];
+                                    $inputEcu['alternative_contact_number'] = $ecu['alternative_contact_number']['full'];
                                     $inputEcu['email_address'] = $ecu['email_address'];
                                     $createEcu = UAEEmergencyContact::create($inputEcu);                            
                                 }
@@ -204,11 +207,11 @@ class CandidatePersonalInfoController extends Controller
                             if(count($request->ech) > 0) {
                                 foreach($request->ech as $ech) {  
                                     $inputEch = [];  
-                                    $inputEch['employee_id'] = $request->id;                      
+                                    $inputEch['candidate_id'] = $createEmp->id;                      
                                     $inputEch['name'] = $ech['name'];
                                     $inputEch['relation'] = $ech['relation'];
-                                    $inputEch['contact_number'] = $ech['contact_number']['main'];
-                                    $inputEch['alternative_contact_number'] = $ech['alternative_contact_number']['main'];
+                                    $inputEch['contact_number'] = $ech['contact_number']['full'];
+                                    $inputEch['alternative_contact_number'] = $ech['alternative_contact_number']['full'];
                                     $inputEch['email_address'] = $ech['email'];
                                     $inputEch['home_country_address'] = $ech['home_country_address'];
                                     $createEch = HomeCountryEmergencyContact::create($inputEch);                            
@@ -222,7 +225,7 @@ class CandidatePersonalInfoController extends Controller
                                 $destinationPath = 'hrm/employee/passport';
                                 $file->move($destinationPath, $fileName);        
                                 $CandidateDocument = new EmpDoc();
-                                $CandidateDocument->emp_profile_id = $request->id;
+                                $CandidateDocument->candidate_id = $createEmp->id;
                                 $CandidateDocument->document_name = 'passport';
                                 $CandidateDocument->document_path = $fileName;
                                 $CandidateDocument->save();
@@ -235,7 +238,7 @@ class CandidatePersonalInfoController extends Controller
                                 $destinationPath = 'hrm/employee/national_id';
                                 $file->move($destinationPath, $fileName);        
                                 $CandidateDocument = new EmpDoc();
-                                $CandidateDocument->emp_profile_id = $request->id;
+                                $CandidateDocument->candidate_id = $createEmp->id;
                                 $CandidateDocument->document_name = 'national_id';
                                 $CandidateDocument->document_path = $fileName;
                                 $CandidateDocument->save();
@@ -248,7 +251,7 @@ class CandidatePersonalInfoController extends Controller
                                 $destinationPath = 'hrm/employee/educational_docs';
                                 $file->move($destinationPath, $fileName);        
                                 $CandidateDocument = new EmpDoc();
-                                $CandidateDocument->emp_profile_id = $request->id;
+                                $CandidateDocument->candidate_id = $createEmp->id;
                                 $CandidateDocument->document_name = 'educational_docs';
                                 $CandidateDocument->document_path = $fileName;
                                 $CandidateDocument->save();
@@ -261,7 +264,7 @@ class CandidatePersonalInfoController extends Controller
                                 $destinationPath = 'hrm/employee/professional_diploma_certificates';
                                 $file->move($destinationPath, $fileName);        
                                 $CandidateDocument = new EmpDoc();
-                                $CandidateDocument->emp_profile_id = $request->id;
+                                $CandidateDocument->candidate_id = $createEmp->id;
                                 $CandidateDocument->document_name = 'professional_diploma_certificates';
                                 $CandidateDocument->document_path = $fileName;
                                 $CandidateDocument->save();
