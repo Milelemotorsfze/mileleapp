@@ -384,8 +384,7 @@ class InterviewSummaryReportController extends Controller
         }
     }
     public function show($id) {
-        $data = InterviewSummaryReport::where('id',$id)->with('candidateDetails.candidateLanguages.language')->first();
-        // dd($data);
+        $data = InterviewSummaryReport::where('id',$id)->first();
         $previous = InterviewSummaryReport::where('hiring_request_id',$data->hiring_request_id)->where('id', '<', $id)->max('id');
         $next = InterviewSummaryReport::where('hiring_request_id',$data->hiring_request_id)->where('id', '>', $id)->min('id');
         return view('hrm.hiring.interview_summary_report.show',compact('data','previous','next')); 

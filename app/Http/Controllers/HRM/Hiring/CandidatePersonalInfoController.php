@@ -72,7 +72,9 @@ class CandidatePersonalInfoController extends Controller
     }
     public function sendForm($id) {
         $id = Crypt::decrypt($id);
-        $candidate = InterviewSummaryReport::where('id',$id)->first();
+        $candidate = InterviewSummaryReport::where('id',$id)->with('candidateDetails.candidateChildren','candidateDetails.emergencyContactUAE'
+        ,'candidateDetails.emergencyContactHomeCountry','candidateDetails.candidatePassport','candidateDetails.candidateNationalId'
+        ,'candidateDetails.candidateEduDocs','candidateDetails.candidateProDipCerti')->first();
         $masterMaritalStatus = MasterMaritalStatus::whereNot('name','Other')->select('id','name')->get();
         $masterReligion = MasterReligion::select('id','name')->get();
         $masterLanguages = Language::select('id','name')->get();
@@ -81,6 +83,7 @@ class CandidatePersonalInfoController extends Controller
         return view('hrm.hiring.personal_info.create',compact('candidate','masterMaritalStatus','masterReligion','masterLanguages','masterNationality','masterRelations'));
     }
     public function storePersonalinfo(Request $request) {
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'id' => 'required|integer',
             'first_name' => 'required',
@@ -152,8 +155,8 @@ class CandidatePersonalInfoController extends Controller
                             $input['emirates_id_file'] = $emiratesIdFileName;
                         }
                         $input['personal_information_created_by'] = $request->id;
-                        $input['residence_telephone_number'] = $request->residence_telephone_number['main'];
-                        $input['contact_number'] = $request->contact_number['main'];
+                        $input['residence_telephone_number'] = $request->residence_telephone_number['full'];
+                        $input['contact_number'] = $request->contact_number['full'];
                         $input['type'] = 'candidate';
                         $input['interview_summary_id'] = $request->id;
                         $input['designation_id'] = $candidate->employeeHiringRequest->questionnaire->designation->id;
@@ -193,8 +196,8 @@ class CandidatePersonalInfoController extends Controller
                                     $inputEcu['candidate_id'] = $createEmp->id;                      
                                     $inputEcu['name'] = $ecu['name'];
                                     $inputEcu['relation'] = $ecu['relation'];
-                                    $inputEcu['contact_number'] = $ecu['contact_number']['main'];
-                                    $inputEcu['alternative_contact_number'] = $ecu['alternative_contact_number']['main'];
+                                    $inputEcu['contact_number'] = $ecu['contact_number']['full'];
+                                    $inputEcu['alternative_contact_number'] = $ecu['alternative_contact_number']['full'];
                                     $inputEcu['email_address'] = $ecu['email_address'];
                                     $createEcu = UAEEmergencyContact::create($inputEcu);                            
                                 }
@@ -207,8 +210,8 @@ class CandidatePersonalInfoController extends Controller
                                     $inputEch['candidate_id'] = $createEmp->id;                      
                                     $inputEch['name'] = $ech['name'];
                                     $inputEch['relation'] = $ech['relation'];
-                                    $inputEch['contact_number'] = $ech['contact_number']['main'];
-                                    $inputEch['alternative_contact_number'] = $ech['alternative_contact_number']['main'];
+                                    $inputEch['contact_number'] = $ech['contact_number']['full'];
+                                    $inputEch['alternative_contact_number'] = $ech['alternative_contact_number']['full'];
                                     $inputEch['email_address'] = $ech['email'];
                                     $inputEch['home_country_address'] = $ech['home_country_address'];
                                     $createEch = HomeCountryEmergencyContact::create($inputEch);                            
