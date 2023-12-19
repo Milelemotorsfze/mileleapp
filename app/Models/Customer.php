@@ -12,5 +12,9 @@ class Customer extends Model
     public const CUSTOMER_TYPE_COMPANY = "Company";
     public const CUSTOMER_TYPE_GOVERMENT = "Governtment";
     public const CUSTOMER_TYPE_NGO = "NGO";
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
 
 }

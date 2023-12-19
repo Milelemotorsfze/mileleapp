@@ -178,13 +178,15 @@ class MasterModelController extends Controller
         //
     }
     public function getLoiDescription(Request $request) {
-        info($request->id);
+
+        $data['transcar_loi_format'] = "";
+        $data['milele_loi_format'] = "";
         $variant = Varaint::with('brand','master_model_lines')->find($request->id);
-        if($request->is_milele == 1) {
-            $data['milele_loi_format'] = $variant->master_model_lines->model_line.' '.$variant->engine.' Litre '.$variant->fuel_type.' '.$variant->steering;
-        }
         if($request->is_transcar == 1) {
-            $data['transcar_loi_format'] = $variant->steering.', BRAND NEW, '.$variant->brand->brand_name.' '.$variant->master_model_lines->model_line.', '.$variant->fuel_type.' ENGINE '.$variant->engine
+            $data['transcar_loi_format'] = $variant->master_model_lines->model_line.' '.$variant->engine.' Litre '.$variant->fuel_type.' '.$variant->steering;
+        }
+        if($request->is_milele == 1) {
+            $data['milele_loi_format'] = $variant->steering.', BRAND NEW, '.$variant->brand->brand_name.' '.$variant->master_model_lines->model_line.', '.$variant->fuel_type.' ENGINE '.$variant->engine
                 .'L - SPECIFICATION ATTACHED IN APPENDIX';
         }
         $variantItems = VariantItems::with('model_specification','model_specification_option')

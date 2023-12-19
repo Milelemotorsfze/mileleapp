@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Country;
 use App\Models\Customer;
 use App\Models\Demand;
 use App\Models\DemandList;
@@ -98,7 +99,7 @@ class LetterOfIndentController extends Controller
      */
     public function create()
     {
-        $countries = CountryListFacade::getList('en');
+        $countries = Country::all();
         $customers = Customer::all();
         $suppliers = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query) {
@@ -106,7 +107,10 @@ class LetterOfIndentController extends Controller
             })
             ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
-        return view('letter_of_indents.create',compact('countries','customers','suppliers'));
+        $addedModelIds = [];
+        $models = MasterModel::whereNotIn('id', $addedModelIds)->groupBy('model')->orderBy('id','ASC')->get();
+
+        return view('letter_of_indents.create',compact('countries','customers','suppliers','models'));
     }
 
     /**
@@ -114,6 +118,8 @@ class LetterOfIndentController extends Controller
      */
     public function store(Request $request)
     {
+//        dd($request->all());
+
         $request->validate([
             'customer_id' => 'required',
             'category' => 'required',
@@ -121,12 +127,15 @@ class LetterOfIndentController extends Controller
             'dealers' => 'required',
         ]);
 
+        DB::beginTransaction();
+
         $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
             ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
             ->where('category', $request->category)
 //            ->where('submission_status', LetterOfIndent::LOI_SUBMISION_STATUS_NEW)
             ->where('status', LetterOfIndent::LOI_STATUS_NEW)
             ->first();
+
         if (!$LOI)
         {
             $LOI = new LetterOfIndent();
@@ -141,7 +150,6 @@ class LetterOfIndentController extends Controller
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
             $LOI->created_by = Auth::id();
             $LOI->save();
-
         }
 
         if ($request->has('files'))
@@ -159,12 +167,28 @@ class LetterOfIndentController extends Controller
                 $LoiDocument->save();
             }
         }
+        $quantities = $request->quantity;
+        foreach ($quantities as $key => $quantity) {
+            $masterModel = MasterModel::where('sfx', $request->sfx[$key])
+                ->where('model', $request->models[$key])
+                ->where('model_year', $request->model_year[$key])
+                ->first();
+            if($masterModel) {
+                $LOIItem = new LetterOfIndentItem();
+                $LOIItem->letter_of_indent_id  = $LOI->id;
+                $LOIItem->master_model_id = $masterModel->id ?? '';
+                $LOIItem->quantity = $quantity;
+                $LOIItem->save();
+            }
+        }
 
-        return redirect()->route('letter-of-indent-items.create',['id' => $LOI->id]);
+        DB::commit();
+
+        return redirect()->route('letter-of-indent-items.index');
     }
     public function getCustomers(Request $request)
     {
-        $customers = Customer::where('country', $request->country)
+        $customers = Customer::where('country_id', $request->country)
             ->where('type', $request->customer_type)
             ->get();
 
@@ -297,7 +321,7 @@ class LetterOfIndentController extends Controller
     public function edit(string $id)
     {
         $letterOfIndent = LetterOfIndent::find($id);
-        $countries = CountryListFacade::getList('en');
+        $countries = Country::all();
         $customers = Customer::all();
         $suppliers = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query) {

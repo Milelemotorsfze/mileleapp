@@ -47,7 +47,7 @@
                         <select class="form-control" autofocus name="country" id="country" >
                             <option disabled>Select Country</option>
                             @foreach($countries as $country)
-                                <option value="{{$country}}" {{ $country == $letterOfIndent->customer->country ? 'selected' : '' }} > {{ $country }} </option>
+                                <option value="{{$country->id}}" {{ $country->id == $letterOfIndent->customer->country_id ? 'selected' : '' }} > {{ $country->name }} </option>
                             @endforeach
                         </select>
                     </div>

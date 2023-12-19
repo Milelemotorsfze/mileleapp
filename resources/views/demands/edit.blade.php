@@ -292,7 +292,7 @@
             $('#sfx-error').remove();
             let sfx = $(this).val();
             let model = $('#model').val();
-            let url = '{{ route('demand.get-variant') }}';
+            let url = '{{ route('demand.get-loi-description') }}';
             $.ajax({
                 type: "GET",
                 url: url,

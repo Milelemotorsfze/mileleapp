@@ -306,7 +306,7 @@ Route::get('/d', function () {
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
     Route::get('demand-planning/get-model-year', [DemandController::class,'getModelYear'])->name('demand.get-model-year');
-    Route::get('demand-planning/get-variant', [DemandController::class,'getVariant'])->name('demand.get-variant');
+    Route::get('demand-planning/get-loi-description', [DemandController::class,'getLOIDescription'])->name('demand.get-loi-description');
     Route::resource('demands', DemandController::class);
     Route::resource('demand-lists', DemandListController::class);
     Route::resource('monthly-demands', MonthlyDemandsController::class);
@@ -400,7 +400,7 @@ Route::get('/d', function () {
      Route::post('getVinForVehicle', [VehiclePicturesController::class, 'getVinForVehicle']);
      Route::get('vehicle_pictures/pending', [VehiclePicturesController::class,'pending'])->name('vehicle_pictures.pending');
      Route::post('vehicle_pictures/saving', [VehiclePicturesController::class,'saving'])->name('vehicle_pictures.saving');
-    
+
 
      // Variants
     Route::resource('variants', VariantController::class);
@@ -632,7 +632,7 @@ Route::get('/d', function () {
     Route::get('/shipping_rates/{id}', [ShippingController::class, 'shippingrates'])->name('shipping_medium.shippingrates');
     Route::get('shipping_medium_create/{id}', [ShippingController::class, 'openmediumcreate'])->name('shipping_medium.openmedium_create');
     Route::get('shipping_rates_create/{id}', [ShippingController::class, 'shippingratescreate'])->name('shipping_rate.shippingrates_create');
-    Route::post('/storeportrates', [ShippingController::class, 'storeportrates'])->name('Shipping.storeportrates'); 
+    Route::post('/storeportrates', [ShippingController::class, 'storeportrates'])->name('Shipping.storeportrates');
     Route::post('/storevendorrates', [ShippingController::class, 'storevendorrates'])->name('Shipping.storevendorrates');
     Route::post('/select-shipping-rate/{id}', [ShippingController::class, 'selectShippingRate']);
     Route::get('/getShippingRateDetails/{id}', [ShippingController::class, 'getShippingRateDetails']);

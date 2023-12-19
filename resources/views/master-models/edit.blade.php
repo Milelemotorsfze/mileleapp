@@ -53,7 +53,7 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label  class="form-label">Model Year</label>
-                        <input type="text" class="form-control" id="model-year"  value="{{ $masterModel->model_year }}"  name="model_year" placeholder="Enter Model Year">
+                        <input type="text" class="form-control" id="model-year"  name="model_year" placeholder="Enter Model Year">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
@@ -253,6 +253,7 @@
 @push('scripts')
     <script>
         $("#model-year").yearpicker({
+            year: '{{ $masterModel->model_year }}',
             startYear: 2000,
             endYear: 2050,
         });

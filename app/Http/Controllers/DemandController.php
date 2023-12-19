@@ -105,66 +105,75 @@ class DemandController extends Controller
     }
     public function getSFX(Request $request)
     {
-        $data = MasterModel::where('model', $request->model);
+        info($request->all());
             if ($request->module == 'LOI')
             {
-                $loiItems = LetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)->get();
-                $addedModelIds = [];
-                foreach ($loiItems as $loiItem) {
-                    $addedModelIds[] = $loiItem->master_model_id;
-                }
-//                $supplierInventoriesModels = SupplierInventory::with('masterModel')
-//                    ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-//                    ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-//                    ->whereNull('eta_import')
-//                    ->whereNull('status')
-//                    ->groupBy('master_model_id')
-//                    ->pluck('master_model_id');
-
-                $data = $data->whereNotIn('id', $addedModelIds);
+//                $masterModelIds = LetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)->pluck('master_model_id')->toArray();
+//                $similarModelIds = MasterModel::where('model', $request->model)
+//                    ->pluck('id')->toArray();
+                $alreadyaddedModelIds = [];
+//                if($similarModelIds) {
+//                    foreach ($similarModelIds as $similarModelId) {
+//                        if(in_array($similarModelId,$masterModelIds)) {
+//                            array_push($alreadyaddedModelIds, $similarModelId);
+//                        }
+//                    }
+//                }
             }
             if($request->module == 'Demand')
             {
                 $demandLists = DemandList::where('demand_id', $request->demand_id)->get();
-                $addedModelIds = [];
+                $alreadyaddedModelIds = [];
                 foreach ($demandLists as $demandList) {
-                    $addedModelIds[] = $demandList->master_model_id;
+                    $alreadyaddedModelIds[] = $demandList->master_model_id;
                 }
-                $data = $data->whereNotIn('id', $addedModelIds);
+
             }
-            $data = $data->groupBy('sfx')->pluck('sfx');
+            $data = MasterModel::where('model', $request->model)->whereNotIn('id', $alreadyaddedModelIds)->groupBy('sfx')->pluck('sfx');
 
         return $data;
     }
     public function getModelYear(Request $request) {
+        $LOI = LetterOfIndent::find($request->letter_of_indent_id);
+//        $masterModelIds = $LOI->letterOfIndentItems->pluck('master_model_id')->toArray();
+//            $similarModelIds = MasterModel::where('model', $request->model)
+//                ->where('sfx', $request->sfx)
+//                ->pluck('id')->toArray();
+            $alreadyaddedModelIds = [];
+//            if($similarModelIds) {
+//                foreach ($similarModelIds as $similarModelId) {
+//                   if(in_array($similarModelId,$masterModelIds)) {
+//                       array_push($alreadyaddedModelIds, $similarModelId);
+//                   }
+//                }
+//            }
         $data = MasterModel::where('model', $request->model)
             ->where('sfx', $request->sfx)
+            ->whereNotIn('id', $alreadyaddedModelIds)
             ->pluck('model_year');
+
         return $data;
     }
-    public function getVariant(Request $request)
+    public function getLOIDescription(Request $request)
     {
-        info($request->all());
-        $letterOfIndent = LetterOfIndent::find($request->letter_of_indent_id);
+//        $letterOfIndent = LetterOfIndent::find($request->letter_of_indent_id);
 
         $masterModel = MasterModel::where('model', $request->model)
                                     ->where('sfx', $request->sfx)
                                     ->where('model_year', $request->model_year)->first();
-//        info($masterModel);
-        if($letterOfIndent->dealers == 'Milele Motors') {
+
+        if($request->dealer == 'Milele Motors') {
             $data['loi_description'] = $masterModel->milele_loi_description;
         }else{
             $data['loi_description'] = $masterModel->transcar_loi_description;
         }
-        info($data['loi_description']);
-//        $data['loi_description'] = Varaint::with('master_model_lines','masterModel')->whereIn('id', $variantId)
-//                                     ->get();
 
         if ($request->module == 'LOI') {
             $inventory = SupplierInventory::with('masterModel')
                 ->whereHas('masterModel', function ($query) use($request) {
                     $query->where('sfx', $request->sfx);
                     $query->where('model', $request->model);
+                    $query->where('model_year', $request->model_year);
                 })
                 ->first();
             if($inventory) {
@@ -172,7 +181,6 @@ class DemandController extends Controller
             }else{
                 $data['quantity'] = 0;
             }
-
         }
 
         return $data;

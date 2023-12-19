@@ -34,7 +34,7 @@
                 </div>
             @endif
             <div class="row">
-                <div class="col-sm-4">
+                <div class="col-sm-4 mt-2">
                     <div class="row mt-2">
                         <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
                             Customer :
@@ -60,12 +60,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-4 mt-2">
                     <div class="row mt-2">
                         <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
                             Perefered Location :
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-6 col-md-6 col-lg-6">
                             {{ $letterOfIndent->prefered_location }}
                         </div>
                     </div>
@@ -74,25 +74,25 @@
                         <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
                          LOI Category :
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-6 col-md-6 col-lg-6">
                             {{ $letterOfIndent->category }}
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-4">
-                    <div class="row ">
+                <div class="col-sm-4 mt-2">
+                    <div class="row">
                         <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
                             LOI Date :
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-6 col-md-6 col-lg-6">
                             {{ Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
+                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
                           Destination :
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-6 col-md-6 col-lg-6">
                             {{ $letterOfIndent->destination }}
                         </div>
                     </div>
@@ -208,22 +208,15 @@
                                 </div>
                                 <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
                                     <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">LOI Description</label>
-                                    <input type="text" name="loi_description" placeholder="LOI Description"
+                                    <input type="text" name="loi_description" readonly placeholder="LOI Description"
                                            class="form-control text-dark" id="loi_description">
-{{--                                    <select class="form-select text-dark" name="loi_description" id="loi_description">--}}
-{{--                                        <option value="">Select LOI Description</option>--}}
-{{--                                    </select>--}}
+
                                 </div>
                                 <div class="col-lg-1 col-md-2 col-sm-12">
                                     <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Quantity</label>
                                     <input type="number" name="quantity" placeholder="Quantity" maxlength="5" class="form-control text-dark"
                                            step="1" oninput="validity.valid||(value='');" min="0" >
                                 </div>
-{{--                                <div class="col-lg-1 md-mt-20 col-md-2 col-sm-12">--}}
-{{--                                    <label class="form-label d-none d-lg-block d-xl-block d-xxl-block" @if($letterOfIndentItems->count() <= 0) style="margin-top: 30px" @endif >--}}
-{{--                                        Inventory Quantity--}}
-{{--                                    </label>--}}
-{{--                                </div>--}}
                                 <div class="col-lg-1 col-md-2 col-sm-12">
                                     <label class="form-label  @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Inventory Qty</label>
                                     <input type="number" readonly id="inventory-quantity" value="" class="form-control" >
@@ -250,6 +243,7 @@
 @endsection
 @push('scripts')
     <script>
+        let loiId = '{{ $letterOfIndent->id }}';
         $("#form-letter-of-indent-items").validate({
             ignore: [],
             rules: {
@@ -288,7 +282,6 @@
 
         $('#model').on('change',function(){
             let model = $(this).val();
-            let id = $('#letter_of_indent_id').val();
             let url = '{{ route('demand.get-sfx') }}';
             $.ajax({
                 type: "GET",
@@ -297,15 +290,15 @@
                 data: {
                     model: model,
                     module: 'LOI',
-                    letter_of_indent_id: id
+                    letter_of_indent_id: loiId
                 },
                 success:function (data) {
                     $('#inventory-quantity').val(0);
                     $('select[name="sfx"]').empty();
-                    $('select[name="loi_description"]').empty();
+                    $('#loi_description').val("");
                     $('#sfx').html('<option value=""> Select SFX </option>');
                     $('#model-year').html('<option value=""> Select Model Year </option>');
-                    $('#loi_description').html('<option value=""> Select LOI Description </option>');
+
                     jQuery.each(data, function(key,value){
                         $('select[name="sfx"]').append('<option value="'+ value +'">'+ value +'</option>');
                     });
@@ -316,8 +309,7 @@
             let model_year = $(this).val();
             let model = $('#model').val();
             let sfx = $('#sfx').val();
-            let url = '{{ route('demand.get-variant') }}';
-            let loiId = '{{ $letterOfIndent->id }}';
+            let url = '{{ route('demand.get-loi-description') }}';
             $.ajax({
                 type: "GET",
                 url: url,
@@ -330,15 +322,12 @@
                     module: 'LOI',
                 },
                 success:function (data) {
-                    $('select[name="loi_description"]').empty();
-                    $('#loi_description').html('<option value=""> Select LOI Description </option>');
+                    $('#loi_description').val("");
                     let quantity = data.quantity;
-                    var data = data.loi_description;
-                    console.log(data);
+                    var LOIDescription = data.loi_description;
+                    console.log(LOIDescription);
                     $('#inventory-quantity').val(quantity);
-                    jQuery.each(data, function(key,value){
-                        $('select[name="loi_description"]').append('<option value="'+  +'">'+ value +'</option>');
-                    });
+                    $('#loi_description').val(LOIDescription);
                 }
             });
         });
@@ -352,6 +341,7 @@
                 dataType: "json",
                 data: {
                     sfx: sfx,
+                    letter_of_indent_id: loiId,
                     model:model,
                 },
                 success:function (data) {
