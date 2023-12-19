@@ -185,6 +185,17 @@
                                                 <a href="{{ route('interview-summary-report.index') }}" class="dropdown-item" data-key="t-login">Interview Summary</a>
                                                 @endif
                                                 @endcanany
+                                                <!-- @canany(['view-personal-information-form-listing'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-personal-information-form-listing']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('interview-summary-report.index') }}" class="dropdown-item" data-key="t-login">Candidate Info</a>
+                                                @endif
+                                                @endcanany -->
+                                                
+
+
                                             </div>
                                             @endif
                                             @endcanany

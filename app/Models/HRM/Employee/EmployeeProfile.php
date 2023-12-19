@@ -9,7 +9,12 @@ use App\Models\User;
 use App\Models\Masters\MasterJobPosition;
 use App\Models\Masters\MasterOfficeLocation;
 use App\Models\Masters\MasterDepartment;
+use App\Models\Masters\MasterMaritalStatus;
+use App\Models\Masters\MasterReligion;
 use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
+use App\Models\HRM\Employee\EmployeeSpokenLanguage;
+use App\Models\Country;
+use App\Models\EmpDoc;
 class EmployeeProfile extends Model
 {
     use HasFactory, SoftDeletes;
@@ -137,5 +142,38 @@ class EmployeeProfile extends Model
     }
     public function leadManagerHandover() {
         return $this->hasOne(TeamLeadOrReportingManagerHandOverTo::class,'lead_or_manager_id','team_lead_or_reporting_manager');
+    }
+    public function maritalStatus() {
+        return $this->hasOne(MasterMaritalStatus::class,'id','marital_status');
+    }
+    public function religionName() {
+        return $this->hasOne(MasterReligion::class,'id','religion');
+    }
+    public function candidateLanguages() {
+        return $this->hasMany(EmployeeSpokenLanguage::class,'candidate_id','id');
+    }
+    public function emergencyContactUAE() {
+        return $this->hasMany(UAEEmergencyContact::class,'candidate_id','id');
+    }
+    public function emergencyContactHomeCountry() {
+        return $this->hasMany(HomeCountryEmergencyContact::class,'candidate_id','id');
+    }
+    public function spouseNationality() {
+        return $this->hasOne(Country::class,'id','spouse_nationality');
+    }
+    public function candidateChildren() {
+        return $this->hasMany(Children::class,'candidate_id','id');
+    }
+    public function candidatePassport() {
+        return $this->hasMany(EmpDoc::class,'candidate_id','id')->where('document_name','passport');
+    }
+    public function candidateNationalId() {
+        return $this->hasMany(EmpDoc::class,'candidate_id','id')->where('document_name','national_id');
+    }
+    public function candidateEduDocs() {
+        return $this->hasMany(EmpDoc::class,'candidate_id','id')->where('document_name','educational_docs');
+    }
+    public function candidateProDipCerti() {
+        return $this->hasMany(EmpDoc::class,'candidate_id','id')->where('document_name','professional_diploma_certificates');
     }
 }
