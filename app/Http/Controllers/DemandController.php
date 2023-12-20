@@ -105,21 +105,6 @@ class DemandController extends Controller
     }
     public function getSFX(Request $request)
     {
-        info($request->all());
-            if ($request->module == 'LOI')
-            {
-//                $masterModelIds = LetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)->pluck('master_model_id')->toArray();
-//                $similarModelIds = MasterModel::where('model', $request->model)
-//                    ->pluck('id')->toArray();
-                $alreadyaddedModelIds = [];
-//                if($similarModelIds) {
-//                    foreach ($similarModelIds as $similarModelId) {
-//                        if(in_array($similarModelId,$masterModelIds)) {
-//                            array_push($alreadyaddedModelIds, $similarModelId);
-//                        }
-//                    }
-//                }
-            }
             if($request->module == 'Demand')
             {
                 $demandLists = DemandList::where('demand_id', $request->demand_id)->get();
@@ -129,28 +114,25 @@ class DemandController extends Controller
                 }
 
             }
-            $data = MasterModel::where('model', $request->model)->whereNotIn('id', $alreadyaddedModelIds)->groupBy('sfx')->pluck('sfx');
-
+            info($request->all());
+            $data = MasterModel::where('model', $request->model);
+            info($data->get());
+            if($request->selectedModelIds) {
+                $data = $data->whereNotIn('id', $request->selectedModelIds);
+            }
+            info($request->selectedModelIds);
+            info($data->get());
+            $data = $data->groupBy('sfx')->pluck('sfx');
         return $data;
     }
     public function getModelYear(Request $request) {
-        $LOI = LetterOfIndent::find($request->letter_of_indent_id);
-//        $masterModelIds = $LOI->letterOfIndentItems->pluck('master_model_id')->toArray();
-//            $similarModelIds = MasterModel::where('model', $request->model)
-//                ->where('sfx', $request->sfx)
-//                ->pluck('id')->toArray();
-            $alreadyaddedModelIds = [];
-//            if($similarModelIds) {
-//                foreach ($similarModelIds as $similarModelId) {
-//                   if(in_array($similarModelId,$masterModelIds)) {
-//                       array_push($alreadyaddedModelIds, $similarModelId);
-//                   }
-//                }
-//            }
+
         $data = MasterModel::where('model', $request->model)
-            ->where('sfx', $request->sfx)
-            ->whereNotIn('id', $alreadyaddedModelIds)
-            ->pluck('model_year');
+            ->where('sfx', $request->sfx);
+        if($request->selectedModelIds) {
+            $data = $data->whereNotIn('id', $request->selectedModelIds);
+        }
+        $data = $data->pluck('model_year');
 
         return $data;
     }
@@ -161,12 +143,17 @@ class DemandController extends Controller
         $masterModel = MasterModel::where('model', $request->model)
                                     ->where('sfx', $request->sfx)
                                     ->where('model_year', $request->model_year)->first();
+        if($masterModel) {
+            if($request->dealer == 'Milele Motors') {
+                $data['loi_description'] = $masterModel->milele_loi_description;
 
-        if($request->dealer == 'Milele Motors') {
-            $data['loi_description'] = $masterModel->milele_loi_description;
-        }else{
-            $data['loi_description'] = $masterModel->transcar_loi_description;
+            }else{
+                $data['loi_description'] = $masterModel->transcar_loi_description;
+            }
+
+            $data['master_model_id'] = $masterModel->id ?? "";
         }
+
 
         if ($request->module == 'LOI') {
             $inventory = SupplierInventory::with('masterModel')
@@ -181,6 +168,17 @@ class DemandController extends Controller
             }else{
                 $data['quantity'] = 0;
             }
+        }
+
+        return $data;
+    }
+
+    public function getMasterModel(Request $request) {
+
+        if($request->selectedModelIds) {
+          $data =  MasterModel::whereNotIn('id', $request->selectedModelIds)->groupBy('model')->orderBy('id','ASC')->get();
+        }else{
+            $data = MasterModel::groupBy('model')->orderBy('id','ASC')->get();
         }
 
         return $data;

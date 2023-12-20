@@ -307,6 +307,8 @@ Route::get('/d', function () {
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
     Route::get('demand-planning/get-model-year', [DemandController::class,'getModelYear'])->name('demand.get-model-year');
     Route::get('demand-planning/get-loi-description', [DemandController::class,'getLOIDescription'])->name('demand.get-loi-description');
+    Route::get('demand-planning/getMasterModel', [DemandController::class,'getMasterModel'])->name('demand.getMasterModel');
+
     Route::resource('demands', DemandController::class);
     Route::resource('demand-lists', DemandListController::class);
     Route::resource('monthly-demands', MonthlyDemandsController::class);

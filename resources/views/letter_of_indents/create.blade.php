@@ -177,10 +177,10 @@
                     </div>
                     <div class="card-body">
                         <div id="loi-items" >
-                            <div class="row" data-row="1">
+                            <div class="row Loi-items-row-div" id="row-1">
                                 <div class="col-lg-2 col-md-6 col-sm-12">
                                     <label class="form-label">Model</label>
-                                    <select class="form-select widthinput text-dark models" multiple required data-index="1" name="models[]" id="model-1" autofocus>
+                                    <select class="form-select widthinput text-dark models" multiple data-index="1" name="models[]" id="model-1" autofocus>
                                         <option value="" >Select Model</option>
                                         @foreach($models as $model)
                                             <option value="{{ $model->model }}">{{ $model->model }}</option>
@@ -192,9 +192,9 @@
                             </span>
                                     @enderror
                                 </div>
-                                <div class="col-lg-1 col-md-6 col-sm-12 mb-3">
+                                <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
                                     <label class="form-label">SFX</label>
-                                    <select class="form-select widthinput text-dark sfx" multiple required data-index="1" name="sfx[]" id="sfx-1" >
+                                    <select class="form-select widthinput text-dark sfx" multiple  data-index="1" name="sfx[]" id="sfx-1" >
                                         <option value="">Select SFX</option>
                                     </select>
                                     @error('sfx')
@@ -205,7 +205,7 @@
                                 </div>
                                 <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
                                     <label class="form-label">Model Year</label>
-                                    <select class="form-select widthinput text-dark model-years" multiple required data-index="1" name="model_year[]" id="model-year-1">
+                                    <select class="form-select widthinput text-dark model-years" multiple  data-index="1" name="model_year[]" id="model-year-1">
                                         <option value="">Select Model Year</option>
                                     </select>
                                     @error('model_year')
@@ -214,19 +214,20 @@
                                     </div>
                                     @enderror
                                 </div>
-                                <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                                <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
                                     <label class="form-label">LOI Description</label>
                                     <input type="text" readonly placeholder="LOI Description"
-                                           class="form-control widthinput text-dark" data-index="1" id="loi-description-1">
+                                           class="form-control widthinput text-dark loi-descriptions"  data-index="1" id="loi-description-1">
                                 </div>
                                 <div class="col-lg-1 col-md-6 col-sm-12">
                                     <label class="form-label">Quantity</label>
-                                    <input type="number" name="quantity[]" placeholder="Quantity" required maxlength="5" data-index="1" class="form-control widthinput text-dark"
+                                    <input type="number" name="quantity[]" placeholder="Quantity"  maxlength="5" data-index="1" class="form-control widthinput quantities text-dark"
                                            step="1" oninput="validity.valid||(value='');" min="0" id="quantity-1">
                                 </div>
                                 <div class="col-lg-1 col-md-6 col-sm-12">
                                     <label class="form-label">Inventory Qty</label>
-                                    <input type="number" readonly id="inventory-quantity-1" value="" data-index="1" class="form-control widthinput" >
+                                    <input type="number" readonly id="inventory-quantity-1" value="" data-index="1" class="form-control widthinput inventory-qty" >
+                                    <input type="hidden" name="master_model_ids[]" class="master-model-ids" id="master-model-id-1">
                                 </div>
                                 <div class="col-lg-1 col-md-6 col-sm-12">
                                     <a class="btn btn-sm btn-danger removeButton" id="remove-btn-1" data-index="1" data-index="1" style="margin-top: 30px;" >  <i class="fas fa-trash-alt"></i> </a>
@@ -262,7 +263,6 @@
                     <button type="submit" class="btn btn-primary">Submit </button>
                 </div>
             </div>
-
         </form>
     </div>
     </div>
@@ -301,7 +301,6 @@
         });
         getCustomers();
         $("#form-create").validate({
-            ignore: [],
             rules: {
                 customer_id: {
                     required: true,
@@ -318,20 +317,17 @@
                 dealers:{
                     required:true
                 },
-                model: {
-                    required: true,
+                "models[]": {
+                    required: true
                 },
-                sfx: {
-                    required: true,
+                "sfx[]": {
+                    required: true
                 },
-                model_year: {
-                    required: true,
+                "model_year[]": {
+                    required: true
                 },
-                loi_description: {
-                    required: true,
-                },
-                quantity:{
-                    required:true
+                "quantity[]": {
+                    required: true
                 },
                 "files[]": {
                     extension: "pdf"
@@ -343,6 +339,23 @@
                 }
             },
         });
+
+        $.validator.prototype.checkForm = function (){
+            this.prepareForm();
+            for ( var i = 0, elements = (this.currentElements = this.elements()); elements[i]; i++ ) {
+                if (this.findByName( elements[i].name ).length != undefined && this.findByName( elements[i].name ).length > 1) {
+                    for (var cnt = 0; cnt < this.findByName( elements[i].name ).length; cnt++) {
+                        this.check( this.findByName( elements[i].name )[cnt] );
+                    }
+                }
+                else {
+                    this.check( elements[i] );
+                }
+            }
+            return this.valid();
+        };
+
+
         $('#country').select2({
             placeholder : 'Select Country'
         });
@@ -398,26 +411,74 @@
             });
         }
 
+        function getModels(index) {
+
+            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+
+            var selectedModelIds = [];
+            for(let i=1; i<totalIndex; i++)
+            {
+                var eachSelectedModelId = $('#master-model-id-'+i).val();
+                if(eachSelectedModelId[0]) {
+                    selectedModelIds.push(eachSelectedModelId[0]);
+                }
+            }
+            $.ajax({
+                url:"{{route('demand.getMasterModel')}}",
+                type: "GET",
+                data:
+                    {
+                        selectedModelIds: selectedModelIds,
+                    },
+                dataType : 'json',
+                success: function(data) {
+                    myarray = data;
+
+                    var size = myarray.length;
+                    if (size >= 1) {
+                        let modelDropdownData   = [];
+                        $.each(data,function(key,value)
+                        {
+                            modelDropdownData.push
+                            ({
+
+                                id: value.model,
+                                text: value.model
+                            });
+                        });
+                        $('#model-' + index).html("");
+                        $('#model-' + index).select2({
+                            placeholder: 'Select Model',
+                            allowClear: true,
+                            data: modelDropdownData,
+                            maximumSelectionLength: 1,
+                        });
+                    }
+                }
+            });
+        }
+
         var index = 1;
         $('.add-row-btn').click(function() {
             index++;
-            var newRow = `
-                <div class="row" data-row="${index}">
+
+                        var newRow = `
+                <div class="row Loi-items-row-div" id="row-${index}">
                     <div class="col-lg-2 col-md-6 col-sm-12">
-                        <select class="form-select widthinput text-dark models" multiple name="models[]" required data-index="${index}" id="model-${index}" autofocus>
+                        <select class="form-select widthinput text-dark models" multiple name="models[]" data-index="${index}" id="model-${index}" autofocus>
                             <option value="" >Select Model</option>
                             @foreach($models as $model)
-                                <option value="{{ $model->model }}">{{ $model->model }}</option>
+                        <option value="{{ $model->model }}">{{ $model->model }}</option>
                            @endforeach
                         </select>
                         @error('model')
-                            <span>
-                                <strong >{{ $message }}</strong>
+                        <span>
+                            <strong >{{ $message }}</strong>
                             </span>
                         @enderror
-                    </div>
-                     <div class="col-lg-1 col-md-6 col-sm-12 mb-3">
-                        <select class="form-select widthinput text-dark sfx" multiple name="sfx[]" required data-index="${index}" id="sfx-${index}" >
+                        </div>
+                         <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
+                            <select class="form-select widthinput text-dark sfx" multiple name="sfx[]"  data-index="${index}" id="sfx-${index}" >
                             <option value="">Select SFX</option>
                         </select>
                         @error('sfx')
@@ -425,75 +486,78 @@
                             <strong>{{ $message }}</strong>
                         </div>
                         @enderror
-                    </div>
-                    <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                            <select class="form-select widthinput text-dark model-years" multiple required name="model_year[]" data-index="${index}" id="model-year-${index}">
+                        </div>
+                        <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
+                                <select class="form-select widthinput text-dark model-years" multiple  name="model_year[]" data-index="${index}" id="model-year-${index}">
                                 <option value="">Select Model Year</option>
                             </select>
                             @error('model_year')
-                            <div role="alert">
-                                <strong>{{ $message }}</strong>
+                        <div role="alert">
+                            <strong>{{ $message }}</strong>
                             </div>
                             @enderror
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
-                        <input type="text" readonly placeholder="LOI Description"
-                               class="form-control widthinput text-dark" data-index="${index}" id="loi-description-${index}" >
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+                            <input type="text" readonly placeholder="LOI Description"
+                                   class="form-control widthinput text-dark loi-descriptions" data-index="${index}" id="loi-description-${index}" >
                    </div>
                     <div class="col-lg-1 col-md-6 col-sm-12">
-                        <input type="number" name="quantity[]" placeholder="Quantity" maxlength="5" required class="form-control widthinput text-dark"
+                        <input type="number" name="quantity[]" placeholder="Quantity" maxlength="5"  class="form-control widthinput text-dark quantities"
                                step="1" oninput="validity.valid||(value='');" min="0" data-index="${index}" id="quantity-${index}">
                     </div>
                     <div class="col-lg-1 col-md-6 col-sm-12">
-                        <input type="number" readonly id="inventory-quantity-${index}" data-index="${index}" value="" class="form-control widthinput" >
+                        <input type="number" readonly id="inventory-quantity-${index}" data-index="${index}" value="" class="form-control widthinput inventory-qty" >
+                          <input type="hidden" name="master_model_ids[]" class="master-model-ids" id="master-model-id-${index}">
                     </div>
                     <div class="col-lg-1 col-md-6 col-sm-12">
                         <a class="btn btn-sm btn-danger removeButton" id="remove-btn-${index}" data-index="${index}" >  <i class="fas fa-trash-alt"></i> </a>
                     </div>
                     </div>
                     `;
-            $('#loi-items').append(newRow);
-            $('#model-' + index).select2({
-                placeholder: 'Select Model',
-                allowClear: true,
-                maximumSelectionLength: 1
-            });
-            $('#sfx-' + index).select2({
-                placeholder: 'Select SFX',
-                allowClear: true,
-                maximumSelectionLength: 1
-            });
-            $('#model-year-' + index).select2({
-                placeholder: 'Select Model Year',
-                allowClear: true,
-                maximumSelectionLength: 1
-            });
+                        $('#loi-items').append(newRow);
 
+                        $('#model-' + index).select2({
+                            placeholder: 'Select Model',
+                            allowClear: true,
+                            maximumSelectionLength: 1
+                        });
+                        $('#sfx-' + index).select2({
+                            placeholder: 'Select SFX',
+                            allowClear: true,
+                            maximumSelectionLength: 1
+                        });
+                        $('#model-year-' + index).select2({
+                            placeholder: 'Select Model Year',
+                            allowClear: true,
+                            maximumSelectionLength: 1
+                        });
+
+                getModels(index);
         });
 
         $(document.body).on('click', ".removeButton", function (e) {
-            alert("ok");
             var indexNumber = $(this).attr('data-index');
-
-            // $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
-            //     var id = (this.value);
-            //     var text = (this.text);
-            //     addOption(id,text)
-            // });
-
             $(this).closest('#row-'+indexNumber).remove();
 
-            $('.form_field_outer_row').each(function(i){
+            $('.Loi-items-row-div').each(function(i){
                 var index = +i + +1;
-                $(this).attr('data-row', index);
+                $(this).attr('id', 'row-'+index);
                 $(this).find('.models').attr('data-index', index);
                 $(this).find('.models').attr('id', 'model-'+index);
-                // $(this).find('select').attr('id','vehicles-'+ index);
-                // $(this).find('.variant-detail').attr('id','variant-detail-'+index);
-                // $(this).find('.select').attr('data-select2-id','select2-data-vehicles-'+index);
-                //
-                // $(this).find('button').attr('data-index', index);
-                // $(this).find('button').attr('id','remove-'+ index);
+                $(this).find('.sfx').attr('data-index', index);
+                $(this).find('.sfx').attr('id', 'sfx-'+index);
+                $(this).find('.loi-descriptions').attr('data-index', index);
+                $(this).find('.loi-descriptions').attr('id', 'loi-description-'+index);
+                $(this).find('.model-years').attr('data-index', index);
+                $(this).find('.model-years').attr('id', 'model-year-'+index);
+                $(this).find('.quantities').attr('data-index', index);
+                $(this).find('.quantities').attr('id', 'quantity-'+index);
+                $(this).find('.inventory-qty').attr('data-index', index);
+                $(this).find('.inventory-qty').attr('id', 'inventory-quantity-'+index);
+                $(this).find('.master-model-ids').attr('id', 'master-model-id-'+index);
+                $(this).find('.removeButton').attr('data-index', index);
+                $(this).find('.removeButton').attr('id', 'remove-btn-'+index);
+
                 $('#model-'+index).select2
                 ({
                     placeholder: 'Select Model',
@@ -517,19 +581,48 @@
 
         $(document.body).on('select2:select', ".models", function (e) {
             let index = $(this).attr('data-index');
+            $('#model-'+index+'-error').remove();
             getSfx(index);
         });
         $(document.body).on('select2:select', ".sfx", function (e) {
             let index = $(this).attr('data-index');
+            $('#sfx-'+index+'-error').remove();
             getModelYear(index);
         });
         $(document.body).on('select2:select', ".model-years", function (e) {
             let index = $(this).attr('data-index');
+            $('#model-year-'+index+'-error').remove();
             getLOIDescription(index);
         });
 
+        $(document.body).on('select2:unselect', ".sfx", function (e) {
+            let index = $(this).attr('data-index');
+            $('#model-year-'+index).empty();
+            $('#loi-description-'+index).val("");
+        });
+        $(document.body).on('select2:unselect', ".models", function (e) {
+            let index = $(this).attr('data-index');
+            $('#sfx-'+index).empty();
+            $('#model-year-'+index).empty();
+            $('#loi-description-'+index).val("");
+        });
+        $(document.body).on('select2:unselect', ".model-years", function (e) {
+            let index = $(this).attr('data-index');
+            $('#loi-description-'+index).val("");
+        });
         function getSfx(index) {
+
             let model = $('#model-'+index).val();
+            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+
+            var selectedModelIds = [];
+            for(let i=1; i<totalIndex; i++)
+            {
+                var eachSelectedModelId = $('#master-model-id-'+i).val();
+                if(eachSelectedModelId[0]) {
+                    selectedModelIds.push(eachSelectedModelId[0]);
+                }
+            }
 
             let url = '{{ route('demand.get-sfx') }}';
             $.ajax({
@@ -538,6 +631,7 @@
                 dataType: "json",
                 data: {
                     model: model[0],
+                    selectedModelIds:selectedModelIds,
                     module: 'LOI',
                 },
                 success:function (data) {
@@ -558,7 +652,17 @@
 
            let model = $('#model-'+index).val();
            let sfx = $('#sfx-'+index).val();
-           console.log(sfx);
+           var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+
+           var selectedModelIds = [];
+           for(let i=1; i<totalIndex; i++)
+           {
+               var eachSelectedModelId = $('#master-model-id-'+i).val();
+               if(eachSelectedModelId[0]) {
+                   selectedModelIds.push(eachSelectedModelId[0]);
+               }
+           }
+
            let url = '{{ route('demand.get-model-year') }}';
            $.ajax({
                type: "GET",
@@ -567,9 +671,10 @@
                data: {
                    sfx: sfx[0],
                    model:model[0],
+                   selectedModelIds:selectedModelIds,
                },
                success:function (data) {
-                   console.log(data);
+
                    $('#model-year-'+index).empty();
                     $('#model-year-'+index).html('<option value=""> Select Model Year </option>');
                    $('#loi-description-'+index).html('<option value=""> Select LOI Description </option>');
@@ -601,10 +706,12 @@
                success:function (data) {
                    $('#loi-description-'+index).val("");
                    let quantity = data.quantity;
+                   let modelId = data.master_model_id;
                    var LOIDescription = data.loi_description;
                    console.log(LOIDescription);
                    $('#inventory-quantity-'+index).val(quantity);
                    $('#loi-description-'+index).val(LOIDescription);
+                    $('#master-model-id-'+index).val(modelId);
                }
            });
         }
