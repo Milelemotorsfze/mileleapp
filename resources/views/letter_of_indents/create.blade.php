@@ -416,11 +416,12 @@
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
             var selectedModelIds = [];
-            for(let i=1; i<totalIndex; i++)
+            for(let i=1; i<=totalIndex; i++)
             {
                 var eachSelectedModelId = $('#master-model-id-'+i).val();
-                if(eachSelectedModelId[0]) {
-                    selectedModelIds.push(eachSelectedModelId[0]);
+
+                if(eachSelectedModelId) {
+                    selectedModelIds.push(eachSelectedModelId);
                 }
             }
             $.ajax({
@@ -460,9 +461,9 @@
 
         var index = 1;
         $('.add-row-btn').click(function() {
-            index++;
+            var index = $("#loi-items").find(".Loi-items-row-div").length + 1;
 
-                        var newRow = `
+           var newRow = `
                 <div class="row Loi-items-row-div" id="row-${index}">
                     <div class="col-lg-2 col-md-6 col-sm-12">
                         <select class="form-select widthinput text-dark models" multiple name="models[]" data-index="${index}" id="model-${index}" autofocus>
@@ -537,6 +538,13 @@
 
         $(document.body).on('click', ".removeButton", function (e) {
             var indexNumber = $(this).attr('data-index');
+            var modelYear = $('#model-year-'+indexNumber).val();
+            if(modelYear[0]) {
+                var model = $('#model-'+indexNumber).val();
+                var sfx = $('#sfx-'+indexNumber).val();
+                appendModelYear(indexNumber, model[0],sfx[0],modelYear[0]);
+            }
+
             $(this).closest('#row-'+indexNumber).remove();
 
             $('.Loi-items-row-div').each(function(i){
@@ -593,34 +601,87 @@
             let index = $(this).attr('data-index');
             $('#model-year-'+index+'-error').remove();
             getLOIDescription(index);
+
+            var value = e.params.data.text;
+            hideModelYear(index, value)
+
         });
 
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
-            $('#model-year-'+index).empty();
+
             $('#loi-description-'+index).val("");
+            $('#master-model-id-'+index).val("");
+            var modelYear =  $('#model-year-'+index).val();
+            var model = $('#model-'+index).val();
+            var sfx = e.params.data.id;
+            if(modelYear[0]){
+                appendModelYear(index, model[0],sfx,modelYear[0])
+            }
+            appendSFX(index,model[0],sfx)
+            $('#model-year-'+index).empty();
+
         });
         $(document.body).on('select2:unselect', ".models", function (e) {
             let index = $(this).attr('data-index');
+
+            var modelYear =  $('#model-year-'+index).val();
+
+            if(modelYear[0]){
+                var sfx = $('#sfx-'+index).val();
+                var model = e.params.data.id;
+                appendModelYear(index, model,sfx[0],modelYear[0])
+            }
+
             $('#sfx-'+index).empty();
             $('#model-year-'+index).empty();
             $('#loi-description-'+index).val("");
+            $('#master-model-id-'+index).val("");
+
+            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+
+            // for(let i=1; i<=totalIndex; i++)
+            // {
+            //     if(i != index) {
+            //         var currentModel = $('#model-'+index).val();
+            //         var currentId = 'model-' + i;
+            //
+            //         var exists = false;
+            //         $('#'+ currentId + ' option').each(function(){
+            //             if (currentModel[0] == data) {
+            //                 exists = true;
+            //                 return exists;
+            //             }
+            //         });
+            //         alert(i);
+            //         alert(exists);
+            //     }
+            // }
         });
         $(document.body).on('select2:unselect', ".model-years", function (e) {
             let index = $(this).attr('data-index');
             $('#loi-description-'+index).val("");
+            $('#master-model-id-'+index).val("");
+
+            var modelYear = e.params.data.id;
+            var model = $('#model-'+index).val();
+            var sfx = $('#sfx-'+index).val();
+            appendModelYear(index, model[0],sfx[0],modelYear);
+
+            // get the unseleted index and match with each row  item if model and sfx is matching append that row
         });
+
         function getSfx(index) {
 
             let model = $('#model-'+index).val();
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
             var selectedModelIds = [];
-            for(let i=1; i<totalIndex; i++)
+            for(let i=1; i<=totalIndex; i++)
             {
                 var eachSelectedModelId = $('#master-model-id-'+i).val();
-                if(eachSelectedModelId[0]) {
-                    selectedModelIds.push(eachSelectedModelId[0]);
+                if(eachSelectedModelId) {
+                    selectedModelIds.push(eachSelectedModelId);
                 }
             }
 
@@ -655,11 +716,11 @@
            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
            var selectedModelIds = [];
-           for(let i=1; i<totalIndex; i++)
+           for(let i=1; i<=totalIndex; i++)
            {
                var eachSelectedModelId = $('#master-model-id-'+i).val();
-               if(eachSelectedModelId[0]) {
-                   selectedModelIds.push(eachSelectedModelId[0]);
+               if(eachSelectedModelId) {
+                   selectedModelIds.push(eachSelectedModelId);
                }
            }
 
@@ -715,6 +776,73 @@
                }
            });
         }
+
+       function appendModelYear(index,unSelectedmodel,unSelectedsfx,unSelectedmodelYear) {
+            console.log(index);
+            console.log(unSelectedmodel);
+           console.log(unSelectedsfx);
+           console.log(unSelectedmodelYear);
+
+           var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+
+            for(let i=1; i<=totalIndex; i++)
+            {
+                if(i != index) {
+                    var model = $('#model-'+i).val();
+                    var sfx = $('#sfx-'+i).val();
+                    if(unSelectedmodel == model[0] && unSelectedsfx == sfx[0]) {
+                        $('#model-year-'+i).append($('<option>', {value: unSelectedmodelYear, text : unSelectedmodelYear}))
+                    }
+                }
+            }
+       }
+       function hideModelYear(index, value) {
+           var selectedModel = $('#model-'+index).val();
+           var selectedSFX = $('#sfx-'+index).val();
+
+           var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+           for(let i=1; i<=totalIndex; i++)
+           {
+               if(i != index) {
+                   var model = $('#model-'+i).val();
+                   var sfx = $('#sfx-'+i).val();
+
+                   if(selectedModel[0] == model[0] && selectedSFX[0] == sfx[0]) {
+                       var currentId = 'model-year-' + i;
+                       $('#' + currentId + ' option[value=' + value + ']').detach();
+                   }
+               }
+           }
+       }
+       function appendSFX(index,unSelectedmodel,sfx){
+           var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+
+           for(let i=1; i<=totalIndex; i++)
+           {
+               if(i != index) {
+                   var model = $('#model-'+i).val();
+                   if(unSelectedmodel == model[0] ) {
+                       // chcek this option value alredy exist in dropdown list or not.
+                       var currentId = 'sfx-' + i;
+                       var isOptionExist = 'no';
+                       $('#' + currentId +' option').each(function () {
+                            console.log(this.text);
+                           if (this.text == sfx) {
+                               console.log("inside condition");
+                                isOptionExist = 'yes';
+                               return false;
+                           }
+                       });
+                       console.log(isOptionExist);
+                       if(isOptionExist == 'no'){
+                           $('#sfx-'+i).append($('<option>', {value: sfx, text : sfx}))
+
+                       }
+
+                   }
+               }
+           }
+       }
     </script>
 @endpush
 
