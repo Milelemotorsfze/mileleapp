@@ -48,7 +48,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">Country</label>
-                        <select class="form-control" name="country" id="country" autofocus>
+                        <select class="form-control widthinput" multiple name="country" id="country" autofocus>
                             <option ></option>
                             @foreach($countries as $country)
                                 <option value="{{ $country->id }}"> {{ $country->name }} </option>
@@ -59,7 +59,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label  text-muted">Customer Type</label>
-                        <select class="form-control" name="customer_type" id="customer-type">
+                        <select class="form-control widthinput" name="customer_type" id="customer-type">
                             <option value="" disabled>Type</option>
                             <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}</option>
                             <option value={{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}>{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}</option>
@@ -71,7 +71,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label ">Customer</label>
-                        <select class="form-control @error('customer_id') is-invalid @enderror" name="customer_id" id="customer" >
+                        <select class="form-control widthinput @error('customer_id') is-invalid @enderror" name="customer_id" id="customer" >
                         </select>
                         @error('customer_id')
                         <span role="alert">
@@ -83,7 +83,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
-                        <input type="date" class="form-control" id="basicpill-firstname-input"  name="date">
+                        <input type="date" class="form-control widthinput" id="basicpill-firstname-input"  name="date">
                         @error('date')
                         <span role="alert">
                             <strong>{{ $message }}</strong>
@@ -96,7 +96,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
-                        <select class="form-control" name="category" id="choices-single-default">
+                        <select class="form-control widthinput" name="category" id="choices-single-default">
                             <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}">
                                 {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
                             </option>
@@ -124,7 +124,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">Dealer</label>
-                        <select class="form-control" name="dealers" id="dealer">
+                        <select class="form-control widthinput" name="dealers" id="dealer">
                             <option value="Trans Cars">Trans Cars</option>
                             <option value="Milele Motors">Milele Motors</option>
                         </select>
@@ -138,13 +138,13 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">So Number</label>
-                        <input type="text" class="form-control" name="so_number" placeholder="So Number">
+                        <input type="text" class="form-control widthinput" name="so_number" placeholder="So Number">
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">Destination</label>
-                        <input type="text" class="form-control" name="destination" placeholder="Destination" >
+                        <input type="text" class="form-control widthinput" name="destination" placeholder="Destination" >
                         @error('destination')
                         <span role="alert">
                             <strong>{{ $message }}</strong>
@@ -155,7 +155,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">Prefered Location</label>
-                        <input type="text" class="form-control" name="prefered_location" placeholder="Prefered Location" >
+                        <input type="text" class="form-control widthinput" name="prefered_location" placeholder="Prefered Location" >
                         @error('prefered_location')
                         <span role="alert">
                             <strong>{{ $message }}</strong>
@@ -166,7 +166,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">LOI Document</label>
-                        <input type="file" name="files[]" id="file-upload" class="form-control text-dark" multiple
+                        <input type="file" name="files[]" id="file-upload" class="form-control widthinput text-dark" multiple
                                autofocus accept="application/pdf">
                     </div>
                 </div>
@@ -236,7 +236,7 @@
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <div class="btn btn-outline-info btn-sm add-row-btn float-end" data-row="1">
+                                <div class="btn btn-info btn-sm add-row-btn float-end" >
                                     <i class="fas fa-plus"></i> Add LOI Item
                                 </div>
                             </div>
@@ -357,12 +357,16 @@
 
 
         $('#country').select2({
-            placeholder : 'Select Country'
-        });
+            placeholder : 'Select Country',
+            allowClear: true,
+            maximumSelectionLength: 1
+        }).on('change', function() {
+            getCustomers();
+        });;
 
-        $('#country').change(function (){
-           getCustomers();
-        });
+        // $('#country').change(function (){
+        //    getCustomers();
+        // });
         $('#customer-type').change(function (){
             getCustomers();
         });
@@ -539,10 +543,16 @@
         $(document.body).on('click', ".removeButton", function (e) {
             var indexNumber = $(this).attr('data-index');
             var modelYear = $('#model-year-'+indexNumber).val();
+            var model = $('#model-'+indexNumber).val();
+            var sfx = $('#sfx-'+indexNumber).val();
             if(modelYear[0]) {
-                var model = $('#model-'+indexNumber).val();
-                var sfx = $('#sfx-'+indexNumber).val();
                 appendModelYear(indexNumber, model[0],sfx[0],modelYear[0]);
+            }
+            if(model[0]) {
+                appendModel(indexNumber,model[0]);
+            }
+            if(sfx[0]) {
+                appendSFX(indexNumber,model[0],sfx[0]);
             }
 
             $(this).closest('#row-'+indexNumber).remove();
@@ -626,12 +636,13 @@
             let index = $(this).attr('data-index');
 
             var modelYear =  $('#model-year-'+index).val();
-
+            var sfx = $('#sfx-'+index).val();
+            var model = e.params.data.id;
             if(modelYear[0]){
-                var sfx = $('#sfx-'+index).val();
-                var model = e.params.data.id;
                 appendModelYear(index, model,sfx[0],modelYear[0])
             }
+            appendSFX(index,model,sfx[0]);
+            appendModel(index,model);
 
             $('#sfx-'+index).empty();
             $('#model-year-'+index).empty();
@@ -640,23 +651,6 @@
 
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
-            // for(let i=1; i<=totalIndex; i++)
-            // {
-            //     if(i != index) {
-            //         var currentModel = $('#model-'+index).val();
-            //         var currentId = 'model-' + i;
-            //
-            //         var exists = false;
-            //         $('#'+ currentId + ' option').each(function(){
-            //             if (currentModel[0] == data) {
-            //                 exists = true;
-            //                 return exists;
-            //             }
-            //         });
-            //         alert(i);
-            //         alert(exists);
-            //     }
-            // }
         });
         $(document.body).on('select2:unselect', ".model-years", function (e) {
             let index = $(this).attr('data-index');
@@ -826,9 +820,8 @@
                        var currentId = 'sfx-' + i;
                        var isOptionExist = 'no';
                        $('#' + currentId +' option').each(function () {
-                            console.log(this.text);
+
                            if (this.text == sfx) {
-                               console.log("inside condition");
                                 isOptionExist = 'yes';
                                return false;
                            }
@@ -843,6 +836,33 @@
                }
            }
        }
+        function appendModel(index,unSelectedmodel){
+            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+
+            for(let i=1; i<=totalIndex; i++)
+            {
+                if(i != index) {
+                    // if(unSelectedmodel == model[0] ) {
+                        // chcek this option value alredy exist in dropdown list or not.
+                        var currentId = 'model-' + i;
+                        var isOptionExist = 'no';
+                        $('#' + currentId +' option').each(function () {
+
+                            if (this.text == unSelectedmodel) {
+                                isOptionExist = 'yes';
+                                return false;
+                            }
+                        });
+                        console.log(isOptionExist);
+                        if(isOptionExist == 'no'){
+                            $('#model-'+i).append($('<option>', {value: unSelectedmodel, text : unSelectedmodel}))
+
+                        }
+
+                    // }
+                }
+            }
+        }
     </script>
 @endpush
 

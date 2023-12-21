@@ -127,8 +127,6 @@ class LetterOfIndentController extends Controller
             'dealers' => 'required',
         ]);
 
-        DB::beginTransaction();
-
         $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
             ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
             ->where('category', $request->category)
@@ -138,6 +136,8 @@ class LetterOfIndentController extends Controller
 
         if (!$LOI)
         {
+            DB::beginTransaction();
+
             $LOI = new LetterOfIndent();
             $LOI->customer_id = $request->customer_id;
             $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
@@ -150,41 +150,45 @@ class LetterOfIndentController extends Controller
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
             $LOI->created_by = Auth::id();
             $LOI->save();
-        }
 
-        if ($request->has('files'))
-        {
-            foreach ($request->file('files') as $key => $file)
+            if ($request->has('files'))
             {
-                $extension = $file->getClientOriginalExtension();
-                $fileName = $key.time().'.'.$extension;
-                $destinationPath = 'LOI-Documents';
-                $file->move($destinationPath, $fileName);
-                $LoiDocument = new LetterOfIndentDocument();
+                foreach ($request->file('files') as $key => $file)
+                {
+                    $extension = $file->getClientOriginalExtension();
+                    $fileName = $key.time().'.'.$extension;
+                    $destinationPath = 'LOI-Documents';
+                    $file->move($destinationPath, $fileName);
+                    $LoiDocument = new LetterOfIndentDocument();
 
-                $LoiDocument->loi_document_file = $fileName;
-                $LoiDocument->letter_of_indent_id = $LOI->id;
-                $LoiDocument->save();
+                    $LoiDocument->loi_document_file = $fileName;
+                    $LoiDocument->letter_of_indent_id = $LOI->id;
+                    $LoiDocument->save();
+                }
             }
-        }
-        $quantities = $request->quantity;
-        foreach ($quantities as $key => $quantity) {
-            $masterModel = MasterModel::where('sfx', $request->sfx[$key])
-                ->where('model', $request->models[$key])
-                ->where('model_year', $request->model_year[$key])
-                ->first();
-            if($masterModel) {
-                $LOIItem = new LetterOfIndentItem();
-                $LOIItem->letter_of_indent_id  = $LOI->id;
-                $LOIItem->master_model_id = $masterModel->id ?? '';
-                $LOIItem->quantity = $quantity;
-                $LOIItem->save();
+            $quantities = $request->quantity;
+            foreach ($quantities as $key => $quantity) {
+                $masterModel = MasterModel::where('sfx', $request->sfx[$key])
+                    ->where('model', $request->models[$key])
+                    ->where('model_year', $request->model_year[$key])
+                    ->first();
+                if($masterModel) {
+                    $LOIItem = new LetterOfIndentItem();
+                    $LOIItem->letter_of_indent_id  = $LOI->id;
+                    $LOIItem->master_model_id = $masterModel->id ?? '';
+                    $LOIItem->quantity = $quantity;
+                    $LOIItem->save();
+                }
             }
+
+            DB::commit();
+
+            return redirect()->route('letter-of-indents.index')->with('success',"LOI Created successfully");
+
+        }else{
+
+            return redirect()->back()->with('error', "LOI with this customer and date and category is already exist.");
         }
-
-        DB::commit();
-
-        return redirect()->route('letter-of-indent-items.index');
     }
     public function getCustomers(Request $request)
     {
