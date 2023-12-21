@@ -23,6 +23,11 @@
 }
 </style>
 @section('content')
+@canany(['view-interview-summary-report-details'])
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
+@endphp
+@if ($hasPermission)
 <div class="card-header">
 	<h4 class="card-title"> Candidate Details</h4>
 	@if($previous != '')
@@ -136,6 +141,8 @@
 	</div>
 </div>
 </div>
+@endif
+@endcanany
 @endsection
 @push('scripts')
 <script>

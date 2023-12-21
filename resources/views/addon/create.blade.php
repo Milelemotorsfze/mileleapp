@@ -1644,6 +1644,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	}
 	function readURL(input)
 	{
+		// console.log($("#image").val());
 	    if(input.value == '')
 	    {
 	        $('#blah').hide();

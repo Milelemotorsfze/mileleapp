@@ -23,6 +23,11 @@
 }
 </style>
 @section('content')
+@canany(['view-interview-summary-report-details','view-questionnaire-details','view-all-hiring-request-details','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'])
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','view-questionnaire-details','view-all-hiring-request-details','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user']);
+@endphp
+@if ($hasPermission)
 <div class="card-header">
 	<h4 class="card-title"> Employee Hiring Request Details</h4>
     <div class="row">
@@ -43,10 +48,6 @@
 
         </div>
     </div>
-	
-    
-                        
-
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -74,65 +75,104 @@
 <div class="card-body">
 <div class="portfolio">
 	<ul class="nav nav-pills nav-fill" id="my-tab">
-      
+        @canany(['view-all-hiring-request-details','view-hiring-request-details-of-current-user'])
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-details-of-current-user']);
+        @endphp
+        @if ($hasPermission)
 		<li class="nav-item">
 			<a class="nav-link active" data-bs-toggle="pill" href="#requests"> Hiring Request</a>
 		</li>
+        @endif
+        @endcanany
+
+        @canany(['view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'])
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user']);
+        @endphp
+        @if ($hasPermission)
         <li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#approvals-and-history"> Approvals and History</a>
 		</li>
+        @endif
+        @endcanany
+
+        @canany(['view-questionnaire-details'])
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-questionnaire-details']);
+        @endphp
+        @if ($hasPermission)
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#questionnaire-and-job-descriptions">Questionnaire and Job Description</a>
 		</li>
+        @endif
+        @endcanany
+
+        @canany(['view-interview-summary-report-details'])
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
+        @endphp
+        @if ($hasPermission)
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#interview-summary-report">Interview Summary Report</a>
 		</li>
+        @endif
+        @endcanany
 	</ul>
 </div>
+@canany(['view-all-hiring-request-details','view-hiring-request-details-of-current-user'])
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-details-of-current-user']);
+@endphp
+@if ($hasPermission)
 <div class="tab-content">
 	<div class="tab-pane fade show active" id="requests">
         <br>
-            <div class="card">
-                <div class="card-header" style="background-color:#e8f3fd;">
-                    <div class="row">
-                        <div class="col-lg-10 col-md-3 col-sm-6 col-12">
-                            <h4 class="card-title"><center>Hiring request Info</center></h4>
-                        </div>
-                        <div class="col-lg-2 col-md-3 col-sm-6 col-12">
-                            @if(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
-                                @if(isset($data->is_auth_user_can_approve['can_approve']))
-                                    @if($data->is_auth_user_can_approve['can_approve'] == true)
-                                        <button style="float:right;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
-                                            <i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
-                                        </button>
-                                        <button style="float:right; margin-right:5px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-                                            data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
-                                            <i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
-                                        </button>
-                                        @include('hrm.hiring.hiring_request.approve_reject_modal')
-                                    @endif
+        <div class="card">       
+            <div class="card-header" style="background-color:#e8f3fd;">
+                <div class="row">
+                    
+                    <div class="col-lg-10 col-md-3 col-sm-6 col-12">
+                        <h4 class="card-title"><center>Hiring request Info</center></h4>
+                    </div>
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-12">
+                        @if(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
+                            @if(isset($data->is_auth_user_can_approve['can_approve']))
+                                @if($data->is_auth_user_can_approve['can_approve'] == true)
+                                    <button style="float:right;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+                                        <i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
+                                    </button>
+                                    <button style="float:right; margin-right:5px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+                                        data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+                                        <i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
+                                    </button>
+                                    @include('hrm.hiring.hiring_request.approve_reject_modal')
                                 @endif
                             @endif
-                            @canany(['edit-employee-hiring-request'])
-                            @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request']);
-                            @endphp
-                            @if ($hasPermission)
-                                <a style="float:right; margin-right:5px;" title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$data->id)}}">
-                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                </a>
-                            @endif
-                            @endcanany
-                        </div>
+                        @endif
+                        @canany(['edit-employee-hiring-request'])
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request']);
+                        @endphp
+                        @if ($hasPermission)
+                            <a style="float:right; margin-right:5px;" title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$data->id)}}">
+                                <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                            </a>
+                        @endif
+                        @endcanany
                     </div>
                 </div>
-                <div class="card-body">
-                    @include('hrm.hiring.hiring_request.details')
-                </div>
             </div>
+            <div class="card-body">
+                @include('hrm.hiring.hiring_request.details')
+            </div>              
+        </div>                                
 	</div>
 </div>
+@endif
+@endcanany
+
 @canany(['view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'])
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user']);
@@ -344,6 +384,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
 </div>
 @endif
 @endcanany
+
+@canany(['view-questionnaire-details'])
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-questionnaire-details']);
+@endphp
+@if ($hasPermission)
 <div class="tab-content">
 	<div class="tab-pane fade show" id="questionnaire-and-job-descriptions">
         <br>
@@ -353,6 +399,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
         </div>
     </div>
 </div>
+@endif
+@endcanany
+
+@canany(['view-interview-summary-report-details'])
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
+@endphp
+@if ($hasPermission)
 <div class="tab-content">
 	<div class="tab-pane fade show" id="interview-summary-report">
         <br>
@@ -361,7 +415,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
         </div>
     </div>
 </div>
+@endif
+@endcanany
 </div>
+@endif
+@endcanany
 @endsection
 @push('scripts')
 <script>

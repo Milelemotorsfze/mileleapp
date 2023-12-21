@@ -2256,7 +2256,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											<form method="POST" action="{{route('personal-info.send-email')}}" id="send_email_{{$data->id}}">
 												@csrf
 												<div class="modal-header">
-													<h1 class="modal-title fs-5" id="exampleModalLabel">Send Personal Information Form To candodates
+													<h1 class="modal-title fs-5" id="exampleModalLabel">Send Personal Information Form To candidates
 
 													</h1>
 													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -2276,8 +2276,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																	</div>
 																	<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
 																			<input name="email" id="email_{{$data->id}}" class="form-control" required
-																			placeholder="Enter Candidate Email" value="@if($data->email) {{$data->email}} @endif">
-																			
+																			placeholder="Enter Candidate Email" value="@if($data->email){{$data->email}}@endif">																		
 																	</div>
 																</div>
 															</div>

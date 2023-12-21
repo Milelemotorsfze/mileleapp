@@ -388,8 +388,8 @@
                                                                 <div class="col-xxl-8 col-lg-8 col-md-8 mt-2">
                                                                 <input id="residence_telephone_number" type="tel" class="widthinput contact form-control @error('residence_telephone_number[full]')
                                                                     is-invalid @enderror" name="residence_telephone_number[main]" placeholder="Enter Alternative Contact Number"
-                                                                    value="{{$candidate->candidateDetails->residence_telephone_number}}" autocomplete="residence_telephone_number[full]" autofocus
-                                                                    onkeyup="validationOnKeyUp(this)">
+                                                                    value="{{$candidate->candidateDetails->residence_telephone_number ?? ''}}" autocomplete="residence_telephone_number[full]" autofocus
+                                                                    >
                                                                 </div>
                                                                 <div class="col-xxl-4 col-lg-4 col-md-4 mt-2">
                                                                     <span class="error">* </span>
@@ -569,7 +569,6 @@
                                                                             placeholder="Contact Number" value="" autocomplete="ech_contact_number" autofocus>
                                                                     </div>
                                                                     <div class="col-xxl-3 col-lg-3 col-md-3">
-                                                                        <span class="error">* </span>
                                                                         <label for="ech_alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Number') }}</label>
                                                                     </div>
                                                                     <div class="col-xxl-9 col-lg-9 col-md-9">
@@ -597,7 +596,7 @@
                                                             <span class="error">* </span>
                                                             <label for="first_name" class="col-form-label text-md-end">{{ __('Passport Size Photograph') }}</label>
                                                             <input type="file" class="form-control" id="passport-size-photograph" name="passport_size_photograph"
-                                                                        accept="application/pdf, image/*">
+                                                                     accept="application/pdf, image/*">
                                                         </div>
                                                         <div class="col-xxl-3 col-lg-6 col-md-6">
                                                             <span class="error">* </span>
@@ -645,74 +644,188 @@
                                                         <div class="card-body">
                                                             <div class="row">
                                                                 <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-                                                                    <span class="col-form-label text-md-end" id="passport-size-photograph-label"></span>
-                                                                    <!-- @if($candidate->candidateDetails->candidatePassport->count() > 0)
-                                                                        <h6 class="fw-bold text-center">Other Documents</h6>
-                                                                        @foreach($candidate->candidateDetails->candidatePassport as $document)
-                                                                            <div class="col-lg-4 col-md-12 col-sm-12 text-center" id="preview-div-{{$document->id}}">
-                                                                                <div>
-                                                                                    <iframe src="{{ url('hrm/employee/passport/' . $document->document_path) }}"
-                                                                                        class="mt-2" alt="Other Document"></iframe>
-                                                                                    <button  type="button" class="btn btn-sm btn-info mt-3 ">
-                                                                                        <a href="{{url('hrm/employee/passport/' . $document->document_path)}}" download class="text-white">
-                                                                                            Download
-                                                                                        </a>
-                                                                                    </button>
-                                                                                    <button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button"
-                                                                                        data-id="{{ $document->id }}"> Delete</button>
-                                                                                </div>
-                                                                            </div>
-                                                                        @endforeach
-                                                                    @endif -->
-                                                                    @if($candidate->candidateDetails->image_path)
-                                                                        <h6 class="fw-bold text-center mb-1">Passport</h6>
-                                                                        <iframe src="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" alt="Passport"></iframe>
-                                                                        <button  type="button" class="btn btn-sm btn-info mt-3 ">
-                                                                            <a href="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" download class="text-white">
-                                                                                Download
-                                                                            </a>
-                                                                        </button>
-                                                                        <button  type="button" class="btn btn-sm btn-danger mt-3 delete-button"
-                                                                                data-file-type="PASSPORT"> Delete</button>
-
-                                                                    @endif
+                                                                    <span class="fw-bold col-form-label text-md-end" id="passport-size-photograph-label"></span>
                                                                     <div id="passport-size-photograph-preview">
+                                                                    @if(isset($candidate->candidateDetails->image_path))
+                                                                        <div id="passport-size-photograph-preview1">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                                                                <h6 class="fw-bold text-center mb-1" style="float:left;">Passport Size Photograph</h6>
+                                                                            </div>
+                                                                            <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                                                                <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                                                                    <a href="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" download class="text-white">
+                                                                                        Download
+                                                                                    </a>
+                                                                                </button>
+                                                                                <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                                                                        data-file-type="PASSPORT"> Delete</button>
+                                                                            </div>
+                                                                        </div>
+                                                                        <iframe src="{{ url('hrm/employee/photo/' . $candidate->candidateDetails->image_path) }}" alt="Passport Size Photograph"></iframe>                                                                           
+                                                                        </div>
+                                                                        @endif
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-                                                                    <span class="col-form-label text-md-end" id="resume-label"></span>
+                                                                    <span class="fw-bold col-form-label text-md-end" id="resume-label"></span>
                                                                     <div id="resume-preview">
+                                                                    @if(isset($candidate->candidateDetails->resume))
+                                                                    <div id="resume-preview1">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                                                                <h6 class="fw-bold text-center mb-1" style="float:left;">Resume</h6>
+                                                                            </div>
+                                                                            <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                                                                <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                                                                    <a href="{{ url('hrm/employee/resume/' . $candidate->candidateDetails->resume) }}" download class="text-white">
+                                                                                        Download
+                                                                                    </a>
+                                                                                </button>
+                                                                                <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                                                                        data-file-type="RESUME"> Delete</button>
+                                                                            </div>
+                                                                        </div>
+                                                                        <iframe src="{{ url('hrm/employee/resume/' . $candidate->candidateDetails->resume) }}" alt="Resume"></iframe>                                                                           
+                                                                        </div>
+                                                                        @endif
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-                                                                    <span class="col-form-label text-md-end" id="visa-label"></span>
+                                                                    <span class="fw-bold col-form-label text-md-end" id="visa-label"></span>
                                                                     <div id="visa-file-preview">
+                                                                    @if(isset($candidate->candidateDetails->visa))
+                                                                    <div id="visa-file-preview1">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                                                                <h6 class="fw-bold text-center mb-1" style="float:left;">Visa</h6>
+                                                                            </div>
+                                                                            <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                                                                <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                                                                    <a href="{{ url('hrm/employee/visa/' . $candidate->candidateDetails->visa) }}" download class="text-white">
+                                                                                        Download
+                                                                                    </a>
+                                                                                </button>
+                                                                                <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                                                                        data-file-type="VISA"> Delete</button>
+                                                                            </div>
+                                                                        </div>
+                                                                        <iframe src="{{ url('hrm/employee/visa/' . $candidate->candidateDetails->visa) }}" alt="Visa"></iframe>                                                                           
+                                                                        </div>
+                                                                        @endif
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-                                                                    <span class="col-form-label text-md-end" id="emirates-id-label"></span>
+                                                                    <span class="fw-bold col-form-label text-md-end" id="emirates-id-label"></span>
                                                                     <div id="emirates-id-file-preview">
+                                                                    @if(isset($candidate->candidateDetails->emirates_id_file))
+                                                                    <div id="emirates-id-file-preview1">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                                                                <h6 class="fw-bold text-center mb-1" style="float:left;">Emirates ID</h6>
+                                                                            </div>
+                                                                            <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                                                                <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                                                                    <a href="{{ url('hrm/employee/emirates_id/' . $candidate->candidateDetails->emirates_id_file) }}" download class="text-white">
+                                                                                        Download
+                                                                                    </a>
+                                                                                </button>
+                                                                                <button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+                                                                                        data-file-type="EMIRATESID"> Delete</button>
+                                                                            </div>
+                                                                        </div>
+                                                                        <iframe src="{{ url('hrm/employee/emirates_id/' . $candidate->candidateDetails->emirates_id_file) }}" alt="Emirates ID"></iframe>                                                                           
+                                                                        </div>
+                                                                        @endif
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                             <div class="row mt-4">
                                                                 <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-                                                                    <span class="col-form-label text-md-end" id="passport-label"></span>
+                                                                    <span class="fw-bold col-form-label text-md-end" id="passport-label">
+                                                                        @if(isset($candidate->candidateDetails->candidatePassport) && $candidate->candidateDetails->candidatePassport->count() > 0) Passport @endif
+                                                                    </span>
+                                                                    @if(isset($candidate->candidateDetails->candidatePassport) && $candidate->candidateDetails->candidatePassport->count() > 0)
+                                                                        @foreach($candidate->candidateDetails->candidatePassport as $document)
+                                                                            <div id="preview-div-{{$document->id}}">
+                                                                                <button  type="button" class="btn btn-sm btn-info mt-3 " style="float:right;">
+                                                                                    <a href="{{url('hrm/employee/passport/' . $document->document_path)}}" download class="text-white">
+                                                                                        Download
+                                                                                    </a>
+                                                                                </button>
+                                                                                <button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button" style="float:right;" data-id="{{ $document->id }}"> 
+                                                                                    Delete
+                                                                                </button>
+                                                                                <iframe src="{{ url('hrm/employee/passport/' . $document->document_path) }}" class="mt-2" alt="Passport"></iframe>                                                                                   
+                                                                            </div>
+                                                                        @endforeach
+                                                                    @endif
                                                                     <div id="passport-file-preview">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-                                                                    <span class="col-form-label text-md-end" id="national-id-label"></span>
+                                                                    <span class="fw-bold col-form-label text-md-end" id="national-id-label">
+                                                                        @if(isset($candidate->candidateDetails->candidateNationalId) && $candidate->candidateDetails->candidateNationalId->count() > 0) National ID @endif
+                                                                    </span>
+                                                                    @if(isset($candidate->candidateDetails->candidateNationalId) && $candidate->candidateDetails->candidateNationalId->count() > 0)
+                                                                        @foreach($candidate->candidateDetails->candidateNationalId as $document)
+                                                                            <div id="preview-div-{{$document->id}}">
+                                                                                <button  type="button" class="btn btn-sm btn-info mt-3 " style="float:right;">
+                                                                                    <a href="{{url('hrm/employee/national_id/' . $document->document_path)}}" download class="text-white">
+                                                                                        Download
+                                                                                    </a>
+                                                                                </button>
+                                                                                <button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button" style="float:right;" data-id="{{ $document->id }}"> 
+                                                                                    Delete
+                                                                                </button>
+                                                                                <iframe src="{{ url('hrm/employee/national_id/' . $document->document_path) }}" class="mt-2" alt="National ID"></iframe>                                                                                   
+                                                                            </div>
+                                                                        @endforeach
+                                                                    @endif
                                                                     <div id="national-id-file-preview">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-                                                                    <span class="col-form-label text-md-end" id="educational-docs-label"></span>
+                                                                    <span class="fw-bold col-form-label text-md-end" id="educational-docs-label">
+                                                                        @if(isset($candidate->candidateDetails->candidateEduDocs) && $candidate->candidateDetails->candidateEduDocs->count() > 0) Attested Educational Documents @endif
+                                                                    </span>
+                                                                    @if(isset($candidate->candidateDetails->candidateEduDocs) && $candidate->candidateDetails->candidateEduDocs->count() > 0)
+                                                                        @foreach($candidate->candidateDetails->candidateEduDocs as $document)
+                                                                            <div id="preview-div-{{$document->id}}">
+                                                                                <button  type="button" class="btn btn-sm btn-info mt-3 " style="float:right;">
+                                                                                    <a href="{{url('hrm/employee/educational_docs/' . $document->document_path)}}" download class="text-white">
+                                                                                        Download
+                                                                                    </a>
+                                                                                </button>
+                                                                                <button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button" style="float:right;" data-id="{{ $document->id }}"> 
+                                                                                    Delete
+                                                                                </button>
+                                                                                <iframe src="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" class="mt-2" alt="Attested Educational Documents"></iframe>                                                                                   
+                                                                            </div>
+                                                                        @endforeach
+                                                                    @endif
                                                                     <div id="educational-docs-preview">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-                                                                    <span class="col-form-label text-md-end" id="professional-diploma-certificates-label"></span>
+                                                                    <span class="fw-bold col-form-label text-md-end" id="professional-diploma-certificates-label">
+                                                                        @if(isset($candidate->candidateDetails->candidateProDipCerti) && $candidate->candidateDetails->candidateProDipCerti->count() > 0) Professional / Diploma Certificates @endif
+                                                                    </span>
+                                                                    @if(isset($candidate->candidateDetails->candidateProDipCerti) && $candidate->candidateDetails->candidateProDipCerti->count() > 0)
+                                                                        @foreach($candidate->candidateDetails->candidateProDipCerti as $document)
+                                                                            <div id="preview-div-{{$document->id}}">
+                                                                                <button  type="button" class="btn btn-sm btn-info mt-3 " style="float:right;">
+                                                                                    <a href="{{url('hrm/employee/professional_diploma_certificates/' . $document->document_path)}}" download class="text-white">
+                                                                                        Download
+                                                                                    </a>
+                                                                                </button>
+                                                                                <button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button" style="float:right;" data-id="{{ $document->id }}"> 
+                                                                                    Delete
+                                                                                </button>
+                                                                                <iframe src="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" class="mt-2" alt="Professional / Diploma Certificates"></iframe>                                                                                   
+                                                                            </div>
+                                                                        @endforeach
+                                                                    @endif
                                                                     <div id="professional-diploma-certificates-preview">
                                                                     </div>
                                                                 </div>
@@ -736,12 +849,19 @@
                                                     </div>
                                                     <div id="signature-pad" class="m-signature-pad">
                                                         <div class="m-signature-pad--body">
-                                                            <canvas class="signature-pad form-control @error('signature') is-invalid @enderror"></canvas>                                               
+                                                            <canvas id="signature_canvas"  class="signature-pad form-control @error('signature') is-invalid @enderror"></canvas>                                               
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             </br>
+                                            <input type="hidden" id="photo-file-delete" name="is_photo_delete" value="">
+                                        <input type="hidden" id="visa-file-delete" name="is_visa_delete" value="">
+                                        <input type="hidden" id="resume-file-delete" name="is_resume_delete" value="">   
+                                        <input type="hidden" id="emirates-id-file-delete" name="is_emirates_id_delete" value=""> 
+                                        <!-- <input type="hidden" id="deleted-files" name="deleted_files" value="">  -->
+                                        <select hidden id="deleted-files" name="deleted_files[]" multiple="true">
+        </select>
                                             <div class="row">
                                                 <div class="col-xxl-6 col-lg-6 col-md-6" style="float:left;">
                                                     <a id="resetSignature" class="btn btn-sm" style="background-color: lightblue; float:left;">Reset Signature</a>
@@ -751,7 +871,8 @@
                                                 <button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
                                             </div>
                                             </div>
-                                        </form>	                                      
+                                        </form>	 
+                                                                           
                                     </div>
                                     <div class="overlay"></div>
                                 </div>
@@ -773,6 +894,10 @@
         <script type="text/javascript">
             var candidate = {!! json_encode($candidate) !!};
             var indexVal = 1;
+            var oldNationalIdArr = [];
+            var oldPassportArr = [];
+            var oldProDipCertiArr = [];
+            var oldEduDocsArr = [];
 
             let canvas = document.querySelector('.signature-pad');
             let signatureSaveButton = document.getElementById('saveSignature');
@@ -792,6 +917,7 @@
                 let signatureBlank = signaturePad.isEmpty();
                 if (!signatureBlank) {
                     signatureUrl = signaturePad.toDataURL();
+                    // console.log(signatureUrl);
                     signatureInput.value = signatureUrl;
                     $("div.error-messages span").html(''); // Clear messages
                 }
@@ -823,16 +949,14 @@
                     previewFilePhotograph.removeChild(previewFilePhotograph.firstChild);
                 }
                 const file = files[0];
-                if (file.type.match("application/pdf"))
-                {
+                if (file.type.match("application/pdf")) {
                     document.getElementById('passport-size-photograph-label').textContent="Passport Size Photograph";
                     const objectUrl = URL.createObjectURL(file);
                     const iframe = document.createElement("iframe");
                     iframe.src = objectUrl;
                     previewFilePhotograph.appendChild(iframe);
                 }
-                else if (file.type.match("image/*"))
-                {
+                else if (file.type.match("image/*")) {
                     document.getElementById('passport-size-photograph-label').textContent="Passport Size Photograph";
                     const objectUrl = URL.createObjectURL(file);
                     const image = new Image();
@@ -988,80 +1112,107 @@
                     }
                 }
             });
-            $(document).ready(function() { console.log(candidate);
+            $(document).ready(function() {                
                 if(candidate.candidate_details != null) {
-                $("#first_name").val(candidate.candidate_details.first_name);
-                $("#last_name").val(candidate.candidate_details.last_name);
-                $("#name_of_father").val(candidate.candidate_details.name_of_father);
-                $("#name_of_mother").val(candidate.candidate_details.name_of_mother);
-                $("#marital_status").val(candidate.candidate_details.marital_status);
-                $("#passport_number").val(candidate.candidate_details.passport_number);
-                $("#passport_expiry_date").val(candidate.candidate_details.passport_expiry_date);
-                $("#educational_qualification").val(candidate.candidate_details.educational_qualification);
-                $("#religion").val(candidate.candidate_details.religion);
-                $("#dob").val(candidate.candidate_details.dob);
-                $("#address_uae").val(candidate.candidate_details.address_uae);
-                $("#residence_telephone_number").val(candidate.candidate_details.residence_telephone_number);
-                $("#contact_number").val(candidate.candidate_details.contact_number);
-                $("#personal_email_address").val(candidate.candidate_details.personal_email_address);
-                $("#spouse_name").val(candidate.candidate_details.spouse_name);
-                $("#spouse_passport_number").val(candidate.candidate_details.spouse_passport_number);
-                $("#spouse_passport_expiry_date").val(candidate.candidate_details.spouse_passport_expiry_date);
-                $("#spouse_dob").val(candidate.candidate_details.spouse_dob);
-                $("#spouse_nationality").val(candidate.candidate_details.spouse_nationality);
-                if(candidate.candidate_details.candidate_children.length > 0) {
-                    for(var i=1; i<=candidate.candidate_details.candidate_children.length; i++) {
+                    $("#first_name").val(candidate.candidate_details.first_name);
+                    $("#last_name").val(candidate.candidate_details.last_name);
+                    $("#name_of_father").val(candidate.candidate_details.name_of_father);
+                    $("#name_of_mother").val(candidate.candidate_details.name_of_mother);
+                    $("#marital_status").val(candidate.candidate_details.marital_status);
+                    $("#passport_number").val(candidate.candidate_details.passport_number);
+                    $("#passport_expiry_date").val(candidate.candidate_details.passport_expiry_date);
+                    $("#educational_qualification").val(candidate.candidate_details.educational_qualification);
+                    $("#religion").val(candidate.candidate_details.religion);
+                    $("#dob").val(candidate.candidate_details.dob);
+                    $("#address_uae").val(candidate.candidate_details.address_uae);
+                    $("#residence_telephone_number").val(candidate.candidate_details.residence_telephone_number);
+                    $("#contact_number").val(candidate.candidate_details.contact_number);
+                    $("#personal_email_address").val(candidate.candidate_details.personal_email_address);
+                    $("#spouse_name").val(candidate.candidate_details.spouse_name);
+                    $("#spouse_passport_number").val(candidate.candidate_details.spouse_passport_number);
+                    $("#spouse_passport_expiry_date").val(candidate.candidate_details.spouse_passport_expiry_date);
+                    $("#spouse_dob").val(candidate.candidate_details.spouse_dob);
+                    $("#spouse_nationality").val(candidate.candidate_details.spouse_nationality);
+                    $("#signature").val(candidate.pif_sign);
+                    if(candidate.candidate_details.candidate_national_id.length > 0) {
+                        for(var i=0; i<candidate.candidate_details.candidate_national_id.length; i++) {
+                            oldNationalIdArr.push(candidate.candidate_details.candidate_national_id[i].id);
+                        }
+                    }
+                    if(candidate.candidate_details.candidate_passport.length > 0) {
+                        for(var i=0; i<candidate.candidate_details.candidate_passport.length; i++) {
+                            oldPassportArr.push(candidate.candidate_details.candidate_passport[i].id);
+                        }
+                    }
+                    if(candidate.candidate_details.candidate_pro_dip_certi.length > 0) {
+                        for(var i=0; i<candidate.candidate_details.candidate_pro_dip_certi.length; i++) {
+                            oldProDipCertiArr.push(candidate.candidate_details.candidate_pro_dip_certi[i].id);
+                        }
+                    }
+                    if(candidate.candidate_details.candidate_edu_docs.length > 0) {
+                        for(var i=0; i<candidate.candidate_details.candidate_edu_docs.length; i++) {
+                            oldEduDocsArr.push(candidate.candidate_details.candidate_edu_docs[i].id);
+                        }
+                    }
+                    if(candidate.candidate_details.candidate_children.length > 0) {
+                        for(var i=1; i<=candidate.candidate_details.candidate_children.length; i++) {
+                            addChild();
+                            $("#child_name_"+i).val(candidate.candidate_details.candidate_children[i-1].child_name);
+                            $("#child_passport_number_"+i).val(candidate.candidate_details.candidate_children[i-1].child_passport_number);
+                            $("#child_passport_expiry_date_"+i).val(candidate.candidate_details.candidate_children[i-1].child_passport_expiry_date);
+                            $("#child_dob_"+i).val(candidate.candidate_details.candidate_children[i-1].child_dob);
+                            $("#child_nationality_"+i).val(candidate.candidate_details.candidate_children[i-1].child_nationality);
+                        }
+                    }
+                    else {
                         addChild();
-                        $("#child_name_"+i).val(candidate.candidate_details.candidate_children[i-1].child_name);
-                        $("#child_passport_number_"+i).val(candidate.candidate_details.candidate_children[i-1].child_passport_number);
-                        $("#child_passport_expiry_date_"+i).val(candidate.candidate_details.candidate_children[i-1].child_passport_expiry_date);
-                        $("#child_dob_"+i).val(candidate.candidate_details.candidate_children[i-1].child_dob);
-                        $("#child_nationality_"+i).val(candidate.candidate_details.candidate_children[i-1].child_nationality);
+                    }
+                    if(candidate.candidate_details.emergency_contact_u_a_e.length > 0) {
+                        for(var i=1; i<=candidate.candidate_details.emergency_contact_u_a_e.length; i++) {
+                            if(i !=1) {
+                                addContactUAE();
+                            }
+                            $("#ecu_name_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].name);
+                            $("#ecu_relation_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].relation);
+                            $("#ecu_contact_number_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].contact_number);
+                            $("#ecu_alternative_number_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].alternative_contact_number);
+                            $("#ecu_email_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].email_address);
+                        }
+                    }
+                    if(candidate.candidate_details.emergency_contact_home_country.length > 0) {
+                        for(var i=1; i<=candidate.candidate_details.emergency_contact_home_country.length; i++) {
+                            if(i !=1) {
+                                addContactHome();
+                            }
+                            $("#ech_name_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].name);
+                            $("#ech_relation_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].relation);
+                            $("#ech_contact_number_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].contact_number);
+                            $("#ech_alternative_contact_number_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].alternative_contact_number);
+                            $("#ech_email_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].email_address);
+                            $("#ech_home_country_address_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].home_country_address);
+                        }
+                    }
+                    if(candidate.candidate_details.image_path != '' || candidate.candidate_details.resume != '' || candidate.candidate_details.visa ||
+                    candidate.candidate_details.emirates_id_file || candidate.candidate_details.candidate_passport.length > 0 ||
+                    candidate.candidate_details.candidate_national_id.length > 0 || candidate.candidate_details.candidate_pro_dip_certi.length > 0 ||
+                    candidate.candidate_details.candidate_edu_docs.length > 0) {
+                        $('.preview-div').attr('hidden', false);
+                    }
+                    if(candidate.pif_sign != '') {
+                        window.addEventListener("load", draw);
+                        function draw() {
+                            var ctx = document.querySelector('#signature_canvas').getContext('2d');
+                            var img1 = new Image();
+                            img1.onload = function() {
+                                ctx.drawImage(img1, 40, 10);
+                            }
+                            img1.src = candidate.pif_sign; 
+                        }
                     }
                 }
                 else {
                     addChild();
                 }
-                if(candidate.candidate_details.emergency_contact_u_a_e.length > 0) {
-                    for(var i=1; i<=candidate.candidate_details.emergency_contact_u_a_e.length; i++) {
-                        if(i !=1) {
-                            addContactUAE();
-                        }
-                        $("#ecu_name_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].name);
-                        $("#ecu_relation_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].relation);
-                        $("#ecu_contact_number_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].contact_number);
-                        $("#ecu_alternative_contact_number_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].alternative_contact_number);
-                        $("#ecu_email_"+i).val(candidate.candidate_details.emergency_contact_u_a_e[i-1].email_address);
-                    }
-                }
-                if(candidate.candidate_details.emergency_contact_home_country.length > 0) {
-                    for(var i=1; i<=candidate.candidate_details.emergency_contact_home_country.length; i++) {
-                        if(i !=1) {
-                            addContactHome();
-                        }
-                        $("#ech_name_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].name);
-                        $("#ech_relation_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].relation);
-                        $("#ech_contact_number_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].contact_number);
-                        $("#ech_alternative_contact_number_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].alternative_contact_number);
-                        $("#ech_email_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].email_address);
-                        $("#ech_home_country_address_"+i).val(candidate.candidate_details.emergency_contact_home_country[i-1].home_country_address);
-                    }
-                }
-                if(candidate.candidate_details.image_path != '' || candidate.candidate_details.resume != '' || candidate.candidate_details.visa ||
-                candidate.candidate_details.emirates_id_file || candidate.candidate_details.candidate_passport.length > 0 ||
-                candidate.candidate_details.candidate_national_id.length > 0 || candidate.candidate_details.candidate_pro_dip_certi.length > 0 ||
-                candidate.candidate_details.candidate_edu_docs.length > 0) {
-                    $('.preview-div').attr('hidden', false);
-                }
-                
-                // $("#passport-size-photograph").val(candidate.candidate_details.image_path);
-                // $("#resume").val(candidate.candidate_details.resume);
-                // $("#visa").val(candidate.candidate_details.visa);
-                // $("#emirates_id_file").val(candidate.candidate_details.emirates_id_file);
-                }
-
-               
-
                 // main layout
                 alertify.set('notifier','position', 'top-right','delay', 40);
                 $('.close').on('click', function() {
@@ -1112,19 +1263,25 @@
                 today = yyyy+'-'+mm+'-'+dd;
                 dobMax = dobMaxyyyy+'-'+mm+'-'+dd;
                 dobMin = dobMinyyyy+'-'+mm+'-'+dd;
-                document.getElementById("passport_expiry_date").min = today;
+                if(candidate.candidate_details != null) {
+                    if(candidate.candidate_details.passport_expiry_date == '') {
+                        document.getElementById("passport_expiry_date").min = today;
+                    }
+                }         
                 document.getElementById("dob").max = dobMax;
                 document.getElementById("dob").min = dobMin;
                 document.getElementById("spouse_dob").max = dobMax;
-                document.getElementById("spouse_dob").min = dobMin;               
-                if(candidate.candidate_details.year_of_completion != '') {
-                    var yearOfCompletion = candidate.candidate_details.year_of_completion;
-                    $("#year_of_completion").yearpicker({
-                        year: yearOfCompletion,
-                        startYear: 1950,
-                        endYear: yyyy,
-                    }); 
-                }
+                document.getElementById("spouse_dob").min = dobMin;  
+                if(candidate.candidate_details != null) {          
+                    if(candidate.candidate_details.year_of_completion != '') {
+                        var yearOfCompletion = candidate.candidate_details.year_of_completion;
+                        $("#year_of_completion").yearpicker({
+                            year: yearOfCompletion,
+                            startYear: 1950,
+                            endYear: yyyy,
+                        }); 
+                    }
+                } 
                 else {
                     $("#year_of_completion").yearpicker({
                         startYear: 1950,
@@ -1690,20 +1847,17 @@
                     }
                 }
             });
-
             jQuery.validator.addMethod("lettersonly", function(value, element) {
                 return this.optional(element) || /^[a-z ]+$/i.test(value);
             }, "Letters and spaces only allowed");
 
             jQuery.validator.addMethod("validPassport", function(value, element) {
                 return this.optional(element) || /^[A-PR-WYa-pr-wy][1-9]\d\s?\d{4}[1-9]$/i.test(value);
-            }, "Passport number is not valid");
-            
+            }, "Passport number is not valid");           
             $.validator.addMethod('signaturePresent', function(value, element) {
                 console.log('Checking...');
                 return this.optional(element) || signaturePad.isEmpty();
             }, "Please provide your signature...");
-
 	        $('#candidatepersonalInfoForm').validate({ 
                 rules: {
                     first_name: {
@@ -1845,59 +1999,153 @@
                         },
                     },
                     passport_size_photograph: { 
-                        required: true,
+                        required: function(element){
+                            if(candidate == null && candidate.candidate_details == null && candidate.candidate_details.image_path == null && $("#passport-size-photograph").val().length > 0) {
+                                return false;
+                            }
+                            else if(candidate != null && candidate.candidate_details != null && candidate.candidate_details.image_path != null && $("#photo-file-delete").val().length == 0) {
+                                return false;
+                            }    
+                            else if(candidate != null && candidate.candidate_details != null && candidate.candidate_details.image_path != null && $("#photo-file-delete").val().length > 0) {
+                                return true;
+                            }                         
+                            else {
+                                return true;
+                            }
+                        },
                         extension: "jpg|jpeg",
                     },
                     resume: { 
-                        required: true,
+                        required: function(element){
+                            if(candidate == null && candidate.candidate_details == null && candidate.candidate_details.resume == null && $("#resume").val().length > 0) {
+                                return false;
+                            }
+                            else if(candidate != null && candidate.candidate_details != null && candidate.candidate_details.resume != null && $("#resume-file-delete").val().length == 0) {
+                                return false;
+                            }    
+                            else if(candidate != null && candidate.candidate_details != null && candidate.candidate_details.resume != null && $("#resume-file-delete").val().length > 0) {
+                                return true;
+                            }                         
+                            else {
+                                return true;
+                            }
+                        },
                         extension: "docx|rtf|doc|pdf",
                     },
                     visa: { 
-                        required: true,
+                        required: function(element) {
+                            if(candidate == null && candidate.candidate_details == null && candidate.candidate_details.visa == null && $("#visa-file").val().length > 0) {
+                                return false;
+                            }
+                            else if(candidate != null && candidate.candidate_details != null && candidate.candidate_details.visa != null && $("#visa-file-delete").val().length == 0) {
+                                return false;
+                            }    
+                            else if(candidate != null && candidate.candidate_details != null && candidate.candidate_details.visa != null && $("#visa-file-delete").val().length > 0) {
+                                return true;
+                            }                         
+                            else {
+                                return true;
+                            }
+                        },
                         extension: "docx|rtf|doc|pdf|jpg|jpeg",
                     },
                     emirates_id: { 
                         extension: "docx|rtf|doc|pdf|jpg|jpeg",
                     },
                     "passport[]": {
-                        required: true,
+                        required: function(element) {
+                            if(candidate != null  && candidate.candidate_details != null && candidate.candidate_details.candidate_passport != null && oldPassportArr.length > 0) {
+                                return false;
+                            }
+                            else if($("#passport-file").val().length > 0) {
+                                return false;
+                            }              
+                            else {
+                                return true;
+                            }
+                        },
                         extension: "docx|rtf|doc|pdf|jpg|jpeg",
                     },
                     "national_id[]": {
-                        required: true,
+                        required: function(element) {
+                            if(candidate != null  && candidate.candidate_details != null && candidate.candidate_details.candidate_national_id != null && oldNationalIdArr.length > 0) {
+                                return false;
+                            }
+                            else if($("#national-id-file").val().length > 0) {
+                                return false;
+                            }              
+                            else {
+                                return true;
+                            }
+                        },
                         extension: "docx|rtf|doc|pdf|jpg|jpeg",
                     },
                     "educational_docs[]": {
-                        required: true,
+                        required: function(element) {
+                            if(candidate != null  && candidate.candidate_details != null && candidate.candidate_details.candidate_edu_docs != null && oldEduDocsArr.length > 0) {
+                                return false;
+                            }
+                            else if($("#educational-docs").val().length > 0) {
+                                return false;
+                            }              
+                            else {
+                                return true;
+                            }
+                        },
                         extension: "docx|rtf|doc|pdf|jpg|jpeg",
                     },
                     "professional_diploma_certificates[]": {
-                        required: true,
+                        required: function(element) {
+                            if(candidate != null  && candidate.candidate_details != null && candidate.candidate_details.candidate_pro_dip_certi != null && oldProDipCertiArr.length > 0) {
+                                return false;
+                            }
+                            else if($("#professional-diploma-certificates").val().length > 0) {
+                                return false;
+                            }              
+                            else {
+                                return true;
+                            }
+                        },
                         extension: "docx|rtf|doc|pdf|jpg|jpeg",
                     },
                     signature: {
                         required: true,
                     }
                 },
-                // submitHandler: function(form) {
-                //     $("div.error-messages span").html(''); // Clear messages
-                //     console.log('Submitting form...');
-                //     form.submit(); <-- UNCOMMENT TO ACTUALLY SUBMIT
-                // },
-                // invalidHandler: function(event, validator) {
-                //     console.log('INVALID!');
-                //     // 'this' refers to the form
-                //     var errors = validator.numberOfInvalids();
-                //     if (errors) {
-                //     var message = errors == 1
-                //         ? 'You missed 1 field. It has been highlighted'
-                //         : 'You missed ' + errors + ' fields. They have been highlighted';
-                //     $("div.error-messages span").html(message);
-                //     $("div.error").show();
-                //     } else {
-                //     $("div.error").hide();
-                //     }
-                // }
+            });
+            var deletedDocuments = new Array();
+            $('.document-delete-button').on('click',function(){
+                let id = $(this).attr('data-id');
+                if (confirm('Are you sure you want to Delete this item ?')) {
+                    $('#preview-div-'+id).remove();
+                    deletedDocuments.push(Number(id));
+                    $("#deleted-files").append('<option value='+Number(id)+' selected>yyyyyyyyy</option>');
+                    oldProDipCertiArr = oldProDipCertiArr.filter(x => !deletedDocuments.includes(x));
+                    oldPassportArr = oldPassportArr.filter(x => !deletedDocuments.includes(x));
+                    oldEduDocsArr = oldEduDocsArr.filter(x => !deletedDocuments.includes(x));
+                    oldNationalIdArr = oldNationalIdArr.filter(x => !deletedDocuments.includes(x));
+                }
+            });
+            $('.delete-button').on('click',function(){
+                var fileType = $(this).attr('data-file-type');
+                if (confirm('Are you sure you want to Delete this item ?')) {
+                    if(fileType == 'PASSPORT') {
+                        $('#passport-size-photograph-preview1').remove();
+                        $('#photo-file-delete').val(1);
+
+                    }else if(fileType == 'RESUME') {
+                        $('#resume-preview1').remove();
+                        $('#resume-file-delete').val(1);
+
+                    }else if(fileType == 'VISA') {
+                        $('#visa-file-preview1').remove();
+                        $('#visa-file-delete').val(1);
+                    }
+                    else if(fileType == 'EMIRATESID') {
+                        $('#emirates-id-file-preview1').remove();
+                        $('#emirates-id-file-delete').val(1);
+                    }
+                }
             });
         </script>
     </body>
