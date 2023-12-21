@@ -7,9 +7,9 @@
         }
     }
 </style>
-@canany(['view-interview-summary-report-listing'])
+@canany(['view-interview-summary-report-details'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
 @endphp
 @if ($hasPermission)
 <div class="card-body">
@@ -19,12 +19,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 <a class="nav-link active" data-bs-toggle="pill" href="#interview-summary"> Interview Summary Report</a>
             </li>
             @if(isset($data->candidateDetails))
+            @canany(['view-interview-summary-report-details'])
+            @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
+            @endphp
+            @if ($hasPermission)
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="pill" href="#personal-info"> Personal Information</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="pill" href="#documents"> Documents</a>
             </li>
+            @endcanany
+            @endif
             @endif
         </ul>
     </div>
@@ -463,6 +470,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
             </div>
         </div>
         @if(isset($data->candidateDetails))
+        @canany(['view-interview-summary-report-details'])
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
+        @endphp 
+        @if ($hasPermission)    
         <div class="tab-pane fade show" id="personal-info">
             <div class="row">
                 <div class="col-xxl-6 col-lg-6 col-md-12">
@@ -616,7 +628,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         <label for="choices-single-default" class="form-label"> Child Passport Expiry Date  :</label>
                                     </div>
                                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                        <span>{{\Carbon\Carbon::parse($children->child_passport_expiry_date)->format('d M Y') ?? ''}}</span>
+                                        <span> @if($children->child_passport_expiry_date != '') {{\Carbon\Carbon::parse($children->child_passport_expiry_date)->format('d M Y') }} @endif</span>
                                     </div>
                                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                         <label for="choices-single-default" class="form-label"> Child Date Of Birth  :</label>
@@ -925,6 +937,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 </div>
             </div>
         </div>
+        @endcanany
+        @endif
         @endif
     </div>    
 </div>
