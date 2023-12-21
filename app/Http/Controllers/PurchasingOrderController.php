@@ -11,6 +11,8 @@ use App\Models\PurchasingOrderItems;
 use App\Models\SupplierInventory;
 use Illuminate\Http\Request;
 use App\Models\Varaint;
+use App\Models\Brand;
+use App\Models\MasterModelLines;
 use App\Models\Supplier;
 use App\Models\Vehicles;
 use App\Models\Movement;
@@ -208,10 +210,17 @@ class PurchasingOrderController extends Controller
         ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
         ->get();
-
     return view('warehouse.create', compact('variants', 'vendors'));
 }
-
+public function getBrandsAndModelLines(Request $request)
+{
+    $brands = Brand::all(); // Replace with your actual query to get brands
+    $modelLines = MasterModelLines::all(); // Replace with your actual query to get model lines
+    return response()->json([
+        'brands' => $brands,
+        'modelLines' => $modelLines,
+    ]);
+}
     /**
      * Store a newly created resource in storage.
      */

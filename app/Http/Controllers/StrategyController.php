@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StrategiesDates;
 use App\Models\LeadSource;
+use App\Models\CallsPriority;
 use App\Http\Requests\StoreStrategyRequest;
 use App\Http\Requests\UpdateStrategyRequest;
 use Carbon\Carbon;
@@ -160,4 +161,19 @@ public function updaters(Request $request, $id)
         Strategy::findOrFail($id)->delete();
         return response()->json(['message' => 'Strategy deleted successfully']);
     }
+    // In your controller
+public function updatePriority(Request $request)
+{
+    $leadSourceId = $request->input('lead_source_id');
+    $priority = $request->input('priority');
+    $leadSource = LeadSource::find($leadSourceId);
+    $leadSource->priority = $priority;
+    $leadSource->save();
+    $callpriority = New CallsPriority();
+    $callpriority->priority = $priority;
+    $callpriority->lead_source_id = $leadSourceId;
+    $callpriority->set_by_id = Auth::id();
+    $callpriority->save();
+    return response()->json(['message' => 'Priority updated successfully']);
+}
 }

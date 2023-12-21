@@ -15,6 +15,7 @@ use App\Models\Brand;
 use App\Models\Country;
 use App\Models\Language;
 use App\Models\LeadSource;
+use App\Models\Strategy;
 use App\Models\MasterModelLines;
 use App\Models\Logs;
 use App\Models\CallsRequirement;
@@ -35,15 +36,65 @@ class CallsController extends Controller
      */
     public function index()
     {
-        $data = Calls::where('status', 'New')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->orderBy('created_at', 'desc')->get();    
-        $convertedleads = Calls::where('status', 'Prospecting')->orwhere('status', 'New Demand')->orwhere('status', 'Quoted')->orwhere('status', 'Negotiation')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
-        $convertedso = Calls::where('status','Closed')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
-        $convertedrejection = Calls::where('status','Rejected')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
+        $datahot = Calls::where('calls.status', 'New')
+        ->join('lead_source', 'calls.source', '=', 'lead_source.id')
+        ->where('lead_source.priority', 'High')
+        ->orderBy('calls.created_at', 'desc')
+        ->select('calls.*', 'lead_source.priority as lead_source_priority')
+        ->get();
+        $countdatahot = $datahot->count();
+        $datanormal = Calls::where('calls.status', 'New')
+        ->join('lead_source', 'calls.source', '=', 'lead_source.id')
+        ->where('lead_source.priority', 'Normal')
+        ->orderBy('calls.created_at', 'desc')
+        ->select('calls.*', 'lead_source.priority as lead_source_priority')
+        ->get();
+        $countdatanormal = $datanormal->count();
+        $datalow = Calls::where('calls.status', 'New')
+    ->join('lead_source', 'calls.source', '=', 'lead_source.id')
+    ->where(function ($query) {
+        $query->where('lead_source.priority', 'Low')
+              ->orWhereNull('lead_source.priority');
+    })
+    ->orderBy('calls.created_at', 'desc')
+    ->select('calls.*', 'lead_source.priority as lead_source_priority')
+    ->get();
+        $countdatalow = $datalow->count();
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Call & Lead Pending Info";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        return view('calls.index',compact('datahot', 'datanormal', 'datalow', 'countdatalow', 'countdatanormal', 'countdatahot'));
+    }
+    public function inprocess()
+    {
+        $data = Calls::where('status', 'Prospecting')->orwhere('status', 'New Demand')->orwhere('status', 'Quoted')->orwhere('status', 'Negotiation')->get();     
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Call & Lead Inprocess Info";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        return view('calls.inprocess',compact('data'));
+    }
+    public function converted()
+    {
+        $data = Calls::where('status','Closed')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get();    
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open Call & Lead Info";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return view('calls.index',compact('data','convertedleads', 'convertedso','convertedrejection'));
+        return view('calls.converted',compact('data'));
+    }
+    public function rejected()
+    {
+        $data = Calls::where('status','Rejected')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Call & Lead Info";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        return view('calls.rejected',compact('data'));
+    }
+    public function datacenter()
+    {
     }
     /**
      * Show the form for creating a new resource.
@@ -468,6 +519,7 @@ return view('calls.resultbrand', compact('data'));
 			$model_line_name = $row[8];
             $custom_brand_model = $row[9];
             $remarks = $row[10];
+            $strategies = $row[11];
             $errorDescription = '';
             if ($sales_person == null) {
                 $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
@@ -636,6 +688,17 @@ return view('calls.resultbrand', compact('data'));
 			else {
                 $lead_source_id = 1;
             }
+            if ($strategies !== null) {
+                $strategiesid = Strategy::where('name', $strategies)->first();
+                if ($strategiesid) {
+                    $strategies_id = $strategiesid->id;
+                } else {
+                    $strategies_id = 1;
+                }
+            } 
+			else {
+                $strategies_id = 1;
+            }
             if ($language !== null) {
                 $language = Language::where('name', $language)->first();
                 if ($language) {
@@ -658,7 +721,7 @@ return view('calls.resultbrand', compact('data'));
 			else {
                 $location = 'Not Supported';
             }
-            if($lead_source_id === 1 || $salesPerson === 'not correct' || $language === 'Not Supported' || $location === 'Not Supported')
+            if($lead_source_id === 1 || $salesPerson === 'not correct' || $language === 'Not Supported' || $location === 'Not Supported' || $strategies_id === 1)
             {
                 $filteredRows[] = $row;
                 if ($salesPerson === 'not correct') {
@@ -666,6 +729,9 @@ return view('calls.resultbrand', compact('data'));
                 }
                 if ($lead_source_id === 1) {
                     $errorDescription .= 'Invalid Source ';
+                }
+                if ($strategies_id === 1) {
+                    $errorDescription .= 'Invalid Strategies ';
                 }
                 if ($language === 'Not Supported') {
                     $errorDescription .= 'Invalid Language ';
@@ -690,6 +756,7 @@ return view('calls.resultbrand', compact('data'));
                 $call->custom_brand_model = $row[9];
                 $call->remarks = $row[10];
                 $call->source = $lead_source_id;
+                $call->strategies_id = $strategies_id;
                 $call->language = $row[6];
                 $call->sales_person = $sales_person_id;
                 $call->created_at = $formattedDate;

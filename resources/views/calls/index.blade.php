@@ -68,7 +68,16 @@
       background-color: #e9ecef;
       border-color: #bbb;
     }
-    
+    .badge-notification {
+    position: absolute;
+    top: -5;
+    right: 15;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 0.3rem 0.6rem;
+    transform: translate(50%, -50%);
+}
   </style>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
@@ -97,19 +106,20 @@
     @endif
     @can('Calls-view')
     <ul class="nav nav-pills nav-fill">
-      <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Calls & Messages to Leads</a>
+      <li class="nav-item" style="position: relative;">
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Hot Leads
+          <span class="badge badge-danger badge-notification">{{$countdatahot}}</span></a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Calls & Messages to Leads Converted</a>
+      <li class="nav-item" style="position: relative;">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Normal Leads
+        <span class="badge badge-danger badge-notification">{{$countdatanormal}}</span>
+        </a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Rejection Inquiry</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Leads Convert to Sales</a>
-      </li>
-      
+      <li class="nav-item" style="position: relative;">
+    <a class="nav-link" data-bs-toggle="pill" href="#tab3">Low Leads
+        <span class="badge badge-danger badge-notification">{{$countdatalow}}</span>
+    </a>
+</li>
     </ul>      
   </div>
   <div class="tab-content">
@@ -143,10 +153,10 @@
               </thead>
               <tbody>
               <div hidden>{{$i=0;}}</div>
-                @foreach ($data as $key => $calls)
+                @foreach ($datahot as $key => $calls)
                   <tr data-id="1">
                   <td>{{ ++$i }}</td>
-                    <td class="nowrap-td">{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
+                  <td class="nowrap-td">{{ \Carbon\Carbon::parse($calls->created_at)->format('d-M-Y') }}</td>
                     <td class="nowrap-td">{{ $calls->type }}</td>
                     <td class="nowrap-td">{{ $calls->name }}</td>     
                     <td class="nowrap-td">{{ $calls->phone }}</td> 
@@ -217,15 +227,15 @@
       <br>
       <div class="row">
       <div class="col-lg-1">
-      <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+      <button class="btn btn-success" id="export-normal" style="margin: 10px;">Export CSV</button>
       </div>
       </div>
         <div class="card-body">
           <div class="table-responsive">
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered">
             <thead class="bg-soft-secondary">
-                <tr>
-                <th>Ser No</th>
+            <tr>
+                  <th>Ser No</th>
                   <th>Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
@@ -238,25 +248,25 @@
                   <th>Preferred Language</th>
                   <th>Destination</th>
                   <th>Remarks & Messages</th>
-                  <th>Sales Person Remarks</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
               <div hidden>{{$i=0;}}</div>
-                @foreach ($convertedleads as $key => $calls)
-                <tr data-id="1">
+              @foreach ($datanormal as $key => $calls)
+                  <tr data-id="1">
                   <td>{{ ++$i }}</td>
-                    <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
-                    <td>{{ $calls->type }}</td>
-                    <td>{{ $calls->name }}</td>     
-                    <td>{{ $calls->phone }}</td> 
-                    <td>{{ $calls->email }}</td>
+                    <td class="nowrap-td">{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
+                    <td class="nowrap-td">{{ $calls->type }}</td>
+                    <td class="nowrap-td">{{ $calls->name }}</td>     
+                    <td class="nowrap-td">{{ $calls->phone }}</td> 
+                    <td class="nowrap-td">{{ $calls->email }}</td>
                      @php
                      $sales_persons_name = "";
                      $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
                      $sales_persons_name = $sales_persons->name;
                      @endphp  
-                    <td>{{ $sales_persons_name }}</td>
+                    <td class="nowrap-td">{{ $sales_persons_name }}</td>
                     @php
     $leads_models_brands = DB::table('calls_requirement')
         ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
@@ -265,32 +275,45 @@
         ->where('calls_requirement.lead_id', $calls->id)
         ->get();
 @endphp
-
-<td>
-    @php
+@php
         $models_brands_string = '';
         foreach ($leads_models_brands as $lead_model_brand) {
             $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
         }
         // Remove the trailing comma and space from the string
         $models_brands_string = rtrim($models_brands_string, ', ');
-        echo $models_brands_string;
+        
     @endphp
+<td class="nowrap-td">
+{{ ucwords(strtolower($models_brands_string))}}
 </td>
-                    <td>{{ $calls->custom_brand_model }}</td>
+                    <td class="nowrap-td">{{ $calls->custom_brand_model }}</td>
                     @php
+                    $leadsources = "";
                      $leadsource = DB::table('lead_source')->where('id', $calls->source)->first();
                      $leadsources = $leadsource->source_name;
                      @endphp
-                    <td>{{ $leadsources }}</td>
-                    <td>{{ $calls->language }}</td>
-                    <td>{{ $calls->location }}</td>
+                    <td class="nowrap-td">{{ $leadsources }}</td>
+                    <td class="nowrap-td">{{ ucwords(strtolower($calls->language))}}</td>
+                    <td class="nowrap-td">{{ ucwords(strtolower($calls->location))}}</td>
                     @php
     $text = $calls->remarks;
     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
     @endphp
-    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>      
-    <td>{{ $calls->sales_person_remarks }}</td>   
+    <td class="nowrap-td">{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>   
+    <td class="nowrap-td">
+    <div class="dropdown">
+    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+      <i class="fa fa-bars" aria-hidden="true"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+      <li><a class="dropdown-item" href="{{ route('calls.edit',$calls->id) }}">Edit</a></li>
+      <li>
+  <a class="dropdown-item delete-link" href="#" data-url="{{ route('calls.destroy', $calls->id) }}">Delete</a>
+</li>
+    </ul>
+  </div>
+    </td>
                   </tr>
                 @endforeach
               </tbody>
@@ -304,15 +327,15 @@
       <br>
       <div class="row">
       <div class="col-lg-1">
-      <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+      <button class="btn btn-success" id="export-low" style="margin: 10px;">Export CSV</button>
       </div>
       </div>
         <div class="card-body">
           <div class="table-responsive">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered">
             <thead class="bg-soft-secondary">
-                <tr>
-                <th>Ser No</th>
+            <tr>
+                  <th>Ser No</th>
                   <th>Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
@@ -325,26 +348,25 @@
                   <th>Preferred Language</th>
                   <th>Destination</th>
                   <th>Remarks & Messages</th>
-                  <th>Sales Person Remarks</th>
-                  <th>Customer Remarks</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
               <div hidden>{{$i=0;}}</div>
-                @foreach ($convertedrejection as $key => $calls)
-                <tr data-id="1">
+              @foreach ($datalow as $key => $calls)
+                  <tr data-id="1">
                   <td>{{ ++$i }}</td>
-                    <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
-                    <td>{{ $calls->type }}</td>
-                    <td>{{ $calls->name }}</td>     
-                    <td>{{ $calls->phone }}</td> 
-                    <td>{{ $calls->email }}</td>
+                    <td class="nowrap-td">{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
+                    <td class="nowrap-td">{{ $calls->type }}</td>
+                    <td class="nowrap-td">{{ $calls->name }}</td>     
+                    <td class="nowrap-td">{{ $calls->phone }}</td> 
+                    <td class="nowrap-td">{{ $calls->email }}</td>
                      @php
                      $sales_persons_name = "";
                      $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
                      $sales_persons_name = $sales_persons->name;
                      @endphp  
-                    <td>{{ $sales_persons_name }}</td>
+                    <td class="nowrap-td">{{ $sales_persons_name }}</td>
                     @php
     $leads_models_brands = DB::table('calls_requirement')
         ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
@@ -353,118 +375,45 @@
         ->where('calls_requirement.lead_id', $calls->id)
         ->get();
 @endphp
-
-<td>
-    @php
+@php
         $models_brands_string = '';
         foreach ($leads_models_brands as $lead_model_brand) {
             $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
         }
         // Remove the trailing comma and space from the string
         $models_brands_string = rtrim($models_brands_string, ', ');
-        echo $models_brands_string;
+        
     @endphp
+<td class="nowrap-td">
+{{ ucwords(strtolower($models_brands_string))}}
 </td>
-                    <td>{{ $calls->custom_brand_model }}</td>
+                    <td class="nowrap-td">{{ $calls->custom_brand_model }}</td>
                     @php
+                    $leadsources = "";
                      $leadsource = DB::table('lead_source')->where('id', $calls->source)->first();
                      $leadsources = $leadsource->source_name;
                      @endphp
-                    <td>{{ $leadsources }}</td>
-                    <td>{{ $calls->language }}</td>
-                    <td>{{ $calls->location }}</td>
+                    <td class="nowrap-td">{{ $leadsources }}</td>
+                    <td class="nowrap-td">{{ ucwords(strtolower($calls->language))}}</td>
+                    <td class="nowrap-td">{{ ucwords(strtolower($calls->location))}}</td>
                     @php
     $text = $calls->remarks;
     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
     @endphp
-    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>    
-    <td>{{ $calls->sales_person_remarks }}</td>  
-    <td>{{ $calls->client_remarks }}</td>    
-                  </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div> 
-        </div>  
-      </div> 
-      @endcan
-      @can('Calls-view')
-      <div class="tab-pane fade show" id="tab4">
-      <br>
-      <div class="row">
-      <div class="col-lg-1">
-      <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
-      </div>
-      </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table id="dtBasicExample4" class="table table-striped table-editable table-edits table table-bordered">
-            <thead class="bg-soft-secondary">
-                <tr>
-                <th>Ser No</th>
-                  <th>Date</th>
-                  <th>Purchase Type</th>
-                  <th>Customer Name</th>
-                  <th>Customer Phone</th>
-                  <th>Customer Email</th>
-                  <th>Sales Person</th>
-                  <th>Brands & Models</th>
-                  <th>Custom Model & Brand</th>
-                  <th>Lead Source</th>
-                  <th>Preferred Language</th>
-                  <th>Destination</th>
-                  <th>Remarks & Messages</th>
-                </tr>
-              </thead>
-              <tbody>
-              <div hidden>{{$i=0;}}</div>
-                @foreach ($convertedso as $key => $calls)
-                <tr data-id="1">
-                  <td>{{ ++$i }}</td>
-                    <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
-                    <td>{{ $calls->type }}</td>
-                    <td>{{ $calls->name }}</td>     
-                    <td>{{ $calls->phone }}</td> 
-                    <td>{{ $calls->email }}</td>
-                     @php
-                     $sales_persons_name = "";
-                     $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
-                     $sales_persons_name = $sales_persons->name;
-                     @endphp  
-                    <td>{{ $sales_persons_name }}</td>
-                    @php
-    $leads_models_brands = DB::table('calls_requirement')
-        ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
-        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-        ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-        ->where('calls_requirement.lead_id', $calls->id)
-        ->get();
-@endphp
-
-<td>
-    @php
-        $models_brands_string = '';
-        foreach ($leads_models_brands as $lead_model_brand) {
-            $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
-        }
-        // Remove the trailing comma and space from the string
-        $models_brands_string = rtrim($models_brands_string, ', ');
-        echo $models_brands_string;
-    @endphp
-</td>
-                    <td>{{ $calls->custom_brand_model }}</td>
-                    @php
-                     $leadsource = DB::table('lead_source')->where('id', $calls->source)->first();
-                     $leadsources = $leadsource->source_name;
-                     @endphp
-                    <td>{{ $leadsources }}</td>
-                    <td>{{ $calls->language }}</td>
-                    <td>{{ $calls->location }}</td>
-                    @php
-    $text = $calls->remarks;
-    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
-    @endphp
-    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>          
+    <td class="nowrap-td">{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>   
+    <td class="nowrap-td">
+    <div class="dropdown">
+    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+      <i class="fa fa-bars" aria-hidden="true"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+      <li><a class="dropdown-item" href="{{ route('calls.edit',$calls->id) }}">Edit</a></li>
+      <li>
+  <a class="dropdown-item delete-link" href="#" data-url="{{ route('calls.destroy', $calls->id) }}">Delete</a>
+</li>
+    </ul>
+  </div>
+    </td>
                   </tr>
                 @endforeach
               </tbody>
@@ -537,7 +486,63 @@ $('#export-excel').on('click', function() {
     var blob = new Blob([s2ab(XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' }))], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     var link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'Call.xlsx';
+    link.download = 'hotleads.xlsx';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+$('#export-normal').on('click', function() {
+    var filteredData = dataTableb.rows({ search: 'applied' }).data();
+    var data = [];
+    filteredData.each(function(rowData) {
+        var row = [];
+        for (var i = 0; i < rowData.length; i++) {
+            if (i !== 13 && i !== 14) {
+                row.push(rowData[i]);
+            }
+        }
+        data.push(row);
+    });
+    var excelData = [
+        ['S.No', 'Date', 'Purchase Type', 'Customer Name', 'Customer Phone', 'Customer Email', 'Sales Person', 'Brands & Models', 'Custom Model & Brand', 'Source', 'Preferred Language', 'Destination', 'Remarks & Messages']
+    ];
+    excelData = excelData.concat(data);
+    var workbook = XLSX.utils.book_new();
+    var worksheet = XLSX.utils.aoa_to_sheet(excelData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+    var blob = new Blob([s2ab(XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' }))], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'normalleads.xlsx';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+$('#export-low').on('click', function() {
+    var filteredData = dataTablec.rows({ search: 'applied' }).data();
+    var data = [];
+    filteredData.each(function(rowData) {
+        var row = [];
+        for (var i = 0; i < rowData.length; i++) {
+            if (i !== 13 && i !== 14) {
+                row.push(rowData[i]);
+            }
+        }
+        data.push(row);
+    });
+    var excelData = [
+        ['S.No', 'Date', 'Purchase Type', 'Customer Name', 'Customer Phone', 'Customer Email', 'Sales Person', 'Brands & Models', 'Custom Model & Brand', 'Source', 'Preferred Language', 'Destination', 'Remarks & Messages']
+    ];
+    excelData = excelData.concat(data);
+    var workbook = XLSX.utils.book_new();
+    var worksheet = XLSX.utils.aoa_to_sheet(excelData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+    var blob = new Blob([s2ab(XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' }))], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'lowleads.xlsx';
     link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
@@ -664,29 +669,6 @@ function s2ab(s) {
     downloadCSVd(dataTabled, 'Lead-to-So.csv');
   });
 });
-// function downloadCSVa(dataTablea, fileName) {
-//   var csv = '';
-//   var rows = dataTablea.rows().data();
-//   var header = dataTablea.columns().header();
-//   var headerArray = [];
-//   $(header).each(function() {
-//     headerArray.push($(this).text());
-//   });
-//   csv += headerArray.join(',') + '\r\n';
-//   $(rows).each(function(index, row) {
-//     var rowData = [];
-//     $(row).each(function() {
-//       rowData.push(this);
-//     });
-//     csv += rowData.join(',') + '\r\n';
-//   });
-//   var link = document.createElement('a');
-//   link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
-//   link.setAttribute('download', fileName);
-//   document.body.appendChild(link);
-//   link.click();
-//   document.body.removeChild(link);
-// }
 function downloadCSVb(dataTableb, fileName) {
   var csv = '';
   var rows = dataTableb.rows({ 'search': 'applied' }).data();
@@ -759,7 +741,58 @@ function downloadCSVd(dataTabled, fileName) {
 $(document).ready(function() {
   $('#dtBasicExample1').on('click', '.delete-link', function(e) {
     e.preventDefault();
-    console.log("123");
+    var url = $(this).data('url');
+
+    if (confirm('Are you sure you want to delete this item?')) {
+      $.ajax({
+        url: url,
+        type: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(result) {
+          // Handle successful deletion, e.g., show a success message
+          console.log('Item deleted successfully.');
+          location.reload();
+        },
+        error: function(xhr) {
+          // Handle error response, e.g., show an error message
+          console.log('Error deleting item.');
+          location.reload();
+        }
+      });
+    } else {
+      // If "No" is clicked, do nothing
+    }
+  });
+  $('#dtBasicExample2').on('click', '.delete-link', function(e) {
+    e.preventDefault();
+    var url = $(this).data('url');
+
+    if (confirm('Are you sure you want to delete this item?')) {
+      $.ajax({
+        url: url,
+        type: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(result) {
+          // Handle successful deletion, e.g., show a success message
+          console.log('Item deleted successfully.');
+          location.reload();
+        },
+        error: function(xhr) {
+          // Handle error response, e.g., show an error message
+          console.log('Error deleting item.');
+          location.reload();
+        }
+      });
+    } else {
+      // If "No" is clicked, do nothing
+    }
+  });
+  $('#dtBasicExample3').on('click', '.delete-link', function(e) {
+    e.preventDefault();
     var url = $(this).data('url');
 
     if (confirm('Are you sure you want to delete this item?')) {
