@@ -23,7 +23,7 @@ use Carbon\Carbon;
 use App\Models\MasterModelLines;
 use Monarobase\CountryList\CountryListFacade;
 use App\Models\Logs;
-use Yajra\DataTables\DataTables; // Import DataTables from Yajra namespace
+use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Response;
 
 class DailyleadsController extends Controller
@@ -35,7 +35,13 @@ class DailyleadsController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $id = Auth::user()->id;
-        $pendingdata = Calls::where('status', 'New')->where('sales_person', $id)->orderBy('created_by', 'desc')->get();
+        $pendingdata = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
+    ->where('calls.status', 'New')
+    ->where('calls.sales_person', $id)
+    ->orderByRaw("FIELD(lead_source.priority, 'Low', 'Normal', 'High') DESC")
+    ->orderBy('calls.created_by', 'desc')
+    ->select('calls.*', 'lead_source.priority')
+    ->get();
         if ($request->ajax()) {
             $status = $request->input('status');
             $searchValue = $request->input('search.value');
@@ -472,9 +478,16 @@ public function saveprospecting(Request $request)
     $prospecting->created_by = auth()->user()->id;
     $prospecting->created_at = now();
     $prospecting->calls_id = $request->callId;
+    if ($request->hasFile('file')) {
+        $file = $request->file('file');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $path = $file->storeAs('prospecting', $filename, 'public');
+        $prospecting->file_path = $path;
+    }
     $prospecting->save();
     $call = Calls::findOrFail($request->callId);
     $call->status = 'Prospecting';
+    $call->priority = $request->has('priority') ? $request->priority : '';
     $call->save();
     return response()->json(['success' => true]);
 	}

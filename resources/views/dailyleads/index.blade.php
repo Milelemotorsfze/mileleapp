@@ -11,6 +11,15 @@
     #dtBasicExample2 {
         width: 100%;
     }
+    @keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.blink {
+    animation: blink 1s infinite;
+}
   .wrapper
   {
     display: table-cell;
@@ -184,6 +193,7 @@ input[type=number]::-webkit-outer-spin-button
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
             <thead class="bg-soft-secondary">
                 <tr>
+                <th>Priority</th>
                   <th>Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
@@ -200,6 +210,17 @@ input[type=number]::-webkit-outer-spin-button
               <tbody>
                 @foreach ($pendingdata as $key => $calls)
                     <tr data-id="{{$calls->id}}">
+                <td>
+                    @if ($calls->priority == "High")
+                        <i class="fas fa-circle blink" style="color: red;"> Hot</i>
+                    @elseif ($calls->priority == "Normal")
+                        <i class="fas fa-circle" style="color: green;"> Normal</i>
+                    @elseif ($calls->priority == "Low")
+                        <i class="fas fa-circle" style="color: orange;"> Low</i>
+                    @else
+                        <i class="fas fa-circle" style="color: black;"> Regular</i>
+                    @endif
+                </td>
                     <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
                     <td>{{ $calls->type }}</td>
                     <td>{{ $calls->name }}</td>
@@ -305,6 +326,26 @@ input[type=number]::-webkit-outer-spin-button
             </div>
             <div class="col-md-8">
               <textarea class="form-control" id="sales-notes"></textarea>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="document-upload" class="form-label">Upload Picture:</label>
+            </div>
+            <div class="col-md-8">
+              <input type="file" class="form-control" id="screenshort">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="document-upload" class="form-label">Set Priority:</label>
+            </div>
+            <div class="col-md-8">
+            <select class="form-control" id="priority" name="priority">
+                    <option value="Normal">Normal</option>
+                    <option value="Low">Low</option>
+                    <option value="High">High</option>
+                </select>
             </div>
           </div>
         </div>
@@ -957,6 +998,12 @@ function saveprospecting() {
   var callId = $('#prospectingmodel').data('call-id');
   var date = document.getElementById('date').value;
   var salesNotes = document.getElementById('sales-notes').value;
+  var priority = document.getElementById('priority').value;
+  var fileInput = document.getElementById('screenshort').value;
+  if (salesNotes === '') {
+    alert('Please Write the Sales Notes');
+    return;
+  }
   if (date === '') {
     alert('Please select a date');
     return;
@@ -964,7 +1011,9 @@ function saveprospecting() {
   var formData = new FormData();
   formData.append('callId', callId);
   formData.append('date', date);
+  formData.append('priority', priority);
   formData.append('salesNotes', salesNotes);
+  formData.append('file', document.getElementById('screenshort').files[0]);
   var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   var xhr = new XMLHttpRequest();
   xhr.open('POST', '{{ route('sales.saveprospecting') }}', true);
@@ -1280,7 +1329,7 @@ $(document).ready(function () {
       var column = this;
       var columnId = column.index();
       var columnName = $(column.header()).attr('id');
-      if (d === 9 || d === 10) {
+      if (d === 10 || d === 11 || d === 0 ) {
         return;
       }
 

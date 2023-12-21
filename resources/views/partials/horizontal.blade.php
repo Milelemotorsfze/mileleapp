@@ -491,10 +491,38 @@
                                 @endphp
                                 @if ($hasPermission)
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-more" role="button">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                         <i data-feather="phone-call"></i>
                                         <span data-key="t-extra-pages">Messages & Calls</span>
+                                        <div class="arrow-down"></div>
                                     </a>
+                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Pending Leads</span>
+                                            </a>
+                                        </div>
+										<div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.inprocess') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">In Process Leads</span>
+                                            </a>
+                                        </div>
+										<div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.converted') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Converted Leads</span>
+                                            </a>
+                                        </div>
+										<div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.rejected') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Rejected Leads</span>
+                                            </a>
+                                        </div>
+										<div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.datacenter') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Leads Data Center</span>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('sale_person_status.index') }}" id="topnav-more" role="button">

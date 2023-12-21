@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Country;
-use App\Models\MasterShippingPort;
+use App\Models\MasterShippingPorts;
 use App\Models\OtherLogisticsCharges;
 use App\Models\Setting;
 use App\Models\Shipping;
@@ -37,7 +37,7 @@ class ProformaInvoiceController extends Controller {
         })->get();
 
         $countries = Country::all();
-        $shippingPorts = MasterShippingPort::all();
+        $shippingPorts = MasterShippingPorts::all();
         $shippings = ShippingMedium::all();
         $shippingDocuments = ShippingDocuments::all();
         $certifications = ShippingCertification::all();
