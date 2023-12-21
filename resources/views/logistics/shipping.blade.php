@@ -32,10 +32,19 @@
     }
   </style>
 @section('content')
+@if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
   <div class="card-header">
     <h4 class="card-title">
      Shipping Info
-     <a class="btn btn-sm btn-success float-end" href="{{ route('Shipping.create') }}" text-align: right>
+     <a class="btn btn-sm btn-primary float-end" href="{{ route('ports.index') }}" text-align: right>
+        <i class="fa fa-info" aria-hidden="true"></i> Ports
+      </a>
+      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+      <a class="btn btn-sm btn-success float-end" href="{{ route('Shipping.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New
       </a>
     </h4>

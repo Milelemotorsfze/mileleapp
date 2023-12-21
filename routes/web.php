@@ -79,6 +79,8 @@ use App\Http\Controllers\HRM\Hiring\EmployeeLiabilityController;
 use App\Http\Controllers\HRM\Hiring\InterviewSummaryReportController;
 use App\Http\Controllers\AgentsController;
 use App\Http\Controllers\SalesPersonStatusController;
+use App\Http\Controllers\PortsController;
+
 /*
 /*
 |--------------------------------------------------------------------------
@@ -347,6 +349,10 @@ Route::get('/d', function () {
     //Marketing
     Route::resource('calls', CallsController::class)
     ->parameters(['calls' => 'call']);
+    Route::get('callsinprocess', [CallsController::class,'inprocess'])->name('calls.inprocess');
+    Route::get('callsconverted', [CallsController::class,'converted'])->name('calls.converted');
+    Route::get('callsrejected', [CallsController::class,'rejected'])->name('calls.rejected');
+    Route::get('callsdatacenter', [CallsController::class,'datacenter'])->name('calls.datacenter');
     Route::resource('sales_person_languages', SalesPersonLanguagesController::class);
     Route::resource('variant_pictures', VariatnsPicturesController::class);
     Route::get('/editreels/{id}', [VariatnsPicturesController::class, 'editreels'])->name('variant_pictures.editreels');
@@ -370,6 +376,7 @@ Route::get('/d', function () {
     Route::post('calls/check-checkExistenceupdatecalls', [CallsController::class, 'checkExistenceupdatecalls'])->name('checkExistenceupdatecalls');
     Route::get('customers/repeatedcustomers', [Repeatedcustomers::class, 'repeatedcustomers'])->name('repeatedcustomers');
     Route::put('/strategy-updates/{id}', [StrategyController::class, 'updaters'])->name('strategy.updaters');
+    Route::post('/update-priority', [StrategyController::class, 'updatePriority'])->name('strategy.updatePriority');
     Route::get('/simplefile', [CallsController::class,'simplefile'])->name('calls.simplefile');
     Route::delete('/calls/{id}', [CallsController::class, 'destroy'])->name('calls.destroy');
     Route::post('/calls/removerow', [CallsController::class, 'removeRow'])->name('calls.removerow');
@@ -530,7 +537,7 @@ Route::get('/d', function () {
     Route::get('vehicles/viewall', [VehiclesController::class, 'viewall'])->name('vehicles.viewall');
     Route::get('vehicles/viewalls', [VehiclesController::class, 'viewalls'])->name('vehicles.viewalls');
     Route::get('/get-updated-vehicle/{id}', [VehiclesController::class, 'getUpdatedVehicle'])->name('getUpdatedVehicle');
-
+    Route::get('/getBrandsAndModelLines', [PurchasingOrderController::class, 'getBrandsAndModelLines']);
     //booking
     Route::get('booking/create/{call_id}', [BookingController::class, 'create'])->name('booking.create');
     Route::get('/get-model-lines/booking/{brandId}', [BookingController::class, 'getModelLines'])->name('booking.getmodel');
@@ -639,6 +646,7 @@ Route::get('/d', function () {
     Route::post('/select-shipping-rate/{id}', [ShippingController::class, 'selectShippingRate']);
     Route::get('/getShippingRateDetails/{id}', [ShippingController::class, 'getShippingRateDetails']);
     Route::post('/updateShippingRate', [ShippingController::class, 'updateShippingRate']);
+    Route::resource('ports', PortsController::class);
     //Agents
     Route::resource('agents', AgentsController::class);
     Route::get('/get-agent-names', [AgentsController::class, 'getAgentNames'])->name('agents.getAgentNames');

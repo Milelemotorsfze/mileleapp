@@ -161,7 +161,7 @@ class ShippingController extends Controller
             $shippingother->save();
         }
 
-        return redirect()->back()->with("Shipping data Created Successfully.");
+        return redirect()->route('Shipping.index')->with('success', 'Port has been successfully added!');
     }
     public function generateUUID($latestCode, $category) {
         $length = 5;
