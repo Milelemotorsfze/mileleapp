@@ -373,9 +373,10 @@
                 getCustomers();
             });
             $('#dealer').change(function () {
-
                 var value = $('#dealer').val();
                 $('#dealer-input').val(value);
+
+                getModels('all','dealer-change');
 
             });
 
@@ -583,8 +584,8 @@
                 allowClear: true,
                 maximumSelectionLength: 1
             });
-
-            getModels(index);
+            let type = 'add-new';
+            getModels(index,type);
         });
 
         $(document.body).on('click', ".removeButton", function (e) {
@@ -658,6 +659,7 @@
             let index = $(this).attr('data-index');
             $('#model-'+index+'-error').remove();
             getSfx(index);
+            $('#dealer').attr("disabled", true);
         });
         $(document.body).on('select2:select', ".sfx", function (e) {
             let index = $(this).attr('data-index');
@@ -670,7 +672,6 @@
             getLOIDescription(index);
             var value = e.params.data.text;
             hideModelYear(index, value);
-            $('#dealer').attr("disabled", true);
 
         });
         $(document.body).on('select2:unselect', ".sfx", function (e) {
@@ -699,6 +700,7 @@
             }
             appendSFX(index,model,sfx[0]);
             appendModel(index,model);
+            enableDealer();
 
             $('#sfx-'+index).empty();
             $('#model-year-'+index).empty();
@@ -715,13 +717,17 @@
             var model = $('#model-'+index).val();
             var sfx = $('#sfx-'+index).val();
             appendModelYear(index, model[0],sfx[0],modelYear);
-            enableDealer();
+
             // get the unseleted index and match with each row  item if model and sfx is matching append that row
         });
 
-        function getModels(index) {
+        function getModels(index,type) {
+            console.log(index);
+            console.log(type);
 
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+            let dealer = $('#dealer').val();
+
             var selectedModelIds = [];
             for(let i=1; i<=totalIndex; i++)
             {
@@ -731,13 +737,14 @@
                     selectedModelIds.push(eachSelectedModelId);
                 }
             }
-            console.log(selectedModelIds);
+
             $.ajax({
                 url:"{{route('demand.getMasterModel')}}",
                 type: "GET",
                 data:
                     {
                         selectedModelIds: selectedModelIds,
+                        dealer:dealer,
                     },
                 dataType : 'json',
                 success: function(data) {
@@ -745,7 +752,7 @@
 
                     var size = myarray.length;
                     if (size >= 1) {
-                        let modelDropdownData   = [];
+                        let modelDropdownData = [];
                         $.each(data,function(key,value)
                         {
                             modelDropdownData.push
@@ -755,13 +762,26 @@
                                 text: value.model
                             });
                         });
-                        $('#model-' + index).html("");
-                        $('#model-' + index).select2({
-                            placeholder: 'Select Model',
-                            allowClear: true,
-                            data: modelDropdownData,
-                            maximumSelectionLength: 1,
-                        });
+                        if(type == 'add-new') {
+                            $('#model-' + index).html("");
+                            $('#model-' + index).select2({
+                                placeholder: 'Select Model',
+                                allowClear: true,
+                                data: modelDropdownData,
+                                maximumSelectionLength: 1,
+                            });
+                        }else{
+                            for(let i=1; i<=totalIndex; i++)
+                            {
+                                $('#model-' + i).html("");
+                                $('#model-' + i).select2({
+                                    placeholder: 'Select Model',
+                                    allowClear: true,
+                                    data: modelDropdownData,
+                                    maximumSelectionLength: 1,
+                                });
+                            }
+                        }
                     }
                 }
             });
@@ -965,19 +985,18 @@
         function enableDealer() {
             // check any model year is selected or not
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-            var selectedModelYears = [];
+            var selectedModels = [];
             for(let i=1; i<=totalIndex; i++)
             {
-                var modelYear = $('#model-year-'+i).val();
-                if(modelYear[0]) {
-                    selectedModelYears.push(modelYear[0])
+                var model = $('#model-'+i).val();
+                if(model[0]) {
+                    selectedModels.push(model[0])
                 }
             }
-            if(selectedModelYears.length <= 0) {
+            if(selectedModels.length <= 0) {
                 $('#dealer').attr("disabled", false);
             }
         }
-
 
     </script>
 @endpush

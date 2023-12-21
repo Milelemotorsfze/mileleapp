@@ -105,22 +105,21 @@ class DemandController extends Controller
     }
     public function getSFX(Request $request)
     {
-        info($request->all());
-            if($request->module == 'Demand')
-            {
-                $demandLists = DemandList::where('demand_id', $request->demand_id)->get();
-                $alreadyaddedModelIds = [];
-                foreach ($demandLists as $demandList) {
-                    $alreadyaddedModelIds[] = $demandList->master_model_id;
-                }
+        if($request->module == 'Demand')
+        {
+            $demandLists = DemandList::where('demand_id', $request->demand_id)->get();
+            $alreadyaddedModelIds = [];
+            foreach ($demandLists as $demandList) {
+                $alreadyaddedModelIds[] = $demandList->master_model_id;
+            }
+        }
 
-            }
-            $data = MasterModel::where('model', $request->model);
-            if($request->selectedModelIds) {
-                $data = $data->whereNotIn('id', $request->selectedModelIds);
-            }
-            info($data->pluck('id'));
-            $data = $data->groupBy('sfx')->pluck('sfx');
+        $data = MasterModel::where('model', $request->model);
+        if($request->selectedModelIds) {
+            $data = $data->whereNotIn('id', $request->selectedModelIds);
+        }
+
+        $data = $data->groupBy('sfx')->pluck('sfx');
         return $data;
     }
     public function getModelYear(Request $request) {
@@ -171,13 +170,17 @@ class DemandController extends Controller
     }
 
     public function getMasterModel(Request $request) {
+        if($request->dealer == 'Trans Cars') {
+            $data = MasterModel::whereNotNull('transcar_loi_description');
+        }else{
+            $data = MasterModel::whereNotNull('milele_loi_description');
+        }
 
         if($request->selectedModelIds) {
-          $data =  MasterModel::whereNotIn('id', $request->selectedModelIds)->groupBy('model')->orderBy('id','ASC')->get();
-
-        }else{
-            $data = MasterModel::groupBy('model')->orderBy('id','ASC')->get();
+          $data =  $data->whereNotIn('id', $request->selectedModelIds);
         }
+
+        $data = $data->groupBy('model')->orderBy('id','ASC')->get();
 
         return $data;
     }

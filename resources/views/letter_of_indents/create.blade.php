@@ -12,6 +12,9 @@
         {
             height:32px!important;
         }
+        .select-error{
+            color: red;
+        }
     </style>
     <div class="card-header">
         <h4 class="card-title">Add New LOI</h4>
@@ -179,21 +182,24 @@
                     <div class="card-body">
                         <div id="loi-items" >
                             <div class="row Loi-items-row-div" id="row-1">
-                                <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="col-lg-2 col-md-6 col-sm-12 select-button-main-div">
                                     <label class="form-label">Model</label>
-                                    <select class="form-select widthinput text-dark models" multiple data-index="1" name="models[]" id="model-1" autofocus>
-                                        <option value="" >Select Model</option>
-                                        @foreach($models as $model)
-                                            <option value="{{ $model->model }}">{{ $model->model }}</option>
-                                        @endforeach
-                                    </select>
+                                    <div class="dropdown-option-div">
+                                        <select class="form-select widthinput text-dark models" multiple data-index="1" name="models[]" id="model-1" autofocus>
+                                            <option value="" >Select Model</option>
+                                            @foreach($models as $model)
+                                                <option value="{{ $model->model }}">{{ $model->model }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
                                     @error('model')
                                     <span>
                                 <strong >{{ $message }}</strong>
                             </span>
                                     @enderror
                                 </div>
-                                <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
+                                <div class="col-lg-2 col-md-6 col-sm-12 mb-3 select-button-main-div">
                                     <label class="form-label">SFX</label>
                                     <select class="form-select widthinput text-dark sfx" multiple  data-index="1" name="sfx[]" id="sfx-1" >
                                         <option value="">Select SFX</option>
@@ -204,7 +210,7 @@
                                     </div>
                                     @enderror
                                 </div>
-                                <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
+                                <div class="col-lg-2 col-md-6 col-sm-12 mb-3 select-button-main-div">
                                     <label class="form-label">Model Year</label>
                                     <select class="form-select widthinput text-dark model-years" multiple  data-index="1" name="model_year[]" id="model-year-1">
                                         <option value="">Select Model Year</option>
@@ -338,7 +344,7 @@
                         extension: "Please upload pdf file"
                     }
                 }
-            },
+            }
         });
 
         $.validator.prototype.checkForm = function (){
@@ -390,6 +396,14 @@
             $(this).valid();
         });
 
+        $('#dealer').change(function () {
+            var value = $('#dealer').val();
+            $('#dealer-input').val(value);
+
+            getModels('all','dealer-change');
+
+        });
+
         function getCustomers() {
             var country = $('#country').val();
             var customer_type = $('#customer-type').val();
@@ -413,8 +427,9 @@
             });
         }
 
-        function getModels(index) {
+        function getModels(index,type) {
 
+            let dealer = $('#dealer').val();
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
             var selectedModelIds = [];
@@ -432,6 +447,7 @@
                 data:
                     {
                         selectedModelIds: selectedModelIds,
+                        dealer:dealer,
                     },
                 dataType : 'json',
                 success: function(data) {
@@ -449,13 +465,26 @@
                                 text: value.model
                             });
                         });
-                        $('#model-' + index).html("");
-                        $('#model-' + index).select2({
-                            placeholder: 'Select Model',
-                            allowClear: true,
-                            data: modelDropdownData,
-                            maximumSelectionLength: 1,
-                        });
+                        if(type == 'add-new') {
+                            $('#model-' + index).html("");
+                            $('#model-' + index).select2({
+                                placeholder: 'Select Model',
+                                allowClear: true,
+                                data: modelDropdownData,
+                                maximumSelectionLength: 1,
+                            });
+                        }else{
+                            for(let i=1; i<=totalIndex; i++)
+                            {
+                                $('#model-' + i).html("");
+                                $('#model-' + i).select2({
+                                    placeholder: 'Select Model',
+                                    allowClear: true,
+                                    data: modelDropdownData,
+                                    maximumSelectionLength: 1,
+                                });
+                            }
+                        }
                     }
                 }
             });
@@ -467,7 +496,7 @@
 
            var newRow = `
                 <div class="row Loi-items-row-div" id="row-${index}">
-                    <div class="col-lg-2 col-md-6 col-sm-12">
+                    <div class="col-lg-2 col-md-6 col-sm-12 select-button-main-div">
                         <select class="form-select widthinput text-dark models" multiple name="models[]" data-index="${index}" id="model-${index}" autofocus>
                             <option value="" >Select Model</option>
                             @foreach($models as $model)
@@ -480,7 +509,7 @@
                             </span>
                         @enderror
                         </div>
-                         <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
+                         <div class="col-lg-2 col-md-6 col-sm-12 mb-3 select-button-main-div">
                             <select class="form-select widthinput text-dark sfx" multiple name="sfx[]"  data-index="${index}" id="sfx-${index}" >
                             <option value="">Select SFX</option>
                         </select>
@@ -490,7 +519,7 @@
                         </div>
                         @enderror
                         </div>
-                        <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
+                        <div class="col-lg-2 col-md-6 col-sm-12 mb-3 select-button-main-div">
                                 <select class="form-select widthinput text-dark model-years" multiple  name="model_year[]" data-index="${index}" id="model-year-${index}">
                                 <option value="">Select Model Year</option>
                             </select>
@@ -500,7 +529,7 @@
                             </div>
                             @enderror
                         </div>
-                        <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+                        <div class="col-lg-3 col-md-6 col-sm-12 mb-3 ">
                             <input type="text" readonly placeholder="LOI Description"
                                    class="form-control widthinput text-dark loi-descriptions" data-index="${index}" id="loi-description-${index}" >
                    </div>
@@ -535,7 +564,8 @@
                             maximumSelectionLength: 1
                         });
 
-                getModels(index);
+                    let type = 'add-new';
+                    getModels(index,type);
         });
 
         $(document.body).on('click', ".removeButton", function (e) {
@@ -608,6 +638,7 @@
             let index = $(this).attr('data-index');
             $('#model-'+index+'-error').remove();
             getSfx(index);
+            $('#dealer').attr("disabled", true);
         });
         $(document.body).on('select2:select', ".sfx", function (e) {
             let index = $(this).attr('data-index');
@@ -620,7 +651,6 @@
             getLOIDescription(index);
             var value = e.params.data.text;
             hideModelYear(index, value);
-            $('#dealer').attr("disabled", true);
 
         });
         $(document.body).on('select2:unselect', ".sfx", function (e) {
@@ -649,6 +679,7 @@
             }
             appendSFX(index,model,sfx[0]);
             appendModel(index,model);
+            enableDealer();
 
             $('#sfx-'+index).empty();
             $('#model-year-'+index).empty();
@@ -665,7 +696,6 @@
             var model = $('#model-'+index).val();
             var sfx = $('#sfx-'+index).val();
             appendModelYear(index, model[0],sfx[0],modelYear);
-            enableDealer();
             // get the unseleted index and match with each row  item if model and sfx is matching append that row
         });
 
@@ -705,7 +735,7 @@
                     });
                 }
             });
-        }
+       }
        function getModelYear(index){
 
            let model = $('#model-'+index).val();

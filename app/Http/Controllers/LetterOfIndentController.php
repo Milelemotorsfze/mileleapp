@@ -101,8 +101,7 @@ class LetterOfIndentController extends Controller
     {
         $countries = Country::all();
         $customers = Customer::all();
-
-        $models = MasterModel::groupBy('model')->orderBy('id','ASC')->get();
+        $models = MasterModel::whereNotNull('transcar_loi_description')->groupBy('model')->orderBy('id','ASC')->get();
 
         return view('letter_of_indents.create',compact('countries','customers','models'));
     }
@@ -295,7 +294,6 @@ class LetterOfIndentController extends Controller
     }
     public function approve(Request $request)
     {
-
         $letterOfIndent = LetterOfIndent::find($request->id);
         $letterOfIndent->status = $request->status;
         if($request->status = LetterOfIndent::LOI_STATUS_REJECTED) {
@@ -320,8 +318,13 @@ class LetterOfIndentController extends Controller
         $letterOfIndent = LetterOfIndent::find($id);
         $countries = Country::all();
         $customers = Customer::all();
+        if($letterOfIndent->dealers == 'Trans Cars') {
+            $models = MasterModel::whereNotNull('transcar_loi_description');
+        }else{
+            $models = MasterModel::whereNotNull('milele_loi_description');
+        }
 
-        $models = MasterModel::groupBy('model')->orderBy('id','ASC')->get();
+        $models = $models->groupBy('model')->orderBy('id','ASC')->get();
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $id)->get();
         foreach ($letterOfIndentItems as $letterOfIndentItem) {
             $letterOfIndentItem->sfxLists = MasterModel::where('model', $letterOfIndentItem->masterModel->model)->groupBy('sfx')->pluck('sfx');
