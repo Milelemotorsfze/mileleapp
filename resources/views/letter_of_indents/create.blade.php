@@ -128,6 +128,7 @@
                             <option value="Trans Cars">Trans Cars</option>
                             <option value="Milele Motors">Milele Motors</option>
                         </select>
+                        <input type="hidden" name="dealers" value="Trans Cars" id="dealer-input">
                         @error('dealers')
                         <span role="alert">
                             <strong>{{ $message }}</strong>
@@ -221,7 +222,7 @@
                                 </div>
                                 <div class="col-lg-1 col-md-6 col-sm-12">
                                     <label class="form-label">Quantity</label>
-                                    <input type="number" name="quantity[]" placeholder="Quantity"  maxlength="5" data-index="1" class="form-control widthinput quantities text-dark"
+                                    <input type="number" name="quantity[]" placeholder="Quantity"  maxlength="5" value="1" data-index="1" class="form-control widthinput quantities text-dark"
                                            step="1" oninput="validity.valid||(value='');" min="0" id="quantity-1">
                                 </div>
                                 <div class="col-lg-1 col-md-6 col-sm-12">
@@ -230,7 +231,7 @@
                                     <input type="hidden" name="master_model_ids[]" class="master-model-ids" id="master-model-id-1">
                                 </div>
                                 <div class="col-lg-1 col-md-6 col-sm-12">
-                                    <a class="btn btn-sm btn-danger removeButton" id="remove-btn-1" data-index="1" data-index="1" style="margin-top: 30px;" >  <i class="fas fa-trash-alt"></i> </a>
+                                    <a class="btn btn-sm btn-danger removeButton" id="remove-btn-1" data-index="1" style="margin-top: 30px;" >  <i class="fas fa-trash-alt"></i> </a>
                                 </div>
                             </div>
                         </div>
@@ -364,9 +365,6 @@
             getCustomers();
         });;
 
-        // $('#country').change(function (){
-        //    getCustomers();
-        // });
         $('#customer-type').change(function (){
             getCustomers();
         });
@@ -507,7 +505,7 @@
                                    class="form-control widthinput text-dark loi-descriptions" data-index="${index}" id="loi-description-${index}" >
                    </div>
                     <div class="col-lg-1 col-md-6 col-sm-12">
-                        <input type="number" name="quantity[]" placeholder="Quantity" maxlength="5"  class="form-control widthinput text-dark quantities"
+                        <input type="number" name="quantity[]" placeholder="Quantity" maxlength="5" value="1" class="form-control widthinput text-dark quantities"
                                step="1" oninput="validity.valid||(value='');" min="0" data-index="${index}" id="quantity-${index}">
                     </div>
                     <div class="col-lg-1 col-md-6 col-sm-12">
@@ -541,60 +539,69 @@
         });
 
         $(document.body).on('click', ".removeButton", function (e) {
-            var indexNumber = $(this).attr('data-index');
-            var modelYear = $('#model-year-'+indexNumber).val();
-            var model = $('#model-'+indexNumber).val();
-            var sfx = $('#sfx-'+indexNumber).val();
-            if(modelYear[0]) {
-                appendModelYear(indexNumber, model[0],sfx[0],modelYear[0]);
-            }
-            if(model[0]) {
-                appendModel(indexNumber,model[0]);
-            }
-            if(sfx[0]) {
-                appendSFX(indexNumber,model[0],sfx[0]);
-            }
+            var rowCount = $("#loi-items").find(".Loi-items-row-div").length;
+            if(rowCount > 1) {
 
-            $(this).closest('#row-'+indexNumber).remove();
+                var indexNumber = $(this).attr('data-index');
+                var modelYear = $('#model-year-'+indexNumber).val();
+                var model = $('#model-'+indexNumber).val();
+                var sfx = $('#sfx-'+indexNumber).val();
+                if(modelYear[0]) {
+                    appendModelYear(indexNumber, model[0],sfx[0],modelYear[0]);
+                }
+                if(model[0]) {
+                    appendModel(indexNumber,model[0]);
+                }
+                if(sfx[0]) {
+                    appendSFX(indexNumber,model[0],sfx[0]);
+                }
 
-            $('.Loi-items-row-div').each(function(i){
-                var index = +i + +1;
-                $(this).attr('id', 'row-'+index);
-                $(this).find('.models').attr('data-index', index);
-                $(this).find('.models').attr('id', 'model-'+index);
-                $(this).find('.sfx').attr('data-index', index);
-                $(this).find('.sfx').attr('id', 'sfx-'+index);
-                $(this).find('.loi-descriptions').attr('data-index', index);
-                $(this).find('.loi-descriptions').attr('id', 'loi-description-'+index);
-                $(this).find('.model-years').attr('data-index', index);
-                $(this).find('.model-years').attr('id', 'model-year-'+index);
-                $(this).find('.quantities').attr('data-index', index);
-                $(this).find('.quantities').attr('id', 'quantity-'+index);
-                $(this).find('.inventory-qty').attr('data-index', index);
-                $(this).find('.inventory-qty').attr('id', 'inventory-quantity-'+index);
-                $(this).find('.master-model-ids').attr('id', 'master-model-id-'+index);
-                $(this).find('.removeButton').attr('data-index', index);
-                $(this).find('.removeButton').attr('id', 'remove-btn-'+index);
+                $(this).closest('#row-'+indexNumber).remove();
 
-                $('#model-'+index).select2
-                ({
-                    placeholder: 'Select Model',
-                    maximumSelectionLength:1,
-                    allowClear: true
+                $('.Loi-items-row-div').each(function(i){
+                    var index = +i + +1;
+                    $(this).attr('id', 'row-'+index);
+                    $(this).find('.models').attr('data-index', index);
+                    $(this).find('.models').attr('id', 'model-'+index);
+                    $(this).find('.sfx').attr('data-index', index);
+                    $(this).find('.sfx').attr('id', 'sfx-'+index);
+                    $(this).find('.loi-descriptions').attr('data-index', index);
+                    $(this).find('.loi-descriptions').attr('id', 'loi-description-'+index);
+                    $(this).find('.model-years').attr('data-index', index);
+                    $(this).find('.model-years').attr('id', 'model-year-'+index);
+                    $(this).find('.quantities').attr('data-index', index);
+                    $(this).find('.quantities').attr('id', 'quantity-'+index);
+                    $(this).find('.inventory-qty').attr('data-index', index);
+                    $(this).find('.inventory-qty').attr('id', 'inventory-quantity-'+index);
+                    $(this).find('.master-model-ids').attr('id', 'master-model-id-'+index);
+                    $(this).find('.removeButton').attr('data-index', index);
+                    $(this).find('.removeButton').attr('id', 'remove-btn-'+index);
+
+                    $('#model-'+index).select2
+                    ({
+                        placeholder: 'Select Model',
+                        maximumSelectionLength:1,
+                        allowClear: true
+                    });
+                    $('#sfx-'+index).select2
+                    ({
+                        placeholder: 'Select SFX',
+                        maximumSelectionLength:1,
+                        allowClear: true
+                    });
+                    $('#model-year-'+index).select2
+                    ({
+                        placeholder: 'Select Model Year',
+                        maximumSelectionLength:1,
+                        allowClear: true
+                    });
                 });
-                $('#sfx-'+index).select2
-                ({
-                    placeholder: 'Select SFX',
-                    maximumSelectionLength:1,
-                    allowClear: true
-                });
-                $('#model-year-'+index).select2
-                ({
-                    placeholder: 'Select Model Year',
-                    maximumSelectionLength:1,
-                    allowClear: true
-                });
-            });
+
+            }else{
+                var confirm = alertify.confirm('You are not able to remove this row, Atleast one LOI Item Required',function (e) {
+                }).set({title:"Can't Remove LOI Item"})
+            }
+            enableDealer();
         })
 
         $(document.body).on('select2:select', ".models", function (e) {
@@ -611,12 +618,11 @@
             let index = $(this).attr('data-index');
             $('#model-year-'+index+'-error').remove();
             getLOIDescription(index);
-
             var value = e.params.data.text;
-            hideModelYear(index, value)
+            hideModelYear(index, value);
+            $('#dealer').attr("disabled", true);
 
         });
-
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
 
@@ -649,8 +655,6 @@
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
 
-            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-
         });
         $(document.body).on('select2:unselect', ".model-years", function (e) {
             let index = $(this).attr('data-index');
@@ -661,11 +665,11 @@
             var model = $('#model-'+index).val();
             var sfx = $('#sfx-'+index).val();
             appendModelYear(index, model[0],sfx[0],modelYear);
-
+            enableDealer();
             // get the unseleted index and match with each row  item if model and sfx is matching append that row
         });
 
-        function getSfx(index) {
+       function getSfx(index) {
 
             let model = $('#model-'+index).val();
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
@@ -702,7 +706,6 @@
                 }
             });
         }
-
        function getModelYear(index){
 
            let model = $('#model-'+index).val();
@@ -770,7 +773,6 @@
                }
            });
         }
-
        function appendModelYear(index,unSelectedmodel,unSelectedsfx,unSelectedmodelYear) {
             console.log(index);
             console.log(unSelectedmodel);
@@ -836,7 +838,7 @@
                }
            }
        }
-        function appendModel(index,unSelectedmodel){
+       function appendModel(index,unSelectedmodel){
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
             for(let i=1; i<=totalIndex; i++)
@@ -863,6 +865,22 @@
                 }
             }
         }
+       function enableDealer() {
+            // check any model year is selected or not
+            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
+            var selectedModelYears = [];
+            for(let i=1; i<=totalIndex; i++)
+            {
+                var modelYear = $('#model-year-'+i).val();
+                if(modelYear[0]) {
+                    selectedModelYears.push(modelYear[0])
+                }
+            }
+            if(selectedModelYears.length <= 0) {
+                $('#dealer').attr("disabled", false);
+            }
+       }
+
     </script>
 @endpush
 

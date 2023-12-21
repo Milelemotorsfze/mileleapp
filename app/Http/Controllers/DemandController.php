@@ -105,6 +105,7 @@ class DemandController extends Controller
     }
     public function getSFX(Request $request)
     {
+        info($request->all());
             if($request->module == 'Demand')
             {
                 $demandLists = DemandList::where('demand_id', $request->demand_id)->get();
@@ -114,14 +115,11 @@ class DemandController extends Controller
                 }
 
             }
-            info($request->all());
             $data = MasterModel::where('model', $request->model);
-            info($data->get());
             if($request->selectedModelIds) {
                 $data = $data->whereNotIn('id', $request->selectedModelIds);
             }
-            info($request->selectedModelIds);
-            info($data->get());
+            info($data->pluck('id'));
             $data = $data->groupBy('sfx')->pluck('sfx');
         return $data;
     }
@@ -154,7 +152,6 @@ class DemandController extends Controller
             $data['master_model_id'] = $masterModel->id ?? "";
         }
 
-
         if ($request->module == 'LOI') {
             $inventory = SupplierInventory::with('masterModel')
                 ->whereHas('masterModel', function ($query) use($request) {
@@ -177,6 +174,7 @@ class DemandController extends Controller
 
         if($request->selectedModelIds) {
           $data =  MasterModel::whereNotIn('id', $request->selectedModelIds)->groupBy('model')->orderBy('id','ASC')->get();
+
         }else{
             $data = MasterModel::groupBy('model')->orderBy('id','ASC')->get();
         }

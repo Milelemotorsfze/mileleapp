@@ -101,16 +101,10 @@ class LetterOfIndentController extends Controller
     {
         $countries = Country::all();
         $customers = Customer::all();
-        $suppliers = Supplier::with('supplierTypes')
-            ->whereHas('supplierTypes', function ($query) {
-                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
-            })
-            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
-            ->get();
-        $addedModelIds = [];
-        $models = MasterModel::whereNotIn('id', $addedModelIds)->groupBy('model')->orderBy('id','ASC')->get();
 
-        return view('letter_of_indents.create',compact('countries','customers','suppliers','models'));
+        $models = MasterModel::groupBy('model')->orderBy('id','ASC')->get();
+
+        return view('letter_of_indents.create',compact('countries','customers','models'));
     }
 
     /**
@@ -130,7 +124,6 @@ class LetterOfIndentController extends Controller
         $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
             ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
             ->where('category', $request->category)
-//            ->where('submission_status', LetterOfIndent::LOI_SUBMISION_STATUS_NEW)
             ->where('status', LetterOfIndent::LOI_STATUS_NEW)
             ->first();
 
@@ -327,14 +320,23 @@ class LetterOfIndentController extends Controller
         $letterOfIndent = LetterOfIndent::find($id);
         $countries = Country::all();
         $customers = Customer::all();
-        $suppliers = Supplier::with('supplierTypes')
-            ->whereHas('supplierTypes', function ($query) {
-                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
-            })
-            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
-            ->get();
 
-        return view('letter_of_indents.edit', compact('countries','customers','letterOfIndent','suppliers'));
+        $models = MasterModel::groupBy('model')->orderBy('id','ASC')->get();
+        $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $id)->get();
+        foreach ($letterOfIndentItems as $letterOfIndentItem) {
+            $letterOfIndentItem->sfxLists = MasterModel::where('model', $letterOfIndentItem->masterModel->model)->groupBy('sfx')->pluck('sfx');
+            $letterOfIndentItem->modelYearLists = MasterModel::where('model', $letterOfIndentItem->masterModel->model)
+                                        ->where('sfx', $letterOfIndentItem->masterModel->sfx)->pluck('model_year');
+            if($letterOfIndent->dealers == 'Milele Motors') {
+                $letterOfIndentItem->loi_description = $letterOfIndentItem->masterModel->milele_loi_description;
+
+            }else{
+                $letterOfIndentItem->loi_description = $letterOfIndentItem->masterModel->transcar_loi_description;
+            }
+        }
+
+        return view('letter_of_indents.edit', compact('countries','customers','letterOfIndent','models',
+        'letterOfIndentItems'));
     }
 
     /**
@@ -342,41 +344,70 @@ class LetterOfIndentController extends Controller
      */
     public function update(Request $request, string $id)
     {
+//        dd($request->all());
         $request->validate([
             'customer_id' => 'required',
             'category' => 'required',
             'date' => 'required',
-//            'shipment_method' => 'required',
             'dealers' => 'required',
         ]);
 
-        $LOI = LetterOfIndent::find($id);
+        $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
+            ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
+            ->where('category', $request->category)
+            ->whereNot('id',$id)
+            ->where('status', LetterOfIndent::LOI_STATUS_NEW)
+            ->first();
 
-        $LOI->customer_id = $request->customer_id;
-        $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
-        $LOI->category = $request->category;
-        $LOI->dealers = $request->dealers;
-        $LOI->destination = $request->destination;
-        $LOI->so_number = $request->so_number;
-        $LOI->prefered_location = $request->prefered_location;
-        $LOI->save();
-        if ($request->has('files'))
-        {
-            foreach ($request->file('files') as $key => $file)
-            {
-                $extension = $file->getClientOriginalExtension();
-                $fileName = $key.time().'.'.$extension;
-                $destinationPath = 'LOI-Documents';
-                $file->move($destinationPath, $fileName);
-                $LoiDocument = new LetterOfIndentDocument();
+        if (!$LOI) {
+            DB::beginTransaction();
 
-                $LoiDocument->loi_document_file = $fileName;
-                $LoiDocument->letter_of_indent_id = $LOI->id;
-                $LoiDocument->save();
+            $LOI = LetterOfIndent::find($id);
+
+            $LOI->customer_id = $request->customer_id;
+            $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
+            $LOI->category = $request->category;
+            $LOI->dealers = $request->dealers;
+            $LOI->destination = $request->destination;
+            $LOI->so_number = $request->so_number;
+            $LOI->prefered_location = $request->prefered_location;
+            $LOI->save();
+
+            if ($request->has('files')) {
+                foreach ($request->file('files') as $key => $file) {
+                    $extension = $file->getClientOriginalExtension();
+                    $fileName = $key . time() . '.' . $extension;
+                    $destinationPath = 'LOI-Documents';
+                    $file->move($destinationPath, $fileName);
+                    $LoiDocument = new LetterOfIndentDocument();
+
+                    $LoiDocument->loi_document_file = $fileName;
+                    $LoiDocument->letter_of_indent_id = $LOI->id;
+                    $LoiDocument->save();
+                }
             }
-        }
+            $LOI->letterOfIndentItems()->delete();
+            $quantities = $request->quantity;
+            foreach ($quantities as $key => $quantity) {
+                $masterModel = MasterModel::where('sfx', $request->sfx[$key])
+                    ->where('model', $request->models[$key])
+                    ->where('model_year', $request->model_year[$key])
+                    ->first();
+                if ($masterModel) {
+                    $LOIItem = new LetterOfIndentItem();
+                    $LOIItem->letter_of_indent_id = $LOI->id;
+                    $LOIItem->master_model_id = $masterModel->id ?? '';
+                    $LOIItem->quantity = $quantity;
+                    $LOIItem->save();
+                }
+            }
+            DB::commit();
 
-        return redirect()->back()->with('success','LOI Details updated successfully.');
+            return redirect()->route('letter-of-indents.index')->with('success',"LOI Updated successfully");
+
+        }else{
+            return redirect()->back()->with('error', "LOI with this customer and date and category is already exist.");
+        }
     }
 
     /**
