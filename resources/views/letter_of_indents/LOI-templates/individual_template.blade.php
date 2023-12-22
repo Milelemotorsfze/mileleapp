@@ -36,6 +36,12 @@
         .fw-bold{
             font-weight: bold;
         }
+        @media only screen and (min-device-width: 1200px)
+        {
+            .container{
+                max-width: 1000px; !important;
+            }
+        }
     </style>
 
     <div class="container" style="padding-bottom: 0px;">

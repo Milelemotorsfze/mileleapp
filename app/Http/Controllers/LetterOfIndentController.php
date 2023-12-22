@@ -287,7 +287,7 @@ class LetterOfIndentController extends Controller
             {
                 $pdf->AddPage();
                 $tplIdx = $pdf->importPage($i+1);
-                $pdf->useTemplate($tplIdx);
+                $pdf->useTemplate($tplIdx,0,0);
             }
         }
         return $pdf;

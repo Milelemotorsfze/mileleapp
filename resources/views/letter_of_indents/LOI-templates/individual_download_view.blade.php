@@ -22,6 +22,9 @@
         .fw-bold{
             font-weight: bold;
         }
+        p{
+            font-size: 14px;
+        }
     </style>
 
 </head>
@@ -38,13 +41,15 @@
 
         <p>I, ({{ ucfirst($letterOfIndent->customer->name) ?? 'Customer Name'}}) am writing this letter to express my sincere intention to purchase the following models from your company.</p>
         <h3 class="fw-bold" style="margin-bottom: 15px;text-decoration: underline">Requirements:</h3>
-        <div style="list-style-type: none;margin-right: 15px;">
+        <div style="list-style-type: none;margin-right: 15px;font-size: 14px;">
             @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
                 <li>{{$key + 1}}.&nbsp;
                     <span class="fw-bold">Model Name:</span>
-                    {{ $letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}},
-                    {{ $letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? '' }}
-                    {{ $letterOfIndentItem->masterModel->variant->my ?? ''}}
+                    @if($letterOfIndentItem->masterModel->variant()->exists())
+                        {{ $letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}},
+                        {{ $letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? '' }}
+                    @endif
+                    {{ $letterOfIndentItem->masterModel->model_year ?? ''}}
                 </li>
                 <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Type: </span> Brand New</li>
                 <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Drive: </span>

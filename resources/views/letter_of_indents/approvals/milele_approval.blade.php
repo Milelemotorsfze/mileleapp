@@ -33,88 +33,95 @@
             </div>
             @endif
             <div class="row">
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label ">Select Country</label>
-                        <select class="form-control" data-trigger name="country" readonly id="country">
-                           <option> {{ $letterOfIndent->customer->country ?? '' }} </option>
-                        </select>
+                <div class="col-sm-4 mt-3">
+                    <div class="row mt-2">
+                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
+                            Customer :
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-6">
+                            {{ $letterOfIndent->customer->name ?? '' }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
+                            Dealers :
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-6">
+                            {{ $letterOfIndent->dealers }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3 col-md-6 col-lg-3 fw-bold">
+                            So Number :
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-6">
+                            {{ $letterOfIndent->so_number }}
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label ">Customer Type</label>
-                        <select class="form-control" name="customer_type" readonly>
-                            <option>{{  $letterOfIndent->customer->type ?? '' }}</option>
-                        </select>
+                <div class="col-sm-4 mt-3">
+                    <div class="row mt-2">
+                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
+                            Perefered Location :
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-6">
+                            {{ $letterOfIndent->prefered_location }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
+                            LOI Category :
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-6">
+                            {{ $letterOfIndent->category }}
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label ">Customer</label>
-                        <select class="form-control"  name="customer_id" readonly >
-                            <option>{{ $letterOfIndent->customer->name ?? '' }}</option>
-                        </select>
+                <div class="col-sm-4 mt-3">
+                    <div class="row">
+                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
+                            LOI Date :
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-6">
+                            {{ Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label ">Supplier</label>
-                        <select class="form-control" name="supplier_id" readonly>
-                                <option>{{ $letterOfIndent->supplier->supplier ?? '' }}</option>
-                        </select>
+                    <div class="row">
+                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
+                            Destination :
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-6">
+                            {{ $letterOfIndent->destination }}
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">LOI Category</label>
-                        <select class="form-control" name="category"  readonly>
-                            <option>{{ $letterOfIndent->category }}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label ">LOI Date</label>
-                        <input type="date" class="form-control" id="basicpill-firstname-input" name="date" readonly
-                               value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}">
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label ">Dealers</label>
-                        <select class="form-control" name="dealers" readonly >
-                            <option>{{ $letterOfIndent->dealers }}</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+                <hr>
                 <div class="row d-none d-lg-block d-xl-block d-xxl-block">
                     <div class="d-flex">
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <div class="row">
                                 <div class="col-lg-3 col-md-6">
-                                    <label class="form-label">Model</label>
+                                    <label class="form-label fw-bold">Model</label>
                                 </div>
-                                <div class="col-lg-2 col-md-6">
-                                    <label  class="form-label">SFX</label>
+                                <div class="col-lg-1 col-md-6">
+                                    <label  class="form-label fw-bold">SFX</label>
                                 </div>
-                                <div class="col-lg-3 col-md-6">
-                                    <label class="form-label">Variant</label>
-                                </div>
-                                <div class="col-lg-1 col-md-3">
-                                    <label class="form-label">LOI Qty</label>
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="form-label fw-bold">LOI Description</label>
                                 </div>
                                 <div class="col-lg-1 col-md-3">
-                                    <label class="form-label">Balance Qty</label>
+                                    <label class="form-label fw-bold">LOI Qty</label>
                                 </div>
                                 <div class="col-lg-1 col-md-3">
-                                    <label class="form-label">Inventory Qty</label>
+                                    <label class="form-label fw-bold">Balance Qty</label>
                                 </div>
                                 <div class="col-lg-1 col-md-3">
-                                    <label class="form-label">PFI Qty</label>
+                                    <label class="form-label fw-bold">Inventory Qty</label>
+                                </div>
+                                <div class="col-lg-1 col-md-3">
+                                    <label class="form-label fw-bold">PFI Qty</label>
                                 </div>
                             </div>
                         </div>
@@ -129,29 +136,29 @@
                             <div class="col-lg-12">
                                 <div class="row">
                                     <div class="col-lg-3 col-md-4">
-                                        <label class="form-label d-lg-none d-xl-none">Model</label>
+                                        <label class="form-label d-lg-none d-xl-none fw-bold">Model</label>
                                         <input type="text" value="{{ $letterOfIndentItem->masterModel->model ?? '' }}" readonly class="form-control">
                                     </div>
-                                    <div class="col-lg-2 col-md-4">
-                                        <label class="form-label d-lg-none d-xl-none">SFX</label>
+                                    <div class="col-lg-1 col-md-4">
+                                        <label class="form-label d-lg-none d-xl-none fw-bold">SFX</label>
                                         <input type="text" value="{{ $letterOfIndentItem->masterModel->sfx ?? ''}}" readonly class="form-control">
                                     </div>
-                                    <div class="col-lg-3 col-md-4">
-                                        <label class="form-label d-lg-none d-xl-none">Variant</label>
-                                        <input type="text" value="{{ $letterOfIndentItem->masterModel->variant->name ?? '' }}" readonly class="form-control">
+                                    <div class="col-lg-4 col-md-4">
+                                        <label class="form-label d-lg-none d-xl-none fw-bold">LOI Description</label>
+                                        <input type="text" value="{{ $letterOfIndentItem->loi_description ?? '' }}" readonly class="form-control">
                                     </div>
                                     <div class="col-lg-1 col-md-3">
-                                        <label class="form-label d-lg-none d-xl-none">LOI Qty</label>
+                                        <label class="form-label d-lg-none d-xl-none fw-bold">LOI Qty</label>
                                         <input type="text" value="{{ $letterOfIndentItem->quantity }}"
                                                readonly class="form-control">
                                     </div>
                                     <div class="col-lg-1 col-md-3">
-                                        <label class="form-label d-lg-none d-xl-none">Balance Qty</label>
+                                        <label class="form-label d-lg-none d-xl-none fw-bold">Balance Qty</label>
                                         <input type="text" value="{{ $letterOfIndentItem->balance_quantity }}" id="balance-qty-{{$key}}"
                                                readonly class="form-control">
                                     </div>
                                     <div class="col-lg-1 col-md-3">
-                                        <label class="form-label d-lg-none d-xl-none">Inventory Qty</label>
+                                        <label class="form-label d-lg-none d-xl-none fw-bold">Inventory Qty</label>
                                         <input type="text" value="{{ $letterOfIndentItem->inventory_quantity }}" id="inventory-qty-{{$key}}"
                                                readonly class="form-control">
                                     </div>
@@ -169,7 +176,7 @@
                                             ?>
 {{--                                        {{ $count }}--}}
 
-                                        <label class="form-label d-lg-none d-xl-none">PFI Qty</label>
+                                        <label class="form-label d-lg-none d-xl-none fw-bold">PFI Qty</label>
                                         <select name="quantities[]" class="form-control approve-quantity" id="quantity-{{$key}}" data-key="{{$key}}"
                                         data-balance-qty="{{$letterOfIndentItem->balance_quantity}}" data-inventory-qty="{{ $letterOfIndentItem->inventory_quantity }}">
                                             @for($i=0;$i <= $count;$i++)
