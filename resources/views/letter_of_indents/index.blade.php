@@ -3,6 +3,7 @@
     <style>
         .modal {
             position: absolute;
+            min-height: 500px;
         }
     </style>
     @can('LOI-list')
@@ -141,21 +142,21 @@
                                                     </div>
                                                     <div class="modal-body p-3">
                                                         @if($letterOfIndent->letterOfIndentItems->count() > 0)
-                                                            <div class="row  d-none d-lg-block d-xl-block d-xxl-block">
+                                                            <div class="row d-none d-lg-block d-xl-block d-xxl-block">
                                                                 <div class="d-flex">
                                                                     <div class="col-lg-12 col-md-12 col-sm-12">
                                                                         <div class="row">
                                                                             <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Model</label>
+                                                                                <dt>Model</dt>
                                                                             </div>
-                                                                            <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                <label  class="form-label">SFX</label>
+                                                                            <div class="col-lg-1 col-md-12 col-sm-12">
+                                                                                <dt>SFX </dt>
                                                                             </div>
-                                                                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Variant</label>
+                                                                            <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                                <dt>LOI Description</dt>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Quantity</label>
+                                                                                <dt>Quantity</dt>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -165,22 +166,23 @@
                                                                 <div class="row">
                                                                     <div class="d-flex">
                                                                         <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                            <hr>
                                                                             <div class="row mt-3">
                                                                                 <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->model ?? ''}}" readonly class="form-control" >
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">Model</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->model ?? ''}} </dl>
                                                                                 </div>
-                                                                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                    <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->sfx  ?? ''}}" readonly class="form-control">
+                                                                                <div class="col-lg-1 col-md-12 col-sm-12">
+                                                                                    <dt  class=" d-lg-none d-xl-none d-xxl-none">SFX</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                                 </div>
-                                                                                <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->variant->name ?? ''}}" readonly class="form-control">
+                                                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">LOI Description</dt>
+                                                                                    <dl> {{ $LOIItem->loi_description ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
-                                                                                    <input type="text" value="{{ $LOIItem->quantity }}" readonly class="form-control">
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">Quantity</dt>
+                                                                                    <dl>{{ $LOIItem->quantity }}</dl>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -320,16 +322,16 @@
                                                                     <div class="col-lg-12 col-md-12 col-sm-12">
                                                                         <div class="row">
                                                                             <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Model</label>
+                                                                                <dt>Model</dt>
                                                                             </div>
-                                                                            <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                <label  class="form-label">SFX</label>
+                                                                            <div class="col-lg-1 col-md-12 col-sm-12">
+                                                                                <dt>SFX</dt>
                                                                             </div>
-                                                                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Variant</label>
+                                                                            <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                                <dt>LOI Description</dt>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Quantity</label>
+                                                                                <dt>Quantity</dt>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -339,22 +341,23 @@
                                                                 <div class="row">
                                                                     <div class="d-flex">
                                                                         <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                            <hr>
                                                                             <div class="row mt-3">
                                                                                 <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->model ?? ''}}" readonly class="form-control" >
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">Model</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->model ?? ''}} </dl>
                                                                                 </div>
-                                                                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                    <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->sfx ?? '' }}" readonly class="form-control">
+                                                                                <div class="col-lg-1 col-md-12 col-sm-12">
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none fw-bold">SFX</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                                 </div>
-                                                                                <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->variant->name ?? '' }}" readonly class="form-control">
+                                                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none fw-bold">LOI Description</dt>
+                                                                                    <dl> {{ $LOIItem->loi_description ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
-                                                                                    <input type="text" value="{{ $LOIItem->quantity }}" readonly class="form-control">
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none fw-bold">Quantity</dt>
+                                                                                    <dl>{{ $LOIItem->quantity }}</dl>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -499,16 +502,16 @@
                                                                     <div class="col-lg-12 col-md-12 col-sm-12">
                                                                         <div class="row">
                                                                             <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Model</label>
+                                                                                <dt>Model</dt>
                                                                             </div>
-                                                                            <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                <label  class="form-label">SFX</label>
+                                                                            <div class="col-lg-1 col-md-12 col-sm-12">
+                                                                                <dt>SFX</dt>
                                                                             </div>
-                                                                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Variant</label>
+                                                                            <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                                <dt>LOI Description</dt>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Quantity</label>
+                                                                                <dt>Quantity</dt>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -518,22 +521,23 @@
                                                                 <div class="row">
                                                                     <div class="d-flex">
                                                                         <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                            <hr>
                                                                             <div class="row mt-3">
                                                                                 <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->model ?? '' }}" readonly class="form-control" >
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->model ?? ''}} </dl>
                                                                                 </div>
-                                                                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                    <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->sfx ?? '' }}" readonly class="form-control">
+                                                                                <div class="col-lg-1 col-md-12 col-sm-12">
+                                                                                    <dt  class="d-lg-none d-xl-none d-xxl-none ">SFX</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                                 </div>
-                                                                                <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->variant->name ?? ''}}" readonly class="form-control">
+                                                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">LOI Description</dt>
+                                                                                    <dl> {{ $LOIItem->loi_description ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
-                                                                                    <input type="text" value="{{ $LOIItem->quantity }}" readonly class="form-control">
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">Quantity</dt>
+                                                                                    <dl>{{ $LOIItem->quantity }}</dl>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -657,16 +661,16 @@
                                                                     <div class="col-lg-12 col-md-12 col-sm-12">
                                                                         <div class="row">
                                                                             <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Model</label>
+                                                                                <dt>Model</dt>
                                                                             </div>
-                                                                            <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                <label  class="form-label">SFX</label>
+                                                                            <div class="col-lg-1 col-md-12 col-sm-12">
+                                                                                <dt>SFX</dt>
                                                                             </div>
-                                                                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Variant</label>
+                                                                            <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                                <dt>LOI Description</dt>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Quantity</label>
+                                                                                <dt>Quantity</dt>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -676,22 +680,23 @@
                                                                 <div class="row">
                                                                     <div class="d-flex">
                                                                         <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                            <hr>
                                                                             <div class="row mt-3">
                                                                                 <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->model }}" readonly class="form-control" >
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->model ?? ''}} </dl>
                                                                                 </div>
-                                                                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                    <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->sfx  }}" readonly class="form-control">
+                                                                                <div class="col-lg-1 col-md-12 col-sm-12">
+                                                                                    <dt  class="d-lg-none d-xl-none d-xxl-none">SFX</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                                 </div>
-                                                                                <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->variant->name }}" readonly class="form-control">
+                                                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">LOI Description</dt>
+                                                                                    <dl> {{ $LOIItem->loi_description ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
-                                                                                    <input type="text" value="{{ $LOIItem->quantity }}" readonly class="form-control">
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">Quantity</dt>
+                                                                                    <dl>{{ $LOIItem->quantity }}</dl>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -799,16 +804,16 @@
                                                                     <div class="col-lg-12 col-md-12 col-sm-12">
                                                                         <div class="row">
                                                                             <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Model</label>
+                                                                                <dt>Model</dt>
                                                                             </div>
-                                                                            <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                <label  class="form-label">SFX</label>
+                                                                            <div class="col-lg-1 col-md-12 col-sm-12">
+                                                                                <dt>SFX</dt>
                                                                             </div>
-                                                                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Variant</label>
+                                                                            <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                                <dt>LOI Description</dt>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Quantity</label>
+                                                                                <dt>Quantity</dt>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -818,22 +823,23 @@
                                                                 <div class="row">
                                                                     <div class="d-flex">
                                                                         <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                            <hr>
                                                                             <div class="row mt-3">
                                                                                 <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->model ?? ''}}" readonly class="form-control" >
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">Model</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->model ?? ''}} </dl>
                                                                                 </div>
-                                                                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                    <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->sfx ?? '' }}" readonly class="form-control">
+                                                                                <div class="col-lg-1 col-md-12 col-sm-12">
+                                                                                    <dt  class="d-lg-none d-xl-none d-xxl-none">SFX</dt>
+                                                                                    <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                                 </div>
-                                                                                <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->variant->name ?? ''}}" readonly class="form-control">
+                                                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">LOI Description</dt>
+                                                                                    <dl> {{ $LOIItem->loi_description ?? '' }} </dl>
                                                                                 </div>
                                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
-                                                                                    <input type="text" value="{{ $LOIItem->masterModel->quantity }}" readonly class="form-control">
+                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">Quantity</dt>
+                                                                                    <dl>{{ $LOIItem->quantity }}</dl>
                                                                                 </div>
                                                                             </div>
                                                                         </div>

@@ -13,7 +13,8 @@ class LetterOfIndentItem extends Model
     protected $appends = [
         'steering',
         'balance_quantity',
-        'inventory_quantity'
+        'inventory_quantity',
+        'loi_description'
     ];
     public function LOI()
     {
@@ -37,6 +38,19 @@ class LetterOfIndentItem extends Model
            return $mastermodel->steering;
        }
        return null;
+    }
+    public function getLoiDescriptionAttribute()
+    {
+        $Loi = LetterOfIndent::find($this->letter_of_indent_id);
+        $LoiItem = LetterOfIndentItem::find($this->id);
+
+        if($Loi->dealers == 'Trans Cars') {
+            $loiDescription = $LoiItem->masterModel->transcar_loi_description;
+        }else{
+            $loiDescription = $LoiItem->masterModel->milele_loi_description;
+        }
+
+        return $loiDescription;
     }
     public function getBalanceQuantityAttribute()
     {
