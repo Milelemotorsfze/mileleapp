@@ -277,6 +277,7 @@ Route::get('/d', function () {
     Route::resource('personal-info', CandidatePersonalInfoController::class);
     Route::controller(CandidatePersonalInfoController::class)->group(function(){
         Route::post('personal-info/send-email', 'sendEmail')->name('personal-info.send-email');
+        Route::post('personal-info/verified', 'personalInfoVerified')->name('personal-info.verified');
     });
     // Employee Passport Request
     Route::resource('passport_request', PassportRequestController::class);
