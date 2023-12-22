@@ -185,17 +185,7 @@
                                                 <a href="{{ route('interview-summary-report.index') }}" class="dropdown-item" data-key="t-login">Interview Summary</a>
                                                 @endif
                                                 @endcanany
-                                                <!-- @canany(['view-personal-information-form-listing'])
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-personal-information-form-listing']);
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <a href="{{ route('interview-summary-report.index') }}" class="dropdown-item" data-key="t-login">Candidate Info</a>
-                                                @endif
-                                                @endcanany -->
-                                                
-
-
+                                                                                         
                                             </div>
                                             @endif
                                             @endcanany
@@ -401,9 +391,9 @@
                                 </li>
                                 @endif
                                 @endcanany
-                            @canany(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action'])
+                            @canany(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action','verify-candidate-personal-information','send-personal-info-form-action'])
                             @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action']);
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action','verify-candidate-personal-information','send-personal-info-form-action']);
                             @endphp
                             @if ($hasPermission OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can'] == true)
                             <li class="nav-item dropdown">
@@ -451,8 +441,10 @@
                                     </div>
                                     @endif
                                     @endcanany
-
-                                    @if(Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can']  == true OR Auth::user()->interview_summary_report_approval == true)
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action']);
+                                            @endphp
+                                    @if($hasPermission OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can']  == true OR Auth::user()->interview_summary_report_approval == true)
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                             <span data-key="t-utility"> Employee Hiring @if((Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']) > 0)
@@ -473,10 +465,17 @@
                                             </a>
                                             @endif
                                             @if(Auth::user()->interview_summary_report_approval == true)
-                                            <a href="{{ route('interview-summary-report.approval-awaiting') }}" class="dropdown-item" data-key="t-login">Interview Summary
-                                            @if(Auth::user()->interview_summary_report_approval['count'] > 0) <span class="approval-count">{{Auth::user()->interview_summary_report_approval['count']}}</span> @endif
+                                            <a href="{{ route('interview-summary-report.approval-awaiting') }}" class="dropdown-item" data-key="t-login">InterviewSummary @if(Auth::user()->interview_summary_report_approval['count'] > 0)<span class="approval-count">{{Auth::user()->interview_summary_report_approval['count']}}</span> @endif
                                             </a>
                                             @endif
+                                            @canany(['verify-candidate-personal-information','send-personal-info-form-action'])
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action']);
+                                            @endphp
+                                            @if ($hasPermission)
+                                            <a href="{{ route('candidate.listingInfo') }}" class="dropdown-item" data-key="t-login">Candidate Info</a>
+                                            @endif
+                                            @endcanany     
                                         </div>
                                     </div>
                                     @endif

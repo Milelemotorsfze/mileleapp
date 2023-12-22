@@ -107,7 +107,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 			<a class="nav-link" data-bs-toggle="pill" href="#approved-hiring-requests">Approved</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#personalinfo_docs">Personal Info & Docs</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#personalinfo_docs">Documents</a>
 		</li>
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#selected_for_job">Selected For Job</a>
@@ -2172,18 +2172,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											<i class="fa fa-user-plus" aria-hidden="true"></i> Add Personal Info
 											</a>
 										</li> -->
-										@canany(['send-personal-info-form-action'])
+										@canany(['send-candidate-documents-request-form'])
 										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-personal-info-form-action']);
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-candidate-documents-request-form']);
 										@endphp
 										@if ($hasPermission)
 										
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Send Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#send-personal-info-form-{{$data->id}}">
-												<i class="fa fa-paper-plane" aria-hidden="true"></i> Send Form
+												<i class="fa fa-paper-plane" aria-hidden="true"></i> Request Documents
 											</button>
 										</li>
+										<!-- <li>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Send Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#send-personal-info-form-{{$data->id}}">
+												<i class="fa fa-paper-plane" aria-hidden="true"></i> Send Form
+											</button>
+										</li> -->
 										@endif
 										@endcanany
 
@@ -2253,6 +2259,49 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 									<div class="modal-dialog ">
 										<div class="modal-content">
+											<form method="POST" action="{{route('docs.send-email')}}" id="send_email_{{$data->id}}">
+												@csrf
+												<div class="modal-header">
+													<h1 class="modal-title fs-5" id="exampleModalLabel">Send Candidate's Documents Request Form
+
+													</h1>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body p-3">
+													<div class="col-lg-12">
+														<div class="row">
+															<div class="col-12">
+																<div class="row">
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<input type="text" name="id" value="{{$data->id}}" hidden>
+																	</div>
+																</div>
+																<div class="row">
+																	<div class="col-xxl-12 col-lg-12 col-md-12">
+																		<label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
+																	</div>
+																	<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
+																			<input name="email" id="email_{{$data->id}}" class="form-control" required
+																			placeholder="Enter Candidate Email" value="@if($data->email){{$data->email}}@endif">																		
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary send-email"
+														data-id="{{ $data->id }}" data-status="final">Submit</button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+								<!-- <div class="modal fade" id="send-personal-info-form-{{$data->id}}"
+									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog ">
+										<div class="modal-content">
 											<form method="POST" action="{{route('personal-info.send-email')}}" id="send_email_{{$data->id}}">
 												@csrf
 												<div class="modal-header">
@@ -2291,7 +2340,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</form>
 										</div>
 									</div>
-								</div>
+								</div> -->
 							</td>
 						</tr>
 						@endforeach
@@ -2664,30 +2713,30 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
 										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
-										@canany(['send-personal-info-form-action'])
+										@canany(['send-candidate-documents-request-form'])
 										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-personal-info-form-action']);
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-candidate-documents-request-form']);
 										@endphp
-										@if ($hasPermission && $data->candidateDetails->personal_information_verified_at == NULL)
+										@if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL)
 										
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Resend Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#send-personal-info-form-{{$data->id}}">
-												<i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Form
+												<i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Docs Form
 											</button>
 										</li>
 										@endif
 										@endcanany
 
-										@canany(['verify-candidate-personal-information-and-documents'])
+										@canany(['verify-candidates-documents'])
 										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information-and-documents']);
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents']);
 										@endphp
-										@if ($hasPermission && $data->candidateDetails->personal_information_verified_at == NULL)
+										@if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL)
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-personalinfo"  data-bs-toggle="modal"
 												data-bs-target="#verify-personal-info-form-{{$data->id}}" data-id="{{$data->id}}">
-												<i class="fa fa-check" aria-hidden="true"></i> Verified
+												<i class="fa fa-check" aria-hidden="true"></i> Docs Verified
 											</button>
 										</li>
 										@endif
@@ -3047,8 +3096,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	}
 	$('.btn-verify-personalinfo').click(function (e) {
 	        var id = $(this).attr('data-id');
-			let url = '{{ route('personal-info.verified') }}';
-	        var confirm = alertify.confirm('Are you sure you verified this personal information and documents ?',function (e) {
+			let url = '{{ route('docs.verified') }}';
+	        var confirm = alertify.confirm('Are you sure you verified this candidate documents ?',function (e) {
 	            if (e) {
 	                $.ajax({
 	                    type: "POST",

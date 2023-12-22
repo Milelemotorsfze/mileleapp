@@ -1009,7 +1009,7 @@
 			<div class="table-responsive">
 				<table id="teamlead-rejected-hiring-requests-table" class="table table-striped table-editable table-edits table data-table-class">
 					<thead>
-                    <tr>
+                    	<tr>
 							<th rowspan="2" class="light">Sl No</th>
 							<th colspan="2" class="dark">
 								<center>Hiring Request</center>
