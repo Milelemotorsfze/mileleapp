@@ -172,6 +172,7 @@
     @endphp
     <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>
        @php
+       $sales_notes = "";
        if($calls->status == "Prospecting")
        {
        $sales_notes = DB::table('prospectings')->where('calls_id', $calls->id)->first();
