@@ -373,6 +373,7 @@
                 getCustomers();
             });
             $('#dealer').change(function () {
+                alert("clicked");
                 var value = $('#dealer').val();
                 $('#dealer-input').val(value);
 
@@ -383,7 +384,9 @@
             $('#customer-type').change(function () {
                 getCustomers();
             });
-
+            // $('#dealer').change(function () {
+            //    alert("ok");
+            // });
             var LOICount = '{{ $letterOfIndentItems->count() }}';
 
             for(var i=1;i<=LOICount;i++) {

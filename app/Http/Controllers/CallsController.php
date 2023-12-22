@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Calls;
 use App\Models\UserActivities;
 use App\Models\User;
+use Yajra\DataTables\DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -93,8 +94,165 @@ class CallsController extends Controller
         $useractivities->save();
         return view('calls.rejected',compact('data'));
     }
-    public function datacenter()
+    public function datacenter(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open The Leads Database";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        if ($request->ajax()) {
+            $callsQuery = Calls::query();
+            foreach ($request->input('columns') as $column) {
+                $searchValue = $column['search']['value'];
+                $columnName = $column['name'];
+                if (!empty($searchValue)) {
+                if ($columnName === 'date' && $searchValue !== null) {
+                    $callsQuery->orWhere('created_at', 'like', '%' . $searchValue . '%');
+                } elseif ($columnName === 'status' && $searchValue !== null) {
+                    $callsQuery->orWhere('status', 'like', '%' . $searchValue . '%');
+                } elseif ($columnName === 'type' && $searchValue !== null) {
+                    $callsQuery->orWhere('type', 'like', '%' . $searchValue . '%');
+                } elseif ($columnName === 'priority' && $searchValue !== null) {
+                    $callsQuery->orWhere('priority', 'like', '%' . $searchValue . '%');
+                } elseif ($columnName === 'name' && $searchValue !== null) {
+                    $callsQuery->orWhere('name', 'like', '%' . $searchValue . '%');
+                } elseif ($columnName === 'email' && $searchValue !== null) {
+                    $callsQuery->orWhere('email', 'like', '%' . $searchValue . '%');
+                } elseif ($columnName === 'phone' && $searchValue !== null) {
+                    $callsQuery->orWhere('phone', 'like', '%' . $searchValue . '%');
+                }
+                elseif ($columnName === 'location' && $searchValue !== null) {
+                    $callsQuery->orWhere('location', 'like', '%' . $searchValue . '%');
+                }
+                elseif ($columnName === 'custom_brand_model' && $searchValue !== null) {
+                    $callsQuery->orWhere('custom_brand_model', 'like', '%' . $searchValue . '%');
+                }
+                elseif ($columnName === 'remarks' && $searchValue !== null) {
+                    $callsQuery->orWhere('remarks', 'like', '%' . $searchValue . '%');
+                }
+                elseif ($columnName === 'remarks' && $searchValue !== null) {
+                    $callsQuery->orWhere('remarks', 'like', '%' . $searchValue . '%');
+                }
+                elseif ($columnName === 'salesperson' && $searchValue !== null) {
+                    $callsQuery->orWhereHas('salesperson', function ($query) use ($searchValue) {
+                        $query->where('name', 'like', '%' . $searchValue . '%');
+                    });
+                }
+                else if ($columnName === 'brand_model' && $searchValue !== null) {
+                    $callsQuery->orWhereHas('requirements.masterModelLine.brand', function ($query) use ($searchValue) {
+                        $query->where('brand_name', 'like', '%' . $searchValue . '%');
+                    });
+                
+                    $callsQuery->orWhereHas('requirements.masterModelLine', function ($query) use ($searchValue) {
+                        $query->where('model_line', 'like', '%' . $searchValue . '%');
+                    });
+                }
+                else if ($columnName === 'sales_remarks_coming' && $searchValue !== null) {
+                    $callsQuery->orWhereHas('closed', function ($query) use ($searchValue) {
+                        $query->where('sales_notes', 'like', '%' . $searchValue . '%');
+                    });
+                
+                    $callsQuery->orWhereHas('rejectionleads', function ($query) use ($searchValue) {
+                        $query->where('sales_notes', 'like', '%' . $searchValue . '%');
+                    });
+                
+                    $callsQuery->orWhereHas('salesdemandleads', function ($query) use ($searchValue) {
+                        $query->where('salesnotes', 'like', '%' . $searchValue . '%');
+                    });
+                
+                    $callsQuery->orWhereHas('negotiationleads', function ($query) use ($searchValue) {
+                        $query->where('sales_notes', 'like', '%' . $searchValue . '%');
+                    });
+                
+                    $callsQuery->orWhereHas('quotationleads', function ($query) use ($searchValue) {
+                        $query->where('sales_notes', 'like', '%' . $searchValue . '%');
+                    });
+                
+                    $callsQuery->orWhereHas('prospectingleads', function ($query) use ($searchValue) {
+                        $query->where('salesnotes', 'like', '%' . $searchValue . '%');
+                    });
+                }
+                else if ($columnName === 'strategies' && $searchValue !== null) {
+                    $callsQuery->orWhereHas('strategies', function ($query) use ($searchValue) {
+                        $query->where('name', 'like', '%' . $searchValue . '%');
+                    });
+                }                
+            }
+            }
+            return DataTables::of($callsQuery)
+                ->addColumn('date', function ($call) {
+                    return date('d-M-Y', strtotime($call->created_at));
+                })
+                ->addColumn('status', function ($call) {
+                    return $call->status;
+                })
+                ->addColumn('language', function ($call) {
+                    return $call->language;
+                })
+                ->addColumn('custom_brand_model', function ($call) {
+                    return $call->custom_brand_model;
+                })
+                ->addColumn('location', function ($call) {
+                    return $call->location;
+                })
+                ->addColumn('remarks', function ($call) {
+                    return $call->remarks;
+                })
+                ->addColumn('type', function ($call) {
+                    return $call->type;
+                })
+                ->addColumn('name', function ($call) {
+                    return $call->name;
+                })
+                ->addColumn('priority', function ($call) {
+                    return $call->priority;
+                })
+                ->addColumn('salesperson', function ($call) {
+                    return $call->salesperson->name;
+                })
+                ->addColumn('leadsource', function ($call) {
+                    return $call->leadssouces ? $call->leadssouces->source_name : '';
+                }) 
+                ->addColumn('strategies', function ($call) {
+                    return $call->strategies ? $call->strategies->name : '';
+                })               
+                ->addColumn('brand_model', function ($call) {
+                    $requirements = $call->requirements;
+                    if ($requirements) {
+                        $brand = optional($requirements->masterModelLine->brand)->brand_name ?? '';
+                        $modelLine = optional($requirements->masterModelLine)->model_line ?? '';
+                        return $brand . ' - ' . $modelLine;
+                    } else {
+                        return '';
+                    }
+                })
+                ->addColumn('sales_remarks_coming', function ($call) {
+                    $closed = $call->closed;
+                    $rejection = $call->rejectionleads;
+                    $negotiation = $call->negotiationleads;
+                    $quotation = $call->quotationleads;
+                    $quotation = $call->quotationleads;
+                    $demandleads = $call->salesdemandleads;
+                    $prospecting = $call->prospectingleads;
+                    if ($closed) {
+                        return $closed->sales_notes;
+                    } elseif ($rejection) {
+                        return $rejection->sales_notes;
+                    }elseif ($demandleads) {
+                        return $demandleads->salesnotes;
+                    }elseif ($negotiation) {
+                        return $negotiation->sales_notes;
+                    } elseif ($quotation) {
+                        return $quotation->sales_notes;
+                    } elseif ($prospecting) {
+                        return $prospecting->salesnotes;
+                    } else {
+                        return '';
+                    }
+                })                
+                ->toJson();
+        }
+        return view('calls.leadsdatabase');
     }
     /**
      * Show the form for creating a new resource.

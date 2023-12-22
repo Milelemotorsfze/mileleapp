@@ -80,7 +80,7 @@ use App\Http\Controllers\HRM\Hiring\InterviewSummaryReportController;
 use App\Http\Controllers\AgentsController;
 use App\Http\Controllers\SalesPersonStatusController;
 use App\Http\Controllers\PortsController;
-
+use App\Http\Controllers\WebhookController;
 /*
 /*
 |--------------------------------------------------------------------------
@@ -92,6 +92,7 @@ use App\Http\Controllers\PortsController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::post('/webhook', [WebhookController::class, 'handleWebhook']);
 Route::get('/react-page', function () {
     return view('react-app.index');
 });
