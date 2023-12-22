@@ -274,10 +274,15 @@ Route::get('/d', function () {
         Route::get('interview-summary-report-approval-awaiting', 'approvalAwaiting')->name('interview-summary-report.approval-awaiting');
     });
     // Candidate Personal Information Form
+    Route::get('candidate/listingInfo', [CandidatePersonalInfoController::class, 'getCandidatePersonalInfo'])->name('candidate.listingInfo');
+
     Route::resource('personal-info', CandidatePersonalInfoController::class);
     Route::controller(CandidatePersonalInfoController::class)->group(function(){
         Route::post('personal-info/send-email', 'sendEmail')->name('personal-info.send-email');
+        Route::post('docs/send-email', 'sendDocsEmail')->name('docs.send-email');
         Route::post('personal-info/verified', 'personalInfoVerified')->name('personal-info.verified');
+        Route::post('docs/verified', 'docsVerified')->name('docs.verified');
+        // Route::get('personal-info/listingInfo', 'getCandidatePersonalInfo')->name('personal-info.listingInfo');
     });
     // Employee Passport Request
     Route::resource('passport_request', PassportRequestController::class);

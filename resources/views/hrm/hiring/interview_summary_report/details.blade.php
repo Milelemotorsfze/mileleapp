@@ -25,11 +25,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
             @endphp
             @if ($hasPermission)
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="pill" href="#personal-info"> Personal Information</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="pill" href="#documents"> Documents</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="pill" href="#personal-info"> Personal Information</a>
+            </li>
+           
             @endcanany
             @endif
             @endif
@@ -478,31 +479,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
         <div class="row">
             <div class="col-xxl-8 col-lg-8 col-md-8">	
             </div>
-            <div class="col-xxl-4 col-lg-4 col-md-4">	
-            
-                @canany(['verify-candidate-personal-information-and-documents'])
-                @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information-and-documents']);
-                @endphp
-                @if ($hasPermission && $data->candidateDetails->personal_information_verified_at == NULL)
-                <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-personalinfo"  data-bs-toggle="modal"
-                    data-bs-target="#verify-personal-info-form-{{$data->id}}" data-id="{{$data->id}}">
-                    <i class="fa fa-check" aria-hidden="true"></i> Verified Personal information And Documents
-                </button>
-                @endif
-                @endcanany
-
-                @canany(['send-personal-info-form-action'])
-                @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-personal-info-form-action']);
-                @endphp
-                @if ($hasPermission && $data->candidateDetails->personal_information_verified_at == NULL)	            							
-                <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Resend Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-                    data-bs-target="#send-personal-info-form-{{$data->id}}">
-                    <i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Form To Edit
-                </button>
-                @endif
-                @endcanany
+            <div class="col-xxl-4 col-lg-4 col-md-4">	              
                 <div class="modal fade" id="send-personal-info-form-{{$data->id}}"
                     tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog ">
@@ -555,8 +532,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade show" id="personal-info">
+        <div class="tab-pane fade show" id="personal-info">                
             <div class="row">
+                <div class="col-xxl-12 col-lg-12 col-md-12">
+                    @canany(['verify-candidate-personal-information'])
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information']);
+                    @endphp
+                    @if ($hasPermission && $data->candidateDetails->personal_information_verified_at == NULL)
+                    <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-personalinfo"  data-bs-toggle="modal"
+                        data-bs-target="#verify-personal-info-form-{{$data->id}}" data-id="{{$data->id}}">
+                        <i class="fa fa-check" aria-hidden="true"></i> Verified Personal information
+                    </button>
+                    @endif
+                    @endcanany
+
+                    @canany(['send-personal-info-form-action'])
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-personal-info-form-action']);
+                    @endphp
+                    @if ($hasPermission && $data->candidateDetails->personal_information_verified_at == NULL)	            							
+                    <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Resend Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+                        data-bs-target="#send-personal-info-form-{{$data->id}}">
+                        <i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Personal Info Form
+                    </button>
+                    @endif
+                    @endcanany
+                </div>
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                     <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                         <div class="card">
@@ -875,6 +877,85 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 </div>
                 <div class="card-body">
                     <div class="row">
+                        <div class="col-xxl-12 col-lg-12 col-md-12">
+                            @canany(['verify-candidates-documents'])
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents']);
+                            @endphp
+                            @if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL)
+                            <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-personalinfo"  data-bs-toggle="modal"
+                                data-bs-target="#verify-docs-{{$data->id}}" data-id="{{$data->id}}">
+                                <i class="fa fa-check" aria-hidden="true"></i> Verified Documents
+                            </button>
+                            @endif
+                            @endcanany
+
+                            @canany(['send-candidate-documents-request-form'])
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-candidate-documents-request-form']);
+                            @endphp
+                            @if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL)	            							
+                            <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Resend Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+                                data-bs-target="#send-docs-form-{{$data->id}}">
+                                <i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Docs Form
+                            </button>
+                            @endif
+                            @endcanany
+
+                            <div class="modal fade" id="send-docs-form-{{$data->id}}"
+                    tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog ">
+                        <div class="modal-content">
+                            <form method="POST" action="{{route('docs.send-email')}}" id="send_email_{{$data->id}}">
+                                @csrf
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Resend Documents Request Form To candidate for Edit
+
+                                    </h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body p-3">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <div class="col-xxl-6 col-lg-6 col-md-6">
+                                                        <input type="text" name="id" value="{{$data->id}}" hidden>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xxl-12 col-lg-12 col-md-12">
+                                                        <label for="email" class="form-label font-size-13">{{ __('Comments send to candidate') }}</label>
+                                                    </div>
+                                                    <div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
+                                                            <textarea rows="5" name="comment"  id="comments_{{$data->id}}" class="form-control" required
+                                                            placeholder="Comments send to candidate" value=""></textarea>																		
+                                                    </div>
+                                                    <div class="col-xxl-12 col-lg-12 col-md-12">
+                                                        <label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
+                                                    </div>
+                                                    <div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
+                                                            <input name="email" id="email_{{$data->id}}" class="form-control" required
+                                                            placeholder="Enter Candidate Email" value="@if($data->email){{$data->email}}@endif">																		
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary send-email"
+                                        data-id="{{ $data->id }}" data-status="final">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
                         @if($data->candidateDetails->image_path)
                         <div class="row">
@@ -1026,8 +1107,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 <script type="text/javascript">
     $('.btn-verify-personalinfo').click(function (e) {
         var id = $(this).attr('data-id');
-        let url = '{{ route('personal-info.verified') }}';
-        var confirm = alertify.confirm('Are you sure you verified this personal information and documents ?',function (e) {
+        let url = '{{ route('docs.verified') }}';
+        var confirm = alertify.confirm('Are you sure you verified this candidate documents ?',function (e) {
             if (e) {
                 $.ajax({
                     type: "POST",

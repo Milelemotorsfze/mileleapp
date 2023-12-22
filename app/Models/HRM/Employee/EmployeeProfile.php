@@ -117,7 +117,9 @@ class EmployeeProfile extends Model
         'personal_information_verified_at',
         'personal_information_created_by',
         'personal_information_verified_by',
-        
+        'documents_verified_at',
+        'documents_verified_by',
+
         'image_path',
         'language',
         'office',
