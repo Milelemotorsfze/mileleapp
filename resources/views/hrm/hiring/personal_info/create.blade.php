@@ -241,7 +241,7 @@
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-header" style="background-color:#d2e7f9!important;">
-										<h4 class="card-title"><center>CANDIDATE PERSONAL INFORMATION & DOCUMENTS SHAREING FORM</center></h4>
+										<h4 class="card-title"><center>CANDIDATE PERSONAL INFORMATION & DOCUMENTS SHARING FORM</center></h4>
 									</div>
                                     <div class="card-body">
                                         <form class="w3-container" action="{{route('candidate.storePersonalinfo')}}" method="POST" id="candidatepersonalInfoForm"

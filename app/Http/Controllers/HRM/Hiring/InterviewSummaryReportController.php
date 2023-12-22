@@ -85,7 +85,7 @@ class InterviewSummaryReportController extends Controller
             ['date_of_second_round','!=',NULL],
             ['date_of_first_round','!=',NULL],
             ['date_of_telephonic_interview','!=',NULL],
-            ['candidate_selected','==',NULL],
+            ['candidate_selected',NULL],
             ['status','pending'],
         ])->latest()->get();
         $notSelected = InterviewSummaryReport::where([
@@ -109,10 +109,10 @@ class InterviewSummaryReportController extends Controller
             ['candidate_selected','yes'],
         ])->latest()->get();
         // $pendings = InterviewSummaryReport::where('status','pending')->latest()->get();
-        $approved = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')->latest()->get(); 
+        $approved = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')->whereDoesntHave('candidateDetails')->latest()->get(); 
         $rejected = InterviewSummaryReport::where('status','rejected')->where('seleced_status','pending')->latest()->get();
         $selectedForJob = InterviewSummaryReport::where('status','approved')->where('seleced_status','selected')->latest()->get(); 
-        $personalInfo = [];
+        $personalInfo = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')->whereHas('candidateDetails')->latest()->get();
         $interviewersNames = User::whereHas('empProfile')->select('id','name')->get();
         return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','notSelected',
         'pendings','approved','selectedForJob','personalInfo','rejected','interviewersNames'));

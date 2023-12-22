@@ -23,6 +23,7 @@ use App\Models\EmpDoc;
 use DB;
 use Exception;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class CandidatePersonalInfoController extends Controller
 {
@@ -38,13 +39,17 @@ class CandidatePersonalInfoController extends Controller
             return redirect()->back()->withInput()->withErrors($validator);
         }
         else {
-            // DB::beginTransaction();
-            // try {
+            DB::beginTransaction();
+            try {
                 $update = InterviewSummaryReport::where('id',$request->id)->first();
                 if($update) {
                     $update->email = $request->email;
                 }
                 $update->update();
+                $data['comment'] = '';
+                if($request->comment) {
+                    $data['comment'] = $request->comment;
+                }
                 $data['id'] = Crypt::encrypt($update->id);
                 $data['email'] = $request->email;
                 $data['name'] = 'Dear '.$update->candidate_name.' ,';
@@ -60,14 +65,14 @@ class CandidatePersonalInfoController extends Controller
                                 ->subject($subject);
                         }
                     );
-                // DB::commit();
-                return redirect()->route('interview-summary-report.index')
+                DB::commit();
+                return redirect()->back()
                                     ->with('success','Personal Information Form Successfully Send To Candidate');
-            // } 
-            // catch (\Exception $e) {
-                // DB::rollback();
-                // dd($e);
-            // }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                info($e);
+            }
         }
     }
     public function sendForm($id) {
@@ -156,7 +161,7 @@ class CandidatePersonalInfoController extends Controller
                         if(isset($emiratesIdFileName)) {
                             $input['emirates_id_file'] = $emiratesIdFileName;                  
                         }
-                        $input['personal_information_created_by'] = $request->id;
+                        // $input['personal_information_created_by'] = $request->id;
                         $input['residence_telephone_number'] = $request->residence_telephone_number['full'];
                         $input['contact_number'] = $request->contact_number['full'];
                         $input['type'] = 'candidate';
@@ -359,6 +364,32 @@ class CandidatePersonalInfoController extends Controller
            DB::commit();
            $successMessage = 'Candidate Personal Information Form Submitted Successfully.';
            return view('hrm.hiring.personal_info.successPersonalinfo',compact('candidate','successMessage'));
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                dd($e);
+            }
+        }
+    }
+    public function personalInfoVerified(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $authId = Auth::id();
+                $candidate = EmployeeProfile::where('interview_summary_id',$request->id)->first();
+                if($candidate) {
+                    $candidate->personal_information_verified_at = Carbon::now();
+                    $candidate->personal_information_verified_by = $authId;
+                    $candidate->update();
+                }
+                DB::commit();
+                return response()->json('success');
             } 
             catch (\Exception $e) {
                 DB::rollback();
