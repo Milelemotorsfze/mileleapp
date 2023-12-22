@@ -105,36 +105,79 @@ class CallsController extends Controller
             foreach ($request->input('columns') as $column) {
                 $searchValue = $column['search']['value'];
                 $columnName = $column['name'];
-        
+                if (!empty($searchValue)) {
                 if ($columnName === 'date' && $searchValue !== null) {
-                    $callsQuery->orWhereHas('date', function ($query) use ($searchValue) {
-                        $query->where('date', 'like', '%' . $searchValue . '%');
-                    });
+                    $callsQuery->orWhere('created_at', 'like', '%' . $searchValue . '%');
                 } elseif ($columnName === 'status' && $searchValue !== null) {
-                    $callsQuery->orWhereHas('status', function ($query) use ($searchValue) {
-                        $query->where('status', 'like', '%' . $searchValue . '%');
-                    });
+                    $callsQuery->orWhere('status', 'like', '%' . $searchValue . '%');
                 } elseif ($columnName === 'type' && $searchValue !== null) {
-                    $callsQuery->orWhereHas('type', function ($query) use ($searchValue) {
-                        $query->where('type', 'like', '%' . $searchValue . '%');
-                    });
+                    $callsQuery->orWhere('type', 'like', '%' . $searchValue . '%');
                 } elseif ($columnName === 'priority' && $searchValue !== null) {
-                    $callsQuery->orWhereHas('priority', function ($query) use ($searchValue) {
-                        $query->where('priority', 'like', '%' . $searchValue . '%');
-                    });
-                } elseif ($columnName === 'to_name' && $searchValue !== null) {
-                    $callsQuery->orWhereHas('toWarehouse', function ($query) use ($searchValue) {
+                    $callsQuery->orWhere('priority', 'like', '%' . $searchValue . '%');
+                } elseif ($columnName === 'name' && $searchValue !== null) {
+                    $callsQuery->orWhere('name', 'like', '%' . $searchValue . '%');
+                } elseif ($columnName === 'email' && $searchValue !== null) {
+                    $callsQuery->orWhere('email', 'like', '%' . $searchValue . '%');
+                } elseif ($columnName === 'phone' && $searchValue !== null) {
+                    $callsQuery->orWhere('phone', 'like', '%' . $searchValue . '%');
+                }
+                elseif ($columnName === 'location' && $searchValue !== null) {
+                    $callsQuery->orWhere('location', 'like', '%' . $searchValue . '%');
+                }
+                elseif ($columnName === 'custom_brand_model' && $searchValue !== null) {
+                    $callsQuery->orWhere('custom_brand_model', 'like', '%' . $searchValue . '%');
+                }
+                elseif ($columnName === 'remarks' && $searchValue !== null) {
+                    $callsQuery->orWhere('remarks', 'like', '%' . $searchValue . '%');
+                }
+                elseif ($columnName === 'remarks' && $searchValue !== null) {
+                    $callsQuery->orWhere('remarks', 'like', '%' . $searchValue . '%');
+                }
+                elseif ($columnName === 'salesperson' && $searchValue !== null) {
+                    $callsQuery->orWhereHas('salesperson', function ($query) use ($searchValue) {
                         $query->where('name', 'like', '%' . $searchValue . '%');
                     });
-                } elseif ($columnName === 'so_number' && $searchValue !== null) {
-                    $callsQuery->orWhereHas('vehicle.so', function ($query) use ($searchValue) {
-                        $query->where('so_number', 'like', '%' . $searchValue . '%');
+                }
+                else if ($columnName === 'brand_model' && $searchValue !== null) {
+                    $callsQuery->orWhereHas('requirements.masterModelLine.brand', function ($query) use ($searchValue) {
+                        $query->where('brand_name', 'like', '%' . $searchValue . '%');
                     });
-                } elseif ($columnName === 'po_number' && $searchValue !== null) {
-                    $callsQuery->orWhereHas('vehicle.purchasingOrder', function ($query) use ($searchValue) {
-                        $query->where('po_number', 'like', '%' . $searchValue . '%');
+                
+                    $callsQuery->orWhereHas('requirements.masterModelLine', function ($query) use ($searchValue) {
+                        $query->where('model_line', 'like', '%' . $searchValue . '%');
                     });
                 }
+                else if ($columnName === 'sales_remarks_coming' && $searchValue !== null) {
+                    $callsQuery->orWhereHas('closed', function ($query) use ($searchValue) {
+                        $query->where('sales_notes', 'like', '%' . $searchValue . '%');
+                    });
+                
+                    $callsQuery->orWhereHas('rejectionleads', function ($query) use ($searchValue) {
+                        $query->where('sales_notes', 'like', '%' . $searchValue . '%');
+                    });
+                
+                    $callsQuery->orWhereHas('salesdemandleads', function ($query) use ($searchValue) {
+                        $query->where('salesnotes', 'like', '%' . $searchValue . '%');
+                    });
+                
+                    $callsQuery->orWhereHas('negotiationleads', function ($query) use ($searchValue) {
+                        $query->where('sales_notes', 'like', '%' . $searchValue . '%');
+                    });
+                
+                    $callsQuery->orWhereHas('quotationleads', function ($query) use ($searchValue) {
+                        $query->where('sales_notes', 'like', '%' . $searchValue . '%');
+                    });
+                
+                    $callsQuery->orWhereHas('prospectingleads', function ($query) use ($searchValue) {
+                        $query->where('salesnotes', 'like', '%' . $searchValue . '%');
+                    });
+                }
+                else if ($columnName === 'strategies' && $searchValue !== null) {
+                    $callsQuery->orWhereHas('strategies', function ($query) use ($searchValue) {
+                        $query->where('name', 'like', '%' . $searchValue . '%');
+                    });
+                }                
+            }
             }
             return DataTables::of($callsQuery)
                 ->addColumn('date', function ($call) {
