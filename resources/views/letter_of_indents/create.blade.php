@@ -12,9 +12,6 @@
         {
             height:32px!important;
         }
-        .select-error{
-            color: red;
-        }
     </style>
     <div class="card-header">
         <h4 class="card-title">Add New LOI</h4>
@@ -182,24 +179,21 @@
                     <div class="card-body">
                         <div id="loi-items" >
                             <div class="row Loi-items-row-div" id="row-1">
-                                <div class="col-lg-2 col-md-6 col-sm-12 select-button-main-div">
+                                <div class="col-lg-2 col-md-6 col-sm-12">
                                     <label class="form-label">Model</label>
-                                    <div class="dropdown-option-div">
-                                        <select class="form-select widthinput text-dark models" multiple data-index="1" name="models[]" id="model-1" autofocus>
-                                            <option value="" >Select Model</option>
-                                            @foreach($models as $model)
-                                                <option value="{{ $model->model }}">{{ $model->model }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
+                                    <select class="form-select widthinput text-dark models" multiple data-index="1" name="models[]" id="model-1" autofocus>
+                                        <option value="" >Select Model</option>
+                                        @foreach($models as $model)
+                                            <option value="{{ $model->model }}">{{ $model->model }}</option>
+                                        @endforeach
+                                    </select>
                                     @error('model')
                                     <span>
                                 <strong >{{ $message }}</strong>
                             </span>
                                     @enderror
                                 </div>
-                                <div class="col-lg-2 col-md-6 col-sm-12 mb-3 select-button-main-div">
+                                <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
                                     <label class="form-label">SFX</label>
                                     <select class="form-select widthinput text-dark sfx" multiple  data-index="1" name="sfx[]" id="sfx-1" >
                                         <option value="">Select SFX</option>
@@ -210,7 +204,7 @@
                                     </div>
                                     @enderror
                                 </div>
-                                <div class="col-lg-2 col-md-6 col-sm-12 mb-3 select-button-main-div">
+                                <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
                                     <label class="form-label">Model Year</label>
                                     <select class="form-select widthinput text-dark model-years" multiple  data-index="1" name="model_year[]" id="model-year-1">
                                         <option value="">Select Model Year</option>
@@ -307,7 +301,9 @@
             }
         });
         getCustomers();
+
         $("#form-create").validate({
+            ignore: [],
             rules: {
                 customer_id: {
                     required: true,
@@ -343,7 +339,7 @@
                     file: {
                         extension: "Please upload pdf file"
                     }
-                }
+                },
             }
         });
 
@@ -369,7 +365,7 @@
             maximumSelectionLength: 1
         }).on('change', function() {
             getCustomers();
-        });;
+        });
 
         $('#customer-type').change(function (){
             getCustomers();
@@ -399,7 +395,6 @@
         $('#dealer').change(function () {
             var value = $('#dealer').val();
             $('#dealer-input').val(value);
-
             getModels('all','dealer-change');
 
         });
@@ -496,7 +491,7 @@
 
            var newRow = `
                 <div class="row Loi-items-row-div" id="row-${index}">
-                    <div class="col-lg-2 col-md-6 col-sm-12 select-button-main-div">
+                    <div class="col-lg-2 col-md-6 col-sm-12">
                         <select class="form-select widthinput text-dark models" multiple name="models[]" data-index="${index}" id="model-${index}" autofocus>
                             <option value="" >Select Model</option>
                             @foreach($models as $model)
@@ -509,7 +504,7 @@
                             </span>
                         @enderror
                         </div>
-                         <div class="col-lg-2 col-md-6 col-sm-12 mb-3 select-button-main-div">
+                         <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
                             <select class="form-select widthinput text-dark sfx" multiple name="sfx[]"  data-index="${index}" id="sfx-${index}" >
                             <option value="">Select SFX</option>
                         </select>
@@ -519,7 +514,7 @@
                         </div>
                         @enderror
                         </div>
-                        <div class="col-lg-2 col-md-6 col-sm-12 mb-3 select-button-main-div">
+                        <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
                                 <select class="form-select widthinput text-dark model-years" multiple  name="model_year[]" data-index="${index}" id="model-year-${index}">
                                 <option value="">Select Model Year</option>
                             </select>
@@ -529,7 +524,7 @@
                             </div>
                             @enderror
                         </div>
-                        <div class="col-lg-3 col-md-6 col-sm-12 mb-3 ">
+                        <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
                             <input type="text" readonly placeholder="LOI Description"
                                    class="form-control widthinput text-dark loi-descriptions" data-index="${index}" id="loi-description-${index}" >
                    </div>
