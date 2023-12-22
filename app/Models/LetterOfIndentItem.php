@@ -48,14 +48,11 @@ class LetterOfIndentItem extends Model
     }
     public function getInventoryQuantityAttribute()
     {
-        info('mastermodelid');
-        info($this->master_model_id);
         $masterModel = MasterModel::find($this->master_model_id);
-        $masterModelIds = MasterModel::where('steering', $masterModel->steering)
+        $masterModelIds = MasterModel::where('model_year', $masterModel->model_year)
             ->where('model', $masterModel->model)
             ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
-        info("inventory count");
-        info($masterModelIds);
+        // confirm we should not conside the steering for unique combination
         $inventoryCount = SupplierInventory::whereIn('master_model_id', $masterModelIds)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
