@@ -171,30 +171,32 @@
     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
     @endphp
     <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>
-       @php
-       $sales_notes = "";
-       if($calls->status == "Prospecting")
-       {
-       $sales_notes = DB::table('prospectings')->where('calls_id', $calls->id)->first();
-       $sales_notes = $sales_notes->salesnotes;
-       }
-       else if ($calls->status == "New Demand")
-       {
-        $sales_notes = DB::table('demand')->where('calls_id', $calls->id)->first();
-       $sales_notes = $sales_notes->salesnotes;
-       }
-       else if ($calls->status == "Quoted")
-       {
-        $sales_notes = DB::table('quotations')->where('calls_id', $calls->id)->first();
-       $sales_notes = $sales_notes->sales_notes;
-       }
-       else
-       {
-        $sales_notes = DB::table('negotiations')->where('calls_id', $calls->id)->first();
-       $sales_notes = $sales_notes->sales_notes;
-       }
-       @endphp   
-    <td>{{ $sales_notes }}</td>   
+    @php
+    $sales_notes = "";
+    if ($calls->status == "Prospecting") {
+        $result = DB::table('prospectings')->where('calls_id', $calls->id)->first();
+        if ($result) {
+            $sales_notes = $result->salesnotes;
+        }
+    } elseif ($calls->status == "New Demand") {
+        $result = DB::table('demand')->where('calls_id', $calls->id)->first();
+        if ($result) {
+            $sales_notes = $result->salesnotes;
+        }
+    } elseif ($calls->status == "Quoted") {
+        $result = DB::table('quotations')->where('calls_id', $calls->id)->first();
+        if ($result) {
+            $sales_notes = $result->sales_notes;
+        }
+    } else {
+        $result = DB::table('negotiations')->where('calls_id', $calls->id)->first();
+        if ($result) {
+            $sales_notes = $result->sales_notes;
+        }
+    }
+@endphp
+
+<td>{{ $sales_notes }}</td>
                   </tr>
                 @endforeach
               </tbody>
