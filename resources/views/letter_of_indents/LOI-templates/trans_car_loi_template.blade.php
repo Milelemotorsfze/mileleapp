@@ -1,11 +1,13 @@
 @extends('layouts.main')
 @section('content')
     <style>
-        @page { size: 700pt }
-        /*.content{*/
-        /*    font-family: arial, sans-serif;*/
-        /*    background-color: #f6f5f5;*/
-        /*}*/
+        /*@page { size: 700pt }*/
+        @media only screen and (min-device-width: 1200px)
+        {
+            .container{
+                max-width: 1000px; !important;
+            }
+        }
         table {
             font-family: arial, sans-serif;
             /*border-collapse: collapse;*/
@@ -101,7 +103,7 @@
                 <td colspan="5">1. GENERAL INFORMATION</td>
                 </tr>
                 <tr class="bg-light-grey text-dark fw-bold"">
-                <th width="50px">SL</th>
+                <th width="50px">S No:</th>
                 <th>1A. VEHICLE</th>
                 <th>QTY</th>
                 <th>PRICE </th>
@@ -149,7 +151,6 @@
             <div class="pb-2 ">
                 <div style="text-align: center;bottom: 0">
                     Note: If you have queries or concerns please feel free to contact us on the information provided above.
-
                 </div>
         </div>
 

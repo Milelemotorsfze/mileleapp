@@ -50,6 +50,7 @@
             padding-right: 10px;
             padding-left: 10px;
         }.
+         #fullpage{height: 0;}
     </style>
 
 </head>
@@ -131,11 +132,14 @@
                 <tr>
                     <td>{{$letterOfIndentItem->quantity}}</td>
                     <td>
-                        {{ strtoupper($letterOfIndentItem->masterModel->steering) }}, BRAND NEW, {{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}},
-                        {{ strtoupper($letterOfIndentItem->masterModel->variant->name) }}, {{ strtoupper($letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? '') }},
-                        {{ strtoupper($letterOfIndentItem->masterModel->variant->fuel_type) ?? ''}}
-                        @if($letterOfIndentItem->masterModel->variant->engine != '')
-                            , ENGINE {{ strtoupper($letterOfIndentItem->masterModel->variant->engine) ?? ''}}
+                        {{ strtoupper($letterOfIndentItem->masterModel->steering) }}, BRAND NEW,
+                        @if($letterOfIndentItem->masterModel->variant()->exists())
+                            {{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}},
+                            {{ strtoupper($letterOfIndentItem->masterModel->variant->name) }}, {{ strtoupper($letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? '') }},
+                            {{ strtoupper($letterOfIndentItem->masterModel->variant->fuel_type) ?? ''}}
+                            @if($letterOfIndentItem->masterModel->variant->engine != '')
+                                , ENGINE {{ strtoupper($letterOfIndentItem->masterModel->variant->engine) ?? ''}}
+                            @endif
                         @endif
                         - SPECIFICATION ATTACHED IN APPENDIX
                     </td>

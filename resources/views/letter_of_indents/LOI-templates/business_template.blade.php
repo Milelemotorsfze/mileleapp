@@ -25,6 +25,12 @@
             text-align: end;
             margin-left: 20px;
         }
+        @media only screen and (min-device-width: 1200px)
+        {
+            .container{
+                max-width: 1000px; !important;
+            }
+        }
     </style>
 
     <div class="container" style="padding-bottom: 0px;">
@@ -60,10 +66,17 @@
                 </tr>
                 @foreach($letterOfIndentItems as $letterOfIndentItem)
                     <tr>
-                        <td>{{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}}</td>
-                        <td>{{ strtoupper($letterOfIndentItem->masterModel->variant->master_model_lines->model_line) ?? ''}}</td>
+                        <td>
+                            @if($letterOfIndentItem->masterModel->variant()->exists())
+                                {{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}}
+                            @endif
+                        </td>
+                        <td>
+                            @if($letterOfIndentItem->masterModel->variant()->exists())
+                                {{ strtoupper($letterOfIndentItem->masterModel->variant->master_model_lines->model_line) ?? ''}}
+                            @endif
+                        </td>
                         <td>{{ $letterOfIndentItem->quantity }}</td>
-
                     </tr>
                 @endforeach
             </table>

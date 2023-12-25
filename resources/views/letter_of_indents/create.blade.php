@@ -12,7 +12,18 @@
         {
             height:32px!important;
         }
+
+         .kbw-signature { width: 100%; height: 200px;}
+        #sig canvas{
+            width: 100% !important;
+            height: auto;
+        }
+
     </style>
+    <head>
+        <link type="text/css" href=" {{ asset('south-street-jquery-ui/jquery-ui.css') }}" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="http://keith-wood.name/css/jquery.signature.css">
+    </head>
     <div class="card-header">
         <h4 class="card-title">Add New LOI</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -171,6 +182,15 @@
                                autofocus accept="application/pdf">
                     </div>
                 </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">Signature:</label>
+                        <br/>
+                        <div id="loi-signature" ></div>
+                        <input type="hidden" id="signature" name="loi_signature">
+                        <button id="clear" class="btn btn-danger btn-sm">Clear Signature</button>
+                    </div>
+                </div>
                 <br>
                 <div class="card p-2" >
                     <div class="card-header">
@@ -244,7 +264,6 @@
                         </div>
                     </div>
                 </div>
-
                 <br>
                 <div class="row mb-3">
                     <div class="col-lg-6 col-md-12 col-sm-12 mb-3">
@@ -269,7 +288,19 @@
     </div>
 @endsection
 @push('scripts')
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="http://keith-wood.name/js/jquery.signature.js"></script>
     <script>
+        var signature = jQuery('#loi-signature').signature({
+            syncField: '#signature',
+            syncFormat: 'PNG'
+        });
+        $('#clear').click(function(e) {
+            e.preventDefault();
+            signature.signature('clear');
+            $("#signature").val('');
+        });
+
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
         const previewImage = document.querySelector("#image-preview");
@@ -335,10 +366,13 @@
                 "files[]": {
                     extension: "pdf"
                 },
+                loi_signature: {
+                    required: true,
+                },
                 messages: {
                     file: {
                         extension: "Please upload pdf file"
-                    }
+                    },
                 },
             }
         });

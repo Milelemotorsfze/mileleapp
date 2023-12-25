@@ -33,7 +33,7 @@
 <body>
 <div class="row" id="fullpage">
     <div class="content">
-        <h3 class="center" style="text-decoration: underline;color: black">Letter of Intent for Automotive Purchase</h3>
+        <h3 class="center" style="text-decoration: underline;color: black;font-size: 16px;">Letter of Intent for Automotive Purchase</h3>
         <p class="last">Date:{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </p>
         <p style="margin-bottom: 0px;"> <span style="font-weight: bold">Company Name: </span> {{ $letterOfIndent->customer->company_name ?? '' }} </p>
         <p>  <span style="font-weight: bold">Address: </span>  Dubai, UAE</p>
@@ -49,8 +49,16 @@
             </tr>
             @foreach($letterOfIndentItems as $letterOfIndentItem)
                 <tr>
-                    <td>{{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}}</td>
-                    <td>{{ strtoupper($letterOfIndentItem->masterModel->variant->master_model_lines->model_line) ?? ''}}</td>
+                    <td>
+                        @if($letterOfIndentItem->masterModel->variant()->exists())
+                            {{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}}
+                      @endif
+                    </td>
+                    <td>
+                        @if($letterOfIndentItem->masterModel->variant()->exists())
+                            {{ strtoupper($letterOfIndentItem->masterModel->variant->master_model_lines->model_line) ?? ''}}
+                        @endif
+                      </td>
                     <td>{{ $letterOfIndentItem->quantity }}</td>
 
                 </tr>

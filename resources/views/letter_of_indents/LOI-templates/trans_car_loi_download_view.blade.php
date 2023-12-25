@@ -17,11 +17,12 @@
             border: 2px solid #1c1b1b;
             text-align: left;
             padding-left: 8px;
+            font-size: 14px;
 
         }
         #basic-details td, th{
             padding-left: 8px;
-
+            font-size: 14px;
         }
         .bg-light-grey{
             background-color: #ababaf;
@@ -79,7 +80,7 @@
             </tr>
             <tr>
                 <td></td>
-                <td>{{ $letterOfIndent->customer->country }}</td>
+                <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
                 <td></td>
                 <td></td>
             </tr>
@@ -106,7 +107,7 @@
                     <p style="font-weight: bold"> {{ $letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? '' }} {{ $letterOfIndentItem->masterModel->variant->engine_type ?? ''}}
                         {{ $letterOfIndentItem->masterModel->variant->fuel_type ?? ''}} {{ $letterOfIndentItem->masterModel->steering }}</p>
                     <p>Make: {{$letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}}</p>
-                    <p>Model: {{$letterOfIndentItem->masterModel->variant->my}}  Brand New Zero km</p>
+                    <p>Model: {{$letterOfIndentItem->masterModel->model_year}}  Brand New Zero km</p>
                 </td>
                 <td>{{$letterOfIndentItem->quantity}}</td>
                 <td class="bg-light-grey"></td>

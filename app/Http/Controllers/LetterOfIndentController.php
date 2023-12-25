@@ -141,6 +141,20 @@ class LetterOfIndentController extends Controller
             $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS_NEW;
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
             $LOI->created_by = Auth::id();
+            if($request->loi_signature) {
+                $folderPath = public_path('LOI-Signatures');
+                $image_parts = explode(";base64,", $request->loi_signature);
+                $image_type_aux = explode("image/", $image_parts[0]);
+
+                $image_type = $image_type_aux[1];
+
+                $image_base64 = base64_decode($image_parts[1]);
+                $file = $folderPath . time() . '.'.$image_type;
+                $sigFileName = time().'.'.$image_type;
+                $LOI->signature = $sigFileName;
+                file_put_contents($file, $image_base64);
+            }
+
             $LOI->save();
 
             if ($request->has('files'))
@@ -287,7 +301,7 @@ class LetterOfIndentController extends Controller
             {
                 $pdf->AddPage();
                 $tplIdx = $pdf->importPage($i+1);
-                $pdf->useTemplate($tplIdx);
+                $pdf->useTemplate($tplIdx,0,0);
             }
         }
         return $pdf;
