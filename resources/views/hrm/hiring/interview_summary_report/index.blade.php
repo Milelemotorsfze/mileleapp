@@ -2741,7 +2741,66 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
+
+										@if($data->candidateDetails->documents_verified_at != NULL)
+										<li>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Send Offer Letter & Personal Info Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#send-offer-letter-{{$data->id}}">
+												<i class="fa fa-paper-plane" aria-hidden="true"></i> Send Offer Letter & Personal Info Form
+											</button>
+										</li>
+										@endif
 									</ul>
+									<div class="modal fade" id="send-offer-letter-{{$data->id}}"
+										tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+										<div class="modal-dialog ">
+											<div class="modal-content">
+												<form method="POST" action="{{route('personal-info.send-email')}}" id="send_email_{{$data->id}}">
+													@csrf
+													<div class="modal-header">
+														<h1 class="modal-title fs-5" id="exampleModalLabel">Send Offer Letter & Personal Info Form To Candidate
+
+														</h1>
+														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<div class="modal-body p-3">
+														<div class="col-lg-12">
+															<div class="row">
+																<div class="col-12">
+																	<div class="row">
+																		<div class="col-xxl-6 col-lg-6 col-md-6">
+																			<input type="text" name="id" value="{{$data->id}}" hidden>
+																		</div>
+																	</div>
+																	<div class="row">
+																		<!-- <div class="col-xxl-12 col-lg-12 col-md-12">
+																			<label for="email" class="form-label font-size-13">{{ __('Comments send to candidate') }}</label>
+																		</div>
+																		<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
+																				<textarea rows="5" name="comment"  id="comments_{{$data->id}}" class="form-control" required
+																				placeholder="Comments send to candidate" value=""></textarea>																		
+																		</div> -->
+																		<div class="col-xxl-12 col-lg-12 col-md-12">
+																			<label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
+																		</div>
+																		<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
+																				<input name="email" id="email_{{$data->id}}" class="form-control" required
+																				placeholder="Enter Candidate Email" value="@if($data->email){{$data->email}}@endif">																		
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+													<div class="modal-footer">
+														<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+														<button type="submit" class="btn btn-primary send-email"
+															data-id="{{ $data->id }}" data-status="final">Submit</button>
+													</div>
+												</form>
+											</div>
+										</div>
+									</div>
 									<div class="modal fade" id="send-personal-info-form-{{$data->id}}"
 										tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 										<div class="modal-dialog ">
