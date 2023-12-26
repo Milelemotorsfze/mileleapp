@@ -211,7 +211,7 @@
                                                             </div>
                                                             <div class="col-xxl-8 col-lg-8 col-md-8 mt-2">
                                                                 <input id="residence_telephone_number" type="tel" class="widthinput contact form-control @error('residence_telephone_number[full]')
-                                                                    is-invalid @enderror" name="residence_telephone_number[main]" placeholder="Enter Alternative Contact Number"
+                                                                    is-invalid @enderror" name="residence_telephone_number[main]" placeholder="Enter Alternative Contact Number" oninput="validationOnKeyUp(this)"
                                                                     value="{{$candidate->candidateDetails->residence_telephone_number ?? ''}}" autocomplete="residence_telephone_number[full]" autofocus
                                                                     >
                                                             </div>
@@ -221,7 +221,7 @@
                                                             </div>
                                                             <div class="col-xxl-8 col-lg-8 col-md-8 mt-2">
                                                                 <input id="contact_number" type="tel" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
-                                                                    name="contact_number[main]" placeholder="Mobile Number" value="{{old('hiddencontact')}}"
+                                                                    name="contact_number[main]" placeholder="Mobile Number" value="{{old('hiddencontact')}}" oninput="validationOnKeyUp(this)"
                                                                     autocomplete="contact_number[main]" autofocus>
                                                             </div>
                                                             <div class="col-xxl-4 col-lg-4 col-md-4 mt-2">
@@ -318,12 +318,12 @@
                                                         <div class="col-xxl-2 col-lg-6 col-md-6">
                                                             <span class="error">* </span>
                                                             <label for="ecu_contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
-                                                            <input id="ecu_contact_number_1" type="tel" class="form-control widthinput @error('ecu_contact_number[main]') is-invalid @enderror" 
+                                                            <input id="ecu_contact_number_1" type="tel" class="form-control widthinput @error('ecu_contact_number[main]') is-invalid @enderror" oninput="validationOnKeyUp(this)"
                                                                 name="ecu[1][contact_number][main]" data-index=1 placeholder="Contact Number" value="" autocomplete="ecu_contact_number[main]" autofocus>
                                                         </div>
                                                         <div class="col-xxl-2 col-lg-6 col-md-6">
                                                             <label for="ecu_alternative_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
-                                                            <input id="ecu_alternative_number_1" type="tel" class="form-control widthinput @error('ecu_alternative_number[main]') is-invalid @enderror" 
+                                                            <input id="ecu_alternative_number_1" type="tel" class="form-control widthinput @error('ecu_alternative_number[main]') is-invalid @enderror" oninput="validationOnKeyUp(this)"
                                                                 name="ecu[1][alternative_contact_number][main]" data-index=1 placeholder="Alternative Number" value="" autocomplete="ecu_alternative_number[main]" autofocus>
                                                         </div>
                                                     </div>
@@ -388,7 +388,7 @@
                                                                 </div>
                                                                 <div class="col-xxl-9 col-lg-9 col-md-9">
                                                                     <input id="ech_contact_number_1" type="tel" class="form-control widthinput @error('ech_contact_number') is-invalid @enderror" 
-                                                                        name="ech[1][contact_number][main]" data-index=1
+                                                                        name="ech[1][contact_number][main]" data-index=1 oninput="validationOnKeyUp(this)"
                                                                         placeholder="Contact Number" value="" autocomplete="ech_contact_number" autofocus>
                                                                 </div>
                                                                 <div class="col-xxl-3 col-lg-3 col-md-3">
@@ -396,7 +396,7 @@
                                                                 </div>
                                                                 <div class="col-xxl-9 col-lg-9 col-md-9">
                                                                     <input id="ech_alternative_contact_number_1" type="tel" class="form-control widthinput @error('ech_alternative_contact_number') is-invalid @enderror" 
-                                                                        name="ech[1][alternative_contact_number][main]" data-index=1
+                                                                        name="ech[1][alternative_contact_number][main]" data-index=1 oninput="validationOnKeyUp(this)"
                                                                         placeholder="Alternative Contact Number" value="" autocomplete="ech_alternative_contact_number" autofocus>
                                                                 </div>
                                                             </div>
@@ -1291,12 +1291,12 @@
                                 <span class="error">* </span>
                                 <label for="ecu_contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                                 <input id="ecu_contact_number_${index}" type="tel" class="form-control widthinput @error('ecu_contact_number[main]') is-invalid @enderror" 
-                                name="ecu[${index}][contact_number][main]" data-index=${index} placeholder="Contact Number"  value="" autocomplete="ecu_contact_number[main]" autofocus>
+                                oninput="validationOnKeyUp(this)" name="ecu[${index}][contact_number][main]" data-index=${index} placeholder="Contact Number"  value="" autocomplete="ecu_contact_number[main]" autofocus>
                             </div>
                             <div class="col-xxl-2 col-lg-6 col-md-6">
                                 <label for="ecu_alternative_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
                                 <input id="ecu_alternative_number_${index}" type="tel" class="form-control widthinput @error('ecu_alternative_number[main]') is-invalid @enderror" 
-                                name="ecu[${index}][alternative_contact_number][main]" data-index=${index} placeholder="Alternative Number"  value="" autocomplete="ecu_alternative_number[main]" autofocus>
+                                oninput="validationOnKeyUp(this)" name="ecu[${index}][alternative_contact_number][main]" data-index=${index} placeholder="Alternative Number"  value="" autocomplete="ecu_alternative_number[main]" autofocus>
                             </div>
                             <div class="col-xxl-1 col-lg-6 col-md-6 add_del_btn_outer">
                                 <a class="btn_round remove_node_btn_frm_field" title="Remove Row">
@@ -1356,7 +1356,7 @@
                                     </div>
                                     <div class="col-xxl-9 col-lg-9 col-md-9">
                                         <input id="ech_contact_number_${index}" type="tel" class="form-control widthinput @error('ech_contact_number') is-invalid @enderror" 
-                                        name="ech[${index}][contact_number][main]" data-index=${index}
+                                        name="ech[${index}][contact_number][main]" data-index=${index} oninput="validationOnKeyUp(this)"
                                             placeholder="Contact Number" value="" autocomplete="ech_contact_number" autofocus>
                                     </div>
                                     <div class="col-xxl-3 col-lg-3 col-md-3">
@@ -1364,7 +1364,7 @@
                                     </div>
                                     <div class="col-xxl-9 col-lg-9 col-md-9">
                                         <input id="ech_alternative_contact_number_${index}" type="tel" class="form-control widthinput @error('ech_alternative_contact_number') is-invalid @enderror" 
-                                        name="ech[${index}][alternative_contact_number][main]" data-index=${index}
+                                        name="ech[${index}][alternative_contact_number][main]" data-index=${index} oninput="validationOnKeyUp(this)"
                                             placeholder="Alternative Contact Number" value="" autocomplete="ech_alternative_contact_number" autofocus>
                                     </div>
                                 </div>
@@ -1956,6 +1956,13 @@
             //         }
             //     }
             // });
+            function validationOnKeyUp(currentPriceInput) {
+                var id = currentPriceInput.id;
+                var input = document.getElementById(id);
+                var val = input.value;
+                val = val.replace(/^0+|[^\d]/g, '');
+                input.value = val;
+            }
         </script>
     </body>
 </html>

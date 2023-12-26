@@ -112,11 +112,11 @@ class InterviewSummaryReportController extends Controller
         $approved = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')->whereDoesntHave('candidateDetails')->latest()->get(); 
         $rejected = InterviewSummaryReport::where('status','rejected')->where('seleced_status','pending')->latest()->get();
         $selectedForJob = InterviewSummaryReport::where('status','approved')->where('seleced_status','selected')->latest()->get(); 
-        $personalInfo = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')->whereHas('candidateDetails')->latest()->get();
-        // dd($personalInfo);
+        $docsUploaded = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')->whereHas('candidateDetails')->latest()->get();
+        // dd($docsUploaded);
         $interviewersNames = User::whereHas('empProfile')->select('id','name')->get();
         return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','notSelected',
-        'pendings','approved','selectedForJob','personalInfo','rejected','interviewersNames'));
+        'pendings','approved','selectedForJob','docsUploaded','rejected','interviewersNames'));
     }
     public function createOrEdit($id) {
         $currentInterviewReport = InterviewSummaryReport::with('telephonicInterviewers')->where('id',$id)->first();

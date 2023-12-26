@@ -276,10 +276,11 @@ Route::get('/d', function () {
     });
     // Candidate Personal Information Form
     Route::get('candidate/listingInfo', [CandidatePersonalInfoController::class, 'getCandidatePersonalInfo'])->name('candidate.listingInfo');
-
+    Route::get('candidate/listDocs', [CandidatePersonalInfoController::class, 'getCandidateDocsInfo'])->name('candidate.listDocs');
     Route::resource('personal-info', CandidatePersonalInfoController::class);
     Route::controller(CandidatePersonalInfoController::class)->group(function(){
         Route::post('personal-info/send-email', 'sendEmail')->name('personal-info.send-email');
+        Route::post('personal-info/create-offer-letter', 'createOfferLetter')->name('personal-info.create-offer-letter');
         Route::post('docs/send-email', 'sendDocsEmail')->name('docs.send-email');
         Route::post('personal-info/verified', 'personalInfoVerified')->name('personal-info.verified');
         Route::post('docs/verified', 'docsVerified')->name('docs.verified');

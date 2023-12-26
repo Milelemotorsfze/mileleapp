@@ -1,13 +1,13 @@
 @extends('layouts.table')
 	@section('content')
-		@canany(['verify-candidate-personal-information','send-personal-info-form-action'])
+		@canany(['verify-candidates-documents','send-candidate-documents-request-form'])
 		@php
-		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action']);
+		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents','send-candidate-documents-request-form']);
 		@endphp
 		@if ($hasPermission)
 				<div class="card-header">
 					<h4 class="card-title">
-						Candidate Personal Information and Documents Verification
+						Candidate Documents Verification
 					</h4>
 					@if (count($errors) > 0)
 					<div class="alert alert-danger">

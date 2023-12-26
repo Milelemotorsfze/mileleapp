@@ -78,6 +78,9 @@ class CandidatePersonalInfoController extends Controller
             }
         }
     }
+    public function createOfferLetter(Request $request) {
+        dd($request->all());
+    }
     public function sendEmail(Request $request) {
         $validator = Validator::make($request->all(), [
             'id' => 'required',
@@ -110,18 +113,19 @@ class CandidatePersonalInfoController extends Controller
                 $template['from'] = 'no-reply@milele.com';
                 $template['from_name'] = 'Milele Matrix';
                 $subject = 'Milele - Candidate Personal Information Form';
-                Mail::send(
-                        "hrm.hiring.personal_info.email",
-                        ["data"=>$data] ,
-                        function($msg) use ($data,$template,$subject) {
-                            $msg->to($data['email'], $data['name'])
-                                ->from($template['from'],$template['from_name'])
-                                ->subject($subject);
-                        }
-                    );
+                return view('hrm.hiring.personal_info.offerLetter');
+                // Mail::send(
+                //         "hrm.hiring.personal_info.email",
+                //         ["data"=>$data] ,
+                //         function($msg) use ($data,$template,$subject) {
+                //             $msg->to($data['email'], $data['name'])
+                //                 ->from($template['from'],$template['from_name'])
+                //                 ->subject($subject);
+                //         }
+                //     );
                 // DB::commit();
-                return redirect()->back()
-                                    ->with('success','Offer Letter and Personal Information Form Successfully Send To Candidate');
+                // return redirect()->back()
+                //                     ->with('success','Offer Letter and Personal Information Form Successfully Send To Candidate');
             // } 
             // catch (\Exception $e) {
             //     DB::rollback();
@@ -746,6 +750,17 @@ class CandidatePersonalInfoController extends Controller
         $verified = EmployeeProfile::where([
             ['type','candidate'],
             ['personal_information_verified_at','!=',NULL],
+        ])->get();
+        return view('hrm.hiring.personal_info.verifyOrResend',compact('pending','verified'));
+    }
+    public function getCandidateDocsInfo() {
+        $pending = EmployeeProfile::where([
+            ['type','candidate'],
+            ['documents_verified_at',NULL],
+        ])->get();
+        $verified = EmployeeProfile::where([
+            ['type','candidate'],
+            ['documents_verified_at','!=',NULL],
         ])->get();
         return view('hrm.hiring.documents.verifyOrResend',compact('pending','verified'));
     }
