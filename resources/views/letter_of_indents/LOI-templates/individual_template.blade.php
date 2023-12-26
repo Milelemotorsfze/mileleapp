@@ -101,6 +101,9 @@
             </p>
             <p style="margin-bottom: 5px;">Sincerely,</p>
             <p> {{ ucfirst($letterOfIndent->customer->name ?? '') }} </p>
+            <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
+
+            </p>
         </div>
     </div>
 

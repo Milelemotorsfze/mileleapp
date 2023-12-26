@@ -13,7 +13,16 @@
         {
             height:32px!important;
         }
+        .kbw-signature { width: 100%; height: 200px;}
+        #sig canvas{
+            width: 100% !important;
+            height: auto;
+        }
     </style>
+    <head>
+        <link type="text/css" href=" {{ asset('css/south-street-jquery-ui/jquery-ui.css') }}" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="http://keith-wood.name/css/jquery.signature.css">
+    </head>
     <div class="card-header">
         <h4 class="card-title">Edit LOI</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -171,6 +180,73 @@
                                autofocus id="file-upload" accept="application/pdf">
                     </div>
                 </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label">Signature:</label>
+                        <br/>
+                        <div id="loi-signature" ></div>
+                        <input type="hidden" id="signature" name="loi_signature">
+                        <button id="clear" class="btn btn-danger btn-sm">Clear Signature</button>
+                    </div>
+                </div>
+                @if($letterOfIndent->signature)
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label class="form-label">Already Added Signature:</label>
+                            <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" class="border">
+                        </div>
+                    </div>
+                @endif
+                <div class="col-lg-6 col-md-6 col-sm-12">
+                @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
+                    <div class="row p-2">
+                        <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" style="height: 300px;">
+
+{{--                            File {{ $key + 1 }}--}}
+{{--                            <button type="button" class="btn btn-primary btn-sm pl-2" data-bs-toggle="modal" data-bs-target="#show-document-{{$letterOfIndentDocument->id}}">--}}
+{{--                                View--}}
+{{--                            </button>--}}
+{{--                            <button type="button" class="btn btn-danger btn-sm loi-doc-button-delete"--}}
+{{--                                    data-id="{{ $letterOfIndentDocument->id }}" data-url="{{ route('letter-of-indent-documents.destroy', $letterOfIndentDocument->id) }}">--}}
+{{--                                <i class="fa fa-trash"></i>--}}
+{{--                            </button>--}}
+{{--                        </div>--}}
+                    </div>
+                    <!-- Modal -->
+{{--                    <div class="modal mb-5 justify-content-center" id="show-document-{{$letterOfIndentDocument->id}}"  aria-labelledby="exampleModalLabel" aria-hidden="true">--}}
+{{--                        <div class="modal-dialog modal-dialog-centered modal-xl ">--}}
+{{--                            <div class="modal-content">--}}
+{{--                                <div class="modal-header">--}}
+{{--                                    <h5 class="modal-title" id="exampleModalLabel">LOI Document</h5>--}}
+{{--                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>--}}
+{{--                                </div>--}}
+{{--                                <div class="modal-body">--}}
+{{--                                    <div class="d-flex">--}}
+{{--                                        <div class="col-lg-12">--}}
+{{--                                            <div class="row p-2">--}}
+{{--                                                <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" style="height: 400px">--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+                @endforeach
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-6">
+                        <div id="file-preview">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div id="image-preview">
+                        </div>
+                    </div>
+                </div>
                 <br>
                 <div class="card p-2" >
                     <div class="card-header">
@@ -273,52 +349,7 @@
                         </div>
                     </div>
                 </div>
-                <br>
-                @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
-                    <div class="row p-2">
-                        <div class="col-12">
-                            File {{ $key + 1 }}
-                            <button type="button" class="btn btn-primary btn-sm pl-2" data-bs-toggle="modal" data-bs-target="#show-document-{{$letterOfIndentDocument->id}}">
-                                View
-                            </button>
-                            <button type="button" class="btn btn-danger btn-sm loi-doc-button-delete"
-                                    data-id="{{ $letterOfIndentDocument->id }}" data-url="{{ route('letter-of-indent-documents.destroy', $letterOfIndentDocument->id) }}">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Modal -->
-                    <div class="modal mb-5 justify-content-center" id="show-document-{{$letterOfIndentDocument->id}}"  aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-xl ">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">LOI Document</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="d-flex">
-                                        <div class="col-lg-12">
-                                            <div class="row p-2">
-                                                <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" style="height: 400px">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-                <div class="row">
-                    <div class="col-6">
-                        <div id="file-preview">
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div id="image-preview">
-                        </div>
-                    </div>
-                </div>
-                <br>
+
                 <div class="col-12 text-center">
                     <button type="submit" class="btn btn-primary float-end">Update</button>
 
@@ -328,10 +359,21 @@
     </div>
 @endsection
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" ></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="http://keith-wood.name/js/jquery.signature.js"></script>
+        {{--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" ></script>--}}
 
-    <script type="text/javascript">
+    <script>
 
+        var signature = jQuery('#loi-signature').signature({
+            syncField: '#signature',
+            syncFormat: 'PNG'
+        });
+        $('#clear').click(function(e) {
+            e.preventDefault();
+            signature.signature('clear');
+            $("#signature").val('');
+        });
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
         const previewImage = document.querySelector("#image-preview");
