@@ -92,7 +92,7 @@ use App\Http\Controllers\WebhookController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::post('/webhook', [WebhookController::class, 'handleWebhook']);
+Route::match(['get', 'post'], '/whatsapp/receive', [WebhookController::class, 'sendMessage']);
 Route::get('/react-page', function () {
     return view('react-app.index');
 });
