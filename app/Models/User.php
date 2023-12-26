@@ -37,7 +37,8 @@ class User extends Authenticatable
         'hiring_request_approval',
         'job_description_approval',
         'interview_summary_report_approval',
-        // 'candidate_personal_information_varify',
+        'candidate_docs_varify',
+        'candidate_personal_information_varify',
     ];
     public function getPassportWithAttribute() {
         $passportWith = 'with_employee';
@@ -201,11 +202,27 @@ class User extends Authenticatable
             ['hr_manager_id',$this->id],
             ])->latest()->get();
         if(count($HRManagerPendings) > 0 OR count($HRManagerApproved) > 0 OR count($HRManagerRejected) > 0 OR count($divisionHeadPendings) > 0 OR 
-        count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0) {
+        count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0 ) {
             $interviewSummaryReportApproval['can'] = true;
             $interviewSummaryReportApproval['count'] = count($HRManagerPendings) + count($divisionHeadPendings);
         }
         return $interviewSummaryReportApproval;
+    }
+    public function getCandidateDocsVarifyAttribute() {
+        $pendingdocsUploaded = 0;
+        $pendingdocsUploaded = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')
+        ->whereHas('candidateDetails', function($q){
+            $q->where('documents_verified_at', NULL);
+        })->latest()->count();
+        return $pendingdocsUploaded;
+    }
+    public function getCandidatePersonalInformationVarifyAttribute() {
+        $pendingPersonalInfo = 0;
+        $pendingPersonalInfo = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')
+        ->whereHas('candidateDetails', function($q){
+            $q->where('documents_verified_at','!=',NULL)->where('personal_information_verified_at',NULL)->where('personal_information_created_at','!=',NULL);
+        })->latest()->count();
+        return $pendingPersonalInfo;
     }
     public function getSelectedRoleAttribute() {
         return $this->attributes['selected_role'] ?? $this->roles()->first()->name;
@@ -213,8 +230,7 @@ class User extends Authenticatable
     public function hasPermissionForSelectedRole($permissionName) {
         $selectedRole = $this->selected_role;
         if(is_array($permissionName)) {
-            if(count($permissionName) > 0)
-            {
+            if(count($permissionName) > 0) {
                 return DB::table('role_has_permissions')
                     ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
                     ->where('role_has_permissions.role_id', $selectedRole)
@@ -222,7 +238,7 @@ class User extends Authenticatable
                     ->exists();
             }
         }
-        else{
+        else {
             if ($selectedRole) {
                 return DB::table('role_has_permissions')
                     ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
@@ -231,7 +247,6 @@ class User extends Authenticatable
                     ->exists();
             }
         }
-
         return false;
     }
     public function empProfile() {

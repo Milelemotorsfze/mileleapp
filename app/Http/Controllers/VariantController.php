@@ -108,15 +108,19 @@ public function store(Request $request)
         }
         else if($fuel_type == "PHEV") 
         {
-            $f = "P";
+            $f = "PHEV";
         }
         else if($fuel_type == "MHEV") 
         {
-            $f = "M";
+            $f = "MHEV";
+        }
+        else if($fuel_type == "PH") 
+        {
+            $f = "PH";
         }
         else
         {
-            $f = "E";
+            $f = "EV";
         }
         $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
         $existingName = $existingspecifications->name;
@@ -167,25 +171,29 @@ public function store(Request $request)
     $engine = $request->input('engine');
     $fuel_type = $request->input('fuel_type');
     if($fuel_type == "Petrol")
-    {
-        $f = "P";
-    }
-    else if($fuel_type == "Diesel") 
-    {
-        $f = "D";
-    }
-    else if($fuel_type == "PHEV") 
-    {
-        $f = "P";
-    }
-    else if($fuel_type == "MHEV") 
-    {
-        $f = "M";
-    }
-    else
-    {
-        $f = "E";
-    }
+        {
+            $f = "P";
+        }
+        else if($fuel_type == "Diesel") 
+        {
+            $f = "D";
+        }
+        else if($fuel_type == "PHEV") 
+        {
+            $f = "PHEV";
+        }
+        else if($fuel_type == "MHEV") 
+        {
+            $f = "MHEV";
+        }
+        else if($fuel_type == "PH") 
+        {
+            $f = "PH";
+        }
+        else
+        {
+            $f = "EV";
+        }
     $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
     if ($maxVariant) {
     $existingName = $maxVariant->name;
@@ -226,25 +234,29 @@ public function store(Request $request)
     $gearbox = $request->input('gearbox');
     $fuel_type = $request->input('fuel_type');
     if($fuel_type == "Petrol")
-    {
-        $f = "P";
-    }
-    else if($fuel_type == "Diesel") 
-    {
-        $f = "D";
-    }
-    else if($fuel_type == "PHEV") 
-    {
-        $f = "P";
-    }
-    else if($fuel_type == "MHEV") 
-    {
-        $f = "M";
-    }
-    else
-    {
-        $f = "E";
-    }
+        {
+            $f = "P";
+        }
+        else if($fuel_type == "Diesel") 
+        {
+            $f = "D";
+        }
+        else if($fuel_type == "PHEV") 
+        {
+            $f = "PHEV";
+        }
+        else if($fuel_type == "MHEV") 
+        {
+            $f = "MHEV";
+        }
+        else if($fuel_type == "PH") 
+        {
+            $f = "PH";
+        }
+        else
+        {
+            $f = "EV";
+        }
     $model_details = $steering . ' ' . $model_line . ' ' . $engine . ' ' . $gearbox . ' ' . $fuel_type;
     }
     $variant_details= $request->input('variant');
@@ -270,15 +282,19 @@ public function store(Request $request)
         }
         else if($fuel_type == "PHEV") 
         {
-            $f = "P";
+            $f = "PHEV";
         }
         else if($fuel_type == "MHEV") 
         {
-            $f = "M";
+            $f = "MHEV";
+        }
+        else if($fuel_type == "PH") 
+        {
+            $f = "PH";
         }
         else
         {
-            $f = "E";
+            $f = "EV";
         }
         $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
     }

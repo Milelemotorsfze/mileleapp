@@ -67,17 +67,6 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-2 col-md-6 col-sm-12" id="coo">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">COO</label>
-                                    <select class="form-control coo" name="coo" id="coo">
-                                        <option value="" disabled selected>Select Country</option>
-                                        @foreach ($countries as $country)
-                                        <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
                             <div class="col-lg-2 col-md-6 col-sm-12" id="my">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Model Year</label>
@@ -93,21 +82,12 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-2 col-md-6 col-sm-12" id="drive_train">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Drive Train</label>
-                                    <select class="form-control" autofocus name="drive_train" id="drive_train">
-                                        <option value="Auto" {{ old('drive_train') == 'AWD' ? 'selected' : '' }}>AWD</option>
-                                        <option value="Manual" {{ old('geadrive_trainrbox') == 'RWD' ? 'selected' : '' }}>RWD</option>
-                                    </select>
-                                </div>
-                            </div>
                             <div class="col-lg-2 col-md-6 col-sm-12" id="gear">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Gear</label>
                                     <select class="form-control" autofocus name="gearbox" id="gear">
-                                        <option value="Auto" {{ old('gearbox') == 'Auto' ? 'selected' : '' }}>Auto</option>
-                                        <option value="Manual" {{ old('gearbox') == 'Manual' ? 'selected' : '' }}>Manual</option>
+                                        <option value="AT" {{ old('gearbox') == 'AT' ? 'selected' : '' }}>AT</option>
+                                        <option value="MT" {{ old('gearbox') == 'MT' ? 'selected' : '' }}>MT</option>
                                     </select>
                                 </div>
                             </div>
@@ -117,6 +97,7 @@
                                     <select class="form-control" autofocus name="fuel_type" id="fuel">
                                         <option value="Petrol" {{ old('fuel_type') == 'Petrol' ? 'selected' : '' }}>Petrol</option>
                                         <option value="Diesel" {{ old('fuel_type') == 'Diesel' ? 'selected' : '' }}>Diesel</option>
+                                        <option value="PH" {{ old('fuel_type') == 'PH' ? 'selected' : '' }}>PH</option>
                                         <option value="PHEV" {{ old('fuel_type') == 'PHEV' ? 'selected' : '' }}>PHEV</option>
                                         <option value="MHEV" {{ old('fuel_type') == 'MHEV' ? 'selected' : '' }}>MHEV</option>
                                         <option value="EV" {{ old('fuel_type') == 'EV' ? 'selected' : '' }}>EV</option>
@@ -166,12 +147,37 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12" id="coo">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">COO</label>
+                                    <select class="form-control coo" name="coo" id="coo">
+                                        <option value="" disabled selected>Select Country</option>
+                                        @foreach ($countries as $country)
+                                        <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12" id="drive_train">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Drive Train</label>
+                                    <select class="form-control" autofocus name="drive_train" id="drive_train">
+                                        <option value="AWD" {{ old('drive_train') == 'AWD' ? 'selected' : '' }}>AWD</option>
+                                        <option value="4WD" {{ old('geadrive_trainrbox') == '4WD' ? 'selected' : '' }}>4WD</option>
+                                        <option value="FWD" {{ old('geadrive_trainrbox') == 'FWD' ? 'selected' : '' }}>FWD</option>
+                                        <option value="RWD" {{ old('geadrive_trainrbox') == 'RWD' ? 'selected' : '' }}>RWD</option>
+
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-lg-2 col-md-6 col-sm-12" id="Upholstery">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Upholstery</label>
                                     <select class="form-control" autofocus name="upholestry" id="upholstery">
-                                        <option value="Leather" {{ old('steering') == 'Leather' ? 'selected' : '' }}>Leather</option>
-                                        <option value="Fabric" {{ old('steering') == 'Fabric' ? 'selected' : '' }}>Fabric</option>
+                                        <option value="Leather" {{ old('upholstery') == 'Leather' ? 'selected' : '' }}>Leather</option>
+                                        <option value="Fabric" {{ old('upholstery') == 'Fabric' ? 'selected' : '' }}>Fabric</option>
+                                        <option value="Vinyl" {{ old('upholstery') == 'Vinyl' ? 'selected' : '' }}>Vinyl</option>
+                                        <option value="Leather & Fabric" {{ old('upholstery') == 'Leather & Fabric' ? 'selected' : '' }}>Leather & Fabric</option>
                                     </select>
                                 </div>
                             </div>
@@ -326,6 +332,7 @@ $(document).ready(function () {
     function updateModelDetail() {
     var selectedOptions = [];
     var fieldIdOrder = ['steering', 'model', 'engine', 'fuel', 'gear'];
+    var gradeOption = null;
 
     $('input[name^="field_checkbox"]:checked').each(function () {
         var fieldId = $(this).data('field-id');
@@ -335,6 +342,11 @@ $(document).ready(function () {
         }
 
         selectedOptions.push({ fieldId: fieldId, value: fieldValue });
+
+        // Check if the field is "model" and save the grade option
+        if (fieldId === 'model') {
+            gradeOption = selectedOptions.find(option => option.fieldId === 'model');
+        }
     });
 
     $('input[name^="specification_checkbox"]:checked').each(function () {
@@ -342,8 +354,20 @@ $(document).ready(function () {
         var selectedValue = $('select[name="specification_' + specificationId + '"]').text();
         var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text();
         var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').siblings('label').text() : selectedText;
-        selectedOptions.push({ specificationId: specificationId, value: displayValue });
+        var specificationName = $('select[name="specification_' + specificationId + '"]').siblings('label').text();
+
+        if (specificationName === 'Grade') {
+            // If specificationName is "Grade," update the gradeOption
+            if (gradeOption) {
+                gradeOption.value += ' ' + displayValue;
+            } else {
+                selectedOptions.push({ fieldId: 'model', value: displayValue });
+            }
+        } else {
+            selectedOptions.push({ specificationId: specificationId, value: displayValue });
+        }
     });
+
     selectedOptions.sort(function (a, b) {
         var orderA = fieldIdOrder.indexOf(a.fieldId);
         var orderB = fieldIdOrder.indexOf(b.fieldId);

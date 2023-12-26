@@ -1,28 +1,35 @@
 @extends('layouts.table')
+<link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
-	  .texttransform {
-    text-transform: capitalize;
-  }
-  .light {
-	background-color:#e6e6e6!important;
-	font-weight: 700!important;
-  }
-  .dark {
-	background-color:#d9d9d9!important;
-	font-weight: 700!important;
-  }
-  .paragraph-class 
-    {
-        color: red;
-        font-size:11px;
-    }
+	.form-label {
+		margin-top: 0.5rem;
+	}
+	.iti {
+		width: 100%;
+	}
+	.texttransform {
+    	text-transform: capitalize;
+	}
+	.light {
+		background-color:#e6e6e6!important;
+		font-weight: 700!important;
+	}
+	.dark {
+		background-color:#d9d9d9!important;
+		font-weight: 700!important;
+	}
+	.paragraph-class {
+		color: red;
+		font-size:11px;
+	}
 	.other-error {
-        color: red;
-    }
+		color: red;
+	}
 	.table-edits input, .table-edits select {
 		height:38px!important;
 	}
-	</style>
+</style>
 @section('content')
 <div class="card-header">
 	@canany(['view-interview-summary-report-listing'])
@@ -200,7 +207,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								</div>
 								<div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
 									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-									<div class="modal-dialog ">
+									<div class="modal-dialog">
 										<div class="modal-content">
 											<form method="POST" action="{{route('interview-summary-report.round-summary')}}" id="form_{{$data->id}}">
 												@csrf
@@ -2619,7 +2626,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($personalInfo as $key => $data)
+						<input hidden value="{{$docsUploaded->count()}}" id="count_docs">
+						
+						@foreach ($docsUploaded as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
@@ -2741,7 +2750,126 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
+
+										@if($data->candidateDetails->documents_verified_at != NULL)
+										<li>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Send Offer Letter & Personal Info Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#send-offer-letter-{{$data->id}}">
+												<i class="fa fa-paper-plane" aria-hidden="true"></i> Send Offer Letter & Personal Info Form
+											</button>
+										</li>
+										@endif
 									</ul>
+									<div class="modal fade" id="send-offer-letter-{{$data->id}}"
+										tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+										<div class="modal-dialog modal-lg">
+											<div class="modal-content">
+												<form method="POST" action="{{route('personal-info.create-offer-letter')}}" id="offer_letter_{{$data->id}}">
+													@csrf
+													<div class="modal-header">
+														<h1 class="modal-title fs-5" id="exampleModalLabel">Send Offer Letter & Personal Info Form To Candidate
+
+														</h1>
+														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<div class="modal-body p-3">
+														<div class="col-lg-12">
+															<div class="row">
+																<div class="col-12">
+																	<div class="row">
+																		<div class="col-xxl-6 col-lg-6 col-md-6">
+																			<input type="text" name="id" value="{{$data->id}}" hidden>
+																		</div>
+																	</div>
+																	<div class="row">
+																		<!-- <div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
+																		<label for="email" class="form-label font-size-13">{{ __('Date') }}</label>
+																				<input name="email" id="email_{{$data->id}}" class="form-control" required
+																				placeholder="Enter Candidate Name" value="@if($data->email){{$data->email}}@endif">																		
+																		</div> -->
+																		<input type="hidden" value="{{$data->id}}">
+																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
+																		<label for="candidate_name" class="form-label font-size-13">{{ __('Candidate Name') }}</label>
+																				<input name="candidate_name" id="candidate_name_{{$data->id}}" class="form-control" required
+																				placeholder="Enter Candidate Name" value="@if($data->candidate_name){{$data->candidate_name}}@endif">																		
+																		</div>
+																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
+																		<label for="passport_number" class="form-label font-size-13">{{ __('Passport Number') }}</label>
+																				<input name="passport_number" id="passport_number_{{$data->id}}" class="form-control" required
+																				placeholder="Enter Candidate Passport Number" value="@if($data->passport_number){{$data->passport_number}}@endif">																		
+																		</div>
+																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
+																		<label for="contact_number" class="form-label font-size-13">{{ __('Mobile Phone') }}</label>
+																		<input id="contact_number_{{$i}}" type="tel" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
+																				name="contact_number[main]" placeholder="Mobile Number" value="{{old('hiddencontact')}}"
+																				autocomplete="contact_number[main]" autofocus oninput="validationOnKeyUp(this)">
+																				<!-- <input name="contact_number" id="contact_number_{{$data->id}}" class="form-control" required
+																				placeholder="Enter Mobile Phone" value="@if($data->contact_number){{$data->contact_number}}@endif">																		 -->
+																		</div>
+																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
+																			<label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
+																			<input name="email" id="email_{{$data->id}}" class="form-control" required
+																				placeholder="Enter Candidate Email" value="@if($data->email){{$data->email}}@endif">																		
+																		</div>
+																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
+																			<label for="job_position" class="form-label font-size-13">{{ __('Job Position') }}</label>
+																			<input readonly name="designation_id" id="job_position_{{$data->id}}" class="form-control" required
+																				placeholder="Enter Candidate Job Position" value="{{$data->employeeHiringRequest->questionnaire->designation->name ?? ''}}">																		
+																		</div>
+																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
+																		<label for="probation_period" class="form-label font-size-13">{{ __('Probation Period') }}</label>
+																		<div class="input-group">													
+																		<input type="number" name="probation_duration_in_months" id="probation_period_{{$data->id}}" class="form-control" required
+																				placeholder="Enter Probation Period" value="{{$data->employeeHiringRequest->questionnaire->probation_length_in_months ?? ''}}">	
+																				<div class="input-group-append">
+																					<span class="input-group-text widthinput" >Months</span>
+																				</div>
+																			</div>
+																																					
+																		</div>
+																		<div class="col-xxl-4 col-lg-4 col-md-4 radio-main-div">
+																		<label for="basic_salary" class="form-label font-size-13">{{ __('Basic Salary ( Per Month )') }}</label>
+																		<div class="input-group">													
+																		<input name="basic_salary" id="basic_salary_{{$data->id}}" class="form-control" required data-value="{{$data->id}}"
+																				placeholder="Enter Basic Salary" value="{{($data->total_salary*40)/100}}" oninput="validation(this)">	
+																				<div class="input-group-append">
+																					<span class="input-group-text widthinput" >AED</span>
+																				</div>
+																			</div>																	
+																		</div>
+																		<div class="col-xxl-4 col-lg-4 col-md-4 radio-main-div">
+																		<label for="other_allowances" class="form-label font-size-13">{{ __('Other Allowance ( Per Month )') }}</label>
+																		<div class="input-group">
+																		<input name="other_allowances" id="other_allowances_{{$data->id}}" class="form-control" required data-value="{{$data->id}}"
+																		oninput="validation(this)" placeholder="Enter Other Allowance" value="{{($data->total_salary*60)/100}}">	
+																				<div class="input-group-append">
+																					<span class="input-group-text widthinput" >AED</span>
+																				</div>
+																			</div>																										
+																		</div>
+																		<div class="col-xxl-4 col-lg-4 col-md-4 radio-main-div">
+																			<label for="total_salary" class="form-label font-size-13">{{ __('Total Salary ( Per Month )') }}</label>
+																			<div class="input-group">
+																				<input readonly name="total_salary" id="total_salary_{{$data->id}}" class="form-control" value="@if($data->total_salary){{$data->total_salary}}@endif">	
+																				<div class="input-group-append">
+																					<span class="input-group-text widthinput" >AED</span>
+																				</div>
+																			</div>																													
+																		</div>																		
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+													<div class="modal-footer">
+														<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+														<button type="submit" class="btn btn-primary send-offer-letter"
+															data-id="{{ $data->id }}" data-status="final">Submit</button>
+													</div>
+												</form>
+											</div>
+										</div>
+									</div>
 									<div class="modal fade" id="send-personal-info-form-{{$data->id}}"
 										tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 										<div class="modal-dialog ">
@@ -2990,6 +3118,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 <script type="text/javascript">
 	var interviewersNames = {!! json_encode($interviewersNames) !!};
 	$(document).ready(function () {
+		if($("#count_docs").val() > 0) {
+			for(var i=1; i<=$("#count_docs").val(); i++) {
+				var contact_number = window.intlTelInput(document.querySelector("#contact_number_"+i), {
+					separateDialCode: true,
+					preferredCountries:["ae"],
+					hiddenInput: "full",
+					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+				});
+			}
+		}		
 		var countinterviewersNames = 0;
 		countinterviewersNames = interviewersNames.length;
 		if(countinterviewersNames > 0 ) {
@@ -3001,6 +3139,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 				});
 			}
 		}
+		jQuery.validator.addMethod("validPassport", function(value, element) {
+			return this.optional(element) || /^[A-PR-WYa-pr-wy][1-9]\d\s?\d{4}[1-9]$/i.test(value);
+		}, "Passport number is not valid");   
+		jQuery.validator.addMethod("lettersonly", function(value, element) {
+			return this.optional(element) || /^[a-z ]+$/i.test(value);
+		}, "Letters and spaces only allowed");
+		jQuery.validator.addMethod(
+			"lessThan",
+			function(value, element, param) {
+				var bigValue = $(param).val();
+				var isValid = parseFloat(value) < parseFloat(bigValue);
+				return this.optional(element) || isValid;
+			},
+			"value must be less than total salary"
+		);
 		$('.add-interview-summary').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
@@ -3020,7 +3173,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					},
 					'interviewer_id[]': {
 						required: true,
-					}
+					},
 				},
 			});
 		})
@@ -3037,17 +3190,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					},
 					id: {
 						required: true,
-					}
+					}           
 				},
 				errorPlacement: function(error, element) {
-            if (element.attr('name') === 'candidate_expected_salary' || element.attr('name') === 'total_salary') {
-                error.addClass('other-error');
-                error.insertAfter(element.closest('.input-group'));
-            } else {
-                error.addClass('other-error');
-                error.insertAfter(element);
-            }
-        },
+					if (element.attr('name') === 'candidate_expected_salary' || element.attr('name') === 'total_salary') {
+						error.addClass('other-error');
+						error.insertAfter(element.closest('.input-group'));
+					} else {
+						error.addClass('other-error');
+						error.insertAfter(element);
+					}
+				},
 			});
 		})
 		$('.final-interview-summary').click(function (e) {
@@ -3081,45 +3234,106 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					},
 				},
 			});
-		})		
+		})
+		$('.send-offer-letter').click(function (e) {
+	        var id = $(this).attr('data-id');
+			$('#offer_letter_'+id).validate({ 
+				rules: {
+					candidate_name: {
+                        required: true,
+                        lettersonly: true,
+                    },
+					passport_number: {
+                        required: true,
+                        validPassport:true,
+                    },
+					"contact_number[main]": {
+                        required: true,
+                        minlength: 5,
+                        maxlength: 20,
+                    },
+					email: {
+						required: true,
+						email: true,
+                        accept:"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}"
+					},
+					designation_id: {
+						required: true,
+					},
+					basic_salary: {
+						required: true,
+						lessThan: "#total_salary_"+id,
+					},
+					other_allowances: {
+						required: true,
+						lessThan: "#total_salary_"+id,
+					},
+					total_salary: {
+						required: true,
+					},
+					probation_duration_in_months: {
+                        required: true,
+                        minlength: 1,
+                        maxlength: 2,
+						max: 12,
+						min: 1,
+                    },					
+				},
+			});
+		})
+				
 	})
-	function inputNumberAbs(currentPriceInput) {
+	function validationOnKeyUp(currentPriceInput) {
 	    var id = currentPriceInput.id;
 	    var input = document.getElementById(id);
 	    var val = input.value;
-	    val = val.replace(/^0+|[^\d.]/g, '');
-	    if(val.split('.').length>2) 
-	    {
-	        val =val.replace(/\.+$/,"");
-	    }
+	    val = val.replace(/^0+|[^\d]/g, '');
 	    input.value = val;
 	}
+	function validation(currentPriceInput) {
+		var id = currentPriceInput.id;
+		var input = document.getElementById(id);
+		var val = input.value;
+		val = val.replace(/^0+|[^\d.]/g, '');
+		if(val.split('.').length>2)
+		{
+			val = val.replace(/\.+$/,"");
+		}
+		input.value = val;	
+		var index = $("#"+id).data('value');
+		var totalSalary = $("#total_salary_"+index).val();
+		if(id == "basic_salary_"+index) {
+			document.getElementById('other_allowances_'+index).value=totalSalary-val;
+		}
+		else if(id == "other_allowances_"+index) {
+			document.getElementById('basic_salary_'+index).value=totalSalary-val;
+		}
+	}
 	$('.btn-verify-personalinfo').click(function (e) {
-	        var id = $(this).attr('data-id');
-			let url = '{{ route('docs.verified') }}';
-	        var confirm = alertify.confirm('Are you sure you verified this candidate documents ?',function (e) {
-	            if (e) {
-	                $.ajax({
-	                    type: "POST",
-	                    url: url,
-	                    dataType: "json",
-	                    data: {
-	                        id: id,
-	                        _token: '{{ csrf_token() }}'
-	                    },
-	                    success: function (data) {							
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
+		var id = $(this).attr('data-id');
+		let url = '{{ route('docs.verified') }}';
+		var confirm = alertify.confirm('Are you sure you verified this candidate documents ?',function (e) {
+			if (e) {
+				$.ajax({
+					type: "POST",
+					url: url,
+					dataType: "json",
+					data: {
+						id: id,
+						_token: '{{ csrf_token() }}'
+					},
+					success: function (data) {							
+						if(data == 'success') {
+							window.location.reload();
+							alertify.success(status + " Successfully")
+						}
+						else if(data == 'error') {
 
-							}
-	                    }
-	                });
-	            }
-	
-	        }).set({title:"Confirmation"})
-	    })
+						}
+					}
+				});
+			}	
+		}).set({title:"Confirmation"})
+	})
 </script>
 @endpush

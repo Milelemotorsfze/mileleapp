@@ -92,7 +92,7 @@ use App\Http\Controllers\WebhookController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::post('/webhook', [WebhookController::class, 'handleWebhook']);
+Route::match(['get', 'post'], '/whatsapp/receive', [WebhookController::class, 'sendMessage']);
 Route::get('/react-page', function () {
     return view('react-app.index');
 });
@@ -276,10 +276,11 @@ Route::get('/d', function () {
     });
     // Candidate Personal Information Form
     Route::get('candidate/listingInfo', [CandidatePersonalInfoController::class, 'getCandidatePersonalInfo'])->name('candidate.listingInfo');
-
+    Route::get('candidate/listDocs', [CandidatePersonalInfoController::class, 'getCandidateDocsInfo'])->name('candidate.listDocs');
     Route::resource('personal-info', CandidatePersonalInfoController::class);
     Route::controller(CandidatePersonalInfoController::class)->group(function(){
         Route::post('personal-info/send-email', 'sendEmail')->name('personal-info.send-email');
+        Route::post('personal-info/create-offer-letter', 'createOfferLetter')->name('personal-info.create-offer-letter');
         Route::post('docs/send-email', 'sendDocsEmail')->name('docs.send-email');
         Route::post('personal-info/verified', 'personalInfoVerified')->name('personal-info.verified');
         Route::post('docs/verified', 'docsVerified')->name('docs.verified');
@@ -658,6 +659,11 @@ Route::get('/d', function () {
     Route::resource('agents', AgentsController::class);
     Route::get('/get-agent-names', [AgentsController::class, 'getAgentNames'])->name('agents.getAgentNames');
     });
-    Route::get('candidate/personal_info/{id}', [CandidatePersonalInfoController::class, 'sendForm'])->name('candidate_personal_info.send_form');
+    Route::get('candidate/documents/{id}', [CandidatePersonalInfoController::class, 'sendForm'])->name('candidate_documents.send_form');
+    Route::post('candidate/store_docs', [CandidatePersonalInfoController::class, 'storeDocs'])->name('candidate.storeDocs');
+    Route::get('candidate/success_docs', [CandidatePersonalInfoController::class, 'successDocs'])->name('candidate.successDocs');
+
+
+    Route::get('candidate/personal_info/{id}', [CandidatePersonalInfoController::class, 'sendPersonalForm'])->name('candidate_personal_info.send_form');
     Route::post('candidate/store_personal_info', [CandidatePersonalInfoController::class, 'storePersonalinfo'])->name('candidate.storePersonalinfo');
     Route::get('candidate/success_personal_info', [CandidatePersonalInfoController::class, 'successPersonalinfo'])->name('candidate.successPersonalinfo');
