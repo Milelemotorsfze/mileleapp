@@ -8,6 +8,7 @@ use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\PFI;
+use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -59,8 +60,14 @@ class PFIController extends Controller
                                         ->whereNull('pfi_id')
                                         ->where('is_pfi_created', false)
                                         ->get();
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
+            ->get();
 
-        return view('pfi.create', compact('pendingPfiItems','approvedPfiItems','letterOfIndent'));
+        return view('pfi.create', compact('pendingPfiItems','approvedPfiItems','letterOfIndent','suppliers'));
     }
     public function addPFI(Request $request)
     {
@@ -221,8 +228,14 @@ class PFIController extends Controller
             ->whereNull('pfi_id')
             ->where('is_pfi_created', false)
             ->get();
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
+            ->get();
 
-        return view('pfi.edit', compact('pfi','pendingPfiItems','approvedPfiItems','letterOfIndent'));
+        return view('pfi.edit', compact('pfi','pendingPfiItems','approvedPfiItems','letterOfIndent','suppliers'));
     }
 
     /**

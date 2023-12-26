@@ -193,13 +193,29 @@
                             </div>
                             <div class="col-lg-3 col-md-6">
                                 <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Vendor</label>
+                                    <select class="form-control" name="supplier_id" id="supplier-id" multiple >
+                                        @foreach($suppliers as $supplier)
+                                            <option value="{{$supplier->id}}" >{{ $supplier->supplier }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Released Date</label>
                                     <input type="date" class="form-control" name="pfi_date">
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Amount</label>
+                                    <label for="choices-single-default" class="form-label">Released Amount</label>
+                                    <input type="number" min="0" class="form-control" name="released_amount">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">PFI Amount</label>
                                     <input type="number" class="form-control" name="amount" min="0" placeholder="Enter Amount">
                                 </div>
                             </div>
@@ -234,6 +250,11 @@
 @endsection
 @push('scripts')
     <script>
+        $('#supplier-id').select2({
+            placeholder: "Select Vendor",
+            maximumSelectionLength: 1
+        });
+
         $('form').on('submit', function(e){
             let addedPfiCount = $('#added-pfi-count').val();
             if(addedPfiCount <= 0) {
@@ -245,7 +266,6 @@
                 }else{
                     e.preventDefault();
                 }
-
             }
         });
 

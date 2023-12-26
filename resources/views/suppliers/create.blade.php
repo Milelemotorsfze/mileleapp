@@ -238,8 +238,8 @@
                                            onchange="validationOnKeyUp(this)">
                                     @error('supplier')
                                     <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
+                                        <strong>{{ $message }}</strong>
+                                    </span>
                                     @enderror
                                     <span id="supplierError" class="invalid-feedback"></span>
                                 </div>
@@ -353,6 +353,21 @@
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <textarea cols="25" rows="5" class=" form-control" name="comment" placeholder="Comment" id="comment" autofocus></textarea>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label for="mmc-checkbox" class="col-form-label text-md-end">{{ __('Vendor') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input type="checkbox" name="is_mmc" id="MMC-checkbox" >
+                                    <label for="MMC-checkbox" class="col-form-label text-md-end ml-3">{{ __('Is vendor is MMC?') }}</label>
+                                    <input type="checkbox" name="is_mmc" id="AMS-checkbox" >
+                                    <label for="AMS-checkbox" class="col-form-label text-md-end">{{ __('Is vendor is AMS?') }}</label>
                                 </div>
                             </div>
                             </br>
@@ -1220,6 +1235,14 @@
             })
             $(document.body).on('select2:select', "#category", function (e) {
                 getSubCategories();
+            });
+
+            $(document.body).on('select2:select', "#supplier_type", function (e) {
+                var data = e.params.data.id;
+                if(data == 'demand_planning' ) {
+
+                }
+
             });
 
             function getSubCategories() {
