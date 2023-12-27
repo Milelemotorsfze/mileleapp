@@ -36,7 +36,7 @@
                                 <td>{{ \Illuminate\Support\Carbon::parse($pfi->created_at)->format('d M y') }}</td>
                                 <td>{{ $pfi->pfi_reference_number }}</td>
                                 <td>{{ $pfi->letterOfIndent->customer->name }}</td>
-                                <td>{{ $pfi->letterOfIndent->customer->country  }}</td>
+                                <td>{{ $pfi->letterOfIndent->customer->country->name ?? ''  }}</td>
                                 <td>{{ $pfi->amount }}</td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($pfi->pfi_date)->format('d M y') }}</td>
                                 <td>{{ $pfi->comment }}</td>

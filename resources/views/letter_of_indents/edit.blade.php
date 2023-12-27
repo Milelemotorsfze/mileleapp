@@ -415,7 +415,6 @@
                 getCustomers();
             });
             $('#dealer').change(function () {
-                alert("clicked");
                 var value = $('#dealer').val();
                 $('#dealer-input').val(value);
 
