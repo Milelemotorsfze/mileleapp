@@ -146,6 +146,9 @@
                                                                     <div class="col-lg-1 col-md-12 col-sm-12">
                                                                         <dt>SFX </dt>
                                                                     </div>
+                                                                    <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                        <dt>Model Year </dt>
+                                                                    </div>
                                                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                                                         <dt>LOI Description</dt>
                                                                     </div>
@@ -170,7 +173,11 @@
                                                                             <dt  class=" d-lg-none d-xl-none d-xxl-none">SFX</dt>
                                                                             <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                         </div>
-                                                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                            <dt  class=" d-lg-none d-xl-none d-xxl-none">Model Year</dt>
+                                                                            <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>
+                                                                        </div>
+                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
                                                                             <dt class="d-lg-none d-xl-none d-xxl-none ">LOI Description</dt>
                                                                             <dl> {{ $LOIItem->loi_description ?? '' }} </dl>
                                                                         </div>
@@ -417,7 +424,10 @@
                                                                     <div class="col-lg-1 col-md-12 col-sm-12">
                                                                         <dt>SFX </dt>
                                                                     </div>
-                                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                    <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                        <dt>Model Year </dt>
+                                                                    </div>
+                                                                    <div class="col-lg-4 col-md-12 col-sm-12">
                                                                         <dt>LOI Description</dt>
                                                                     </div>
                                                                     <div class="col-lg-2 col-md-12 col-sm-12">
@@ -441,7 +451,11 @@
                                                                             <dt  class=" d-lg-none d-xl-none d-xxl-none">SFX</dt>
                                                                             <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
                                                                         </div>
-                                                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                            <dt  class=" d-lg-none d-xl-none d-xxl-none">Model Year</dt>
+                                                                            <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>
+                                                                        </div>
+                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
                                                                             <dt class="d-lg-none d-xl-none d-xxl-none ">LOI Description</dt>
                                                                             <dl> {{ $LOIItem->loi_description ?? '' }} </dl>
                                                                         </div>
@@ -566,7 +580,10 @@
                                                                     <div class="col-lg-1 col-md-12 col-sm-12">
                                                                         <dt>SFX </dt>
                                                                     </div>
-                                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                    <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                        <dt>Model Year </dt>
+                                                                    </div>
+                                                                    <div class="col-lg-4 col-md-12 col-sm-12">
                                                                         <dt>LOI Description</dt>
                                                                     </div>
                                                                     <div class="col-lg-2 col-md-12 col-sm-12">
@@ -589,6 +606,10 @@
                                                                         <div class="col-lg-1 col-md-12 col-sm-12">
                                                                             <dt  class=" d-lg-none d-xl-none d-xxl-none">SFX</dt>
                                                                             <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
+                                                                        </div>
+                                                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                            <dt  class=" d-lg-none d-xl-none d-xxl-none">Model Year</dt>
+                                                                            <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>
                                                                         </div>
                                                                         <div class="col-lg-6 col-md-12 col-sm-12">
                                                                             <dt class="d-lg-none d-xl-none d-xxl-none ">LOI Description</dt>
