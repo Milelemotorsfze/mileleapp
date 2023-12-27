@@ -55,7 +55,8 @@ class SupplierController extends Controller
             ->where('status', 'inactive')
             ->get();
 
-        if(Auth::user()->hasPermissionTo('demand-planning-supplier-list') && !Auth::user()->hasPermissionTo('addon-supplier-list')) {
+        if(Auth::user()->hasPermissionForSelectedRole('demand-planning-supplier-list') && !Auth::user()->hasPermissionForSelectedRole('addon-supplier-list')) {
+
              $suppliers = Supplier::with('supplierTypes')
                  ->whereHas('supplierTypes', function ($query){
                      $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
@@ -413,8 +414,6 @@ class SupplierController extends Controller
     }
     public function store(Request $request)
     {
-        info($request->supplier_types);
-
         $payment_methods_id = $addon_id = [];
         (new UserActivityController)->createActivity('Created Vendor');
 
@@ -802,6 +801,8 @@ class SupplierController extends Controller
         $input['is_communication_email'] = $request->is_communication_email ? true : false;
         $input['is_communication_postal'] = $request->is_communication_postal ? true : false;
         $input['is_communication_any'] = $request->is_communication_any ? true : false;
+        $input['is_MMC'] = $request->is_mmc ? true : false;
+        $input['is_AMS'] = $request->is_ams ? true : false;
 
         if($request->form_action == 'UPDATE') {
 
