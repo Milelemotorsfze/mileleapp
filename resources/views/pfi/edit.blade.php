@@ -434,7 +434,6 @@
            }else{
                 alertify.confirm('Atleast One Item is Mandatory in PFI.You can not delete item.').set({title:"Alert !"})
             }
-
         }
         $('#pfi_reference_number').keyup(function(){
 

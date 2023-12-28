@@ -478,8 +478,7 @@
                 $('#total-amount-'+id).val(eachItemTotal);
 
                 sum = sum + eachItemTotal;
-            });
-          
+            });  
             $('.removed-unit-prices').each(function() {
                     var id = $(this).attr('index');  
                     console.log(id);

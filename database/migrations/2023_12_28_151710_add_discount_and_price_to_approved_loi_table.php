@@ -15,7 +15,6 @@ return new class extends Migration
             $table->double('unit_price')->nullable()->after('quantity');    
         });
     }
-
     /**
      * Reverse the migrations.
      */

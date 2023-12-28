@@ -113,20 +113,17 @@ class PFIController extends Controller
         if($request->supplier_id) {
             $supplier = Supplier::find($request->supplier_id);
             $loiItem = LetterOfIndentItem::find($approevdLOI->letter_of_indent_item_id);
-        //    if($approevdLOI->unit_price){
-        //       $price = $approevdLOI->unit_price;
-        //    }else{
+       
                 if($supplier->is_MMC == true) {
                     $price = $loiItem->masterModel->amount_belgium > 0 ? $loiItem->masterModel->amount_belgium : 0;
                 }else if($supplier->is_AMS == true) {
                     $price = $loiItem->masterModel->amount_uae > 0 ? $loiItem->masterModel->amount_uae : 0;
                 }else{
                     $price = 0;
-                }
-        //    }
+                }    
             
             $approevdLOI['unit_price'] = $price;
-            // $approevdLOI['unit_price'] = $price;
+        
         }
 
         return response($approevdLOI);

@@ -52,7 +52,6 @@ class LetterOfIndentItem extends Model
 
         return $loiDescription;
     }
-
     public function getBalanceQuantityAttribute()
     {
        $totalQuantity = $this->quantity;
