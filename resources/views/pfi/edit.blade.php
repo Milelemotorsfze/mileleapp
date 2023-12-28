@@ -432,7 +432,7 @@
                     }
                 });
            }else{
-                alertify.confirm('Atleast One Variant item is Mandatory in PFI.You can not delete item.').set({title:"Alert !"})
+                alertify.confirm('Atleast One Item is Mandatory in PFI.You can not delete item.').set({title:"Alert !"})
             }
 
         }

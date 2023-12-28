@@ -52,19 +52,7 @@ class LetterOfIndentItem extends Model
 
         return $loiDescription;
     }
-    public function getLoiItemUnitPriceAttribute()
-    {
-        $LoiItem = LetterOfIndentItem::find($this->id);
-        $price = 0;
-        if($LoiItem->supplier->is_MMC == true) {
-            $price = $LoiItem->masterModel->amount_belgium;
-        }
-        if($LoiItem->supplier->is_AMS == true) {
-            $price = $LoiItem->masterModel->amount_uae;
-        }
 
-        return $price;
-    }
     public function getBalanceQuantityAttribute()
     {
        $totalQuantity = $this->quantity;
