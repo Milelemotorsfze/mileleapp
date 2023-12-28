@@ -247,6 +247,78 @@ $existingspecifications = Varaint::with('VariantItems')
     }
 }
     }
+    else{
+        $maxVariant = Varaint::where('brands_id', $request->input('brands_id'))
+        ->where('master_model_lines_id', $request->input('master_model_lines_id'))
+        ->where('fuel_type', $request->input('fuel_type'))
+        ->where('engine', $request->input('engine'))
+        ->where('steering', $request->input('steering'))
+        ->orderBy('name', 'desc')
+        ->first();
+        $master_model_lines_id = $request->input('master_model_lines_id');
+        $steering = $request->input('steering');
+        if($steering == "LHD"){
+            $steeringn = "L";
+        }
+        else{
+            $steeringn = "R";
+        }
+        $engine = $request->input('engine');
+        $fuel_type = $request->input('fuel_type');
+        if($fuel_type == "Petrol")
+            {
+                $f = "P";
+            }
+            else if($fuel_type == "Diesel") 
+            {
+                $f = "D";
+            }
+            else if($fuel_type == "PHEV") 
+            {
+                $f = "PHEV";
+            }
+            else if($fuel_type == "MHEV") 
+            {
+                $f = "MHEV";
+            }
+            else if($fuel_type == "PH") 
+            {
+                $f = "PH";
+            }
+            else
+            {
+                $f = "EV";
+            }
+        $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+        if ($maxVariant) {
+        $existingName = $maxVariant->name;
+        $parts = explode('_', $existingName);
+        if (count($parts) > 1) {
+            $lastNumber = end($parts);
+            if (is_numeric($lastNumber)) {
+                $newNumber = (int)$lastNumber + 1;
+                array_pop($parts);
+                $name = implode('_', $parts) . '_' . $newNumber;
+            } else {
+                $NewexistingName = substr($existingName, 0, -1);
+                $parts = explode('_', $NewexistingName);
+                if (count($parts) > 1) {
+                    $lastNumber = end($parts);
+                    if (is_numeric($lastNumber)) {
+                        $newNumber = (int)$lastNumber + 1;
+                        array_pop($parts);
+                        $name = implode('_', $parts) . '_' . $newNumber;
+                    } 
+                }
+            }
+        } else {
+                $name = $existingName . '_1';
+        }
+        } 
+        else {
+                $name = $steeringn . $model_line . $engine . $f . '_1';
+        }
+    }
     (new UserActivityController)->createActivity('Creating New Variant');
     $model_details= $request->input('model_detail');
     if($model_details == null){
