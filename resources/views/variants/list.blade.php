@@ -101,6 +101,12 @@
                 {{ Session::get('success') }}
             </div>
         @endif
+        @if (Session::has('error'))
+            <div class="alert alert-error" id="error-alert">
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('error') }}
+            </div>
+        @endif
         <div class="table-responsive">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
                 <thead class="bg-soft-secondary">
@@ -144,8 +150,12 @@
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
                     @endphp
                     @if ($hasPermission)
-                    <td class="nowrap-td">
+                    <!-- <td class="nowrap-td">
                                 <a data-placement="top" href="{{ route('variants.edit', $variant->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
+                                </a>
+                                </td> -->
+                                <td class="nowrap-td">
+                                <a data-placement="top" href="{{ route('variants.edit', $variant->id) }}" class="btn btn-info btn-sm"><i class="fa fa fa-clone">Duplicate</i>
                                 </a>
                                 </td>
                             @endif

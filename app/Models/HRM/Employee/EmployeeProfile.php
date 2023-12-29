@@ -129,6 +129,10 @@ class EmployeeProfile extends Model
         'resume',
         'visa',
         'emirates_id_file',
+
+        'offer_sign',
+        'offer_signed_at',
+        'offer_letter_hr_id',
     ];
     public function teamLeadOrReportingManager() {
         return $this->hasOne(User::class,'id','team_lead_or_reporting_manager');
@@ -177,5 +181,8 @@ class EmployeeProfile extends Model
     }
     public function candidateProDipCerti() {
         return $this->hasMany(EmpDoc::class,'candidate_id','id')->where('document_name','professional_diploma_certificates');
+    }
+    public function offerLetterHr() {
+        return $this->hasOne(User::class,'id','offer_letter_hr_id'); 
     }
 }

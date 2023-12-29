@@ -277,6 +277,7 @@ Route::get('/d', function () {
     // Candidate Personal Information Form
     Route::get('candidate/listingInfo', [CandidatePersonalInfoController::class, 'getCandidatePersonalInfo'])->name('candidate.listingInfo');
     Route::get('candidate/listDocs', [CandidatePersonalInfoController::class, 'getCandidateDocsInfo'])->name('candidate.listDocs');
+    Route::get('candidate-offer-letter/send/{id}', [CandidatePersonalInfoController::class, 'sendJobOfferLetter'])->name('candidate-offer-letter.send');
     Route::resource('personal-info', CandidatePersonalInfoController::class);
     Route::controller(CandidatePersonalInfoController::class)->group(function(){
         Route::post('personal-info/send-email', 'sendEmail')->name('personal-info.send-email');
@@ -284,6 +285,7 @@ Route::get('/d', function () {
         Route::post('docs/send-email', 'sendDocsEmail')->name('docs.send-email');
         Route::post('personal-info/verified', 'personalInfoVerified')->name('personal-info.verified');
         Route::post('docs/verified', 'docsVerified')->name('docs.verified');
+        
         // Route::get('personal-info/listingInfo', 'getCandidatePersonalInfo')->name('personal-info.listingInfo');
     });
     // Employee Passport Request
@@ -669,3 +671,6 @@ Route::get('/d', function () {
     Route::get('candidate/personal_info/{id}', [CandidatePersonalInfoController::class, 'sendPersonalForm'])->name('candidate_personal_info.send_form');
     Route::post('candidate/store_personal_info', [CandidatePersonalInfoController::class, 'storePersonalinfo'])->name('candidate.storePersonalinfo');
     Route::get('candidate/success_personal_info', [CandidatePersonalInfoController::class, 'successPersonalinfo'])->name('candidate.successPersonalinfo');
+    Route::get('candidate-offer-letter/sign/{id}', [CandidatePersonalInfoController::class, 'signJobOfferLetter'])->name('candidate-offer-letter.sign');
+    Route::post('offer-letter/signed', [CandidatePersonalInfoController::class, 'signedOfferLetter'])->name('offerletter.signed');
+    

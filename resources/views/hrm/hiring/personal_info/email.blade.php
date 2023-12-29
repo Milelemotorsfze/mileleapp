@@ -6,13 +6,14 @@
 <p>This is with the reference to your applied position and being a part of our interview process. We would like to inform you that you have 
     completed our selection process successfully, and we are excited to offer you to join our team as a {{ $data['job_position'] }} to add value to our 
     esteemed organization’s growth with your best knowledge and skills, and abilities.</p></br>
-<p>Your gross compensation package will be AED 1,000 (UAE Dirhams One Thousand Only) per month which will be divided into basic salary and other 
+<p>Your gross compensation package will be AED {{$data['basic_salary']}} ( {{$data['basic_salary_inwords']}} Only) per month which will be divided into basic salary and other 
     allowances as well, as per our payroll structure. </p></br>
-<p>The attached offer letter for your acceptance and signature that you need to send back to us as soon as possible </p></br>
-<p>Please also complete, sign, and return the attached "Personal Information Form" by email. </p></br>
+<p>The attached offer letter link is for your acceptance and signature that you need to submit back to us as soon as possible. You will receive a signed copy of your job offer letter to your email. </p></br>
+<p>Please also complete, sign, and submit the attached "Personal Information Form" by using the following link. </p></br>
 <p>Wish you good luck.</p></br>
 @endif
-<p>link is - <a href="{{env('BASE_URL')}}/candidate/personal_info/{{ $data["id"] }}">Candidate Personal Information Form</a></p></br>
+<p>Candidate Job Offer Letter link is - <a href="{{env('BASE_URL')}}/candidate-offer-letter/sign/{{ $data["id"] }}">Candidate Job Offer Letter</a></p></br>
+<p>Candidate Personal Information Form link is - <a href="{{env('BASE_URL')}}/candidate/personal_info/{{ $data["id"] }}">Candidate Personal Information Form</a></p></br>
 @if($data["comment"])
 <p>{{$data["comment"]}}</p>
 @endif
