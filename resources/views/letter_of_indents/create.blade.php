@@ -13,17 +13,8 @@
             height:32px!important;
         }
 
-         .kbw-signature { width: 100%; height: 200px;}
-        #sig canvas{
-            width: 100% !important;
-            height: auto;
-        }
-
     </style>
-    <head>
-        <link type="text/css" href=" {{ asset('css/south-street-jquery-ui/jquery-ui.css') }}" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="http://keith-wood.name/css/jquery.signature.css">
-    </head>
+
     <div class="card-header">
         <h4 class="card-title">Add New LOI</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -182,33 +173,28 @@
                                autofocus accept="application/pdf">
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">Signature:</label>
-                        <br/>
-                        <div id="loi-signature" ></div>
-                        <input type="hidden" id="signature" name="loi_signature">
-                        <button id="clear" class="btn btn-danger btn-sm">Clear Signature</button>
+                        <input type="file" id="signature-upload" name="loi_signature" accept="application/pdf" class="form-control widthinput">
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <div class="row mb-3">
-                        <div class="col-lg-6 col-md-12 col-sm-12 mb-3">
-                            <div id="file-preview">
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-lg-4 col-md-12 col-sm-12">
-                            <div id="image-preview">
-
-                            </div>
-                        </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-12 col-sm-12">
+                    <div id="file-preview">
                     </div>
                 </div>
+{{--                <div class="col-lg-4 col-md-12 col-sm-12">--}}
+{{--                    <div id="image-preview">--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+                <div class="col-lg-4 col-md-12 col-sm-12">
+                    <div id="signature-preview">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
                 <div class="card p-2" >
                     <div class="card-header">
                         <h4 class="card-title ">LOI Items</h4>
@@ -281,9 +267,7 @@
                         </div>
                     </div>
                 </div>
-                <br>
-
-                <div class="col-12 text-end">
+                <div class="col-12 text-end mt-3">
                     <button type="submit" class="btn btn-primary">Submit </button>
                 </div>
             </div>
@@ -292,30 +276,20 @@
     </div>
 @endsection
 @push('scripts')
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="http://keith-wood.name/js/jquery.signature.js"></script>
+
     <script>
-        var signature = jQuery('#loi-signature').signature({
-            syncField: '#signature',
-            syncFormat: 'PNG'
-        });
-        $('#clear').click(function(e) {
-            e.preventDefault();
-            signature.signature('clear');
-            $("#signature").val('');
-        });
 
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
-        const previewImage = document.querySelector("#image-preview");
+        // const previewImage = document.querySelector("#image-preview");
         fileInputLicense.addEventListener("change", function(event) {
             const files = event.target.files;
             while (previewFile.firstChild) {
                 previewFile.removeChild(previewFile.firstChild);
             }
-            while (previewImage.firstChild) {
-                previewImage.removeChild(previewImage.firstChild);
-            }
+            // while (previewImage.firstChild) {
+            //     previewImage.removeChild(previewImage.firstChild);
+            // }
             for (let i = 0; i < files.length; i++)
             {
                 const file = files[i];
@@ -326,16 +300,44 @@
                     iframe.src = objectUrl;
                     previewFile.appendChild(iframe);
                 }
-                else if (file.type.match("image/*"))
-                {
-                    const objectUrl = URL.createObjectURL(file);
-                    const image = new Image();
-                    image.src = objectUrl;
-                    previewImage.appendChild(image);
-                }
+                // else if (file.type.match("image/*"))
+                // {
+                //     const objectUrl = URL.createObjectURL(file);
+                //     const image = new Image();
+                //     image.src = objectUrl;
+                //     previewImage.appendChild(image);
+                // }
             }
         });
+        const signatureFileInput = document.querySelector("#signature-upload");
+        const signaturePreviewFile = document.querySelector("#signature-preview");
+
+        signatureFileInput.addEventListener("change", function(event) {
+            const files = event.target.files;
+            while (signaturePreviewFile.firstChild) {
+                signaturePreviewFile.removeChild(signaturePreviewFile.firstChild);
+            }
+
+            const file = files[0];
+            if (file.type.match("application/pdf"))
+            {
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                signaturePreviewFile.appendChild(iframe);
+            }
+
+        });
         getCustomers();
+
+        // jQuery.validator.addMethod('required_check', function(value, element) {
+        //     let dealer = $('#dealer').val();
+        //     if(dealer == 'Milele Motors') {
+        //         return true;
+        //     }else{
+        //         return false;
+        //     }
+        // },'This feild is required');
 
         $("#form-create").validate({
             ignore: [],
@@ -371,12 +373,16 @@
                     extension: "pdf"
                 },
                 loi_signature: {
-                    required: true,
+                    // required_check: true,
+                    extension: "pdf"
                 },
                 messages: {
                     file: {
                         extension: "Please upload pdf file"
                     },
+                    loi_signature:{
+                        extension: "Please upload Pdf file!"
+                    }
                 },
             }
         });
