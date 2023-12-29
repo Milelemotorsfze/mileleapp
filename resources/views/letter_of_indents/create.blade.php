@@ -21,7 +21,7 @@
 
     </style>
     <head>
-        <link type="text/css" href=" {{ asset('south-street-jquery-ui/jquery-ui.css') }}" rel="stylesheet">
+        <link type="text/css" href=" {{ asset('css/south-street-jquery-ui/jquery-ui.css') }}" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="http://keith-wood.name/css/jquery.signature.css">
     </head>
     <div class="card-header">
@@ -182,6 +182,8 @@
                                autofocus accept="application/pdf">
                     </div>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">Signature:</label>
@@ -191,7 +193,22 @@
                         <button id="clear" class="btn btn-danger btn-sm">Clear Signature</button>
                     </div>
                 </div>
-                <br>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="row mb-3">
+                        <div class="col-lg-6 col-md-12 col-sm-12 mb-3">
+                            <div id="file-preview">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-lg-4 col-md-12 col-sm-12">
+                            <div id="image-preview">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="card p-2" >
                     <div class="card-header">
                         <h4 class="card-title ">LOI Items</h4>
@@ -265,20 +282,7 @@
                     </div>
                 </div>
                 <br>
-                <div class="row mb-3">
-                    <div class="col-lg-6 col-md-12 col-sm-12 mb-3">
-                        <div id="file-preview">
 
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-lg-4 col-md-12 col-sm-12">
-                        <div id="image-preview">
-
-                        </div>
-                    </div>
-                </div>
                 <div class="col-12 text-end">
                     <button type="submit" class="btn btn-primary">Submit </button>
                 </div>
@@ -336,7 +340,9 @@
         $("#form-create").validate({
             ignore: [],
             rules: {
+
                 customer_id: {
+
                     required: true,
                 },
                 category: {

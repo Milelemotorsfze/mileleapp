@@ -92,7 +92,7 @@ use App\Http\Controllers\WebhookController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::post('/webhook', [WebhookController::class, 'handleWebhook']);
+Route::match(['get', 'post'], '/whatsapp/receive', [WebhookController::class, 'sendMessage']);
 Route::get('/react-page', function () {
     return view('react-app.index');
 });
@@ -341,6 +341,8 @@ Route::get('/d', function () {
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
     Route::resource('pfi', PFIController::class);
     Route::get('add-pfi', [PFIController::class,'addPFI'])->name('add_pfi');
+    Route::get('loi-item/unit-price', [PFIController::class,'getUnitPrice'])->name('loi-item.unit-price');
+
     Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);
 
     // Supplier Inventories

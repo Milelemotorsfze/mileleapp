@@ -76,6 +76,8 @@
         </p>
         <p style="margin-bottom:0px;">Sincerely,</p>
         <p> {{ $letterOfIndent->customer->company_name ?? '' }} </p>
+        <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
+
     </div>
 </div>
 </body>

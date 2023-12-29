@@ -14,6 +14,7 @@ use App\Models\Supplier;
 use App\Models\SupplierInventory;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -141,18 +142,21 @@ class LetterOfIndentController extends Controller
             $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS_NEW;
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
             $LOI->created_by = Auth::id();
+
             if($request->loi_signature) {
-                $folderPath = public_path('LOI-Signatures');
+                $folderPath = public_path('LOI-Signature');
                 $image_parts = explode(";base64,", $request->loi_signature);
                 $image_type_aux = explode("image/", $image_parts[0]);
-
                 $image_type = $image_type_aux[1];
-
                 $image_base64 = base64_decode($image_parts[1]);
-                $file = $folderPath . time() . '.'.$image_type;
-                $sigFileName = time().'.'.$image_type;
-                $LOI->signature = $sigFileName;
-                file_put_contents($file, $image_base64);
+
+                $file =  uniqid() . '.'.$image_type;
+                if(!\Illuminate\Support\Facades\File::isDirectory($folderPath)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($folderPath, $mode = 0777, true, true);
+                }
+                $filePath = public_path('LOI-Signature/' . $file);
+                $LOI->signature = $file;
+                file_put_contents($filePath, $image_base64);
             }
 
             $LOI->save();
@@ -388,6 +392,23 @@ class LetterOfIndentController extends Controller
             $LOI->destination = $request->destination;
             $LOI->so_number = $request->so_number;
             $LOI->prefered_location = $request->prefered_location;
+
+            if($request->loi_signature) {
+                $folderPath = public_path('LOI-Signature');
+                $image_parts = explode(";base64,", $request->loi_signature);
+                $image_type_aux = explode("image/", $image_parts[0]);
+                $image_type = $image_type_aux[1];
+                $image_base64 = base64_decode($image_parts[1]);
+
+                $file =  uniqid() . '.'.$image_type;
+                if(!\Illuminate\Support\Facades\File::isDirectory($folderPath)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($folderPath, $mode = 0777, true, true);
+                }
+                $filePath = public_path('LOI-Signature/' . $file);
+                $LOI->signature = $file;
+                file_put_contents($filePath, $image_base64);
+            }
+
             $LOI->save();
 
             if ($request->has('files')) {

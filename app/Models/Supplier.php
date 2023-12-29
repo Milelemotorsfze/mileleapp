@@ -47,7 +47,9 @@ class Supplier extends Model
         'created_by',
         'updated_by',
         'deleted_by',
-        'status'
+        'status',
+        'is_MMC',
+        'is_AMS'
     ];
     protected $appends = [
         'is_deletable',

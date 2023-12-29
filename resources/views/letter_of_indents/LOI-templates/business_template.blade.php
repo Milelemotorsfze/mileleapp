@@ -92,6 +92,8 @@
             </p>
             <p style="margin-bottom: 5px;">Sincerely,</p>
             <p> {{ $letterOfIndent->customer->company_name ?? '' }} </p>
+             <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
+{{--            <img src="{{ url('images/test_sign.png') }}" style="height: 70px;width: 150px">--}}
 
     </div>
 </div>

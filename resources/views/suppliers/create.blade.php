@@ -238,8 +238,8 @@
                                            onchange="validationOnKeyUp(this)">
                                     @error('supplier')
                                     <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
+                                        <strong>{{ $message }}</strong>
+                                    </span>
                                     @enderror
                                     <span id="supplierError" class="invalid-feedback"></span>
                                 </div>
@@ -357,6 +357,21 @@
                             </div>
                             </br>
                         </div>
+
+                        <div class="col-xxl-6 col-lg-6 col-md-12" hidden id="vendor-name-checkbox">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label  class="col-form-label text-md-end">{{ __('Vendor') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input type="checkbox" name="is_mmc" id="MMC-checkbox" class="demand-planning-vendor-checkbox">
+                                    <label for="MMC-checkbox" class="col-form-label text-md-end ml-3">{{ __('Is vendor MMC?') }}</label>
+                                    <input type="checkbox" name="is_ams" id="AMS-checkbox" class="demand-planning-vendor-checkbox">
+                                    <label for="AMS-checkbox" class="col-form-label text-md-end">{{ __('Is vendor AMS?') }}</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -366,7 +381,6 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-
                         <div class="col-xxl-6 col-lg-6 col-md-12">
                             <div class="row">
                                 <div class="col-xxl-3 col-lg-6 col-md-12">
@@ -1214,14 +1228,41 @@
                 minimumResultsForSearch: -1,
                 placeholder:"Choose Vendor Type",
             });
+
+            $('.demand-planning-vendor-checkbox').click(function() {
+                $('.demand-planning-vendor-checkbox').not(this).prop('checked', false);
+            });
+
             $(document.body).on('select2:unselect', "#category", function (e) {
                 getSubCategories();
+                $('#vendor-name-checkbox').attr('hidden', true);
+                $('#MMC-checkbox').prop('checked', false);
+                $('#AMS-checkbox').prop('checked', false);
 
             })
             $(document.body).on('select2:select', "#category", function (e) {
                 getSubCategories();
             });
 
+            $(document.body).on('select2:select', "#supplier_type", function (e) {
+                var data = $('#supplier_type').val();
+                if(jQuery.inArray("demand_planning", data) === -1) {
+                    // demand planning not exits
+                    $('#vendor-name-checkbox').attr('hidden', true);
+                }else{
+                    // demand planning exits
+                    $('#vendor-name-checkbox').attr('hidden', false);
+                }
+            });
+            $(document.body).on('select2:unselect', "#supplier_type", function (e) {
+                var data = e.params.data.id;
+                if(data == 'demand_planning') {
+                    // demand planning not exits
+                    $('#vendor-name-checkbox').attr('hidden', true);
+                    $('#MMC-checkbox').prop('checked', false);
+                    $('#AMS-checkbox').prop('checked', false);
+                }
+            });
             function getSubCategories() {
                 var categories =  $('#category').val();
                 let url = '{{ route('vendor.sub-categories') }}';

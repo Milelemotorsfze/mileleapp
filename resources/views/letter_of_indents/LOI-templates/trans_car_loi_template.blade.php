@@ -1,11 +1,11 @@
 @extends('layouts.main')
 @section('content')
     <style>
-        /*@page { size: 700pt }*/
+        /*@page { size: A4; }*/
         @media only screen and (min-device-width: 1200px)
         {
             .container{
-                max-width: 1000px; !important;
+                max-width: 803px; !important;
             }
         }
         table {
@@ -161,7 +161,7 @@
         const values = ["500", "300", "400"];
         const random = Math.floor(Math.random() * values.length);
         var imageWidth = values[random];
-
+        console.log(imageWidth);
         var imageHeight = height - 150;
         $('#total-height').val(imageHeight);
         $('#width').val(imageWidth);

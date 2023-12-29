@@ -8,6 +8,7 @@ use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\PFI;
+use App\Models\Supplier;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -59,12 +60,18 @@ class PFIController extends Controller
                                         ->whereNull('pfi_id')
                                         ->where('is_pfi_created', false)
                                         ->get();
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
+            ->get();
 
-        return view('pfi.create', compact('pendingPfiItems','approvedPfiItems','letterOfIndent'));
+        return view('pfi.create', compact('pendingPfiItems','approvedPfiItems','letterOfIndent','suppliers'));
     }
     public function addPFI(Request $request)
     {
-        $approevdLOI = ApprovedLetterOfIndentItem::with('letterOfIndentItem.masterModel.variant')
+        $approevdLOI = ApprovedLetterOfIndentItem::with('letterOfIndentItem.masterModel')
                                     ->findOrFail($request->id);
 
         if($request->action == 'REMOVE') {
@@ -124,6 +131,10 @@ class PFIController extends Controller
         $pfi->created_by = Auth::id();
         $pfi->comment = $request->comment;
         $pfi->status = PFI::PFI_STATUS_NEW;
+        $pfi->delivery_location = $request->delivery_location;
+        $pfi->currency = $request->currency;
+        $pfi->supplier_id = $request->supplier_id;
+        $pfi->released_amount = $request->released_amount;
 
         $destinationPath = 'PFI_document_withoutsign';
         $destination = 'PFI_document_withsign';
@@ -221,8 +232,14 @@ class PFIController extends Controller
             ->whereNull('pfi_id')
             ->where('is_pfi_created', false)
             ->get();
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
+            ->get();
 
-        return view('pfi.edit', compact('pfi','pendingPfiItems','approvedPfiItems','letterOfIndent'));
+        return view('pfi.edit', compact('pfi','pendingPfiItems','approvedPfiItems','letterOfIndent','suppliers'));
     }
 
     /**
@@ -230,6 +247,7 @@ class PFIController extends Controller
      */
     public function update(Request $request, string $id)
     {
+//        dd($request->all());
         (new UserActivityController)->createActivity('Updated PFI Details');
 
         $request->validate([
@@ -246,6 +264,10 @@ class PFIController extends Controller
         $pfi->pfi_date = Carbon::parse($request->pfi_date)->format('Y-m-d');
         $pfi->amount = $request->amount;
         $pfi->comment = $request->comment;
+        $pfi->delivery_location = $request->delivery_location;
+        $pfi->currency = $request->currency;
+        $pfi->supplier_id = $request->supplier_id;
+        $pfi->released_amount = $request->released_amount;
 
         $destinationPath = 'PFI_document_withoutsign';
         $destination = 'PFI_document_withsign';
@@ -346,6 +368,36 @@ class PFIController extends Controller
         DB::commit();
 
         return response(true);
+
+    }
+    public function getUnitPrice(Request $request) {
+//        info($request->all());
+        $supplier = Supplier::find($request->supplier_id);
+
+        $approvedPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)
+            ->whereNull('pfi_id')
+            ->where('is_pfi_created', true)
+            ->get();
+        $pendingPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)
+            ->whereNull('pfi_id')
+            ->where('is_pfi_created', false)
+            ->get();
+        $approvedItemUnitPrices = [];
+        foreach ($approvedPfiItems as $approvedPfiItem) {
+            info($approvedPfiItem->letter_of_indent_id);
+            $loiItem = LetterOfIndentItem::find($approvedPfiItem->letter_of_indent_item_id);
+            info($loiItem);
+            if($supplier->is_MMC == true) {
+                $price = $loiItem->masterModel->amount_belgium;
+            }
+            if($supplier->is_AMS == true) {
+                $price = $loiItem->masterModel->amount_uae;
+            }
+            $approvedItemUnitPrices[$loiItem->id] = $price;
+
+        }
+        $data['approvedItemUnitPrices'] = $approvedItemUnitPrices;
+        return $data;
 
     }
 }

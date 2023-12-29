@@ -24,6 +24,7 @@
             border: 1px solid #1c1b1b;
             text-align: left;
             padding: 8px;
+            font-size: 14px;
         }
         .left {
             text-align: left;
@@ -191,9 +192,9 @@
                             </tr >
                             <tr style="background-color: #FFFFFF" id="date-div">
                                 <td style="border: none">Date:
-                                    <span style="margin-left: 10px">
-                                            {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}
-                                        </span>
+                                    <span>
+                                         {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}
+                                    </span>
                                 </td>
                                 <td style="border: none">
                                     <img class="overlay-image" src="{{ url('milele_seal.png') }}" style="width: 170px; height: 150px;"></img>
@@ -203,7 +204,9 @@
                             </tr>
                             <tr style="background-color: #FFFFFF">
                                 <td style="border: none">Signature :
-                                    <img src="{{ url('images/sign.jpg') }}" style="height: 50px;width: 70px"></img>
+                                    @if($letterOfIndent->signature)
+                                        <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
+                                    @endif
                                 </td>
                                 <td style="border: none">
 
@@ -233,8 +236,9 @@
         var height = document.getElementById('full-page').offsetHeight;
         var tableFooterHeight = document.getElementById('footer-table').offsetHeight;
 
-        const values = ["200", "290", "300", "400", "350"];
+        const values = ["200", "290", "310","250", "350"];
         const random = Math.floor(Math.random() * values.length);
+
         var imageWidth = values[random];
 
         var headerHeight = (6 * tableFooterHeight);

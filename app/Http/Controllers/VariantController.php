@@ -48,6 +48,8 @@ public function store(Request $request)
 {
     $selectedSpecifications = json_decode(request('selected_specifications'), true);
     ksort($selectedSpecifications);
+    
+    $totalSpecifications = count($selectedSpecifications);
     $existingVariantop = Varaint::where('brands_id', $request->input('brands_id'))
         ->where('master_model_lines_id', $request->input('master_model_lines_id'))
         ->where('fuel_type', $request->input('fuel_type'))
@@ -58,36 +60,56 @@ public function store(Request $request)
         ->where('gearbox', $request->input('gearbox'))
         ->where('steering', $request->input('steering'))
         ->where('upholestry', $request->input('upholestry'))
-        ->where(function ($query) use ($selectedSpecifications) {
-            foreach ($selectedSpecifications as $specificationData) { 
-                $query->whereHas('variantItems', function ($q) use ($specificationData) {
-                    $q->where('model_specification_id', $specificationData['specification_id'])
-                      ->where('model_specification_options_id', $specificationData['value']);
-                });
-            }
-        })
-        ->first();
-    if ($existingVariantop) {
-        return redirect()->route('variants.index')->with('error', 'Variant with the same specifications and options already exists');
-    }
-    $existingspecifications = Varaint::where('brands_id', $request->input('brands_id'))
-        ->where('master_model_lines_id', $request->input('master_model_lines_id'))
-        ->where('coo', $request->input('coo'))
-        ->where('my', $request->input('my'))
-        ->where('drive_train', $request->input('drive_train'))
-        ->where('gearbox', $request->input('gearbox'))
-        ->where('upholestry', $request->input('upholestry'))
-        ->where(function ($query) use ($selectedSpecifications) {
-            foreach ($selectedSpecifications as $specificationData) { 
-                $query->whereHas('variantItems', function ($q) use ($specificationData) {
-                    $q->where('model_specification_id', $specificationData['specification_id'])
-                      ->where('model_specification_options_id', $specificationData['value']);
-                });
-            }
+        ->whereHas('variantItems', function ($q) use ($selectedSpecifications) {
+            $q->whereIn('model_specification_id', array_column($selectedSpecifications, 'specification_id'))
+              ->whereIn('model_specification_options_id', array_column($selectedSpecifications, 'value'));
         })
         ->orderBy('created_at', 'desc')
         ->first();
+    if ($existingVariantop) {
+        // Check if all specifications and values match
+        $matchedSpecifications = 0;
+        foreach ($selectedSpecifications as $specificationData) {
+            $matchFound = $existingVariantop->variantItems->contains(function ($variantItem) use ($specificationData) {
+                return $variantItem->model_specification_id == $specificationData['specification_id'] &&
+                       $variantItem->model_specification_options_id == $specificationData['value'];
+            });
+    
+            if ($matchFound) {
+                $matchedSpecifications++;
+            }
+        }
+        if ($matchedSpecifications == $totalSpecifications) {
+            return redirect()->route('variants.index')->with('error', 'Variant with the same specifications and options already exists');
+        }
+    }
+$existingspecifications = Varaint::with('VariantItems')
+    ->where('brands_id', $request->input('brands_id'))
+    ->where('master_model_lines_id', $request->input('master_model_lines_id'))
+    ->where('coo', $request->input('coo'))
+    ->where('my', $request->input('my'))
+    ->where('drive_train', $request->input('drive_train'))
+    ->where('gearbox', $request->input('gearbox'))
+    ->where('upholestry', $request->input('upholestry'))
+    ->whereHas('variantItems', function ($q) use ($selectedSpecifications) {
+        $q->whereIn('model_specification_id', array_column($selectedSpecifications, 'specification_id'))
+          ->whereIn('model_specification_options_id', array_column($selectedSpecifications, 'value'));
+    })
+    ->orderBy('created_at', 'desc')
+    ->first();
     if ($existingspecifications) {
+        $sematchedSpecifications = 0;
+        foreach ($selectedSpecifications as $specificationData) {
+            $matchFound = $existingspecifications->variantItems->contains(function ($variantItem) use ($specificationData) {
+                return $variantItem->model_specification_id == $specificationData['specification_id'] &&
+                       $variantItem->model_specification_options_id == $specificationData['value'];
+            });
+    
+            if ($matchFound) {
+                $sematchedSpecifications++;
+            }
+        }
+        if ($sematchedSpecifications == $totalSpecifications) {
         $steering = $request->input('steering');
         if($steering == "LHD"){
             $steeringn = "L";
@@ -108,15 +130,19 @@ public function store(Request $request)
         }
         else if($fuel_type == "PHEV") 
         {
-            $f = "P";
+            $f = "PHEV";
         }
         else if($fuel_type == "MHEV") 
         {
-            $f = "M";
+            $f = "MHEV";
+        }
+        else if($fuel_type == "PH") 
+        {
+            $f = "PH";
         }
         else
         {
-            $f = "E";
+            $f = "EV";
         }
         $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
         $existingName = $existingspecifications->name;
@@ -167,25 +193,29 @@ public function store(Request $request)
     $engine = $request->input('engine');
     $fuel_type = $request->input('fuel_type');
     if($fuel_type == "Petrol")
-    {
-        $f = "P";
-    }
-    else if($fuel_type == "Diesel") 
-    {
-        $f = "D";
-    }
-    else if($fuel_type == "PHEV") 
-    {
-        $f = "P";
-    }
-    else if($fuel_type == "MHEV") 
-    {
-        $f = "M";
-    }
-    else
-    {
-        $f = "E";
-    }
+        {
+            $f = "P";
+        }
+        else if($fuel_type == "Diesel") 
+        {
+            $f = "D";
+        }
+        else if($fuel_type == "PHEV") 
+        {
+            $f = "PHEV";
+        }
+        else if($fuel_type == "MHEV") 
+        {
+            $f = "MHEV";
+        }
+        else if($fuel_type == "PH") 
+        {
+            $f = "PH";
+        }
+        else
+        {
+            $f = "EV";
+        }
     $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
     if ($maxVariant) {
     $existingName = $maxVariant->name;
@@ -216,6 +246,79 @@ public function store(Request $request)
             $name = $steeringn . $model_line . $engine . $f . '_1';
     }
 }
+    }
+    else{
+        $maxVariant = Varaint::where('brands_id', $request->input('brands_id'))
+        ->where('master_model_lines_id', $request->input('master_model_lines_id'))
+        ->where('fuel_type', $request->input('fuel_type'))
+        ->where('engine', $request->input('engine'))
+        ->where('steering', $request->input('steering'))
+        ->orderBy('name', 'desc')
+        ->first();
+        $master_model_lines_id = $request->input('master_model_lines_id');
+        $steering = $request->input('steering');
+        if($steering == "LHD"){
+            $steeringn = "L";
+        }
+        else{
+            $steeringn = "R";
+        }
+        $engine = $request->input('engine');
+        $fuel_type = $request->input('fuel_type');
+        if($fuel_type == "Petrol")
+            {
+                $f = "P";
+            }
+            else if($fuel_type == "Diesel") 
+            {
+                $f = "D";
+            }
+            else if($fuel_type == "PHEV") 
+            {
+                $f = "PHEV";
+            }
+            else if($fuel_type == "MHEV") 
+            {
+                $f = "MHEV";
+            }
+            else if($fuel_type == "PH") 
+            {
+                $f = "PH";
+            }
+            else
+            {
+                $f = "EV";
+            }
+        $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
+        if ($maxVariant) {
+        $existingName = $maxVariant->name;
+        $parts = explode('_', $existingName);
+        if (count($parts) > 1) {
+            $lastNumber = end($parts);
+            if (is_numeric($lastNumber)) {
+                $newNumber = (int)$lastNumber + 1;
+                array_pop($parts);
+                $name = implode('_', $parts) . '_' . $newNumber;
+            } else {
+                $NewexistingName = substr($existingName, 0, -1);
+                $parts = explode('_', $NewexistingName);
+                if (count($parts) > 1) {
+                    $lastNumber = end($parts);
+                    if (is_numeric($lastNumber)) {
+                        $newNumber = (int)$lastNumber + 1;
+                        array_pop($parts);
+                        $name = implode('_', $parts) . '_' . $newNumber;
+                    } 
+                }
+            }
+        } else {
+                $name = $existingName . '_1';
+        }
+        } 
+        else {
+                $name = $steeringn . $model_line . $engine . $f . '_1';
+        }
+    }
     (new UserActivityController)->createActivity('Creating New Variant');
     $model_details= $request->input('model_detail');
     if($model_details == null){
@@ -226,25 +329,29 @@ public function store(Request $request)
     $gearbox = $request->input('gearbox');
     $fuel_type = $request->input('fuel_type');
     if($fuel_type == "Petrol")
-    {
-        $f = "P";
-    }
-    else if($fuel_type == "Diesel") 
-    {
-        $f = "D";
-    }
-    else if($fuel_type == "PHEV") 
-    {
-        $f = "P";
-    }
-    else if($fuel_type == "MHEV") 
-    {
-        $f = "M";
-    }
-    else
-    {
-        $f = "E";
-    }
+        {
+            $f = "P";
+        }
+        else if($fuel_type == "Diesel") 
+        {
+            $f = "D";
+        }
+        else if($fuel_type == "PHEV") 
+        {
+            $f = "PHEV";
+        }
+        else if($fuel_type == "MHEV") 
+        {
+            $f = "MHEV";
+        }
+        else if($fuel_type == "PH") 
+        {
+            $f = "PH";
+        }
+        else
+        {
+            $f = "EV";
+        }
     $model_details = $steering . ' ' . $model_line . ' ' . $engine . ' ' . $gearbox . ' ' . $fuel_type;
     }
     $variant_details= $request->input('variant');
@@ -270,15 +377,19 @@ public function store(Request $request)
         }
         else if($fuel_type == "PHEV") 
         {
-            $f = "P";
+            $f = "PHEV";
         }
         else if($fuel_type == "MHEV") 
         {
-            $f = "M";
+            $f = "MHEV";
+        }
+        else if($fuel_type == "PH") 
+        {
+            $f = "PH";
         }
         else
         {
-            $f = "E";
+            $f = "EV";
         }
         $variant_details = $my . ',' . $steering . ',' . $model_line . ',' . $engine . ',' . $gearbox . ',' . $fuel_type . ',' . $gearbox . ',' . $coo . ',' . $drive_train . ',' . $upholestry;
     }
@@ -332,12 +443,31 @@ public function store(Request $request)
      */
     public function edit(string $id)
     {
-        (new UserActivityController)->createActivity('Edit Variant Details page View');
-        $brands = Brand::all();
-        $masterModelLines = MasterModelLines::all();
+        (new UserActivityController)->createActivity('Duplicate the Variants');
         $variant = Varaint::findOrFail($id);
-        $variantlog = Variantlog::where('variant_id', $id)->orderBy('created_at', 'desc')->get();
-        return view('variants.edit',compact('variant','brands','masterModelLines', 'variantlog'));
+        $brand = Brand::findOrFail($variant->brands_id);
+        $brands = Brand::all();
+        $countries = CountryListFacade::getList('en');
+        $masterModelLines = MasterModelLines::all();
+        $masterModelLine = MasterModelLines::findOrFail($variant->master_model_lines_id);
+        $variantItems = VariantItems::where('varaint_id', '=', $id)->get();
+        $modelLineId = $masterModelLine->id;
+        $specifications = ModelSpecification::where('master_model_lines_id', $modelLineId)->get();
+        $data = [];
+        foreach ($specifications as $specification) {
+            $selectedOptions = VariantItems::where('varaint_id', $id)
+                ->where('model_specification_id', $specification->id)
+                ->pluck('model_specification_options_id')
+                ->toArray();
+            $options = ModelSpecificationOption::where('model_specification_id', $specification->id)->get();
+    
+            $data[] = [
+                'specification' => $specification,
+                'selectedOptions' => $selectedOptions,
+                'options' => $options,
+            ];
+        }
+        return view('variants.duplicate',compact('countries','variant','brand','brands','masterModelLines', 'variantItems', 'data', 'masterModelLine'));
     }
 
     /**
