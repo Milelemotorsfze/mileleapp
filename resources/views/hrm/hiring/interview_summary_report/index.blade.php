@@ -2796,12 +2796,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
 																		<label for="passport_number" class="form-label font-size-13">{{ __('Passport Number') }}</label>
 																				<input name="passport_number" id="passport_number_{{$data->id}}" class="form-control" required
-																				placeholder="Enter Candidate Passport Number" value="@if($data->passport_number){{$data->passport_number}}@endif">																		
+																				placeholder="Enter Candidate Passport Number" value="@if($data->candidateDetails->passport_number){{$data->candidateDetails->passport_number}}@endif">																		
 																		</div>
 																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
 																		<label for="contact_number" class="form-label font-size-13">{{ __('Mobile Phone') }}</label>
 																		<input id="contact_number_{{$i}}" type="tel" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
-																				name="contact_number[main]" placeholder="Mobile Number" value="{{old('hiddencontact')}}"
+																				name="contact_number[main]" placeholder="Mobile Number" value="@if($data->candidateDetails->contact_number){{$data->candidateDetails->contact_number}} @endif"
 																				autocomplete="contact_number[main]" autofocus oninput="validationOnKeyUp(this)">
 																				<!-- <input name="contact_number" id="contact_number_{{$data->id}}" class="form-control" required
 																				placeholder="Enter Mobile Phone" value="@if($data->contact_number){{$data->contact_number}}@endif">																		 -->
@@ -2813,14 +2813,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																		</div>
 																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
 																			<label for="job_position" class="form-label font-size-13">{{ __('Job Position') }}</label>
-																			<input readonly name="designation_id" id="job_position_{{$data->id}}" class="form-control" required
+																			<input type="hidden" name="designation_id" value="{{$data->employeeHiringRequest->questionnaire->designation_id}}">
+																			<input readonly name="designation_name" id="job_position_{{$data->id}}" class="form-control" required
 																				placeholder="Enter Candidate Job Position" value="{{$data->employeeHiringRequest->questionnaire->designation->name ?? ''}}">																		
 																		</div>
 																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
 																		<label for="probation_period" class="form-label font-size-13">{{ __('Probation Period') }}</label>
 																		<div class="input-group">													
 																		<input type="number" name="probation_duration_in_months" id="probation_period_{{$data->id}}" class="form-control" required
-																				placeholder="Enter Probation Period" value="{{$data->employeeHiringRequest->questionnaire->probation_length_in_months ?? ''}}">	
+																				placeholder="Enter Probation Period" value="{{$data->candidateDetails->probation_length_in_months ?? $data->employeeHiringRequest->questionnaire->probation_length_in_months ?? ''}}">	
 																				<div class="input-group-append">
 																					<span class="input-group-text widthinput" >Months</span>
 																				</div>
@@ -2831,7 +2832,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																		<label for="basic_salary" class="form-label font-size-13">{{ __('Basic Salary ( Per Month )') }}</label>
 																		<div class="input-group">													
 																		<input name="basic_salary" id="basic_salary_{{$data->id}}" class="form-control" required data-value="{{$data->id}}"
-																				placeholder="Enter Basic Salary" value="{{($data->total_salary*40)/100}}" oninput="validation(this)">	
+																				placeholder="Enter Basic Salary" value="@if($data->candidateDetails->basic_salary != 0.00){{$data->candidateDetails->basic_salary}}@else{{($data->total_salary*40)/100}}@endif" oninput="validation(this)">	
 																				<div class="input-group-append">
 																					<span class="input-group-text widthinput" >AED</span>
 																				</div>
@@ -2841,7 +2842,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																		<label for="other_allowances" class="form-label font-size-13">{{ __('Other Allowance ( Per Month )') }}</label>
 																		<div class="input-group">
 																		<input name="other_allowances" id="other_allowances_{{$data->id}}" class="form-control" required data-value="{{$data->id}}"
-																		oninput="validation(this)" placeholder="Enter Other Allowance" value="{{($data->total_salary*60)/100}}">	
+																		oninput="validation(this)" placeholder="Enter Other Allowance" value="@if($data->candidateDetails->other_allowances != 0.00){{$data->candidateDetails->other_allowances}}@else{{($data->total_salary*60)/100}}@endif">	
 																				<div class="input-group-append">
 																					<span class="input-group-text widthinput" >AED</span>
 																				</div>
