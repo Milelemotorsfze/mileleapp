@@ -47,7 +47,7 @@ class LetterOfIndentController extends Controller
             ->cursor();
         $rejectedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
-            ->where('status', LetterOfIndent::LOI_STATUS_REJECTED)
+            ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED)
             ->cursor();
 
         return view('letter_of_indents.index', compact('newLOIs','approvedLOIs',

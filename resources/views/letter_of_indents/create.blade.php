@@ -340,9 +340,7 @@
         $("#form-create").validate({
             ignore: [],
             rules: {
-
                 customer_id: {
-
                     required: true,
                 },
                 category: {

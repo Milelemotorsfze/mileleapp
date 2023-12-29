@@ -189,7 +189,7 @@
                         </div>
                     @endforeach
                     <div class="col-12 text-end">
-                        <button class="btn btn-primary" type="submit">Approve</button>
+                        <button class="btn btn-primary" type="submit">Update</button>
                     </div>
                 @endif
                 </form>

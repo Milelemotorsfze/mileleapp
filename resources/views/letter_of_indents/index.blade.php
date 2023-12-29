@@ -49,10 +49,10 @@
                         <a class="nav-link" data-bs-toggle="pill" href="#supplier-approved-LOI">Supplier Approved LOI</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="pill" href="#milele-partial-approved-LOI">Milele Partial Approved LOI</a>
+                        <a class="nav-link" data-bs-toggle="pill" href="#milele-partial-approved-LOI"> Partialy Utilized LOI</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="pill" href="#milele-approved-LOI">Milele Approved LOI</a>
+                        <a class="nav-link" data-bs-toggle="pill" href="#milele-approved-LOI">Fully Utilized LOI</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#supplier-rejected-LOI">Supplier Rejected LOI</a>
@@ -74,7 +74,7 @@
                                     <th>So Number</th>
                                     <th>Destination</th>
                                     <th>Prefered Location</th>
-                                    <th>Approval Status</th>
+                                    <th> Status</th>
 {{--                                    <th>LOI</th>--}}
                                     <th>Actions</th>
                                 </tr>
@@ -255,13 +255,13 @@
                                     <th>So Number</th>
                                     <th>Destination</th>
                                     <th>Prefered Location</th>
-                                    <th>Approval Status</th>
+                                    <th> Status</th>
                                     @can('LOI-approve')
                                         @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
                                         @endphp
                                         @if ($hasPermission)
-                                            <th>Milele Approval</th>
+                                            <th>Utilization Update</th>
                                         @endif
                                     @endcan
 {{--                                    <th>LOI</th>--}}
@@ -289,7 +289,7 @@
                                                 <td>
                                                     <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
                                                         <button type="button" class=" btn btn-primary btn-sm" >
-                                                             Partial Approval
+                                                            Utilization Quantity
                                                         </button>
                                                     </a>
                                                 </td>
@@ -438,16 +438,16 @@
                                     <th>So Number</th>
                                     <th>Destination</th>
                                     <th>Prefered Location</th>
-                                    <th>Approval Status</th>
+                                    <th>Status</th>
                                     @can('LOI-approve')
                                         @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
                                         @endphp
                                         @if ($hasPermission)
-                                            <th>Approval</th>
+                                            <th>Utilization Update</th>
                                         @endif
                                     @endcan
-{{--                                    <th>LOI</th>--}}
+                                    <th>LOI</th>
                                     <th width="150px">Actions</th>
                                 </tr>
                                 </thead>
@@ -471,21 +471,21 @@
                                             @if ($hasPermission)
                                                 <td>
                                                     <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
-                                                        <button type="button" class=" btn btn-primary btn-sm" >Approve</button>
+                                                        <button type="button" class=" btn btn-primary btn-sm" >Utilization Quantity</button>
                                                     </a>
                                                 </td>
                                             @endif
                                         @endcan
-{{--                                        <td>--}}
-{{--                                            <select class="form-control" onchange="location = this.value;">--}}
-{{--                                                <option value="">Select Template</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">--}}
-{{--                                                    Trans Car Template</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>--}}
-{{--                                            </select>--}}
-{{--                                        </td>--}}
+                                        <td>
+                                            <select class="form-control" onchange="location = this.value;">
+                                                <option value="">Select Template</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">
+                                                    Trans Car Template</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>
+                                            </select>
+                                        </td>
                                         <td>
                                             @if($letterOfIndent->is_pfi_pending_for_loi == true)
                                                 <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
@@ -624,8 +624,8 @@
                                     <th>So Number</th>
                                     <th>Destination</th>
                                     <th>Prefered Location</th>
-                                    <th>Approval Status</th>
-                                    <th>LOI</th>
+                                    <th> Status</th>
+                                    <th>LOI Pdf</th>
                                     <th width="150px">Actions</th>
                                 </tr>
                                 </thead>
@@ -790,7 +790,7 @@
                                     <th>So Number</th>
                                     <th>Destination</th>
                                     <th>Prefered Location</th>
-                                    <th>Approval Status</th>
+                                    <th> Status</th>
                                     <th>Review</th>
 
                                     <th width="100px">Actions</th>
@@ -930,7 +930,7 @@
             </div>
         @endif
     @endcan
-            <script type="text/javascript">
+   <script type="text/javascript">
                 $(document).ready(function () {
                     $('.status-reject-button').click(function (e) {
                         var id = $('#id').val();

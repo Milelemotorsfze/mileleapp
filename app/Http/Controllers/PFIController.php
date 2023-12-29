@@ -69,71 +69,71 @@ class PFIController extends Controller
 
         return view('pfi.create', compact('pendingPfiItems','approvedPfiItems','letterOfIndent','suppliers'));
     }
-    public function addPFI(Request $request)
-    {
-        $approevdLOI = ApprovedLetterOfIndentItem::with('letterOfIndentItem.masterModel')
-                                    ->findOrFail($request->id);
-
-        if($request->action == 'REMOVE') {
-            // remove from pfi
-            if($request->pfi_id) {
-                $approevdLOI->pfi_id = NULL;
-            }
-
-            $approevdLOI->is_pfi_created = false;
-            // $approevdLOI->discount = $request->discount;
-            // $approevdLOI->unit_price = $request->unit_price;
-        }else{
-            // add to pfi
-            if($request->pfi_id) {
-                $approevdLOI->pfi_id = $request->pfi_id;
-            }
-
-            $approevdLOI->is_pfi_created = true;
-            // $approevdLOI->discount = $request->discount;
-            // $approevdLOI->unit_price = $request->unit_price;
-        }
-
-        $approevdLOI->save();
-
-        if($request->pfi_id) {
-            $approvedItemCount = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $approevdLOI->letter_of_indent_id)
-                ->where('pfi_id', $request->pfi_id)
-                ->where('is_pfi_created', true)
-                ->count();
-        }else{
-            $approvedItemCount = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $approevdLOI->letter_of_indent_id)
-                ->whereNull('pfi_id')
-                ->where('is_pfi_created', true)
-                ->count();
-        }
-
-        $approevdLOI['approvedItems'] = $approvedItemCount;
-       
-        if($request->supplier_id) {
-            $supplier = Supplier::find($request->supplier_id);
-            $loiItem = LetterOfIndentItem::find($approevdLOI->letter_of_indent_item_id);
-       
-                if($supplier->is_MMC == true) {
-                    $price = $loiItem->masterModel->amount_belgium > 0 ? $loiItem->masterModel->amount_belgium : 0;
-                }else if($supplier->is_AMS == true) {
-                    $price = $loiItem->masterModel->amount_uae > 0 ? $loiItem->masterModel->amount_uae : 0;
-                }else{
-                    $price = 0;
-                }    
-            
-            $approevdLOI['unit_price'] = $price;
-        
-        }
-
-        return response($approevdLOI);
-    }
+//    public function addPFI(Request $request)
+//    {
+//        $approevdLOI = ApprovedLetterOfIndentItem::with('letterOfIndentItem.masterModel')
+//                                    ->findOrFail($request->id);
+//
+//        if($request->action == 'REMOVE') {
+//            // remove from pfi
+//            if($request->pfi_id) {
+//                $approevdLOI->pfi_id = NULL;
+//            }
+//
+//            $approevdLOI->is_pfi_created = false;
+//            // $approevdLOI->discount = $request->discount;
+//            // $approevdLOI->unit_price = $request->unit_price;
+//        }else{
+//            // add to pfi
+//            if($request->pfi_id) {
+//                $approevdLOI->pfi_id = $request->pfi_id;
+//            }
+//
+//            $approevdLOI->is_pfi_created = true;
+//            // $approevdLOI->discount = $request->discount;
+//            // $approevdLOI->unit_price = $request->unit_price;
+//        }
+//
+//        $approevdLOI->save();
+//
+//        if($request->pfi_id) {
+//            $approvedItemCount = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $approevdLOI->letter_of_indent_id)
+//                ->where('pfi_id', $request->pfi_id)
+//                ->where('is_pfi_created', true)
+//                ->count();
+//        }else{
+//            $approvedItemCount = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $approevdLOI->letter_of_indent_id)
+//                ->whereNull('pfi_id')
+//                ->where('is_pfi_created', true)
+//                ->count();
+//        }
+//
+//        $approevdLOI['approvedItems'] = $approvedItemCount;
+//
+//        if($request->supplier_id) {
+//            $supplier = Supplier::find($request->supplier_id);
+//            $loiItem = LetterOfIndentItem::find($approevdLOI->letter_of_indent_item_id);
+//
+//                if($supplier->is_MMC == true) {
+//                    $price = $loiItem->masterModel->amount_belgium > 0 ? $loiItem->masterModel->amount_belgium : 0;
+//                }else if($supplier->is_AMS == true) {
+//                    $price = $loiItem->masterModel->amount_uae > 0 ? $loiItem->masterModel->amount_uae : 0;
+//                }else{
+//                    $price = 0;
+//                }
+//
+//            $approevdLOI['unit_price'] = $price;
+//
+//        }
+//
+//        return response($approevdLOI);
+//    }
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+//         dd($request->all());
         (new UserActivityController)->createActivity('New PFI Created');
 
         $request->validate([
@@ -172,14 +172,9 @@ class PFIController extends Controller
 
         $pfi->save();
 
-        $currentlyApprovedItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)
-                                                        ->where('is_pfi_created', true)
-                                                        ->whereNull('pfi_id')
-                                                        ->get();
-
+        $currentlyApprovedItems = $request->selectedIds;
         $letterOfIndent = LetterOfIndent::find($request->letter_of_indent_id);
-
-        $pfiApprovedQuantity = $currentlyApprovedItems->sum('quantity');
+        $pfiApprovedQuantity = ApprovedLetterOfIndentItem::whereIn('id', $currentlyApprovedItems)->sum('quantity');
 
         // status change in LOI table by checking quantity of pfi created untill now
         if($pfiApprovedQuantity == $letterOfIndent->total_loi_quantity) {
@@ -191,9 +186,9 @@ class PFIController extends Controller
         // update pfiId FOR EACH ADDED ITEM
         foreach ($currentlyApprovedItems as $key => $currentlyApprovedItem)
         {
-            $approvedLoiItem = ApprovedLetterOfIndentItem::find($currentlyApprovedItem->id);
+            $approvedLoiItem = ApprovedLetterOfIndentItem::find($currentlyApprovedItem);
+            $approvedLoiItem->is_pfi_created = true;
             $approvedLoiItem->pfi_id = $pfi->id;
-            $approvedLoiItem->discount = $request->discount[$key];
             $approvedLoiItem->unit_price = $request->unit_price[$key];
             $approvedLoiItem->save();
         }
@@ -262,6 +257,19 @@ class PFIController extends Controller
             })
             ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
+
+        foreach ($pendingPfiItems as $pendingPfiItem) {
+            $loiItem = LetterOfIndentItem::find($pendingPfiItem->letter_of_indent_item_id);
+
+            if($pfi->supplier->is_MMC == true) {
+                $price = $loiItem->masterModel->amount_belgium > 0 ?  $loiItem->masterModel->amount_belgium : 0;
+            }else if($pfi->supplier->is_AMS == true) {
+                $price = $loiItem->masterModel->amount_uae > 0 ? $loiItem->masterModel->amount_uae : 0;
+            }else{
+                $price = 0;
+            }
+           $pendingPfiItem->unit_price = $price;
+        }
 
         return view('pfi.edit', compact('pfi','pendingPfiItems','approvedPfiItems','letterOfIndent','suppliers'));
     }
@@ -332,13 +340,11 @@ class PFIController extends Controller
 
         $pfi->save();
 
-        $currentlyApprovedItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $pfi->letter_of_indent_id)
-            ->where('is_pfi_created', true)
-            ->get();
+        $currentlyApprovedItems = $request->selectedIds;
 
         $letterOfIndent = LetterOfIndent::find($pfi->letter_of_indent_id);
 
-        $pfiApprovedQuantity = $currentlyApprovedItems->sum('quantity');
+        $pfiApprovedQuantity = ApprovedLetterOfIndentItem::whereIn('id', $currentlyApprovedItems)->sum('quantity');
 
         // status change in LOI table by checking quantity of pfi created untill now
         if($pfiApprovedQuantity == $letterOfIndent->total_loi_quantity) {
@@ -347,11 +353,24 @@ class PFIController extends Controller
             $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED;
         }
         $letterOfIndent->save();
+
+        // make all existing items as new items
+        $existingPfiItems = ApprovedLetterOfIndentItem::where('pfi_id', $id)
+            ->where('is_pfi_created', true)
+            ->get();
+        foreach ($existingPfiItems as $pfiItem) {
+            $pfiItem->pfi_id = null;
+            $pfiItem->is_pfi_created = false;
+            $pfiItem->unit_price = 0;
+            $pfiItem->save();
+        }
         // update pfiId FOR EACH ADDED ITEM
-        foreach ($currentlyApprovedItems as $currentlyApprovedItem)
+        foreach ($currentlyApprovedItems as $key => $currentlyApprovedItem)
         {
-            $approvedLoiItem = ApprovedLetterOfIndentItem::find($currentlyApprovedItem->id);
+            $approvedLoiItem = ApprovedLetterOfIndentItem::find($currentlyApprovedItem);
             $approvedLoiItem->pfi_id = $pfi->id;
+            $approvedLoiItem->is_pfi_created = true;
+            $approvedLoiItem->unit_price = $request->unit_price[$key];
             $approvedLoiItem->save();
         }
 
@@ -378,7 +397,7 @@ class PFIController extends Controller
             }
 
             $letterOfIndent = LetterOfIndent::find($pfi->letter_of_indent_id);
-            
+
             // change the status to previous while deleting PO
             if($letterOfIndent->total_loi_quantity == $letterOfIndent->total_approved_quantity) {
                 $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
@@ -395,54 +414,50 @@ class PFIController extends Controller
 
     }
     public function getUnitPrice(Request $request) {
-      
+
         $supplier = Supplier::find($request->supplier_id);
 
-        $approvedPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)
-            ->whereNull('pfi_id')
-            ->where('is_pfi_created', true)
-            ->get();
         $pendingPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)
             ->whereNull('pfi_id')
             ->where('is_pfi_created', false)
             ->get();
         $approvedItemUnitPrices = [];
         $pendingPfiItemUnitPrices = [];
-        foreach ($approvedPfiItems as $approvedPfiItem) {
-            
-            $loiItem = LetterOfIndentItem::find($approvedPfiItem->letter_of_indent_item_id);
-           
-            if($supplier->is_MMC == true) {
-                $price = $loiItem->masterModel->amount_belgium > 0 ?  $loiItem->masterModel->amount_belgium : 0;;
-            }else if($supplier->is_AMS == true) {
-                $price = $loiItem->masterModel->amount_uae > 0 ? $loiItem->masterModel->amount_uae : 0;;
-            }else{
-                $price = 0;
-            }
-            $approvedItemUnitPrices[$approvedPfiItem->id] = $price;
+        if($request->action == 'EDIT') {
+            $approvedPfiItems = ApprovedLetterOfIndentItem::where('pfi_id', $request->pfi_id)
+                ->where('is_pfi_created', true)
+                ->get();
+            foreach ($approvedPfiItems as $approvedPfiItem) {
 
-        }
-        if($pendingPfiItems->count() > 0) {
-            foreach ($pendingPfiItems as $pendingPfiItem) {
-              
-                $loiItem = LetterOfIndentItem::find($pendingPfiItem->letter_of_indent_item_id);
-            
+                $loiItem = LetterOfIndentItem::find($approvedPfiItem->letter_of_indent_item_id);
+
                 if($supplier->is_MMC == true) {
-                    info("mmc");
                     $price = $loiItem->masterModel->amount_belgium > 0 ?  $loiItem->masterModel->amount_belgium : 0;
                 }else if($supplier->is_AMS == true) {
-                    info("ams");
                     $price = $loiItem->masterModel->amount_uae > 0 ? $loiItem->masterModel->amount_uae : 0;
                 }else{
-                    info("no price");
+                    $price = 0;
+                }
+                $approvedItemUnitPrices[$approvedPfiItem->id] = $price;
+            }
+        }
+
+        if($pendingPfiItems->count() > 0) {
+            foreach ($pendingPfiItems as $pendingPfiItem) {
+
+                $loiItem = LetterOfIndentItem::find($pendingPfiItem->letter_of_indent_item_id);
+
+                if($supplier->is_MMC == true) {
+                    $price = $loiItem->masterModel->amount_belgium > 0 ?  $loiItem->masterModel->amount_belgium : 0;
+                }else if($supplier->is_AMS == true) {
+                    $price = $loiItem->masterModel->amount_uae > 0 ? $loiItem->masterModel->amount_uae : 0;
+                }else{
                     $price = 0;
                 }
                 $pendingPfiItemUnitPrices[$pendingPfiItem->id] = $price;
-    
             }
-            info($pendingPfiItemUnitPrices);
         }
-       
+
         $data['approvedItemUnitPrices'] = $approvedItemUnitPrices;
         $data['pendingItemUnitPrices'] = $pendingPfiItemUnitPrices;
         return $data;
