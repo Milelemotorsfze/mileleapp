@@ -6,6 +6,7 @@
             float: left;
             left: 50%;
             top: 50%;
+            min-height: 500px;
             transform: translate(-50%, -50%);
         }
 
@@ -50,13 +51,13 @@
     <div class="portfolio">
         <ul class="nav nav-pills nav-fill" id="my-tab">
             <li class="nav-item">
-                <a class="nav-link tab-1 active" data-bs-toggle="tab" data-tab="PENDING" href="#pending-approved-LOI">Pending Approval LOIs</a>
+                <a class="nav-link tab-1 active" data-bs-toggle="tab" data-tab="PENDING" href="#pending-approved-LOI">Pending </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link tab-2" data-bs-toggle="tab" data-tab="APPROVED" href="#approved-LOI"> Approved LOIs</a>
+                <a class="nav-link tab-2" data-bs-toggle="tab" data-tab="APPROVED" href="#approved-LOI"> Approved </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link tab-3" data-bs-toggle="tab" data-tab="REJECTED" href="#rejected-LOI">Rejected LOIs</a>
+                <a class="nav-link tab-3" data-bs-toggle="tab" data-tab="REJECTED" href="#rejected-LOI">Rejected</a>
             </li>
         </ul>
     </div>
@@ -76,16 +77,7 @@
                             <th>Prefered Location</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
-                            <th>LOI Items</th>
-                            <th>LOI Documents</th>
-                            @can('loi-supplier-approve')
-                                @php
-                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
-                                @endphp
-                                @if ($hasPermission)
-                                    <th>Actions</th>
-                                @endif
-                            @endcan
+                            <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -103,29 +95,26 @@
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#view-new-loi-items-{{$letterOfIndent->id}}">View
+                                    <button type="button" class="btn btn-soft-violet btn-sm" data-bs-toggle="modal" title="View LOI Item Lists"
+                                            data-bs-target="#view-new-loi-items-{{$letterOfIndent->id}}"><i class="fa fa-list"></i>
                                     </button>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#view-new-loi-docs-{{$letterOfIndent->id}}">View
+                                    <button type="button" class="btn btn-dark-blue btn-sm" data-bs-toggle="modal" title="View LOI Documents"
+                                            data-bs-target="#view-new-loi-docs-{{$letterOfIndent->id}}"><i class="fa fa-file"></i>
                                     </button>
-                                </td>
-                                @can('loi-supplier-approve')
-                                    @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
-                                    @endphp
-                                    @if ($hasPermission)
-                                        <td>
+                                    @can('loi-supplier-approve')
+                                        @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
+                                        @endphp
+                                        @if ($hasPermission)
                                             <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
                                                     data-bs-target="#approve-LOI-{{ $letterOfIndent->id }}" > Approve </button>
 
                                             <button type="button" class="btn btn-danger modal-button btn-sm" data-bs-toggle="modal"
                                                     data-bs-target="#reject-LOI-{{$letterOfIndent->id}}"> Reject </button>
-                                        </td>
-                                    @endif
-                                @endcan
+                                        @endif
+                                    @endcan
+                                </td>
+
                                 <div class="modal fade" id="view-new-loi-items-{{$letterOfIndent->id}}" data-bs-backdrop="static"
                                      tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -258,14 +247,6 @@
                                                                     <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
                                                                 </div>
                                                             </div>
-{{--                                                            <div class="row mt-2">--}}
-{{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
-{{--                                                                    <label class="form-label font-size-13 text-muted">Vendor</label>--}}
-{{--                                                                </div>--}}
-{{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
-{{--                                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >--}}
-{{--                                                                </div>--}}
-{{--                                                            </div>--}}
                                                             <div class="row mt-2">
                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
                                                                     <label class="form-label font-size-13 text-muted">LOI Date</label>
@@ -324,14 +305,7 @@
                                                                     <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
                                                                 </div>
                                                             </div>
-{{--                                                            <div class="row mt-2">--}}
-{{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
-{{--                                                                    <label class="form-label font-size-13 text-muted">Vendor</label>--}}
-{{--                                                                </div>--}}
-{{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
-{{--                                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >--}}
-{{--                                                                </div>--}}
-{{--                                                            </div>--}}
+
                                                             <div class="row mt-2">
                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
                                                                     <label class="form-label font-size-13 text-muted">LOI Date</label>
@@ -376,8 +350,8 @@
                             <th>Prefered Location</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
-                            <th>LOI Items</th>
-                            <th>LOI Documents</th>
+                            <th>Actions</th>
+
                         </tr>
                         </thead>
                         <tbody>
@@ -395,13 +369,11 @@
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#supplier-approved-loi-items-{{$letterOfIndent->id}}">View
+                                    <button type="button" class="btn btn-soft-violet btn-sm" data-bs-toggle="modal" title="View LOI Item Lists"
+                                            data-bs-target="#supplier-approved-loi-items-{{$letterOfIndent->id}}"><i class="fa fa-list"></i>
                                     </button>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#supplier-approved-loi-doc-{{$letterOfIndent->id}}">View
+                                    <button type="button" class="btn btn-dark-blue btn-sm" data-bs-toggle="modal" title="View LOI Documents"
+                                            data-bs-target="#supplier-approved-loi-doc-{{$letterOfIndent->id}}"><i class="fa fa-file"></i>
                                     </button>
                                 </td>
                                 <div class="modal fade" id="supplier-approved-loi-items-{{$letterOfIndent->id}}" data-bs-backdrop="static"
@@ -531,8 +503,7 @@
                             <th>Submission Status</th>
                             <th>Approval Status</th>
                             <th>Review</th>
-                            <th>LOI Items</th>
-                            <th>LOI Documents</th>
+                            <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -551,13 +522,11 @@
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>{{ $letterOfIndent->review }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#supplier-rejected-loi-items-{{$letterOfIndent->id}}">View
+                                    <button type="button" class="btn btn-soft-violet btn-sm" data-bs-toggle="modal" title="View LOI Item Lists"
+                                            data-bs-target="#supplier-rejected-loi-items-{{$letterOfIndent->id}}"><i class="fa fa-list"></i>
                                     </button>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#supplier-rejected-loi-doc-{{$letterOfIndent->id}}">View
+                                    <button type="button" class="btn btn-dark-blue btn-sm" data-bs-toggle="modal" title="View LOI Documents"
+                                            data-bs-target="#supplier-rejected-loi-doc-{{$letterOfIndent->id}}"><i class="fa fa-file-pdf"></i>
                                     </button>
                                 </td>
                                 <div class="modal fade" id="supplier-rejected-loi-items-{{$letterOfIndent->id}}" data-bs-backdrop="static"
@@ -713,8 +682,10 @@
                 let url = '{{ route('letter-of-indents.supplier-approval') }}';
                 if(status == 'REJECTED') {
                         var message = 'Reject';
+                        var review = $('#review').val();
                     }else{
                         var message = 'Approve';
+                        var review = '';
                     }
                 var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
                 if (e) {
@@ -725,6 +696,7 @@
                         data: {
                             id: id,
                             status: status,
+                            review:review,
                             _token: '{{ csrf_token() }}'
                         },
                         success: function (data) {

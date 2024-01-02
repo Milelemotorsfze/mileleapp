@@ -8,7 +8,36 @@
         <meta name="csrf-token" content="content">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-
+        <style>
+            .btn-soft-blue{
+                background-color: #1bb4e3;
+                color: #FFFFFF;
+            }
+            .btn-soft-blue:hover{
+                color: #FFFFFF;
+            }
+            .btn-soft-green{
+                background-color: #1bbc9b;
+                color: #FFFFFF;
+            }
+            .btn-soft-green:hover{
+                color: #FFFFFF;
+            }
+            .btn-soft-violet{
+                background-color: #5c61af;
+                color: #FFFFFF;
+            }
+            .btn-soft-violet:hover{
+                color: #FFFFFF;
+            }
+            .btn-dark-blue{
+                background-color: #4275e1;
+                color: #FFFFFF;
+            }
+            .btn-dark-blue:hover{
+                color: #FFFFFF;
+            }
+        </style>
     </head>
     <body data-layout="horizontal">
         <div id="layout-wrapper">
@@ -41,7 +70,7 @@
         {
 
             alertify.set('notifier','position', 'top-right','delay', 40);
-			// datatables  
+			// datatables
 
             $('#teamlead-pending-hiring-requests-table').DataTable();
             $('#teamlead-approved-hiring-requests-table').DataTable();
