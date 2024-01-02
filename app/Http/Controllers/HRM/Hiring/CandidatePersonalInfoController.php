@@ -25,6 +25,9 @@ use Exception;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\HRM\Approvals\ApprovalByPositions;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\File;
+
 
 class CandidatePersonalInfoController extends Controller
 {
@@ -119,7 +122,7 @@ class CandidatePersonalInfoController extends Controller
                 $hr = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $isAuth = 1;
                  DB::commit();
-                 return view('hrm.hiring.personal_info.offerLetter',compact('data','inwords','hr','isAuth'));
+                 return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr','isAuth'));
             } 
             catch (\Exception $e) {
                 DB::rollback();
@@ -200,7 +203,7 @@ class CandidatePersonalInfoController extends Controller
                 $template['from'] = 'no-reply@milele.com';
                 $template['from_name'] = 'Milele Matrix';
                 $subject = 'Milele - Candidate Personal Information Form';
-                // return view('hrm.hiring.personal_info.offerLetter');
+                // return view('hrm.hiring.offer_letter.offerLetter');
                 Mail::send(
                         "hrm.hiring.personal_info.email",
                         ["data"=>$data] ,
@@ -572,6 +575,75 @@ class CandidatePersonalInfoController extends Controller
             }
         }
     }
+    public function offerLetterSignVerified(Request $request) {
+        // dd($request->all());
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                $authId = Auth::id();
+                $data = InterviewSummaryReport::where('id',$request->id)->first();
+                if($data) {
+                    $data->offer_letter_verified_at = Carbon::now();
+                    $data->offer_letter_verified_by = $authId;
+                    $data->update();
+                }
+                $hr = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                $emp = EmployeeProfile::where('interview_summary_id',$request->id)->first();
+                $inwords['basic_salary'] = $this->decimalNumberInWords($emp->basic_salary);
+                $inwords['other_allowances'] = $this->decimalNumberInWords($emp->other_allowances);
+                $inwords['total_salary'] = $this->decimalNumberInWords($emp->total_salary);
+                $isAuth = 2;
+                $pdf = PDF::loadView('pdf.sample', compact('data','inwords','hr','isAuth'));               
+                $data['name'] = 'Dear '.$data->candidate_name.' ,';
+                $template['from'] = 'no-reply@milele.com';
+                $template['from_name'] = 'Milele Matrix';
+                $subject = 'Milele - Candidate Job Offer Letter Document';
+                
+                //     return $pdf->download('offerletter.pdf');
+
+
+                // $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.individual_download_view',
+                //     compact('letterOfIndent','letterOfIndentItems','height','width'));
+
+                $filename = 'OL_'.$data->id.date('Y_m_d').'.pdf';
+                $directory = public_path('hrm/employee/offer_letter');
+                \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+                $pdf->save($directory . '/' . $filename);
+                if($emp) {
+                    $emp->offer_letter_fileName = $filename;
+                    $emp->update();
+                }
+                $attachPath = $directory . '/' . $filename;
+                Mail::send(
+                        "hrm.hiring.offer_letter.sendOfferLetterDocsEmail",
+                        ["data"=>$data] ,
+                        function($msg) use ($data,$template,$subject,$attachPath) {
+                            $msg->to($data['email'], $data['name'])
+                                ->from($template['from'],$template['from_name'])
+                                ->subject($subject)
+                                ->attach($attachPath);
+                        }
+                    );
+                // $pdf = $this->pdfMerge($letterOfIndent->id);
+                // return $pdf->Output('OL_'.$data->id.date('Y_m_d').'.pdf','D');
+
+
+                    // return $pdf->save('/public/hrm/employee/offer_letter/my_stored_file.pdf')->stream('download.pdf');
+                DB::commit();
+                return response()->json('success');
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                dd($e);
+            }
+        }
+    }
     public function personalInfoVerified(Request $request) {
         $validator = Validator::make($request->all(), [
             'id' => 'required',
@@ -620,6 +692,27 @@ class CandidatePersonalInfoController extends Controller
         ])->get();
         return view('hrm.hiring.documents.verifyOrResend',compact('pending','verified'));
     }
+    public function getOfferLetterList() {
+        $pending = EmployeeProfile::where([
+            ['type','candidate'],
+            ['documents_verified_at','!=',NULL],
+        ])->whereHas('interviewSummary', function($q){
+            $q->where([
+                ['offer_letter_send_at','!=',NULL],
+                ['offer_letter_verified_at',NULL],
+            ]);
+        })->get();
+        $verified = EmployeeProfile::where([
+            ['type','candidate'],
+            ['documents_verified_at','!=',NULL],
+        ])->whereHas('interviewSummary', function($q){
+            $q->where([
+                ['offer_letter_send_at','!=',NULL],
+                ['offer_letter_verified_at','!=',NULL],
+            ]);
+        })->get();
+        return view('hrm.hiring.offer_letter.verifyOrResend',compact('pending','verified'));
+    }
     public function sendJobOfferLetter($id) {
         if($id != NULL) {
             // DB::beginTransaction();
@@ -627,6 +720,7 @@ class CandidatePersonalInfoController extends Controller
                 $update = InterviewSummaryReport::where('id',$id)->first();
                 if($update) {
                     $update->offer_letter_send_at = Carbon::now();
+                    $update->offer_letter_send_by = Auth::id();
                 }
                 $update->update();
                 $emp = EmployeeProfile::where('interview_summary_id',$id)->first();
@@ -655,7 +749,7 @@ class CandidatePersonalInfoController extends Controller
                         }
                     );
                 // DB::commit();
-                // return redirect()->back()->with('success','Offer Letter and Personal Information Form Successfully Send To Candidate');
+                return redirect()->route('interview-summary-report.index')->with('success','Offer Letter and Personal Information Form Successfully Send To Candidate');
             // } 
             // catch (\Exception $e) {
             //     DB::rollback();
@@ -676,10 +770,16 @@ class CandidatePersonalInfoController extends Controller
                 $inwords['basic_salary'] = $this->decimalNumberInWords($emp->basic_salary);
                 $inwords['other_allowances'] = $this->decimalNumberInWords($emp->other_allowances);
                 $inwords['total_salary'] = $this->decimalNumberInWords($emp->total_salary);
-                $hr = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
-                $isAuth = 0;
+                $hr = ApprovalByPositions::where('approved_by_position','HR Manager')->first();               
+                if($emp->offer_sign != NULL && $emp->offer_signed_at != NULL && $emp->offer_letter_hr_id != NULL) {
+                    $isAuth = 2;
+                }
+                else if($data->offer_letter_send_at != NULL && $emp->offer_sign == NULL && $emp->offer_signed_at == NULL && $emp->offer_letter_hr_id == NULL) {
+                    $isAuth = 0;
+                }
+                $canVerifySign = true;
                 DB::commit();
-                return view('hrm.hiring.personal_info.offerLetter',compact('data','inwords','hr','isAuth'));
+                return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr','isAuth','canVerifySign'));
             } 
             catch (\Exception $e) {
                 DB::rollback();
@@ -713,7 +813,32 @@ class CandidatePersonalInfoController extends Controller
                 $inwords['other_allowances'] = $this->decimalNumberInWords($emp->other_allowances);
                 $inwords['total_salary'] = $this->decimalNumberInWords($emp->total_salary);
                 $isAuth = 2;
-                return view('hrm.hiring.personal_info.offerLetter',compact('data','inwords','hr','isAuth'));
+
+
+                // // $pdf = Pdf::loadView('hrm.hiring.offer_letter.offerLetter', compact('data',
+                // //         'inwords','hr','isAuth'));
+                // //     return $pdf->download('report.pdf');
+                // $pdf = PDF::loadView('pdf.sample', compact('data','inwords','hr','isAuth'));
+            
+                
+                // $data['name'] = 'Dear '.$data->candidate_name.' ,';
+                // $template['from'] = 'no-reply@milele.com';
+                // $template['from_name'] = 'Milele Matrix';
+                // $subject = 'Milele - Candidate Job Offer Letter Document';
+                // Mail::send(
+                //         "hrm.hiring.personal_info.email",
+                //         ["data"=>$data] ,
+                //         function($msg) use ($data,$template,$subject) {
+                //             $msg->to($data['email'], $data['name'])
+                //                 ->from($template['from'],$template['from_name'])
+                //                 ->subject($subject);
+                //         }
+                //     );
+                //     return $pdf->download('offerletter.pdf');
+                //     return $pdf->save('/path-to/my_stored_file.pdf')->stream('invoice.pdf');
+                // // $pdf = Pdf::loadView('hrm.hiring.offer_letter.offerLetter',$data, $inwords, $hr, $isAuth); //load view page
+                // // return $pdf->download('test.pdf'); // download pdf file
+                return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr','isAuth'));
             } 
             catch (\Exception $e) {
                 DB::rollback();

@@ -15,6 +15,7 @@ use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 use App\Models\HRM\Employee\EmployeeSpokenLanguage;
 use App\Models\Country;
 use App\Models\EmpDoc;
+use App\Models\HRM\Hiring\InterviewSummaryReport;
 class EmployeeProfile extends Model
 {
     use HasFactory, SoftDeletes;
@@ -133,6 +134,8 @@ class EmployeeProfile extends Model
         'offer_sign',
         'offer_signed_at',
         'offer_letter_hr_id',
+        'offer_letter_fileName',
+        
     ];
     public function teamLeadOrReportingManager() {
         return $this->hasOne(User::class,'id','team_lead_or_reporting_manager');
@@ -184,5 +187,8 @@ class EmployeeProfile extends Model
     }
     public function offerLetterHr() {
         return $this->hasOne(User::class,'id','offer_letter_hr_id'); 
+    }
+    public function interviewSummary() {
+        return $this->belongsTo(InterviewSummaryReport::class,'interview_summary_id','id'); 
     }
 }

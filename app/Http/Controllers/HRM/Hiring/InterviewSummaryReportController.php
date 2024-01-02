@@ -20,6 +20,8 @@ use App\Models\HRM\Hiring\EmployeeHiringRequest;
 use App\Models\User;
 use Validator;
 use App\Models\HRM\Approvals\ApprovalByPositions;
+use App\Models\HRM\Employee\EmployeeProfile;
+use App\Http\Controllers\HRM\Hiring\CandidatePersonalInfoController;
 
 class InterviewSummaryReportController extends Controller
 {
@@ -388,7 +390,19 @@ class InterviewSummaryReportController extends Controller
         $data = InterviewSummaryReport::where('id',$id)->first();
         $previous = InterviewSummaryReport::where('hiring_request_id',$data->hiring_request_id)->where('id', '<', $id)->max('id');
         $next = InterviewSummaryReport::where('hiring_request_id',$data->hiring_request_id)->where('id', '>', $id)->min('id');
-        return view('hrm.hiring.interview_summary_report.show',compact('data','previous','next')); 
+        $emp = EmployeeProfile::where('interview_summary_id',$id)->first();
+        $inwords['basic_salary'] = (new CandidatePersonalInfoController)->decimalNumberInWords($emp->basic_salary);
+        $inwords['other_allowances'] = (new CandidatePersonalInfoController)->decimalNumberInWords($emp->other_allowances);
+        $inwords['total_salary'] = (new CandidatePersonalInfoController)->decimalNumberInWords($emp->total_salary);
+        $hr = ApprovalByPositions::where('approved_by_position','HR Manager')->first();               
+        if($emp->offer_sign != NULL && $emp->offer_signed_at != NULL && $emp->offer_letter_hr_id != NULL) {
+            $isAuth = 2;
+        }
+        else if($data->offer_letter_send_at != NULL && $emp->offer_sign == NULL && $emp->offer_signed_at == NULL && $emp->offer_letter_hr_id == NULL) {
+            $isAuth = 0;
+        }
+        $canVerifySign = true;
+        return view('hrm.hiring.interview_summary_report.show',compact('data','previous','next','emp','inwords','hr','isAuth','canVerifySign')); 
     }
     public function salary(Request $request) { 
         $validator = Validator::make($request->all(), [

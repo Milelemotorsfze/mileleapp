@@ -400,7 +400,7 @@
                                 <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                     <i data-feather="grid"></i>
                                     <span data-key="t-extra-pages">Approvals @if((Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']) > 0)
-                                    <span class="approval-count">{{Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->candidate_docs_varify+Auth::user()->candidate_personal_information_varify}}</span>
+                                    <span class="approval-count">{{Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->candidate_docs_varify+Auth::user()->candidate_personal_information_varify+Auth::user()->verify_offer_letters}}</span>
                                                 @endif
                                             </span>
                                     <div class="arrow-down"></div>
@@ -448,7 +448,7 @@
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                             <span data-key="t-utility"> Employee Hiring @if((Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']) > 0)
-                                            <span class="approval-count">{{Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->candidate_docs_varify+Auth::user()->candidate_personal_information_varify}}</span>
+                                            <span class="approval-count">{{Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->candidate_docs_varify+Auth::user()->candidate_personal_information_varify+Auth::user()->verify_offer_letters}}</span>
                                                 @endif
                                             </span>
                                             <div class="arrow-down"></div>
@@ -474,6 +474,14 @@
                                             @endphp
                                             @if ($hasPermission)
                                             <a href="{{ route('candidate.listDocs') }}" class="dropdown-item" data-key="t-login">Candidate Docs @if(Auth::user()->candidate_docs_varify > 0)<span class="approval-count">{{Auth::user()->candidate_docs_varify}}</span> @endif</a>
+                                            @endif
+                                            @endcanany  
+                                            @canany(['verify-offer-letter-signature'])
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-offer-letter-signature']);
+                                            @endphp
+                                            @if ($hasPermission)
+                                            <a href="{{ route('candidate.listOfferLetter') }}" class="dropdown-item" data-key="t-login">Offer Letter @if(Auth::user()->verify_offer_letters > 0)<span class="approval-count">{{Auth::user()->verify_offer_letters}}</span> @endif</a>
                                             @endif
                                             @endcanany  
                                             @canany(['verify-candidate-personal-information','send-personal-info-form-action'])

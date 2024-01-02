@@ -9,7 +9,9 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
+        <!-- <style>#signature_canvas { background-color: rgba(158, 167, 184, 0.2); }</style> -->
         <style type="text/css">
+            canvas.style.background = "red"; 
             .m-signature-pad--body canvas {
                 position: relative; left: 0; top: 0; width: 100%; height: 250px; border: 1px solid #CCCCCC;
             }

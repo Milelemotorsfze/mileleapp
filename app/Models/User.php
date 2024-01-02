@@ -38,6 +38,7 @@ class User extends Authenticatable
         'job_description_approval',
         'interview_summary_report_approval',
         'candidate_docs_varify',
+        'verify_offer_letters',
         'candidate_personal_information_varify',
     ];
     public function getPassportWithAttribute() {
@@ -215,6 +216,20 @@ class User extends Authenticatable
             $q->where('documents_verified_at', NULL);
         })->latest()->count();
         return $pendingdocsUploaded;
+    }
+    public function getVerifyOfferLettersAttribute() {
+        $verifyOffers = 0;
+        $verifyOffers = InterviewSummaryReport::where([
+            ['status','approved'],
+            ['seleced_status','pending'],
+            ['offer_letter_send_at','!=',NULL],
+            ['offer_letter_verified_at',NULL],
+        ])
+            // where('status','approved')->where('seleced_status','pending')->where('offer_letter_send_at','!=',NULL)
+        ->whereHas('candidateDetails', function($q){
+            $q->where('documents_verified_at','!=', NULL);
+        })->latest()->count();
+        return $verifyOffers;
     }
     public function getCandidatePersonalInformationVarifyAttribute() {
         $pendingPersonalInfo = 0;
