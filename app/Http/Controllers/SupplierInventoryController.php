@@ -173,6 +173,25 @@ class SupplierInventoryController extends Controller
 
             foreach($uploadFileContents as $uploadFileContent){
                 $chaisis[] = $uploadFileContent['chasis'];
+                // finding model year
+                $similarMasterModelVariantIds = MasterModel::select(['id','model','sfx','variant_id'])
+                                ->where('model',$uploadFileContent['model'])
+                                ->where('sfx', $uploadFileContent['sfx'])
+                                ->with('variant.master_model_lines')
+                                ->whereHas('variant.master_model_lines', function ($query) {
+                                   $query->where('model_line', 'LIKE', '%' . 'Camry' . '%')
+                                        ->orwhere('model_line', 'LIKE', '%' . 'Coaster' . '%')
+                                        ->orwhere('model_line', 'LIKE', '%' . 'Hiace' . '%')
+                                        ->orwhere('model_line', 'LIKE', '%' . 'Rumion' . '%')
+                                        ->orwhere('model_line', 'LIKE', '%' . 'Starlet' . '%')
+                                        ->orwhere('model_line', 'LIKE', '%' . 'Corolla' . '%')
+                                       ->orwhere('model_line', 'LIKE', '%' . 'LC76' . '%')
+                                       ->orwhere('model_line', 'LIKE', '%' . 'LC78' . '%')
+                                       ->orwhere('model_line', 'LIKE', '%' . 'LC79' . '%');
+                                    })
+                                ->pluck('id');
+
+                info($similarMasterModelVariantIds);
 
                 $isModelExist = MasterModel::where('model',$uploadFileContent['model'])
                                             ->where('sfx', $uploadFileContent['sfx'])
