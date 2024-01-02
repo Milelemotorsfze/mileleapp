@@ -39,6 +39,33 @@
                         {{ Session::get('success') }}
                     </div>
                 @endif
+                <div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="optionsmodalLabel">Update Options</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                <div class="col-lg-12">
+                                        <div class="row">
+                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                            <label class="form-label font-size-13 text-center">New Option Name</label>
+                                        </div>
+                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                            <input type="text" class="form-label" name="option_name" id="option_name" />
+                                            <input type ="hidden" name="specification-id-input" id="specification-id-input" />
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" onclick="savenewoptions()" id="btn-save">Save</button>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
                 <form id="form-create" action="{{ route('variants.store') }}" method="POST">
                     @csrf
                         <div class="row">
@@ -111,6 +138,7 @@
                                         <option value="0.8" {{ old('engine') == '0.8' ? 'selected' : '' }}>0.8</option>
                                         <option value="1.0" {{ old('engine') == '1.0' ? 'selected' : '' }}>1.0</option>
                                         <option value="1.2" {{ old('engine') == '1.2' ? 'selected' : '' }}>1.2</option>
+                                        <option value="1.2" {{ old('engine') == '1.2' ? 'selected' : '' }}>1.3</option>
                                         <option value="1.4" {{ old('engine') == '1.4' ? 'selected' : '' }}>1.4</option>
                                         <option value="1.5" {{ old('engine') == '1.5' ? 'selected' : '' }}>1.5</option>
                                         <option value="1.6" {{ old('engine') == '1.6' ? 'selected' : '' }}>1.6</option>
@@ -289,28 +317,36 @@
     });
 </script>
 <script>
-$(document).ready(function() {
+$(document).ready(function () {
     $('#fuel, #coo, #steering, #gear, #drive_train, #my, #ex, #int, #engine, #Upholstery').hide();
-    $('#model').on('change', function() {
+    $('#model').on('change', function () {
         $('#fuel, #coo, #steering, #gear, #drive_train, #my, #ex, #int, #engine, #Upholstery').show();
         var selectedModelLineId = $(this).val();
         selectedSpecifications = [];
         $.ajax({
             type: 'GET',
             url: '/getSpecificationDetails/' + selectedModelLineId,
-            success: function(response) {
+            success: function (response) {
                 var data = response.data;
                 $('#specification-details-container').empty();
                 var selectedSpecifications = [];
-                data.forEach(function(item) {
+                data.forEach(function (item) {
                     var specification = item.specification;
                     var options = item.options;
                     var select = $('<select class="form-control" name="specification_' + specification.id + '"data-specification-id="' + specification.id + '">');
                     select.append('<option value="" disabled selected>Select an Option</option>');
-                    options.forEach(function(option) {
+                    options.forEach(function (option) {
                         select.append('<option value="' + option.id + '">' + option.name + '</option>');
                     });
-                    select.on('change', function() {
+                    var addButton = $('<a><button class="btn btn-primary btn-sm ml-2">+</button></a>');
+                    addButton.on('click', function (event) {
+                        event.preventDefault();
+                        $('#specification-id-input').val(specification.id);
+                        $('#optionsmodal').modal('show');
+                    });
+                    var selectContainer = $('<div class="d-flex align-items-center"></div>');
+                    selectContainer.append(select).append(addButton);
+                    select.on('change', function () {
                         var selectedValue = $(this).val();
                         selectedSpecifications.push({
                             specification_id: specification.id,
@@ -318,9 +354,10 @@ $(document).ready(function() {
                         });
                         $('#selected_specifications').val(JSON.stringify(selectedSpecifications));
                     });
+
                     var specificationColumn = $('<div class="col-lg-4 mb-3">');
                     specificationColumn.append('<label class="form-label">' + specification.name + '</label');
-                    specificationColumn.append(select);
+                    specificationColumn.append(selectContainer);
                     $('#specification-details-container').append(specificationColumn);
                 });
             }
@@ -328,6 +365,29 @@ $(document).ready(function() {
         $('#selected_model_id').val(selectedModelLineId);
     });
 });
+</script>
+<script>
+    function savenewoptions() {
+        var specificationId = $('#specification-id-input').val();
+        var newOptionValue = $('#option_name').val();
+        $.ajax({
+            url: '{{ route('variants.saveOption') }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                specificationId: specificationId,
+                newOption: newOptionValue
+            },
+            success: function (response) {
+                var option = '<option value="' + response.option.id + '">' + response.option.name + '</option>';
+                $('[data-specification-id="' + specificationId + '"]').append(option);
+                alertify.success('Specification Option successfully Added');
+                $('#optionsmodal').modal('hide');
+            }
+        });
+    }
+    </script>
+<script> 
 $(document).ready(function () {
     function updateModelDetail() {
     var selectedOptions = [];
@@ -338,9 +398,20 @@ $(document).ready(function () {
         var fieldId = $(this).data('field-id');
         var fieldValue = $('#' + fieldId + ' option:selected').text();
         if (fieldId === 'fuel') {
-            fieldValue = fieldValue.charAt(0);
-        }
-
+    if (fieldValue === 'Petrol') {
+        fieldValue = 'P';
+    } else if (fieldValue === 'Diesel') {
+        fieldValue = 'D';
+    } else if (fieldValue === 'PHEV') {
+        fieldValue = 'PHEV';
+    } else if (fieldValue === 'MHEV') {
+        fieldValue = 'MHEV';
+    } else if (fieldValue === 'PH') {
+        fieldValue = 'PH';
+    } else {
+        fieldValue = 'EV';
+    }
+}
         selectedOptions.push({ fieldId: fieldId, value: fieldValue });
 
         // Check if the field is "model" and save the grade option
