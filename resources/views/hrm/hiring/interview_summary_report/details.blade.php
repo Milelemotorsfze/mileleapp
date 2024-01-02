@@ -28,6 +28,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 <a class="nav-link" data-bs-toggle="pill" href="#documents"> Documents</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="pill" href="#job-offer-letter"> Job Offer Letter</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="pill" href="#personal-info"> Personal Information</a>
             </li>
            
@@ -532,6 +535,272 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 </div>
             </div>
         </div>
+        <div class="tab-pane fade show" id="documents">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title fw-bold">Documents</div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xxl-12 col-lg-12 col-md-12">
+                            @canany(['verify-candidates-documents'])
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents']);
+                            @endphp
+                            @if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL)
+                            <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-personalinfo"  data-bs-toggle="modal"
+                                data-bs-target="#verify-docs-{{$data->id}}" data-id="{{$data->id}}">
+                                <i class="fa fa-check" aria-hidden="true"></i> Verified Documents
+                            </button>
+                            @endif
+                            @endcanany
+
+                            @canany(['send-candidate-documents-request-form'])
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-candidate-documents-request-form']);
+                            @endphp
+                            @if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL)	            							
+                            <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Resend Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+                                data-bs-target="#send-docs-form-{{$data->id}}">
+                                <i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Docs Form
+                            </button>
+                            @endif
+                            @endcanany
+
+                            <div class="modal fade" id="send-docs-form-{{$data->id}}"
+                    tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog ">
+                        <div class="modal-content">
+                            <form method="POST" action="{{route('docs.send-email')}}" id="send_email_{{$data->id}}">
+                                @csrf
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Resend Documents Request Form To candidate for Edit
+
+                                    </h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body p-3">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <div class="col-xxl-6 col-lg-6 col-md-6">
+                                                        <input type="text" name="id" value="{{$data->id}}" hidden>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xxl-12 col-lg-12 col-md-12">
+                                                        <label for="email" class="form-label font-size-13">{{ __('Comments send to candidate') }}</label>
+                                                    </div>
+                                                    <div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
+                                                            <textarea rows="5" name="comment"  id="comments_{{$data->id}}" class="form-control" required
+                                                            placeholder="Comments send to candidate" value=""></textarea>																		
+                                                    </div>
+                                                    <div class="col-xxl-12 col-lg-12 col-md-12">
+                                                        <label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
+                                                    </div>
+                                                    <div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
+                                                            <input name="email" id="email_{{$data->id}}" class="form-control" required
+                                                            placeholder="Enter Candidate Email" value="@if($data->email){{$data->email}}@endif">																		
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary send-email"
+                                        data-id="{{ $data->id }}" data-status="final">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
+                        @if($data->candidateDetails->image_path)
+                        <div class="row">
+                            <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                <h6 class="fw-bold text-center mb-1" style="float:left">Passport Size Photograph</h6>
+                            </div>
+                            <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                <a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" target="_blank">
+                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                </a>
+                                <a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" download>
+                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                </a>
+                            </div>
+                        </div>
+                        <iframe src="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" alt="Passport Size Photograph" style="height:400px;"></iframe>
+                                
+
+                            @endif
+                        </div>
+                        <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
+                            @if($data->candidateDetails->resume)
+                                <div class="row">
+                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left">Resume</h6>
+                                    </div>
+                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                        <a href="{{ url('hrm/employee/resume/' . $data->candidateDetails->resume) }}" target="_blank">
+                                            <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                        </a>
+                                        <a href="{{ url('hrm/employee/resume/' . $data->candidateDetails->resume) }}" download>
+                                            <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                        </a>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('hrm/employee/resume/' . $data->candidateDetails->resume) }}" alt="Resume" style="height:400px;"></iframe>
+                            @endif
+                        </div>
+                        <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
+                            @if($data->candidateDetails->visa)
+                                <div class="row">
+                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left">Visa</h6>
+                                    </div>
+                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                        <a href="{{ url('hrm/employee/visa/' . $data->candidateDetails->visa) }}" target="_blank">
+                                            <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                        </a>
+                                        <a href="{{ url('hrm/employee/visa/' . $data->candidateDetails->visa) }}" download>
+                                            <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                        </a>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('hrm/employee/visa/' . $data->candidateDetails->visa) }}" alt="Visa" style="height:400px;"></iframe>
+                            @endif
+                        </div>
+                        <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                            @if($data->candidateDetails->emirates_id_file)
+                                <div class="row">
+                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left">Emirates ID</h6>
+                                    </div>
+                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                        <a href="{{ url('hrm/employee/emirates_id/' . $data->candidateDetails->emirates_id_file) }}" target="_blank">
+                                            <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                        </a>
+                                        <a href="{{ url('hrm/employee/emirates_id/' . $data->candidateDetails->emirates_id_file) }}" download>
+                                            <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                        </a>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('hrm/employee/emirates_id/' . $data->candidateDetails->emirates_id_file) }}" alt="Emirates ID" style="height:400px;"></iframe>
+                            @endif
+                        </div>
+                    </div>
+                    @if($data->candidateDetails->candidatePassport->count() > 0)
+                        <div class="row m-3">
+                            <h6 class="fw-bold text-center mb-13">Passport (First & Second page)</h6>
+                            @foreach($data->candidateDetails->candidatePassport as $document)
+                            <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
+                                <a href="{{ url('hrm/employee/passport/' . $document->document_path) }}" target="_blank">
+                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                </a>
+                                <a href="{{ url('hrm/employee/passport/' . $document->document_path) }}" download>
+                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                </a>
+                                <iframe src="{{ url('hrm/employee/passport/' . $document->document_path) }}" alt="Passport (First & Second page)" style="height:400px;"></iframe>                                 
+                            </div>
+                            @endforeach
+                        </div>
+                    @endif
+                    @if($data->candidateDetails->candidateNationalId->count() > 0)
+                        <div class="row m-3">
+                            <h6 class="fw-bold text-center mb-13">National ID (First & Second page)</h6>
+                                @foreach($data->candidateDetails->candidateNationalId as $document)
+                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
+                                    <a href="{{ url('hrm/employee/national_id/' . $document->document_path) }}" target="_blank">
+                                        <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                    </a>
+                                    <a href="{{ url('hrm/employee/national_id/' . $document->document_path) }}" download>
+                                        <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                    </a>
+                                    <iframe src="{{ url('hrm/employee/national_id/' . $document->document_path) }}" alt="National ID (First & Second page)" style="height:400px;"></iframe>                                  
+                                </div>
+                                @endforeach
+                        </div>
+                    @endif
+                    @if($data->candidateDetails->candidateEduDocs->count() > 0)
+                        <div class="row m-3">
+                            <h6 class="fw-bold text-center mb-13">Attested Educational Documents</h6>
+                                @foreach($data->candidateDetails->candidateEduDocs as $document)
+                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
+                                    <a href="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" target="_blank">
+                                        <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                    </a>
+                                    <a href="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" download>
+                                        <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                    </a>
+                                    <iframe src="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" alt="Attested Educational Documents" style="height:400px;"></iframe>                                  
+                                </div>
+                                @endforeach
+                        </div>
+                    @endif
+                    @if($data->candidateDetails->candidateProDipCerti->count() > 0)
+                        <div class="row m-3">
+                            <h6 class="fw-bold text-center mb-13">Attested Professional Diplomas / Certificates</h6>
+                                @foreach($data->candidateDetails->candidateProDipCerti as $document)
+                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
+                                    <a href="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" target="_blank">
+                                        <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                    </a>
+                                    <a href="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" download>
+                                        <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                    </a>
+                                    <iframe src="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" alt="Attested Professional Diplomas / Certificates" style="height:400px;"></iframe>                                   
+                                </div>
+                                @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade show" id="job-offer-letter">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title fw-bold">Job Offer Letter</div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xxl-12 col-lg-12 col-md-12">
+                            @if($data->candidateDetails->offer_letter_fileName)
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-xxl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                            <h4 class="card-title">Resume</h4>
+                                        </div>
+                                        <div class="col-xxl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+                                            <button style="float:right;" type="button" class="btn btn-sm btn-info mt-3 ">
+                                                <a href="{{ url('hrm/employee/offer_letter/' . $data->candidateDetails->offer_letter_fileName) }}" download class="text-white">
+                                                    Download
+                                                </a>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <iframe src="{{ url('hrm/employee/offer_letter/' . $data->candidateDetails->offer_letter_fileName) }}" alt="Offer Letter" style="height:1000;"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                            @else
+                            @include('hrm.hiring.offer_letter.offerLetter')
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="tab-pane fade show" id="personal-info">                
             <div class="row">
                 <div class="col-xxl-12 col-lg-12 col-md-12">
@@ -870,234 +1139,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade show" id="documents">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title fw-bold">Documents</div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-xxl-12 col-lg-12 col-md-12">
-                            @canany(['verify-candidates-documents'])
-                            @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents']);
-                            @endphp
-                            @if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL)
-                            <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-personalinfo"  data-bs-toggle="modal"
-                                data-bs-target="#verify-docs-{{$data->id}}" data-id="{{$data->id}}">
-                                <i class="fa fa-check" aria-hidden="true"></i> Verified Documents
-                            </button>
-                            @endif
-                            @endcanany
-
-                            @canany(['send-candidate-documents-request-form'])
-                            @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-candidate-documents-request-form']);
-                            @endphp
-                            @if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL)	            							
-                            <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Resend Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-                                data-bs-target="#send-docs-form-{{$data->id}}">
-                                <i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Docs Form
-                            </button>
-                            @endif
-                            @endcanany
-
-                            <div class="modal fade" id="send-docs-form-{{$data->id}}"
-                    tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog ">
-                        <div class="modal-content">
-                            <form method="POST" action="{{route('docs.send-email')}}" id="send_email_{{$data->id}}">
-                                @csrf
-                                <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Resend Documents Request Form To candidate for Edit
-
-                                    </h1>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body p-3">
-                                    <div class="col-lg-12">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="row">
-                                                    <div class="col-xxl-6 col-lg-6 col-md-6">
-                                                        <input type="text" name="id" value="{{$data->id}}" hidden>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                        <label for="email" class="form-label font-size-13">{{ __('Comments send to candidate') }}</label>
-                                                    </div>
-                                                    <div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
-                                                            <textarea rows="5" name="comment"  id="comments_{{$data->id}}" class="form-control" required
-                                                            placeholder="Comments send to candidate" value=""></textarea>																		
-                                                    </div>
-                                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                        <label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
-                                                    </div>
-                                                    <div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
-                                                            <input name="email" id="email_{{$data->id}}" class="form-control" required
-                                                            placeholder="Enter Candidate Email" value="@if($data->email){{$data->email}}@endif">																		
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary send-email"
-                                        data-id="{{ $data->id }}" data-status="final">Submit</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                        @if($data->candidateDetails->image_path)
-                        <div class="row">
-                            <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
-                                <h6 class="fw-bold text-center mb-1" style="float:left">Passport Size Photograph</h6>
-                            </div>
-                            <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-                                <a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" target="_blank">
-                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                </a>
-                                <a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" download>
-                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                </a>
-                            </div>
-                        </div>
-                        <iframe src="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" alt="Passport Size Photograph" style="height:400px;"></iframe>
-                                
-
-                            @endif
-                        </div>
-                        <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                            @if($data->candidateDetails->resume)
-                                <div class="row">
-                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left">Resume</h6>
-                                    </div>
-                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-                                        <a href="{{ url('hrm/employee/resume/' . $data->candidateDetails->resume) }}" target="_blank">
-                                            <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                        </a>
-                                        <a href="{{ url('hrm/employee/resume/' . $data->candidateDetails->resume) }}" download>
-                                            <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                        </a>
-                                    </div>
-                                </div>
-                                <iframe src="{{ url('hrm/employee/resume/' . $data->candidateDetails->resume) }}" alt="Resume" style="height:400px;"></iframe>
-                            @endif
-                        </div>
-                        <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                            @if($data->candidateDetails->visa)
-                                <div class="row">
-                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left">Visa</h6>
-                                    </div>
-                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-                                        <a href="{{ url('hrm/employee/visa/' . $data->candidateDetails->visa) }}" target="_blank">
-                                            <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                        </a>
-                                        <a href="{{ url('hrm/employee/visa/' . $data->candidateDetails->visa) }}" download>
-                                            <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                        </a>
-                                    </div>
-                                </div>
-                                <iframe src="{{ url('hrm/employee/visa/' . $data->candidateDetails->visa) }}" alt="Visa" style="height:400px;"></iframe>
-                            @endif
-                        </div>
-                        <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
-                            @if($data->candidateDetails->emirates_id_file)
-                                <div class="row">
-                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                                        <h6 class="fw-bold text-center mb-1" style="float:left">Emirates ID</h6>
-                                    </div>
-                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-                                        <a href="{{ url('hrm/employee/emirates_id/' . $data->candidateDetails->emirates_id_file) }}" target="_blank">
-                                            <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                        </a>
-                                        <a href="{{ url('hrm/employee/emirates_id/' . $data->candidateDetails->emirates_id_file) }}" download>
-                                            <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                        </a>
-                                    </div>
-                                </div>
-                                <iframe src="{{ url('hrm/employee/emirates_id/' . $data->candidateDetails->emirates_id_file) }}" alt="Emirates ID" style="height:400px;"></iframe>
-                            @endif
-                        </div>
-                    </div>
-                    @if($data->candidateDetails->candidatePassport->count() > 0)
-                        <div class="row m-3">
-                            <h6 class="fw-bold text-center mb-13">Passport (First & Second page)</h6>
-                            @foreach($data->candidateDetails->candidatePassport as $document)
-                            <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                                <a href="{{ url('hrm/employee/passport/' . $document->document_path) }}" target="_blank">
-                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                </a>
-                                <a href="{{ url('hrm/employee/passport/' . $document->document_path) }}" download>
-                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                </a>
-                                <iframe src="{{ url('hrm/employee/passport/' . $document->document_path) }}" alt="Passport (First & Second page)" style="height:400px;"></iframe>                                 
-                            </div>
-                            @endforeach
-                        </div>
-                    @endif
-                    @if($data->candidateDetails->candidateNationalId->count() > 0)
-                        <div class="row m-3">
-                            <h6 class="fw-bold text-center mb-13">National ID (First & Second page)</h6>
-                                @foreach($data->candidateDetails->candidateNationalId as $document)
-                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                                    <a href="{{ url('hrm/employee/national_id/' . $document->document_path) }}" target="_blank">
-                                        <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                    </a>
-                                    <a href="{{ url('hrm/employee/national_id/' . $document->document_path) }}" download>
-                                        <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                    </a>
-                                    <iframe src="{{ url('hrm/employee/national_id/' . $document->document_path) }}" alt="National ID (First & Second page)" style="height:400px;"></iframe>                                  
-                                </div>
-                                @endforeach
-                        </div>
-                    @endif
-                    @if($data->candidateDetails->candidateEduDocs->count() > 0)
-                        <div class="row m-3">
-                            <h6 class="fw-bold text-center mb-13">Attested Educational Documents</h6>
-                                @foreach($data->candidateDetails->candidateEduDocs as $document)
-                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                                    <a href="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" target="_blank">
-                                        <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                    </a>
-                                    <a href="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" download>
-                                        <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                    </a>
-                                    <iframe src="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" alt="Attested Educational Documents" style="height:400px;"></iframe>                                  
-                                </div>
-                                @endforeach
-                        </div>
-                    @endif
-                    @if($data->candidateDetails->candidateProDipCerti->count() > 0)
-                        <div class="row m-3">
-                            <h6 class="fw-bold text-center mb-13">Attested Professional Diplomas / Certificates</h6>
-                                @foreach($data->candidateDetails->candidateProDipCerti as $document)
-                                <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                                    <a href="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" target="_blank">
-                                        <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                    </a>
-                                    <a href="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" download>
-                                        <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                    </a>
-                                    <iframe src="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" alt="Attested Professional Diplomas / Certificates" style="height:400px;"></iframe>                                   
-                                </div>
-                                @endforeach
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
+        
         @endcanany
         @endif
         @endif
@@ -1119,6 +1161,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                         _token: '{{ csrf_token() }}'
                     },
                     success: function (data) {							
+                        if(data == 'success') {
+                            window.location.reload();
+                            alertify.success(status + " Successfully")
+                        }
+                        else if(data == 'error') {
+
+                        }
+                    }
+                });
+            }
+        }).set({title:"Confirmation"})
+    })
+    $('.btn-verify-offer-letter-sign').click(function (e) {
+        var id = $(this).attr('data-id');
+        let url = '{{ route('offer_letter_sign.verified') }}';
+        var confirm = alertify.confirm('Are you sure you verified this candidate offer letter signature ?',function (e) {
+            if (e) {
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        id: id,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function (data) {	console.log('hlo'); console.log(data);					
                         if(data == 'success') {
                             window.location.reload();
                             alertify.success(status + " Successfully")

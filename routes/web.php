@@ -277,6 +277,7 @@ Route::get('/d', function () {
     // Candidate Personal Information Form
     Route::get('candidate/listingInfo', [CandidatePersonalInfoController::class, 'getCandidatePersonalInfo'])->name('candidate.listingInfo');
     Route::get('candidate/listDocs', [CandidatePersonalInfoController::class, 'getCandidateDocsInfo'])->name('candidate.listDocs');
+    Route::get('candidate/listOfferLetter', [CandidatePersonalInfoController::class, 'getOfferLetterList'])->name('candidate.listOfferLetter');
     Route::get('candidate-offer-letter/send/{id}', [CandidatePersonalInfoController::class, 'sendJobOfferLetter'])->name('candidate-offer-letter.send');
     Route::resource('personal-info', CandidatePersonalInfoController::class);
     Route::controller(CandidatePersonalInfoController::class)->group(function(){
@@ -285,7 +286,7 @@ Route::get('/d', function () {
         Route::post('docs/send-email', 'sendDocsEmail')->name('docs.send-email');
         Route::post('personal-info/verified', 'personalInfoVerified')->name('personal-info.verified');
         Route::post('docs/verified', 'docsVerified')->name('docs.verified');
-
+        Route::post('offer-letter-sign/verified', 'offerLetterSignVerified')->name('offer_letter_sign.verified');
         // Route::get('personal-info/listingInfo', 'getCandidatePersonalInfo')->name('personal-info.listingInfo');
     });
     // Employee Passport Request

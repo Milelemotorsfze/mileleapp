@@ -577,7 +577,7 @@ public function saveOption(Request $request)
     $specificationoptions->name = $request->input('newOption');
     $specificationoptions->model_specification_id = $request->input('specificationId');
     $specificationoptions->save();
-    return response()->json(['message' => 'Option added successfully'], 200);
+    return response()->json(['option' => $specificationoptions, 'message' => 'Option added successfully'], 200);
 }
 public function savespecification(Request $request)
 {

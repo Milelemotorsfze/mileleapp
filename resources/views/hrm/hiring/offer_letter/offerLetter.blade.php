@@ -1,70 +1,71 @@
+<!DOCTYPE html>
 <html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
         <style>
-            .error {
+            #offer-letter-page .error {
                 color: #FF0000;
             }
-            .m-signature-pad--body canvas {
+            #offer-letter-page .m-signature-pad--body canvas {
                 position: relative; left: 0; top: 0; width: 100%; height: 100%; border: 1px solid #CCCCCC;
             }
-            a:link {
+            #offer-letter-page a:link {
                 text-decoration: none;
             }
-            body {
+            #offer-letter-page body {
                 margin: 0; padding: 0; background-color: white; font: 12pt "Tahoma";
             }
-            * {
+            #offer-letter-page * {
                 box-sizing: border-box; -moz-box-sizing: border-box;
             }
-            .page {
+            #offer-letter-page .page {
                 width: 21cm; min-height: 29.7cm; padding: 2cm; margin: 1cm auto; border: 1px #f5fbff solid; border-radius: 5px; background: #f5fbff; 
                 box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); 
             }
-            .subpage {
+            #offer-letter-page .subpage {
                 padding: 1cm; border: 5px #f5fbff solid; height: 256mm; outline: 2cm #f5fbff solid;
             }
-            @page {
+            #offer-letter-page @page {
                 size: A4; margin: 0;
             }
-            @media print {
+            #offer-letter-page @media print {
                 .page {
                     margin: 0; border: initial; border-radius: initial; width: initial; min-height: initial; box-shadow: initial; background: initial;
                     page-break-after: always; 
                 }
             }
-            p {
+            #offer-letter-page p {
                 font-family: "Gill Sans", sans-serif !important; font-size: 13px !important;  width: fit-content!important;
             }
-            .bold {
+            #offer-letter-page .bold {
                 font-family: "Gill Sans", sans-serif !important; font-size: 13px !important; width: 163px !important;
             }
-            .normal {
+            #offer-letter-page .normal {
                 font-family: "Gill Sans", sans-serif !important; font-size: 13px !important; width: max-content!important;
             }
-            .bold1 {
+            #offer-letter-page .bold1 {
                 font-family: "Gill Sans", sans-serif !important; font-size: 13px !important; width: 40% !important;
             }
-            .normal1 {
+            #offer-letter-page .normal1 {
                 font-family: "Gill Sans", sans-serif !important; font-size: 13px !important; width: 40% !important;
             }
-            table {
+            #offer-letter-page table {
                 border-collapse: separate; border-spacing: 0 7px;
             }
-            h1 {
-                margin-bottom: 75px!important;
+            #offer-letter-page h1 {
+                margin-bottom: 62px!important;
             }
-            .fit-content {
+            #offer-letter-page .fit-content {
                 justify-content: space-between;
             }
-            .justify {
+            #offer-letter-page .justify {
                 width: 100%;
                 /* background: #D33; */
             }
 
-            .justify p {
+            #offer-letter-page .justify p {
                 /* margin: 0 auto; */
                 /* max-width: 70%; */
                 /* list-style: disc outside none; */
@@ -72,12 +73,15 @@
                 /* display: list-item; */
                 /* background: #ccc; */
             }
-            .normal {
+            #offer-letter-page .normal {
                 text-align: justify;
+            }
+            #offer-letter-page input[type=text] {
+                background-color: #f5fbff;
             }
         </style>
     </head>
-    <body>
+    <body id="offer-letter-page">
         <div class="book">
             <div class="page">
                 <div class="subpage justify" style="font-style:Serif;" id="justify">
@@ -243,10 +247,17 @@
                                         </tr>
                                     </tbody>
                                     </table>
+                                    @endif
                                     
-                                    @else
-                                    Signature:…………………	</br>   
-                                    Date: ………………… 
+                                    @if(isset($canVerifySign) && $canVerifySign == true && $data->offer_letter_verified_at == NULL && $data->offer_letter_verified_by == NULL)
+                                    <table>
+                                    <tbody>
+                                        <tr>
+                                        <button type="button" class="btn btn-success btn-verify-offer-letter-sign"
+												data-id="{{ $data->id }}" data-status="approved"><i class="fa fa-check" aria-hidden="true"></i> Signature Verified</button>
+                                        </tr>
+                                    </tbody>
+                                    </table>
                                     @endif 
                                 </td>
                             </tr>                        
@@ -297,6 +308,9 @@
                     canvas.getContext("2d").scale(ratio, ratio);
                     signaturePad.clear();
                     signaturePad.fromData(oldContent);
+
+                    let signaturePad = new SignaturePad(canvas);
+                    signaturePad.clear();
                 }
                 window.onresize = resizeCanvas;
                 resizeCanvas();
@@ -311,6 +325,33 @@
                         }
                     },
                 });
+                $('.btn-verify-offer-letter-sign').click(function (e) {
+                    var id = $(this).attr('data-id');
+                    let url = '{{ route('offer_letter_sign.verified') }}';
+                    var confirm = alertify.confirm('Are you sure you verified this candidate offer letter signature ?',function (e) {
+                        if (e) {
+                            $.ajax({
+                                type: "POST",
+                                url: url,
+                                dataType: "json",
+                                data: {
+                                    id: id,
+                                    _token: '{{ csrf_token() }}'
+                                },
+                                success: function (data) {	console.log('hi');
+                                    console.log(data);						
+                                    if(data == 'success') {
+                                        window.location.reload();
+                                        alertify.success(status + " Successfully")
+                                    }
+                                    else if(data == 'error') {
+
+                                    }
+                                }
+                            });
+                        }
+                    }).set({title:"Confirmation"})
+                })
             });
         </script>
     </body>

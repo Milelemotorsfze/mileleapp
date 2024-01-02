@@ -54,6 +54,7 @@ class InterviewSummaryReport extends Model
         'selected_hiring_request_id',
         'candidate_expected_salary',
         'offer_letter_send_at',
+        'offer_letter_send_by',
         'offer_letter_verified_at',
         'offer_letter_verified_by',
         'total_salary',
@@ -181,5 +182,11 @@ class InterviewSummaryReport extends Model
     }
     public function candidateDetails() {
         return $this->hasOne(EmployeeProfile::class,'interview_summary_id','id');
+    }
+    public function offerLetterSendBy() {
+        return $this->hasOne(User::class,'id','offer_letter_send_by'); 
+    }
+    public function offerLetterVerifieddBy() {
+        return $this->hasOne(User::class,'id','offer_letter_verified_by'); 
     }
 }
