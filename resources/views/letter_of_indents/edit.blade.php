@@ -13,16 +13,9 @@
         {
             height:32px!important;
         }
-        .kbw-signature { width: 100%; height: 200px;}
-        #sig canvas{
-            width: 100% !important;
-            height: auto;
-        }
+
     </style>
-    <head>
-        <link type="text/css" href=" {{ asset('css/south-street-jquery-ui/jquery-ui.css') }}" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="http://keith-wood.name/css/jquery.signature.css">
-    </head>
+
     <div class="card-header">
         <h4 class="card-title">Edit LOI</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -180,75 +173,41 @@
                                autofocus id="file-upload" accept="application/pdf">
                     </div>
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label">Signature:</label>
-                        <br/>
-                        <div id="loi-signature" ></div>
-                        <input type="hidden" id="signature" name="loi_signature">
-                        <button id="clear" class="btn btn-danger btn-sm">Clear Signature</button>
+                        <label class="form-label">Signature</label>
+                        <input type="file" id="signature" name="loi_signature" class="form-control widthinput" accept="application/pdf">
                     </div>
                 </div>
+            </div>
+            <div class="row ">
                 @if($letterOfIndent->signature)
                     <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label class="form-label">Already Added Signature:</label>
-                            <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" class="border">
+                        <div class="mb-3" id="signature-preview">
+                            <label class="form-label fw-bold">Signature</label>
+                            <iframe src="{{ url('/LOI-Signature/'.$letterOfIndent->signature) }}"></iframe>
                         </div>
                     </div>
                 @endif
-                <div class="col-lg-6 col-md-6 col-sm-12">
-                @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
-                    <div class="row p-2">
-                        <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" style="height: 300px;">
+                @if($letterOfIndent->LOIDocuments->count() > 0)
+                    <label class="form-label fw-bold">LOI Document</label>
+                    @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
+                        <div class="col-lg-3 col-md-6 col-sm-12 " id="remove-doc-{{$letterOfIndentDocument->id}}">
+                            <iframe src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" style="height: 300px;"></iframe>
+                            <a href="#"  data-id="{{ $letterOfIndentDocument->id }}"
+                               class="btn btn-danger text-center mt-2 remove-doc-button"><i class="fa fa-trash"></i> </a>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+            <div class="row mt-3">
+                <div class="col-6">
+                    <div id="file-preview">
+                    </div>
+                </div>
+            </div>
 
-{{--                            File {{ $key + 1 }}--}}
-{{--                            <button type="button" class="btn btn-primary btn-sm pl-2" data-bs-toggle="modal" data-bs-target="#show-document-{{$letterOfIndentDocument->id}}">--}}
-{{--                                View--}}
-{{--                            </button>--}}
-{{--                            <button type="button" class="btn btn-danger btn-sm loi-doc-button-delete"--}}
-{{--                                    data-id="{{ $letterOfIndentDocument->id }}" data-url="{{ route('letter-of-indent-documents.destroy', $letterOfIndentDocument->id) }}">--}}
-{{--                                <i class="fa fa-trash"></i>--}}
-{{--                            </button>--}}
-{{--                        </div>--}}
-                    </div>
-                    <!-- Modal -->
-{{--                    <div class="modal mb-5 justify-content-center" id="show-document-{{$letterOfIndentDocument->id}}"  aria-labelledby="exampleModalLabel" aria-hidden="true">--}}
-{{--                        <div class="modal-dialog modal-dialog-centered modal-xl ">--}}
-{{--                            <div class="modal-content">--}}
-{{--                                <div class="modal-header">--}}
-{{--                                    <h5 class="modal-title" id="exampleModalLabel">LOI Document</h5>--}}
-{{--                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>--}}
-{{--                                </div>--}}
-{{--                                <div class="modal-body">--}}
-{{--                                    <div class="d-flex">--}}
-{{--                                        <div class="col-lg-12">--}}
-{{--                                            <div class="row p-2">--}}
-{{--                                                <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" style="height: 400px">--}}
-{{--                                            </div>--}}
-{{--                                        </div>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-                @endforeach
-                </div>
-                <br>
-                <div class="row">
-                    <div class="col-6">
-                        <div id="file-preview">
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div id="image-preview">
-                        </div>
-                    </div>
-                </div>
-                <br>
-                <div class="card p-2" >
+            <div class="card p-2" >
                     <div class="card-header">
                         <h4 class="card-title ">LOI Items</h4>
                     </div>
@@ -349,31 +308,17 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-primary float-end">Update</button>
-
-                </div>
+            <input type="hidden" name="deletedIds[]" id="deleted-docs" value="" >
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-primary float-end">Update</button>
             </div>
+
         </form>
     </div>
 @endsection
 @push('scripts')
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="http://keith-wood.name/js/jquery.signature.js"></script>
-        {{--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" ></script>--}}
-
     <script>
-
-        var signature = jQuery('#loi-signature').signature({
-            syncField: '#signature',
-            syncFormat: 'PNG'
-        });
-        $('#clear').click(function(e) {
-            e.preventDefault();
-            signature.signature('clear');
-            $("#signature").val('');
-        });
+        let deletedDocumetIds = [];
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
         const previewImage = document.querySelector("#image-preview");
@@ -425,9 +370,15 @@
             $('#customer-type').change(function () {
                 getCustomers();
             });
-            // $('#dealer').change(function () {
-            //    alert("ok");
-            // });
+
+            $('.remove-doc-button').click(function () {
+                let id = $(this).attr('data-id');
+                $('#remove-doc-'+id).remove();
+                deletedDocumetIds.push(id);
+                console.log(deletedDocumetIds);
+                $('#deleted-docs').val(deletedDocumetIds);
+
+            });
             var LOICount = '{{ $letterOfIndentItems->count() }}';
 
             for(var i=1;i<=LOICount;i++) {
@@ -498,6 +449,15 @@
                 }
             }).set({title:"Delete Item"})
         });
+        //
+        // jQuery.validator.addMethod('required_check', function(value, element) {
+        //     let dealer = $('#dealer').val();
+        //     if(dealer == 'Milele Motors') {
+        //         return false;
+        //     }else{
+        //         return true;
+        //     }
+        // },'This feild is required');
 
         $("#form-doc-upload").validate({
             ignore: [],
@@ -766,8 +726,6 @@
         });
 
         function getModels(index,type) {
-            console.log(index);
-            console.log(type);
 
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
             let dealer = $('#dealer').val();
@@ -935,10 +893,6 @@
             });
         }
         function appendModelYear(index,unSelectedmodel,unSelectedsfx,unSelectedmodelYear) {
-            console.log(index);
-            console.log(unSelectedmodel);
-            console.log(unSelectedsfx);
-            console.log(unSelectedmodelYear);
 
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 

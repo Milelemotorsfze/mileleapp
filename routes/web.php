@@ -341,7 +341,7 @@ Route::get('/d', function () {
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
     Route::resource('pfi', PFIController::class);
-    Route::get('add-pfi', [PFIController::class,'addPFI'])->name('add_pfi');
+//    Route::get('add-pfi', [PFIController::class,'addPFI'])->name('add_pfi');
     Route::get('loi-item/unit-price', [PFIController::class,'getUnitPrice'])->name('loi-item.unit-price');
 
     Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);
@@ -674,4 +674,3 @@ Route::get('/d', function () {
     Route::get('candidate/success_personal_info', [CandidatePersonalInfoController::class, 'successPersonalinfo'])->name('candidate.successPersonalinfo');
     Route::get('candidate-offer-letter/sign/{id}', [CandidatePersonalInfoController::class, 'signJobOfferLetter'])->name('candidate-offer-letter.sign');
     Route::post('offer-letter/signed', [CandidatePersonalInfoController::class, 'signedOfferLetter'])->name('offerletter.signed');
-    

@@ -149,7 +149,7 @@
                                                                     <div class="col-lg-2 col-md-12 col-sm-12">
                                                                         <dt>Model Year </dt>
                                                                     </div>
-                                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                    <div class="col-lg-4 col-md-12 col-sm-12">
                                                                         <dt>LOI Description</dt>
                                                                     </div>
                                                                     <div class="col-lg-2 col-md-12 col-sm-12">
@@ -611,7 +611,7 @@
                                                                             <dt  class=" d-lg-none d-xl-none d-xxl-none">Model Year</dt>
                                                                             <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>
                                                                         </div>
-                                                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
                                                                             <dt class="d-lg-none d-xl-none d-xxl-none ">LOI Description</dt>
                                                                             <dl> {{ $LOIItem->loi_description ?? '' }} </dl>
                                                                         </div>
@@ -690,14 +690,14 @@
                 },
             });
 
-            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
-                localStorage.setItem('activeTab', $(e.target).attr('href'));
-            });
-
-            var activeTab = localStorage.getItem('activeTab');
-            if (activeTab) {
-                $('#my-tab a[href="' + activeTab + '"]').tab('show');
-            }
+            // $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+            //     localStorage.setItem('activeTab', $(e.target).attr('href'));
+            // });
+            //
+            // var activeTab = localStorage.getItem('activeTab');
+            // if (activeTab) {
+            //     $('#my-tab a[href="' + activeTab + '"]').tab('show');
+            // }
 
             $('.status-change-button-approve').click(function () {
                 var id = $('#id').val();

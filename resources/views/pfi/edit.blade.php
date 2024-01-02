@@ -158,7 +158,7 @@
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
                                                     <label for="choices-single-default" class="form-label">PFI Amount</label>
-                                                    <input type="number" class="form-control" name="amount" value="{{ old('amount', $pfi->amount) }}" min="0" placeholder="Enter Amount">
+                                                    <input type="number" class="form-control pfi-amount" readonly name="amount" value="{{ old('amount', $pfi->amount) }}" min="0" placeholder="Enter Amount">
                                                 </div>
                                             </div>
 
@@ -200,116 +200,170 @@
                                         <iframe src="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" ></iframe>
                                     </div>
                                 </div>
-                                <hr>
-                                <div class="row">
-                                    @if($pendingPfiItems->count() > 0 || $approvedPfiItems->count() > 0)
-                                        <p class="fw-bold font-size-16 mt-3">Added PFI Items</p>
+
+                                <div id="pfi-items-div" >
+                                    <hr>
+                                    <div class="row" id="added-pfi-row-div" >
+                                        @if($pendingPfiItems->count() > 0 || $approvedPfiItems->count() > 0)
+                                            <p class="fw-bold font-size-16 mt-3">Added PFI Items</p>
+
+                                            <div class="d-flex d-none d-lg-block d-xl-block d-xxl-block">
+                                                <div class="col-lg-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-2 col-md-6">
+                                                            <label class="form-label">Model</label>
+                                                        </div>
+                                                        <div class="col-lg-2 col-md-6">
+                                                            <label  class="form-label">SFX</label>
+                                                        </div>
+                                                        <div class="col-lg-2 col-md-6">
+                                                            <label  class="form-label">Model Year</label>
+                                                        </div>
+                                                        <div class="col-lg-1 col-md-6">
+                                                            <label class="form-label">Quantity</label>
+                                                        </div>
+                                                        <div class="col-lg-2 col-md-6">
+                                                            <label class="form-label">Unit Price</label>
+                                                        </div>
+                                                        <div class="col-lg-2 col-md-6">
+                                                            <label class="form-label">Total Price</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        @if($approvedPfiItems->count() > 0)
+                                            @foreach($approvedPfiItems as $value => $approvedPfiItem)
+
+                                                <div class="d-flex">
+                                                    <div class="col-lg-12">
+                                                        <div class="row mt-2" id="approved-row-{{$approvedPfiItem->id}}">
+                                                            <input type="hidden" name="selectedIds[]" value="{{ $approvedPfiItem->id }}" id="selected-id-{{ $approvedPfiItem->id }}">
+                                                            <div class="col-lg-2 col-md-6">
+                                                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
+                                                                <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->masterModel->model ?? '' }}"
+                                                                       id="model-{{ $approvedPfiItem->id }}" readonly class="form-control mb-2">
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-6">
+                                                                <label class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
+                                                                <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->masterModel->sfx ?? '' }}"
+                                                                       id="sfx-{{ $approvedPfiItem->id }}" readonly class="form-control mb-2">
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-6">
+                                                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Model Year</label>
+                                                                <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->masterModel->model_year ?? '' }}"
+                                                                       id="model-year-{{ $approvedPfiItem->id }}" readonly class="form-control mb-2">
+                                                            </div>
+                                                            <div class="col-lg-1 col-md-6">
+                                                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
+                                                                <input type="text" value="{{ $approvedPfiItem->quantity }}" id="quantity-{{ $approvedPfiItem->id }}"
+                                                                       readonly class="form-control mb-2">
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-6">
+                                                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Unit Price</label>
+                                                                <input type="number" min="0"  required value="{{ $approvedPfiItem->unit_price ?? 0 }}"  oninput="calculatePfiAmount()"
+                                                                       index="{{ $approvedPfiItem->id }}" name="unit_price[]" class="form-control mb-3 added-unit-prices"
+                                                                       id="unit-price-{{ $approvedPfiItem->id}}">
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-6">
+                                                                    <?php $totalAmount = $approvedPfiItem->quantity * $approvedPfiItem->unit_price ?>
+                                                                <label class="form-label  d-lg-none d-xl-none d-xxl-none">Total Price</label>
+                                                                <input type="number" value="{{ $totalAmount }}" min="0" readonly class="form-control mb-3"
+                                                                       id="total-amount-{{ $approvedPfiItem->id }}">
+                                                            </div>
+                                                            <div class="col-lg-1 col-md-6">
+                                                                <label class="form-label d-lg-none d-xl-none d-xxl-none"></label>
+                                                                <button type="button" class="btn btn-danger btn-sm remove" onclick="removepfi({{ $approvedPfiItem->id }})"  >
+                                                                    Remove
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @endif
+                                        <div id="approved">
+
+                                        </div>
+                                    </div>
+                                    <div class="row" id="pending-pfi-row-div">
+                                        {{--                        @if($pendingPfiItems->count() > 0)--}}
+                                        <p class="fw-bold font-size-16 mt-3">Pending Items to Add PFI </p>
                                         <div class="d-flex d-none d-lg-block d-xl-block d-xxl-block">
                                             <div class="col-lg-12">
                                                 <div class="row">
-                                                    <div class="col-lg-2 col-md-3 col-sm-12">
+                                                    <div class="col-lg-2 col-md-6">
                                                         <label class="form-label">Model</label>
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                    <div class="col-lg-2 col-md-6">
                                                         <label  class="form-label">SFX</label>
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                    <div class="col-lg-2 col-md-6">
                                                         <label  class="form-label">Model Year</label>
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                    <div class="col-lg-1 col-md-6">
                                                         <label class="form-label">Quantity</label>
                                                     </div>
-                                                    <div class="col-lg-2 col-md-3 col-sm-12">
+                                                    <div class="col-lg-2 col-md-6">
                                                         <label class="form-label">Unit Price</label>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-6">
+                                                        <label class="form-label">Total Price</label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    @endif
-                                    @if($approvedPfiItems->count() > 0)
-                                        @foreach($approvedPfiItems as $value => $approvedPfiItem)
+                                        @foreach($pendingPfiItems as $value => $pendingPfiItem)
                                             <div class="d-flex">
                                                 <div class="col-lg-12">
-                                                    <div class="row mt-2" id="approved-row-{{$approvedPfiItem->id}}">
-                                                        <div class="col-lg-2 col-md-6 col-sm-12">
+                                                    <div class="row mt-2" id="pending-row-{{$pendingPfiItem->id}}">
+                                                        <div class="col-lg-2 col-md-6">
                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                            <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->masterModel->model ?? '' }}" readonly class="form-control mb-2">
+                                                            <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->masterModel->model ?? ''}}"
+                                                                   id="model-{{ $pendingPfiItem->id }}" readonly class="form-control mb-2">
                                                         </div>
-                                                        <div class="col-lg-2 col-md-6 col-sm-12">
+                                                        <div class="col-lg-2 col-md-6">
                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                            <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->masterModel->sfx ?? '' }}" readonly class="form-control mb-2">
+                                                            <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->masterModel->sfx ?? ''}}"
+                                                                   id="sfx-{{ $pendingPfiItem->id }}" readonly class="form-control mb-2">
                                                         </div>
-                                                        <div class="col-lg-2 col-md-6 col-sm-12">
+                                                        <div class="col-lg-2 col-md-6">
                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Model Year</label>
-                                                            <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->masterModel->model_year ?? '' }}" readonly class="form-control mb-2">
+                                                            <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->masterModel->model_year ?? ''}}"
+                                                                   id="model-year-{{ $pendingPfiItem->id }}"  readonly class="form-control">
                                                         </div>
-
-                                                        <div class="col-lg-2 col-md-6 col-sm-12">
+                                                        <div class="col-lg-1 col-md-6">
                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
-                                                            <input type="text" value="{{ $approvedPfiItem->quantity }}" readonly class="form-control mb-2">
+                                                            <input type="text" value="{{ $pendingPfiItem->quantity }}" id="quantity-{{ $pendingPfiItem->id }}"
+                                                                   readonly class="form-control mb-3">
                                                         </div>
-                                                        <div class="col-lg-2 col-md-6 col-sm-12">
+                                                        <div class="col-lg-2 col-md-6">
                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Unit Price</label>
-                                                            <input type="text" value="" readonly class="form-control">
+                                                            <input type="number" value="{{ $pendingPfiItem->unit_price ?? 0}}" index="{{ $pendingPfiItem->id }}" oninput="calculateTotalAmount({{$pendingPfiItem->id}})" class="form-control mb-3 removed-unit-prices"
+                                                                   id="unit-price-{{ $pendingPfiItem->id }}">
                                                         </div>
-                                                        <div class="col-lg-1 col-md-6 col-sm-12">
-                                                            <label class="form-label d-lg-none d-xl-none d-xxl-none"></label>
-                                                            <button type="button" class="btn btn-danger btn-sm remove" onclick="removepfi({{ $approvedPfiItem->id }})" >
-                                                               Remove
+                                                        <div class="col-lg-2 col-md-6">
+                                                            <?php $totalAmount = $pendingPfiItem->quantity * $pendingPfiItem->unit_price ?>
+                                                            <label class="form-label d-lg-none d-xl-none d-xxl-none">Total Price</label>
+                                                            <input type="number" value="{{ $totalAmount }}" min="0" readonly class="form-control mb-3" id="total-amount-{{ $pendingPfiItem->id }}">
+                                                        </div>
+                                                        <div class="col-lg-1 col-md-6">
+                                                            <button type="button" class="btn btn-info btn-sm add-now" onclick="addpfi({{ $pendingPfiItem->id }})" >
+                                                                Add Pfi
                                                             </button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         @endforeach
-                                    @endif
-                                    <div id="approved">
+                                        {{--                        @endif--}}
+                                        <div id="pending">
 
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    {{--                    @if($pendingPfiItems->count() > 0)--}}
-                                    <p class="fw-bold font-size-16 mt-3">Approved Inventory</p>
-                                    @foreach($pendingPfiItems as $value => $pendingPfiItem)
-                                        <div class="d-flex">
-                                            <div class="col-lg-12">
-                                                <div class="row mt-2" id="pending-row-{{$pendingPfiItem->id}}">
-                                                    <div class="col-lg-2 col-md-6 col-sm-12">
-                                                        <label class="form-label d-block d-sm-none">Model</label>
-                                                        <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->masterModel->model ?? ''}}" readonly class="form-control mb-2">
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-6 col-sm-12">
-                                                        <label class="form-label d-block d-sm-none">SFX</label>
-                                                        <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->masterModel->sfx ?? ''}}" readonly class="form-control mb-2">
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-6 col-sm-12">
-                                                        <label class="form-label d-block d-sm-none">Model Year</label>
-                                                        <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->masterModel->model_year ?? ''}}" readonly class="form-control mb-2">
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-6 col-sm-12">
-                                                        <label class="form-label d-block d-sm-none">Quantity</label>
-                                                        <input type="text" value="{{ $pendingPfiItem->quantity }}" readonly class="form-control mb-3">
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-6 col-sm-12">
-                                                        <label class="form-label d-lg-none d-xl-none d-xxl-none">Unit Price</label>
-                                                        <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->loi_item_unit_price }}" readonly class="form-control">
-                                                    </div>
-                                                    <div class="col-lg-1 col-md-6 col-sm-12">
-                                                        <button type="button" class="btn btn-info btn-sm add-now" onclick="addpfi({{ $pendingPfiItem->id }})" >
-                                                            Add Pfi
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                    {{--                    @endif--}}
-                                </div>
-                                <div id="pending">
 
-                                </div>
-
-                                <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
+{{--                                <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">--}}
                                 <div class="col-12 text-center">
                                     <button type="submit" class="btn btn-primary btn-submit float-end">Submit</button>
                                 </div>
@@ -325,6 +379,8 @@
     <script>
         var itemCount = '{{ $approvedPfiItems->count() }}';
         $('#added-pfi-count').val(itemCount);
+        showOrHideItemsDiv();
+
         const fileInputLicense = document.querySelector("#file");
         const previewFile = document.querySelector("#file-preview");
         fileInputLicense.addEventListener("change", function(event) {
@@ -341,101 +397,12 @@
                 previewFile.appendChild(iframe);
             }
         });
-        {{--$('.remove').on('click',function(){--}}
-        {{--    let id = $(this).attr('data-id');--}}
-        {{--    let action = $(this).attr('data-action');--}}
-        {{--    let count = '{{ $approvedPfiItems->count() }}';--}}
-        {{--    if(count > 1){--}}
-        {{--        pfi(id, action);--}}
-        {{--    }else {--}}
-        {{--        alertify.confirm('Ooops! You can not delete this item.One variant item is mandatory for PFI.').set({title:"Delete Item?"});--}}
-        {{--    }--}}
-        {{--})--}}
-        {{--$('.add-now').on('click',function(){--}}
-        {{--    let id = $(this).attr('data-id');--}}
-        {{--    let action = $(this).attr('data-action');--}}
-        {{--    pfi(id, action);--}}
-        {{--})--}}
+
         $('#supplier-id').select2({
             placeholder: "Select Vendor",
             maximumSelectionLength: 1
         });
-        function addpfi(id) {
-            let action = 'ADD';
-            let url = '{{ route('add_pfi') }}';
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "json",
-                data: {
-                    id: id,
-                    action: action,
-                    pfi_id: '{{ $pfi->id }}'
-                },
-                success:function (response) {
-                    // location.reload();
-                    console.log(response);
-                    var itemsCount = response.approvedItems;
-                    $('#added-pfi-count').val(itemsCount);
 
-                    $('#pending-row-'+id).remove();
-                    $('#approved').append('<div class="row mt-2" id="approved-row-'+ response.id+'"><div class="col-lg-2 col-md-6"> <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label> ' +
-                        '<input type="text" value="'+ response.letter_of_indent_item.master_model.model +'" readonly class="form-control mb-2"> </div>' +
-                        '<div class="col-lg-2 col-md-6"> <label class="form-label d-block d-sm-none">SFX</label> ' +
-                        '<input type="text" value="'+ response.letter_of_indent_item.master_model.sfx +'" readonly class="form-control mb-2">' +
-                        ' </div><div class="col-lg-2 col-md-6"> <label class="form-label d-block d-sm-none">Model Year</label>' +
-                        '<input type="text" value="'+ response.letter_of_indent_item.master_model.model_year +'" readonly class="form-control mb-2">' +
-                        '</div>  <div class="col-lg-2 col-md-6"> <label class="form-label d-block d-sm-none">Quantity</label>'+
-                        '<input type="text" value="'+ response.quantity +'" readonly class="form-control mb-3"> </div>' +
-                        '<div class="col-lg-2 col-md-6"> <label class="form-label d-block d-sm-none">Unit Price</label> ' +
-                        '<input type="text" value="" readonly class="form-control"> </div>'+
-                        '<div class="col-lg-1 col-md-6"> ' +
-                        '<button type="button" class="btn btn-danger btn-sm remove" onclick="removepfi('+ response.id +')" >Remove </button></div></div>'
-                    );
-                }
-            });
-        }
-        function removepfi(id) {
-            let addedPfiCount = $('#added-pfi-count').val();
-            let action = 'REMOVE';
-
-            if(addedPfiCount > 1) {
-                let url = '{{ route('add_pfi') }}';
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    dataType: "json",
-                    data: {
-                        id: id,
-                        action: action,
-                        pfi_id: '{{ $pfi->id }}'
-                    },
-                    success:function (response) {
-                        var itemsCount = response.approvedItems;
-                        $('#added-pfi-count').val(itemsCount);
-
-                        $('#approved-row-'+id).remove();
-                        $('#pending').append(' <div class="row mt-2" id="pending-row-'+ response.id+'"><div class="col-lg-2 col-md-6">' +
-                            ' <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label> ' +
-                            '<input type="text" value="'+ response.letter_of_indent_item.master_model.model +'" readonly class="form-control mb-2"> </div>' +
-                            '<div class="col-lg-2 col-md-6"> <label class="form-label d-block d-sm-none">SFX</label> ' +
-                            '<input type="text" value="'+ response.letter_of_indent_item.master_model.sfx +'" readonly class="form-control mb-2">' +
-                            ' </div> <div class="col-lg-2 col-md-6"> <label class="form-label d-block d-sm-none">Model Year</label>' +
-                            '<input type="text" value="'+ response.letter_of_indent_item.master_model.model_year +'" readonly class="form-control mb-2">' +
-                            '</div> <div class="col-lg-2 col-md-6"> <label class="form-label d-block d-sm-none">Quantity</label>'+
-                            '<input type="text" value="'+ response.quantity +'" readonly class="form-control mb-3"> </div>' +
-                            '<div class="col-lg-2 col-md-6"> <label class="form-label d-block d-sm-none">Unit Price</label> ' +
-                            '<input type="text" value="" readonly class="form-control"> </div>'+
-                            '<div class="col-lg-1 col-md-6"> ' +
-                            '<button type="button" class="btn btn-info btn-sm add-now" onclick="addpfi('+ response.id +')" >Add Pfi </button> </div></div>'
-                        );
-                    }
-                });
-           }else{
-                alertify.confirm('Atleast One Variant item is Mandatory in PFI.You can not delete item.').set({title:"Alert !"})
-            }
-
-        }
         $('#pfi_reference_number').keyup(function(){
 
                 $.ajax({
@@ -475,10 +442,18 @@
                 file:{
                     extension: 'pdf'
                 },
+                supplier_id:{
+                    required:true
+                },
+                "unit_price[]": {
+                    required: true
+                },
             },
 
         });
         $(document.body).on('select2:select', "#supplier-id", function (e) {
+            $('#pfi-items-div').attr('hidden',false);
+
             let MMC = $(this).find('option:selected').attr("data-is-MMC");
             if(MMC == 1) {
                 $('.mmc-items-div').attr('hidden', false);
@@ -487,6 +462,152 @@
                 $('#delivery-location').val('');
                 $('#currency').val('USD');
             }
+
+            let supplier = $(this).val();
+            let letter_of_indent_id = '{{ $pfi->letter_of_indent_id }}';
+
+            if(supplier) {
+                $.ajax({
+                    type:"GET",
+                    url: "{{ route('loi-item.unit-price') }}",
+                    data: {
+                        supplier_id:supplier[0],
+                        pfi_id: '{{ $pfi->id }}',
+                        letter_of_indent_id:letter_of_indent_id,
+                        action: 'EDIT'
+                    },
+                    success: function(data) {
+                        var approvedItems = data.approvedItemUnitPrices;
+                        var pendingItems = data.pendingItemUnitPrices;
+
+                        jQuery.each(approvedItems, function(key,value){
+                            $('#unit-price-'+key).val(value);
+                        });
+                        jQuery.each(pendingItems, function(key,value){
+                            $('#unit-price-'+key).val(value);
+                        });
+
+                        calculatePfiAmount();
+                    }
+                });
+            }
+        });
+
+        function showOrHideItemsDiv() {
+            let totalIndex = $('#added-pfi-count').val();
+            let availablependingItems = parseInt('{{ $pendingPfiItems->count() }}') + parseInt('{{ $approvedPfiItems->count() }}');
+            if(totalIndex > 0) {
+                $('#added-pfi-row-div').attr('hidden', false);
+            }else{
+                $('#added-pfi-row-div').attr('hidden', true);
+            }
+            if(availablependingItems == totalIndex) {
+                $('#pending-pfi-row-div').attr('hidden', true);
+            }else{
+                $('#pending-pfi-row-div').attr('hidden', false);
+
+            }
+        }
+        function addpfi(id) {
+            let model = $('#model-'+id).val();
+            let sfx = $('#sfx-'+id).val();
+            let modelYear = $('#model-year-'+id).val();
+            let quantity = $('#quantity-'+id).val();
+            let unitPrice = $('#unit-price-'+id).val();
+
+            let totalCount = $('#added-pfi-count').val();
+            let latestCount = parseInt(totalCount) + 1;
+            $('#added-pfi-count').val(latestCount);
+
+            $('#pending-row-'+id).remove();
+            $('#approved').append('<div class="row mt-2" id="approved-row-'+ id+'">' +
+                '<input type="hidden" name="selectedIds[]" value="'+ id +'" id="selected-id-'+ id +'"> <div class="col-lg-2 col-md-6">' +
+                ' <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label> ' +
+                '<input type="text" value="'+ model +'" id="model-'+ id+'" readonly class="form-control mb-2"> </div>' +
+                '<div class="col-lg-2 col-md-6"> <label class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label> ' +
+                '<input type="text" value="'+ sfx +'" readonly id="sfx-'+ id+'" class="form-control mb-2">' +
+                ' </div> <div class="col-lg-2 col-md-6"> <label class="form-label d-lg-none d-xl-none d-xxl-none">Model Year</label> ' +
+                '<input type="text" value="'+ modelYear +'" id="model-year-'+ id+'" readonly class="form-control mb-2">' +
+                ' </div> <div class="col-lg-1 col-md-6"> <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>'+
+                '<input type="text" value="'+ quantity +'" readonly id="quantity-'+ id +'" class="form-control mb-3"> </div>' +
+                '<div class="col-lg-2 col-md-6"> <label class="form-label d-lg-none d-xl-none d-xxl-none">Unit Price</label>'+
+                '<input type="number" required value="'+ unitPrice +'" index="'+ id +'"  oninput="calculatePfiAmount()"   ' +
+                'name="unit_price[]" class="form-control mb-3 added-unit-prices"  id="unit-price-'+ id +'"> </div>'+
+                ' <div class="col-lg-2 col-md-6"> <label class="form-label d-lg-none d-xl-none d-xxl-none">Total Amount</label>'+
+                '<input type="number" value="" min="0" readonly id="total-amount-'+ id +'" class="form-control mb-3"> </div>'+
+                '<div class="col-lg-1 col-md-6"> ' +
+                '<button type="button" class="btn btn-danger btn-sm remove" onclick="removepfi('+ id +')" >Remove </button></div></div>'
+            );
+            calculatePfiAmount();
+            showOrHideItemsDiv();
+        }
+        function removepfi(id) {
+            let addedPfiCount = $('#added-pfi-count').val();
+            let model = $('#model-'+id).val();
+            let sfx = $('#sfx-'+id).val();
+            let modelYear = $('#model-year-'+id).val();
+            let quantity = $('#quantity-'+id).val();
+            let unitPrice = $('#unit-price-'+id).val();
+
+            if(addedPfiCount > 1) {
+                let totalCount = $('#added-pfi-count').val();
+                let latestCount = parseInt(totalCount) - 1;
+                $('#added-pfi-count').val(latestCount);
+
+                $('#approved-row-'+id).remove();
+                $('#pending').append(' <div class="row mt-2" id="pending-row-'+ id+'"><div class="col-lg-2 col-md-6">' +
+                    ' <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label> ' +
+                    '<input type="text" value="'+ model +'" id="model-'+ id+'" readonly class="form-control mb-2"> </div>' +
+                    '<div class="col-lg-2 col-md-6"> <label class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label> ' +
+                    '<input type="text" value="'+ sfx +'" id="sfx-'+ id+'" readonly class="form-control mb-2">' +
+                    ' </div><div class="col-lg-2 col-md-6"> <label class="form-label d-lg-none d-xl-none d-xxl-none">Model Year</label> ' +
+                    '<input type="text" value="'+ modelYear +'" id="model-year-'+ id+'" readonly class="form-control mb-2">' +
+                    ' </div> <div class="col-lg-1 col-md-6"> <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>'+
+                    '<input type="text" value="'+ quantity +'" readonly id="quantity-'+ id +'" class="form-control mb-3"> </div>' +
+                    '<div class="col-lg-2 col-md-6"> <label class="form-label d-lg-none d-xl-none d-xxl-none">Unit Price</label>'+
+                    '<input type="text" value="'+ unitPrice +'" oninput="calculateTotalAmount('+ id +')" index="'+ id +'" class="form-control mb-3 removed-unit-prices" id="unit-price-'+ id +'"> </div>'+
+                    ' <div class="col-lg-2 col-md-6"> <label class="form-label d-lg-none d-xl-none d-xxl-none">Total Price</label>'+
+                    '<input type="text" value="" min="0" readonly  id="total-amount-'+ id +'" class="form-control mb-3"> </div>'+
+                    '<div class="col-lg-1 col-md-6"> ' +
+                    '<button type="button" class="btn btn-info btn-sm add-now" onclick="addpfi('+ id +')" >Add Pfi </button> </div></div>'
+                );
+
+                calculatePfiAmount();
+                showOrHideItemsDiv();
+            }else{
+                alertify.confirm('Atleast One item is Mandatory in PFI.You can not delete item.').set({title:"Alert !"})
+            }
+        }
+
+        function calculatePfiAmount() {
+            var sum = 0;
+            $('.added-unit-prices').each(function() {
+                var id = $(this).attr('index');
+                var quantity = $('#quantity-'+id).val();
+                var eachItemTotal = parseFloat(quantity) * parseFloat(this.value);
+
+                $('#total-amount-'+id).val(eachItemTotal);
+                sum = sum + eachItemTotal;
+            });
+
+            $('.pfi-amount').val(sum);
+            $('.removed-unit-prices').each(function() {
+                var id = $(this).attr('index');
+                var quantity = $('#quantity-'+id).val();
+                var eachItemTotal = parseFloat(quantity) * parseFloat(this.value);
+
+                $('#total-amount-'+id).val(eachItemTotal);
+            });
+        }
+
+        function calculateTotalAmount(id) {
+            var quantity = $('#quantity-'+id).val();
+            var unitPrice = $('#unit-price-'+id).val();
+            var eachItemTotal = parseFloat(quantity) * parseFloat(unitPrice);
+            $('#total-amount-'+id).val(eachItemTotal);
+        }
+        $(document.body).on('select2:unselect', "#supplier-id", function (e) {
+            $('#pfi-items-div').attr('hidden', true);
         });
     </script>
 @endpush
