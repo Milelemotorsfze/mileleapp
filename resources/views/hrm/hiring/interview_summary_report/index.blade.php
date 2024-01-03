@@ -2750,7 +2750,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-
+										
+										@canany(['send-offer-letter'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-offer-letter']);
+										@endphp										
 										@if($data->candidateDetails->documents_verified_at != NULL && $data->offer_letter_send_at == NULL)
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Send Offer Letter & Personal Info Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
@@ -2759,6 +2763,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</button>
 										</li>
 										@endif
+										@endcanany
 									</ul>
 									<div class="modal fade" id="send-offer-letter-{{$data->id}}"
 										tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
