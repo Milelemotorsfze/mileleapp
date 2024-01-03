@@ -32,8 +32,9 @@ class DatabaseSeeder extends Seeder
         // $this->call(BrandRegionsSeeder::class);
 //        $this->call(PermissionSettingSeeder::class);
 //        $this->call(SettingsSeeder::class);
-        $this->call(MasterVendorCategorySeeder::class);
-        $this->call(MasterVendorSubCategorySeeder::class);
+//        $this->call(MasterVendorCategorySeeder::class);
+//        $this->call(MasterVendorSubCategorySeeder::class);
+        $this->call(ModelYearCalculationSeeder::class);
 
     }
 }
