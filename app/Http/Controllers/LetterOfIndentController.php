@@ -33,13 +33,13 @@ class LetterOfIndentController extends Controller
             ->orderBy('id','DESC')
             ->where('status',LetterOfIndent::LOI_STATUS_NEW)
             ->cursor();
-        $approvedLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
-            ->orderBy('id','DESC')
-            ->whereIn('status',[LetterOfIndent::LOI_STATUS_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED])
-            ->cursor();
+//        $approvedLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
+//            ->orderBy('id','DESC')
+//            ->whereIn('status',[LetterOfIndent::LOI_STATUS_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED])
+//            ->cursor();
         $partialApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
-            ->whereIn('status', [LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED])
+            ->whereIn('status', [LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED,LetterOfIndent::LOI_STATUS_APPROVED])
             ->cursor();
         $supplierApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
@@ -50,7 +50,7 @@ class LetterOfIndentController extends Controller
             ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED)
             ->cursor();
 
-        return view('letter_of_indents.index', compact('newLOIs','approvedLOIs',
+        return view('letter_of_indents.index', compact('newLOIs',
             'partialApprovedLOIs','supplierApprovedLOIs','rejectedLOIs'));
     }
     public function getSupplierLOI(Request $request)
@@ -312,8 +312,10 @@ class LetterOfIndentController extends Controller
     }
     public function approve(Request $request)
     {
+        info($request->all());
         $letterOfIndent = LetterOfIndent::find($request->id);
         $letterOfIndent->status = $request->status;
+        info($request->review);
         if($request->status = LetterOfIndent::LOI_STATUS_REJECTED) {
             $letterOfIndent->review = $request->review;
         }
@@ -393,20 +395,20 @@ class LetterOfIndentController extends Controller
             $LOI->so_number = $request->so_number;
             $LOI->prefered_location = $request->prefered_location;
 
-            if($request->loi_signature) {
-                $folderPath = public_path('LOI-Signature');
-                $image_parts = explode(";base64,", $request->loi_signature);
-                $image_type_aux = explode("image/", $image_parts[0]);
-                $image_type = $image_type_aux[1];
-                $image_base64 = base64_decode($image_parts[1]);
+            if ($request->has('loi_signature'))
+            {
+                $file = $request->file('loi_signature');
+                $extension = $file->getClientOriginalExtension();
+                $fileName = time().'.'.$extension;
+                $destinationPath = 'LOI-Signature';
+                $file->move($destinationPath, $fileName);
 
-                $file =  uniqid() . '.'.$image_type;
-                if(!\Illuminate\Support\Facades\File::isDirectory($folderPath)) {
-                    \Illuminate\Support\Facades\File::makeDirectory($folderPath, $mode = 0777, true, true);
+                if(!\Illuminate\Support\Facades\File::isDirectory($destinationPath)) {
+                    \Illuminate\Support\Facades\File::makeDirectory($destinationPath, $mode = 0777, true, true);
                 }
                 $filePath = public_path('LOI-Signature/' . $file);
-                $LOI->signature = $file;
-                file_put_contents($filePath, $image_base64);
+                $LOI->signature = $fileName;
+
             }
 
             $LOI->save();
@@ -425,6 +427,10 @@ class LetterOfIndentController extends Controller
                 }
             }
             $LOI->letterOfIndentItems()->delete();
+            if($request->deletedIds) {
+                LetterOfIndentDocument::whereIn('id', $request->deletedIds)->delete();
+            }
+
             $quantities = $request->quantity;
             foreach ($quantities as $key => $quantity) {
                 $masterModel = MasterModel::where('sfx', $request->sfx[$key])

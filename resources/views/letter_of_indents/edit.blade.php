@@ -180,11 +180,11 @@
                     </div>
                 </div>
             </div>
-            <div class="row ">
+            <div class="row">
                 @if($letterOfIndent->signature)
                     <div class="col-lg-3 col-md-6 col-sm-12">
+                        <label class="form-label fw-bold">Signature</label>
                         <div class="mb-3" id="signature-preview">
-                            <label class="form-label fw-bold">Signature</label>
                             <iframe src="{{ url('/LOI-Signature/'.$letterOfIndent->signature) }}"></iframe>
                         </div>
                     </div>
@@ -199,15 +199,12 @@
                         </div>
                     @endforeach
                 @endif
-            </div>
-            <div class="row mt-3">
-                <div class="col-6">
+                <div class="col-lg-3 col-md-6 col-sm-12"  >
                     <div id="file-preview">
                     </div>
                 </div>
             </div>
-
-            <div class="card p-2" >
+            <div class="card mt-2" >
                     <div class="card-header">
                         <h4 class="card-title ">LOI Items</h4>
                     </div>
@@ -308,7 +305,8 @@
                         </div>
                     </div>
                 </div>
-            <input type="hidden" name="deletedIds[]" id="deleted-docs" value="" >
+            <select name="deletedIds[]" id="deleted-docs" hidden="hidden" multiple>
+            </select>
             <div class="col-12 text-center">
                 <button type="submit" class="btn btn-primary float-end">Update</button>
             </div>
@@ -321,15 +319,14 @@
         let deletedDocumetIds = [];
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
-        const previewImage = document.querySelector("#image-preview");
         fileInputLicense.addEventListener("change", function(event) {
             const files = event.target.files;
-            while (previewFile.firstChild) {
-                previewFile.removeChild(previewFile.firstChild);
-            }
-            while (previewImage.firstChild) {
-                previewImage.removeChild(previewImage.firstChild);
-            }
+            // while (previewFile.firstChild) {
+            //     previewFile.removeChild(previewFile.firstChild);
+            // }
+            // while (previewImage.firstChild) {
+            //     previewImage.removeChild(previewImage.firstChild);
+            // }
             for (let i = 0; i < files.length; i++)
             {
                 const file = files[i];
@@ -340,14 +337,33 @@
                     iframe.src = objectUrl;
                     previewFile.appendChild(iframe);
                 }
-                else if (file.type.match("image/*"))
-                {
-                    const objectUrl = URL.createObjectURL(file);
-                    const image = new Image();
-                    image.src = objectUrl;
-                    previewImage.appendChild(image);
-                }
+                // else if (file.type.match("image/*"))
+                // {
+                //     const objectUrl = URL.createObjectURL(file);
+                //     const image = new Image();
+                //     image.src = objectUrl;
+                //     previewImage.appendChild(image);
+                // }
             }
+        });
+
+        const signatureFileInput = document.querySelector("#signature");
+        const signaturePreviewFile = document.querySelector("#signature-preview");
+        signatureFileInput.addEventListener("change", function(event) {
+            const files = event.target.files;
+            while (signaturePreviewFile.firstChild) {
+                signaturePreviewFile.removeChild(signaturePreviewFile.firstChild);
+            }
+
+            const file = files[0];
+            if (file.type.match("application/pdf"))
+            {
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                signaturePreviewFile.closest('.row').appendChild(iframe);
+            }
+
         });
 
             getCustomers();
@@ -375,9 +391,13 @@
                 let id = $(this).attr('data-id');
                 $('#remove-doc-'+id).remove();
                 deletedDocumetIds.push(id);
-                console.log(deletedDocumetIds);
-                $('#deleted-docs').val(deletedDocumetIds);
+                $('#deleted-docs').empty();
 
+                jQuery.each(deletedDocumetIds, function (key, value) {
+                    console.log(value);
+                    $('#deleted-docs').append('<option value="' + value + '" >' + value+ '</option>');
+                    $("#deleted-docs option").attr("selected", "selected");
+                });
             });
             var LOICount = '{{ $letterOfIndentItems->count() }}';
 

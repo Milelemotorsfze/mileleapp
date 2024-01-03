@@ -224,8 +224,7 @@ class LOIItemsController extends Controller
                 ->whereNull('status')
                 ->take($quantity)
                 ->pluck('id');
-            info("supplier inventory Id");
-            info($supplierInventoriesIds);
+
             SupplierInventory::whereIn('id', $supplierInventoriesIds)->update(['status' => SupplierInventory::VEH_STATUS_LOI_APPROVED]);
         }
 
@@ -247,6 +246,7 @@ class LOIItemsController extends Controller
         if($request->status == 'REJECTED') {
             $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
             $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
+            $LOI->review = $request->review;
 
         }elseif ($request->status == 'APPROVE') {
             $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
