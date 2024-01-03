@@ -190,6 +190,57 @@
                                             @endif
                                             @endcanany
                                         </div>
+                                        <div class="dropdown">
+                                            @canany(['view-asset-allocation-request-listing'])
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-asset-allocation-request-listing']);
+                                            @endphp
+                                            @if ($hasPermission)
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> On Boarding</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @canany(['view-joining-report-listing'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('joining_report.index') }}" class="dropdown-item" data-key="t-login">Joining Report</a>
+                                                <!-- <div class="dropdown">                                            
+                                                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                        <span data-key="t-utility"> Joining Report</span>
+                                                        <div class="arrow-down"></div>
+                                                    </a>
+                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">                                               
+                                                        <a href="{{ route('joining_report.index') }}" class="dropdown-item" data-key="t-login">Trial Period Joining</a>                                              
+                                                        <a href="{{ route('joining_report.index') }}" class="dropdown-item" data-key="t-login">Permanent Joining</a>                                            
+                                                    </div>                                           
+                                                </div> -->
+                                                @endif
+                                                @endcanany
+                                                @canany(['view-asset-allocation-request-listing'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-asset-allocation-request-listing']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('asset_allocation.index') }}" class="dropdown-item" data-key="t-login">Asset Allocation</a>
+                                                @endif
+                                                @endcanany
+                                                @canany([])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole([]);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('interview-summary-report.index') }}" class="dropdown-item" data-key="t-login">HandOver Form</a>
+                                                @endif
+                                                @endcanany
+                                                                                         
+                                            </div>
+                                            @endif
+                                            @endcanany
+                                        </div>
+                                        
                                         <!-- @canany(['warranty-create', 'warranty-list'])
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create','warranty-list']);

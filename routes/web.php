@@ -6,6 +6,8 @@ use App\Http\Controllers\HRM\Hiring\EmployeeHiringQuestionnaireController;
 use App\Http\Controllers\HRM\Hiring\JobDescriptionController;
 use App\Http\Controllers\HRM\Hiring\PassportRequestController;
 use App\Http\Controllers\HRM\Hiring\CandidatePersonalInfoController;
+use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
+use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -289,6 +291,11 @@ Route::get('/d', function () {
         Route::post('offer-letter-sign/verified', 'offerLetterSignVerified')->name('offer_letter_sign.verified');
         // Route::get('personal-info/listingInfo', 'getCandidatePersonalInfo')->name('personal-info.listingInfo');
     });
+
+    // Joining Report
+    Route::resource('joining_report', JoiningReportController::class);
+    // Asset Allocation
+    Route::resource('asset_allocation', AssetAllocationController::class);
     // Employee Passport Request
     Route::resource('passport_request', PassportRequestController::class);
     Route::controller(PassportRequestController::class)->group(function(){

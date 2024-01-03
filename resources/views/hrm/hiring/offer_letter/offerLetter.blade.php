@@ -249,7 +249,11 @@
                                     </table>
                                     @endif
                                     
-                                    @if(isset($canVerifySign) && $canVerifySign == true && $data->offer_letter_verified_at == NULL && $data->offer_letter_verified_by == NULL)
+                                    @canany(['verify-offer-letter-signature'])
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-offer-letter-signature']);
+                                    @endphp                    
+                                    @if($hasPermission && isset($canVerifySign) && $canVerifySign == true && $data->offer_letter_verified_at == NULL && $data->offer_letter_verified_by == NULL)
                                     <table>
                                     <tbody>
                                         <tr>
@@ -259,6 +263,7 @@
                                     </tbody>
                                     </table>
                                     @endif 
+                                    @endcanany
                                 </td>
                             </tr>                        
                         </tbody>

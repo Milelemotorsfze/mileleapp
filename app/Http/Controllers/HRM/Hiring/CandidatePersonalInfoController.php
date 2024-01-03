@@ -466,6 +466,7 @@ class CandidatePersonalInfoController extends Controller
                         $createEmp->spouse_nationality = $request->spouse_nationality;
                         $createEmp->residence_telephone_number = $request->residence_telephone_number['full'];
                         $createEmp->contact_number = $request->contact_number['full'];
+                        $createEmp->personal_information_created_at = Carbon::now();
                         $createEmp->update();
                     }
                     $oldLangs = EmployeeSpokenLanguage::where('candidate_id',$createEmp->id)->get();

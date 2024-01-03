@@ -548,7 +548,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents']);
                             @endphp
                             @if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL)
-                            <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-personalinfo"  data-bs-toggle="modal"
+                            <button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-docs"  data-bs-toggle="modal"
                                 data-bs-target="#verify-docs-{{$data->id}}" data-id="{{$data->id}}">
                                 <i class="fa fa-check" aria-hidden="true"></i> Verified Documents
                             </button>
@@ -1147,10 +1147,36 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 </div>
 @push('scripts')
 <script type="text/javascript">
-    $('.btn-verify-personalinfo').click(function (e) {
+    $('.btn-verify-docs').click(function (e) {
         var id = $(this).attr('data-id');
         let url = '{{ route('docs.verified') }}';
         var confirm = alertify.confirm('Are you sure you verified this candidate documents ?',function (e) {
+            if (e) {
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        id: id,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function (data) {							
+                        if(data == 'success') {
+                            window.location.reload();
+                            alertify.success(status + " Successfully")
+                        }
+                        else if(data == 'error') {
+
+                        }
+                    }
+                });
+            }
+        }).set({title:"Confirmation"})
+    })
+    $('.btn-verify-personalinfo').click(function (e) {
+        var id = $(this).attr('data-id');
+        let url = '{{ route('personal-info.verified') }}';
+        var confirm = alertify.confirm('Are you sure you verified this candidate personal information ?',function (e) {
             if (e) {
                 $.ajax({
                     type: "POST",
