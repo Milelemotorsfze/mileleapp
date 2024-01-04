@@ -360,7 +360,7 @@ Route::get('/d', function () {
     Route::get('supplier-inventories/file-comparision-report', [SupplierInventoryController::class,'FileComparisionReport'])
         ->name('supplier-inventories.file-comparision-report');
     Route::get('supplier-inventories/get-dates', [SupplierInventoryController::class,'getDate'])->name('supplier-inventories.get-dates');
-//    Route::get('supplier-inventories/get-supplier-inventories', [SupplierInventoryController::class,'getSupplierInventories'])->name('supplier-inventories.get-child-rows');
+    Route::get('/viewall-supplier-inventories', [SupplierInventoryController::class,'viewAll'])->name('supplier-inventories.view-all');
 
     //BL Module
     Route::resource('blform', BlFormController::class);

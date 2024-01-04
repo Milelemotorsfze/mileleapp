@@ -185,7 +185,7 @@
                                                 <a href="{{ route('interview-summary-report.index') }}" class="dropdown-item" data-key="t-login">Interview Summary</a>
                                                 @endif
                                                 @endcanany
-                                                                                         
+
                                             </div>
                                             @endif
                                             @endcanany
@@ -207,15 +207,15 @@
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('joining_report.index') }}" class="dropdown-item" data-key="t-login">Joining Report</a>
-                                                <!-- <div class="dropdown">                                            
+                                                <!-- <div class="dropdown">
                                                     <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                                         <span data-key="t-utility"> Joining Report</span>
                                                         <div class="arrow-down"></div>
                                                     </a>
-                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">                                               
-                                                        <a href="{{ route('joining_report.index') }}" class="dropdown-item" data-key="t-login">Trial Period Joining</a>                                              
-                                                        <a href="{{ route('joining_report.index') }}" class="dropdown-item" data-key="t-login">Permanent Joining</a>                                            
-                                                    </div>                                           
+                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                        <a href="{{ route('joining_report.index') }}" class="dropdown-item" data-key="t-login">Trial Period Joining</a>
+                                                        <a href="{{ route('joining_report.index') }}" class="dropdown-item" data-key="t-login">Permanent Joining</a>
+                                                    </div>
                                                 </div> -->
                                                 @endif
                                                 @endcanany
@@ -235,12 +235,12 @@
                                                 <a href="{{ route('interview-summary-report.index') }}" class="dropdown-item" data-key="t-login">HandOver Form</a>
                                                 @endif
                                                 @endcanany
-                                                                                         
+
                                             </div>
                                             @endif
                                             @endcanany
                                         </div>
-                                        
+
                                         <!-- @canany(['warranty-create', 'warranty-list'])
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create','warranty-list']);
@@ -526,7 +526,7 @@
                                             @if ($hasPermission)
                                             <a href="{{ route('candidate.listDocs') }}" class="dropdown-item" data-key="t-login">Candidate Docs @if(Auth::user()->candidate_docs_varify > 0)<span class="approval-count">{{Auth::user()->candidate_docs_varify}}</span> @endif</a>
                                             @endif
-                                            @endcanany  
+                                            @endcanany
                                             @canany(['verify-offer-letter-signature'])
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-offer-letter-signature']);
@@ -534,7 +534,7 @@
                                             @if ($hasPermission)
                                             <a href="{{ route('candidate.listOfferLetter') }}" class="dropdown-item" data-key="t-login">Offer Letter @if(Auth::user()->verify_offer_letters > 0)<span class="approval-count">{{Auth::user()->verify_offer_letters}}</span> @endif</a>
                                             @endif
-                                            @endcanany  
+                                            @endcanany
                                             @canany(['verify-candidate-personal-information','send-personal-info-form-action'])
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action']);
@@ -542,7 +542,7 @@
                                             @if ($hasPermission)
                                             <a href="{{ route('candidate.listingInfo') }}" class="dropdown-item" data-key="t-login">Candidate Info @if(Auth::user()->candidate_personal_information_varify > 0)<span class="approval-count">{{Auth::user()->candidate_personal_information_varify}}</span> @endif</a>
                                             @endif
-                                            @endcanany     
+                                            @endcanany
                                         </div>
                                     </div>
                                     @endif
@@ -806,13 +806,21 @@
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                                 @can('supplier-inventory-list')
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list');
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <a href="{{route('supplier-inventories.index')}}" class="dropdown-item" data-key="t-login">Supplier Inventory</a>
-                                                @endif
+                                                    @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list');
+                                                    @endphp
+                                                    @if ($hasPermission)
+                                                        <a href="{{route('supplier-inventories.index')}}" class="dropdown-item" data-key="t-login">Supplier Inventory</a>
+                                                    @endif
                                                 @endcan
+{{--                                                 @can('supplier-inventory-list-view-all')--}}
+{{--                                                     @php--}}
+{{--                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-view-all');--}}
+{{--                                                     @endphp--}}
+{{--                                                     @if ($hasPermission)--}}
+                                                        <a href="{{route('supplier-inventories.view-all')}}" class="dropdown-item" data-key="t-login">Inventory Stock</a>
+{{--                                                     @endif--}}
+{{--                                                 @endcan--}}
                                                 {{-- @can('supplier-inventory-list-with-date-filter')--}}
                                                 {{-- @php--}}
                                                 {{-- $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-with-date-filter');--}}

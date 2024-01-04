@@ -34,7 +34,7 @@
 <h2 style="text-align: center">Please Add the following Models in Your Master Model List</h2>
 <table class="new-models">
     <tr>
-        <td colspan="2" class="heading">New Models - {{ count($newModels) }}</td>
+        <td colspan="3" class="heading">New Models - {{ count($newModels) }}</td>
     </tr>
     <tr>
         <th>Model</th>
@@ -50,14 +50,14 @@
     @endforeach
     @if(!$newModels)
         <tr>
-            <td colspan="2" style="text-align: center" >No data Available</td>
+            <td colspan="3" style="text-align: center" >No data Available</td>
         </tr>
     @endif
 </table>
 <br><br>
 <table class="new-model-steering">
     <tr>
-        <td colspan="3" class="heading">Mistake in Steering - {{ count($newModelsWithSteerings) }}</td>
+        <td colspan="4" class="heading">Mistake in Steering - {{ count($newModelsWithSteerings) }}</td>
     </tr>
     <tr>
         <th>Steering</th>
@@ -75,7 +75,7 @@
     @endforeach
     @if(!$newModelsWithSteerings)
         <tr>
-            <td colspan="3" style="text-align: center" >No data Available</td>
+            <td colspan="4" style="text-align: center" >No data Available</td>
         </tr>
     @endif
 </table>
