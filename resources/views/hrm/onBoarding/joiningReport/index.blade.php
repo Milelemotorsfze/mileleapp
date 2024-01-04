@@ -7,14 +7,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 @if ($hasPermission)                                           
 <div class="card-header">
 	<h4 class="card-title">
-		Joining Report Info
+		New Employee Joining Report Info
 	</h4>	
 	@canany(['create-joining-report'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report']);
 	@endphp
 	@if ($hasPermission)
-	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('employee-hiring-job-description.create-or-edit', ['id' => 'new', 'hiring_id' => 'new']) }}">
+	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('joining_report.create') }}">
       <i class="fa fa-plus" aria-hidden="true"></i> New Joining Report
     </a>
 	@endif
@@ -72,18 +72,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 					<thead>
 						<tr>
 							<th>Sl No</th>
-							<th>Hiring Request UUID</th>
-							<th>Request Date</th>
-							<th>Job Title</th>
-							<th>Department Location</th>
-							<th>Job Purpose</th>
-							<th>Duties and Responsibilities (Generic) of the position</th>
-							<th>Skills required at fulfill the position</th>
-							<th>Position Qualifications (Academic & Professional)</th>
-							<th>Created By</th>
-							<th>Created At</th>
-							<th>Team Lead/ Manager Name</th>
-							<th>HR Manager Name</th>
+							<th>Employee Name</th>
+							<th>Employee Code</th>
+							<th>Designation</th>
+							<th>Department</th>
+							<th>Joining Type</th>
+							<th>Joining Date</th>
+							<th>Location</th>
+							<th>Reporting Manager</th>
+							<th>Remarks</th>
+							<th>Prepared By</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -92,30 +90,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 						@foreach ($pendings as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
-							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
-							<td>{{ $data->request_date ?? '' }}</td>
-							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}</td>
+							<td>{{ $data->employee->employee_code ?? '' }}</td>
+							<td>{{ $data->employee->designation->name ?? '' }}</td>
+							<td>{{ $data->employee->department->name ?? '' }}</td>
+							<td>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</td>
+							<td>{{ $data->trial_period_joining_date ?? $data->permanent_joining_date ?? '' }}</td>
 							<td>{{ $data->location->name ?? '' }}</td>
-							<td>{{ $data->job_purpose ?? '' }}</td>
-							<td>{{ $data->duties_and_responsibilities ?? '' }}</td>
-							<td>{{ $data->skills_required ?? '' }}</td>
-							<td>{{ $data->position_qualification ?? '' }}</td>
-							<td>{{ $data->createdBy->name ?? '' }}</td>
-							<td>{{ $data->departmentHeadName->name ?? '' }}</td>
-							<td>{{ $data->hrManagerName->name ?? '' }}</td>
-							<td>{{ $data->created_at ?? '' }}</td>
+							<td>{{ $data->reportingManager->name ?? '' }}</td>
+							<td>{{ $data->remarks ?? '' }}</td>
+							<td>{{ $data->preparedBy->name ?? '' }}</td>
 							<td>
 							<div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id)}}">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i> View Details
 										</a>
 									</li>
                                     <li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('employee-hiring-job-description.create-or-edit',['id' => $data->id, 'hiring_id' => $data->hiring_request_id])}}">
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('joining_report.edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 										</a>
 									</li>
@@ -164,25 +160,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 					<thead>
 						<tr>
 							<th>Sl No</th>
-							<th>Hiring Request UUID</th>
-							<th>Request Date</th>
-							<th>Job Title</th>
-							<th>Department Location</th>
-							<th>Job Purpose</th>
-							<th>Duties and Responsibilities (Generic) of the position</th>
-							<th>Skills required at fulfill the position</th>
-							<th>Position Qualifications (Academic & Professional)</th>
-							<th>Team Lead/ Manager Name</th>
-							<th>Team Lead/ Manager Action</th>
-							<th>Team Lead/ Manager Action At</th>
-							<th>Team Lead/ Manager Comment</th>
-							<th>HR Manager Name</th>
-							<th>HR Manager Action</th>
-							<th>HR Manager Action At</th>
-							<th>HR Manager Comment</th>
-							
-							<th>Created By</th>
-							<th>Created At</th>
+							<th>Employee Name</th>
+							<th>Employee Code</th>
+							<th>Designation</th>
+							<th>Department</th>
+							<th>Joining Type</th>
+							<th>Joining Date</th>
+							<th>Location</th>
+							<th>Reporting Manager</th>
+							<th>Remarks</th>
+							<th>Prepared By</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -342,25 +329,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 				<table id="rejected-hiring-requests-table" class="table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
-						<th>Sl No</th>
-							<th>Hiring Request UUID</th>
-							<th>Request Date</th>
-							<th>Job Title</th>
-							<th>Department Location</th>
-							<th>Job Purpose</th>
-							<th>Duties and Responsibilities (Generic) of the position</th>
-							<th>Skills required at fulfill the position</th>
-							<th>Position Qualifications (Academic & Professional)</th>
-							<th>Created By</th>
-							<th>Created At</th>
-							<th>Team Lead/ Manager Name</th>
-							<th>Team Lead/ Manager Action</th>
-							<th>Team Lead/ Manager Action At</th>
-							<th>Team Lead/ Manager Comment</th>
-							<th>HR Manager Name</th>
-							<th>HR Manager Action</th>
-							<th>HR Manager Action At</th>
-							<th>HR Manager Comment</th>
+							<th>Sl No</th>
+							<th>Employee Name</th>
+							<th>Employee Code</th>
+							<th>Designation</th>
+							<th>Department</th>
+							<th>Joining Type</th>
+							<th>Joining Date</th>
+							<th>Location</th>
+							<th>Reporting Manager</th>
+							<th>Remarks</th>
+							<th>Prepared By</th>
 							<th>Action</th>
 						</tr>
 					</thead>

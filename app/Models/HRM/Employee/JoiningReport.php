@@ -5,6 +5,8 @@ namespace App\Models\HRM\Employee;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\User;
+use App\Models\Masters\MasterOfficeLocation;
 
 class JoiningReport extends Model
 {
@@ -44,4 +46,19 @@ class JoiningReport extends Model
         'updated_by',
         'deleted_by',
     ];
+    public function employee() {
+        return $this->belongsTo(EmployeeProfile::class,'employee_id');
+    }
+    public function location() {
+        return $this->hasOne(MasterOfficeLocation::class,'id','location_id');
+    }
+    public function reportingManager() {
+        return $this->hasOne(User::class,'id','department_head_id');
+    }
+    public function preparedBy() {
+        return $this->hasOne(User::class,'id','prepared_by_id');
+    }
+    public function history() {
+        return $this->hasMany(JoiningReportHistory::class,'joining_report_id','id');
+    }
 }
