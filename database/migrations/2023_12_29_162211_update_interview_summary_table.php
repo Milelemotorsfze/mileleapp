@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::table('interview_summary_reports', function (Blueprint $table) {
             $table->bigInteger('offer_letter_send_by')->unsigned()->index()->nullable();
             $table->foreign('offer_letter_send_by')->references('id')->on('users')->onDelete('cascade');
-            $table->bigInteger('offer_letter_verified_by')->unsigned()->index()->nullable();
-            $table->foreign('offer_letter_verified_by')->references('id')->on('users')->onDelete('cascade');
+//            $table->bigInteger('offer_letter_verified_by')->unsigned()->index()->nullable();
+//            $table->foreign('offer_letter_verified_by')->references('id')->on('users')->onDelete('cascade');
         });
         Schema::table('emp_profile', function (Blueprint $table) {
             $table->string('offer_letter_fileName')->nullable();

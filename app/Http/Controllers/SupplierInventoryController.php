@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Imports\SupplierInventoryImport;
 use App\Models\ColorCode;
 use App\Models\MasterModel;
+use App\Models\ModelYearCalculationCategory;
 use App\Models\Supplier;
 use App\Models\SupplierInventory;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -55,6 +56,8 @@ class SupplierInventoryController extends Controller
     }
     public function create()
     {
+//        $test = substr(202302,0,-2) + 1;
+//        dd($test);
         (new UserActivityController)->createActivity('Open Supplier Inventory Create Page');
 
         $suppliers = Supplier::with('supplierTypes')
@@ -163,6 +166,43 @@ class SupplierInventoryController extends Controller
                     $uploadFileContents[$i]['country'] = $country;
                     $uploadFileContents[$i]['date_of_entry'] = $date;
                     $uploadFileContents[$i]['veh_status'] = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
+
+                    ////// finding model year //////////
+
+                    $modelYearCalculationCategories = ModelYearCalculationCategory::all();
+                    if ($filedata[6]) {
+                        // fetchyear from pod month
+                        $modelYear = substr($filedata[6], 0, -2);
+
+                    }else{
+
+                        // get the eta import year and month and one month before eta import date.
+                        $modelYear = substr($filedata[6], 0, -2);
+                    }
+                    $productionMonth = substr($filedata[6], -2);
+                    foreach ($modelYearCalculationCategories as $modelYearCalculationCategory) {
+
+                        $isItemExistCategory = MasterModel::select(['id', 'model', 'sfx', 'variant_id'])
+                            ->where('model', $filedata[1])
+                            ->where('sfx', $filedata[2])
+                            ->with('variant.master_model_lines')
+                            ->whereHas('variant.master_model_lines', function ($query) use ($modelYearCalculationCategory) {
+                                $query->where('model_line', 'LIKE', '%' . $modelYearCalculationCategory->name . '%');
+                            });
+
+                        if ($isItemExistCategory->count() > 0) {
+                            $correspondingCategoryRuleValue = $modelYearCalculationCategory->modelYearRule->value ?? 0;
+
+                            if ($productionMonth > $correspondingCategoryRuleValue) {
+                                info("model year existing");
+                                $modelYear = substr($filedata[6], 0, -2) + 1;
+                                break;
+                            }
+                        }
+                    }
+                    //////////////model year calculation end //////////
+                    $uploadFileContents[$i]['model_year'] = $modelYear;
+
                 }
                 $i++;
             }
@@ -171,45 +211,38 @@ class SupplierInventoryController extends Controller
             $newModelsWithSteerings = [];
             $j=0;
 
-            foreach($uploadFileContents as $uploadFileContent){
+            foreach($uploadFileContents as $uploadFileContent) {
                 $chaisis[] = $uploadFileContent['chasis'];
-                // finding model year
-                $similarMasterModelVariantIds = MasterModel::select(['id','model','sfx','variant_id'])
-                                ->where('model',$uploadFileContent['model'])
-                                ->where('sfx', $uploadFileContent['sfx'])
-                                ->with('variant.master_model_lines')
-                                ->whereHas('variant.master_model_lines', function ($query) {
-                                   $query->where('model_line', 'LIKE', '%' . 'Camry' . '%')
-                                        ->orwhere('model_line', 'LIKE', '%' . 'Coaster' . '%')
-                                        ->orwhere('model_line', 'LIKE', '%' . 'Hiace' . '%')
-                                        ->orwhere('model_line', 'LIKE', '%' . 'Rumion' . '%')
-                                        ->orwhere('model_line', 'LIKE', '%' . 'Starlet' . '%')
-                                        ->orwhere('model_line', 'LIKE', '%' . 'Corolla' . '%')
-                                       ->orwhere('model_line', 'LIKE', '%' . 'LC76' . '%')
-                                       ->orwhere('model_line', 'LIKE', '%' . 'LC78' . '%')
-                                       ->orwhere('model_line', 'LIKE', '%' . 'LC79' . '%');
-                                    })
-                                ->pluck('id');
 
-                info($similarMasterModelVariantIds);
+                // finding model year
+
 
                 $isModelExist = MasterModel::where('model',$uploadFileContent['model'])
                                             ->where('sfx', $uploadFileContent['sfx'])
+                                            ->where('model_year', $modelYear)
                                             ->first();
-                $isModelWithSteeringExist = MasterModel::where('model',$uploadFileContent['model'])
+
+                $isModelWithSteeringExist = MasterModel::where('model', $uploadFileContent['model'])
                     ->where('sfx', $uploadFileContent['sfx'])
                     ->where('steering', $uploadFileContent['steering'])
+                    ->where('model_year', $modelYear)
                     ->first();
+
                 if(!$isModelWithSteeringExist)
                 {
+
                     $newModelsWithSteerings[$j]['steering'] = $uploadFileContent['steering'];
                     $newModelsWithSteerings[$j]['model'] = $uploadFileContent['model'];
                     $newModelsWithSteerings[$j]['sfx'] = $uploadFileContent['sfx'];
+                    $newModelsWithSteerings[$j]['model_year'] = $modelYear;
+
                 }
                 if (!$isModelExist)
                 {
+
                     $newModels[$j]['model'] = $uploadFileContent['model'];
                     $newModels[$j]['sfx'] = $uploadFileContent['sfx'];
+                    $newModels[$j]['model_year'] = $modelYear;
                 }
                 $j++;
             }
@@ -248,6 +281,7 @@ class SupplierInventoryController extends Controller
                     foreach ($uploadFileContents as $uploadFileContent)
                     {
                         $model = MasterModel::where('model', $uploadFileContent['model'])
+                            ->where('sfx', $uploadFileContent['sfx'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->where('steering', $uploadFileContent['steering'])
                             ->first();

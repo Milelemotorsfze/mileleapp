@@ -39,11 +39,13 @@
     <tr>
         <th>Model</th>
         <th>SFX</th>
+        <th>Model Year</th>
     </tr>
     @foreach($newModels as $newModel)
         <tr>
             <td>{{ $newModel['model'] }}</td>
             <td>{{ $newModel['sfx'] }}</td>
+            <td>{{ $newModel['model_year'] }}</td>
         </tr>
     @endforeach
     @if(!$newModels)
@@ -61,12 +63,14 @@
         <th>Steering</th>
         <th>Model</th>
         <th>SFX</th>
+        <th>Model Year</th>
     </tr>
     @foreach($newModelsWithSteerings as $newModelsWithSteering)
         <tr>
             <td>{{ $newModelsWithSteering['steering'] }}</td>
             <td>{{ $newModelsWithSteering['model'] }}</td>
             <td>{{ $newModelsWithSteering['sfx'] }}</td>
+            <td>{{ $newModelsWithSteering['model_year'] }}</td>
         </tr>
     @endforeach
     @if(!$newModelsWithSteerings)
