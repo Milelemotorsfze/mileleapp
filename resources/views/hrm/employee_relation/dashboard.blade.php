@@ -8,6 +8,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-list']);
 <div class="card-header">
     <h4 class="card-title">Employee Relation</h4>
 </div>
+
 <div class="card-body">
     <div class="table-responsive">
         <table id="dtBasicExample" class="table table-striped table-editable table-edits table">
