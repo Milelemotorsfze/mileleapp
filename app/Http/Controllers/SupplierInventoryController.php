@@ -11,6 +11,7 @@ use App\Models\SupplierInventory;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
 
@@ -56,8 +57,6 @@ class SupplierInventoryController extends Controller
     }
     public function create()
     {
-//        $test = substr(202302,0,-2) + 1;
-//        dd($test);
         (new UserActivityController)->createActivity('Open Supplier Inventory Create Page');
 
         $suppliers = Supplier::with('supplierTypes')
@@ -82,6 +81,9 @@ class SupplierInventoryController extends Controller
 
         if ($request->file('file'))
         {
+
+            DB::beginTransaction();
+
             $errors = [];
             $numberOfFields = 9;
             $file = $request->file('file');
@@ -169,43 +171,53 @@ class SupplierInventoryController extends Controller
 
                     ////// finding model year //////////
 
-                    $modelYearCalculationCategories = ModelYearCalculationCategory::all();
                     if ($filedata[6]) {
-                        // fetchyear from pod month
+                        // fetch year from pod month
+                        info("pod existing");
                         $modelYear = substr($filedata[6], 0, -2);
+                        $productionMonth = substr($filedata[6], -2);
+                        $modelYearCalculationCategories = ModelYearCalculationCategory::all();
+                        foreach ($modelYearCalculationCategories as $modelYearCalculationCategory) {
+                            $isItemExistCategory = MasterModel::select(['id', 'model', 'sfx', 'variant_id'])
+                                ->where('model', $filedata[1])
+                                ->where('sfx', $filedata[2])
+                                ->with('variant.master_model_lines')
+                                ->whereHas('variant.master_model_lines', function ($query) use ($modelYearCalculationCategory) {
+                                    $query->where('model_line', 'LIKE', '%' . $modelYearCalculationCategory->name . '%');
+                                });
 
-                    }else{
+                            if ($isItemExistCategory->count() > 0) {
+                                info("category existing");
+                                $correspondingCategoryRuleValue = $modelYearCalculationCategory->modelYearRule->value ?? 0;
 
-                        // get the eta import year and month and one month before eta import date.
-                        $modelYear = substr($filedata[6], 0, -2);
-                    }
-                    $productionMonth = substr($filedata[6], -2);
-                    foreach ($modelYearCalculationCategories as $modelYearCalculationCategory) {
+                                if ($productionMonth > $correspondingCategoryRuleValue) {
 
-                        $isItemExistCategory = MasterModel::select(['id', 'model', 'sfx', 'variant_id'])
-                            ->where('model', $filedata[1])
-                            ->where('sfx', $filedata[2])
-                            ->with('variant.master_model_lines')
-                            ->whereHas('variant.master_model_lines', function ($query) use ($modelYearCalculationCategory) {
-                                $query->where('model_line', 'LIKE', '%' . $modelYearCalculationCategory->name . '%');
-                            });
-
-                        if ($isItemExistCategory->count() > 0) {
-                            $correspondingCategoryRuleValue = $modelYearCalculationCategory->modelYearRule->value ?? 0;
-
-                            if ($productionMonth > $correspondingCategoryRuleValue) {
-                                info("model year existing");
-                                $modelYear = substr($filedata[6], 0, -2) + 1;
-                                break;
+                                    if ($filedata[6]){
+                                        $modelYear = substr($filedata[6], 0, -2) + 1;
+                                    }
+                                    break;
+                                }
                             }
                         }
+                    }else{
+                        $modelYear = null;
+                        // eta import date always come get the month from eta import date.
+                        $latestModelYearVariant = MasterModel::where('model', $filedata[1])
+                            ->where('sfx', $filedata[2])
+                            ->orderBy('model_year','DESC')
+                            ->first();
+                      if($latestModelYearVariant) {
+                          $modelYear = $latestModelYearVariant->model_year;
+                      }
                     }
-                    //////////////model year calculation end //////////
-                    $uploadFileContents[$i]['model_year'] = $modelYear;
 
+                    info($modelYear);
+                    ////////////// model year calculation end //////////
+                    $uploadFileContents[$i]['model_year'] = $modelYear;
                 }
                 $i++;
             }
+
             fclose($file);
             $newModels = [];
             $newModelsWithSteerings = [];
@@ -214,18 +226,17 @@ class SupplierInventoryController extends Controller
             foreach($uploadFileContents as $uploadFileContent) {
                 $chaisis[] = $uploadFileContent['chasis'];
 
-                // finding model year
-
+                // CHCEKING NEW MODEL SFX MODEL YEAR COMBINATION EXISTING ///////////
 
                 $isModelExist = MasterModel::where('model',$uploadFileContent['model'])
                                             ->where('sfx', $uploadFileContent['sfx'])
-                                            ->where('model_year', $modelYear)
+                                            ->where('model_year',  $uploadFileContent['model_year'])
                                             ->first();
 
                 $isModelWithSteeringExist = MasterModel::where('model', $uploadFileContent['model'])
                     ->where('sfx', $uploadFileContent['sfx'])
                     ->where('steering', $uploadFileContent['steering'])
-                    ->where('model_year', $modelYear)
+                    ->where('model_year',  $uploadFileContent['model_year'])
                     ->first();
 
                 if(!$isModelWithSteeringExist)
@@ -234,7 +245,7 @@ class SupplierInventoryController extends Controller
                     $newModelsWithSteerings[$j]['steering'] = $uploadFileContent['steering'];
                     $newModelsWithSteerings[$j]['model'] = $uploadFileContent['model'];
                     $newModelsWithSteerings[$j]['sfx'] = $uploadFileContent['sfx'];
-                    $newModelsWithSteerings[$j]['model_year'] = $modelYear;
+                    $newModelsWithSteerings[$j]['model_year'] = $uploadFileContent['model_year'];
 
                 }
                 if (!$isModelExist)
@@ -242,7 +253,7 @@ class SupplierInventoryController extends Controller
 
                     $newModels[$j]['model'] = $uploadFileContent['model'];
                     $newModels[$j]['sfx'] = $uploadFileContent['sfx'];
-                    $newModels[$j]['model_year'] = $modelYear;
+                    $newModels[$j]['model_year'] =  $uploadFileContent['model_year'];
                 }
                 $j++;
             }
@@ -282,12 +293,11 @@ class SupplierInventoryController extends Controller
                     {
                         $model = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
-                            ->where('sfx', $uploadFileContent['sfx'])
+                            ->where('model_year', $uploadFileContent['model_year'])
                             ->where('steering', $uploadFileContent['steering'])
                             ->first();
                         $modelId = $model->id;
-                        info("start ....model id");
-                        info($modelId);
+
 
 //                        $modelIds = MasterModel::where('model', $uploadFileContent['model'])
 //                            ->where('sfx', $uploadFileContent['sfx'])
@@ -606,6 +616,7 @@ class SupplierInventoryController extends Controller
                         $model = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->where('steering', $uploadFileContent['steering'])
+                            ->where('model_year', $uploadFileContent['model_year'])
                             ->first();
 
                         $supplierInventory = new SupplierInventory();
@@ -625,6 +636,8 @@ class SupplierInventoryController extends Controller
                         $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                         $supplierInventory->save();
                     }
+
+                    DB::commit();
 
                     $pdf = Pdf::loadView('supplier_inventories.reports', compact('newlyAddedRows',
                         'updatedRows','deletedRows'));
@@ -636,7 +649,10 @@ class SupplierInventoryController extends Controller
                         $model = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->where('steering', $uploadFileContent['steering'])
+                            ->where('model_year', $uploadFileContent['model_year'])
                             ->first();
+
+                        DB::beginTransaction();
 
                         $supplierInventory = new SupplierInventory();
                         $supplierInventory->master_model_id = $model->id;
@@ -654,7 +670,11 @@ class SupplierInventoryController extends Controller
                         $supplierInventory->upload_status   = SupplierInventory::UPLOAD_STATUS_ACTIVE;
                         $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                         $supplierInventory->save();
+
+                        DB::commit();
                     }
+
+
                     return redirect()->route('supplier-inventories.create')->with('message','supplier inventory updated successfully');
                 }
             }
