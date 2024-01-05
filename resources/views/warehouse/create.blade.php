@@ -89,9 +89,13 @@ input[type=number]::-webkit-outer-spin-button {
         </div>
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
-            <label for="basicpill-firstname-input" class="form-label">PO Number : </label>
-            <input type="text" id="po_number" name="po_number" class="form-control" placeholder="PO Number" pattern="[0-9]{4,5}" title="Please enter a valid PO number with 4 to 5 digits" required autocomplete="off">
-            <span id="poNumberError" class="error" style="display: none;"></span>
+            <label for="basicpill-firstname-input" class="form-label">Payment Terms : </label>
+            <select name="payment_term_id" class="form-select" id="payment_term">
+                                <option value="" selected>Select Payment Term</option>
+                                @foreach($payments as $payment)
+                                    <option value="{{ $payment->id }}">{{ $payment->name }}</option>
+                                @endforeach
+                            </select>
         </div>
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
@@ -111,6 +115,17 @@ input[type=number]::-webkit-outer-spin-button {
                                     <option value="Payment Adjustment">Payment Adjustment</option>
             </select>
         </div>
+        <div class="col-lg-2 col-md-6">
+            <span class="error">* </span>
+            <label for="basicpill-firstname-input" class="form-label">Currency: </label>
+            <select class="form-control" autofocus name="currency" required>
+                                    <option value="AED">AED</option>
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="GBP">GBP</option>
+                                    <option value="JPY">JPY</option>
+            </select>
+        </div>
     </div>
     <div id="variantRowsContainer" style="display: none;">
         <div class="bar">Stock Vehicles</div>
@@ -127,7 +142,7 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="col-lg-1 col-md-6">
             <label for="QTY" class="form-label">Model Line:</label>
         </div>
-        <div class="col-lg-2 col-md-6">
+        <div class="col-lg-1 col-md-6">
             <label for="QTY" class="form-label">Variants Detail:</label>
         </div>
         <div class="col-lg-1 col-md-6">
@@ -137,17 +152,19 @@ input[type=number]::-webkit-outer-spin-button {
             <label for="intColour" class="form-label">Interior Color:</label>
         </div>
         <div class="col-lg-1 col-md-6">
+            <label for="intColour" class="form-label">Unit Price:</label>
+        </div>
+        <div class="col-lg-1 col-md-6">
             <label for="exColour" class="form-label">Estimated Arrival:</label>
         </div>
         <div class="col-lg-1 col-md-6">
             <label for="engineNumber" class="form-label">Engine Number:</label>
         </div>
         <div class="col-lg-1 col-md-6">
-            <label for="exColour" class="form-label">Territory:</label>
-        </div>
-
-        <div class="col-lg-1 col-md-6">
             <label for="QTY" class="form-label">VIN:</label>
+        </div>
+        <div class="col-lg-1 col-md-6">
+            <label for="exColour" class="form-label">Territory:</label>
         </div>
     </div>
 </div>
@@ -166,13 +183,17 @@ input[type=number]::-webkit-outer-spin-button {
         <label for="QTY" class="form-label">Brand:</label>
         <input type="text" id="brands_id" name="brands_id" class="form-control" placeholder="Brand" readonly>
     </div>
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg-2 col-md-6">
         <label for="QTY" class="form-label">Model Line:</label>
         <input type="text" id="master_model_lines_id" name="master_model_lines_id" class="form-control" placeholder="Model Line" readonly>
     </div>
     <div class="col-lg-4 col-md-6">
         <label for="QTY" class="form-label">Variants Detail:</label>
         <input type="text" id="details" name="details" class="form-control" placeholder="Variants Detail" readonly>
+    </div>
+    <div class="col-lg-1 col-md-6">
+        <label for="unitprice" class="form-label">Unit Price:</label>
+        <input type="number" id="unit_price" name="unit_price" class="form-control" placeholder="Unit Price">
     </div>
     <div class="col-lg-1 col-md-6">
         <label for="QTY" class="form-label">QTY:</label>
@@ -184,8 +205,37 @@ input[type=number]::-webkit-outer-spin-button {
                     </div>
                 </div>
             </div>
-<br>
-<br>
+            <div class="bar">Shipping</div>
+            <div class="row">
+            <div class="col-lg-1 col-md-6">
+              <label for="Incoterm" class="form-label">Shipping Method:</label>
+              <select class="form-control" id="shippingmethod" name="shippingmethod">
+              <option value="EXW">EXW</option>    
+              <option value="CNF">CNF</option>
+              <option value="CIF">CIF</option>
+              <option value="FOB">FOB</option>
+              <option value="Local">Local</option>
+          </select>
+          </div>
+          <div class="col-lg-2 col-md-6">
+              <label for="Incoterm" class="form-label">Shipping Cost:</label>
+              <input type="number" id="shippingcost" name="shippingcost" class="form-control" placeholder="Shipping Cost">
+          </div>
+          <div class="col-lg-3 col-md-6">
+              <label for="Incoterm" class="form-label">Port of Loading:</label>
+              <input type="number" id="pol" name="pol" class="form-control" placeholder="Port of Loading">
+          </div>
+          <div class="col-lg-3 col-md-6">
+              <label for="Incoterm" class="form-label">Port of Discharge:</label>
+              <input type="number" id="pod" name="pod" class="form-control" placeholder="Port of Discharge">
+          </div>
+          <div class="col-lg-3 col-md-6">
+              <label for="Incoterm" class="form-label">Final Destination:</label>
+              <input type="number" id="fd" name="fd" class="form-control" placeholder="Final Destination">
+          </div>
+            </div>
+            <br>
+            <br>
     <div class="col-lg-12 col-md-12">
         <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" id="submit-button"/>
     </div>
@@ -237,6 +287,7 @@ $(document).ready(function() {
         return;
     }
     var qty = $('#QTY').val();
+    var unitPrice = $('#unit_price').val(); // Get the unit price
     var detail = variantOption.data('detail');
     var brand = variantOption.data('brands_id');
     var masterModelLine = variantOption.data('master_model_lines_id');
@@ -245,15 +296,15 @@ $(document).ready(function() {
     // Move the declaration and assignment inside the click event function
     var exColours = <?= json_encode($exColours) ?>;
     var intColours = <?= json_encode($intColours) ?>;
-
     for (var i = 0; i < qty; i++) {
             var newRow = $('<div class="row row-space"></div>');
             var variantCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
             var brandCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="brand[]" value="' + brand + '" class="form-control" readonly></div>');
             var masterModelLineCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
-            var detailCol = $('<div class="col-lg-2 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
+            var detailCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
             var exColourCol = $('<div class="col-lg-1 col-md-6"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
             var intColourCol = $('<div class="col-lg-1 col-md-6"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
+            var unitPriceCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="unit_price[]" value="' + unitPrice + '" class="form-control" readonly></div>'); // Add unit price
             var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
             var estimatedCol = $('<div class="col-lg-1 col-md-6"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
             var engineCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="engine_number[]" class="form-control" placeholder="Engine"></div>');
@@ -273,7 +324,7 @@ $(document).ready(function() {
                 intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
             }
         }
-            newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol,engineCol, territory, vinCol, removeBtn);
+            newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, unitPriceCol, estimatedCol,engineCol, vinCol, territory, removeBtn);
             $('#variantRowsContainer').append(newRow);
         }
         $('#variants_id').val('');
@@ -377,7 +428,6 @@ $(document).ready(function() {
       var allBlank = vinValues.every(function(value) {
         return value.trim() === '';
       });
-
       if (allBlank) {
         $('#purchasing-order').unbind('submit').submit();
       } else {

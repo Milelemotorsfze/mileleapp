@@ -135,6 +135,7 @@
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Engine</label>
                                     <select class="form-control" autofocus name="engine" id="engine">
+                                        <option value="" {{ old('engine') == '' ? 'selected' : '' }}>Please Select The Engine Capacity</option>
                                         <option value="0.8" {{ old('engine') == '0.8' ? 'selected' : '' }}>0.8</option>
                                         <option value="1.0" {{ old('engine') == '1.0' ? 'selected' : '' }}>1.0</option>
                                         <option value="1.2" {{ old('engine') == '1.2' ? 'selected' : '' }}>1.2</option>
@@ -156,6 +157,7 @@
                                         <option value="4.2" {{ old('engine') == '4.2' ? 'selected' : '' }}>4.2</option>
                                         <option value="4.4" {{ old('engine') == '4.4' ? 'selected' : '' }}>4.4</option>
                                         <option value="4.5" {{ old('engine') == '4.5' ? 'selected' : '' }}>4.5</option>
+                                        <option value="4.6" {{ old('engine') == '4.6' ? 'selected' : '' }}>4.6</option>
                                         <option value="4.8" {{ old('engine') == '4.8' ? 'selected' : '' }}>4.8</option>
                                         <option value="5.3" {{ old('engine') == '5.3' ? 'selected' : '' }}>5.3</option>
                                         <option value="5.6" {{ old('engine') == '5.6' ? 'selected' : '' }}>5.6</option>
@@ -424,9 +426,8 @@ $(document).ready(function () {
         var specificationId = $(this).data('specification-id');
         var selectedValue = $('select[name="specification_' + specificationId + '"]').text();
         var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text();
-        var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').siblings('label').text() : selectedText;
-        var specificationName = $('select[name="specification_' + specificationId + '"]').siblings('label').text();
-
+        var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text() : selectedText;
+        var specificationName = $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text();
         if (specificationName === 'Grade') {
             // If specificationName is "Grade," update the gradeOption
             if (gradeOption) {
@@ -526,7 +527,7 @@ $(document).ready(function () {
             var specificationId = $(this).data('specification-id');
             var selectedValue = $('select[name="specification_' + specificationId + '"]').text();
             var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text();
-            var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').siblings('label').text() : selectedText;
+            var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text() : selectedText;
             selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
         });
         $('input[name^="fieldvariants"]:checked').each(function () {

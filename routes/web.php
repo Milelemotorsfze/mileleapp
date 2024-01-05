@@ -83,6 +83,7 @@ use App\Http\Controllers\AgentsController;
 use App\Http\Controllers\SalesPersonStatusController;
 use App\Http\Controllers\PortsController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\PaymentTermsController;
 /*
 /*
 |--------------------------------------------------------------------------
@@ -155,8 +156,6 @@ Route::get('/d', function () {
     // addon scroll list route
 
     Route::get('getAddonlists', [AddonController::class,'getAddonlists'])->name('addon.getAddonlists');
-
-
     Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown');
     Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');
     Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');
@@ -629,16 +628,13 @@ Route::get('/d', function () {
     Route::get('/view-pictures-details/{id}', [VehiclesController::class, 'viewpictures'])->name('vehiclespictures.viewpictures');
     Route::get('/view-remarks-details/{id}', [VehiclesController::class, 'viewremarks'])->name('vehiclesremarks.viewremarks');
     Route::post('/vehicles/updatewarehouse', [VehiclesController::class, 'updatewarehouse'])->name('vehicles.updatewarehouse');
-
     Route::get('/listUsers',[LoginActivityController::class, 'listUsers'])->name('listUsers');
     Route::post('/listUsersget-data',[LoginActivityController::class, 'listUsersgetdata'])->name('listUsersgetdata');
     Route::post('/listUsersget-dataac', [LoginActivityController::class, 'listUsersgetdataac'])->name('listUsersgetdataac');
     Route::get('/user/{id}/{date}', [UserController::class, 'showUseractivities'])->name('user.showUseractivitie');
     // vehicle stock report
-
     Route::get('/stock-count-filter',[VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
     // Master Data
-
     Route::resource('brands', BrandController::class);
     Route::resource('model-lines', ModelLinesController::class);
     Route::resource('master-addons', MasterAddonController::class);
@@ -650,11 +646,8 @@ Route::get('/d', function () {
     Route::get('master-model/getLoiDescription', [MasterModelController::class,'getLoiDescription'])
         ->name('master-model.get-loi-description');
     Route::post('quotation/new-model-line', [ModelLinesController::class,'StoreModellineOrBrand'])->name('modelline-or-brand.store');
-
     // DASHBOARD PARTS AND PROCURMENT
-
     Route::get('addon-dashboard/sellingPriceFilter',[HomeController::class, 'sellingPriceFilter'])->name('addon-dashboard.filter');
-
     //Logistics
     Route::resource('logisticsdocuments', DocumentController::class);
     Route::post('logisticsdocuments/sending', [DocumentController::class, 'updatedoc'])->name('logisticsdocuments.updatedoc');
@@ -678,8 +671,6 @@ Route::get('/d', function () {
     Route::get('candidate/documents/{id}', [CandidatePersonalInfoController::class, 'sendForm'])->name('candidate_documents.send_form');
     Route::post('candidate/store_docs', [CandidatePersonalInfoController::class, 'storeDocs'])->name('candidate.storeDocs');
     Route::get('candidate/success_docs', [CandidatePersonalInfoController::class, 'successDocs'])->name('candidate.successDocs');
-
-
     Route::get('candidate/personal_info/{id}', [CandidatePersonalInfoController::class, 'sendPersonalForm'])->name('candidate_personal_info.send_form');
     Route::post('candidate/store_personal_info', [CandidatePersonalInfoController::class, 'storePersonalinfo'])->name('candidate.storePersonalinfo');
     Route::get('candidate/success_personal_info', [CandidatePersonalInfoController::class, 'successPersonalinfo'])->name('candidate.successPersonalinfo');
@@ -689,3 +680,5 @@ Route::get('/d', function () {
     Route::post('employee_joining_report/verified', [JoiningReportController::class, 'employeeVerified'])->name('employee_joining_report.verified');
 
     
+    //Payment Terms
+    Route::resource('paymentterms', PaymentTermsController::class);

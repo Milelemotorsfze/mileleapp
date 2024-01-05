@@ -6,6 +6,9 @@
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
   padding: 4px 8px 4px 8px;
 }
+.capitalize-first-letter {
+        text-transform: capitalize;
+    }
 .table-wrapper {
       position: relative;
     }
@@ -134,17 +137,17 @@
                 <tbody>
                 @foreach ($variants as $key => $variant)
                     <tr data-id="1">
-                        <td class="nowrap-td">{{ ucfirst(strtolower($variant->brand->brand_name ?? 'null' )) }}</td>
-                        <td class="nowrap-td">{{ ucfirst(strtolower($variant->master_model_lines->model_line ?? 'null' )) }}</td>
-                        <td class="nowrap-td">{{ ucfirst(strtolower($variant->model_detail ?? 'null' )) }}</td>
+                        <td class="nowrap-td capitalize-first-letter">{{ $variant->brand->brand_name ?? 'null' }}</td>
+                        <td class="nowrap-td capitalize-first-letter">{{ $variant->master_model_lines->model_line ?? 'null' }}</td>
+                        <td class="nowrap-td capitalize-first-letter">{{ $variant->model_detail ?? 'null' }}</td>
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->my ?? 'null' )) }}</td>
-                        <td class="nowrap-td">{{ ucfirst(strtolower($variant->name ?? 'null' )) }}</td>
-                        <td class="nowrap-td">{{ ucfirst(strtolower($variant->detail ?? 'null' )) }}</td>
+                        <td class="nowrap-td capitalize-first-letter">{{ $variant->name ?? 'null' }}</td>
+                        <td class="nowrap-td capitalize-first-letter">{{ $variant->detail ?? 'null' }}</td>
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->engine ?? 'null' )) }}</td>
-                        <td class="nowrap-td">{{ ucfirst(strtolower($variant->gearbox ?? 'null' )) }}</td>
+                        <td class="nowrap-td capitalize-first-letter">{{ $variant->gearbox ?? 'null' }}</td>
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->fuel_type ?? 'null' )) }}</td>
-                        <td class="nowrap-td">{{ ucfirst(strtolower($variant->steering ?? 'null' )) }}</td>
-                        <td class="nowrap-td">{{ ucfirst(strtolower($variant->seat ?? 'null' )) }}</td>
+                        <td class="nowrap-td capitalize-first-letter">{{ $variant->steering ?? 'null' }}</td>
+                        <td class="nowrap-td capitalize-first-letter">{{ $variant->seat ?? 'null' }}</td>
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->upholestry ?? 'null' )) }}</td>
                         @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');

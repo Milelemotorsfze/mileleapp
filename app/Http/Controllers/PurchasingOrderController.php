@@ -16,6 +16,7 @@ use App\Models\MasterModelLines;
 use App\Models\Supplier;
 use App\Models\Vehicles;
 use App\Models\Movement;
+use App\Models\PaymentTerms;
 use App\Models\PaymentLog;
 use App\Models\User;
 use App\Models\Vehicleslog;
@@ -210,7 +211,8 @@ class PurchasingOrderController extends Controller
         ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
         ->get();
-    return view('warehouse.create', compact('variants', 'vendors'));
+    $payments = PaymentTerms::get();
+    return view('warehouse.create', compact('variants', 'vendors', 'payments'));
 }
 public function getBrandsAndModelLines(Request $request)
 {
@@ -226,32 +228,32 @@ public function getBrandsAndModelLines(Request $request)
      */
     public function store(Request $request)
     {
-//        return $request->all();
-
         $useractivities =  New UserActivities();
         $useractivities->activity = "Store the Purchasing Order";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        $poNumber = $request->input('po_number');
-        $existingPO = PurchasingOrder::where('po_number', $poNumber)->first();
-        if ($existingPO) {
-            return redirect()->back()
-            ->withInput($request->all())
-            ->withErrors(['po_number' => 'PO number already exists']);
-        }
         $poDate = $request->input('po_date');
-        $poNumber = $request->input('po_number');
         $po_type = $request->input('po_type');
         $vendors_id = $request->input('vendors_id');
         $purchasingOrder = new PurchasingOrder();
         $purchasingOrder->po_date = $poDate;
-        $purchasingOrder->po_number = $poNumber;
         $purchasingOrder->vendors_id = $vendors_id;
         $purchasingOrder->po_type = $po_type;
+        $purchasingOrder->payment_term_id = $payment_term_id;
+        $purchasingOrder->currency = $request->input('currency');
+        $purchasingOrder->shippingmethod = $request->input('shippingmethod');
+        $purchasingOrder->shippingcost = $request->input('shippingcost');
+        $purchasingOrder->totalcost = $request->input('totalcost');
+        $purchasingOrder->pol = $request->input('pol');
+        $purchasingOrder->pod = $request->input('pod');
+        $purchasingOrder->fd = $request->input('fd');
         $purchasingOrder->status = "Pending Approval";
         $purchasingOrder->created_by = auth()->user()->id;
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
+        $updateponum = PurchasingOrder::find($purchasingOrderId);
+        $updateponum->po_number = $purchasingOrderId;
+        $updateponum->save();
         $variantNames = $request->input('variant_id');
         if($variantNames != null)
         {
@@ -277,6 +279,7 @@ public function getBrandsAndModelLines(Request $request)
             $variantId = Varaint::where('name', $variantName)->pluck('id')->first();
             $vin = $vins[$key];
             $ex_colour = $ex_colours[$key];
+            $unit_price = $unit_price[$key];
             $int_colour = $int_colours[$key];
             $estimation_arrival = $estimated_arrival[$key];
             $engine = $engine_number[$key];
@@ -285,6 +288,7 @@ public function getBrandsAndModelLines(Request $request)
             $vehicle->varaints_id = $variantId;
             $vehicle->vin = $vin;
             $vehicle->ex_colour = $ex_colour;
+            $vehicle->purchasing_price = $ex_colour;
             $vehicle->int_colour = $int_colour;
             $vehicle->estimation_date = $estimation_arrival;
             $vehicle->engine = $engine;
