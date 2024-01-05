@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\HRM\Hiring;
+namespace App\Http\Controllers\HRM\Employee;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -19,16 +19,16 @@ class EmployeeLeaveController extends Controller
         $pendings = Leave::where('status','pending')->latest()->get();
         $approved = Leave::where('status','approved')->latest()->get();
         $rejected = Leave::where('status','rejected')->latest()->get();
-        return view('hrm.hiring.employee_leave.index',compact('pendings','approved','rejected','page'));
+        return view('hrm.leave.index',compact('pendings','approved','rejected','page'));
     }
     public function create() {
-        return view('hrm.hiring.employee_leave.create');
+        return view('hrm.leave.create');
     }
     public function edit() {
-        return view('hrm.hiring.employee_leave.edit');
+        return view('hrm.leave.edit');
     }
     public function show(string $id) {
-        return view('hrm.hiring.employee_leave.show');
+        return view('hrm.leave.show');
     }
     public function createOrEdit($id) {
         if($id == 'new') {
@@ -41,11 +41,11 @@ class EmployeeLeaveController extends Controller
             $next = Leave::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
         $masterEmployees = User::whereHas('empProfile')->select('id','name')->get();
-        return view('hrm.hiring.employee_liability.create',compact('id','data','previous','next','masterEmployees'));
+        return view('hrm.liability.create',compact('id','data','previous','next','masterEmployees'));
     }
     public function storeOrUpdate(Request $request, $id) { 
         $validator = Validator::make($request->all(), [
-            'employee_id' => 'required',
+            'id' => 'required',
             'type_of_leave' => 'required',
             'type_of_leave_description' => 'required',
             'leave_start_date' => 'required',
@@ -64,7 +64,7 @@ class EmployeeLeaveController extends Controller
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
-                $employee = EmployeeProfile::where('user_id',$request->employee_id)->get();
+                $employee = EmployeeProfile::where('user_id',$request->id)->get();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $departmentHead = DepartmentHeadApprovals::where('department_id',$employee->department_id)->first();
                 $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
@@ -89,7 +89,7 @@ class EmployeeLeaveController extends Controller
                 else {
                     $update = Leave::find($id);
                     if($update) {
-                        $update->employee_id = $request->employee_id;
+                        $update->id = $request->id;
                         $update->type_of_leave = $request->type_of_leave;
                         $update->type_of_leave_description = $request->type_of_leave_description;
                         $update->leave_start_date = $request->leave_start_date;
@@ -111,7 +111,7 @@ class EmployeeLeaveController extends Controller
                     }
                 }
                 DB::commit();
-                return redirect()->route('employee_leave.index')
+                return redirect()->route('leave.index')
                                     ->with('success',$successMessage);
             } 
             catch (\Exception $e) {

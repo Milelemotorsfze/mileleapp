@@ -5,6 +5,9 @@ namespace App\Models\HRM\Employee;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\User;
+use App\Models\Masters\PassportRequestPurpose;
+use App\Models\HRM\Employee\PassportRequestHistory;
 
 class PassportRequest extends Model
 {
@@ -30,26 +33,26 @@ class PassportRequest extends Model
         'submit_hr_manager_id',
         'submit_hr_manager_action_at',
         'submit_comments_by_hr_manager',
-        // 'purposes_of_release',
-        // 'release_purpose',
-        // 'release_submit_status',
-        // 'release_action_by_employee',
-        // 'release_employee_action_at',
-        // 'release_comments_by_employee',
-        // 'release_action_by_department_head',
-        // 'release_department_head_id',
-        // 'release_department_head_action_at',
-        // 'release_comments_by_department_head',
-        // 'release_action_by_division_head',
-        // 'release_division_head_id',
-        // 'release_division_head_action_at',
-        // 'release_comments_by_division_head',
-        // 'release_action_by_hr_manager',
-        // 'release_hr_manager_id',
-        // 'release_hr_manager_action_at',
-        // 'release_comments_by_hr_manager',
         'created_by',
         'updated_by',
         'deleted_by'
     ];
+    public function user() {
+        return $this->hasOne(User::class,'id','employee_id');
+    }
+    public function purpose() {
+        return $this->hasOne(PassportRequestPurpose::class,'id','purposes_of_submit');
+    }
+    public function reportingManager() {
+        return $this->hasOne(User::class,'id','submit_department_head_id');
+    }
+    public function divisionHead() {
+        return $this->hasOne(User::class,'id','submit_division_head_id');
+    }
+    public function hrManager() {
+        return $this->hasOne(User::class,'id','submit_hr_manager_id');
+    }
+    public function history() {
+        return $this->hasMany(PassportRequestHistory::class,'passport_request_id','id');
+    }
 }

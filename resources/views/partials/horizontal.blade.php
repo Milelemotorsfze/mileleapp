@@ -240,40 +240,57 @@
                                             @endif
                                             @endcanany
                                         </div>
-
-                                        <!-- @canany(['warranty-create', 'warranty-list'])
-                                        @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create','warranty-list']);
-                                        @endphp
-                                        @if ($hasPermission) -->
-
-                                        <!-- @endif
-                                        @endcanany
-
-                                        @canany(['addon-create','accessories-list','spare-parts-list','kit-list'])
-                                        @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create','accessories-list','spare-parts-list','kit-list']);
-                                        @endphp
-                                        @if ($hasPermission) -->
-                                        <!-- <div class="dropdown">
+                                        <div class="dropdown">
+                                            @canany(['view-passport-request-list'])
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list']);
+                                            @endphp
+                                            @if ($hasPermission)
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility"> Questionnaire</span>
+                                                <span data-key="t-utility"> Passport Request</span>
                                                 <div class="arrow-down"></div>
                                             </a>
-                                            <div class="dropdown-menu" aria-labelledby="topnav-auth"> -->
-                                                <!-- @can('addon-create')
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @canany(['view-passport-request-list'])
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list']);
                                                 @endphp
-                                                @if ($hasPermission) -->
-                                                <!-- <a href="{{ route('employee-hiring-questionnaire.create') }}" class="dropdown-item" data-key="t-login">Create</a>
-                                                <a href="{{ route('employee-hiring-questionnaire.index') }}" class="dropdown-item" data-key="t-login">Info</a> -->
-                                                <!-- @endif
-                                                @endcan -->
-                                            <!-- </div>
-                                        </div> -->
-                                        <!-- @endif
-                                        @endcanany -->
+                                                @if ($hasPermission)
+                                                <a href="{{ route('passport_request.index') }}" class="dropdown-item" data-key="t-login">Passport Submit</a>
+                                                @endif
+                                                @endcanany
+                                                @canany(['view-passport-request-list'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('passport_release.index') }}" class="dropdown-item" data-key="t-login">Passport Release</a>
+                                                @endif
+                                                @endcanany                                              
+                                            </div>
+                                            @endif
+                                            @endcanany
+                                        </div>
+                                        @canany(['view-liability-list'])
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-liability-list']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee_liability.index') }}"  id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Liability</span>
+                                        </a>
+                                        @endif
+                                        @endcanany
+                                        @canany(['view-leave-list'])
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-list']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee_leave.index') }}"  id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Leave</span>
+                                        </a>
+                                        @endif
+                                        @endcanany
                                     </div>
                                 </li>
                                 @endif

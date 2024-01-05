@@ -4,8 +4,12 @@ use App\Http\Controllers\Masters\MasterSpecificIndustryExperienceController;
 use App\Http\Controllers\HRM\Hiring\EmployeeHiringRequestController;
 use App\Http\Controllers\HRM\Hiring\EmployeeHiringQuestionnaireController;
 use App\Http\Controllers\HRM\Hiring\JobDescriptionController;
-use App\Http\Controllers\HRM\Hiring\PassportRequestController;
 use App\Http\Controllers\HRM\Hiring\CandidatePersonalInfoController;
+use App\Http\Controllers\HRM\Hiring\InterviewSummaryReportController;
+use App\Http\Controllers\HRM\Employee\PassportRequestController;
+use App\Http\Controllers\HRM\Employee\PassportReleaseController;
+use App\Http\Controllers\HRM\Employee\EmployeeLeaveController;
+use App\Http\Controllers\HRM\Employee\EmployeeLiabilityController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -76,9 +80,6 @@ use App\Http\Controllers\ProformaInvoiceController;
 use App\Http\Controllers\ApprovalAwaitingController;
 use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\HRM\Hiring\EmployeeLeaveController;
-use App\Http\Controllers\HRM\Hiring\EmployeeLiabilityController;
-use App\Http\Controllers\HRM\Hiring\InterviewSummaryReportController;
 use App\Http\Controllers\AgentsController;
 use App\Http\Controllers\SalesPersonStatusController;
 use App\Http\Controllers\PortsController;
@@ -305,7 +306,8 @@ Route::get('/d', function () {
         Route::get('employee-passport_request/create-or-edit/{id}', 'createOrEdit')->name('employee-passport_request.create-or-edit');
         Route::post('employee-passport_request/store-or-update/{id}', 'storeOrUpdate')->name('employee-passport_request.store-or-update');
     });
-
+    // Employee Passport Release
+    Route::resource('passport_release', PassportReleaseController::class);
     // Employee Liability
     Route::resource('employee_liability', EmployeeLiabilityController::class);
     Route::controller(EmployeeLiabilityController::class)->group(function(){

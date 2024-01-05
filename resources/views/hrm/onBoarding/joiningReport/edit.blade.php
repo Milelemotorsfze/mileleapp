@@ -200,9 +200,9 @@
 	}
 </style>
 @section('content')
-@canany(['create-interview-summary-report','edit-interview-summary-report'])
+@canany([edit-joining-report])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','edit-interview-summary-report']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole([edit-joining-report]);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
