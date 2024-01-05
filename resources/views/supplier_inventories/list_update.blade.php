@@ -49,21 +49,38 @@
                     <th>Chasis</th>
                     <th>Engine Number</th>
                     <th>ETA Import Date</th>
+                    <th>Production Month</th>
+                    <th>po ams</th>
                 </tr>
                 </thead>
                 <tbody>
                 <div hidden>{{$i=0;}}
-
                     @foreach ($supplierInventories as $key => $supplierInventory)
                         <tr>
                             <td>{{ ++$i }}</td>
                             <td>  {{ $supplierInventory->masterModel->model ?? '' }}</td>
                             <td> {{ $supplierInventory->masterModel->sfx ?? '' }}</td>
-                            <td contenteditable="true"> {{ $supplierInventory->masterModel->model_year ?? '' }}</td>
-                            <td> {{ $supplierInventory->masterModel->variant->name ?? '' }}</td>
+                            <td>
+                                <select  class="model-year" data-field="model_year" data-id="{{ $supplierInventory->id }}" id="model_year-editable-{{$supplierInventory->id}}">
+                                   @foreach($supplierInventory->modelYears as $modelYear)
+                                       <option value="{{ $modelYear }}" {{ $modelYear == $supplierInventory->masterModel->model_year ? 'selected' : '' }}>
+                                           {{ $modelYear }}
+                                       </option>
+                                   @endforeach
+                                </select>
+                            </td>
+                            <td > {{ $supplierInventory->masterModel->variant->name ?? '' }}</td>
                             <td data-field="chasis" id="chasis-editable-{{$supplierInventory->id}}" contenteditable="true" data-id="{{$supplierInventory->id}}" > {{ $supplierInventory->chasis }} </td>
-                            <td class="editable-field engine_number"  contenteditable="true" data-id="{{$supplierInventory->id}}" > {{ $supplierInventory->engine_number ?? '' }}</td>
-                            <td contenteditable="true"> {{ \Carbon\Carbon::parse($supplierInventory->eta_import)->format('d M Y') }}</td>
+                            <td  data-field="engine_number" id="engine_number-editable-{{$supplierInventory->id}}"
+                                 contenteditable="true" data-id="{{$supplierInventory->id}}" > {{ $supplierInventory->engine_number ?? '' }}</td>
+                            <td class="eta-import">
+                                <input type="date" class="eta-import form-control" data-field="eta_import" id="eta_import-editable-{{$supplierInventory->id}}"
+                                       data-id="{{$supplierInventory->id}}"  value="{{ \Carbon\Carbon::parse($supplierInventory->eta_import)->format('d/m/yy') }} ">
+{{--                                <span >{{ \Carbon\Carbon::parse($supplierInventory->eta_import)->format('d/mm/yyyy') }}</span>--}}
+                            </td>
+                            <td  data-field="pord_month" class="pord_month"  id="pord_month-editable-{{$supplierInventory->id}}"  contenteditable="true"
+                                data-id="{{$supplierInventory->id}}" >{{$supplierInventory->pord_month}}</td>
+                            <td>{{ $supplierInventory->po_arm }}</td>
 
                         </tr>
                 @endforeach
@@ -75,61 +92,75 @@
 @endsection
 @push('scripts')
     <script>
+        var updatedData = [];
         $(document).ready(function () {
             var table = $('#dtBasicExample3').DataTable();
 
-            var updatedData = [];
-
             $('#dtBasicExample3 tbody').on('keyup', 'td', function () {
+
                 var id = $(this).data('id');
                 var field = $(this).data('field');
+                addUpdatedData(id,field);
+            });
+            $('#dtBasicExample3 tbody td').on('keyup', 'pord_month', function () {
+                var id = $(this).data('id');
+                var field = $(this).data('field');
+                // validation maxi
+                addUpdatedData(id,field);
+            });
+            $('#dtBasicExample3 tbody td').on('change', '.model-year', function () {
 
-                updatedData.push({id: id, name: field });
-                console.log(id);
+                var id = $(this).data('id');
+                var field = $(this).data('field');
+                addUpdatedData(id,field);
 
-                console.log(updatedData);
-                {{--const updateDataUrl = '{{ route('vehicles.updatedata') }}';--}}
-                {{--const updatedData = [];--}}
-                {{--editableFields.forEach(field => {--}}
-                {{--    console.log(field);--}}
-                {{--    const Id = field.getAttribute('data-id');--}}
-                {{--    const fieldName = field.classList[1];--}}
-                //     const fieldValue = editableFields.innerText.trim();
-                //     console.log(fieldValue);
+            });
+            $('#dtBasicExample3 tbody td').on('change', '.eta-import', function () {
+                var id = $(this).data('id');
+                var field = $(this).data('field');
+                addUpdatedData(id,field);
 
-                {{--    const selectElement = field.querySelector('select');--}}
-                {{--    if (selectElement) {--}}
-                {{--        const selectedOption = selectElement.options[selectElement.selectedIndex];--}}
-                {{--        const selectedValue = selectedOption.value;--}}
-                {{--        updatedData.push({id: Id, name: fieldName, value: selectedValue});--}}
-                {{--    } else {--}}
-                {{--        updatedData.push({id: Id, name: fieldName, value: fieldValue});--}}
-                {{--    }--}}
-
-                {{--});--}}
-                // console.log(updatedData);
+            });
                 $('.update-inventory-btn').on('click', function () {
                     var selectedUpdatedDatas = [];
                     $.each(updatedData,function(key,value) {
-                        console.log(value.name);
-                        var cellId = value.name +'-editable-' + value.id;
-                        console.log(cellId);
-                        var cellValue = $('#'+ cellId).text();
-                        console.log("test");
-                        console.log(cellValue);
-                        selectedUpdatedDatas.push({id: value.id,field: value.name, value: cellValue});
+                        var splitValue = value.split('-');
+                        var cellId = splitValue[1] +'-editable-' + splitValue[0];
+
+                        if(splitValue[1] == 'model_year' ) {
+                            var cellValue = $('#'+ cellId).val();
+                        }else{
+                            var cellValue = $('#'+ cellId).text();
+                        }
+                        selectedUpdatedDatas.push({id: splitValue[0],field: splitValue[1], value: cellValue});
 
                     });
                     // console.log("test data");
                     console.log(selectedUpdatedDatas);
+                    let url = '{{ route('update-inventory') }}';
+                    $.ajax({
+                        type:"POST",
+                        url: url,
+                        data: {
+                            selectedUpdatedDatas:  selectedUpdatedDatas,
+                            _token: '{{csrf_token()}}'
+                        },
+                        dataType : 'json',
+                        success: function(data) {
+                            console.log("success");
+                            alertify.success('Inventory Updated Successfully.');
+                            location.reload();
+                        }
+                    });
                 });
-            });
-
-            // function editRow(row){
-            //     console.log("tested");
-            //     console.log(row);
-            // };
         });
+        function addUpdatedData(id,field) {
+            var arrayvalue = id + '-' + field;
+            if ($.inArray(arrayvalue, updatedData) == -1) {
+                updatedData.push(arrayvalue);
+            }
+            console.log(updatedData);
+        }
     </script>
 @endpush
 

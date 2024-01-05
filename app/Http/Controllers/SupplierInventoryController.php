@@ -64,8 +64,13 @@ class SupplierInventoryController extends Controller
         $supplierInventories = SupplierInventory::with('masterModel')
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->orderBy('id','desc')
+            ->orderBy('updated_at','DESC')
             ->get();
+        foreach ($supplierInventories as $supplierInventory) {
+            $supplierInventory->modelYears = MasterModel::where('model', $supplierInventory->masterModel->model)
+                ->where('sfx', $supplierInventory->masterModel->sfx)
+                ->pluck('model_year');
+        }
 //
 //        if (request()->ajax()) {
 //
@@ -743,8 +748,33 @@ class SupplierInventoryController extends Controller
 
         }
     }
-    public function update(Request $request) {
-        return "Test";
+    public function updateInventory(Request $request) {
+        info($request->all());
+        $updatedDatas = $request->selectedUpdatedDatas;
+
+        foreach ($updatedDatas as $data) {
+            $inventoryId = $data['id'];
+            $fieldName = $data['field'];
+            $fieldValue = $data['value'];
+            info($fieldName);
+            $inventory = SupplierInventory::find($inventoryId);
+            if($fieldName == 'model_year') {
+                info("inside loop");
+                $masterModel = MasterModel::where('model', $inventory->masterModel->model)
+                    ->where('sfx', $inventory->masterModel->sfx)
+                    ->where('model_year', $fieldValue)
+                    ->first();
+                $inventory->master_model_id = $masterModel->id;
+            }else if($fieldName == 'eta_import') {
+                $inventory->$fieldName = Carbon::parse($fieldValue)->format('Y-m-d');
+            }
+            else{
+                $inventory->$fieldName = $fieldValue;
+            }
+
+            $inventory->save();
+        }
+        return response(true);
     }
     public function FileComparision(Request $request) {
         (new UserActivityController)->createActivity('Open Supplier Inventories File Comparison Page');

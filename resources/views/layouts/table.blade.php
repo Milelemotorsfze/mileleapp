@@ -179,9 +179,9 @@
                 $('.alert').hide();
 
             });
-            $('input[type=date]').on('change',function(){
-                $(this).valid();
-            });
+            // $('input[type=date]').on('change',function(){
+            //     $(this).valid();
+            // });
                     // div colour
                     // alert($('.divcolorclass').val());
 

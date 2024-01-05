@@ -361,6 +361,8 @@ Route::get('/d', function () {
         ->name('supplier-inventories.file-comparision-report');
     Route::get('supplier-inventories/get-dates', [SupplierInventoryController::class,'getDate'])->name('supplier-inventories.get-dates');
     Route::get('/viewall-supplier-inventories', [SupplierInventoryController::class,'viewAll'])->name('supplier-inventories.view-all');
+    Route::post('supplier-inventories/update-inventory', [SupplierInventoryController::class,'updateInventory'])->name('update-inventory');
+
 
     //BL Module
     Route::resource('blform', BlFormController::class);
