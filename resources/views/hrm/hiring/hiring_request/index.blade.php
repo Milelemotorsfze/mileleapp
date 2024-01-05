@@ -201,11 +201,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
 							<td>{{ $data->number_of_openings ?? ''}}</td>
-							<td>{{$data->type_of_role_name ?? ''}}</td>
-							<td>{{$data->replacement_for_employee_name ?? ''}}</td>
-							<td>{{$data->explanation_of_new_hiring ?? ''}}</td>
-							<td>{{$data->created_by_name ?? ''}}</td>
-							<td>{{$data->created_at ?? ''}}</td>
+							<td>{{ $data->type_of_role_name ?? ''}}</td>
+							<td>{{ $data->replacement_for_employee_name ?? ''}}</td>
+							<td>{{ $data->explanation_of_new_hiring ?? ''}}</td>
+							<td>{{ $data->created_by_name ?? ''}}</td>
+							<td>{{ $data->created_at ?? ''}}</td>
 							<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
 							<td>
 							<div class="dropdown">

@@ -131,7 +131,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                     <label for="choices-single-default" class="form-label"> Location :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->location->name ?? '' }}</span>
+                                    <span>{{ $data->permanentJoiningLocation->name ?? '' }}</span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Remarks :</label>
@@ -196,21 +196,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                             Status :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                        <label class="badge texttransform @if($data->action_by_department_head =='pending') badge-soft-info 
-                                        @elseif($data->action_by_department_head =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_department_head ?? ''}}</label>
+                                        <label class="badge texttransform @if($data->action_by_prepared_by =='pending') badge-soft-info 
+                                        @elseif($data->action_by_prepared_by =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->action_by_prepared_by ?? ''}}</label>
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->department_head_action_at ?? ''}}
+                                            {{$data->prepared_by_action_at ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_department_head ?? ''}}
+                                            {{$data->comments_by_prepared_by ?? ''}}
                                         </div>
                                     </div>
                                 </div>
@@ -227,27 +227,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                             Name :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->hiring_manager_name ?? ''}}
+                                        {{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Status :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                        <label class="badge texttransform @if($data->action_by_hiring_manager =='pending') badge-soft-info 
-                                        @elseif($data->action_by_hiring_manager =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_hiring_manager ?? ''}}</label>
+                                        <label class="badge texttransform @if($data->action_by_employee =='pending') badge-soft-info 
+                                        @elseif($data->action_by_employee =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->action_by_employee ?? ''}}</label>
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->hiring_manager_action_at ?? ''}}
+                                            {{$data->employee_action_at ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_hiring_manager ?? ''}}
+                                            {{$data->comments_by_employee ?? ''}}
                                         </div>
                                     </div>
                                 </div>
@@ -264,27 +264,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                             Name :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->divisionHead->name ?? ''}}
+                                            {{$data->hr->name ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Status :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            <label class="badge texttransform @if($data->action_by_division_head =='pending') badge-soft-info 
-                                        @elseif($data->action_by_division_head =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_division_head ?? ''}}</label>
+                                            <label class="badge texttransform @if($data->action_by_hr_manager =='pending') badge-soft-info 
+                                        @elseif($data->action_by_hr_manager =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->action_by_hr_manager ?? ''}}</label>
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->division_head_action_at ?? ''}}
+                                            {{$data->hr_manager_action_at ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_division_head ?? ''}}
+                                            {{$data->comments_by_hr_manager ?? ''}}
                                         </div>
                                     </div>
                                 </div>
@@ -301,27 +301,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                             Name :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->hr_manager_name ?? ''}}
+                                        {{ $data->reportingManager->name ?? '' }}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Status :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                        <label class="badge texttransform @if($data->action_by_hr_manager =='pending') badge-soft-info 
-                                        @elseif($data->action_by_hr_manager =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_hr_manager ?? ''}}</label>
+                                        <label class="badge texttransform @if($data->action_by_department_head =='pending') badge-soft-info 
+                                        @elseif($data->action_by_department_head =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->action_by_department_head ?? ''}}</label>
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->hr_manager_action_at ?? ''}}
+                                            {{$data->department_head_action_at ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_hr_manager ?? ''}}
+                                            {{$data->comments_by_department_head ?? ''}}
                                         </div>
                                     </div>
                                 </div>

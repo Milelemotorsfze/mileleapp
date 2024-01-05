@@ -286,8 +286,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
-							<label for="location_id" class="col-form-label text-md-end">{{ __('Choose Location') }}</label>
-							<select name="location_id" id="location_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
+							<label for="permanent_joining_location_id" class="col-form-label text-md-end">{{ __('Choose Location') }}</label>
+							<select name="permanent_joining_location_id" id="permanent_joining_location_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
 								@foreach($masterlocations as $location)
 									<option value="{{$location->id}}">{{$location->name}}</option>
 								@endforeach
@@ -337,7 +337,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
             maximumSelectionLength: 1,
             placeholder:"Choose Employee Name",
         });
-		$('#location_id').select2({
+		$('#permanent_joining_location_id').select2({
             allowClear: true,
 			maximumSelectionLength: 1,
             placeholder:"Choose Employee Hiring Request UUID",
@@ -381,7 +381,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 			joining_date: {
 				required: true,
 			},
-            location_id: {
+            permanent_joining_location_id: {
                 required: true,
             },
             type: {
