@@ -909,6 +909,11 @@
                                         <div class="arrow-down"></div>
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                    <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('paymentterms.index')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Payment Terms</span>
+                                            </a>
+                                        </div>
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-view');
                                         @endphp
