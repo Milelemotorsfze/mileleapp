@@ -83,6 +83,16 @@ input[type=number]::-webkit-outer-spin-button {
             <p><span style="float:right;" class="error">* Required Field</span></p>
 			</div>  
 			<form action="" method="post" enctype="multipart/form-data">
+            <div class="row">
+            <div class="col-lg-4 col-md-6">
+            <label for="customertype">Customer Type:</label>
+            <select class="form-control" id="customertype" name="customertype" onchange="toggleFields()">
+                <option value="individual">Individual</option>
+                <option value="company">Company</option>
+                <option value="government">Government</option>
+            </select>
+            </div>
+            </div>
                 <div class="row"> 
 					<div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
@@ -99,6 +109,10 @@ input[type=number]::-webkit-outer-spin-button {
                     {!! Form::email('email', null, array('id' => 'email', 'placeholder' => 'Email','class' => 'form-control')) !!}
                     <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
                     <div id="emailError" class="error-text"></div>
+                    </div>
+                    <div class="col-lg-4 col-md-6" id="companyNameField" style="display: none;">
+                        <label for="basicpill-firstname-input" class="form-label">Company Name : </label>
+                        <input type="text" id="company_name" name="company_name" class="form-control" placeholder="Company Name">
                     </div>
                     <div class="col-lg-4 col-md-6">
                     <span class="error">* </span>
@@ -131,7 +145,7 @@ input[type=number]::-webkit-outer-spin-button {
                 </div>
                     <div class="col-xs-4 col-sm-12 col-md-4">
                     <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Destination : </label>
+                        <label for="basicpill-firstname-input" class="form-label">Destination / Nationality : </label>
                         <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput">
                     <datalist id="loList">
                     @foreach ($countries as $country)
@@ -149,33 +163,54 @@ input[type=number]::-webkit-outer-spin-button {
                     <option value="Other" data-value="Export">Other</option>
                     </datalist>
                     </div>
+                    <div class="col-lg-4 col-md-6">
+                    <label for="basicpill-firstname-input" class="form-label">Country of Export : </label>
+                    <input type="text" placeholder="Country of Export" name="countryofexport" list="coofexport" class="form-control" id="countryofexport">
+                    <datalist id="coofexport">
+                    @foreach ($countries as $country)
+                    <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
+                    @endforeach
+                    </datalist>
+                    </div>
+                    <div class="col-lg-4 col-md-6" id="tradeLicenseField" style="display: none;">
+                    <label for="basicpill-firstname-input" class="form-label">Trade License : </label>
+                    <input type="file" id="fileInput" class="form-control" name="tradelicense">
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                    <label for="basicpill-firstname-input" class="form-label">Tender Copy : </label>
+                    <input type="file" id="fileInput" class="form-control" name="tender">
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                    <label for="basicpill-firstname-input" class="form-label">Passport : </label>
+                    <input type="file" id="fileInput" class="form-control" name="passport">
+                    </div>
                     </div>
                     </br>
                     <div class="maindd">
-    <div id="row-container">
-        <div class="row">
-            <div class="col-lg-4 col-md-6">
-                <label for="brandInput" class="form-label">Brand & Models:</label>
-                <input type="text" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInput">
-                <datalist id="brandList">
-                    @foreach ($modelLineMasters as $modelLineMaster)
-                        @php
-                            $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-                            $brand_name = $brand->brand_name;
-                        @endphp 
-                        <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
-                    @endforeach
-                </datalist>
-                <input type="hidden" name="model_line_ids" id="selectedBrandIds">
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
-        <div class="btn btn-primary add-row-btn">
-            <i class="fas fa-plus"></i> Add More
-        </div>
-    </div>
-</div>
+                        <div id="row-container">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label for="brandInput" class="form-label">Brand & Models:</label>
+                                    <input type="text" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInput">
+                                    <datalist id="brandList">
+                                        @foreach ($modelLineMasters as $modelLineMaster)
+                                            @php
+                                                $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+                                                $brand_name = $brand->brand_name;
+                                            @endphp 
+                                            <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
+                                        @endforeach
+                                    </datalist>
+                                    <input type="hidden" name="model_line_ids" id="selectedBrandIds">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
+                            <div class="btn btn-primary add-row-btn">
+                                <i class="fas fa-plus"></i> Add More
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
                         {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
@@ -441,6 +476,23 @@ document.getElementById('languageInput').addEventListener('input', function(even
             input.value = "+" + countryCode;
         }
     });
+});
+</script>
+<script>
+    $(document).ready(function() {
+    function toggleFields() {
+        var customerType = document.getElementById("customertype").value;
+        var companyNameField = document.getElementById("companyNameField");
+        var tradeLicenseField = document.getElementById("tradeLicenseField");
+
+        if (customerType === "company") {
+            companyNameField.style.display = "block";
+            tradeLicenseField.style.display = "block";
+        } else {
+            companyNameField.style.display = "none";
+            tradeLicenseField.style.display = "none";
+        }
+    }
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>

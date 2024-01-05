@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\HRM\Hiring;
+namespace App\Http\Controllers\HRM\Employee;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\HRM\Employee\PassportRequest;
 use App\Models\Masters\PassportRequestPurpose;
+use App\Models\HRM\Employee\PassportRelease;
+use App\Models\HRM\Employee\PassportReleaseHistory;
 use Validator;
 use DB;
 use Illuminate\Support\Facades\Auth;
@@ -21,23 +23,22 @@ use App\Models\User;
 class PassportRequestController extends Controller
 {
     public function index() {
-        $page = 'listing';
-        $submit_pendings = PassportRequest::where('submit_status','pending')->latest()->get();
-        $submit_approved = PassportRequest::where('submit_status','approved')->latest()->get();
-        $submit_rejected = PassportRequest::where('submit_status','rejected')->latest()->get();
-        $release_pendings = PassportRequest::where('release_submit_status','pending')->latest()->get();
-        $release_approved = PassportRequest::where('release_submit_status','approved')->latest()->get();
-        $release_rejected = PassportRequest::where('release_submit_status','rejected')->latest()->get();
-        return view('hrm.hiring.passport_request.index',compact('submit_pendings','submit_approved','submit_rejected','release_pendings','release_approved','release_rejected','page'));
+        $pendings = PassportRequest::where('submit_status','pending')->latest()->get();
+        $approved = PassportRequest::where('submit_status','approved')->latest()->get();
+        $rejected = PassportRequest::where('submit_status','rejected')->latest()->get();
+        return view('hrm.passport.passport_request.index',compact('pendings','approved','rejected'));
     }
     public function create() {
-        return view('hrm.hiring.passport_request.create');
+        return view('hrm.passport.passport_request.create');
     }
     public function edit() {
-        return view('hrm.hiring.passport_request.edit');
+        return view('hrm.passport.passport_request.edit');
     }
-    public function show(string $id) {
-        return view('hrm.hiring.passport_request.show');
+    public function show($id) {
+        $data = PassportRequest::where('id',$id)->first();
+        $previous = PassportRequest::where('id', '<', $id)->max('id');
+        $next = PassportRequest::where('id', '>', $id)->min('id');
+        return view('hrm.passport.passport_request.show',compact('data','previous','next'));
     }
     public function createOrEdit($id) {
         if($id == 'new') {
@@ -59,7 +60,7 @@ class PassportRequestController extends Controller
         // dd($Users);
         $submissionPurpose = PassportRequestPurpose::where('type','submit')->get();
         $releasePurpose = PassportRequestPurpose::where('type','release')->get();
-        return view('hrm.hiring.passport_request.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));
+        return view('hrm.passport.passport_request.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));
     }
     public function storeOrUpdate(Request $request, $id) {
         $validator = Validator::make($request->all(), [

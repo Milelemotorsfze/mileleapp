@@ -200,13 +200,13 @@
 	}
 </style>
 @section('content')
-@canany(['create-interview-summary-report','edit-interview-summary-report'])
+@canany([edit-joining-report])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','edit-interview-summary-report']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole([edit-joining-report]);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Create Joining Report</h4>
+	<h4 class="card-title"> Edit Joining Report</h4>
 	
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee-hiring-request.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
@@ -221,8 +221,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 		</ul>
 	</div>
 	@endif
-	<form id="joiningReportForm" name="joiningReportForm" enctype="multipart/form-data" method="POST" action="{{route('joining_report.store')}}">
+	<form id="joiningReportForm" name="joiningReportForm" enctype="multipart/form-data" method="POST" action="{{route('joining_report.update',$data->id)}}">
 		@csrf
+		@method('PUT')
 		<div class="card">
 		<div class="card-body">
 			<div class="row">
@@ -232,7 +233,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 					<label for="employee_id" class="col-form-label text-md-end">{{ __('Employee Name') }}</label>
 					<select name="employee_id" id="employee_id" multiple="true" class="employee_id form-control widthinput" onchange="" autofocus>
 						@foreach($candidates as $candidate)
-							<option value="{{$candidate->id}}">{{$candidate->first_name}} {{$candidate->last_name}}</option>
+							<option value="{{$candidate->id}}" @if($data->employee_id == $candidate->id) selected @endif>{{$candidate->first_name}} {{$candidate->last_name}}</option>
 						@endforeach
 					</select>
 				</div>
@@ -245,11 +246,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 			</div>
 			<div class="col-xxl-3 col-lg-4 col-md-4" id="designation_div">
 			<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
-			<center><span id="designation"></span></center>
+			<center><span id="designation">{{$data->employee->designation->name ?? ''}}</span></center>
 			</div>
             <div class="col-xxl-3 col-lg-4 col-md-4" id="department_div">
 			<center><label for="department" class="col-form-label text-md-end"><strong>{{ __('Department') }}</strong></label></center>
-			<center><span id="department"></span></center>
+			<center><span id="department">{{$data->employee->department->name ?? ''}}</span></center>
 			</div>
 			</div>
 			</div>
@@ -267,11 +268,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 						<fieldset style="margin-top:5px;" class="radio-div-container">
                             <div class="row some-class">
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="type" name="type" value="trial" id="trial" />
+                                    <input type="radio" class="type" name="type" value="trial" id="trial" @if($data->trial_period_joining_date) checked @endif />
                                     <label for="trial">Trial Period</label>
                                 </div>
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="type" name="type" value="permanent" id="permanent" />
+                                    <input type="radio" class="type" name="type" value="permanent" id="permanent" @if($data->permanent_joining_date) checked @endif />
                                     <label for="permanent">Permanent</label>
                                 </div>
                             </div>
@@ -281,15 +282,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
                         <span class="error">* </span>
                         <label for="joining_date" class="col-form-label text-md-end">{{ __('Joining Date') }}</label>
                         <input id="joining_date" type="date" class="form-control widthinput @error('joining_date') is-invalid @enderror" name="joining_date"
-                                placeholder="Candidate Name" value="" autocomplete="joining_date" autofocus>
+                                placeholder="Candidate Name" value="{{$data->trial_period_joining_date ?? $data->permanent_joining_date}}" autocomplete="joining_date" autofocus>
                     </div>
 					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
-							<label for="location_id" class="col-form-label text-md-end">{{ __('Choose Location') }}</label>
-							<select name="location_id" id="location_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
+							<label for="permanent_joining_location_id" class="col-form-label text-md-end">{{ __('Choose Location') }}</label>
+							<select name="permanent_joining_location_id" id="permanent_joining_location_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
 								@foreach($masterlocations as $location)
-									<option value="{{$location->id}}">{{$location->name}}</option>
+									<option value="{{$location->id}}" @if($location->id == $data->permanent_joining_location_id) selected @endif>{{$location->name}}</option>
 								@endforeach
 							</select>
 						</div>
@@ -300,7 +301,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 							<label for="team_lead_or_reporting_manager" class="col-form-label text-md-end">{{ __('Choose Reporting Manager') }}</label>
 							<select name="team_lead_or_reporting_manager" id="team_lead_or_reporting_manager" multiple="true" class="form-control widthinput" onchange="" autofocus>
 								@foreach($reportingTo as $reportingToId)
-									<option value="{{$reportingToId->id}}">{{$reportingToId->name}}</option>
+									<option value="{{$reportingToId->id}}" @if($reportingToId->id == $data->department_head_id) selected @endif >{{$reportingToId->name}}</option>
 								@endforeach
 							</select>
 						</div>
@@ -311,7 +312,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 						<label for="additional_remarks" class="col-form-label text-md-end">{{ __('Remarks') }}</label>
 					</div>
                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                        <textarea rows="5" name="remarks" placeholder="Enter Remarks" class="form-control"></textarea>
+                        <textarea rows="5" name="remarks" placeholder="Enter Remarks" class="form-control">{{$data->remarks}}</textarea>
                     </div>
                 </div>
 			</div>
@@ -329,15 +330,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 <script type="text/javascript">
     var candidates = {!! json_encode($candidates) !!};
 	$(document).ready(function () {
-        $('#employee_code_div').hide();
-		$('#designation_div').hide();
-		$('#department_div').hide();
+        // $('#employee_code_div').hide();
+		// $('#designation_div').hide();
+		// $('#department_div').hide();
         $('#employee_id').select2({
             allowClear: true,
             maximumSelectionLength: 1,
             placeholder:"Choose Employee Name",
         });
-		$('#location_id').select2({
+		$('#permanent_joining_location_id').select2({
             allowClear: true,
 			maximumSelectionLength: 1,
             placeholder:"Choose Employee Hiring Request UUID",
@@ -381,7 +382,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 			joining_date: {
 				required: true,
 			},
-            location_id: {
+            permanent_joining_location_id: {
                 required: true,
             },
             type: {

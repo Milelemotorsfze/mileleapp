@@ -4,8 +4,12 @@ use App\Http\Controllers\Masters\MasterSpecificIndustryExperienceController;
 use App\Http\Controllers\HRM\Hiring\EmployeeHiringRequestController;
 use App\Http\Controllers\HRM\Hiring\EmployeeHiringQuestionnaireController;
 use App\Http\Controllers\HRM\Hiring\JobDescriptionController;
-use App\Http\Controllers\HRM\Hiring\PassportRequestController;
 use App\Http\Controllers\HRM\Hiring\CandidatePersonalInfoController;
+use App\Http\Controllers\HRM\Hiring\InterviewSummaryReportController;
+use App\Http\Controllers\HRM\Employee\PassportRequestController;
+use App\Http\Controllers\HRM\Employee\PassportReleaseController;
+use App\Http\Controllers\HRM\Employee\EmployeeLeaveController;
+use App\Http\Controllers\HRM\Employee\EmployeeLiabilityController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -76,13 +80,11 @@ use App\Http\Controllers\ProformaInvoiceController;
 use App\Http\Controllers\ApprovalAwaitingController;
 use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\HRM\Hiring\EmployeeLeaveController;
-use App\Http\Controllers\HRM\Hiring\EmployeeLiabilityController;
-use App\Http\Controllers\HRM\Hiring\InterviewSummaryReportController;
 use App\Http\Controllers\AgentsController;
 use App\Http\Controllers\SalesPersonStatusController;
 use App\Http\Controllers\PortsController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\PaymentTermsController;
 /*
 /*
 |--------------------------------------------------------------------------
@@ -155,8 +157,6 @@ Route::get('/d', function () {
     // addon scroll list route
 
     Route::get('getAddonlists', [AddonController::class,'getAddonlists'])->name('addon.getAddonlists');
-
-
     Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown');
     Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');
     Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');
@@ -294,6 +294,10 @@ Route::get('/d', function () {
 
     // Joining Report
     Route::resource('joining_report', JoiningReportController::class);
+    Route::controller(JoiningReportController::class)->group(function(){
+        Route::post('joining_report_action', 'requestAction')->name('joiningReport.action');
+        Route::get('joining_report_approval_awaiting', 'approvalAwaiting')->name('joiningReport.approvalAwaiting');
+    });
     // Asset Allocation
     Route::resource('asset_allocation', AssetAllocationController::class);
     // Employee Passport Request
@@ -302,7 +306,8 @@ Route::get('/d', function () {
         Route::get('employee-passport_request/create-or-edit/{id}', 'createOrEdit')->name('employee-passport_request.create-or-edit');
         Route::post('employee-passport_request/store-or-update/{id}', 'storeOrUpdate')->name('employee-passport_request.store-or-update');
     });
-
+    // Employee Passport Release
+    Route::resource('passport_release', PassportReleaseController::class);
     // Employee Liability
     Route::resource('employee_liability', EmployeeLiabilityController::class);
     Route::controller(EmployeeLiabilityController::class)->group(function(){
@@ -627,16 +632,13 @@ Route::get('/d', function () {
     Route::get('/view-pictures-details/{id}', [VehiclesController::class, 'viewpictures'])->name('vehiclespictures.viewpictures');
     Route::get('/view-remarks-details/{id}', [VehiclesController::class, 'viewremarks'])->name('vehiclesremarks.viewremarks');
     Route::post('/vehicles/updatewarehouse', [VehiclesController::class, 'updatewarehouse'])->name('vehicles.updatewarehouse');
-
     Route::get('/listUsers',[LoginActivityController::class, 'listUsers'])->name('listUsers');
     Route::post('/listUsersget-data',[LoginActivityController::class, 'listUsersgetdata'])->name('listUsersgetdata');
     Route::post('/listUsersget-dataac', [LoginActivityController::class, 'listUsersgetdataac'])->name('listUsersgetdataac');
     Route::get('/user/{id}/{date}', [UserController::class, 'showUseractivities'])->name('user.showUseractivitie');
     // vehicle stock report
-
     Route::get('/stock-count-filter',[VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
     // Master Data
-
     Route::resource('brands', BrandController::class);
     Route::resource('model-lines', ModelLinesController::class);
     Route::resource('master-addons', MasterAddonController::class);
@@ -648,11 +650,8 @@ Route::get('/d', function () {
     Route::get('master-model/getLoiDescription', [MasterModelController::class,'getLoiDescription'])
         ->name('master-model.get-loi-description');
     Route::post('quotation/new-model-line', [ModelLinesController::class,'StoreModellineOrBrand'])->name('modelline-or-brand.store');
-
     // DASHBOARD PARTS AND PROCURMENT
-
     Route::get('addon-dashboard/sellingPriceFilter',[HomeController::class, 'sellingPriceFilter'])->name('addon-dashboard.filter');
-
     //Logistics
     Route::resource('logisticsdocuments', DocumentController::class);
     Route::post('logisticsdocuments/sending', [DocumentController::class, 'updatedoc'])->name('logisticsdocuments.updatedoc');
@@ -676,10 +675,14 @@ Route::get('/d', function () {
     Route::get('candidate/documents/{id}', [CandidatePersonalInfoController::class, 'sendForm'])->name('candidate_documents.send_form');
     Route::post('candidate/store_docs', [CandidatePersonalInfoController::class, 'storeDocs'])->name('candidate.storeDocs');
     Route::get('candidate/success_docs', [CandidatePersonalInfoController::class, 'successDocs'])->name('candidate.successDocs');
-
-
     Route::get('candidate/personal_info/{id}', [CandidatePersonalInfoController::class, 'sendPersonalForm'])->name('candidate_personal_info.send_form');
     Route::post('candidate/store_personal_info', [CandidatePersonalInfoController::class, 'storePersonalinfo'])->name('candidate.storePersonalinfo');
     Route::get('candidate/success_personal_info', [CandidatePersonalInfoController::class, 'successPersonalinfo'])->name('candidate.successPersonalinfo');
     Route::get('candidate-offer-letter/sign/{id}', [CandidatePersonalInfoController::class, 'signJobOfferLetter'])->name('candidate-offer-letter.sign');
     Route::post('offer-letter/signed', [CandidatePersonalInfoController::class, 'signedOfferLetter'])->name('offerletter.signed');
+    Route::get('joining_report_employee_verification/{id}', [JoiningReportController::class, 'employeeVerification'])->name('employee_joining_report.verification');
+    Route::post('employee_joining_report/verified', [JoiningReportController::class, 'employeeVerified'])->name('employee_joining_report.verified');
+
+    
+    //Payment Terms
+    Route::resource('paymentterms', PaymentTermsController::class);

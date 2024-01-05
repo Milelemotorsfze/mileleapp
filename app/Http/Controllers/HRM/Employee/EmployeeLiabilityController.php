@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\HRM\Hiring;
+namespace App\Http\Controllers\HRM\Employee;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -24,16 +24,16 @@ class EmployeeLiabilityController extends Controller
         $pendings = Liability::where('status','pending')->latest()->get();
         $approved = Liability::where('status','approved')->latest()->get();
         $rejected = Liability::where('status','rejected')->latest()->get();
-        return view('hrm.hiring.employee_liability.index',compact('pendings','approved','rejected','page'));
+        return view('hrm.liability.index',compact('pendings','approved','rejected','page'));
     }
     public function create() {
-        return view('hrm.hiring.employee_liability.create');
+        return view('hrm.liability.create');
     }
     public function edit() {
-        return view('hrm.hiring.employee_liability.edit');
+        return view('hrm.liability.edit');
     }
     public function show(string $id) {
-        return view('hrm.hiring.employee_liability.show');
+        return view('hrm.liability.show');
     }
     public function createOrEdit($id) {
         if($id == 'new') {
@@ -46,7 +46,7 @@ class EmployeeLiabilityController extends Controller
             $next = Liability::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
         $masterEmployees = User::whereHas('empProfile')->select('id','name')->get();
-        return view('hrm.hiring.employee_liability.create',compact('id','data','previous','next','masterEmployees'));
+        return view('hrm.liability.create',compact('id','data','previous','next','masterEmployees'));
     }
     public function storeOrUpdate(Request $request, $id) { 
         $validator = Validator::make($request->all(), [

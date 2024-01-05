@@ -1,9 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\HRM\Employee;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Masters\PassportReleasePurpose;
+use App\Models\HRM\Employee\PassportReleaseHistory;
 
 class PassportRelease extends Model
 {
@@ -34,4 +37,22 @@ class PassportRelease extends Model
         'updated_by',
         'deleted_by'
     ];
+    public function user() {
+        return $this->hasOne(User::class,'id','employee_id');
+    }
+    public function purpose() {
+        return $this->hasOne(PassportRequestPurpose::class,'id','purposes_of_release');
+    }
+    public function reportingManager() {
+        return $this->hasOne(User::class,'id','release_department_head_id');
+    }
+    public function divisionHead() {
+        return $this->hasOne(User::class,'id','release_division_head_id');
+    }
+    public function hrManager() {
+        return $this->hasOne(User::class,'id','release_hr_manager_id');
+    }
+    public function history() {
+        return $this->hasMany(PassportReleaseHistory::class,'passport_release_id','id');
+    }
 }

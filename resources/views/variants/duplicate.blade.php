@@ -39,6 +39,60 @@
                         {{ Session::get('success') }}
                     </div>
                 @endif
+                <div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="optionsmodalLabel">Update Options</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                <div class="col-lg-12">
+                                        <div class="row">
+                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                            <label class="form-label font-size-13 text-center">New Option Name</label>
+                                        </div>
+                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                            <input type="text" class="form-label" name="option_name" id="option_name" />
+                                            <input type ="hidden" name="specification-id-input" id="specification-id-input" />
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" onclick="savenewoptions()" id="btn-save">Save</button>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                <div class="modal fade optionsmodal-modal" id="optionsmodal" tabindex="-1" aria-labelledby="optionsmodalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="optionsmodalLabel">Update Options</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                <div class="col-lg-12">
+                                        <div class="row">
+                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                            <label class="form-label font-size-13 text-center">New Option Name</label>
+                                        </div>
+                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                            <input type="text" class="form-label" name="option_name" id="option_name" />
+                                            <input type ="hidden" name="specification-id-input" id="specification-id-input" />
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" onclick="savenewoptions()" id="btn-save">Save</button>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
                 <form id="form-create" action="{{ route('variants.store') }}" method="POST">
                     @csrf
                         <div class="row">
@@ -98,6 +152,7 @@
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Engine</label>
                                     <select class="form-control" autofocus name="engine" id="engine">
+                                            <option value="" {{ isset($variant) && $variant->engine == '' ? 'selected' : '' }}>Please Select the Engine Capacity</option>
                                             <option value="0.8" {{ isset($variant) && $variant->engine == '0.8' ? 'selected' : '' }}>0.8</option>
                                             <option value="1.0" {{ isset($variant) && $variant->engine == '1.0' ? 'selected' : '' }}>1.0</option>
                                             <option value="1.2" {{ isset($variant) && $variant->engine == '1.2' ? 'selected' : '' }}>1.2</option>
@@ -119,6 +174,7 @@
                                             <option value="4.2" {{ isset($variant) && $variant->engine == '4.2' ? 'selected' : '' }}>4.2</option>
                                             <option value="4.4" {{ isset($variant) && $variant->engine == '4.4' ? 'selected' : '' }}>4.4</option>
                                             <option value="4.5" {{ isset($variant) && $variant->engine == '4.5' ? 'selected' : '' }}>4.5</option>
+                                            <option value="4.6" {{ isset($variant) && $variant->engine == '4.6' ? 'selected' : '' }}>4.6</option>
                                             <option value="4.8" {{ isset($variant) && $variant->engine == '4.8' ? 'selected' : '' }}>4.8</option>
                                             <option value="5.3" {{ isset($variant) && $variant->engine == '5.3' ? 'selected' : '' }}>5.3</option>
                                             <option value="5.6" {{ isset($variant) && $variant->engine == '5.6' ? 'selected' : '' }}>5.6</option>
@@ -176,18 +232,25 @@
     @foreach ($data as $specData)
         <div class="col-lg-4 mb-3">
             <label>{{ $specData['specification']->name }}</label>
-            <select name="specification_{{ $specData['specification']->id }}" data-specification-id="{{ $specData['specification']->id }}" class="form-control specification-dropdown">
-                <option value="" disabled selected>Select an Option</option>
-                @foreach ($specData['options'] as $option)
-                    <option value="{{ $option->id }}" @if (in_array($option->id, $specData['selectedOptions'])) selected @endif>
-                        {{ $option->name }}
-                    </option>
-                @endforeach
-            </select>
+            <div class="input-group">
+                <select name="specification_{{ $specData['specification']->id }}" data-specification-id="{{ $specData['specification']->id }}" class="form-control specification-dropdown">
+                    <option value="" disabled selected>Select an Option</option>
+                    @foreach ($specData['options'] as $option)
+                        <option value="{{ $option->id }}" @if (in_array($option->id, $specData['selectedOptions'])) selected @endif>
+                            {{ $option->name }}
+                        </option>
+                    @endforeach
+                </select>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" data-specification-id="{{ $specData['specification']->id }}" data-toggle="modal" data-target="#optionsmodal">
+                        +
+                    </button>
+                </div>
+            </div>
         </div>
     @endforeach
 </div>
-<input type="hidden" name="selected_specifications" id="selected_specifications">
+                            <input type="hidden" name="selected_specifications" id="selected_specifications">
                             <div class="col-lg-12 col-md-12 col-sm-12" id="model_detail">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Model Description</label>
@@ -294,15 +357,15 @@ $(document).ready(function () {
     $('input[name^="specification_checkbox"]:checked').each(function () {
         var specificationId = $(this).data('specification-id');
         var selectedValue = $('select[name="specification_' + specificationId + '"]').text();
-        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text();
-        var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').siblings('label').text() : selectedText;
-        var specificationName = $('select[name="specification_' + specificationId + '"]').siblings('label').text();
+        var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text().trim();;
+        var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text() : selectedText;
+        var specificationName = $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text();
 
         if (specificationName === 'Grade') {
             // If specificationName is "Grade," update the gradeOption
             // If specificationName is "Grade," update the gradeOption
 if (gradeOption) {
-    gradeOption.value += displayValue.trim(); // Trim the displayValue before concatenating
+    gradeOption.value += ' ' + displayValue;
 } else {
     selectedOptions.push({ fieldId: 'model', value: displayValue.trim() }); // Trim the displayValue before pushing
 }
@@ -399,8 +462,9 @@ if (gradeOption) {
         $('input[name^="variantcheckbox"]:checked').each(function () {
             var specificationId = $(this).data('specification-id');
             var selectedValue = $('select[name="specification_' + specificationId + '"]').text();
-            var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text();
-            var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').siblings('label').text() : selectedText;
+            var selectedText = $('select[name="specification_' + specificationId + '"] option:selected').text().trim();
+            var displayValue = (selectedText.toUpperCase() === 'YES') ? $('select[name="specification_' + specificationId + '"]').closest('.col-lg-4').find('label').first().text() : selectedText;
+            console.log(selectedText);
             selectedOptionsv.push({ specificationId: specificationId, value: displayValue });
         });
         $('input[name^="fieldvariants"]:checked').each(function () {
@@ -478,5 +542,36 @@ if (gradeOption) {
                 });
             }
         });
+</script>
+<script>
+    $(document).ready(function () {
+        // Attach click event to the plus buttons
+        $('.btn-outline-secondary').click(function () {
+            var specificationId = $(this).data('specification-id');
+            $('#specification-id-input').val(specificationId);
+            $('#optionsmodal').modal('show');
+        });
+    });
+</script>
+<script>
+    function savenewoptions() {
+        var specificationId = $('#specification-id-input').val();
+        var newOptionValue = $('#option_name').val();
+        $.ajax({
+            url: '{{ route('variants.saveOption') }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                specificationId: specificationId,
+                newOption: newOptionValue
+            },
+            success: function (response) {
+                var option = '<option value="' + response.option.id + '">' + response.option.name + '</option>';
+                $('select[name="specification_' + specificationId + '"]').append(option);
+                alertify.success('Specification Option successfully Added');
+                $('#optionsmodal').modal('hide');
+            }
+        });
+    }
 </script>
 @endpush

@@ -29,7 +29,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Employee Joining Report Details</h4>
+	<h4 class="card-title"> Employee Passport Release Details</h4>
 	@if($previous != '')
 	<a  class="btn btn-sm btn-info float-first" href="{{ route('interview-summary-report.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
 	@endif
@@ -67,7 +67,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                 <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Employee Details</h4>
+                            <h4 class="card-title">Employee Passport Release Details</h4>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -75,25 +75,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                     <label for="choices-single-default" class="form-label"> Employee Name :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->employee->first_name ?? '' }} {{ $data->employee->last_name ?? '' }}</span>
+                                    <span>{{ $data->user->name ?? '' }} </span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Employee Code :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->employee->employee_code ?? '' }}</span>
+                                    <span>{{ $data->user->empProfile->employee_code ?? '' }}</span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Designation :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->employee->designation->name ?? '' }}</span>
+                                    <span>{{ $data->user->empProfile->designation->name ?? '' }}</span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Department :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->employee->department->name ?? '' }}</span>
+                                    <span>{{ $data->user->empProfile->department->name ?? '' }}</span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Reporting Manager :</label>
@@ -101,53 +101,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                     <span>{{ $data->reportingManager->name ?? '' }}</span>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Joining Details</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                    <label for="choices-single-default" class="form-label"> Joining Type :</label>
+                                    <label for="choices-single-default" class="form-label"> Division Head :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</span>
+                                    <span>{{ $data->divisionHead->name ?? '' }}</span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                    <label for="choices-single-default" class="form-label"> Joining Date :</label>
+                                    <label for="choices-single-default" class="form-label"> HR Manager :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>
-                                        @if($data->trial_period_joining_date)
-                                        {{\Carbon\Carbon::parse($data->trial_period_joining_date)->format('d M Y')}}
-                                    @elseif($data->permanent_joining_date)
-                                    {{\Carbon\Carbon::parse($data->permanent_joining_date)->format('d M Y')}}
-                                    @endif</span>
-                                </div>
-                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                    <label for="choices-single-default" class="form-label"> Location :</label>
-                                </div>
-                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->permanentJoiningLocation->name ?? '' }}</span>
-                                </div>
-                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                    <label for="choices-single-default" class="form-label"> Remarks :</label>
-                                </div>
-                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->remarks ?? '' }}</span>
-                                </div>
-                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                    <label for="choices-single-default" class="form-label"> Prepared By :</label>
-                                </div>
-                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{ $data->preparedBy->name ?? '' }}</span>
+                                    <span>{{ $data->hrManager->name ?? '' }}</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>                    
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title"><center>History</center></h4>
@@ -182,43 +150,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <center><h4 class="card-title">Prepared by</h4></center>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            Name :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{ $data->preparedBy->name ?? '' }}
-                                        </div>
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            Status :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                        <label class="badge texttransform @if($data->action_by_prepared_by =='pending') badge-soft-info 
-                                        @elseif($data->action_by_prepared_by =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_prepared_by ?? ''}}</label>
-                                        </div>
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            Date & Time :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->prepared_by_action_at ?? ''}}
-                                        </div>
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            Comments :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_prepared_by ?? ''}}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12 col-md-12 col-sm-12">
-                            <div class="card">
-                                <div class="card-header">
                                     <center><h4 class="card-title">Employee</h4></center>
                                 </div>
                                 <div class="card-body">
@@ -227,7 +158,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                             Name :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+                                            {{ $data->user->name ?? '' }}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Status :
@@ -256,43 +187,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <center><h4 class="card-title">HR Manager</h4></center>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            Name :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->hr->name ?? ''}}
-                                        </div>
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            Status :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                            <label class="badge texttransform @if($data->action_by_hr_manager =='pending') badge-soft-info 
-                                        @elseif($data->action_by_hr_manager =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_hr_manager ?? ''}}</label>
-                                        </div>
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            Date & Time :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->hr_manager_action_at ?? ''}}
-                                        </div>
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            Comments :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_hr_manager ?? ''}}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-12 col-md-12 col-sm-12">
-                            <div class="card">
-                                <div class="card-header">
                                     <center><h4 class="card-title">Reporting Manager</h4></center>
                                 </div>
                                 <div class="card-body">
@@ -301,7 +195,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                             Name :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{ $data->reportingManager->name ?? '' }}
+                                        {{ $data->reportingManager->name ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Status :
@@ -322,6 +216,80 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
                                             {{$data->comments_by_department_head ?? ''}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <center><h4 class="card-title">Divison Head</h4></center>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Name :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->divisionHead->name ?? ''}}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Status :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            <label class="badge texttransform @if($data->action_by_division_head =='pending') badge-soft-info 
+                                        @elseif($data->action_by_division_head =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->action_by_division_head ?? ''}}</label>
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Date & Time :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->division_head_action_at ?? ''}}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Comments :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->comments_by_division_head ?? ''}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <center><h4 class="card-title">HR Manager</h4></center>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Name :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                        {{ $data->hrManager->name ?? '' }}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Status :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                        <label class="badge texttransform @if($data->action_by_hr_manager =='pending') badge-soft-info 
+                                        @elseif($data->action_by_hr_manager =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->action_by_hr_manager ?? ''}}</label>
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Date & Time :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->hr_manager_action_at ?? ''}}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Comments :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->comments_by_hr_manager ?? ''}}
                                         </div>
                                     </div>
                                 </div>

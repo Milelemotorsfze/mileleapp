@@ -19,6 +19,7 @@ use App\Models\Prospecting;
 use App\Models\Salesdemand;
 use App\Models\Negotiation;
 use App\Models\Booking;
+use App\Models\LeadCustomers;
 use Carbon\Carbon;
 use App\Models\MasterModelLines;
 use Monarobase\CountryList\CountryListFacade;
@@ -256,6 +257,30 @@ class DailyleadsController extends Controller
         ];
         $calls = new Calls($data);
         $calls->save();
+       $customertype = $request->input('customertype');
+        $customers = New LeadCustomers();
+        $customers->customertype = $customertype;
+        if($customertype === "company")
+        {
+        $file = $request->file('tradelicense');
+        $path = $file->store('tradelicenses');
+        $customers->tradelicense = $path;
+        }
+        else if ($customertype === "government")
+        {
+            $file = $request->file('tender');
+            $path = $file->store('tenders');
+            $customers->tender = $path;
+        }
+        else 
+        {
+            $file = $request->file('passport');
+            $path = $file->store('passports');
+        $customers->passport = $path;
+        }
+        $customers->countryofexport = $request->input('countryofexport');
+        $customers->calls_id = $calls->id;
+        $customers->save();
         $lastRecord = Calls::where('created_by', $data['created_by'])
                    ->orderBy('id', 'desc')
                    ->where('sales_person', Auth::id())
