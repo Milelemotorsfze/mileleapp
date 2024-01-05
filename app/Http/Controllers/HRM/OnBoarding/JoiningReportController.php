@@ -349,18 +349,21 @@ class JoiningReportController extends Controller
         $employeePendings = JoiningReport::where([
             ['action_by_prepared_by','approved'],
             ['action_by_employee','pending'],
-            ['employee_id',$authId],
-            ])->latest()->get();
+            ])->whereHas('employee' , function($q) use($authId){
+                $q->where('user_id', $authId);
+            })->latest()->get();
         $employeeApproved = JoiningReport::where([
             ['action_by_prepared_by','approved'],
-            ['action_by_employee','pending'],
-            ['employee_id',$authId],
-            ])->latest()->get();
+            ['action_by_employee','approved'],
+            ])->whereHas('employee' , function($q) use($authId){
+                $q->where('user_id', $authId);
+            })->latest()->get();
         $employeeRejected = JoiningReport::where([
             ['action_by_prepared_by','approved'],
-            ['action_by_employee','pending'],
-            ['employee_id',$authId],
-            ])->latest()->get();
+            ['action_by_employee','rejected'],
+            ])->whereHas('employee' , function($q) use($authId){
+                $q->where('user_id', $authId);
+            })->latest()->get();
         if($HRManager) {
             $HRManagerPendings = JoiningReport::where([
                 ['action_by_prepared_by','approved'],
@@ -371,13 +374,13 @@ class JoiningReportController extends Controller
             $HRManagerApproved = JoiningReport::where([
                 ['action_by_prepared_by','approved'],
                 ['action_by_employee','approved'],
-                ['action_by_hr_manager','pending'],
+                ['action_by_hr_manager','approved'],
                 ['hr_manager_id',$authId],
                 ])->latest()->get();
             $HRManagerRejected = JoiningReport::where([
                 ['action_by_prepared_by','approved'],
                 ['action_by_employee','approved'],                
-                ['action_by_hr_manager','pending'],
+                ['action_by_hr_manager','rejected'],
                 ['hr_manager_id',$authId],
                 ])->latest()->get();
         }

@@ -212,6 +212,7 @@ class User extends Authenticatable
         return $pendingPersonalInfo;
     }
     public function getJoiningReportApprovalAttribute() {
+        $authId = $this->id;
         $joiningReportApproval['can'] = false;
         $joiningReportApproval['count'] = 0;
         $preparedByPendings = $preparedByApproved = $preparedByRejected = $employeePendings = $employeeApproved = $employeeRejected = $HRManagerPendings 
@@ -219,14 +220,20 @@ class User extends Authenticatable
         $preparedByPendings = JoiningReport::where([['action_by_prepared_by','pending'],['prepared_by_id',$this->id],])->latest()->get();
         $preparedByApproved = JoiningReport::where([['action_by_prepared_by','approved'],['prepared_by_id',$this->id],])->latest()->get();
         $preparedByRejected = JoiningReport::where([['action_by_prepared_by','rejected'],['prepared_by_id',$this->id],])->latest()->get();
-        $employeePendings = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','pending'],['employee_id',$this->id],])->latest()->get();
-        $employeeApproved = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','pending'],['employee_id',$this->id],])->latest()->get();
-        $employeeRejected = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','pending'],['employee_id',$this->id],])->latest()->get();
+        $employeePendings = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','pending']])->whereHas('employee' , function($q) use($authId){
+            $q->where('user_id', $authId);
+        })->latest()->get();
+        $employeeApproved = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','approved']])->whereHas('employee' , function($q) use($authId){
+            $q->where('user_id', $authId);
+        })->latest()->get();
+        $employeeRejected = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','rejected']])->whereHas('employee' , function($q) use($authId){
+            $q->where('user_id', $authId);
+        })->latest()->get();
         $HRManagerPendings = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','approved'],['action_by_hr_manager','pending'],
             ['hr_manager_id',$this->id],])->latest()->get();
-        $HRManagerApproved = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','approved'],['action_by_hr_manager','pending'],
+        $HRManagerApproved = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','approved'],['action_by_hr_manager','approved'],
             ['hr_manager_id',$this->id],])->latest()->get();
-        $HRManagerRejected = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','approved'],['action_by_hr_manager','pending'],
+        $HRManagerRejected = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','approved'],['action_by_hr_manager','rejected'],
             ['hr_manager_id',$this->id],])->latest()->get();  
         $ReportingManagerPendings = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','approved'],['action_by_hr_manager','approved'],
             ['action_by_department_head','pending'],['department_head_id',$this->id],])->latest()->get();

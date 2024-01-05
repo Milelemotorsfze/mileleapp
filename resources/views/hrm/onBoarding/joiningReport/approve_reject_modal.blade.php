@@ -1,4 +1,4 @@
-<div class="modal fade" id="approve-employee-hiring-request-{{$data->id}}"
+<div class="modal fade" id="approve-joining-report-{{$data->id}}"
 	tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog ">
 		<div class="modal-content">
@@ -54,12 +54,12 @@
 		</div>
 	</div>
 </div>
-<div class="modal fade" id="reject-employee-hiring-request-{{$data->id}}"
+<div class="modal fade" id="reject-joining-report-{{$data->id}}"
 	tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog ">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Hiring Request Rejection</h1>
+				<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Joining Report Rejection</h1>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body p-3">
@@ -125,7 +125,7 @@
         function approveOrRejectHiringrequest(id, status) {
 			var comment = $("#comment-"+id).val();
 			var current_approve_position = $("#current_approve_position_"+id).val();
-	        let url = '{{ route('joiningReport.action') }}';
+	        let url = '{{ route('joiningReport.action') }}'; 
 	        if(status == 'rejected') {
 	            var message = 'Reject';
 	        }else{
