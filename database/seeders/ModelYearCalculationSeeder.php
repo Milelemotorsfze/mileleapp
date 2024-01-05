@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Carbon\Carbon;
+use Doctrine\DBAL\Schema\Schema;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,13 @@ class ModelYearCalculationSeeder extends Seeder
      */
     public function run(): void
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+        DB::table('model_year_calculation_categories')->truncate();
+        DB::table('model_year_calculation_rules')->truncate();
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
         DB::table('model_year_calculation_rules')->insert([
             [
                 'id' => 1,
@@ -69,7 +77,7 @@ class ModelYearCalculationSeeder extends Seeder
             ],
             [
                 'id' => 5,
-                'name' => 'LC70',
+                'name' => 'LC76',
                 'model_year_rule_id' => 2,
                 'updated_at' => Carbon::now(),
                 'created_at' => Carbon::now(),
@@ -104,15 +112,15 @@ class ModelYearCalculationSeeder extends Seeder
             ],
             [
                 'id' => 10,
-                'name' => 'Prado',
-                'model_year_rule_id' => 3,
+                'name' => 'LC78',
+                'model_year_rule_id' => 2,
                 'updated_at' => Carbon::now(),
                 'created_at' => Carbon::now(),
             ],
             [
                 'id' => 11,
-                'name' => 'LC300',
-                'model_year_rule_id' => 3,
+                'name' => 'LC79',
+                'model_year_rule_id' => 2,
                 'updated_at' => Carbon::now(),
                 'created_at' => Carbon::now(),
             ],
@@ -129,7 +137,21 @@ class ModelYearCalculationSeeder extends Seeder
                 'model_year_rule_id' => 3,
                 'updated_at' => Carbon::now(),
                 'created_at' => Carbon::now(),
-            ]
+            ],
+            [
+                'id' => 14,
+                'name' => 'Prado',
+                'model_year_rule_id' => 3,
+                'updated_at' => Carbon::now(),
+                'created_at' => Carbon::now(),
+            ],
+            [
+                'id' => 15,
+                'name' => 'LC300',
+                'model_year_rule_id' => 3,
+                'updated_at' => Carbon::now(),
+                'created_at' => Carbon::now(),
+            ],
         ]);
 
     }
