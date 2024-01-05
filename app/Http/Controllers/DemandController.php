@@ -165,6 +165,9 @@ class DemandController extends Controller
                 $data['quantity'] = 0;
             }
         }
+        if($request->module == 'DEMAND') {
+          $data['variant'] = $masterModel->variant->name ?? '';
+        }
 
         return $data;
     }

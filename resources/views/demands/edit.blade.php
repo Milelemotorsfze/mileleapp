@@ -1,5 +1,12 @@
 @extends('layouts.main')
 @section('content')
+    <style>
+        .widthinput
+        {
+            height:32px!important;
+        }
+
+    </style>
     <div class="card-header">
         <h4 class="card-title">Update Demand</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ route('demands.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -31,20 +38,20 @@
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label text-muted">Supplier</label>
-                        <input type="text" value="{{ $demand->supplier->supplier }}" id="supplier-row" class="form-control" readonly/>
+                        <label for="choices-single-default" class="form-label text-muted">Vendor</label>
+                        <input type="text" value="{{ $demand->supplier->supplier }}" id="supplier-row" class="form-control widthinput" readonly/>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label text-muted">Dealers</label>
-                        <input type="text" value="{{ $demand->whole_saler }}" id="whole-saler-row" class="form-control" readonly/>
+                        <label for="choices-single-default" class="form-label text-muted">Dealer</label>
+                        <input type="text" value="{{ $demand->whole_saler }}" id="whole-saler-row" class="form-control widthinput" readonly/>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label text-muted">Steering</label>
-                        <input type="text" value="{{ $demand->steering }}" id="steering-row" class="form-control" readonly/>
+                        <input type="text" value="{{ $demand->steering }}" id="steering-row" class="form-control widthinput" readonly/>
                     </div>
                 </div>
             </div>
@@ -54,11 +61,14 @@
                     <div class="d-flex">
                         <div class="col-lg-7 col-md-12 col-sm-12">
                             <div class="row">
-                                <div class="col-lg-4 col-md-4 col-sm-12">
+                                <div class="col-lg-3 col-md-6 col-sm-12">
                                     <label for="basicpill-firstname-input" class="form-label">Model</label>
                                 </div>
-                                <div class="col-lg-3 col-md-3 col-sm-12">
+                                <div class="col-lg-2 col-md-6 col-sm-12">
                                     <label for="basicpill-firstname-input" class="form-label">SFX</label>
+                                </div>
+                                <div class="col-lg-2 col-md-6 col-sm-12">
+                                    <label for="basicpill-firstname-input" class="form-label">Model Year</label>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-12">
                                     <label for="basicpill-firstname-input" class="form-label">Variant</label>
@@ -81,20 +91,24 @@
                 </div>
             @if($demandLists->count() > 0)
                 @foreach($demandLists as $value => $demandList)
-                <div class="d-flex mt-3">
+                <div class="d-flex mt-2">
                     <div class="col-lg-7 col-md-9 col-sm-9 col-9">
                         <div class="row">
-                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                <input type="text" value="{{ $demandList->masterModel->model ?? ''}}"  readonly class="form-control" >
-                            </div>
                             <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
+                                <input type="text" value="{{ $demandList->masterModel->model ?? ''}}"  readonly class="form-control widthinput" >
+                            </div>
+                            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12">
                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                <input type="text" value="{{ $demandList->masterModel->sfx ?? ''}}" readonly class="form-control">
+                                <input type="text" value="{{ $demandList->masterModel->sfx ?? ''}}" readonly class="form-control widthinput">
+                            </div>
+                            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12">
+                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Model Year</label>
+                                <input type="text" value="{{ $demandList->masterModel->model_year ?? ''}}" readonly class="form-control widthinput">
                             </div>
                             <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12">
                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                <input type="text" value="{{ $demandList->masterModel->variant->name ?? '' }}" readonly class="form-control">
+                                <input type="text" value="{{ $demandList->masterModel->variant->name ?? '' }}" readonly class="form-control widthinput">
                             </div>
                         </div>
                     </div>
@@ -103,32 +117,18 @@
                             @foreach($months as $key => $month)
                                 <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">
                                     <label class="d-lg-none d-xl-none d-xxl-none"> {{ $month }} </label>
-{{--                                    @foreach($demandList->fiveMonthDemands[$key] as $key => $monthlyDemand)--}}
-{{--                                    {{ $demandList->fiveMonthDemands[$key]->quantity }}--}}
-                                            <input type="number" value="{{ $demandList->fiveMonthDemands[$key]->quantity  ?? 0}}" id="demand-quantity-{{$value}}-{{$key}}"
-                                                   min="0" class="form-control demand-list-quantity-{{ $key }}" readonly
-                                                   oninput="validity.valid||(value='');" step="1" />
-{{--                                    @endforeach--}}
+                                        <input type="number" value="{{ $demandList->fiveMonthDemands[$key]->quantity  ?? 0}}" id="demand-quantity-{{$value}}-{{$key}}"
+                                               min="0" class="form-control widthinput demand-list-quantity-{{ $key }}" readonly
+                                               oninput="validity.valid||(value='');" step="1" />
                                 </div>
                             @endforeach
-{{--                            {{$demandList->fiveMonthDemands }}--}}
-{{--                            @if($demandList->fiveMonthDemands->count() < 5)--}}
-{{--                                    <?php--}}
-{{--                                    $count = $demandList->fiveMonthDemands->count();--}}
-{{--                                    ?>--}}
-{{--                                @for($i = $count; $i < 5 ;$i++)--}}
-{{--                                    <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">--}}
-{{--                                        <input type="number" value="0" id="demand-quantity-{{$value}}-{{$i}}" min="0"--}}
-{{--                                               class="form-control demand-list-quantity-{{ $i }}"  oninput="validity.valid||(value='');" step="1" />--}}
-{{--                                    </div>--}}
-{{--                                @endfor--}}
-{{--                            @endif--}}
+
                                 <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12" >
                                     <label class="d-lg-none d-xl-none d-xxl-none">Total </label>
-                                    <input type="number" class="form-control mb-3" readonly value="{{ $demandList->fiveMonthDemands()->sum('quantity') }}" >
+                                    <input type="number" class="form-control widthinput mb-3" readonly value="{{ $demandList->fiveMonthDemands()->sum('quantity') }}" >
                                 </div>
                                 <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">
-                                    <button type="button" class="btn btn-danger demand-list-delete sm-mt-3"  data-id="{{ $demandList->id }}"
+                                    <button type="button" class="btn btn-danger widthinput demand-list-delete sm-mt-3"  data-id="{{ $demandList->id }}"
                                             data-url="{{ route('demand-lists.destroy', $demandList->id) }}">
                                         <i class="fa fa-trash"></i>
                                     </button>
@@ -146,26 +146,30 @@
                 <div class="d-flex">
                     <div class="col-lg-7 col-md-9 col-sm-9 col-9">
                         <div class="row">
-                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                            <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
                                 <label  class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                 <select class="form-select text-dark" name="model" id="model" autofocus="autofocus">
+                                 <select class="form-select text-dark widthinput" name="model" id="model" multiple autofocus="autofocus">
                                      <option></option>
                                     @foreach($models as $model)
                                         <option value="{{ $model->model }}">{{ $model->model }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
-                                <label  class="form-label d-lg-none d-xl-none d-xxl-none mt-3">SFX</label>
-                                <select class="form-select text-dark" name="sfx" id="sfx" >
+                            <div class="col-lg-2 col-md-6 col-sm-12 col-xs-12">
+                                <label  class="form-label d-lg-none d-xl-none d-xxl-none mt-1" >SFX</label>
+                                <select class="form-select text-dark widthinput" name="sfx" id="sfx" multiple >
                                     <option></option>
                                 </select>
                             </div>
-                            <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12">
-                                <label  class="form-label d-lg-none d-xl-none d-xxl-none mt-3">Variant</label>
-                                <select class="form-select variant text-dark" name="variant" id="variant-name" >
-                                    <option ></option>
+                            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12">
+                                <label  class="form-label d-lg-none d-xl-none d-xxl-none mt-1">Model Year</label>
+                                <select class="form-select text-dark" name="model_year" id="model-year" multiple>
                                 </select>
+                            </div>
+                            <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12">
+                                <label  class="form-label d-lg-none d-xl-none d-xxl-none mt-1">Variant</label>
+                                <input type="text" readonly class="form-control  widthinput text-dark" id="variant" >
+
                             </div>
                         </div>
                     </div>
@@ -176,23 +180,23 @@
                                     <label  class="form-label d-lg-none d-xl-none d-xxl-none">{{$month}}</label>
                                     <input type="hidden" value="{{$month}}" name="month[]" id="month-year"/>
                                     <input type="number" value="0" id="count-{{$key}}" name="quantity[]" step="1" oninput="validity.valid||(value='');"
-                                           class="form-control quantity" min="0"/>
+                                           class="form-control widthinput quantity" min="0"/>
                                 </div>
                             @endforeach
                             <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">
                                 <label  class="form-label d-lg-none d-xl-none d-xxl-none">Total</label>
-                                <input type="text" class="form-control mb-3" readonly value="" id="total"  name="total">
+                                <input type="text" class="form-control widthinput mb-3" readonly value="" id="total"  name="total">
                             </div>
 {{--                                hide in samll view--}}
                             <div class="col-lg-2 col-sm-12 col-xs-12 d-none d-sm-block">
-                                <button type="submit" class="btn btn-info ">  Add  </button>
+                                <button type="submit" class="btn widthinput btn-info"> Add  </button>
                             </div>
                         </div>
                     </div>
                 </div>
 {{--                // show only in xs or small view--}}
                 <div class="col-12 text-center d-block d-sm-none">
-                    <button type="submit" class="btn btn-info "> Add   </button>
+                    <button type="submit" class="btn btn-info "> Add </button>
                 </div>
                 <br/>
                 <div class="d-none d-lg-block d-xl-block d-xxl-block">
@@ -227,15 +231,23 @@
         $('.demand-list-quantity-2').attr('readonly', false);
         $('.demand-list-quantity-3').attr('readonly', false);
         $('.demand-list-quantity-4').attr('readonly', false);
-        $('#model-error').addClass('marigin-top','10px')
+        $('#model-error').addClass('marigin-top','10px');
+
         $('#model').select2({
             placeholder : 'Select Model',
+            allowClear: true,
+            maximumSelectionLength: 1
         });
         $('#sfx').select2({
             placeholder : 'Select SFX',
+            allowClear: true,
+            maximumSelectionLength: 1
         });
-        $('.variant').select2({
-            placeholder : 'Select Varaint',
+
+        $('#model-year').select2({
+            placeholder : 'Select Model Year',
+            allowClear: true,
+            maximumSelectionLength: 1
         });
 
         $("#form-demand").validate({
@@ -279,18 +291,47 @@
                 },
                 success:function (data) {
                     $('select[name="sfx"]').empty();
-                    $('select[name="variant"]').empty();
+                    $('#model-year').empty();
+                    $('#variant').val('');
                     $('#sfx').html('<option value=""> Select SFX </option>');
-                    $('#variant-name').html('<option value=""> Select Variant </option>');
+                    $('#model-year').html('<option value=""> Select Model Year </option>');
                     jQuery.each(data, function(key,value){
                         $('select[name="sfx"]').append('<option value="'+ value +'">'+ value +'</option>');
                     });
                 }
             });
         });
+
         $('#sfx').on('change',function(){
             $('#sfx-error').remove();
             let sfx = $(this).val();
+            let model = $('#model').val();
+            let url = '{{ route('demand.get-model-year') }}';
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    sfx: sfx,
+                    model:model,
+                },
+                success:function (data) {
+                    $('#model-year').empty();
+                    $('#model-year').html('<option value=""> Select Model Year </option>');
+                    $('#variant').val('');
+                    jQuery.each(data, function(key,value){
+                        console.log(value);
+                        $('#model-year').append('<option value="'+ value +'">'+ value +'</option>');
+                    });
+                }
+            });
+
+        });
+
+        $('#model-year').on('change',function(){
+            $('#model-year-error').remove();
+            let modelYear = $(this).val();
+            let sfx = $('#sfx').val();
             let model = $('#model').val();
             let url = '{{ route('demand.get-loi-description') }}';
             $.ajax({
@@ -300,15 +341,12 @@
                 data: {
                     sfx: sfx,
                     model:model,
-                    module: 'Demand'
+                    model_year:modelYear[0],
+                    module:'DEMAND'
                 },
                 success:function (data) {
-                    var data = data.variants
-                    $('select[name="variant"]').empty();
-                    $('#variant-name').html('<option value=""> Select Variant </option>');
-                    jQuery.each(data, function(key,value){
-                        $('select[name="variant"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
-                    });
+                    console.log(data);
+                    $('#variant').val(data.variant);
                 }
             });
         });

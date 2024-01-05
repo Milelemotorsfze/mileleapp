@@ -197,7 +197,7 @@
             <div class="row">
                 <div class="card p-2" >
                     <div class="card-header">
-                        <h4 class="card-title ">LOI Items</h4>
+                        <h4 class="card-title">LOI Items</h4>
                     </div>
                     <div class="card-body">
                         <div id="loi-items" >
@@ -700,10 +700,10 @@
             var modelYear =  $('#model-year-'+index).val();
             var model = $('#model-'+index).val();
             var sfx = e.params.data.id;
-            if(modelYear[0]){
+            if(modelYear[0]) {
                 appendModelYear(index, model[0],sfx,modelYear[0])
             }
-            appendSFX(index,model[0],sfx)
+            appendSFX(index,model[0],sfx);
             $('#model-year-'+index).empty();
 
         });
@@ -803,7 +803,7 @@
                success:function (data) {
 
                    $('#model-year-'+index).empty();
-                    $('#model-year-'+index).html('<option value=""> Select Model Year </option>');
+                   $('#model-year-'+index).html('<option value=""> Select Model Year </option>');
                    $('#loi-description-'+index).html('<option value=""> Select LOI Description </option>');
                    // $('#inventory-quantity').val(quantity);
                    jQuery.each(data, function(key,value){
