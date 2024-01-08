@@ -261,6 +261,7 @@ class SupplierInventoryController extends Controller
                         $modelYear = substr($filedata[6], 0, -2);
                         $productionMonth = substr($filedata[6], -2);
                         $modelYearCalculationCategories = ModelYearCalculationCategory::all();
+
                         foreach ($modelYearCalculationCategories as $modelYearCalculationCategory) {
                             $isItemExistCategory = MasterModel::select(['id', 'model', 'sfx', 'variant_id'])
                                 ->where('model', $filedata[1])
@@ -344,7 +345,7 @@ class SupplierInventoryController extends Controller
                 }
                 $j++;
             }
-
+            // CHCEK CHASIS EXISTING WITH ALREDY UPLOADED DATA.
             $chaisisNumbers = array_filter($chaisis);
             $uniqueChaisis =  array_unique($chaisisNumbers);
 
@@ -794,10 +795,38 @@ class SupplierInventoryController extends Controller
 
                 $inventory->$fieldName = Carbon::parse($fieldValue)->format('Y-m-d');
             }
-//            else if($fieldName == 'pord_month') {
-//
-//                $inventory->$fieldName = Carbon::parse($fieldValue)->format('Y-m-d');
-//            }
+            else if($fieldName == 'pord_month') {
+                $modelYear = substr($fieldValue, 0, -2);
+                $productionMonth = substr($fieldValue, -2);
+                $modelYearCalculationCategories = ModelYearCalculationCategory::all();
+                foreach ($modelYearCalculationCategories as $modelYearCalculationCategory) {
+                    $isItemExistCategory = MasterModel::select(['id', 'model', 'sfx', 'variant_id'])
+                        ->where('model', $inventory->masterModel->model)
+                        ->where('sfx', $inventory->masterModel->sfx)
+                        ->with('variant.master_model_lines')
+                        ->whereHas('variant.master_model_lines', function ($query) use ($modelYearCalculationCategory) {
+                            $query->where('model_line', 'LIKE', '%' . $modelYearCalculationCategory->name . '%');
+                        });
+
+                    if ($isItemExistCategory->count() > 0) {
+                        $correspondingCategoryRuleValue = $modelYearCalculationCategory->modelYearRule->value ?? 0;
+                        if ($productionMonth > $correspondingCategoryRuleValue) {
+                            if ($fieldValue){
+                                $modelYear = substr($fieldValue, 0, -2) + 1;
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                $masterModel =  MasterModel::where('model', $inventory->masterModel->model)
+                    ->where('sfx', $inventory->masterModel->sfx)
+                    ->where('model_year',  $modelYear)
+                    ->first();
+
+                $inventory->$fieldName = $fieldValue;
+                $inventory->master_model_id = $masterModel->id;
+            }
             else{
                $inventory->$fieldName = $fieldValue;
             }
@@ -1842,5 +1871,66 @@ class SupplierInventoryController extends Controller
 
             }
         }
+    public function checkChasisUnique(Request $request) {
 
+        $isChasisExist = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            ->where('chasis',  $request->chasis)
+            ->first();
+
+        if($isChasisExist) {
+            $data = 1;
+        }else{
+            $data = 0;
+        }
+
+        return response($data);
+    }
+    public function checkProductionMonth(Request $request) {
+
+        $supplierInventory = SupplierInventory::find($request->id);
+
+        $production_month = $request->prod_month;
+
+        $modelYear = substr($production_month, 0, -2);
+        $productionMonth = substr($production_month, -2);
+        $modelYearCalculationCategories = ModelYearCalculationCategory::all();
+
+        foreach ($modelYearCalculationCategories as $modelYearCalculationCategory) {
+
+            $isItemExistCategory = MasterModel::select(['id', 'model', 'sfx', 'variant_id'])
+                ->where('model', $supplierInventory->masterModel->model)
+                ->where('sfx', $supplierInventory->masterModel->sfx)
+                ->with('variant.master_model_lines')
+                ->whereHas('variant.master_model_lines', function ($query) use ($modelYearCalculationCategory) {
+                    $query->where('model_line', 'LIKE', '%' . $modelYearCalculationCategory->name . '%');
+                });
+
+            if ($isItemExistCategory->count() > 0) {
+
+                $correspondingCategoryRuleValue = $modelYearCalculationCategory->modelYearRule->value ?? 0;
+
+                if ($productionMonth > $correspondingCategoryRuleValue) {
+
+                    if ($production_month){
+                        $modelYear = substr($production_month, 0, -2) + 1;
+                    }
+                    break;
+                }
+            }
+        }
+
+       $isExistModelCombination =  MasterModel::where('model', $supplierInventory->masterModel->model)
+            ->where('sfx', $supplierInventory->masterModel->sfx)
+            ->where('model_year', $modelYear)
+           ->first();
+
+           if($isExistModelCombination) {
+               $data = 1;
+           }else{
+               $data = $modelYear;
+           }
+
+       return response($data);
+    }
 }
