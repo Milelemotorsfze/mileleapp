@@ -240,7 +240,7 @@ class SupplierInventoryController extends Controller
                     $uploadFileContents[$i]['pord_month'] = $filedata[6];
                     $uploadFileContents[$i]['po_arm'] = $filedata[7];
                     if (!empty($filedata[8])) {
-                        $filedata[8] = $filedata[8];
+                        $filedata[8] = \Illuminate\Support\Carbon::parse($filedata[8])->format('Y-m-d');
                     }else {
                         $filedata[8] = NULL;
                     }
