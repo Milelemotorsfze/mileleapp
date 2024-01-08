@@ -28,11 +28,25 @@ class PassportRequestController extends Controller
         $rejected = PassportRequest::where('submit_status','rejected')->latest()->get();
         return view('hrm.passport.passport_request.index',compact('pendings','approved','rejected'));
     }
-    public function create() {
-        return view('hrm.passport.passport_request.create');
-    }
-    public function edit() {
-        return view('hrm.passport.passport_request.edit');
+    // public function create() {
+    //     return view('hrm.passport.passport_request.create');
+    // }
+    public function edit($id) {
+        $data = PassportRequest::where('id',$id)->first();
+        $Users = User::whereHas('empProfile')->get();
+        $masterEmployees = [];
+        $currentUser = User::where('id',$data->employee_id)->first();        
+        if($currentUser) {
+            array_push($masterEmployees,$currentUser);  
+        }
+        foreach($Users as $User) {
+            if($User->can_submit_or_release_passport == true) {
+                array_push($masterEmployees,$User);  
+            }
+        }
+        $submissionPurpose = PassportRequestPurpose::where('type','submit')->get();
+        $releasePurpose = PassportRequestPurpose::where('type','release')->get();
+        return view('hrm.passport.passport_request.edit',compact('data','masterEmployees','submissionPurpose','releasePurpose'));
     }
     public function show($id) {
         $data = PassportRequest::where('id',$id)->first();
@@ -47,8 +61,8 @@ class PassportRequestController extends Controller
         }
         else {
             $data = PassportRequest::find($id);
-            $previous = PassportRequest::where('status',$data->status)->where('id', '<', $id)->max('id');
-            $next = PassportRequest::where('status',$data->status)->where('id', '>', $id)->min('id');
+            $previous = PassportRequest::where('id', '<', $id)->max('id');
+            $next = PassportRequest::where('id', '>', $id)->min('id');
         }
         $Users = User::whereHas('empProfile')->get();
         $masterEmployees = [];
@@ -140,10 +154,10 @@ class PassportRequestController extends Controller
                         $successMessage = "Employee Passport Request Updated Successfully";
                     }
                 }
-                dd('hi');
+                
                 // DB::commit();
-                // return redirect()->route('employee_leave.index')
-                //                     ->with('success',$successMessage);
+                return redirect()->route('passport_request.index')
+                                    ->with('success',$successMessage);
             // } 
             // catch (\Exception $e) {
             //     DB::rollback();

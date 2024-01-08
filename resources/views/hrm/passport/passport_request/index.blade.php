@@ -14,7 +14,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
 	@endphp
 	@if ($hasPermission)
-	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('passport_request.create') }}">
+	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('employee-passport_request.create-or-edit','new') }}">
       <i class="fa fa-plus" aria-hidden="true"></i> New Passport Request
     </a>
 	@endif
