@@ -103,6 +103,7 @@ Route::get('/react-page', function () {
 Route::get('/d', function () {
     return view('addon.ff');
 });
+
     Auth::routes();
     Route::controller(AuthOtpController::class)->group(function(){
         Route::get('/otp/login', 'login')->name('otp.login');
