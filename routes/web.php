@@ -105,6 +105,7 @@ Route::get('/react-page', function () {
 Route::get('/d', function () {
     return view('addon.ff');
 });
+
     Auth::routes();
     Route::controller(AuthOtpController::class)->group(function(){
         Route::get('/otp/login', 'login')->name('otp.login');
@@ -307,9 +308,13 @@ Route::get('/d', function () {
     Route::controller(PassportRequestController::class)->group(function(){
         Route::get('employee-passport_request/create-or-edit/{id}', 'createOrEdit')->name('employee-passport_request.create-or-edit');
         Route::post('employee-passport_request/store-or-update/{id}', 'storeOrUpdate')->name('employee-passport_request.store-or-update');
+        Route::post('employee-passport-submit/request-action', 'requestAction')->name('employee-passport-submit.request-action');
     });
     // Employee Passport Release
     Route::resource('passport_release', PassportReleaseController::class);
+    Route::controller(PassportReleaseController::class)->group(function(){
+        Route::post('employee-passport-release/request-action', 'requestAction')->name('employee-passport-release.request-action');
+    });
     // Employee Liability
     Route::resource('employee_liability', EmployeeLiabilityController::class);
     Route::controller(EmployeeLiabilityController::class)->group(function(){

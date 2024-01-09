@@ -164,21 +164,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                             Status :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                        <label class="badge texttransform @if($data->action_by_employee =='pending') badge-soft-info 
-                                        @elseif($data->action_by_employee =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_employee ?? ''}}</label>
+                                        <label class="badge texttransform @if($data->submit_action_by_employee =='pending') badge-soft-info 
+                                        @elseif($data->submit_action_by_employee =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->submit_action_by_employee ?? ''}}</label>
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->employee_action_at ?? ''}}
+                                            {{$data->submit_employee_action_at ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_employee ?? ''}}
+                                            {{$data->submit_comments_by_employee ?? ''}}
                                         </div>
                                     </div>
                                 </div>
@@ -201,21 +201,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                             Status :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                        <label class="badge texttransform @if($data->action_by_department_head =='pending') badge-soft-info 
-                                        @elseif($data->action_by_department_head =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_department_head ?? ''}}</label>
+                                        <label class="badge texttransform @if($data->submit_action_by_department_head =='pending') badge-soft-info 
+                                        @elseif($data->submit_action_by_department_head =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->submit_action_by_department_head ?? ''}}</label>
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->department_head_action_at ?? ''}}
+                                            {{$data->submit_department_head_action_at ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_department_head ?? ''}}
+                                            {{$data->submit_comments_by_department_head ?? ''}}
                                         </div>
                                     </div>
                                 </div>
@@ -238,21 +238,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                             Status :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            <label class="badge texttransform @if($data->action_by_division_head =='pending') badge-soft-info 
-                                        @elseif($data->action_by_division_head =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_division_head ?? ''}}</label>
+                                            <label class="badge texttransform @if($data->submit_action_by_department_head =='pending') badge-soft-info 
+                                        @elseif($data->submit_action_by_department_head =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->submit_action_by_department_head ?? ''}}</label>
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->division_head_action_at ?? ''}}
+                                            {{$data->submit_division_head_action_at ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_division_head ?? ''}}
+                                            {{$data->submit_comments_by_division_head ?? ''}}
                                         </div>
                                     </div>
                                 </div>
@@ -275,21 +275,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                             Status :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                        <label class="badge texttransform @if($data->action_by_hr_manager =='pending') badge-soft-info 
-                                        @elseif($data->action_by_hr_manager =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_hr_manager ?? ''}}</label>
+                                        <label class="badge texttransform @if($data->submit_action_by_hr_manager =='pending') badge-soft-info 
+                                        @elseif($data->submit_action_by_hr_manager =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->submit_action_by_hr_manager ?? ''}}</label>
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->hr_manager_action_at ?? ''}}
+                                            {{$data->submit_hr_manager_action_at ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_hr_manager ?? ''}}
+                                            {{$data->submit_comments_by_hr_manager ?? ''}}
                                         </div>
                                     </div>
                                 </div>

@@ -1,9 +1,9 @@
-<div class="modal fade" id="approve-employee-hiring-request-{{$data->id}}"
+<div class="modal fade" id="approve-passport-submit-request-{{$data->id}}"
 	tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog ">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Hiring Job Description Approval</h1>
+				<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Passport Submit Request Approval</h1>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body p-3">
@@ -54,12 +54,12 @@
 		</div>
 	</div>
 </div>
-<div class="modal fade" id="reject-employee-hiring-request-{{$data->id}}"
+<div class="modal fade" id="reject-passport-submit-request-{{$data->id}}"
 	tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog ">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Hiring Job Description Approval</h1>
+				<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Passport Submit Request Rejection</h1>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body p-3">
@@ -125,13 +125,13 @@
         function approveOrRejectHiringrequest(id, status) {
 			var comment = $("#comment-"+id).val();
 			var current_approve_position = $("#current_approve_position_"+id).val();
-	        let url = '{{ route('employee-hiring-job-description.request-action') }}';
+	        let url = '{{ route('employee-passport-submit.request-action') }}';
 	        if(status == 'rejected') {
 	            var message = 'Reject';
 	        }else{
 	            var message = 'Approve';
 	        }
-	        var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee hiring job description ?',function (e) {
+	        var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee passport submit request ?',function (e) {
 	            if (e) {
 	                $.ajax({
 	                    type: "POST",

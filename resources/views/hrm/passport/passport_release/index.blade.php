@@ -127,37 +127,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 										</a>
 									</li>
-                                    <li>
-										@if(isset($type))
-											@if($type == 'approve')
+                                    <li>									
+										@if(isset($data->is_auth_user_can_approve['can_approve']))
+											@if($data->is_auth_user_can_approve['can_approve'] == true)
 												<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-													data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
-													<i class="fa fa-thumbs-up" aria-hidden="true"></i>  Approve 
+													data-bs-target="#approve-passport-release-request-{{$data->id}}">
+													<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 												</button>
 												<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-													data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+													data-bs-target="#reject-passport-release-request-{{$data->id}}">
 													<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 												</button>
-											@endif
-										@elseif(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
-											@if(isset($data->is_auth_user_can_approve['can_approve']))
-												@if($data->is_auth_user_can_approve['can_approve'] == true)
-													<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-														data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
-														<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
-													</button>
-													<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-														data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
-														<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
-													</button>
-												@endif
 											@endif
 										@endif
 									</li>
                                 </ul>
                             </div>
 							</td>
-							@include('hrm.hiring.job_description.approve_reject_modal')					
+							@include('hrm.passport.passport_release.approve_reject_modal')					
 						</tr>
 						@endforeach
 					</tbody>

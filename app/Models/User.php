@@ -15,6 +15,7 @@ use App\Models\HRM\Hiring\EmployeeHiringRequest;
 use App\Models\HRM\Hiring\JobDescription;
 use App\Models\HRM\Hiring\InterviewSummaryReport;
 use App\Models\HRM\Employee\JoiningReport;
+use App\Models\HRM\Employee\PassportRelease;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
@@ -42,6 +43,8 @@ class User extends Authenticatable
         'verify_offer_letters',
         'candidate_personal_information_varify',
         'joining_report_approval',
+        'passport_submit_request_approval',
+        'passport_release_request_approval',
     ];
     public function getPassportWithAttribute() {
         $passportWith = 'with_employee';
@@ -69,7 +72,7 @@ class User extends Authenticatable
             else if($this->empProfile->type == 'employee' && $this->empProfile->passport_status == 'with_milele') {
                 $isReleasePending = PassportRelease::where([
                     ['employee_id',$this->id],
-                    ['release_submit_status	','pending'],
+                    ['release_submit_status','pending'],
                 ])->first();
                 if($isReleasePending == null) {
                     $canSubmitOrReleasePassport = true;
@@ -109,32 +112,14 @@ class User extends Authenticatable
         $jobDescriptionApproval['can'] = false;
         $jobDescriptionApproval['count'] = 0;
         $deptHeadPendings = $deptHeadApproved = $deptHeadRejected = $HRManagerPendings = $HRManagerApproved = $HRManagerRejected = [];
-        $deptHeadPendings = JobDescription::where([
-            ['action_by_department_head','pending'],
-            ['department_head_id',$this->id],
+        $deptHeadPendings = JobDescription::where([['action_by_department_head','pending'],['department_head_id',$this->id],])->latest()->get();
+        $deptHeadApproved = JobDescription::where([['action_by_department_head','approved'],['department_head_id',$this->id],])->latest()->get();
+        $deptHeadRejected = JobDescription::where([['action_by_department_head','rejected'],['department_head_id',$this->id],])->latest()->get();
+        $HRManagerPendings = JobDescription::where([['action_by_department_head','approved'],['action_by_hr_manager','pending'],['hr_manager_id',$this->id],
             ])->latest()->get();
-        $deptHeadApproved = JobDescription::where([
-            ['action_by_department_head','approved'],
-            ['department_head_id',$this->id],
+        $HRManagerApproved = JobDescription::where([['action_by_department_head','approved'],['action_by_hr_manager','approved'],['hr_manager_id',$this->id],
             ])->latest()->get();
-        $deptHeadRejected = JobDescription::where([
-            ['action_by_department_head','rejected'],
-            ['department_head_id',$this->id],
-            ])->latest()->get();
-        $HRManagerPendings = JobDescription::where([
-            ['action_by_department_head','approved'],
-            ['action_by_hr_manager','pending'],
-            ['hr_manager_id',$this->id],
-            ])->latest()->get();
-        $HRManagerApproved = JobDescription::where([
-            ['action_by_department_head','approved'],
-            ['action_by_hr_manager','approved'],
-            ['hr_manager_id',$this->id],
-            ])->latest()->get();
-        $HRManagerRejected = JobDescription::where([
-            ['action_by_department_head','approved'],                
-            ['action_by_hr_manager','rejected'],
-            ['hr_manager_id',$this->id],
+        $HRManagerRejected = JobDescription::where([['action_by_department_head','approved'],['action_by_hr_manager','rejected'],['hr_manager_id',$this->id],
             ])->latest()->get();
         if(count($deptHeadPendings) > 0 OR count($deptHeadApproved) > 0 OR count($deptHeadRejected) > 0 OR count($HRManagerPendings) > 0 OR 
             count($HRManagerApproved) > 0 OR count($HRManagerRejected) > 0) {
@@ -147,33 +132,15 @@ class User extends Authenticatable
         $interviewSummaryReportApproval['can'] = false;
         $interviewSummaryReportApproval['count'] = 0;
         $divisionHeadPendings = $divisionHeadApproved = $divisionHeadRejected = $HRManagerPendings = $HRManagerApproved = $HRManagerRejected = [];
-        $HRManagerPendings = InterviewSummaryReport::where([
-            ['action_by_hr_manager','pending'],
-            ['hr_manager_id',$this->id],
-            ])->latest()->get();
-        $HRManagerApproved = InterviewSummaryReport::where([
-            ['action_by_hr_manager','approved'],
-            ['hr_manager_id',$this->id],
-            ])->latest()->get();
-        $HRManagerRejected = InterviewSummaryReport::where([
-            ['action_by_hr_manager','rejected'],
-            ['hr_manager_id',$this->id],
-            ])->latest()->get();
-        $divisionHeadPendings = InterviewSummaryReport::where([
-            ['action_by_hr_manager','approved'],
-            ['action_by_division_head','pending'],
-            ['hr_manager_id',$this->id],
-            ])->latest()->get();
-        $divisionHeadApproved = InterviewSummaryReport::where([
-            ['action_by_hr_manager','approved'],
-            ['action_by_division_head','approved'],
-            ['hr_manager_id',$this->id],
-            ])->latest()->get();
-        $divisionHeadRejected = InterviewSummaryReport::where([
-            ['action_by_hr_manager','approved'],
-            ['action_by_division_head','rejected'],                
-            ['hr_manager_id',$this->id],
-            ])->latest()->get();
+        $HRManagerPendings = InterviewSummaryReport::where([['action_by_hr_manager','pending'],['hr_manager_id',$this->id],])->latest()->get();
+        $HRManagerApproved = InterviewSummaryReport::where([['action_by_hr_manager','approved'],['hr_manager_id',$this->id],])->latest()->get();
+        $HRManagerRejected = InterviewSummaryReport::where([['action_by_hr_manager','rejected'],['hr_manager_id',$this->id],])->latest()->get();
+        $divisionHeadPendings = InterviewSummaryReport::where([['action_by_hr_manager','approved'],['action_by_division_head','pending'],
+            ['hr_manager_id',$this->id],])->latest()->get();
+        $divisionHeadApproved = InterviewSummaryReport::where([['action_by_hr_manager','approved'],['action_by_division_head','approved'],
+            ['hr_manager_id',$this->id],])->latest()->get();
+        $divisionHeadRejected = InterviewSummaryReport::where([['action_by_hr_manager','approved'],['action_by_division_head','rejected'],
+            ['hr_manager_id',$this->id],])->latest()->get();
         if(count($HRManagerPendings) > 0 OR count($HRManagerApproved) > 0 OR count($HRManagerRejected) > 0 OR count($divisionHeadPendings) > 0 OR 
         count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0 ) {
             $interviewSummaryReportApproval['can'] = true;
@@ -248,6 +215,78 @@ class User extends Authenticatable
             $joiningReportApproval['count'] = count($preparedByPendings) + count($employeePendings) + count($HRManagerPendings) + count($ReportingManagerPendings);
         }
         return $joiningReportApproval;
+    }
+    public function getPassportSubmitRequestApprovalAttribute() {
+        $authId = $this->id;
+        $passportSubmitRequestApproval['can'] = false;
+        $passportSubmitRequestApproval['count'] = 0;
+        // employee -------> Reporting Manager  ------------>Division Head--------->HR Manager
+        $employeePendings = $employeeApproved = $employeeRejected = 
+        $reportingManagerPendings = $reportingManagerApproved = $reportingManagerRejected = 
+        $divisionHeadPendings = $divisionHeadApproved = $divisionHeadRejected = 
+        $hrPendings = $hrApproved = $hrRejected = [];
+
+        $employeePendings = PassportRequest::where([['submit_action_by_employee','pending'],['employee_id',$this->id],])->latest()->get();
+        $employeeApproved = PassportRequest::where([['submit_action_by_employee','approved'],['employee_id',$this->id],])->latest()->get();
+        $employeeRejected = PassportRequest::where([['submit_action_by_employee','rejected'],['employee_id',$this->id],])->latest()->get();
+        $reportingManagerPendings = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','pending']])->latest()->get();
+        $reportingManagerApproved = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved']])->latest()->get();
+        $reportingManagerRejected = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','rejected']])->latest()->get();
+        $divisionHeadPendings = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved'],['submit_action_by_division_head','pending'],
+            ['submit_hr_manager_id',$this->id],])->latest()->get();
+        $divisionHeadApproved = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved'],['submit_action_by_division_head','approved'],
+            ['submit_hr_manager_id',$this->id],])->latest()->get();
+        $divisionHeadRejected = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved'],['submit_action_by_division_head','rejected'],
+            ['submit_hr_manager_id',$this->id],])->latest()->get();  
+        $hrPendings = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_division_head','approved'],
+            ['submit_action_by_hr_manager','pending'],['submit_hr_manager_id',$this->id],])->latest()->get();
+        $hrApproved = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_division_head','approved'],
+            ['submit_action_by_hr_manager','approved'],['submit_hr_manager_id',$this->id],])->latest()->get();
+        $hrRejected = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_division_head','approved'],
+            ['submit_action_by_hr_manager','rejected'],['submit_hr_manager_id',$this->id],])->latest()->get();  
+        if(count($employeePendings) > 0 OR count($employeeApproved) > 0 OR count($employeeRejected) > 0 OR count($employeePendings) > 0 OR 
+        count($employeeApproved) > 0 OR count($employeeRejected) > 0 OR count($divisionHeadPendings) > 0 OR count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0
+        OR count($hrPendings) > 0 OR count($hrApproved) > 0 OR count($hrRejected) > 0) {
+            $passportSubmitRequestApproval['can'] = true;
+            $passportSubmitRequestApproval['count'] = count($employeePendings) + count($employeePendings) + count($divisionHeadPendings) + count($hrPendings);
+        }
+        return $passportSubmitRequestApproval;
+    }
+    public function getPassportReleaseRequestApprovalAttribute() {
+        $authId = $this->id;
+        $passportReleaseRequestApproval['can'] = false;
+        $passportReleaseRequestApproval['count'] = 0;
+        // employee -------> Reporting Manager  ------------>Division Head--------->HR Manager
+        $employeePendings = $employeeApproved = $employeeRejected = 
+        $reportingManagerPendings = $reportingManagerApproved = $reportingManagerRejected = 
+        $divisionHeadPendings = $divisionHeadApproved = $divisionHeadRejected = 
+        $hrPendings = $hrApproved = $hrRejected = [];
+
+        $employeePendings = PassportRequest::where([['release_action_by_employee','pending'],['employee_id',$this->id],])->latest()->get();
+        $employeeApproved = PassportRequest::where([['release_action_by_employee','approved'],['employee_id',$this->id],])->latest()->get();
+        $employeeRejected = PassportRequest::where([['release_action_by_employee','rejected'],['employee_id',$this->id],])->latest()->get();
+        $reportingManagerPendings = PassportRequest::where([['release_action_by_employee','approved'],['release_action_by_department_head','pending']])->latest()->get();
+        $reportingManagerApproved = PassportRequest::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved']])->latest()->get();
+        $reportingManagerRejected = PassportRequest::where([['release_action_by_employee','approved'],['release_action_by_department_head','rejected']])->latest()->get();
+        $divisionHeadPendings = PassportRequest::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved'],['release_action_by_division_head','pending'],
+            ['release_hr_manager_id',$this->id],])->latest()->get();
+        $divisionHeadApproved = PassportRequest::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved'],['release_action_by_division_head','approved'],
+            ['release_hr_manager_id',$this->id],])->latest()->get();
+        $divisionHeadRejected = PassportRequest::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved'],['release_action_by_division_head','rejected'],
+            ['release_hr_manager_id',$this->id],])->latest()->get();  
+        $hrPendings = PassportRequest::where([['release_action_by_employee','approved'],['release_action_by_division_head','approved'],
+            ['release_action_by_hr_manager','pending'],['release_hr_manager_id',$this->id],])->latest()->get();
+        $hrApproved = PassportRequest::where([['release_action_by_employee','approved'],['release_action_by_division_head','approved'],
+            ['release_action_by_hr_manager','approved'],['release_hr_manager_id',$this->id],])->latest()->get();
+        $hrRejected = PassportRequest::where([['release_action_by_employee','approved'],['release_action_by_division_head','approved'],
+            ['release_action_by_hr_manager','rejected'],['release_hr_manager_id',$this->id],])->latest()->get();  
+        if(count($employeePendings) > 0 OR count($employeeApproved) > 0 OR count($employeeRejected) > 0 OR count($employeePendings) > 0 OR 
+        count($employeeApproved) > 0 OR count($employeeRejected) > 0 OR count($divisionHeadPendings) > 0 OR count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0
+        OR count($hrPendings) > 0 OR count($hrApproved) > 0 OR count($hrRejected) > 0) {
+            $passportReleaseRequestApproval['can'] = true;
+            $passportReleaseRequestApproval['count'] = count($employeePendings) + count($employeePendings) + count($divisionHeadPendings) + count($hrPendings);
+        }
+        return $passportReleaseRequestApproval;
     }
     public function getSelectedRoleAttribute() {
         return $this->attributes['selected_role'] ?? $this->roles()->first()->name;

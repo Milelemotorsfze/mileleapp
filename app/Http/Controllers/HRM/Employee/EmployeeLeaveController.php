@@ -73,7 +73,7 @@ class EmployeeLeaveController extends Controller
                     $input['created_by'] = $authId;   
                     $input['hr_manager_id'] = $HRManager->handover_to_id;                
                     $input['department_head_id'] = $departmentHead->approval_by_id;
-                    $input['division_head_id'] = $divisionHead->division_head_id;
+                    $input['division_head_id'] = $divisionHead->approval_handover_to;
                     $createRequest = Leave::create($input);
                     $history['leave_id'] = $createRequest->id;
                     $history['icon'] = 'icons8-document-30.png';

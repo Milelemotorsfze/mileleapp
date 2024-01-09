@@ -14,7 +14,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
 	@endphp
 	@if ($hasPermission)
-	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('passport_request.create') }}">
+	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('employee-passport_request.create-or-edit','new') }}">
       <i class="fa fa-plus" aria-hidden="true"></i> New Passport Request
     </a>
 	@endif
@@ -128,36 +128,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 										</a>
 									</li>
                                     <li>
-										@if(isset($type))
-											@if($type == 'approve')
+										@if(isset($data->is_auth_user_can_approve['can_approve']))
+											@if($data->is_auth_user_can_approve['can_approve'] == true)
 												<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-													data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
-													<i class="fa fa-thumbs-up" aria-hidden="true"></i>  Approve 
+													data-bs-target="#approve-passport-submit-request-{{$data->id}}">
+													<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 												</button>
 												<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-													data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+													data-bs-target="#reject-passport-submit-request-{{$data->id}}">
 													<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 												</button>
-											@endif
-										@elseif(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
-											@if(isset($data->is_auth_user_can_approve['can_approve']))
-												@if($data->is_auth_user_can_approve['can_approve'] == true)
-													<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-														data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
-														<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
-													</button>
-													<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-														data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
-														<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
-													</button>
-												@endif
 											@endif
 										@endif
 									</li>
                                 </ul>
                             </div>
 							</td>
-							@include('hrm.hiring.job_description.approve_reject_modal')					
+							@include('hrm.passport.passport_request.approve_reject_modal')					
 						</tr>
 						@endforeach
 					</tbody>
@@ -186,7 +173,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($approved as $key => $approvedOne)
+						@foreach ($approved as $key => $data)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
                             <td>{{ $data->user->name ?? ''}}</td>
@@ -203,7 +190,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 											<i class="fa fa-eye" aria-hidden="true"></i>
 										</a>
 							</td>
-							<div class="modal fade" id="cancelled-hiring-request-{{$approvedOne->id}}"
+							<div class="modal fade" id="cancelled-hiring-request-{{$data->id}}"
 								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 								<div class="modal-dialog ">
 									<div class="modal-content">
@@ -220,7 +207,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="comment-{{$approvedOne->id}}" class="form-control" name="comment">
+																<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment">
 																</textarea>
 															</div>
 														</div>
@@ -231,12 +218,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 										<div class="modal-footer">
 											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 											<button type="button" class="btn btn-danger status-cancelled-button"
-												data-id="{{ $approvedOne->id }}" data-status="cancelled">Submit</button>
+												data-id="{{ $data->id }}" data-status="cancelled">Submit</button>
 										</div>
 									</div>
 								</div>
 							</div>
-							<div class="modal fade" id="on-hold-hiring-request-{{$approvedOne->id}}"
+							<div class="modal fade" id="on-hold-hiring-request-{{$data->id}}"
 								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 								<div class="modal-dialog ">
 									<div class="modal-content">
@@ -253,7 +240,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="comment-{{$approvedOne->id}}" class="form-control" name="comment">
+																<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment">
 																</textarea>
 															</div>
 														</div>
@@ -264,12 +251,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 										<div class="modal-footer">
 											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 											<button type="button" class="btn btn-primary status-onhold-button"
-												data-id="{{ $approvedOne->id }}" data-status="onhold">Submit</button>
+												data-id="{{ $data->id }}" data-status="onhold">Submit</button>
 										</div>
 									</div>
 								</div>
 							</div>
-							<div class="modal fade" id="closed-hiring-request-{{$approvedOne->id}}"
+							<div class="modal fade" id="closed-hiring-request-{{$data->id}}"
 								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 								<div class="modal-dialog ">
 									<div class="modal-content">
@@ -282,15 +269,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 												<div class="row">
 													<div class="col-12">
 														<div class="row mt-2">
-															@if(isset($approvedOne->shortlistedCandidates))
-																@if(count($approvedOne->shortlistedCandidates) > 0)
+															@if(isset($data->shortlistedCandidates))
+																@if(count($data->shortlistedCandidates) > 0)
 																	<div class="col-lg-12 col-md-12 col-sm-12">
 																		<label class="form-label font-size-13">Selected Candidates</label>
 																	</div>
 																	<div class="col-lg-12 col-md-12 col-sm-12">
-																		<select name="candidate_id[]" id="candidate_id_{{$approvedOne->id}}" multiple="true" style="width:100%;"
+																		<select name="candidate_id[]" id="candidate_id_{{$data->id}}" multiple="true" style="width:100%;"
 																		class="candidate_id form-control widthinput" autofocus>
-																			@foreach($approvedOne->shortlistedCandidates as $shortlistedCandidate)
+																			@foreach($data->shortlistedCandidates as $shortlistedCandidate)
 																				<option value="{{$shortlistedCandidate->id}}" selected>{{$shortlistedCandidate->candidate_name}}</option>
 																			@endforeach
 																		</select>
@@ -301,7 +288,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="comment-{{$approvedOne->id}}" class="form-control" name="comment">
+																<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment">
 																</textarea>
 															</div>
 														</div>
@@ -312,7 +299,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 										<div class="modal-footer">
 											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 											<button type="button" class="btn btn-primary status-closed-button"
-												data-id="{{ $approvedOne->id }}" data-status="closed">Submit</button>
+												data-id="{{ $data->id }}" data-status="closed">Submit</button>
 										</div>
 									</div>
 								</div>
