@@ -64,8 +64,13 @@ class SupplierInventoryController extends Controller
         $supplierInventories = SupplierInventory::with('masterModel')
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->orderBy('id','desc')
+            ->orderBy('updated_at','DESC')
             ->get();
+        foreach ($supplierInventories as $supplierInventory) {
+            $supplierInventory->modelYears = MasterModel::where('model', $supplierInventory->masterModel->model)
+                ->where('sfx', $supplierInventory->masterModel->sfx)
+                ->pluck('model_year');
+        }
 //
 //        if (request()->ajax()) {
 //
@@ -164,8 +169,8 @@ class SupplierInventoryController extends Controller
             $i = 0;
 
             $uploadFileContents = [];
-            $code_nameex = NULL;
-            $extcolour = NULL;
+            $colourname = NULL;
+
             $date = Carbon::now()->format('Y-m-d');
             while (($filedata = fgetcsv($file, 5000, ",")) !== FALSE) {
                 $num = count($filedata);
@@ -178,49 +183,64 @@ class SupplierInventoryController extends Controller
                     $colourcode = $filedata[5];
                     if($colourcode) {
 //                        info("test ok");
-//                        info($colourcode);
+                        info($colourcode);
                         $colourcodecount = strlen($colourcode);
-//                        info($colourcodecount);
+                        info($colourcodecount);
 
                         if ($colourcodecount == 5) {
-//                            info("colr code count is 5");
-                            $extcolour = substr($colourcode, 0, 3);
-//                            info($extcolour);
+                            info("colr code count is 5");
+                            $extColour = substr($colourcode, 0, 3);
+                            $intColour = substr($colourcode,  -2);
+                            info($intColour);
+                            info($extColour);
                         }
                         if ($colourcodecount == 4) {
-//                            info("colr code count is 4");
+                            info("colr code count is 4");
 
                             $altercolourcode = "0" . $colourcode;
-                            $extcolour = substr($altercolourcode, 0, 3);
-//                            info($extcolour);
+                            $extColour = substr($altercolourcode, 0, 3);
+                            $intColour = substr($altercolourcode, -2);
+                            info($extColour);
+                            info("interior colour");
+                            info($intColour);
                         }
-                        if($extcolour) {
-//                            info("exterior clr");
-//                            info($extcolour);
-                            $parentColors = ColorCode::where('code', $extcolour)
+                        if($extColour) {
+                            $extColourRow = ColorCode::where('code', $extColour)
                                 ->where('belong_to', ColorCode::EXTERIOR)
                                 ->first();
-//                            info("parent clrs".$parentColors);
-                            if ($parentColors)
+                            $exteriorColor = "";
+                            if ($extColourRow)
                             {
-                                $code_nameex = $parentColors->parent;
+                                $exteriorColor = $extColourRow->name;
+                                $exteriorColorId = $extColourRow->id;
                             }
                         }
+                        if($intColour) {
+                            $intColourRow = ColorCode::where('code', $intColour)
+                                ->where('belong_to', ColorCode::INTERIOR)
+                                ->first();
+                            $interiorColor = "";
+                            if ($intColourRow)
+                            {
+                                $interiorColor = $intColourRow->name;
+                                $interiorColorId = $intColourRow->id;
+                            }
+                        }
+
+                        $colourname = $exteriorColor."-".$interiorColor;
                     }
-//                    info($code_nameex);
-//                    info("clr name");
-                    $colourname = $code_nameex;
+
                     $uploadFileContents[$i]['steering'] = $filedata[0];
                     $uploadFileContents[$i]['model'] = $filedata[1];
                     $uploadFileContents[$i]['sfx'] = $filedata[2];
                     $uploadFileContents[$i]['chasis'] = !empty($filedata[3]) ? $filedata[3] : NULL;
                     $uploadFileContents[$i]['engine_number'] = $filedata[4];
                     $uploadFileContents[$i]['color_code'] = $filedata[5];
-                    $uploadFileContents[$i]['color_name'] = $colourname;
+//                    $uploadFileContents[$i]['color_name'] = $colourname;
                     $uploadFileContents[$i]['pord_month'] = $filedata[6];
                     $uploadFileContents[$i]['po_arm'] = $filedata[7];
                     if (!empty($filedata[8])) {
-                        $filedata[8] = $filedata[8];
+                        $filedata[8] = \Illuminate\Support\Carbon::parse($filedata[8])->format('Y-m-d');
                     }else {
                         $filedata[8] = NULL;
                     }
@@ -230,15 +250,18 @@ class SupplierInventoryController extends Controller
                     $uploadFileContents[$i]['country'] = $country;
                     $uploadFileContents[$i]['date_of_entry'] = $date;
                     $uploadFileContents[$i]['veh_status'] = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
+                    $uploadFileContents[$i]['exterior_color_code_id'] = !empty($exteriorColorId) ? $exteriorColorId: NULL;
+                    $uploadFileContents[$i]['interior_color_code_id'] = !empty($interiorColorId) ? $interiorColorId: NULL;
 
                     ////// finding model year //////////
 
                     if ($filedata[6]) {
                         // fetch year from pod month
-                        info("pod existing");
+//                        info("pod existing");
                         $modelYear = substr($filedata[6], 0, -2);
                         $productionMonth = substr($filedata[6], -2);
                         $modelYearCalculationCategories = ModelYearCalculationCategory::all();
+
                         foreach ($modelYearCalculationCategories as $modelYearCalculationCategory) {
                             $isItemExistCategory = MasterModel::select(['id', 'model', 'sfx', 'variant_id'])
                                 ->where('model', $filedata[1])
@@ -249,7 +272,7 @@ class SupplierInventoryController extends Controller
                                 });
 
                             if ($isItemExistCategory->count() > 0) {
-                                info("category existing");
+
                                 $correspondingCategoryRuleValue = $modelYearCalculationCategory->modelYearRule->value ?? 0;
 
                                 if ($productionMonth > $correspondingCategoryRuleValue) {
@@ -273,10 +296,12 @@ class SupplierInventoryController extends Controller
                       }
                     }
 
-                    info($modelYear);
+
                     ////////////// model year calculation end //////////
                     $uploadFileContents[$i]['model_year'] = $modelYear;
                 }
+                $exteriorColorId = NULL;
+                $interiorColorId = NULL;
                 $i++;
             }
 
@@ -286,6 +311,7 @@ class SupplierInventoryController extends Controller
             $j=0;
 
             foreach($uploadFileContents as $uploadFileContent) {
+                info($uploadFileContent['chasis']);
                 $chaisis[] = $uploadFileContent['chasis'];
 
                 // CHCEKING NEW MODEL SFX MODEL YEAR COMBINATION EXISTING ///////////
@@ -319,7 +345,7 @@ class SupplierInventoryController extends Controller
                 }
                 $j++;
             }
-
+            // CHCEK CHASIS EXISTING WITH ALREDY UPLOADED DATA.
             $chaisisNumbers = array_filter($chaisis);
             $uniqueChaisis =  array_unique($chaisisNumbers);
 
@@ -382,16 +408,16 @@ class SupplierInventoryController extends Controller
                             $newlyAddedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
                             $newlyAddedRows[$i]['color_code'] = $uploadFileContent['color_code'];
                         } else {
-                            info("chaisis");
-                            info($uploadFileContent['chasis']);
+//                            info("chaisis");
+//                            info($uploadFileContent['chasis']);
                             if (!empty($uploadFileContent['chasis']))
                             {
                                 // Store the Count into Update the Row with data
                                 $supplierInventory = $supplierInventories->where('chasis', $uploadFileContent['chasis'])
                                     ->first();
-                                info("chaisis avaialable");
-
-                                info($supplierInventory);
+//                                info("chaisis avaialable");
+//
+//                                info($supplierInventory);
                                 $isNullChaisis = SupplierInventory::where('master_model_id', $modelId)
                                     ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                     ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
@@ -401,18 +427,18 @@ class SupplierInventoryController extends Controller
                                     ->whereNull('chasis');
 
                                 if (empty($supplierInventory)) {
-                                    info("chaiss not existing");
+//                                    info("chaiss not existing");
                                     //adding new row simply
                                     $isNullChaisisExist = $isNullChaisis->first();
                                     if (!empty($isNullChaisisExist)) {
                                         // null chaisis existing => updating row
                                         $chasisUpdatedRow = $isNullChaisis->whereNotIn('id',$chasisUpdatedRowIds)->first();
-                                        info($uploadFileContent['model']);
-                                        info($uploadFileContent['sfx']);
-                                        info($uploadFileContent['chasis']);
-
-                                        info($chasisUpdatedRow);
-                                        info("end");
+//                                        info($uploadFileContent['model']);
+//                                        info($uploadFileContent['sfx']);
+//                                        info($uploadFileContent['chasis']);
+//
+//                                        info($chasisUpdatedRow);
+//                                        info("end");
 //                                        dd($chasisUpdatedRow->id);
                                         if($chasisUpdatedRow) {
                                             $chasisUpdatedRowIds[] = $chasisUpdatedRow->id;
@@ -696,6 +722,8 @@ class SupplierInventoryController extends Controller
                         $supplierInventory->date_of_entry   = $date;
                         $supplierInventory->upload_status   = SupplierInventory::UPLOAD_STATUS_ACTIVE;
                         $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
+                        $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
+                        $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
                         $supplierInventory->save();
                     }
 
@@ -717,6 +745,7 @@ class SupplierInventoryController extends Controller
                         DB::beginTransaction();
 
                         $supplierInventory = new SupplierInventory();
+                        info($uploadFileContent['eta_import']);
                         $supplierInventory->master_model_id = $model->id;
                         $supplierInventory->chasis          = $uploadFileContent['chasis'];
                         $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
@@ -731,6 +760,8 @@ class SupplierInventoryController extends Controller
                         $supplierInventory->date_of_entry   = $date;
                         $supplierInventory->upload_status   = SupplierInventory::UPLOAD_STATUS_ACTIVE;
                         $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
+                        $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
+                        $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
                         $supplierInventory->save();
 
                         DB::commit();
@@ -743,8 +774,66 @@ class SupplierInventoryController extends Controller
 
         }
     }
-    public function update(Request $request) {
-        return "Test";
+    public function updateInventory(Request $request) {
+//        info($request->all());
+        $updatedDatas = $request->selectedUpdatedDatas;
+
+        foreach ($updatedDatas as $data) {
+            $inventoryId = $data['id'];
+            $fieldName = $data['field'];
+            $fieldValue = $data['value'];
+            info($fieldName);
+            $inventory = SupplierInventory::find($inventoryId);
+            if($fieldName == 'model_year') {
+                info("inside loop");
+                $masterModel = MasterModel::where('model', $inventory->masterModel->model)
+                    ->where('sfx', $inventory->masterModel->sfx)
+                    ->where('model_year', $fieldValue)
+                    ->first();
+                $inventory->master_model_id = $masterModel->id;
+            }else if($fieldName == 'eta_import') {
+
+                $inventory->$fieldName = Carbon::parse($fieldValue)->format('Y-m-d');
+            }
+            else if($fieldName == 'pord_month') {
+                $modelYear = substr($fieldValue, 0, -2);
+                $productionMonth = substr($fieldValue, -2);
+                $modelYearCalculationCategories = ModelYearCalculationCategory::all();
+                foreach ($modelYearCalculationCategories as $modelYearCalculationCategory) {
+                    $isItemExistCategory = MasterModel::select(['id', 'model', 'sfx', 'variant_id'])
+                        ->where('model', $inventory->masterModel->model)
+                        ->where('sfx', $inventory->masterModel->sfx)
+                        ->with('variant.master_model_lines')
+                        ->whereHas('variant.master_model_lines', function ($query) use ($modelYearCalculationCategory) {
+                            $query->where('model_line', 'LIKE', '%' . $modelYearCalculationCategory->name . '%');
+                        });
+
+                    if ($isItemExistCategory->count() > 0) {
+                        $correspondingCategoryRuleValue = $modelYearCalculationCategory->modelYearRule->value ?? 0;
+                        if ($productionMonth > $correspondingCategoryRuleValue) {
+                            if ($fieldValue){
+                                $modelYear = substr($fieldValue, 0, -2) + 1;
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                $masterModel =  MasterModel::where('model', $inventory->masterModel->model)
+                    ->where('sfx', $inventory->masterModel->sfx)
+                    ->where('model_year',  $modelYear)
+                    ->first();
+
+                $inventory->$fieldName = $fieldValue;
+                $inventory->master_model_id = $masterModel->id;
+            }
+            else{
+               $inventory->$fieldName = $fieldValue;
+            }
+
+            $inventory->save();
+        }
+        return response(true);
     }
     public function FileComparision(Request $request) {
         (new UserActivityController)->createActivity('Open Supplier Inventories File Comparison Page');
@@ -1256,7 +1345,7 @@ class SupplierInventoryController extends Controller
                         $uploadFileContents[$i]['chasis'] = !empty($filedata[3]) ? $filedata[3] : NULL;
                         $uploadFileContents[$i]['engine_number'] = $filedata[4];
                         $uploadFileContents[$i]['color_code'] = $filedata[5];
-                        $uploadFileContents[$i]['color_name'] = $colourname;
+//                        $uploadFileContents[$i]['color_name'] = $colourname;
                         $uploadFileContents[$i]['pord_month'] = $filedata[6];
                         $uploadFileContents[$i]['po_arm'] = $filedata[7];
                         if (!empty($filedata[8])) {
@@ -1728,7 +1817,7 @@ class SupplierInventoryController extends Controller
                             $supplierInventory->color_code      = $uploadFileContent['color_code'];
                             $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
                             $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
-                            $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
+                            $supplierInventory->eta_import      = Carbon::parse($uploadFileContent['eta_import'])->format('Y-m-d');
                             $supplierInventory->is_add_new     	= !empty($request->is_add_new) ? true : false;
                             $supplierInventory->supplier_id       = $uploadFileContent['supplier_id'];
                             $supplierInventory->whole_sales	    = $uploadFileContent['whole_sales'];
@@ -1763,7 +1852,7 @@ class SupplierInventoryController extends Controller
                             $supplierInventory->color_code      = $uploadFileContent['color_code'];
                             $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
                             $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
-                            $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
+                            $supplierInventory->eta_import      = Carbon::parse($uploadFileContent['eta_import'])->format('Y-m-d');
                             $supplierInventory->is_add_new     	= !empty($request->is_add_new) ? true : false;
                             $supplierInventory->supplier_id       = $uploadFileContent['supplier_id'];
                             $supplierInventory->whole_sales	    = $uploadFileContent['whole_sales'];
@@ -1776,12 +1865,72 @@ class SupplierInventoryController extends Controller
                             DB::commit();
                         }
 
-
                         return redirect()->route('supplier-inventories.create')->with('message','supplier inventory updated successfully');
                     }
                 }
 
             }
         }
+    public function checkChasisUnique(Request $request) {
 
+        $isChasisExist = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            ->where('chasis',  $request->chasis)
+            ->first();
+
+        if($isChasisExist) {
+            $data = 1;
+        }else{
+            $data = 0;
+        }
+
+        return response($data);
+    }
+    public function checkProductionMonth(Request $request) {
+
+        $supplierInventory = SupplierInventory::find($request->id);
+
+        $production_month = $request->prod_month;
+
+        $modelYear = substr($production_month, 0, -2);
+        $productionMonth = substr($production_month, -2);
+        $modelYearCalculationCategories = ModelYearCalculationCategory::all();
+
+        foreach ($modelYearCalculationCategories as $modelYearCalculationCategory) {
+
+            $isItemExistCategory = MasterModel::select(['id', 'model', 'sfx', 'variant_id'])
+                ->where('model', $supplierInventory->masterModel->model)
+                ->where('sfx', $supplierInventory->masterModel->sfx)
+                ->with('variant.master_model_lines')
+                ->whereHas('variant.master_model_lines', function ($query) use ($modelYearCalculationCategory) {
+                    $query->where('model_line', 'LIKE', '%' . $modelYearCalculationCategory->name . '%');
+                });
+
+            if ($isItemExistCategory->count() > 0) {
+
+                $correspondingCategoryRuleValue = $modelYearCalculationCategory->modelYearRule->value ?? 0;
+
+                if ($productionMonth > $correspondingCategoryRuleValue) {
+
+                    if ($production_month){
+                        $modelYear = substr($production_month, 0, -2) + 1;
+                    }
+                    break;
+                }
+            }
+        }
+
+       $isExistModelCombination =  MasterModel::where('model', $supplierInventory->masterModel->model)
+            ->where('sfx', $supplierInventory->masterModel->sfx)
+            ->where('model_year', $modelYear)
+           ->first();
+
+           if($isExistModelCombination) {
+               $data = 1;
+           }else{
+               $data = $modelYear;
+           }
+
+       return response($data);
+    }
 }

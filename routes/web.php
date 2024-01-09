@@ -371,6 +371,10 @@ Route::get('/d', function () {
         ->name('supplier-inventories.file-comparision-report');
     Route::get('supplier-inventories/get-dates', [SupplierInventoryController::class,'getDate'])->name('supplier-inventories.get-dates');
     Route::get('/viewall-supplier-inventories', [SupplierInventoryController::class,'viewAll'])->name('supplier-inventories.view-all');
+    Route::post('supplier-inventories/update-inventory', [SupplierInventoryController::class,'updateInventory'])->name('update-inventory');
+    Route::get('/check-unique-chasis', [SupplierInventoryController::class,'checkChasisUnique'])->name('supplier-inventories.unique-chasis');
+    Route::get('/check-production-month', [SupplierInventoryController::class,'checkProductionMonth'])->name('supplier-inventories.checkProductionMonth');
+
 
     //BL Module
     Route::resource('blform', BlFormController::class);
@@ -686,6 +690,6 @@ Route::get('/d', function () {
     Route::get('joining_report_employee_verification/{id}', [JoiningReportController::class, 'employeeVerification'])->name('employee_joining_report.verification');
     Route::post('employee_joining_report/verified', [JoiningReportController::class, 'employeeVerified'])->name('employee_joining_report.verified');
 
-    
+
     //Payment Terms
     Route::resource('paymentterms', PaymentTermsController::class);

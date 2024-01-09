@@ -19,6 +19,8 @@ use App\Models\Prospecting;
 use App\Models\Salesdemand;
 use App\Models\Negotiation;
 use App\Models\Booking;
+use App\Models\Clients;
+use App\Models\ClientLeads;
 use Carbon\Carbon;
 use App\Models\MasterModelLines;
 use Monarobase\CountryList\CountryListFacade;
@@ -224,8 +226,11 @@ class DailyleadsController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $modelLineIdsRaw = $request->input('model_line_ids');
+        if($modelLineIdsRaw)
+        {
         $modelLineIds = json_decode($modelLineIdsRaw, true);
         $modelLineIds = array_map('strval', $modelLineIds);
+        }
         $this->validate($request, [
             'phone' => 'nullable|required_without:email',
             'email' => 'nullable|required_without:phone|email',
@@ -234,6 +239,9 @@ class DailyleadsController extends Controller
             'language' => 'required',
             'type' => 'required',
         ]);
+        $existingClient = Calls::where('phone', $request->input('phone'))
+        ->orWhere('email', $request->input('email'))
+        ->first();
         $date = Carbon::now();
         $date->setTimezone('Asia/Dubai');
         $formattedDate = $date->format('Y-m-d H:i:s');
@@ -256,11 +264,54 @@ class DailyleadsController extends Controller
         ];
         $calls = new Calls($data);
         $calls->save();
+        $customertype = $request->input('customertype');
+        if($existingClient)
+        {
+            $clientid = ClientLeads::where('calls_id', $existingClient->id)->first();
+            if($clientid)
+            {
+                $customers = Clients::find($clientid->clients_id) ?? new Clients();
+
+            }
+            else {
+                $customers = New Clients(); 
+            }
+        }
+        else{
+            $customers = New Clients(); 
+        }
+        $customers->customertype = $customertype;
+        if($customertype === "company")
+        {
+        $file = $request->file('tradelicense');
+        $path = $file->store('tradelicenses');
+        $customers->tradelicense = $path;
+        }
+        else if ($customertype === "government")
+        {
+            $file = $request->file('tender');
+            $path = $file->store('tenders');
+            $customers->tender = $path;
+        }
+        else 
+        {
+            $file = $request->file('passport');
+            $path = $file->store('passports');
+        $customers->passport = $path;
+        }
+        $customers->countryofexport = $request->input('countryofexport');
+        $customers->save();
+        $clientleads = New ClientLeads();
+        $clientleads->calls_id = $calls->id; 
+        $clientleads->clients_id = $customers->id;
+        $clientleads->save();
         $lastRecord = Calls::where('created_by', $data['created_by'])
                    ->orderBy('id', 'desc')
                    ->where('sales_person', Auth::id())
                    ->first();
         $table_id = $lastRecord->id;
+        if($modelLineIdsRaw)
+        {
         if ($modelLineIds[0] !== null) {
         foreach ($modelLineIds as $modelLineId) {
         $datacalls = [
@@ -272,6 +323,7 @@ class DailyleadsController extends Controller
         $model->save();
         }
         }
+    }
         $logdata = [
             'table_name' => "calls",
             'table_id' => $table_id,

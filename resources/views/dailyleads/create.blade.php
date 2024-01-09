@@ -78,15 +78,28 @@ input[type=number]::-webkit-outer-spin-button {
                 </ul>
             </div>
         @endif
-        {!! Form::open(array('route' => 'dailyleads.store','method'=>'POST', 'id' => 'calls')) !!}
+        {!! Form::open(['route' => 'dailyleads.store', 'method' => 'POST', 'id' => 'calls', 'files' => true]) !!}
             <div class="row">
             <p><span style="float:right;" class="error">* Required Field</span></p>
 			</div>  
 			<form action="" method="post" enctype="multipart/form-data">
+            <div class="row">
+            <div class="col-lg-4 col-md-6">
+            <span class="error">* </span>
+            <label for="customertype">Customer Type:</label>
+            <select class="form-control" id="customertype" name="customertype" required>
+            <option value="" disabled selected>Select an Customer Type</option>
+                <option value="individual">Individual</option>
+                <option value="company">Company</option>
+                <option value="government">Government</option>
+            </select>
+            </div>
+            </div>
                 <div class="row"> 
 					<div class="col-lg-4 col-md-6">
+                    <span class="error">* </span>
                         <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
-                        {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
+                        {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control', 'required' => 'required')) !!}
                     </div>
                     <div class="col-lg-4 col-md-6">
                     <span class="error">* </span>
@@ -96,14 +109,18 @@ input[type=number]::-webkit-outer-spin-button {
                     <div class="col-lg-4 col-md-6">
                     <span class="error">*</span>
                     <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
-                    {!! Form::email('email', null, array('id' => 'email', 'placeholder' => 'Email','class' => 'form-control')) !!}
+                    {!! Form::email('email', null, array('id' => 'email', 'placeholder' => 'Email','class' => 'form-control', 'required' => 'required')) !!}
                     <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
                     <div id="emailError" class="error-text"></div>
+                    </div>
+                    <div class="col-lg-4 col-md-6" id="companyNameField" style="display: none;">
+                        <label for="basicpill-firstname-input" class="form-label">Company Name : </label>
+                        <input type="text" id="company_name" name="company_name" class="form-control" placeholder="Company Name">
                     </div>
                     <div class="col-lg-4 col-md-6">
                     <span class="error">* </span>
                     <label for="basicpill-firstname-input" class="form-label">Source:</label>
-                    <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput">
+                    <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput" required>
                     <datalist id="milelemotorsList">
                     @foreach ($LeadSource as $source)
                     <option value="{{ $source->source_name }}">{{ $source->source_name }}</option>
@@ -113,7 +130,7 @@ input[type=number]::-webkit-outer-spin-button {
                     <div class="col-lg-4 col-md-6">
                     <span class="error">*</span>
                     <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
-                    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput">
+                    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" required>
                     <datalist id="laList">
                         <option value="English" data-value="English">English</option>
                         <option value="Arabic" data-value="English">Arabic</option>
@@ -131,8 +148,8 @@ input[type=number]::-webkit-outer-spin-button {
                 </div>
                     <div class="col-xs-4 col-sm-12 col-md-4">
                     <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Destination : </label>
-                        <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput">
+                        <label for="basicpill-firstname-input" class="form-label">Destination / Nationality : </label>
+                        <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput" required>
                     <datalist id="loList">
                     @foreach ($countries as $country)
                     <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
@@ -141,41 +158,62 @@ input[type=number]::-webkit-outer-spin-button {
                         </div>
                         <div class="col-lg-4 col-md-6">
                         <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Type : </label>
-                        <input type="text" placeholder="Type" name="type" list="typeList" class="form-control" id="typeInput">
-                    <datalist id="typeList">
+                        <label for="basicpill-firstname-input" class="form-label">Shipping Type : </label>
+                        <select class="form-control" id="shippingtype" name="type" required>
+                        <option value="" disabled selected>Select an Shipping Type</option>
                     <option value="Export" data-value="Export">Export</option>
-                    <option value="Local" data-value="Export">Local</option>
-                    <option value="Other" data-value="Export">Other</option>
+                    <option value="Local" data-value="Local">Local</option>
+                    <option value="Other" data-value="Other">Other</option>
+                    </select>
+                    </div>
+                    <div class="col-lg-4 col-md-6" id="countryexp" style="display: none;">
+                    <label for="basicpill-firstname-input" class="form-label">Country of Export : </label>
+                    <input type="text" placeholder="Country of Export" name="countryofexport" list="coofexport" class="form-control" id="countryofexport">
+                    <datalist id="coofexport">
+                    @foreach ($countries as $country)
+                    <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
+                    @endforeach
                     </datalist>
+                    </div>
+                    <div class="col-lg-4 col-md-6" id="tradeLicenseField" style="display: none;">
+                    <label for="basicpill-firstname-input" class="form-label">Trade License : </label>
+                    <input type="file" id="tradelicense" class="form-control" name="tradelicense">
+                    </div>
+                    <div class="col-lg-4 col-md-6" id="tenderLicenseField" style="display: none;">
+                    <label for="basicpill-firstname-input" class="form-label">Tender Copy : </label>
+                    <input type="file" id="tender" class="form-control" name="tender">
+                    </div>
+                    <div class="col-lg-4 col-md-6" id="passportField" style="display: none;">
+                    <label for="basicpill-firstname-input" class="form-label">Passport : </label>
+                    <input type="file" id="passport" class="form-control" name="passport">
                     </div>
                     </div>
                     </br>
                     <div class="maindd">
-    <div id="row-container">
-        <div class="row">
-            <div class="col-lg-4 col-md-6">
-                <label for="brandInput" class="form-label">Brand & Models:</label>
-                <input type="text" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInput">
-                <datalist id="brandList">
-                    @foreach ($modelLineMasters as $modelLineMaster)
-                        @php
-                            $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-                            $brand_name = $brand->brand_name;
-                        @endphp 
-                        <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
-                    @endforeach
-                </datalist>
-                <input type="hidden" name="model_line_ids" id="selectedBrandIds">
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
-        <div class="btn btn-primary add-row-btn">
-            <i class="fas fa-plus"></i> Add More
-        </div>
-    </div>
-</div>
+                        <div id="row-container">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label for="brandInput" class="form-label">Brand & Models:</label>
+                                    <input type="text" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInput">
+                                    <datalist id="brandList">
+                                        @foreach ($modelLineMasters as $modelLineMaster)
+                                            @php
+                                                $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+                                                $brand_name = $brand->brand_name;
+                                            @endphp 
+                                            <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
+                                        @endforeach
+                                    </datalist>
+                                    <input type="hidden" name="model_line_ids" id="selectedBrandIds">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
+                            <div class="btn btn-primary add-row-btn">
+                                <i class="fas fa-plus"></i> Add More
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
                         {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
@@ -258,7 +296,6 @@ $(document).ready(function() {
       updateDropdownList();
     }
   });
-
   $(wrapper).on("click", ".remove-row-btn", function(e) {
     e.preventDefault();
     $(this).closest('.row').remove();
@@ -271,10 +308,8 @@ $(document).ready(function() {
     var selectedBrandIdInput = selectedBrandInput.next('input[name="model_line_ids"]');
     var selectedOption = selectedBrandInput.val();
     var selectedOptionId = selectedBrandInput.siblings('datalist').find('option[value="' + selectedOption + '"]').data('value');
-    
     var selectedBrandIds = $('input[name="model_line_ids"]').val() || '[]';
     selectedBrandIds = JSON.parse(selectedBrandIds);
-
     if (selectedBrandIds.indexOf(selectedOptionId) === -1) {
       selectedBrandIds.push(selectedOptionId);
     }
@@ -326,21 +361,6 @@ document.getElementById('languageInput').addEventListener('input', function(even
         }
         input.setCustomValidity('Please select a valid Source from the list.');
     });
-    document.getElementById('typeInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
-            }
-        }
-        input.setCustomValidity('Please select a valid Type from the list.');
-    });
     document.getElementById('brandInput').addEventListener('input', function(event) {
         var input = event.target;
         var list = input.getAttribute('list');
@@ -372,21 +392,6 @@ document.getElementById('languageInput').addEventListener('input', function(even
             emailInput.classList.remove('invalid');
             emailError.textContent = '';
         }
-    });
-    document.getElementById('salesPersonInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
-            }
-        }
-        input.setCustomValidity('Please select a valid Sales Person from the list.');
     });
     function validateEmail(email) {
         var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -442,6 +447,89 @@ document.getElementById('languageInput').addEventListener('input', function(even
         }
     });
 });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var customertypeDropdown = document.getElementById("customertype");
+
+        if (customertypeDropdown) {
+            customertypeDropdown.addEventListener("change", toggleFields);
+        }
+        function toggleFields() {
+            var customerType = customertypeDropdown.value;
+            var companyNameField = document.getElementById("companyNameField");
+            var tradeLicenseField = document.getElementById("tradeLicenseField");
+            var Tradelicense = document.getElementById("tenderLicenseField");
+            var Passport = document.getElementById("passportField");
+            if (customerType === "company") {
+                companyNameField.style.display = "block";
+                tradeLicenseField.style.display = "block";
+                Passport.style.display = "none";
+                Tradelicense.style.display = "none";
+            } 
+            else if (customerType === "government") {
+                Tradelicense.style.display = "block";
+                companyNameField.style.display = "none";
+                tradeLicenseField.style.display = "none";
+                Passport.style.display = "none";
+            }
+            else if (customerType === "individual") {
+                companyNameField.style.display = "none";
+                tradeLicenseField.style.display = "none";
+                Tradelicense.style.display = "none";
+                Passport.style.display = "block";
+            }
+        }
+    });
+</script>
+<script>
+   document.addEventListener("DOMContentLoaded", function() {
+    var purtype = document.getElementById("shippingtype");
+    if (purtype) {
+        purtype.addEventListener("change", toggleFields);
+    }
+    function toggleFields() {
+        var selectedType = purtype.value;
+        var countryofexport = document.getElementById("countryexp");
+
+        if (selectedType === "Export") {
+            countryofexport.style.display = "block";
+        } else {
+            countryofexport.style.display = "none";
+        }
+    }
+});
+$(document).ready(function() {
+        $('#phone, #email').on('input', function() {
+            var phone = $('#phone').val();
+            var email = $('#email').val();
+            $.ajax({
+                url: "{{ route('checkExistence') }}",
+                method: 'POST',
+                data: {
+                    phone: phone,
+                    email: email,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    $('#phoneCount').text('Phone count: ' + response.phoneCount);
+                    $('#emailCount').text('Email count: ' + response.emailCount);
+                    if (response.phoneCount > 0 || response.emailCount > 0) {
+                        // var customerNames = response.customerNames.join(', ');
+                        // var message = 'Customer Names: ' + customerNames + '<br>';
+                        message = 'Phone Count: ' + response.phoneCount + '<br>';
+                        message += 'Email Count: ' + response.emailCount;
+                        var buttonHtml = '<a href="{{ route('repeatedcustomers') }}?phone=' + encodeURIComponent(phone) + '&email=' + email + '" class="btn btn-primary">See Details</a>';
+                        message += '<br>' + buttonHtml;
+                        
+                        $('#flashMessage').html('<div class="alert alert-info">' + message + '</div>');
+                    } else {
+                        $('#flashMessage').html('');
+                    }
+                }
+            });
+        });
+    });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>

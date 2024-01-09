@@ -40,20 +40,17 @@ class DemandListController extends Controller
         $this->validate($request, [
             'model' => 'required',
             'sfx' => 'required',
-            'variant' => 'required',
+            'model_year' => 'required',
         ]);
 
         DB::beginTransaction();
         $demadList = new DemandList();
         $demadList->demand_id = $request->demand_id;
-        $variant = Varaint::find($request->variant);
-
-        if($variant) {
             $masterModel = MasterModel::where('sfx', $request->sfx)
                 ->where('model', $request->model)
-                ->where('variant_id', $variant->id)->first();
+                ->where('model_year', $request->model_year)->first();
+
             $demadList->master_model_id = $masterModel->id ?? '';
-        }
 
         $demadList->created_by = Auth::id();
         $demadList->save();
