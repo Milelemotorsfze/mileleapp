@@ -253,9 +253,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     <div class="row">
         <p><span style="float:right;" class="error">* Required Field</span></p>
     </div>
-    <form id="employeePassportRequestForm" name="employeePassportRequestForm" enctype="multipart/form-data" method="POST" action="{{route('passport_request.update', $data->id)}}">
+    <form id="employeePassportRequestForm" name="employeePassportRequestForm" enctype="multipart/form-data" method="POST" action="{{route('employee-passport_request.store-or-update', $data->id)}}">
         @csrf
-        @method('PUT')
         <div class="row">
 
             <div class="col-lg-12 job-desc-top-info">
@@ -330,7 +329,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         </div>
         <br />
 
-        <div class="col-lg-12 col-md-12 col-sm-12 col-12 passportSubmitReleaseDropDownInputContainer" id="passportSubmitReleaseDropDownInputContainer" style="display: none;">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-12 passportSubmitReleaseDropDownInputContainer" id="passportSubmitReleaseDropDownInputContainer">
+            <!-- style="display: none;" -->
             <hr />
             <label for="choose-passport-req" class="form-label"><span class="error">* </span><b>Choose your option for the passport:</b></label>
             <div class="col-lg-4 col-md-6 col-sm-12 col-12">
@@ -355,7 +355,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <div class="dropdown-option-div">
                                 <select name="purposes_of_submit" id="purposes_of_submit_id" class="form-control widthinput" multiple="true" autofocus>
                                     @foreach($submissionPurpose as $PassportRequestPurpose)
-                                    <option value="{{ $PassportRequestPurpose->id }}">{{ $PassportRequestPurpose->name ?? ''}}</option>
+                                    <option value="{{ $PassportRequestPurpose->id }}" @if($data->purposes_of_submit == $PassportRequestPurpose->id) selected @endif>{{ $PassportRequestPurpose->name ?? ''}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -428,8 +428,12 @@ redirect()->route('home')->send();
     $(document).ready(function() {
 
         var data = <?php echo json_encode($masterEmployees); ?>;
-        console.log("Passport Request Form User data  -----", data);
+        var passportRequest = '';
+        var passportRequest = <?php echo json_encode($data); ?>;
+        if(passportRequest != '' && passportRequest.purposes_of_submit != '') {
+            showPassportRequestInput();
 
+        }
         $('#employee_name_id').select2({
             allowClear: true,
             maximumSelectionLength: 1,

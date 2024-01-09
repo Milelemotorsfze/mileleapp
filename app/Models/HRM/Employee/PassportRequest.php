@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
 use App\Models\Masters\PassportRequestPurpose;
 use App\Models\HRM\Employee\PassportRequestHistory;
+use Illuminate\Support\Facades\Auth;
 
 class PassportRequest extends Model
 {
@@ -37,6 +38,37 @@ class PassportRequest extends Model
         'updated_by',
         'deleted_by'
     ];
+    protected $appends = [
+        'is_auth_user_can_approve',
+    ];
+    public function getIsAuthUserCanApproveAttribute() {
+        $isAuthUserCanApprove = [];
+        $authId = Auth::id();
+         // employee -------> Reporting Manager  ------------>Division Head--------->HR Manager
+        if($this->submit_action_by_employee =='pending' && $this->employee_id == $authId) {
+            $isAuthUserCanApprove['can_approve'] = true;
+            $isAuthUserCanApprove['current_approve_position'] = 'Employee';
+            $isAuthUserCanApprove['current_approve_person'] = $this->user->name;
+        }
+        else if($this->submit_action_by_employee =='approved' && $this->submit_action_by_department_head == 'pending' && $this->submit_department_head_id == $authId) { 
+            $isAuthUserCanApprove['can_approve'] = true;
+            $isAuthUserCanApprove['current_approve_position'] = 'Reporting Manager';
+            $isAuthUserCanApprove['current_approve_person'] = $this->reportingManager->name;
+        }
+        else if($this->submit_action_by_employee =='approved' && $this->submit_action_by_department_head == 'approved' && $this->submit_action_by_division_head == 'pending' && 
+            $this->submit_division_head_id == $authId) {
+                $isAuthUserCanApprove['can_approve'] = true;
+                $isAuthUserCanApprove['current_approve_position'] = 'Division Head';
+                $isAuthUserCanApprove['current_approve_person'] = $this->divisionHead->name;
+        }
+        else if($this->submit_action_by_employee =='approved' && $this->submit_action_by_department_head == 'approved' && $this->submit_action_by_division_head == 'approved' && 
+            $this->submit_action_by_hr_manager == 'pending' && $this->submit_hr_manager_id == $authId) {
+                $isAuthUserCanApprove['can_approve'] = true;
+                $isAuthUserCanApprove['current_approve_position'] = 'HR Manager';
+                $isAuthUserCanApprove['current_approve_person'] = $this->hrManager->name;
+        }
+        return $isAuthUserCanApprove;
+    }
     public function user() {
         return $this->hasOne(User::class,'id','employee_id');
     }
@@ -54,5 +86,11 @@ class PassportRequest extends Model
     }
     public function history() {
         return $this->hasMany(PassportRequestHistory::class,'passport_request_id','id');
+    }
+    public function allReleases() {
+        return $this->hasMany(PassportRelease::class,'passport_request_id','id');
+    }
+    public function approvedRelease() {
+        return $this->hasOne(PassportRelease::class,'passport_request_id','id')->where('release_submit_status','!=','rejected');
     }
 }

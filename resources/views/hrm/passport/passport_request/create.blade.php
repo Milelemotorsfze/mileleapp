@@ -608,7 +608,8 @@ redirect()->route('home')->send();
                 $('.emp-job-location').text(data[i].emp_profile?.location?.name || '');
                 console.log("Drop down passport request value in update function : ", data[i].passport_with);
                 $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
-
+                console.log("Emp passport status by rejitha is ; ", data[i].emp_profile.passport_status);
+                // $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
                 togglePassportRequestDetailsDiv();
                 break;
             }
@@ -622,14 +623,20 @@ redirect()->route('home')->send();
         function updateFieldsBasedOnEmpId(selectedEmpId) {
             for (var i = 0; i < data.length; i++) {
                 if (data[i].id == selectedEmpId) {
+                    // console.log("Employee Data test by Rejitha : ", data[i].emp_profile.passport_status);
                     $('.employee-code-id').text(data[i].emp_profile?.employee_code || '');
                     $('.emp-designation').text(data[i].emp_profile?.designation?.name || '');
                     $('.emp-mobile-num').text(data[i].emp_profile?.contact_number || '');
                     $('.emp-department').text(data[i].emp_profile?.department?.name || '');
                     $('.emp-job-location').text(data[i].emp_profile?.location?.name || '');
                     console.log("Drop down passport request value in update function : ", data[i].passport_with);
-                    $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
-
+                    // $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
+                    if(data[i].emp_profile.passport_status == 'with_milele') {
+                        $('#passport_request_dropdown').val('with_company' || '').trigger('change');
+                    }
+                    else if(data[i].emp_profile.passport_status == 'with_employee') {
+                        $('#passport_request_dropdown').val('with_employee' || '').trigger('change');
+                    }
                     showPassportRequestInput();
                     break;
                 }
@@ -660,6 +667,7 @@ redirect()->route('home')->send();
 
             if ($('#passport_request_dropdown').length) {
                 var selectedValue = $('#passport_request_dropdown').val();
+                alert(selectedValue);
                 console.log("Selected value:", selectedValue);
 
                 $('#submitPassportInputContainer').toggle(selectedValue == 'with_employee');

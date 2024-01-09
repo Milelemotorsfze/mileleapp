@@ -59,13 +59,13 @@ class JoiningReport extends Model
             $isAuthUserCanApprove['current_approve_position'] = 'Prepared by';
             $isAuthUserCanApprove['current_approve_person'] = $this->preparedBy->name;
         }
-        else if($this->action_by_prepared_by =='approved' && $this->action_by_employee == 'pending' && $this->hr_manager_id == $authId) { 
+        else if($this->action_by_prepared_by =='approved' && $this->action_by_employee == 'pending' && $this->employee_id == $authId) { 
             $isAuthUserCanApprove['can_approve'] = true;
             $isAuthUserCanApprove['current_approve_position'] = 'Employee';
             $isAuthUserCanApprove['current_approve_person'] = $this->employee->first_name . ' ' . $this->employee->last_name;
         }
         else if($this->action_by_prepared_by =='approved' && $this->action_by_employee == 'approved' && $this->action_by_hr_manager == 'pending' && 
-            $this->department_head_id == $authId) {
+            $this->hr_manager_id == $authId) {
                 $isAuthUserCanApprove['can_approve'] = true;
                 $isAuthUserCanApprove['current_approve_position'] = 'HR Manager';
                 $isAuthUserCanApprove['current_approve_person'] = $this->hr->name;
