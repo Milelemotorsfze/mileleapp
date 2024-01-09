@@ -59,6 +59,7 @@
                     <th>ETA Import Date</th>
                     <th>Production Month</th>
                     <th>po ams</th>
+{{--                    <th>Colour Code</th>--}}
                 </tr>
                 </thead>
                 <tbody>
@@ -92,6 +93,7 @@
 
                             <td data-field="po_arm" class="po_arm"  id="po_arm-editable-{{$supplierInventory->id}}"  contenteditable="true"
                                 data-id="{{$supplierInventory->id}}" >{{ $supplierInventory->po_arm }}</td>
+{{--                            <td>{{  }}</td>--}}
 
                         </tr>
                 @endforeach
