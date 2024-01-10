@@ -266,7 +266,7 @@
                                                 @if ($hasPermission)
                                                 <a href="{{ route('passport_release.index') }}" class="dropdown-item" data-key="t-login">Passport Release</a>
                                                 @endif
-                                                @endcanany                                              
+                                                @endcanany
                                             </div>
                                             @endif
                                             @endcanany
@@ -565,7 +565,7 @@
                                     </div>
                                     @endif
 
-                                    
+
                                     @if(Auth::user()->joining_report_approval['can'] == true)
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
@@ -580,7 +580,7 @@
                                             <a href="{{ route('joiningReport.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">Joining Report
                                                 @if(Auth::user()->joining_report_approval['count'] > 0) <span class="approval-count">{{Auth::user()->joining_report_approval['count']}}</span> @endif
                                             </a>
-                                            @endif   
+                                            @endif
                                         </div>
                                     </div>
                                     @endif
@@ -856,7 +856,8 @@
                                         @endif
                                         @endcan
 
-                                        @canany(['supplier-inventory-list','supplier-inventory-edit','supplier-inventory-list-with-date-filter','supplier-inventory-report-view'])
+                                        @canany(['supplier-inventory-list','supplier-inventory-edit','supplier-inventory-list-with-date-filter',
+                                            'supplier-inventory-report-view'])
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-inventory-list','supplier-inventory-edit',
                                         'supplier-inventory-list-with-date-filter','supplier-inventory-report-view']);
@@ -908,33 +909,52 @@
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
                                         @endphp
-                                        @if ($hasPermission)
-                                        <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility">PFI</span>
-                                                <div class="arrow-down"></div>
-                                            </a>
-                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                <a href="{{route('pfi.index')}}" class="dropdown-item" data-key="t-login">List PFI </a>
+                                            @if ($hasPermission)
+                                            <div class="dropdown">
+                                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                    <span data-key="t-utility">PFI</span>
+                                                    <div class="arrow-down"></div>
+                                                </a>
+                                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                    <a href="{{route('pfi.index')}}" class="dropdown-item" data-key="t-login">List PFI </a>
+                                                </div>
                                             </div>
-                                        </div>
-                                        @endif
+                                            @endif
                                         @endcan
                                         @can('list-customer')
-                                        @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-customer');
-                                        @endphp
-                                        @if ($hasPermission)
-                                        <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility">Customer</span>
-                                                <div class="arrow-down"></div>
-                                            </a>
-                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                <a href="{{route('dm-customers.index')}}" class="dropdown-item" data-key="t-login">List Customer </a>
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-customer');
+                                            @endphp
+                                            @if ($hasPermission)
+                                            <div class="dropdown">
+                                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                    <span data-key="t-utility">Customer</span>
+                                                    <div class="arrow-down"></div>
+                                                </a>
+                                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                    <a href="{{route('dm-customers.index')}}" class="dropdown-item" data-key="t-login">List Customer </a>
+                                                </div>
                                             </div>
-                                        </div>
-                                        @endif
+                                            @endif
+                                        @endcan
+                                        @canany(['model-year-calculation-rules-list','model-year-calculation-categories-list'])
+                                            @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['model-year-calculation-rules-list','model-year-calculation-categories-list']);
+                                            @endphp
+                                            @if ($hasPermission)
+                                                <div class="dropdown">
+                                                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                        <span data-key="t-utility">Model Year Settings</span>
+                                                        <div class="arrow-down"></div>
+                                                    </a>
+                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                        <a href="{{route('model-year-calculation-rules.index')}}" class="dropdown-item" data-key="t-login">Rules </a>
+                                                    </div>
+                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                        <a href="{{route('model-year-calculation-categories.index')}}" class="dropdown-item" data-key="t-login">Categories </a>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         @endcan
                                     </div>
                                 </li>

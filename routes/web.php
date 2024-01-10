@@ -19,6 +19,8 @@ use App\Http\Controllers\DemandPlanningPurchaseOrderController;
 use App\Http\Controllers\MasterAddonController;
 use App\Http\Controllers\MasterModelController;
 use App\Http\Controllers\ModelLinesController;
+use App\Http\Controllers\ModelYearCalculationCategoriesController;
+use App\Http\Controllers\ModelYearCalculationRuleController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\SalesPersonLanguagesController;
@@ -656,6 +658,9 @@ Route::get('/d', function () {
     Route::resource('prospecting', ProspectingController::class);
     Route::resource('master-models', MasterModelController::class);
     Route::resource('dm-customers', CustomerController::class);
+    Route::resource('model-year-calculation-rules', ModelYearCalculationRuleController::class);
+    Route::resource('model-year-calculation-categories', ModelYearCalculationCategoriesController::class);
+
     Route::get('master-model/getLoiDescription', [MasterModelController::class,'getLoiDescription'])
         ->name('master-model.get-loi-description');
     Route::post('quotation/new-model-line', [ModelLinesController::class,'StoreModellineOrBrand'])->name('modelline-or-brand.store');
