@@ -16,6 +16,7 @@ use App\Models\HRM\Hiring\JobDescription;
 use App\Models\HRM\Hiring\InterviewSummaryReport;
 use App\Models\HRM\Employee\JoiningReport;
 use App\Models\HRM\Employee\PassportRelease;
+use App\Models\HRM\Employee\Liability;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
@@ -45,6 +46,7 @@ class User extends Authenticatable
         'joining_report_approval',
         'passport_submit_request_approval',
         'passport_release_request_approval',
+        'liability_request_approval',
     ];
     public function getPassportWithAttribute() {
         $passportWith = 'with_employee';
@@ -288,6 +290,48 @@ class User extends Authenticatable
             $passportReleaseRequestApproval['count'] = count($employeePendings) + count($reportingManagerPendings) + count($divisionHeadPendings) + count($hrPendings);
         }
         return $passportReleaseRequestApproval;
+    }
+    public function getLiabilityRequestApprovalAttribute() {
+        $authId = $this->id;
+        $liabilityRequestApproval['can'] = false;
+        $liabilityRequestApproval['count'] = 0;
+         // employee -------> Reporting Manager  ----Finance Manager--------->HR Manager-------->Division Head
+        $employeePendings = $employeeApproved = $employeeRejected = 
+        $reportingManagerPendings = $reportingManagerApproved = $reportingManagerRejected = 
+        $financeManagerPendings = $financeManagerApproved = $financeManagerRejected =  $hrPendings = $hrApproved = $hrRejected =
+        $divisionHeadPendings = $divisionHeadApproved = $divisionHeadRejected =  [];
+
+        $employeePendings = Liability::where([['action_by_employee','pending'],['employee_id',$this->id],])->latest()->get();
+        $employeeApproved = Liability::where([['action_by_employee','approved'],['employee_id',$this->id],])->latest()->get();
+        $employeeRejected = Liability::where([['action_by_employee','rejected'],['employee_id',$this->id],])->latest()->get();
+        $reportingManagerPendings = Liability::where([['action_by_employee','approved'],['action_by_department_head','pending']])->latest()->get();
+        $reportingManagerApproved = Liability::where([['action_by_employee','approved'],['action_by_department_head','approved']])->latest()->get();
+        $reportingManagerRejected = Liability::where([['action_by_employee','approved'],['action_by_department_head','rejected']])->latest()->get();
+        $financeManagerPendings = Liability::where([['action_by_employee','approved'],['action_by_department_head','approved'],['action_by_finance_manager','pending'],
+            ['hr_manager_id',$this->id],])->latest()->get();
+        $financeManagerApproved = Liability::where([['action_by_employee','approved'],['action_by_department_head','approved'],['action_by_finance_manager','approved'],
+            ['hr_manager_id',$this->id],])->latest()->get();
+        $financeManagerRejected = Liability::where([['action_by_employee','approved'],['action_by_department_head','approved'],['action_by_finance_manager','rejected'],
+            ['hr_manager_id',$this->id],])->latest()->get();  
+        $hrPendings = Liability::where([['action_by_employee','approved'],['action_by_finance_manager','approved'],
+            ['action_by_hr_manager','pending'],['hr_manager_id',$this->id],])->latest()->get();
+        $hrApproved = Liability::where([['action_by_employee','approved'],['action_by_finance_manager','approved'],
+            ['action_by_hr_manager','approved'],['hr_manager_id',$this->id],])->latest()->get();
+        $hrRejected = Liability::where([['action_by_employee','approved'],['action_by_finance_manager','approved'],
+            ['action_by_hr_manager','rejected'],['hr_manager_id',$this->id],])->latest()->get();  
+        $divisionHeadPendings = Liability::where([['action_by_employee','approved'],['action_by_finance_manager','approved'],['action_by_hr_manager','approved'],
+            ['action_by_division_head','pending'],['division_head_id',$this->id],])->latest()->get();
+        $divisionHeadApproved = Liability::where([['action_by_employee','approved'],['action_by_finance_manager','approved'],['action_by_hr_manager','approved'],
+            ['action_by_division_head','approved'],['division_head_id',$this->id],])->latest()->get();
+        $divisionHeadRejected = Liability::where([['action_by_employee','approved'],['action_by_finance_manager','approved'],['action_by_hr_manager','approved'],
+            ['action_by_division_head','rejected'],['division_head_id',$this->id],])->latest()->get();  
+        if(count($employeePendings) > 0 OR count($employeeApproved) > 0 OR count($employeeRejected) > 0 OR count($reportingManagerPendings) > 0 OR 
+        count($reportingManagerApproved) > 0 OR count($reportingManagerRejected) > 0 OR count($financeManagerPendings) > 0 OR count($financeManagerApproved) > 0 OR count($financeManagerRejected) > 0
+        OR count($hrPendings) > 0 OR count($hrApproved) > 0 OR count($hrRejected) > 0 OR count($divisionHeadPendings) > 0 OR count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0) {
+            $liabilityRequestApproval['can'] = true;
+            $liabilityRequestApproval['count'] = count($employeePendings) + count($reportingManagerPendings) + count($financeManagerPendings) + count($hrPendings) + count($divisionHeadPendings);
+        }
+        return $liabilityRequestApproval;
     }
     public function getSelectedRoleAttribute() {
         return $this->attributes['selected_role'] ?? $this->roles()->first()->name;

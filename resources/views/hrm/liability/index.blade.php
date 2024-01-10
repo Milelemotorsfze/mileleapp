@@ -87,15 +87,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 						<tr>
 							<th>Sl No</th>
                             <th>Date</th>
-                            <th>Dept./Location</th>
+							<th>Liability Type</th>
+                            <th>Liability Code</th>
 							<th>Employee Name</th>
 							<th>Designation</th>
 							<th>Passport Number</th>
-							<th>Joining Date</th>
-							<th>Liability Type</th>
-                            <th>Liability Code</th>
+							<th>Joining Date</th>							
+                            <th>Department</th>
+                            <th>Location</th>
                             <th>Total Amount</th>
-                            <th>Number of Instalments</th>
+                            <th>Number of Installments</th>
 							<th>Amount per Installment</th>
 							<th>Reason</th>
 							<th>Action</th>
@@ -106,15 +107,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 						@foreach ($pendings as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
-							<td>{{ $data->user->name ?? ''}}</td>
-							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
-							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
-							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
-							<td>{{ $data->purpose->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
-							<td>{{ $data->reportingManager->name ?? ''}}</td>
-							<td>{{ $data->divisionHead->name ?? ''}}</td>
-							<td>{{ $data->hrManager->name ?? ''}}</td>							
+							<td>{{ $data->request_date ?? ''}}</td>
+							<td>{{ $data->liability_type ?? '' }}</td>
+							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->user->name ?? '' }}</td>
+							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
+							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
+							<td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+							<td>{{ $data->user->empProfile->department->name ?? ''}}</td>
+							<td>{{ $data->user->empProfile->location->name ?? ''}}</td>
+							<td>{{ $data->total_amount ?? ''}}</td>	
+							<td>{{ $data->no_of_installments ?? ''}}</td>	
+							<td>{{ $data->amount_per_installment ?? ''}}</td>	
+							<td>{{ $data->reason ?? ''}}</td>							
 							<td>
 							<div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -126,7 +131,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 										</a>
 									</li>
                                     <li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('employee_liability.edit',$data->id)}}">
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('employee-liability.create-or-edit',$data->id) }}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 										</a>
 									</li>
@@ -134,7 +139,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 										@if(isset($type))
 											@if($type == 'approve')
 												<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-													data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+													data-bs-target="#approve-employee-liability-request-{{$data->id}}">
 													<i class="fa fa-thumbs-up" aria-hidden="true"></i>  Approve 
 												</button>
 												<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
@@ -146,11 +151,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 											@if(isset($data->is_auth_user_can_approve['can_approve']))
 												@if($data->is_auth_user_can_approve['can_approve'] == true)
 													<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-														data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+														data-bs-target="#approve-employee-liability-request-{{$data->id}}">
 														<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 													</button>
 													<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-														data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+														data-bs-target="#reject-employee-liability-request-{{$data->id}}">
 														<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 													</button>
 												@endif
@@ -160,7 +165,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
                                 </ul>
                             </div>
 							</td>
-							@include('hrm.hiring.job_description.approve_reject_modal')					
+							@include('hrm.liability.approve_reject_modal')					
 						</tr>
 						@endforeach
 					</tbody>
@@ -174,17 +179,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 				<table id="approved-hiring-requests-table" class="table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
-                            <th>Sl No</th>
+							<th>Sl No</th>
                             <th>Date</th>
-                            <th>Dept./Location</th>
+							<th>Liability Type</th>
+                            <th>Liability Code</th>
 							<th>Employee Name</th>
 							<th>Designation</th>
 							<th>Passport Number</th>
-							<th>Joining Date</th>
-							<th>Liability Type</th>
-                            <th>Liability Code</th>
+							<th>Joining Date</th>							
+                            <th>Department</th>
+                            <th>Location</th>
                             <th>Total Amount</th>
-                            <th>Number of Instalments</th>
+                            <th>Number of Installments</th>
 							<th>Amount per Installment</th>
 							<th>Reason</th>
 							<th>Action</th>
@@ -194,16 +200,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 						<div hidden>{{$i=0;}}</div>
 						@foreach ($approved as $key => $approvedOne)
 						<tr data-id="1">
-						<td>{{ ++$i }}</td>
-                            <td>{{ $data->user->name ?? ''}}</td>
-							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
-							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
-							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
-							<td>{{ $data->purpose->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
-							<td>{{ $data->reportingManager->name ?? ''}}</td>
-							<td>{{ $data->divisionHead->name ?? ''}}</td>
-							<td>{{ $data->hrManager->name ?? ''}}</td>		
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->request_date ?? ''}}</td>
+							<td>{{ $data->liability_type ?? '' }}</td>
+							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->user->name ?? '' }}</td>
+							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
+							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
+							<td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+							<td>{{ $data->user->empProfile->department->name ?? ''}}</td>
+							<td>{{ $data->user->empProfile->location->name ?? ''}}</td>
+							<td>{{ $data->total_amount ?? ''}}</td>	
+							<td>{{ $data->no_of_installments ?? ''}}</td>	
+							<td>{{ $data->amount_per_installment ?? ''}}</td>	
+							<td>{{ $data->reason ?? ''}}</td>
 							<td>
 										<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_liability.show',$data->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i>
@@ -336,17 +346,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 				<table id="rejected-hiring-requests-table" class="table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
-                            <th>Sl No</th>
+							<th>Sl No</th>
                             <th>Date</th>
-                            <th>Dept./Location</th>
+							<th>Liability Type</th>
+                            <th>Liability Code</th>
 							<th>Employee Name</th>
 							<th>Designation</th>
 							<th>Passport Number</th>
-							<th>Joining Date</th>
-							<th>Liability Type</th>
-                            <th>Liability Code</th>
+							<th>Joining Date</th>							
+                            <th>Department</th>
+                            <th>Location</th>
                             <th>Total Amount</th>
-                            <th>Number of Instalments</th>
+                            <th>Number of Installments</th>
 							<th>Amount per Installment</th>
 							<th>Reason</th>
 							<th>Action</th>
@@ -356,16 +367,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 						<div hidden>{{$i=0;}}</div>
 						@foreach ($rejected as $key => $rejectedOne)
 						<tr data-id="1">
-						<td>{{ ++$i }}</td>
-						<td>{{ $data->user->name ?? ''}}</td>
-							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
-							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
-							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
-							<td>{{ $data->purpose->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
-							<td>{{ $data->reportingManager->name ?? ''}}</td>
-							<td>{{ $data->divisionHead->name ?? ''}}</td>
-							<td>{{ $data->hrManager->name ?? ''}}</td>		
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->request_date ?? ''}}</td>
+							<td>{{ $data->liability_type ?? '' }}</td>
+							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->user->name ?? '' }}</td>
+							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
+							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
+							<td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+							<td>{{ $data->user->empProfile->department->name ?? ''}}</td>
+							<td>{{ $data->user->empProfile->location->name ?? ''}}</td>
+							<td>{{ $data->total_amount ?? ''}}</td>	
+							<td>{{ $data->no_of_installments ?? ''}}</td>	
+							<td>{{ $data->amount_per_installment ?? ''}}</td>	
+							<td>{{ $data->reason ?? ''}}</td>		
 							<td>
 							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_liability.show',$data->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>

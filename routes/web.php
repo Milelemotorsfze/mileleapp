@@ -322,6 +322,7 @@ Route::get('/d', function () {
     Route::controller(EmployeeLiabilityController::class)->group(function(){
         Route::get('employee-liability/create-or-edit/{id}', 'createOrEdit')->name('employee-liability.create-or-edit');
         Route::post('employee-liability/store-or-update/{id}', 'storeOrUpdate')->name('employee-liability.store-or-update');
+        Route::post('liability_request_action', 'requestAction')->name('liabilityRequest.action');
     });
 
     // Employee Leave
