@@ -41,7 +41,7 @@ class EmployeeLeaveController extends Controller
             $next = Leave::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
         $masterEmployees = User::whereHas('empProfile')->select('id','name')->get();
-        return view('hrm.liability.create',compact('id','data','previous','next','masterEmployees'));
+        return view('hrm.leave.create',compact('id','data','previous','next','masterEmployees'));
     }
     public function storeOrUpdate(Request $request, $id) { 
         $validator = Validator::make($request->all(), [
