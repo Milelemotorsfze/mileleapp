@@ -23,6 +23,85 @@ use Carbon\Carbon;
 
 class PassportRequestController extends Controller
 {
+    public function approvalAwaiting(Request $request) {
+        $authId = Auth::id();
+        $page = 'approval';
+        $HRManager = '';
+        $deptHead = $employeePendings = $employeeApproved = $employeeRejected = $reportingManagerPendings = $reportingManagerApproved = $reportingManagerRejected = 
+        $divisionHeadPendings = $divisionHeadApproved = $divisionHeadRejected = $hrManagerPendings = $hrManagerApproved = $hrManagerRejected = [];
+        $HRManager = ApprovalByPositions::where([
+            ['approved_by_position','HR Manager'],
+            ['handover_to_id',$authId]
+        ])->first();
+        $employeePendings = PassportRequest::where([
+            ['submit_action_by_employee','pending'],
+            ['employee_id',$authId],
+            ])->latest()->get();
+        $employeeApproved = PassportRequest::where([
+            ['submit_action_by_employee','approved'],
+            ['employee_id',$authId],
+            ])->latest()->get();
+        $employeeRejected = PassportRequest::where([
+            ['submit_action_by_employee','rejected'],
+            ['employee_id',$authId],
+            ])->latest()->get();
+        $reportingManagerPendings = PassportRequest::where([
+            ['submit_action_by_employee','approved'],
+            ['submit_action_by_department_head','pending'],
+            ['submit_department_head_id',$authId],
+            ])->latest()->get();
+        $reportingManagerApproved = PassportRequest::where([
+            ['submit_action_by_employee','approved'],
+            ['submit_action_by_department_head','approved'],
+            ['submit_department_head_id',$authId],
+            ])->latest()->get();
+        $reportingManagerRejected = PassportRequest::where([
+            ['submit_action_by_employee','approved'],
+            ['submit_action_by_department_head','rejected'],
+            ['submit_department_head_id',$authId],
+            ])->latest()->get();
+        $divisionHeadPendings = PassportRequest::where([
+            ['submit_action_by_employee','approved'],
+            ['submit_action_by_department_head','approved'],
+            ['submit_action_by_division_head','pending'],
+            ['submit_division_head_id',$authId],
+            ])->latest()->get();
+        $divisionHeadApproved = PassportRequest::where([
+            ['submit_action_by_employee','approved'],
+            ['submit_action_by_department_head','approved'],
+            ['submit_action_by_division_head','approved'],
+            ['submit_division_head_id',$authId],
+            ])->latest()->get();
+        $divisionHeadRejected = PassportRequest::where([
+            ['submit_action_by_employee','approved'],
+            ['submit_action_by_department_head','approved'],                
+            ['submit_action_by_division_head','rejected'],
+            ['submit_division_head_id',$authId],
+            ])->latest()->get();       
+        $hrManagerPendings = PassportRequest::where([
+            ['submit_action_by_employee','approved'],
+            ['submit_action_by_department_head','approved'],
+            ['submit_action_by_division_head','approved'],
+            ['submit_action_by_hr_manager','pending'],
+            ['submit_hr_manager_id',$authId],
+            ])->latest()->get();
+        $hrManagerApproved = PassportRequest::where([
+            ['submit_action_by_employee','approved'],
+            ['submit_action_by_department_head','approved'],
+            ['submit_action_by_division_head','approved'],
+            ['submit_action_by_hr_manager','approved'],
+            ['submit_hr_manager_id',$authId],
+            ])->latest()->get();
+        $hrManagerRejected = PassportRequest::where([
+            ['submit_action_by_employee','approved'],
+            ['submit_action_by_department_head','approved'],                
+            ['submit_action_by_division_head','approved'],
+            ['submit_action_by_hr_manager','rejected'],
+            ['submit_hr_manager_id',$authId],
+            ])->latest()->get();
+        return view('hrm.passport.passport_request.approvals',compact('page','employeePendings','employeeApproved','employeeRejected','reportingManagerPendings',
+        'reportingManagerApproved','reportingManagerRejected','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','hrManagerPendings','hrManagerApproved','hrManagerRejected'));
+    }
     public function index() {
         $pendings = PassportRequest::where('submit_status','pending')->latest()->get();
         $approved = PassportRequest::where('submit_status','approved')->latest()->get();
@@ -77,7 +156,7 @@ class PassportRequestController extends Controller
         $releasePurpose = PassportRequestPurpose::where('type','release')->get();
         return view('hrm.passport.passport_request.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));
     }
-    public function storeOrUpdate(Request $request, $id) { 
+    public function storeOrUpdate(Request $request, $id) {
         $validator = Validator::make($request->all(), [
             'employee_id' => 'required',
         ]);
@@ -124,31 +203,31 @@ class PassportRequestController extends Controller
                             $input['passport_request_id'] = $passportRequest->id;
                             $input['release_action_by_employee'] = 'pending';
                             $input['release_submit_status'] = 'pending';
-                            // $input['passport_status'] = 'with_company';
+                            $input['release_purpose'] = $request->release_purpose;
                             $createRelease = PassportRelease::create($input);
                             $history['passport_release_id'] = $createRelease->id;
                             $history2['passport_release_id'] = $createRelease->id;
                             $submitOrRelease = '';   
                             $history['icon'] = 'icons8-document-30.png';
                             $history['message'] = 'Employee passport release request created by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
-                            $createHistory = PassportRequestHistory::create($history);                  
+                            $createHistory = PassportReleaseHistory::create($history);                  
                             $history2['icon'] = 'icons8-send-30.png';
                             $history2['message'] = 'Employee passport '.$request->purposes_of_submit.' request send to Employee ( '.$employee->first_name.' '.$employee->last_name.' - '.$employee->personal_email_adddress.' ) for approval';
-                            $createHistory2 = PassportRequestHistory::create($history2);
+                            $createHistory2 = PassportReleaseHistory::create($history2);
                             (new UserActivityController)->createActivity('Employee Passport Release Request Created');
                             $successMessage = "Employee Passport Release Request Created Successfully"; 
                         }                                
                     }                                    
                 }
-                else {
-                    $update = PassportRequest::find($id);
-                    if($update) {
-                        $update->employee_id = $request->employee_id;
-                        $update->updated_by = $authId;
-                        if(isset($request->purposes_of_submit)) {
+                else {                    
+                    if(isset($request->purposes_of_submit)) {
+                        $update = PassportRequest::find($id);
+                        if($update) {
+                            $update->employee_id = $request->employee_id;
+                            $update->updated_by = $authId;
                             $update->submit_hr_manager_id = $HRManager->handover_to_id;                
                             $update->submit_department_head_id = $employee->leadManagerHandover->approval_by_id;
-                            $update->submit_division_head_id = $divisionHead->division_head_id;
+                            $update->submit_division_head_id = $divisionHead->approval_handover_to;
                             $update->purposes_of_submit = $request->purposes_of_submit;
                             $update->submit_status = 'pending';
                             $update->submit_action_by_employee = 'pending';
@@ -164,20 +243,46 @@ class PassportRequestController extends Controller
                             $update->submit_hr_manager_action_at = NULL;
                             $update->submit_comments_by_hr_manager = NULL;
                             $update->update();
-                        } 
-                        else if(isset($request->purposes_of_release)) {
+                            $history['passport_request_id'] = $id;
+                            $history['icon'] = 'icons8-edit-30.png';
+                            $history['message'] = 'Employee Passport submit request edited by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
+                            $createHistory = PassportRequestHistory::create($history);
+                            (new UserActivityController)->createActivity('Employee Passport Submit Request Edited');
+                            $successMessage = "Employee Passport Submit Request Updated Successfully";
+                        }
+                    } 
+                    else if(isset($request->purposes_of_release)) {
+                        $update = PassportRelease::find($id);
+                        if($update) {
+                            $update->employee_id = $request->employee_id;
+                            $update->updated_by = $authId;
                             $update->release_hr_manager_id = $HRManager->handover_to_id;                
                             $update->release_department_head_id = $employee->leadManagerHandover->approval_by_id;
-                            $update->release_division_head_id = $divisionHead->division_head_id;
-                        }                      
-                        $update->update();
-                        $history['passport_request_id'] = $id;
-                        $history['icon'] = 'icons8-edit-30.png';
-                        $history['message'] = 'Employee Passport request edited by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
-                        $createHistory = PassportRequestHistory::create($history);
-                        (new UserActivityController)->createActivity('Employee Passport Request Edited');
-                        $successMessage = "Employee Passport Request Updated Successfully";
-                    }
+                            $update->release_division_head_id = $divisionHead->approval_handover_to;
+                            $update->purposes_of_release = $request->purposes_of_release;
+                            $update->release_submit_status = 'pending';
+                            $update->release_action_by_employee = 'pending';
+                            $update->release_employee_action_at = NULL;
+                            $update->release_comments_by_employee = NULL;
+                            $update->release_action_by_department_head = NULL;
+                            $update->release_department_head_action_at = NULL;
+                            $update->release_comments_by_department_head = NULL;
+                            $update->release_action_by_division_head = NULL;
+                            $update->release_division_head_action_at = NULL;
+                            $update->release_comments_by_division_head = NULL;
+                            $update->release_action_by_hr_manager = NULL;
+                            $update->release_hr_manager_action_at = NULL;
+                            $update->release_comments_by_hr_manager = NULL;
+                            $update->release_purpose = $request->release_purpose;
+                            $update->update();
+                            $history['passport_release_id'] = $id;
+                            $history['icon'] = 'icons8-edit-30.png';
+                            $history['message'] = 'Employee Passport release edited by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
+                            $createHistory = PassportRequestHistory::create($history);
+                            (new UserActivityController)->createActivity('Employee Passport Release Edited');
+                            $successMessage = "Employee Passport Release Updated Successfully";
+                        }
+                    }                                                                 
                 }               
                 DB::commit();
                 if(isset($request->purposes_of_submit)) {
@@ -232,7 +337,7 @@ class PassportRequestController extends Controller
             $update->submit_action_by_hr_manager = $request->status;
             if($request->status == 'approved') {
                 $update->submit_status = 'approved';
-                $emp = EmployeeProfile::where('id',$update->employee_id)->first();
+                $emp = EmployeeProfile::where('user_id',$update->employee_id)->first();
                 $emp->passport_status = 'with_milele';
                 $emp->update();
             }

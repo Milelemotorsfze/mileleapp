@@ -238,18 +238,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 				</div>
 			</div>
 			<div class="col-xxl-3 col-lg-4 col-md-4" id="employee_code_div">
-			<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
-            <input id="employee_code" type="text" class="form-control widthinput @error('employee_code') is-invalid @enderror" name="employee_code"
+				<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
+				<input id="employee_code" type="text" class="form-control widthinput @error('employee_code') is-invalid @enderror" name="employee_code"
                                 placeholder="Candidate Name" value="{{$candidate->employee_code}}" autocomplete="employee_code" autofocus>
-			<!-- <center><span id="employee_code"></span></center> -->
 			</div>
 			<div class="col-xxl-3 col-lg-4 col-md-4" id="designation_div">
-			<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
-			<center><span id="designation"></span></center>
+				<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
+				<center><span id="designation"></span></center>
 			</div>
             <div class="col-xxl-3 col-lg-4 col-md-4" id="department_div">
-			<center><label for="department" class="col-form-label text-md-end"><strong>{{ __('Department') }}</strong></label></center>
-			<center><span id="department"></span></center>
+				<center><label for="department" class="col-form-label text-md-end"><strong>{{ __('Department') }}</strong></label></center>
+				<center><span id="department"></span></center>
 			</div>
 			</div>
 			</div>

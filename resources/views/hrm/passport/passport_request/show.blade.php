@@ -31,10 +31,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
 <div class="card-header">
 	<h4 class="card-title"> Employee Passport Submit Details</h4>
 	@if($previous != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('interview-summary-report.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('passport_request.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
 	@endif
 	@if($next != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('interview-summary-report.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('passport_request.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
 	@endif
 	<a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 	@if (count($errors) > 0)

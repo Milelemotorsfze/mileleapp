@@ -232,7 +232,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-    <h4 class="card-title">Create Passport Request Form</h4>
+    <h4 class="card-title">Edit Passport Request Form</h4>
     <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
@@ -253,9 +253,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
     <div class="row">
         <p><span style="float:right;" class="error">* Required Field</span></p>
     </div>
-    <form id="employeePassportRequestForm" name="employeePassportRequestForm" enctype="multipart/form-data" method="POST" action="{{route('employee-passport_request.store-or-update', $id)}}">
+    <form id="employeePassportRequestForm" name="employeePassportRequestForm" enctype="multipart/form-data" method="POST" action="{{route('employee-passport_request.store-or-update', $data->id)}}">
         @csrf
-
         <div class="row">
 
             <div class="col-lg-12 job-desc-top-info">
@@ -266,7 +265,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <label for="employee_id" class="form-label heading-name"><span class="error">* </span>{{ __('Employee Name') }}</label>
                             <select name="employee_id" id="employee_name_id" class="form-control widthinput" multiple="true" autofocus>
                                 @foreach($masterEmployees as $User)
-                                <option value="{{ $User->id }}">{{ $User->name ?? ''}}</option>
+                                <option value="{{ $User->id }}" @if($User->id == $data->employee_id) selected @endif>{{ $User->name ?? ''}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -274,29 +273,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 </div>
                 <br />
 
-                <!-- <p>Data is: @foreach($masterEmployees as $User)
-                    <text value="{{ $User->id }}">\
-                        {{ $User->empProfile->designation_id ?? ''}} </text>
-                    @endforeach
-                </p> -->
-
-                <!-- <p>
-                    Designation is:
-                    @foreach($masterEmployees as $User)
-                    @if($User->empProfile)
-                    {{ $User->empProfile->designation ? $User->empProfile->designation->name : '' }}/////
-                    {{ $User->empProfile->department ? $User->empProfile->department->name : '' }}///////
-                    {{ $User->empProfile->location ? $User->empProfile->location->name : '' }}////////
-
-                    @else
-                    ---
-                    @endif
-                    @endforeach
-
-                </p> -->
-
-                <div class="row passport-request-details-div" style="display: none;">
-
+                <div class="row passport-request-details-div" >
+                <!-- style="display: none;" -->
                     <!-- Employee ID Section -->
                     <div class="col-lg-4 col-md-4 col-sm-4 col-6 title-section-div">
                         <div class="col-12 job-description-textfield-lable">
@@ -304,7 +282,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <label for="employee_code_id" class="col-form-label widthinput heading-name"><b>Employee Code</b></label>
                         </div>
                         <div class="col-12 job-description-text-value">
-                            <div name="employee_code_id" class="employee-code-id"></div>
+                            <div name="employee_code_id" class="employee-code-id">{{$data->user->empProfile->employee_code ?? ''}}</div>
                         </div>
                     </div>
 
@@ -313,7 +291,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <label for="emp_designation" class="col-form-label widthinput heading-name"><b>Designation</b></label>
                         </div>
                         <div class="col-12 job-description-text-value">
-                            <div name="emp_designation" class="emp-designation"></div>
+                            <div name="emp_designation" class="emp-designation">{{$data->user->empProfile->designation->name ?? ''}}</div>
                         </div>
                     </div>
 
@@ -322,7 +300,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <label for="emp_mobile_num" class="col-form-label widthinput heading-name"><b>Mobile No.</b></label>
                         </div>
                         <div class="job-description-text-value">
-                            <div name="emp_mobile_num" class="emp-mobile-num"></div>
+                            <div name="emp_mobile_num" class="emp-mobile-num">{{$data->user->empProfile->contact_number}}</div>
                         </div>
                     </div>
 
@@ -332,17 +310,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <label for="emp_department" class="col-form-label widthinput heading-name"><b>Department</b></label>
                         </div>
                         <div class="col-12 job-description-text-value">
-                            <div name="emp_department" class="emp-department"></div>
+                            <div name="emp_department" class="emp-department">{{$data->user->empProfile->designation->name ?? ''}}</div>
                         </div>
                     </div>
 
                     <!-- Location Section -->
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-6 reporting-section-div">
+                    <div class="col-lg-8 col-md-8 col-sm-4 col-6 reporting-section-div">
                         <div class="col-12 job-description-textfield-lable">
                             <label for="emp_job_location" class="col-form-label widthinput heading-name"><b>Location</b></label>
                         </div>
                         <div class="job-description-text-value">
-                            <div name="emp_job_location" class="emp-job-location"></div>
+                            <div name="emp_job_location" class="emp-job-location">{{$data->user->empProfile->location->name ?? ''}} , {{$data->user->empProfile->location->address ?? ''}}</div>
                         </div>
                     </div>
                 </div>
@@ -351,15 +329,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         </div>
         <br />
 
-        <div class="col-lg-12 col-md-12 col-sm-12 col-12 passportSubmitReleaseDropDownInputContainer" id="passportSubmitReleaseDropDownInputContainer" style="display: none;">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-12 passportSubmitReleaseDropDownInputContainer" id="passportSubmitReleaseDropDownInputContainer">
+            <!-- style="display: none;" -->
             <hr />
             <label for="choose-passport-req" class="form-label"><span class="error">* </span><b>Choose your option for the passport:</b></label>
             <div class="col-lg-4 col-md-6 col-sm-12 col-12">
-                <select name="passport_request_dropdown" id="passport_request_dropdown" class="form-control widthinput" disabled
-                
-                >
+                <select name="passport_request_dropdown" id="passport_request_dropdown" class="form-control widthinput" <?php echo isset($masterEmployees[0]->passport_with) ? 'disabled' : ''; ?>>
                     <option value="with_employee">Submission of Passport</option>
-                    <option value="with_company">Release of Passport</option>
+                    <option value="with_company" selected>Release of Passport</option>
                 </select>
             </div>
             <br />
@@ -378,7 +355,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <div class="dropdown-option-div">
                                 <select name="purposes_of_submit" id="purposes_of_submit_id" class="form-control widthinput" multiple="true" autofocus>
                                     @foreach($submissionPurpose as $PassportRequestPurpose)
-                                    <option value="{{ $PassportRequestPurpose->id }}">{{ $PassportRequestPurpose->name ?? ''}}</option>
+                                    <option value="{{ $PassportRequestPurpose->id }}" @if($data->purposes_of_submit == $PassportRequestPurpose->id) selected @endif>{{ $PassportRequestPurpose->name ?? ''}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -405,19 +382,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             <div class="dropdown-option-div">
                                 <select name="purposes_of_release" id="purposes_of_release_id" class="form-control widthinput" multiple="true" autofocus>
                                     @foreach($releasePurpose as $PassportRequestPurpose)
-                                    <option value="{{ $PassportRequestPurpose->id }}">{{ $PassportRequestPurpose->name ?? ''}}</option>
+                                    <option value="{{ $PassportRequestPurpose->id }}" @if($data->purposes_of_release == $PassportRequestPurpose->id) selected @endif>{{ $PassportRequestPurpose->name ?? ''}}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
 
-                        <div class="other-specific-passport-release-option" style="display: none;">
+                        @if($data->purposes_of_release == 13)
+                        <div class="other-specific-passport-release-option">
                             <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
                                 <label for="release_purpose" class="form-label"> </label>
-                                <input type="text" placeholder="Please Specify Other" name="release_purpose" class="form-control" id="other_release_purpose" value="">
+                                <input type="text" placeholder="Please Specify Other" name="release_purpose" class="form-control" id="other_release_purpose" value="{{$data->release_purpose ?? ''}}">
                             </div>
                         </div>
+                        @endif
 
                         <div class="col-lg-10 col-md-10 col-sm-10 col-12">
                             <p class="submit-passport-para">However, I can withdraw my passport when required by fulfilling the necessary requirements</p>
@@ -428,118 +407,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             </div>
 
         </div>
-
-
-        <!-- Signatures Div -->
-        <!-- <div class="col-lg-6 col-md-12 col-sm-12 col-12">
-            <div class="passportSubmitReleaseDropDownInputContainer">
-                <h5>Signatures</h5>
-            </div>
-        </div>
-        <hr />
-
-        <div class="col-lg-12 job-desc-top-info">
-            <div class="row">
-                <div class="col-lg-6 col-md-7 col-sm-10 col-12 emp-sign-section-div">
-                    <div class="row">
-                        <div class="col-xxl-5 col-lg-6 col-md-5 col-sm-5 col-12 passport-signature-section-lable-name">
-                            <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Employee Name</label>
-                        </div>
-                        <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12 top-margin-input">
-                            <input type="text" class="form-control top-margin-input-1" name="empName">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6 col-md-5 col-sm-10 col-12 sign-date-section-div">
-                    <div class="row">
-                        <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 passport-signature-section-lable-name">
-                            <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date</label>
-                        </div>
-                        <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="date" class="form-control top-margin-input-1" name="empSign">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <br />
-            <div class="row ">
-                <div class="col-lg-6 col-md-7 col-sm-10 col-12 reportingManager-signature-section-div">
-                    <div class="row">
-                        <div class="col-xxl-5 col-lg-6 col-md-5 col-sm-5 col-12 passport-signature-section-lable-name">
-                            <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Reporting Manager Signature</label>
-                        </div>
-                        <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12 top-margin-input">
-                            <input type="text" class="form-control top-margin-input-1" name="repManagerSign">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6 col-md-5 col-sm-10 col-12 sign-date-section-div">
-                    <div class="row">
-                        <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 reportingManager-signature-section-lable-name">
-                            <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date</label>
-                        </div>
-                        <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="date" class="form-control top-margin-input-1" name="repManagerSignDate">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <br />
-
-            <div class="row">
-
-                <div class="col-lg-6 col-md-7 col-sm-10 col-12 divHead-section-div">
-                    <div class="row">
-                        <div class="col-xxl-5 col-lg-6 col-md-5 col-sm-5 col-12 divHead-signature-section-lable-name">
-                            <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Divison Head Signature</label>
-                        </div>
-                        <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="text" class="form-control top-margin-input-1" name="divHeadSign">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6 col-md-5 col-sm-10 col-12 sign-date-section-div">
-                    <div class="row">
-                        <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 divHead-signature-section-lable-name">
-                            <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date</label>
-                        </div>
-                        <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="date" class="form-control top-margin-input-1" name="divHeadSignDate">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <br />
-
-            <div class="row">
-
-                <div class="col-lg-6 col-md-7 col-sm-10 col-12 hrManager-signature-section-div">
-                    <div class="row">
-                        <div class="col-xxl-5 col-lg-6 col-md-5 col-sm-5 col-12 hrManager-signature-section-lable-name">
-                            <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">HR Manager Signature</label>
-                        </div>
-                        <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="text" class="form-control top-margin-input-1" name="hrManager">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6 col-md-5 col-sm-10 col-12 sign-date-section-div">
-                    <div class="row">
-                        <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 hrManager-signature-section-lable-name">
-                            <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date</label>
-                        </div>
-                        <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                            <input type="date" class="form-control top-margin-input-1" name="hrManagerSign">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div> -->
 
         </br>
         <div class="col-lg-12 col-md-12 col-sm-12">
@@ -563,8 +430,12 @@ redirect()->route('home')->send();
     $(document).ready(function() {
 
         var data = <?php echo json_encode($masterEmployees); ?>;
-        console.log("Passport Request Form User data  -----", data);
+        var passportRequest = '';
+        var passportRequest = <?php echo json_encode($data); ?>;
+        if(passportRequest != '' && passportRequest.purposes_of_submit != '') {
+            showPassportRequestInput();
 
+        }
         $('#employee_name_id').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -610,8 +481,7 @@ redirect()->route('home')->send();
                 $('.emp-job-location').text(data[i].emp_profile?.location?.name || '');
                 console.log("Drop down passport request value in update function : ", data[i].passport_with);
                 $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
-                console.log("Emp passport status by rejitha is ; ", data[i].emp_profile.passport_status);
-                // $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
+
                 togglePassportRequestDetailsDiv();
                 break;
             }
@@ -625,20 +495,14 @@ redirect()->route('home')->send();
         function updateFieldsBasedOnEmpId(selectedEmpId) {
             for (var i = 0; i < data.length; i++) {
                 if (data[i].id == selectedEmpId) {
-                    // console.log("Employee Data test by Rejitha : ", data[i].emp_profile.passport_status);
                     $('.employee-code-id').text(data[i].emp_profile?.employee_code || '');
                     $('.emp-designation').text(data[i].emp_profile?.designation?.name || '');
                     $('.emp-mobile-num').text(data[i].emp_profile?.contact_number || '');
                     $('.emp-department').text(data[i].emp_profile?.department?.name || '');
                     $('.emp-job-location').text(data[i].emp_profile?.location?.name || '');
-                    // console.log("Drop down passport request value in update function : ", data[i].passport_with);
-                    // $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
-                    if(data[i].emp_profile.passport_status == 'with_milele') { 
-                        $('#passport_request_dropdown').val('with_company' || '').trigger('change');
-                    }
-                    else if(data[i].emp_profile.passport_status == 'with_employee') {
-                        $('#passport_request_dropdown').val('with_employee' || '').trigger('change');
-                    }
+                    console.log("Drop down passport request value in update function : ", data[i].passport_with);
+                    $('#passport_request_dropdown').val(data[i].passport_with || '').trigger('change');
+
                     showPassportRequestInput();
                     break;
                 }
@@ -669,7 +533,6 @@ redirect()->route('home')->send();
 
             if ($('#passport_request_dropdown').length) {
                 var selectedValue = $('#passport_request_dropdown').val();
-                // alert(selectedValue);
                 console.log("Selected value:", selectedValue);
 
                 $('#submitPassportInputContainer').toggle(selectedValue == 'with_employee');

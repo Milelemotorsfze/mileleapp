@@ -31,10 +31,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
 <div class="card-header">
 	<h4 class="card-title"> Employee Passport Release Details</h4>
 	@if($previous != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('interview-summary-report.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('passport_release.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
 	@endif
 	@if($next != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('interview-summary-report.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('passport_release.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
 	@endif
 	<a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 	@if (count($errors) > 0)
@@ -164,21 +164,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                             Status :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                        <label class="badge texttransform @if($data->action_by_employee =='pending') badge-soft-info 
-                                        @elseif($data->action_by_employee =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_employee ?? ''}}</label>
+                                        <label class="badge texttransform @if($data->release_action_by_employee =='pending') badge-soft-info 
+                                        @elseif($data->release_action_by_employee =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->release_action_by_employee ?? ''}}</label>
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->employee_action_at ?? ''}}
+                                            {{$data->release_employee_action_at ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_employee ?? ''}}
+                                            {{$data->release_comments_by_employee ?? ''}}
                                         </div>
                                     </div>
                                 </div>
@@ -201,21 +201,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                             Status :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                        <label class="badge texttransform @if($data->action_by_department_head =='pending') badge-soft-info 
-                                        @elseif($data->action_by_department_head =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_department_head ?? ''}}</label>
+                                        <label class="badge texttransform @if($data->release_action_by_department_head =='pending') badge-soft-info 
+                                        @elseif($data->release_action_by_department_head =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->release_action_by_department_head ?? ''}}</label>
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->department_head_action_at ?? ''}}
+                                            {{$data->release_department_head_action_at ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_department_head ?? ''}}
+                                            {{$data->release_comments_by_department_head ?? ''}}
                                         </div>
                                     </div>
                                 </div>
@@ -238,21 +238,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                             Status :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            <label class="badge texttransform @if($data->action_by_division_head =='pending') badge-soft-info 
-                                        @elseif($data->action_by_division_head =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_division_head ?? ''}}</label>
+                                            <label class="badge texttransform @if($data->release_action_by_department_head =='pending') badge-soft-info 
+                                        @elseif($data->release_action_by_department_head =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->release_action_by_department_head ?? ''}}</label>
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->division_head_action_at ?? ''}}
+                                            {{$data->release_division_head_action_at ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_division_head ?? ''}}
+                                            {{$data->release_comments_by_division_head ?? ''}}
                                         </div>
                                     </div>
                                 </div>
@@ -275,21 +275,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                             Status :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                        <label class="badge texttransform @if($data->action_by_hr_manager =='pending') badge-soft-info 
-                                        @elseif($data->action_by_hr_manager =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_hr_manager ?? ''}}</label>
+                                        <label class="badge texttransform @if($data->release_action_by_hr_manager =='pending') badge-soft-info 
+                                        @elseif($data->release_action_by_hr_manager =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->release_action_by_hr_manager ?? ''}}</label>
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->hr_manager_action_at ?? ''}}
+                                            {{$data->release_hr_manager_action_at ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_hr_manager ?? ''}}
+                                            {{$data->release_comments_by_hr_manager ?? ''}}
                                         </div>
                                     </div>
                                 </div>

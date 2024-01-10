@@ -7,15 +7,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 @if ($hasPermission)                                           
 <div class="card-header">
 	<h4 class="card-title">
-		Employee Leave Info
+		Employee Liability Info
 	</h4>	
 	@canany(['create-job-description'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
 	@endphp
 	@if ($hasPermission)
-	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('passport_request.create') }}">
-      <i class="fa fa-plus" aria-hidden="true"></i> New Leave
+	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('employee-liability.create-or-edit','new') }}">
+      <i class="fa fa-plus" aria-hidden="true"></i> New Liability
     </a>
 	@endif
 	@endcanany
@@ -121,12 +121,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('passport_request.show',$data->id)}}">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_liability.show',$data->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i> View Details
 										</a>
 									</li>
                                     <li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('passport_request.edit',$data->id)}}">
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('employee_liability.edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 										</a>
 									</li>
@@ -205,7 +205,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<td>{{ $data->divisionHead->name ?? ''}}</td>
 							<td>{{ $data->hrManager->name ?? ''}}</td>		
 							<td>
-										<a title="View Details" class="btn btn-sm btn-warning" href="{{route('passport_request.show',$data->id)}}">
+										<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_liability.show',$data->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i>
 										</a>
 							</td>
@@ -367,7 +367,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<td>{{ $data->divisionHead->name ?? ''}}</td>
 							<td>{{ $data->hrManager->name ?? ''}}</td>		
 							<td>
-							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('passport_request.show',$data->id)}}">
+							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_liability.show',$data->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
 							</a>
 							</td>
