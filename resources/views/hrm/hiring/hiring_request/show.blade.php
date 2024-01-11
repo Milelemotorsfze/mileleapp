@@ -219,7 +219,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->department_head_action_at ?? ''}}
+                                            @if($data->department_head_action_at != '')
+                                        {{ \Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s') }}
+                                        @endif
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
@@ -256,7 +258,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->hiring_manager_action_at ?? ''}}
+                                            @if($data->hiring_manager_action_at != '')
+                                        {{ \Carbon\Carbon::parse($data->hiring_manager_action_at)->format('d M Y, H:i:s') }}
+                                        @endif
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
@@ -293,7 +297,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->division_head_action_at ?? ''}}
+                                            @if($data->division_head_action_at != '')
+                                        {{ \Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s') }}
+                                        @endif
+                                           
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
@@ -330,7 +337,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                                             Date & Time :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->hr_manager_action_at ?? ''}}
+                                            @if($data->hr_manager_action_at != '')
+                                        {{ \Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s') }}
+                                        @endif
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
@@ -367,7 +376,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                         <img src="{{ asset('icons/' . $history->icon) }}" style="width:30px;height:30px;">
                         </div>
                         <div class="col-xxl-11 col-lg-11 col-md-11">
-                        {{$history->message ?? ''}} </br> <span style="color:gray">{{$history->created_at ?? ''}}</span>
+                        {{$history->message ?? ''}} </br> <span style="color:gray">
+                        @if($history->created_at != '')
+                        {{ \Carbon\Carbon::parse($history->created_at)->format('d M Y, H:i:s') }}
+                        @endif
+                    </span>
                         </div>
                     </div>
                     </br>

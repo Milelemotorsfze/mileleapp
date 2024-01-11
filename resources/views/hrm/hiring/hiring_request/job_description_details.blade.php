@@ -223,7 +223,9 @@
                                         Date & Time :
                                     </div>
                                     <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->jobDescription->department_head_action_at ?? ''}}
+                                        @if($data->jobDescription->department_head_action_at != '')
+                                    {{ \Carbon\Carbon::parse($data->jobDescription->department_head_action_at)->format('d M Y, H:i:s') }}
+                                    @endif
                                     </div>
                                     <div class="col-lg-2 col-md-12 col-sm-12">
                                         Comments :
@@ -260,7 +262,9 @@
                                         Date & Time :
                                     </div>
                                     <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{$data->jobDescription->hr_manager_action_at ?? ''}}
+                                        @if($data->jobDescription->hr_manager_action_at != '')
+                                    {{ \Carbon\Carbon::parse($data->jobDescription->hr_manager_action_at)->format('d M Y, H:i:s') }}
+                                    @endif
                                     </div>
                                     <div class="col-lg-2 col-md-12 col-sm-12">
                                         Comments :

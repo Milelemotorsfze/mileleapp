@@ -330,6 +330,7 @@ Route::get('/d', function () {
     Route::controller(EmployeeLeaveController::class)->group(function(){
         Route::get('employee-leave/create-or-edit/{id}', 'createOrEdit')->name('employee-leave.create-or-edit');
         Route::post('employee-leave/store-or-update/{id}', 'storeOrUpdate')->name('employee-leave.store-or-update');
+        Route::post('leave_request_action', 'requestAction')->name('leaveRequest.action');
     });
 
 

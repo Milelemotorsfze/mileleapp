@@ -417,7 +417,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                                     Date & Time :
                                                 </div>
                                                 <div class="col-lg-10 col-md-12 col-sm-12">
-                                                    {{$data->hr_manager_action_at ?? ''}}
+                                                    @if($data->hr_manager_action_at != '')
+                                                {{ \Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s') }}
+                                                    @endif
                                                 </div>
                                                 <div class="col-lg-2 col-md-12 col-sm-12">
                                                     Comments :
@@ -454,7 +456,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                                     Date & Time :
                                                 </div>
                                                 <div class="col-lg-10 col-md-12 col-sm-12">
-                                                    {{$data->division_head_action_at ?? ''}}
+                                                    @if($data->division_head_action_at != '')
+                                                {{ \Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s') }}
+                                                   @endif
                                                 </div>
                                                 <div class="col-lg-2 col-md-12 col-sm-12">
                                                     Comments :
