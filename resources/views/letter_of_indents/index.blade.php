@@ -793,9 +793,8 @@
                                     <th>So Number</th>
                                     <th>Destination</th>
                                     <th>Prefered Location</th>
-                                    <th> Status</th>
+                                    <th>Status</th>
                                     <th>Review</th>
-
                                     <th width="100px">Actions</th>
                                 </tr>
                                 </thead>
@@ -935,29 +934,29 @@
     @endcan
    <script type="text/javascript">
 
-                $('.loi-button-delete').on('click',function(){
-                    let id = $(this).attr('data-id');
-                    let url =  $(this).attr('data-url');
-                    var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
-                        if (e) {
-                            $.ajax({
-                                type: "POST",
-                                url: url,
-                                dataType: "json",
-                                data: {
-                                    _method: 'DELETE',
-                                    id: 'id',
-                                    _token: '{{ csrf_token() }}'
-                                },
-                                success:function (data) {
-                                    location.reload();
-                                    alertify.success('LOI Deleted successfully.');
-                                }
-                            });
+        $('.loi-button-delete').on('click',function(){
+            let id = $(this).attr('data-id');
+            let url =  $(this).attr('data-url');
+            var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            _method: 'DELETE',
+                            id: 'id',
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            location.reload();
+                            alertify.success('LOI Deleted successfully.');
                         }
-                    }).set({title:"Delete Item"})
-                });
-            </script>
+                    });
+                }
+            }).set({title:"Delete Item"})
+        });
+   </script>
 
 @endsection
 

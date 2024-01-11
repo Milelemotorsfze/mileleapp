@@ -1,13 +1,13 @@
 @extends('layouts.main')
 @section('content')
 
-@can('master-brand-create')
+@can('model-year-calculation-categories-create')
 @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-create');
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-categories-create');
 @endphp
 @if ($hasPermission)
     <div class="card-header">
-        <h4 class="card-title">Add Brand</h4>
+        <h4 class="card-title">Add Model Year Category</h4>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -32,19 +32,30 @@
                 {{ Session::get('success') }}
             </div>
         @endif
-        <form id="form-create" action="{{ route('brands.store') }}" method="POST" >
+        <form id="form-create" action="{{ route('model-year-calculation-categories.store') }}" method="POST" >
             @csrf
             <div class="row">
                 <div class="row ">
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label"> Name</label>
-                            <input type="text" class="form-control" name="brand_name" value="{{ old('brand_name') }}">
+                            <input type="text" class="form-control" style="height: 32px;" name="name" placeholder="Enter Name"  value="{{ old('name') }}">
                         </div>
                     </div>
-                    </br>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label"> Rule</label>
+                            <select name="model_year_rule_id" class="form-select" id="rule" multiple>
+                                @foreach($modelYearCalculationRules as $modelYearCalculationRule)
+                                    <option value="{{ $modelYearCalculationRule->id }}">
+                                        {{ $modelYearCalculationRule->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                     <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary ">Submit</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>
             </div>
@@ -56,12 +67,20 @@
 @endsection
 @push('scripts')
     <script>
+        $('#rule').select2({
+            placeholder: 'Select Rule',
+            allowClear: true,
+            maximumSelectionLength: 1,
+        });
         $("#form-create").validate({
             ignore: [],
             rules: {
-                brand_name: {
+                name: {
                     required: true,
                     maxlength:255
+                },
+                model_year_rule_id: {
+                    required: true,
                 },
             },
         });

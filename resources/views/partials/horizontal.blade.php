@@ -599,12 +599,12 @@
                                             <a href="{{ route('passportSubmit.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">Passport Submit
                                                 @if(Auth::user()->passport_submit_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->passport_submit_request_approval['count']}}</span> @endif
                                             </a>
-                                            @endif  
+                                            @endif
                                             @if(Auth::user()->passport_release_request_approval['can'] == true)
                                             <a href="{{ route('passportRelease.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">Passport Release
                                                 @if(Auth::user()->passport_release_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->passport_release_request_approval['count']}}</span> @endif
                                             </a>
-                                            @endif  
+                                            @endif
                                         </div>
                                     </div>
                                     @endif
@@ -824,37 +824,6 @@
                                         </div>
                                         @endif
                                         @endcan
-                                        @can('list-master-models')
-                                        @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-master-models');
-                                        @endphp
-                                        @if ($hasPermission)
-                                        <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility">Master Model</span>
-                                                <div class="arrow-down"></div>
-                                            </a>
-                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                @can('create-master-models')
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-models');
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <a href="{{route('master-models.create')}}" class="dropdown-item" data-key="t-login">Add New</a>
-                                                @endif
-                                                @endcan
-                                                @can('list-master-models')
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-master-models');
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <a href="{{route('master-models.index')}}" class="dropdown-item" data-key="t-login"> Lists</a>
-                                                @endif
-                                                @endcan
-                                            </div>
-                                        </div>
-                                        @endif
-                                        @endcan
 
                                         @canany(['supplier-inventory-list','supplier-inventory-edit','supplier-inventory-list-with-date-filter',
                                             'supplier-inventory-report-view'])
@@ -921,37 +890,63 @@
                                             </div>
                                             @endif
                                         @endcan
-                                        @can('list-customer')
+
+                                        @canany(['model-year-calculation-rules-list','model-year-calculation-categories-list','list-customer','list-master-models'])
                                             @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-customer');
-                                            @endphp
-                                            @if ($hasPermission)
-                                            <div class="dropdown">
-                                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                    <span data-key="t-utility">Customer</span>
-                                                    <div class="arrow-down"></div>
-                                                </a>
-                                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                    <a href="{{route('dm-customers.index')}}" class="dropdown-item" data-key="t-login">List Customer </a>
-                                                </div>
-                                            </div>
-                                            @endif
-                                        @endcan
-                                        @canany(['model-year-calculation-rules-list','model-year-calculation-categories-list'])
-                                            @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['model-year-calculation-rules-list','model-year-calculation-categories-list']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['model-year-calculation-rules-list',
+                                                'model-year-calculation-categories-list','list-customer','list-master-models']);
                                             @endphp
                                             @if ($hasPermission)
                                                 <div class="dropdown">
                                                     <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                        <span data-key="t-utility">Model Year Settings</span>
+                                                        <span data-key="t-utility">Master Data</span>
                                                         <div class="arrow-down"></div>
                                                     </a>
                                                     <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                        <a href="{{route('model-year-calculation-rules.index')}}" class="dropdown-item" data-key="t-login">Rules </a>
-                                                    </div>
-                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                        <a href="{{route('model-year-calculation-categories.index')}}" class="dropdown-item" data-key="t-login">Categories </a>
+                                                        @can('list-customer')
+{{--                                                            @php--}}
+{{--                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-customer');--}}
+{{--                                                            @endphp--}}
+{{--                                                            @if ($hasPermission)--}}
+                                                                <a href="{{route('dm-customers.index')}}" class="dropdown-item" data-key="t-login">List Customers </a>
+{{--                                                            @endif--}}
+                                                        @endcan
+                                                        @can('list-master-models')
+                                                            @php
+                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-master-models');
+                                                            @endphp
+                                                            @if ($hasPermission)
+                                                                <a href="{{route('master-models.index')}}" class="dropdown-item" data-key="t-login"> Model Lists</a>
+                                                            @endif
+                                                        @endcan
+                                                        <div class="dropdown">
+                                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                                <span data-key="t-utility">Model Year</span>
+                                                                <div class="arrow-down"></div>
+                                                            </a>
+                                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                                @can('model-year-calculation-rules-list')
+                                                                    @php
+                                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-categories-list');
+                                                                    @endphp
+                                                                    @if ($hasPermission)
+                                                                        <a href="{{route('model-year-calculation-rules.index')}}" class="dropdown-item" data-key="t-login">
+                                                                            List Rules
+                                                                        </a>
+                                                                    @endif
+                                                                @endcan
+                                                                @can('model-year-calculation-categories-list')
+                                                                    @php
+                                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-categories-list');
+                                                                    @endphp
+                                                                    @if ($hasPermission)
+                                                                        <a href="{{route('model-year-calculation-categories.index')}}" class="dropdown-item" data-key="t-login">
+                                                                            List Categories
+                                                                        </a>
+                                                                    @endif
+                                                                @endcan
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             @endif
@@ -1067,7 +1062,6 @@
                                             </a>
                                         </div>
                                         @endif
-
                                     </div>
                                 </li>
                                 @endif

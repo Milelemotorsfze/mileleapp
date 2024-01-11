@@ -53,10 +53,10 @@
                         <div class="col-lg-3 col-md-3 col-sm-12">
                             <div class="mb-3">
                                 <label class="form-label">Country</label>
-                                <select class="form-control" name="country" id="country" autofocus>
+                                <select class="form-control" name="country_id" id="country" autofocus>
                                     <option ></option>
                                     @foreach($countries as $country)
-                                        <option value="{{$country}}" {{ $customer->country == $country ? 'selected' : '' }}> {{ $country }} </option>
+                                        <option value="{{$country->id}}" {{ $customer->country_id == $country->id ? 'selected' : '' }}> {{ $country->name }} </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -78,10 +78,22 @@
                             </div>
                         </div>
 
+{{--                        <div class="col-lg-3 col-md-6">--}}
+{{--                            <div class="mb-3">--}}
+{{--                                <label for="choices-single-default" class="form-label">Company Name</label>--}}
+{{--                                <input type="text" class="form-control" name="company_name" placeholder="Enter Company Name" value="{{ old('company_name', $customer->company_name) }}">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Company Name</label>
-                                <input type="text" class="form-control" name="company_name" placeholder="Enter Company Name" value="{{ old('company_name', $customer->company_name) }}">
+                                <label for="choices-single-default" class="form-label">Passport File</label>
+                                <input type="file" class="form-control" name="passport_file" id="file1-upload"  placeholder="Upload Passport">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Trade License</label>
+                                <input type="file" class="form-control" id="file2-upload" name="trade_license_file" placeholder="Upload Trade License">
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
@@ -96,18 +108,19 @@
                     <div class="row">
                         <div class="col-lg-4 col-md-12 col-sm-12 text-center">
                             <div id="file1-preview">
-                                @if($customer->trade_license_file)
-                                    <h6 class="fw-bold text-center">Trade License</h6>
-                                    <iframe src="{{ url('customers/trade_licenses/' . $customer->trade_license_file) }}" alt="Trade License "></iframe>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-12 col-sm-12 text-center">
-                            <div id="file2-preview">
                                 @if($customer->passport_file)
                                     <h6 class="fw-bold text-center">Passport</h6>
                                     <iframe src="{{ url('customers/passports/' . $customer->passport_file) }}" alt="Trade License "></iframe>
 
+                                @endif
+
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-12 col-sm-12 text-center">
+                            <div id="file2-preview">
+                                @if($customer->trade_license_file)
+                                    <h6 class="fw-bold text-center">Trade License</h6>
+                                    <iframe src="{{ url('customers/trade_licenses/' . $customer->trade_license_file) }}" alt="Trade License"></iframe>
                                 @endif
                             </div>
                         </div>
