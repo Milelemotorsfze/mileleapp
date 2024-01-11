@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ModelYearCalculationCategory;
 use App\Models\ModelYearCalculationRule;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Html\Builder;
@@ -13,7 +14,8 @@ class ModelYearCalculationCategoriesController extends Controller
      */
     public function index(Builder $builder)
     {
-
+       $modelYearCategories = ModelYearCalculationCategory::all();
+        return view('model-year-settings.categories.index', compact('modelYearCategories'));
 
     }
 
@@ -22,7 +24,9 @@ class ModelYearCalculationCategoriesController extends Controller
      */
     public function create()
     {
-        //
+        $modelYearCalculationRules = ModelYearCalculationRule::all();
+
+        return view('model-year-settings.categories.create', compact('modelYearCalculationRules'));
     }
 
     /**
@@ -30,7 +34,17 @@ class ModelYearCalculationCategoriesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|unique:model_year_calculation_categories',
+            'model_year_rule_id' => 'required'
+        ]);
+
+        $modelYearCalculationCategory = new ModelYearCalculationCategory();
+        $modelYearCalculationCategory->name = $request->name;
+        $modelYearCalculationCategory->model_year_rule_id = $request->model_year_rule_id;
+        $modelYearCalculationCategory->save();
+
+        return redirect()->route('model-year-calculation-categories.index')->with('success', "Model Year Calculation Category created successfully.");
     }
 
     /**
@@ -46,7 +60,10 @@ class ModelYearCalculationCategoriesController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $modelYearCalculationCategory = ModelYearCalculationCategory::findOrFail($id);
+        $modelYearCalculationRules = ModelYearCalculationRule::all();
+
+        return view('model-year-settings.categories.edit', compact('modelYearCalculationCategory','modelYearCalculationRules' ));
     }
 
     /**
@@ -54,7 +71,18 @@ class ModelYearCalculationCategoriesController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'name' => 'required|unique:model_year_calculation_categories,name'.$id,
+            'model_year_rule_id' => 'required'
+        ]);
+
+        $modelYearCalculationCategory = ModelYearCalculationCategory::findOrFail($id);
+
+        $modelYearCalculationCategory->name = $request->name;
+        $modelYearCalculationCategory->model_year_rule_id = $request->model_year_rule_id;
+        $modelYearCalculationCategory->save();
+
+        return redirect()->route('model-year-calculation-categories.index')->with('success', "Model Year Calculation Category updated successfully.");
     }
 
     /**
@@ -62,6 +90,9 @@ class ModelYearCalculationCategoriesController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $modelYearCalculationCategory = ModelYearCalculationCategory::findOrFail($id);
+        $modelYearCalculationCategory->delete();
+
+        return response(true);
     }
 }

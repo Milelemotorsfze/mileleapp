@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use App\Models\ModelYearCalculationCategory;
 use App\Models\ModelYearCalculationRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -16,28 +17,9 @@ class ModelYearCalculationRuleController extends Controller
      */
     public function index(Builder $builder)
     {
-        if (request()->ajax()) {
-            $modelYearRules = ModelYearCalculationRule::all();
-            return DataTables::of($modelYearRules)
-                ->editColumn('created_at', function($query) {
-                    return Carbon::parse($query->created_at)->format('d M Y');
-                })
-                ->addColumn('action', function(ModelYearCalculationRule $modelYearCalculationRule) {
-                    return view('model-year-settings.rules.action',compact('modelYearCalculationRule'));
-                })
-                ->rawColumns(['action'])
-                ->toJson();
-        }
+        $modelYearRules = ModelYearCalculationRule::all();
 
-        $html = $builder->columns([
-            ['data' => 'id', 'name' => 'id','title' => 'S.No'],
-            ['data' => 'name', 'name' => 'name','title' => 'Name'],
-            ['data' => 'value', 'name' => 'value','title' => 'Value'],
-            ['data' => 'created_at', 'name' => 'created_at','title' => 'Created At'],
-            ['data' => 'action', 'name' => 'action','title' => 'Action'],
-
-        ]);
-        return view('model-year-settings.rules.index', compact('html'));
+        return view('model-year-settings.rules.index', compact('modelYearRules'));
     }
 
     /**
@@ -45,6 +27,7 @@ class ModelYearCalculationRuleController extends Controller
      */
     public function create()
     {
+
         return view('model-year-settings.rules.create');
     }
 
@@ -109,6 +92,11 @@ class ModelYearCalculationRuleController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $modelYearCategories = ModelYearCalculationCategory::where('model_year_rule_id', $id)->delete();
+
+        $modelYearCalculationRule = ModelYearCalculationRule::findOrFail($id);
+        $modelYearCalculationRule->delete();
+
+        return response(true);
     }
 }

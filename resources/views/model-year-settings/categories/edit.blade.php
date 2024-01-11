@@ -1,13 +1,13 @@
 @extends('layouts.main')
 @section('content')
 
-    @can('model-year-calculation-rules-create')
+    @can('model-year-calculation-categories-create')
         @php
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-rules-edit');
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-categories-edit');
         @endphp
         @if ($hasPermission)
             <div class="card-header">
-                <h4 class="card-title">Edit Model Year Rule</h4>
+                <h4 class="card-title">Edit Model Year Category</h4>
             </div>
             <div class="card-body">
                 @if (count($errors) > 0)
@@ -32,7 +32,7 @@
                         {{ Session::get('success') }}
                     </div>
                 @endif
-                <form id="form-create" action="{{ route('model-year-calculation-rules.update', $modelYearCalculationRule->id) }}" method="POST" >
+                <form id="form-create" action="{{ route('model-year-calculation-categories.update', $modelYearCalculationCategory->id) }}" method="POST" >
                     @csrf
                     @method('PUT')
                     <div class="row">
@@ -40,14 +40,21 @@
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Name</label>
-                                    <input type="text" class="form-control" name="name" placeholder="Enter Name"  value="{{ old('name', $modelYearCalculationRule->name) }}">
+                                    <input type="text" class="form-control" name="name" style="height: 32px;" placeholder="Enter Name"
+                                           value="{{ old('name', $modelYearCalculationCategory->name) }}">
                                 </div>
                             </div>
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label"> Break Point Value</label>
-                                    <input type="number" min="0" max="12" class="form-control" placeholder="Enter Break Point Value"
-                                           name="value" value="{{ old('value', $modelYearCalculationRule->value) }}">
+                                    <label for="choices-single-default" class="form-label"> Rule</label>
+                                    <select name="model_year_rule_id" class="form-select" id="rule" multiple>
+                                        @foreach($modelYearCalculationRules as $modelYearCalculationRule)
+                                            <option value="{{ $modelYearCalculationRule->id }}"
+                                                {{ $modelYearCalculationRule->id == $modelYearCalculationCategory->model_year_rule_id ? 'selected' : '' }} >
+                                                {{ $modelYearCalculationRule->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-12 text-center">
@@ -63,6 +70,11 @@
 @endsection
 @push('scripts')
     <script>
+        $('#rule').select2({
+            placeholder: 'Select Rule',
+            allowClear: true,
+            maximumSelectionLength: 1,
+        });
         $("#form-create").validate({
             ignore: [],
             rules: {
@@ -70,9 +82,8 @@
                     required: true,
                     maxlength:255
                 },
-                value: {
+                model_year_rule_id: {
                     required: true,
-                    number:true
                 },
             },
         });
