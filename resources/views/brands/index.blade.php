@@ -41,9 +41,9 @@
         </div>
         @endif
 @endsection
-    @push('scripts')
-        {!! $html->scripts() !!}
-    @endpush
+@push('scripts')
+    {!! $html->scripts() !!}
+@endpush
 
 
 

@@ -6,9 +6,9 @@
     @if ($hasPermission)
         <div class="card-header">
             <h4 class="card-title">
-                Brands
+                Model Year Calculation Rules
             </h4>
-            @can('master-brand-create')
+            @can('model-year-calculation-rules-create')
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-rules-create');
                 @endphp
@@ -37,13 +37,14 @@
             @endif
         </div>
         <div class="m-3">
-            {!! $html->table(['class' => 'table table-bordered table-striped table-responsive ']) !!}
+            {!! $html->table(['class' => 'table table-bordered table-striped table-responsive ','id' => 'model-year-rule-table']) !!}
         </div>
     @endif
 @endsection
 @push('scripts')
     {!! $html->scripts() !!}
 @endpush
+
 
 
 

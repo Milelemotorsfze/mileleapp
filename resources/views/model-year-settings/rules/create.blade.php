@@ -1,13 +1,13 @@
 @extends('layouts.main')
 @section('content')
 
-@can('master-brand-create')
+@can('model-year-calculation-rules-create')
 @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-create');
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-year-calculation-rules-create');
 @endphp
 @if ($hasPermission)
     <div class="card-header">
-        <h4 class="card-title">Add Brand</h4>
+        <h4 class="card-title">Add Model Year Rule</h4>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -32,19 +32,24 @@
                 {{ Session::get('success') }}
             </div>
         @endif
-        <form id="form-create" action="{{ route('brands.store') }}" method="POST" >
+        <form id="form-create" action="{{ route('model-year-calculation-rules.store') }}" method="POST" >
             @csrf
             <div class="row">
                 <div class="row ">
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label"> Name</label>
-                            <input type="text" class="form-control" name="brand_name" value="{{ old('brand_name') }}">
+                            <input type="text" class="form-control" name="name" placeholder="Enter Name"  value="{{ old('name') }}">
                         </div>
                     </div>
-                    </br>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label"> Break Point Value</label>
+                            <input type="number" min="0" max="12" class="form-control" placeholder="Enter Beak Point Value" name="value" value="{{ old('value') }}">
+                        </div>
+                    </div>
                     <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary ">Submit</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>
             </div>
@@ -59,9 +64,13 @@
         $("#form-create").validate({
             ignore: [],
             rules: {
-                brand_name: {
+                name: {
                     required: true,
                     maxlength:255
+                },
+                value: {
+                    required: true,
+                    number:true
                 },
             },
         });

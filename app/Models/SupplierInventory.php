@@ -37,7 +37,8 @@ class SupplierInventory extends Model
         'po_arm',
         'status',
         'eta_import',
-        'upload_status'
+        'upload_status',
+        'delivery_note'
     ];
     public function masterModel()
     {

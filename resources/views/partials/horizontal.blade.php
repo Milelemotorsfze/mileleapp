@@ -924,8 +924,6 @@
                                                     </a>
                                                     <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                                         <a href="{{route('model-year-calculation-rules.index')}}" class="dropdown-item" data-key="t-login">Rules </a>
-                                                    </div>
-                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                                         <a href="{{route('model-year-calculation-categories.index')}}" class="dropdown-item" data-key="t-login">Categories </a>
                                                     </div>
                                                 </div>

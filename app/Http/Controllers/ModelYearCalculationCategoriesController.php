@@ -14,23 +14,7 @@ class ModelYearCalculationCategoriesController extends Controller
     public function index(Builder $builder)
     {
 
-        if (request()->ajax()) {
-            $modelYearRules = ModelYearCalculationRule::all();
-            return DataTables::of($modelYearRules)
-                ->editColumn('created_at', function($query) {
-                    return Carbon::parse($query->created_at)->format('d M Y');
-                })
-                ->toJson();
-        }
 
-        $html = $builder->columns([
-            ['data' => 'id', 'name' => 'id','title' => 'S.No'],
-            ['data' => 'name', 'name' => 'name','title' => 'Name'],
-            ['data' => 'value', 'name' => 'value','title' => 'Value'],
-            ['data' => 'created_at', 'name' => 'created_at','title' => 'Created At'],
-
-        ]);
-        return view('pages.model-year-settings.rules', compact('html'));
     }
 
     /**
