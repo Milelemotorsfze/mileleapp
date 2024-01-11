@@ -111,11 +111,11 @@
                             <div class="col-lg-1 col-md-6">
                                 <label for="engineNumber" class="form-label">Engine Number:</label>
                             </div>
-                            <div class="col-lg-1 col-md-6">
-                                <label for="exColour" class="form-label">Territory:</label>
-                            </div>
+{{--                            <div class="col-lg-1 col-md-6">--}}
+{{--                                <label for="exColour" class="form-label">Territory:</label>--}}
+{{--                            </div>--}}
 
-                            <div class="col-lg-1 col-md-6">
+                            <div class="col-lg-2 col-md-6">
                                 <label for="QTY" class="form-label">VIN:</label>
                             </div>
                         </div>
@@ -285,9 +285,9 @@
                     var detailCol = $('<div class="col-lg-2 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
                     var exColourCol = $('<div class="col-lg-1 col-md-6"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
                     var intColourCol = $('<div class="col-lg-1 col-md-6"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
-                    var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
+                    var vinCol = $('<div class="col-lg-2 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
                     var estimatedCol = $('<div class="col-lg-1 col-md-6"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
-                    var territory = $('<div class="col-lg-1 col-md-6"><input type="text" name="territory[]" class="form-control"></div>');
+                    // var territory = $('<div class="col-lg-1 col-md-6"><input type="text" name="territory[]" class="form-control"></div>');
                     var engineNumber = $('<div class="col-lg-1 col-md-6"><input type="text" name="engine_number[]" class="form-control"></div>');
                     var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" data-variant-id="'+ variantId +'" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
                     // Populate Exterior Colors dropdown
@@ -304,7 +304,7 @@
                             intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
                         }
                     }
-                    newRow.append(masterModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, territory, engineNumber, vinCol, removeBtn);
+                    newRow.append(masterModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, vinCol, removeBtn);
                     $('#variantRowsContainer').append(newRow);
                 }
             }

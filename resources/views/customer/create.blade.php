@@ -52,10 +52,10 @@
                         <div class="col-lg-3 col-md-3 col-sm-12">
                             <div class="mb-3">
                                 <label class="form-label">Country</label>
-                                <select class="form-control" name="country" id="country" autofocus>
+                                <select class="form-control" name="country_id" id="country" autofocus>
                                     <option ></option>
                                     @foreach($countries as $country)
-                                        <option value="{{$country}}"> {{ $country }} </option>
+                                        <option value="{{$country->id}}"> {{ $country->name }} </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -92,7 +92,7 @@
                             </div>
                         </div>
                         <br>
-                        <div class="card preview-div" >
+                        <div class="card preview-div" hidden>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-lg-4 col-md-12 col-sm-12">
@@ -125,6 +125,7 @@
         const previewFile2 = document.querySelector("#file2-preview");
 
         fileInputLicense1.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
             const files = event.target.files;
             while (previewFile1.firstChild) {
                 previewFile1.removeChild(previewFile1.firstChild);
@@ -150,6 +151,8 @@
             }
         });
         fileInputLicense2.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
+
             const files = event.target.files;
             while (previewFile2.firstChild) {
                 previewFile2.removeChild(previewFile2.firstChild);

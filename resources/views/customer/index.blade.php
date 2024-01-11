@@ -27,7 +27,6 @@
                             <th>Name</th>
                             <th>Customer Type</th>
                             <th>Country </th>
-                            <th>Company</th>
                             <th>Address</th>
                             <th>Created At</th>
                             @can('edit-customer')
@@ -48,8 +47,7 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $customer->name }}</td>
                                 <td>{{ $customer->type }}</td>
-                                <td>{{ $customer->country }}</td>
-                                <td>{{ $customer->company_name }}</td>
+                                <td>{{ $customer->country->name }}</td>
                                 <td>{{ $customer->address }}</td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($customer->created_at)->format('d M y') }}</td>
                                 @can('edit-customer')

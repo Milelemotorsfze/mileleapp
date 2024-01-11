@@ -29,7 +29,7 @@ class CustomerController extends Controller
     {
         (new UserActivityController)->createActivity('Open Customer Create Page');
 
-        $countries = Country::pluck('name');
+        $countries = Country::all();
         return view('customer.create', compact('countries'));
 
     }
@@ -43,14 +43,14 @@ class CustomerController extends Controller
 
         $this->validate($request, [
             'name' => 'required',
-            'country' => 'required',
+            'country_id' => 'required',
             'type' => 'required',
         ]);
 
         $customer = new Customer();
         $customer->name = $request->name;
-        $customer->company_name = $request->company_name;
-        $customer->country = $request->country;
+//        $customer->company_name = $request->company_name;
+        $customer->country_id = $request->country_id;
         $customer->type = $request->type;
         $customer->address = $request->address;
 
@@ -98,7 +98,7 @@ class CustomerController extends Controller
         (new UserActivityController)->createActivity('Open Customer Edit Page');
 
          $customer = Customer::find($id);
-         $countries = Country::pluck('name');
+         $countries = Country::all();
 
          return view('customer.edit', compact('customer','countries'));
     }
@@ -112,14 +112,14 @@ class CustomerController extends Controller
 
         $this->validate($request, [
             'name' => 'required',
-            'country' => 'required',
+            'country_id' => 'required',
             'type' => 'required',
         ]);
 
         $customer = Customer::find($id);
         $customer->name = $request->name;
-        $customer->company_name = $request->company_name;
-        $customer->country = $request->country;
+//        $customer->company_name = $request->company_name;
+        $customer->country_id = $request->country_id;
         $customer->type = $request->type;
         $customer->address = $request->address;
 
@@ -148,7 +148,7 @@ class CustomerController extends Controller
 
         $customer->save();
 
-        return redirect()->route('dm-customers.index')->with('success','Customer Created Successfully.');
+        return redirect()->route('dm-customers.index')->with('success','Customer Updated Successfully.');
     }
 
     /**

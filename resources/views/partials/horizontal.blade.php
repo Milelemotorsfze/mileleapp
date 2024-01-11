@@ -891,10 +891,10 @@
                                             @endif
                                         @endcan
 
-                                        @canany(['model-year-calculation-rules-list','model-year-calculation-categories-list','list-customer'])
+                                        @canany(['model-year-calculation-rules-list','model-year-calculation-categories-list','list-customer','list-master-models'])
                                             @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['model-year-calculation-rules-list',
-                                                'model-year-calculation-categories-list','list-customer']);
+                                                'model-year-calculation-categories-list','list-customer','list-master-models']);
                                             @endphp
                                             @if ($hasPermission)
                                                 <div class="dropdown">
@@ -904,12 +904,12 @@
                                                     </a>
                                                     <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                                         @can('list-customer')
-                                                            @php
-                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-customer');
-                                                            @endphp
-                                                            @if ($hasPermission)
-                                                                <a href="{{route('dm-customers.index')}}" class="dropdown-item" data-key="t-login">List Customer </a>
-                                                            @endif
+{{--                                                            @php--}}
+{{--                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-customer');--}}
+{{--                                                            @endphp--}}
+{{--                                                            @if ($hasPermission)--}}
+                                                                <a href="{{route('dm-customers.index')}}" class="dropdown-item" data-key="t-login">List Customers </a>
+{{--                                                            @endif--}}
                                                         @endcan
                                                         @can('list-master-models')
                                                             @php
