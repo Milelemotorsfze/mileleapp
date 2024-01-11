@@ -793,9 +793,8 @@
                                     <th>So Number</th>
                                     <th>Destination</th>
                                     <th>Prefered Location</th>
-                                    <th> Status</th>
+                                    <th>Status</th>
                                     <th>Review</th>
-
                                     <th width="100px">Actions</th>
                                 </tr>
                                 </thead>
