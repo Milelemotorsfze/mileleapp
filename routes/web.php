@@ -357,7 +357,7 @@ Route::get('/d', function () {
 
     Route::resource('letter-of-indent-documents', LOIDocumentsController::class);
     Route::resource('letter-of-indents', LetterOfIndentController::class);
-    Route::resource('letter-of-indent-items', LOIItemsController::class);
+//    Route::resource('letter-of-indent-items', LOIItemsController::class);
     Route::post('letter-of-indent-item/approve', [LOIItemsController::class, 'approveLOIItem'])->name('approve-loi-items');
 
     // PFI

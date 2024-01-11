@@ -83,11 +83,12 @@ class SupplierInventory extends Model
         $masterModel = MasterModel::find($this->master_model_id);
         $masterModelIds = MasterModel::where('steering', $masterModel->steering)
             ->where('model', $masterModel->model)
+            ->where('model_year', $masterModel->model_year)
             ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
 
         $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->whereNull('eta_import')
+            ->whereNull('delivery_note')
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
 
         if (!empty(request()->start_date) && !empty(request()->end_date)) {

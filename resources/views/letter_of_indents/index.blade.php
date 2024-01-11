@@ -262,7 +262,7 @@
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
                                         @endphp
                                         @if ($hasPermission)
-                                            <th>Utilization Qty Update</th>
+                                             <th>Utilization Qty Update</th>
                                         @endif
                                     @endcan
 {{--                                    <th>LOI</th>--}}
@@ -282,20 +282,22 @@
                                         <td>{{ $letterOfIndent->destination }}</td>
                                         <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
+                                        <td>
                                         @can('LOI-approve')
                                             @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
                                             @endphp
                                             @if ($hasPermission)
-                                                <td>
+                                                @if($letterOfIndent->total_loi_quantity > $letterOfIndent->total_approved_quantity)
                                                     <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
                                                         <button type="button" class="btn btn-soft-green btn-sm" title="Update Utilization Quantity" >
                                                             <i class="fa fa-edit"></i>
                                                         </button>
                                                     </a>
-                                                </td>
+                                                 @endif
                                             @endif
                                         @endcan
+                                        </td>
 {{--                                        <td>--}}
 {{--                                            <select class="form-control" onchange="location = this.value;">--}}
 {{--                                                <option value="">Select Template</option>--}}
@@ -418,7 +420,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -465,20 +466,22 @@
                                         <td>{{ $letterOfIndent->destination }}</td>
                                         <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
+                                        <td>
                                         @can('LOI-approve')
                                             @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
                                             @endphp
                                             @if ($hasPermission)
-                                                <td>
+                                                @if($letterOfIndent->total_loi_quantity > $letterOfIndent->total_approved_quantity)
                                                     <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
                                                         <button type="button" class="btn btn-soft-green btn-sm" title="Utilization Quantity Update" >
                                                             <i class="fa fa-edit"></i>
                                                         </button>
                                                     </a>
-                                                </td>
+                                                 @endif
                                             @endif
                                         @endcan
+                                        </td>
                                         <td>
                                             <select class="form-control" onchange="location = this.value;">
                                                 <option value="">Select Template</option>
