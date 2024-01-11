@@ -5,11 +5,20 @@
         width: 100% !important;
     }
 
+    .contact-info-para {
+        padding-left: 10px;
+        font-size: 16px;
+    }
 
+    ul.list-group {
+        display: flex;
+        flex-wrap: wrap;
+    }
 
     li.list-group-item {
         /* padding: 1.75rem 4.25rem; */
         border: none;
+
     }
 
     .btn.btn-success.btncenter {
@@ -75,15 +84,12 @@
         }
     }
 
-    .emp-liability-heading {
-        font-size: 16px;
-    }
+
 
     @media (max-width: 767px) {
 
         .emp-id-section-div,
         .emp-dep-section,
-        .emp-jobtitle-section,
         .emp-joining-date-section,
         .emp-advance-section,
         .emp-penality-section,
@@ -114,7 +120,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-    <h4 class="card-title">Create Employee Liability Form</h4>
+    <h4 class="card-title">Create Employee Leave Form</h4>
     <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
@@ -145,16 +151,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                 <div class="row">
                     <div class="col-xxl-8 col-lg-8 col-md-7 col-sm-5 col-12 emp-liability-lable-name">
 
-                        <h4 class="emp-liability-heading">Employee Information:</h4>
+                        <h4 class="emp-liability-heading">1 - Employee Information:</h4>
 
                     </div>
-                    <!-- <div class="col-xxl-2 col-lg-2 col-md-3 col-sm-4 col-12 emp-liability-lable-name">
-                        <span class="error">*</span>
-                        <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Employee ID:</label>
-                    </div>
-                    <div class="col-xxl-2 col-lg-2 col-md-2 col-sm-3 col-12 top-margin-input">
-                        <input type="text" class="form-control top-margin-input-1" name="empId" placeholder="">
-                    </div> -->
                 </div>
             </div>
             <br />
@@ -162,21 +161,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
             <div class="row">
 
                 <div class="col-lg-12 emp-liability-top-info">
-                    <div class="row">
-                        <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-id-section">
-                            <div class="row">
-                                <div class="col-xxl-3 col-lg-5 col-md-6 col-sm-5 col-8 emp-liability-lable-name">
-                                    <span class="error">*</span>
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Employee ID:</label>
-                                </div>
-                                <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-7 col-12 top-margin-input">
-                                    <input type="text" class="form-control top-margin-input-1" name="empId" placeholder="Employee ID here:">
-                                </div>
-                            </div>
-                        </div>
 
-                    </div>
-                    <br />
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-name-section">
                             <div class="row">
@@ -190,17 +175,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             </div>
                         </div>
 
-                        <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-dep-section">
+                        <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-id-section">
                             <div class="row">
                                 <div class="col-xxl-3 col-lg-5 col-md-6 col-sm-5 col-8 emp-liability-lable-name">
                                     <span class="error">*</span>
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Dept./Location</label>
+                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Employee ID:</label>
                                 </div>
-                                <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-7 col-12">
-                                    <input type="text" class="form-control top-margin-input-1" name="empDepartment">
+                                <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-7 col-12 top-margin-input">
+                                    <input type="text" class="form-control top-margin-input-1" name="empId">
                                 </div>
                             </div>
                         </div>
+
                     </div>
                     <br />
                     <div class="row ">
@@ -216,14 +202,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
                             </div>
                         </div>
 
-                        <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-jobtitle-section">
+                        <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-dep-section">
                             <div class="row">
-                                <div class="col-xxl-3 col-lg-5 col-md-6 col-sm-5 col-12 emp-liability-lable-name">
+                                <div class="col-xxl-3 col-lg-5 col-md-6 col-sm-5 col-8 emp-liability-lable-name">
                                     <span class="error">*</span>
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Job Title</label>
+                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Dept./Location</label>
                                 </div>
                                 <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-7 col-12">
-                                    <input type="text" class="form-control top-margin-input-1" name="empJobTitle">
+                                    <input type="text" class="form-control top-margin-input-1" name="empDepartment">
                                 </div>
                             </div>
                         </div>
@@ -265,190 +251,600 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
         <br />
 
 
-        <!-- Employee Liability Type Section -->
-        <div class="liability-type-main-container">
+        <!-- Employee Leave Information Section -->
 
-            <div class="col-lg-12 emp-liability-top-info">
-                <div class="col-xxl-8 col-lg-8 col-md-12 col-sm-12 col-12 emp-liability-lable-name">
-                    <h4 class="emp-liability-heading">Liability Type:</h4>
-                </div>
-                <br />
-
-                <div class="row">
-                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 emp-loan-section">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-5 col-sm-5 col-8 emp-liability-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Loan</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12 top-margin-input">
-                                <input type="text" class="form-control top-margin-input-1" name="empLoan">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 emp-advance-section">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-5 col-sm-5 col-8 emp-liability-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Advances</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                <input type="text" class="form-control top-margin-input-1" name="empAdvance">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 emp-penality-section">
-                        <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-5 col-sm-5 col-8 emp-liability-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Penality/Fine</label>
-                            </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                <input type="text" class="form-control top-margin-input-1" name="empPenality">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <br />
-
-        <hr />
-        <br />
-
-        <!-- Liability Details Section -->
-
-        <div class="liability-details-main-container">
-            <div class="col-xxl-12 col-lg-12 col-md-6 col-sm-10 col-12 liability-details-section">
-                <div class="row">
-                    <div class="col-xxl-8 col-lg-7 col-md-12 col-sm-12 col-12 emp-liability-lable-name">
-
-                        <h4 class="emp-liability-heading">Liability Details:</h4>
-
-                    </div>
-                </div>
+        <div class="col-lg-12 emp-liability-top-info">
+            <div class="col-xxl-8 col-lg-8 col-md-12 col-sm-12 col-12 emp-liability-lable-name">
+                <h4 class="emp-liability-heading">2 - Leave Information:</h4>
             </div>
             <br />
 
-            <div class="row">
+            <!-- Type Of Leave  -->
 
-                <div class="col-lg-12 emp-liability-top-info">
-
-                    <div class="row">
-                        <div class="col-xxl-6 col-lg-6 col-md-6 col-sm-10 col-12 total-liability-amount-section">
-                            <div class="row">
-                                <div class="col-xxl-5 col-lg-7 col-md-8 col-sm-5 col-12 emp-liability-lable-name">
-                                    <span class="error">*</span>
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Total Amount :</label>
-                                </div>
-                                <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-7 col-12">
-                                    <input type="text" class="form-control top-margin-input-1" name="ttoalLiabilityAmount">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <br />
-
-                    <div class="row ">
-                        <div class="col-xxl-6 col-lg-6 col-md-6 col-sm-10 col-12 numOf-installments-section">
-                            <div class="row">
-                                <div class="col-xxl-5 col-lg-7 col-md-8 col-sm-5 col-12 emp-liability-lable-name">
-                                    <span class="error">*</span>
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Number of Installments</label>
-                                </div>
-                                <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-7 col-12 top-margin-input">
-                                    <input type="text" class="form-control top-margin-input-1" name="numOfInstallments">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-xxl-6 col-lg-6 col-md-6 col-sm-10 col-12 amountPer-installment-section">
-                            <div class="row">
-                                <div class="col-xxl-5 col-lg-7 col-md-8 col-sm-5 col-12 emp-liability-lable-name">
-                                    <span class="error">*</span>
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Amount per Installment</label>
-                                </div>
-                                <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-7 col-12">
-                                    <input type="text" class="form-control top-margin-input-1" name="amountPerInstallment">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <br />
-
-                    <div class="row">
-                        <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12 liability-reason-section">
-                            <div class="row">
-                                <div class="col-xxl-3 col-lg-4 col-md-4 col-sm-5 col-12 emp-liability-lable-name">
-                                    <span class="error">*</span>
-                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Reason</label>
-                                </div>
-                                <div class="col-xxl-9 col-lg-8 col-md-8 col-sm-7 col-12">
-                                    <textarea class="form-control top-margin-input-1" name="empLiabilityReason" rows="5" cols="25"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
+            <div class="typeOfLeave-main-container">
+                <div class="typeOfLeave-heading">
+                    <span class="error">*</span>
+                    <label class="col-form-label text-md-end">
+                        <h5>Type of Leave:</h5>
+                    </label>
                 </div>
+                <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12">
+                    <ul class="list-group list-group-horizontal">
+                        <li class="list-group-item">
+                            <input type="checkbox" id="is_leave_annual" name="annual_leave">
+                            <label for="annual_leave">Annual</label>
+                        </li>
+                        <li class="list-group-item">
+                            <input type="checkbox" id="is_leave_sick" name="sick_leave">
+                            <label for="sick_leave">Sick</label>
+                        </li>
+                        <li class="list-group-item">
+                            <input type="checkbox" id="is_leave_unpaid" name="unpaid_leave">
+                            <label for="unpaid_leave">Unpaid</label>
+                        </li>
+                        <li class="list-group-item">
+                            <input type="checkbox" id="is_leave_maternity" name="maternity_paternity_leave">
+                            <label for="maternity_paternity_leave">Maternity/Paternity</label>
+                        </li>
 
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-5 col-8">
+                                    <input type="checkbox" id="is_leave_others" name="other_leave_reason">
+                                    <label for="other_leave_reason">Others:</label>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-7 col-8 other-input-container">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+                                        <input type="text" class="form-control" name="otherReason" id="otherReason">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+
+                    </ul>
+                </div>
             </div>
-            <br />
-        </div>
-        <hr />
-        <br />
+            </br>
+            <!-- leave Details  -->
 
-
-        <!-- Employee Acknowledge Section -->
-        
-        <!-- <div class="emp-acknowledgement-main-container">
-
-            <div class="col-lg-12 emp-liability-top-info">
-                <div class="col-xxl-8 col-lg-8 col-md-12 col-sm-12 col-12 emp-liability-lable-name">
-
-                    <h4 class="emp-liability-heading">Employee Acknowledgement:</h4>
-                </div>
-                <br />
-                <div class="col-lg-12 col-md-12 col-sm-12 col-12">
-                    <p>
-                        I hereby acknowledge the above mentioned deduction from my salary. I accpet that I will not exit the country until I
-                        repay the whole amount back to the company. If I breach this contract, I am solely responsible for any legal action
-                        taken against me by the company.
-                    </p>
+            <div class="leaveDetails-main-container">
+                <div class="leaveDetails-heading">
+                    <span class="error">*</span>
+                    <label class="col-form-label text-md-end">
+                        <h5>Leave Details:</h5>
+                    </label>
                 </div>
                 <div class="row">
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-name-section">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
                         <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-6 col-sm-5 col-8 emp-liability-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Employee Name</label>
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-5 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Leave Start Date:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-7 col-12">
+                                <input type="date" class="form-control top-margin-input-1" name="empPassportNum">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-joining-date-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-5 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Leave End Date:</label>
                             </div>
                             <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-7 col-12 top-margin-input">
-                                <input type="text" class="form-control top-margin-input-1" name="empName">
+                                <input type="date" class="form-control top-margin-input-1" name="empJoiningDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                </br>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-5 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Total No. of Days</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-7 col-12">
+                                <input type="text" class="form-control top-margin-input-1" name="empPassportNum">
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-sign-section">
+                </div>
+
+                <br />
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
                         <div class="row">
-                            <div class="col-xxl-3 col-lg-5 col-md-4 col-sm-5 col-8 emp-liability-lable-name">
-                                <span class="error">*</span>
-                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Sign</label>
+                            <div class="col-xxl-4 col-lg-6 col-md-8 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">No. of Paid Days (if any)</label>
                             </div>
-                            <div class="col-xxl-5 col-lg-6 col-md-7 col-sm-7 col-12">
-                                <input type="text" class="form-control top-margin-input-1" name="empSign">
+                            <div class="col-xxl-5 col-lg-6 col-md-4 col-sm-5 col-12">
+                                <input type="text" class="form-control top-margin-input-1" name="empPassportNum">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-joining-date-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-8 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">No. of Unpaid Days (if any)</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-4 col-sm-5 col-12 top-margin-input">
+                                <input type="text" class="form-control top-margin-input-1" name="empJoiningDate">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            </br>
+
+            <!-- Contact Information   -->
+
+            <div class="leaveDetails-main-container">
+                <div class="leaveDetails-heading">
+                    <span class="error">*</span>
+                    <label class="col-form-label text-md-end">
+                        <h5>Contact Information:</h5>
+                    </label>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-2 col-lg-3 col-md-4 col-sm-5 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Address While on leave:</label>
+                            </div>
+                            <div class="col-xxl-10 col-lg-9 col-md-8 col-sm-7 col-12">
+                                <textarea class="form-control top-margin-input-1" name="empLiabilityReason" rows="5" cols="25"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-8 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Home Contact No.</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-4 col-sm-5 col-12">
+                                <input type="text" class="form-control top-margin-input-1" name="empPassportNum">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-joining-date-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-8 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Personal Email</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-4 col-sm-5 col-12 top-margin-input">
+                                <input type="email" class="form-control top-margin-input-1" name="empJoiningDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <br />
+                <br />
+
+                <!-- Contact Information Signature Div  -->
+                <div class="row">
+                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-10 col-12 ">
+                        <p class="contact-info-para">I do confirm that I will report back to duty on the due date as approved by the Management,
+                            otherwise the Company will consider me as an absentee as per the Law.</p>
+                    </div>
+
+                    <br />
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                            <div class="row">
+                                <div class="col-xxl-4 col-lg-6 col-md-8 col-sm-7 col-12 emp-liability-lable-name">
+                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date:</label>
+                                </div>
+                                <div class="col-xxl-5 col-lg-6 col-md-4 col-sm-5 col-12">
+                                    <input type="date" class="form-control top-margin-input-1" name="empPassportNum">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-joining-date-section">
+                            <div class="row">
+                                <div class="col-xxl-4 col-lg-6 col-md-8 col-sm-7 col-12 emp-liability-lable-name">
+                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Applicant's Signature</label>
+                                </div>
+                                <div class="col-xxl-5 col-lg-6 col-md-4 col-sm-5 col-12 top-margin-input">
+                                    <input type="email" class="form-control top-margin-input-1" name="empJoiningDate">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                </br>
+
+
+            </div>
         </div>
         <br />
 
-        <hr /> -->
+        <hr />
+        <br />
+
+        <!-- Human Resource Filling Section -->
+        <!-- <div class="col-lg-12 emp-liability-top-info">
+            <div class="col-xxl-8 col-lg-8 col-md-12 col-sm-12 col-12 emp-liability-lable-name">
+                <h4 class="emp-liability-heading">3 - Human Resource (to be filled by the HR):</h4>
+            </div>
+            <br />
+
+            <div class="leaveDetails-main-container">
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-8 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Passport Expiry:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-4 col-sm-5 col-12">
+                                <input type="date" class="form-control top-margin-input-1" name="empPassportNum">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-joining-date-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-8 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Visa Expiry:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-4 col-sm-5 col-12 top-margin-input">
+                                <input type="date" class="form-control top-margin-input-1" name="empJoiningDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <br />
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-8 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Advance/Loan Balance:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-4 col-sm-5 col-12">
+                                <input type="text" class="form-control top-margin-input-1" name="empPassportNum">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-joining-date-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-8 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Others:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-4 col-sm-5 col-12 top-margin-input">
+                                <input type="email" class="form-control top-margin-input-1" name="empJoiningDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <br />
+
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-2 col-lg-3 col-md-4 col-sm-5 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Remarks:</label>
+                            </div>
+                            <div class="col-xxl-10 col-lg-9 col-md-8 col-sm-7 col-12">
+                                <textarea class="form-control top-margin-input-1" name="empLiabilityReason" rows="5" cols="25"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">HR Manager:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-5 col-12">
+                                <input type="text" class="form-control top-margin-input-1" name="empPassportNum">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 emp-joining-date-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Signature:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-5 col-12 top-margin-input">
+                                <input type="text" class="form-control top-margin-input-1" name="empJoiningDate">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6 col-sm-10 col-12 emp-joining-date-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-5 col-12 top-margin-input">
+                                <input type="date" class="form-control top-margin-input-1" name="empJoiningDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+            </div>
+        </div>
+        <br />
+
+        <hr />
+        <br /> -->
+
+
+        <!-- Approval (to be filled by Manager/Department Head) Section -->
+
+        <!-- <div class="col-lg-12 emp-liability-top-info">
+            <div class="col-xxl-8 col-lg-8 col-md-12 col-sm-12 col-12 emp-liability-lable-name">
+                <h4 class="emp-liability-heading">4 - Approval (to be filled by Manager/Department Head) :</h4>
+            </div>
+            <br />
+
+            <div class="leaveDetails-main-container">
+
+                <div class="typeOfLeave-main-container">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                            <div class="row">
+                                <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-7 col-12 emp-liability-lable-name">
+                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Designation:</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-10 col-10">
+                        <ul class="list-group list-group-horizontal">
+                            <li class="list-group-item">
+                                <input type="checkbox" id="is_leave_annual" name="annual_leave">
+                                <label for="annual_leave">Supervisor</label>
+                            </li>
+                            <li class="list-group-item">
+                                <input type="checkbox" id="is_leave_sick" name="sick_leave">
+                                <label for="sick_leave">Manager</label>
+                            </li>
+
+                        </ul>
+                    </div>
+                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-10 col-10">
+                        <ul class="list-group list-group-horizontal">
+                            <li class="list-group-item">
+                                <input type="checkbox" id="is_leave_unpaid" name="unpaid_leave">
+                                <label for="unpaid_leave">Approved</label>
+                            </li>
+                            <li class="list-group-item">
+                                <input type="checkbox" id="is_leave_maternity" name="maternity_paternity_leave">
+                                <label for="maternity_paternity_leave">Not Approved</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                </br>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">To be Replaced By:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-5 col-12">
+                                <input type="text" class="form-control top-margin-input-1" name="empPassportNum">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <br />
+
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-2 col-lg-3 col-md-3 col-sm-5 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Remarks:</label>
+                            </div>
+                            <div class="col-xxl-10 col-lg-9 col-md-9 col-sm-7 col-12">
+                                <textarea class="form-control top-margin-input-1" name="empLiabilityReason" rows="5" cols="25"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Name:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-5 col-12">
+                                <input type="text" class="form-control top-margin-input-1" name="empPassportNum">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <br />
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Signature:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-5 col-12">
+                                <input type="text" class="form-control top-margin-input-1" name="empPassportNum">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-joining-date-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-5 col-12 top-margin-input">
+                                <input type="date" class="form-control top-margin-input-1" name="empJoiningDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+            </div>
+        </div>
+        <br />
+
+        <hr />
+        <br /> -->
+
+        <!-- Approval (to be filled by Division Head)) Section -->
+
+        <!-- <div class="col-lg-12 emp-liability-top-info">
+            <div class="col-xxl-8 col-lg-8 col-md-12 col-sm-12 col-12 emp-liability-lable-name">
+                <h4 class="emp-liability-heading">5 - Approval (to be filled by Division Head) :</h4>
+            </div>
+            <br />
+
+            <div class="leaveDetails-main-container">
+
+                <div class="typeOfLeave-main-container">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                            <div class="row">
+                                <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-7 col-12 emp-liability-lable-name">
+                                    <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Designation:</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-10 col-10">
+                        <ul class="list-group list-group-horizontal">
+                            <li class="list-group-item">
+                                <input type="checkbox" id="is_leave_unpaid" name="unpaid_leave">
+                                <label for="unpaid_leave">Approved</label>
+                            </li>
+                            <li class="list-group-item">
+                                <input type="checkbox" id="is_leave_maternity" name="maternity_paternity_leave">
+                                <label for="maternity_paternity_leave">Not Approved</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                </br>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">To be Replaced By:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-5 col-12">
+                                <input type="text" class="form-control top-margin-input-1" name="empPassportNum">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <br />
+
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-2 col-lg-3 col-md-3 col-sm-5 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Remarks:</label>
+                            </div>
+                            <div class="col-xxl-10 col-lg-9 col-md-9 col-sm-7 col-12">
+                                <textarea class="form-control top-margin-input-1" name="empLiabilityReason" rows="5" cols="25"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Name:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-5 col-12">
+                                <input type="text" class="form-control top-margin-input-1" name="empPassportNum">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <br />
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-passport-num-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Signature:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-5 col-12">
+                                <input type="text" class="form-control top-margin-input-1" name="empPassportNum">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-10 col-12 emp-joining-date-section">
+                        <div class="row">
+                            <div class="col-xxl-4 col-lg-6 col-md-6 col-sm-7 col-12 emp-liability-lable-name">
+                                <label for="basicpill-firstname-input" class="col-form-label widthinput heading-name">Date:</label>
+                            </div>
+                            <div class="col-xxl-5 col-lg-6 col-md-6 col-sm-5 col-12 top-margin-input">
+                                <input type="date" class="form-control top-margin-input-1" name="empJoiningDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+            </div>
+        </div>
+        <br />
+
+        <hr />
+        <br /> -->
+
+
     </form>
 
 </div>

@@ -463,12 +463,12 @@
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action','verify-candidate-personal-information','send-personal-info-form-action']);
                             @endphp
-                            @if ($hasPermission OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can'] == true OR Auth::user()->candidate_docs_varify OR Auth::user()->candidate_personal_information_varify > 0 OR Auth::user()->joining_report_approval['count'])
+                            @if ($hasPermission OR Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can'] == true OR Auth::user()->candidate_docs_varify OR Auth::user()->candidate_personal_information_varify > 0 OR Auth::user()->joining_report_approval['count'])
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                     <i data-feather="grid"></i>
-                                    <span data-key="t-extra-pages">Approvals @if((Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']) > 0)
-                                    <span class="approval-count">{{Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->candidate_docs_varify+Auth::user()->candidate_personal_information_varify+Auth::user()->verify_offer_letters+Auth::user()->joining_report_approval['count']}}</span>
+                                    <span data-key="t-extra-pages">Approvals @if((Auth::user()->passport_submit_request_approval['count']+Auth::user()->passport_release_request_approval['count']+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']) > 0)
+                                    <span class="approval-count">{{Auth::user()->passport_submit_request_approval['count']+Auth::user()->passport_release_request_approval['count']+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->candidate_docs_varify+Auth::user()->candidate_personal_information_varify+Auth::user()->verify_offer_letters+Auth::user()->joining_report_approval['count']}}</span>
                                                 @endif
                                             </span>
                                     <div class="arrow-down"></div>
@@ -584,6 +584,31 @@
                                         </div>
                                     </div>
                                     @endif
+
+                                    @if(Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true)
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                            <span data-key="t-utility"> Passport Request @if((Auth::user()->passport_submit_request_approval['count']) > 0 OR (Auth::user()->passport_release_request_approval['count']) > 0)
+                                            <span class="approval-count">{{Auth::user()->passport_submit_request_approval['count']+Auth::user()->passport_release_request_approval['count']}}</span>
+                                                @endif
+                                            </span>
+                                            <div class="arrow-down"></div>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                            @if(Auth::user()->passport_submit_request_approval['can'] == true)
+                                            <a href="{{ route('passportSubmit.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">Passport Submit
+                                                @if(Auth::user()->passport_submit_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->passport_submit_request_approval['count']}}</span> @endif
+                                            </a>
+                                            @endif  
+                                            @if(Auth::user()->passport_release_request_approval['can'] == true)
+                                            <a href="{{ route('passportRelease.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">Passport Release
+                                                @if(Auth::user()->passport_release_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->passport_release_request_approval['count']}}</span> @endif
+                                            </a>
+                                            @endif  
+                                        </div>
+                                    </div>
+                                    @endif
+
                                 </div>
                             </li>
                             @endif

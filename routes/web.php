@@ -309,17 +309,20 @@ Route::get('/d', function () {
         Route::get('employee-passport_request/create-or-edit/{id}', 'createOrEdit')->name('employee-passport_request.create-or-edit');
         Route::post('employee-passport_request/store-or-update/{id}', 'storeOrUpdate')->name('employee-passport_request.store-or-update');
         Route::post('employee-passport-submit/request-action', 'requestAction')->name('employee-passport-submit.request-action');
+        Route::get('employee-passport-submit-approval-awaiting', 'approvalAwaiting')->name('passportSubmit.approvalAwaiting');
     });
     // Employee Passport Release
     Route::resource('passport_release', PassportReleaseController::class);
     Route::controller(PassportReleaseController::class)->group(function(){
         Route::post('employee-passport-release/request-action', 'requestAction')->name('employee-passport-release.request-action');
+        Route::get('employee-passport-release-approval-awaiting', 'approvalAwaiting')->name('passportRelease.approvalAwaiting');
     });
     // Employee Liability
     Route::resource('employee_liability', EmployeeLiabilityController::class);
     Route::controller(EmployeeLiabilityController::class)->group(function(){
         Route::get('employee-liability/create-or-edit/{id}', 'createOrEdit')->name('employee-liability.create-or-edit');
         Route::post('employee-liability/store-or-update/{id}', 'storeOrUpdate')->name('employee-liability.store-or-update');
+        Route::post('liability_request_action', 'requestAction')->name('liabilityRequest.action');
     });
 
     // Employee Leave

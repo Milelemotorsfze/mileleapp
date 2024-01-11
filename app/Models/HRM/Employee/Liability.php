@@ -5,20 +5,24 @@ namespace App\Models\HRM\Employee;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class Liability extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $table = "leaves";
+    protected $table = "liabilities";
     protected $fillable = [
         'employee_id',
         'request_date',
-        'loan',
-        'loan_amount',
-        'advances',
-        'advances_amount',
-        'penalty_or_fine',
-        'penalty_or_fine_amount',
+        // 'loan',
+        // 'loan_amount',
+        // 'advances',
+        // 'advances_amount',
+        // 'penalty_or_fine',
+        // 'penalty_or_fine_amount',
+        'type',
+        'code',
         'total_amount',
         'no_of_installments',
         'amount_per_installment',
@@ -47,4 +51,73 @@ class Liability extends Model
         'updated_by',
         'deleted_by',
     ];
+    protected $appends = [
+        'liability_type',
+        'is_auth_user_can_approve',
+    ];
+    public function getLiabilityTypeAttribute() {
+        $liabilityType = '';
+        if($this->type == 'loan') {
+            $liabilityType = 'Loan';
+        }
+        else if($this->type == 'advances') {
+            $liabilityType = 'Advances';
+        }
+        else if($this->type == 'penalty_or_fine') {
+            $liabilityType = 'Penalty Or Fine';
+        }
+        return $liabilityType;
+    }
+    public function getIsAuthUserCanApproveAttribute() {
+        $isAuthUserCanApprove = [];
+        $authId = Auth::id();
+         // employee -------> Reporting Manager  ----Finance Manager--------->HR Manager-------->Division Head
+        if($this->action_by_employee =='pending' && $this->employee_id == $authId) {
+            $isAuthUserCanApprove['can_approve'] = true;
+            $isAuthUserCanApprove['current_approve_position'] = 'Employee';
+            $isAuthUserCanApprove['current_approve_person'] = $this->user->name;
+        }
+        else if($this->action_by_employee =='approved' && $this->action_by_department_head == 'pending' && $this->department_head_id == $authId) { 
+            $isAuthUserCanApprove['can_approve'] = true;
+            $isAuthUserCanApprove['current_approve_position'] = 'Reporting Manager';
+            $isAuthUserCanApprove['current_approve_person'] = $this->reportingManager->name;
+        }
+        else if($this->action_by_employee =='approved' && $this->action_by_department_head == 'approved' && $this->action_by_finance_manager == 'pending' && 
+            $this->finance_manager_id == $authId) {
+                $isAuthUserCanApprove['can_approve'] = true;
+                $isAuthUserCanApprove['current_approve_position'] = 'Finance Manager';
+                $isAuthUserCanApprove['current_approve_person'] = $this->divisionHead->name;
+        }
+        else if($this->action_by_employee =='approved' && $this->action_by_department_head == 'approved' && $this->action_by_finance_manager == 'approved' && 
+            $this->action_by_hr_manager == 'pending' && $this->hr_manager_id == $authId) {
+                $isAuthUserCanApprove['can_approve'] = true;
+                $isAuthUserCanApprove['current_approve_position'] = 'HR Manager';
+                $isAuthUserCanApprove['current_approve_person'] = $this->hrManager->name;
+        }
+        else if($this->action_by_employee =='approved' && $this->action_by_department_head == 'approved' && $this->action_by_finance_manager == 'approved' && 
+            $this->action_by_hr_manager == 'approved' && $this->action_by_division_head == 'pending' && $this->division_head_id == $authId) {
+                $isAuthUserCanApprove['can_approve'] = true;
+                $isAuthUserCanApprove['current_approve_position'] = 'Division Head';
+                $isAuthUserCanApprove['current_approve_person'] = $this->hrManager->name;
+        }
+        return $isAuthUserCanApprove;
+    }
+    public function user() {
+        return $this->hasOne(User::class,'id','employee_id');
+    }
+    public function reportingManager() {
+        return $this->hasOne(User::class,'id','department_head_id');
+    }
+    public function financeManager() {
+        return $this->hasOne(User::class,'id','finance_manager_id');
+    }
+    public function hrManager() {
+        return $this->hasOne(User::class,'id','hr_manager_id');
+    }
+    public function divisionHead() {
+        return $this->hasOne(User::class,'id','division_head_id');
+    }
+    public function history() {
+        return $this->hasMany(LiabilityHistory::class,'liability_id','id');
+    }
 }

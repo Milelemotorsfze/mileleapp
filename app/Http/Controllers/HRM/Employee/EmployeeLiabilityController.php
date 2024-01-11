@@ -16,9 +16,87 @@ use App\Models\HRM\Approvals\DepartmentHeadApprovals;
 use App\Models\HRM\Approvals\ApprovalByPositions;
 use App\Models\Masters\MasterDivisionWithHead;
 use Exception;
+use Carbon\Carbon;
+use Carbon\CarbonTimeZone;
 
 class EmployeeLiabilityController extends Controller
 {
+    public function requestAction(Request $request) {
+        DB::beginTransaction();
+        try {
+            $message = '';
+            $update = Liability::where('id',$request->id)->first();
+            // employee -------> Reporting Manager---->Finance Manager--------->HR Manager-------->Division Head
+            if($request->current_approve_position == 'Employee') {
+                $update->comments_by_employee = $request->comment;
+                $update->employee_action_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->action_by_employee = $request->status;
+                if($request->status == 'approved') {
+                    $update->action_by_department_head = 'pending';
+                    $message = 'Employee Liability Request send to Reporting Manager ( '.$update->reportingManager->name.' - '.$update->reportingManager->email.' ) for approval';
+                }
+            }
+            else if($request->current_approve_position == 'Reporting Manager') {
+                $update->comments_by_department_head = $request->comment;
+                $update->department_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->action_by_department_head = $request->status;
+                if($request->status == 'approved') {
+                    $update->action_by_finance_manager = 'pending';
+                    $message = 'Employee Liability Request send to Finance Manager ( '.$update->financeManager->name.' - '.$update->financeManager->email.' ) for approval';
+                }
+            }
+            else if($request->current_approve_position == 'Finance Manager') {        
+                $update->comments_by_finance_manager = $request->comment;
+                $update->finance_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->action_by_finance_manager = $request->status;
+                if($request->status == 'approved') {
+                    $update->action_by_hr_manager = 'pending';
+                    $message = 'Employee Liability Request send to HR Manager ( '.$update->hrManager->name.' - '.$update->hrManager->email.' ) for approval';
+                }
+            }
+            else if($request->current_approve_position == 'HR Manager') {
+                $update->comments_by_hr_manager = $request->comment;
+                $update->hr_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->action_by_hr_manager = $request->status;
+                if($request->status == 'approved') {
+                    $update->action_by_division_head = 'pending';
+                    $message = 'Employee Liability Request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';               
+                }
+            }
+            else if($request->current_approve_position == 'Division Head') {
+                $update->comments_by_division_head = $request->comment;
+                $update->division_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->action_by_division_head = $request->status;
+                if($request->status == 'approved') {
+                    $update->status = 'approved'; 
+                    $update->action_by_division_head = 'approved';
+                }
+            }
+            $update->update();
+            $history['liability_id'] = $update->id;
+            if($request->status == 'approved') {
+                $history['icon'] = 'icons8-thumb-up-30.png';
+            }
+            else if($request->status == 'rejected') {
+                $history['icon'] = 'icons8-thumb-down-30.png';
+            }
+            $history['message'] = 'Employee Liability Request '.$request->status.' by '.$request->current_approve_position.' ( '.Auth::user()->name.' - '.Auth::user()->email.' )';
+            $createHistory = LiabilityHistory::create($history);  
+            if($request->status == 'approved' && $message != '') {
+                $history['icon'] = 'icons8-send-30.png';
+                $history['message'] = $message;
+                $createHistory = LiabilityHistory::create($history);
+            }
+            (new UserActivityController)->createActivity($history['message']);
+            DB::commit();
+            return response()->json('success');
+        } 
+        catch (\Exception $e) {
+            // info($e);
+            DB::rollback();
+            dd($e);
+        }
+    }
     public function index() {
         $page = 'listing';
         $pendings = Liability::where('status','pending')->latest()->get();
@@ -32,8 +110,11 @@ class EmployeeLiabilityController extends Controller
     public function edit() {
         return view('hrm.liability.edit');
     }
-    public function show(string $id) {
-        return view('hrm.liability.show');
+    public function show($id) {
+        $data = Liability::where('id',$id)->first();
+        $previous = Liability::where('id', '<', $id)->max('id');
+        $next = Liability::where('id', '>', $id)->min('id');
+        return view('hrm.liability.show',compact('data','previous','next'));
     }
     public function createOrEdit($id) {
         if($id == 'new') {
@@ -41,23 +122,18 @@ class EmployeeLiabilityController extends Controller
             $previous = $next = '';
         }
         else {
-            $data = Liability::find($id);
+            $data = Liability::where('id',$id)->with('user.empProfile.designation','user.empProfile.department','user.empProfile.location')->first();
             $previous = Liability::where('status',$data->status)->where('id', '<', $id)->max('id');
             $next = Liability::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
-        $masterEmployees = User::whereHas('empProfile')->select('id','name')->get();
+        $masterEmployees = User::whereHas('empProfile')->with('empProfile.designation','empProfile.department','empProfile.location')->select('id','name')->get();
         return view('hrm.liability.create',compact('id','data','previous','next','masterEmployees'));
     }
     public function storeOrUpdate(Request $request, $id) { 
         $validator = Validator::make($request->all(), [
             'employee_id' => 'required',
-            'request_date' => 'required',
-            'loan' => 'required',
-            'loan_amount' => 'required',
-            'advances' => 'required',
-            'advances_amount' => 'required',
-            'penalty_or_fine' => 'required',
-            'penalty_or_fine_amount' => 'required',
+            'type' => 'required',
+            'code' => 'required',
             'total_amount' => 'required',
             'no_of_installments' => 'required',
             'amount_per_installment' => 'required',
@@ -70,18 +146,19 @@ class EmployeeLiabilityController extends Controller
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
-                $employee = EmployeeProfile::where('user_id',$request->employee_id)->get();
-                $departmentHead = DepartmentHeadApprovals::where('department_id',$employee->department_id)->first();
+                $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 $financeManager = ApprovalByPositions::where('approved_by_position','Finance Manager')->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
                 $input = $request->all();
                 if($id == 'new') {
                     $input['created_by'] = $authId;                   
-                    $input['department_head_id'] = $departmentHead->approval_by_id;
+                    $input['department_head_id'] = $employee->team_lead_or_reporting_manager;
                     $input['finance_manager_id'] = $financeManager->handover_to_id;
                     $input['hr_manager_id'] = $HRManager->handover_to_id;
                     $input['division_head_id'] = $divisionHead->approval_handover_to;
+                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                    $input['request_date'] = Carbon::now($dubaiTimeZone);
                     $createRequest = Liability::create($input);
                     $history['liability_id'] = $createRequest->id;
                     $history['icon'] = 'icons8-document-30.png';
@@ -89,7 +166,7 @@ class EmployeeLiabilityController extends Controller
                     $createHistory = LiabilityHistory::create($history);
                     $history2['liability_id'] = $createRequest->id;
                     $history2['icon'] = 'icons8-send-30.png';
-                    $history2['message'] = 'Employee liability request send to Team Lead / Reporting Manager ( '.$departmentHead->handover_to_name.' - '.$departmentHead->handover_to_email.' ) for approval';
+                    $history2['message'] = 'Employee liability request send to Team Lead / Reporting Manager ( '.$employee->teamLeadOrReportingManager->name.' - '.$employee->teamLeadOrReportingManager->email.' ) for approval';
                     $createHistory2 = LiabilityHistory::create($history2);
                     (new UserActivityController)->createActivity('Employee Liability Request Created');
                     $successMessage = "Employee Liability Hiring Request Created Successfully";
@@ -98,19 +175,34 @@ class EmployeeLiabilityController extends Controller
                     $update = Liability::find($id);
                     if($update) {
                         $update->employee_id = $request->employee_id;
-                        $update->request_date = $request->request_date;
-                        $update->loan = $request->loan;
-                        $update->loan_amount = $request->loan_amount;
-                        $update->advances = $request->advances;
-                        $update->advances_amount = $request->advances_amount;
-                        $update->penalty_or_fine = $request->penalty_or_fine;
-                        $update->penalty_or_fine_amount = $request->penalty_or_fine_amount;
+                        $update->code = $request->code;
+                        $update->type = $request->type;
                         $update->total_amount = $request->total_amount;
                         $update->no_of_installments = $request->no_of_installments;
                         $update->amount_per_installment = $request->amount_per_installment;
-                        $update->number_of_openings = $request->number_of_openings;
+                        $update->no_of_installments = $request->no_of_installments;
                         $update->reason = $request->reason;
                         $update->updated_by = $authId;
+                        $update->action_by_employee = 'pending';
+                        $update->employee_action_at = NULL;
+                        $update->comments_by_employee = NULL;
+                        $update->action_by_department_head = NULL;
+                        $update->department_head_action_at = NULL;
+                        $update->comments_by_department_head = NULL;
+                        $update->action_by_finance_manager = NULL;
+                        $update->finance_manager_action_at = NULL;
+                        $update->comments_by_finance_manager = NULL;
+                        $update->action_by_hr_manager = NULL;
+                        $update->hr_manager_action_at = NULL;
+                        $update->comments_by_hr_manager = NULL;
+                        $update->action_by_division_head = NULL;
+                        $update->division_head_action_at = NULL;
+                        $update->comments_by_division_head = NULL;
+                        $update->department_head_id = $employee->team_lead_or_reporting_manager;
+                        $update->finance_manager_id = $financeManager->handover_to_id;
+                        $update->hr_manager_id = $HRManager->handover_to_id;
+                        $update->division_head_id = $divisionHead->approval_handover_to;
+                        $update->employee_id = $request->employee_id;
                         $update->update();
                         $history['liability_id'] = $id;
                         $history['icon'] = 'icons8-edit-30.png';
@@ -126,6 +218,7 @@ class EmployeeLiabilityController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
+                dd($e);
             }
         }
     }

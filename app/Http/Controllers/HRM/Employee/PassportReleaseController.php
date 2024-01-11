@@ -8,9 +8,110 @@ use App\Models\HRM\Employee\PassportRelease;
 use App\Models\HRM\Employee\PassportReleaseHistory;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\UserActivityController;
+use App\Models\HRM\Employee\EmployeeProfile;
+use App\Models\User;
+use App\Models\Masters\PassportRequestPurpose;
+use App\Models\HRM\Approvals\ApprovalByPositions;
 
 class PassportReleaseController extends Controller
 {
+    public function approvalAwaiting(Request $request) {
+        $authId = Auth::id();
+        $page = 'approval';
+        $HRManager = '';
+        $deptHead = $employeePendings = $employeeApproved = $employeeRejected = $reportingManagerPendings = $reportingManagerApproved = $reportingManagerRejected = 
+        $divisionHeadPendings = $divisionHeadApproved = $divisionHeadRejected = $hrManagerPendings = $hrManagerApproved = $hrManagerRejected = [];
+        $HRManager = ApprovalByPositions::where([
+            ['approved_by_position','HR Manager'],
+            ['handover_to_id',$authId]
+        ])->first();
+        $employeePendings = PassportRelease::where([
+            ['release_action_by_employee','pending'],
+            ['employee_id',$authId],
+            ])->latest()->get();
+        $employeeApproved = PassportRelease::where([
+            ['release_action_by_employee','approved'],
+            ['employee_id',$authId],
+            ])->latest()->get();
+        $employeeRejected = PassportRelease::where([
+            ['release_action_by_employee','rejected'],
+            ['employee_id',$authId],
+            ])->latest()->get();
+        $reportingManagerPendings = PassportRelease::where([
+            ['release_action_by_employee','approved'],
+            ['release_action_by_department_head','pending'],
+            ['release_department_head_id',$authId],
+            ])->latest()->get();
+        $reportingManagerApproved = PassportRelease::where([
+            ['release_action_by_employee','approved'],
+            ['release_action_by_department_head','approved'],
+            ['release_department_head_id',$authId],
+            ])->latest()->get();
+        $reportingManagerRejected = PassportRelease::where([
+            ['release_action_by_employee','approved'],
+            ['release_action_by_department_head','rejected'],
+            ['release_department_head_id',$authId],
+            ])->latest()->get();
+        $divisionHeadPendings = PassportRelease::where([
+            ['release_action_by_employee','approved'],
+            ['release_action_by_department_head','approved'],
+            ['release_action_by_division_head','pending'],
+            ['release_division_head_id',$authId],
+            ])->latest()->get();
+        $divisionHeadApproved = PassportRelease::where([
+            ['release_action_by_employee','approved'],
+            ['release_action_by_department_head','approved'],
+            ['release_action_by_division_head','approved'],
+            ['release_division_head_id',$authId],
+            ])->latest()->get();
+        $divisionHeadRejected = PassportRelease::where([
+            ['release_action_by_employee','approved'],
+            ['release_action_by_department_head','approved'],                
+            ['release_action_by_division_head','rejected'],
+            ['release_division_head_id',$authId],
+            ])->latest()->get();       
+        $hrManagerPendings = PassportRelease::where([
+            ['release_action_by_employee','approved'],
+            ['release_action_by_department_head','approved'],
+            ['release_action_by_division_head','approved'],
+            ['release_action_by_hr_manager','pending'],
+            ['release_hr_manager_id',$authId],
+            ])->latest()->get();
+        $hrManagerApproved = PassportRelease::where([
+            ['release_action_by_employee','approved'],
+            ['release_action_by_department_head','approved'],
+            ['release_action_by_division_head','approved'],
+            ['release_action_by_hr_manager','approved'],
+            ['release_hr_manager_id',$authId],
+            ])->latest()->get();
+        $hrManagerRejected = PassportRelease::where([
+            ['release_action_by_employee','approved'],
+            ['release_action_by_department_head','approved'],                
+            ['release_action_by_division_head','approved'],
+            ['release_action_by_hr_manager','rejected'],
+            ['release_hr_manager_id',$authId],
+            ])->latest()->get();
+        return view('hrm.passport.passport_release.approvals',compact('page','employeePendings','employeeApproved','employeeRejected','reportingManagerPendings',
+        'reportingManagerApproved','reportingManagerRejected','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','hrManagerPendings','hrManagerApproved','hrManagerRejected'));
+    }
+    public function edit($id) {
+        $data = PassportRelease::where('id',$id)->first();
+        $Users = User::whereHas('empProfile')->get();
+        $masterEmployees = [];
+        $currentUser = User::where('id',$data->employee_id)->first();        
+        if($currentUser) {
+            array_push($masterEmployees,$currentUser);  
+        }
+        foreach($Users as $User) {
+            if($User->can_submit_or_release_passport == true) {
+                array_push($masterEmployees,$User);  
+            }
+        }
+        $submissionPurpose = PassportRequestPurpose::where('type','submit')->get();
+        $releasePurpose = PassportRequestPurpose::where('type','release')->get();
+        return view('hrm.passport.passport_release.edit',compact('data','masterEmployees','submissionPurpose','releasePurpose'));
+    }
     public function index() {
         $pendings = PassportRelease::where('release_submit_status','pending')->latest()->get();
         $approved = PassportRelease::where('release_submit_status','approved')->latest()->get();
@@ -53,14 +154,14 @@ class PassportReleaseController extends Controller
             $update->release_hr_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
             $update->release_action_by_hr_manager = $request->status;
             if($request->status == 'approved') {
-                $update->release_status = 'approved';
-                $emp = EmployeeProfile::where('id',$update->employee_id)->first();
+                $update->release_submit_status = 'approved';
+                $emp = EmployeeProfile::where('user_id',$update->employee_id)->first();
                 $emp->passport_status = 'with_employee';
                 $emp->update();
             }
         }
         if($request->status == 'rejected') {
-            $update->release_status = 'rejected';
+            $update->release_submit_status = 'rejected';
         }
         $update->update();
         $history['passport_release_id'] = $request->id;
@@ -80,5 +181,11 @@ class PassportReleaseController extends Controller
         (new UserActivityController)->createActivity($history['message']);
         return response()->json('success');
         // ,'New Employee Hiring Request '.$request->status.' Successfully'
+    }
+    public function show($id) {
+        $data = PassportRelease::where('id',$id)->first();
+        $previous = PassportRelease::where('id', '<', $id)->max('id');
+        $next = PassportRelease::where('id', '>', $id)->min('id');
+        return view('hrm.passport.passport_release.show',compact('data','previous','next'));
     }
 }

@@ -1,9 +1,9 @@
-<div class="modal fade" id="approve-joining-report-{{$data->id}}"
+<div class="modal fade" id="approve-employee-liability-request-{{$data->id}}"
 	tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog ">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Joining Report Approval</h1>
+				<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Liability Request Approval</h1>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body p-3">
@@ -28,7 +28,7 @@
 									@if(isset($data->is_auth_user_can_approve['current_approve_person']))
 									{{$data->is_auth_user_can_approve['current_approve_person']}}
 									@endif
-								</div>579.67
+								</div>
 							</div>
 							@if(isset($data->is_auth_user_can_approve['current_approve_position']))
 							<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
@@ -54,12 +54,12 @@
 		</div>
 	</div>
 </div>
-<div class="modal fade" id="reject-joining-report-{{$data->id}}"
+<div class="modal fade" id="reject-employee-liability-request-{{$data->id}}"
 	tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog ">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Joining Report Rejection</h1>
+				<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Liability Request Rejection</h1>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body p-3">
@@ -125,13 +125,13 @@
         function approveOrRejectHiringrequest(id, status) {
 			var comment = $("#comment-"+id).val();
 			var current_approve_position = $("#current_approve_position_"+id).val();
-	        let url = '{{ route('joiningReport.action') }}'; 
+	        let url = '{{ route('liabilityRequest.action') }}'; 
 	        if(status == 'rejected') {
 	            var message = 'Reject';
 	        }else{
 	            var message = 'Approve';
 	        }
-	        var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee joining report ?',function (e) {
+	        var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee Liability request ?',function (e) {
 	            if (e) {
 	                $.ajax({
 	                    type: "POST",
