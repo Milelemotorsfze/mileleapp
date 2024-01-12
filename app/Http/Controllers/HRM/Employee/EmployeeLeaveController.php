@@ -14,15 +14,159 @@ use App\Http\Controllers\UserActivityController;
 use App\Models\HRM\Employee\EmployeeProfile;
 use App\Models\HRM\Approvals\ApprovalByPositions;
 use App\Models\Masters\MasterDivisionWithHead;
+use Carbon\Carbon;
 
 class EmployeeLeaveController extends Controller
 {
+    public function approvalAwaiting(Request $request) {
+        $authId = Auth::id();
+        $page = 'approval';
+        $HRManager = '';
+        $deptHead = $divisionHeadPendings = $divisionHeadApproved = $divisionHeadRejected = $employeePendings = $employeeApproved = $employeeRejected = 
+        $HRManagerPendings = $HRManagerApproved = $HRManagerRejected = $reportingManagerPendings = $reportingManagerApproved = $reportingManagerRejected = [];
+        $HRManager = ApprovalByPositions::where([
+            ['approved_by_position','HR Manager'],
+            ['handover_to_id',$authId]
+        ])->first();
+        $employeePendings = Leave::where([
+            ['action_by_employee','pending'],
+            ['employee_id',$authId],
+            ])->latest()->get();
+        $employeeApproved = Leave::where([
+            ['action_by_employee','approved'],
+            ['employee_id',$authId],
+            ])->latest()->get();
+        $employeeRejected = Leave::where([
+            ['action_by_employee','rejected'],
+            ['employee_id',$authId],
+            ])->latest()->get();
+        $HRManagerPendings = Leave::where([
+            ['action_by_employee','approved'],
+            ['action_by_hr_manager','pending'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
+        $HRManagerApproved = Leave::where([
+            ['action_by_employee','approved'],
+            ['action_by_hr_manager','approved'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
+        $HRManagerRejected = Leave::where([
+            ['action_by_employee','approved'],
+            ['action_by_hr_manager','rejected'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
+        $ReportingManagerPendings = Leave::where([
+            ['action_by_employee','approved'],
+            ['action_by_employee','approved'],
+            ['action_by_department_head','pending'],
+            ['department_head_id',$authId],
+            ])->latest()->get();
+        $ReportingManagerApproved = Leave::where([
+            ['action_by_employee','approved'],
+            ['action_by_hr_manager','approved'],
+            ['action_by_department_head','approved'],
+            ['department_head_id',$authId],
+            ])->latest()->get();
+        $ReportingManagerRejected = Leave::where([
+            ['action_by_employee','approved'],
+            ['action_by_hr_manager','approved'],                
+            ['action_by_department_head','rejected'],
+            ['department_head_id',$authId],
+            ])->latest()->get();   
+        $divisionHeadPendings = Leave::where([
+            ['action_by_employee','approved'],
+            ['action_by_hr_manager','approved'],
+            ['action_by_department_head','approved'],
+            ['action_by_division_head','pending'],
+            ['division_head_id',$authId],
+            ])->latest()->get();
+        $divisionHeadApproved = Leave::where([
+            ['action_by_employee','approved'],
+            ['action_by_hr_manager','approved'],
+            ['action_by_department_head','approved'],
+            ['action_by_division_head','approved'],
+            ['division_head_id',$authId],
+            ])->latest()->get();
+        $divisionHeadRejected = Leave::where([
+            ['action_by_employee','approved'],
+            ['action_by_hr_manager','approved'],                
+            ['action_by_department_head','approved'],
+            ['action_by_division_head','rejected'],
+            ['division_head_id',$authId],
+            ])->latest()->get();
+        return view('hrm.leave.approvals',compact('page','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','employeePendings',
+        'employeeApproved','employeeRejected','HRManagerPendings','HRManagerApproved','HRManagerRejected','ReportingManagerPendings','ReportingManagerApproved','ReportingManagerRejected'));
+    }
+    public function requestAction(Request $request) {
+        $message = '';
+        $update = Leave::where('id',$request->id)->first();
+        // employee--------->HR Manager -------> Reporting Manager  ------------>Division Head       
+        if($request->current_approve_position == 'Employee') {
+            $update->comments_by_employee = $request->comment;
+            $update->employee_action_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->action_by_employee = $request->status;
+            if($request->status == 'approved') {
+                $update->action_by_hr_manager = 'pending';
+                $message = 'Employee passport submit request send to HR Manager ( '.$update->hrManager->name.' - '.$update->hrManager->email.' ) for approval';
+            }
+        }
+        else if($request->current_approve_position == 'HR Manager') {
+            $update->comments_by_hr_manager = $request->comment;
+            $update->hr_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->action_by_hr_manager = $request->status;
+            $update->others = $request->others;
+            if($request->status == 'approved') {
+                $update->action_by_department_head = 'pending';
+                $message = 'Employee passport submit request send to Reporting Manager ( '.$update->reportingManager->name.' - '.$update->reportingManager->email.' ) for approval';
+            }
+        }
+        else if($request->current_approve_position == 'Reporting Manager') {
+            $update->comments_by_department_head = $request->comment;
+            $update->department_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->action_by_department_head = $request->status;
+            $update->to_be_replaced_by = $request->to_be_replaced_by;
+            if($request->status == 'approved') {
+                $update->action_by_division_head = 'pending';
+                $message = 'Employee passport submit request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';
+            }
+        }
+        else if($request->current_approve_position == 'Division Head') {
+            $update->comments_by_division_head = $request->comment;
+            $update->division_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->action_by_division_head = $request->status;
+            if($request->status == 'approved') {
+                $update->status = 'approved';
+            }
+        }
+        if($request->status == 'rejected') {
+            $update->status = 'rejected';
+        }
+        $update->update();
+        $history['leave_id'] = $request->id;
+        if($request->status == 'approved') {
+            $history['icon'] = 'icons8-thumb-up-30.png';
+        }
+        else if($request->status == 'rejected') {
+            $history['icon'] = 'icons8-thumb-down-30.png';
+        }
+        $history['message'] = 'Employee leave submit request '.$request->status.' by '.$request->current_approve_position.' ( '.Auth::user()->name.' - '.Auth::user()->email.' )';
+        $createHistory = LeaveHistory::create($history);  
+        if($request->status == 'approved' && $message != '') {
+            $history['icon'] = 'icons8-send-30.png';
+            $history['message'] = $message;
+            $createHistory = LeaveHistory::create($history);
+        }
+        (new UserActivityController)->createActivity($history['message']);
+        return response()->json('success');
+        // ,'New Employee Hiring Request '.$request->status.' Successfully'
+    }
     public function index() {
         $page = 'listing';
         $pendings = Leave::where('status','pending')->latest()->get();
         $approved = Leave::where('status','approved')->latest()->get();
         $rejected = Leave::where('status','rejected')->latest()->get();
-        return view('hrm.leave.index',compact('pendings','approved','rejected','page'));
+        $leavePersonReplacedBy = User::whereHas('empProfile')->get();
+        return view('hrm.leave.index',compact('pendings','approved','rejected','page','leavePersonReplacedBy'));
     }
     public function create() {
         return view('hrm.leave.create');

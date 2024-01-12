@@ -84,4 +84,7 @@ class Leave extends Model {
     public function divisionHead() {
         return $this->hasOne(User::class,'id','division_head_id');
     }
+    public function toBeReplacedBy() {
+        return $this->hasOne(User::class,'id','to_be_replaced_by');
+    }
 }
