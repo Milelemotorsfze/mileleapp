@@ -323,6 +323,7 @@ Route::get('/d', function () {
         Route::get('employee-liability/create-or-edit/{id}', 'createOrEdit')->name('employee-liability.create-or-edit');
         Route::post('employee-liability/store-or-update/{id}', 'storeOrUpdate')->name('employee-liability.store-or-update');
         Route::post('liability_request_action', 'requestAction')->name('liabilityRequest.action');
+        Route::get('liability_approval_awaiting', 'approvalAwaiting')->name('liability.approvalAwaiting');
     });
 
     // Employee Leave
@@ -331,13 +332,14 @@ Route::get('/d', function () {
         Route::get('employee-leave/create-or-edit/{id}', 'createOrEdit')->name('employee-leave.create-or-edit');
         Route::post('employee-leave/store-or-update/{id}', 'storeOrUpdate')->name('employee-leave.store-or-update');
         Route::post('leave_request_action', 'requestAction')->name('leaveRequest.action');
+        Route::get('leave_approval_awaiting', 'approvalAwaiting')->name('leave.approvalAwaiting');
     });
 
 
     // Demand & Planning Module
 
     // suppliers
-//    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
+    //    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
 
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');

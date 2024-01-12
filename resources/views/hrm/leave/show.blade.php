@@ -113,6 +113,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                     <span>{{ $data->reportingManager->name ?? '' }}</span>
                                 </div>
+                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                    <label for="choices-single-default" class="form-label"> Passport Expiry :</label>
+                                </div>
+                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                    <span>
+                                        @if($data->user->empProfile->passport_expiry_date != NULL)
+                                            {{\Carbon\Carbon::parse($data->user->empProfile->passport_expiry_date)->format('d M Y') ?? ''}}
+                                        @endif
+                                    </span>
+                                </div>
+                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                    <label for="choices-single-default" class="form-label"> Visa Expiry :</label>
+                                </div>
+                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                    <span>
+                                        @if($data->user->empProfile->visa_expiry_date != NULL)
+                                            {{\Carbon\Carbon::parse($data->user->empProfile->visa_expiry_date)->format('d M Y') ?? ''}}
+                                        @endif
+                                    </span>
+                                </div>
+                                <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                    <label for="choices-single-default" class="form-label"> Advance/Loan Balance :</label>
+                                </div>
+                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                    <span>{{$data->user->advance_or_loan_balance ?? ''}} AED</span>
+                                </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -305,6 +332,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                             @endif
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Others :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->others ?? ''}}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
@@ -342,6 +375,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                             @if($data->department_head_action_at != '')
                                         {{ \Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s') }}
                                         @endif
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            To Be Replaced By :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->toBeReplacedBy->name ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :

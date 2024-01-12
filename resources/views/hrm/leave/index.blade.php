@@ -1,4 +1,14 @@
 @extends('layouts.table')
+<style>
+	.required-class {
+        margin-top: .25rem;
+        font-size: 80%;
+        color: #fd625e;
+    }
+	.widthinput {
+	height:32px!important;
+	}
+</style>
 @section('content')
 @canany(['create-job-description','edit-job-description','view-pending-job-description-list','view-approved-job-description-list','view-rejected-job-description-list','view-job-description-details','view-job-description-approvals-details'])
 @php
@@ -423,16 +433,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 @endsection
 @push('scripts')
 <script type="text/javascript">
-	var approved = {!! json_encode($approved) !!};
+	var pendings = {!! json_encode($pendings) !!};
 	$(document).ready(function () {
-		var countApproved = 0;
-		countApproved = approved.length;
-		if(countApproved > 0 ) {
-			for(var i=0; i<countApproved; i++) {
-				$('#candidate_id_'+approved[i].id).select2({
+		$('.employee_id').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder:"Choose Employee Name",
+        });
+
+		var countpendings = 0;
+		countpendings = pendings.length;
+		if(countpendings > 0 ) {
+			for(var i=0; i<countpendings; i++) {
+				$('#to_be_replaced_by_'+pendings[i].id).select2({
 					allowClear: true,
-					placeholder:"Choose Selected Candidates Name",
-					dropdownParent: $('#closed-hiring-request-'+approved[i].id)
+					placeholder:"Choose To Be Replaced By Name",
+					dropdownParent: $('#approve-employee-leave-request-'+pendings[i].id)
 				});
 			}
 		}

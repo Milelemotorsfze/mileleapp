@@ -446,11 +446,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
             else {
                 $("#other_leave_type").hide();
             }
-        });       
-        $('#employee_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder:"Choose Employee Name",
         });
         $('#employee_id').on('change', function() {
             var selectedEmpId = $(this).val();
