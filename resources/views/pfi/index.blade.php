@@ -59,17 +59,17 @@
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-edit');
                                             @endphp
                                             @if ($hasPermission)
-                                            <a class="btn btn-primary btn-sm" href="{{ route('pfi.edit', $pfi->id) }}">
+                                            <a class="btn btn-soft-green btn-sm" title="To Edit PFI" href="{{ route('pfi.edit', $pfi->id) }}">
                                                 <i class="fa fa-edit"></i>
                                             </a>
                                             @endif
                                         @endcan
                                     @endif
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-pfi-docs-{{$pfi->id}}">
-                                        View Docs
+                                    <button type="button" class="btn btn-soft-violet btn-sm" title="To view PFI Document" data-bs-toggle="modal" data-bs-target="#view-pfi-docs-{{$pfi->id}}">
+                                        <i class="fa fa-file-pdf"></i>
                                     </button>
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-pfi-items-{{$pfi->id}}">
-                                        View PFI Items
+                                    <button type="button" class="btn btn-dark-blue btn-sm" title="To View PFI Items" data-bs-toggle="modal" data-bs-target="#view-pfi-items-{{$pfi->id}}">
+                                        <i class="fa fa-list"></i>
                                     </button>
                                     @can('create-demand-planning-po')
                                         @php
@@ -77,7 +77,7 @@
                                         @endphp
                                         @if ($hasPermission)
                                             @if($pfi->is_po_active == true)
-                                                <a href="{{ route('demand-planning-purchase-orders.create', ['id' => $pfi->id]) }}"  class="btn btn-primary btn-sm"> Add PO </a>
+                                                <a href="{{ route('demand-planning-purchase-orders.create', ['id' => $pfi->id]) }}" title="To Create Purchase Order" class="btn btn-soft-blue btn-sm"> Add PO </a>
                                             @endif
                                         @endif
                                     @endcan
@@ -118,41 +118,57 @@
                                                                 <div class="col-lg-12 col-md-12 col-sm-12">
                                                                     <div class="row">
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                            <label class="form-label">Model</label>
+                                                                            <dt>Model</dt>
                                                                         </div>
-                                                                        <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                            <label  class="form-label">SFX</label>
-                                                                        </div>
-                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                            <label class="form-label">Variant</label>
+                                                                        <div class="col-lg-1 col-md-12 col-sm-12">
+                                                                            <dt>SFX</dt>
                                                                         </div>
                                                                         <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                            <label class="form-label">Quantity</label>
+                                                                            <dt>Model Year</dt>
+                                                                        </div>
+                                                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                            <dt>Unit Price</dt>
+                                                                        </div>
+                                                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                            <dt>Quantity</dt>
+                                                                        </div>
+                                                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                            <dt>Total Price ({{ $pfi->currency }})</dt>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         @foreach($pfi->pfi_items as $value => $approvedItem)
+
                                                             <div class="row">
                                                                 <div class="d-flex">
                                                                     <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                        <hr>
                                                                         <div class="row mt-3">
                                                                             <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                                <input type="text" value="{{ $approvedItem->letterOfIndentItem->masterModel->model ?? ''}}" readonly class="form-control" >
+                                                                                <dt class="d-lg-none d-xl-none d-xxl-none">Model</dt>
+                                                                                <dl> {{ $approvedItem->letterOfIndentItem->masterModel->model ?? ''}} </dl>
                                                                             </div>
-                                                                            <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                                <input type="text" value="{{$approvedItem->letterOfIndentItem->masterModel->sfx ?? '' }}" readonly class="form-control">
-                                                                            </div>
-                                                                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                                <input type="text" value="{{ $approvedItem->letterOfIndentItem->masterModel->variant->name ?? ''}}" readonly class="form-control">
+                                                                            <div class="col-lg-1 col-md-12 col-sm-12">
+                                                                                <dt class="d-lg-none d-xl-none d-xxl-none fw-bold">SFX</dt>
+                                                                                <dl> {{ $approvedItem->letterOfIndentItem->masterModel->sfx ?? ''}} </dl>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
-                                                                                <input type="text" value="{{ $approvedItem->quantity }}" readonly class="form-control">
+                                                                                <dt class="d-lg-none d-xl-none d-xxl-none">Model Year</dt>
+                                                                                <dl> {{ $approvedItem->letterOfIndentItem->masterModel->model_year ?? ''}}</dl>
+                                                                            </div>
+                                                                            <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                                <dt class="d-lg-none d-xl-none d-xxl-none fw-bold">Unit Price</dt>
+                                                                                <dl>{{ $approvedItem->unit_price ?? ''}} </dl>
+                                                                            </div>
+                                                                            <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                                <dt class="d-lg-none d-xl-none d-xxl-none fw-bold">Quantity</dt>
+                                                                                <dl>{{ $approvedItem->quantity }}</dl>
+                                                                            </div>
+                                                                            <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                                <dt class="d-lg-none d-xl-none d-xxl-none fw-bold">Total Price ({{ $pfi->currency }})</dt>
+                                                                                <dl>{{ $approvedItem->unit_price * $approvedItem->quantity }}  </dl>
                                                                             </div>
                                                                         </div>
                                                                     </div>

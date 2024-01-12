@@ -817,7 +817,7 @@
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
                                                 @endphp
                                                 @if ($hasPermission)
-                                                <a href="{{route('letter-of-indents.get-suppliers-LOIs')}}" class="dropdown-item" data-key="t-login">Supplier LOIs </a>
+                                                <a href="{{route('letter-of-indents.get-suppliers-LOIs')}}" class="dropdown-item" data-key="t-login">Supplier Approval </a>
                                                 @endif
                                                 @endcan
                                             </div>
