@@ -7,7 +7,7 @@
         @if ($hasPermission)
             <div class="card-header">
                 <h4 class="card-title">
-                    PFI List
+                    PFI Lists
                 </h4>
                 @if (Session::has('success'))
                     <div class="alert alert-success" id="success-alert">
@@ -16,6 +16,7 @@
                     </div>
                 @endif
             </div>
+
             <div class="card-body">
                 <div class="table-responsive" >
                     <table id="PFI-table" class="table table-striped table-editable table-edits table table-condensed" style="">
@@ -195,7 +196,6 @@
                                                             </div>
                                                         </div>
                                                         @foreach($pfi->pfi_items as $value => $approvedItem)
-
                                                             <div class="row">
                                                                 <div class="d-flex">
                                                                     <div class="col-lg-12 col-md-12 col-sm-12">
