@@ -364,7 +364,7 @@ Route::get('/d', function () {
     // PFI
     Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
     Route::resource('pfi', PFIController::class);
-//    Route::get('add-pfi', [PFIController::class,'addPFI'])->name('add_pfi');
+    Route::post('pfi-payment-status/update/{id}', [PFIController::class, 'paymentStatusUpdate'])->name('pfi-payment-status-update');
     Route::get('loi-item/unit-price', [PFIController::class,'getUnitPrice'])->name('loi-item.unit-price');
 
     Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);

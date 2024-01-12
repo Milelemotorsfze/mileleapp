@@ -9,6 +9,12 @@
                 <h4 class="card-title">
                     PFI List
                 </h4>
+                @if (Session::has('success'))
+                    <div class="alert alert-success" id="success-alert">
+                        <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                        {{ Session::get('success') }}
+                    </div>
+                @endif
             </div>
             <div class="card-body">
                 <div class="table-responsive" >
@@ -24,6 +30,7 @@
                             <th>PFI Date</th>
                             <th>Comment</th>
                             <th>Status</th>
+                            <th>Payment Status</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -40,7 +47,8 @@
                                 <td>{{ $pfi->amount }}</td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($pfi->pfi_date)->format('d M y') }}</td>
                                 <td>{{ $pfi->comment }}</td>
-                                <td>{{$pfi->status }}</td>
+                                <td>{{ $pfi->status }}</td>
+                                <td>{{ $pfi->payment_status }} </td>
                                 <td>
                                     @if($pfi->status == 'New')
                                         @can('pfi-delete')
@@ -81,6 +89,53 @@
                                             @endif
                                         @endif
                                     @endcan
+                                    @can('pfi-payment-status-update')
+                                        @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('pfi-payment-status-update');
+                                        @endphp
+                                        @if ($hasPermission)
+                                            <button type="button" style="background-color: #2688a6;color: #FFFFFF" class="btn btn-sm"
+                                                    title="To Update PFI Payment Status" data-bs-toggle="modal" data-bs-target="#update-pfi-payment-status-{{$pfi->id}}">
+                                                <i class="fa fa-dollar-sign"></i>
+                                            </button>
+                                        @endif
+                                    @endcan
+
+                                     <!--  PFI PAYMENT UPDATE MODAL -->
+                                        <div class="modal fade " id="update-pfi-payment-status-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog ">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Update Payment Status</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form action="{{ route('pfi-payment-status-update', $pfi->id) }}" method="POST">
+                                                        @csrf
+                                                        <div class="modal-body">
+                                                            <div class="col-lg-12">
+                                                                <div class="row p-2">
+                                                                 <select name="payment_status" class="form-select">
+                                                                     <option value="UNPAID" {{ \App\Models\PFI::PFI_PAYMENT_STATUS_UNPAID == $pfi->payment_status ? 'selected' : '' }} >UNPAID </option>
+                                                                     <option value="PARTIALY PAID" {{ \App\Models\PFI::PFI_PAYMENT_STATUS_PARTIALY_PAID == $pfi->payment_status ? 'selected' : '' }}>
+                                                                         PARTIALY PAID
+                                                                     </option>
+                                                                     <option value="PAID" {{ \App\Models\PFI::PFI_PAYMENT_STATUS_PAID == $pfi->payment_status ? 'selected' : '' }} >
+                                                                         PAID
+                                                                     </option>
+                                                                     <option value="CANCELLED" {{ \App\Models\PFI::PFI_PAYMENT_STATUS_CANCELLED == $pfi->payment_status ? 'selected' : '' }}>CANCELLED </option>
+                                                                 </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-info">Update</button>
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--  PFI PAYMENT DOCS MODAL -->
 
                                     <div class="modal fade " id="view-pfi-docs-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-xl">

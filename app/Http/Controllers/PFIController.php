@@ -157,6 +157,7 @@ class PFIController extends Controller
         $pfi->currency = $request->currency;
         $pfi->supplier_id = $request->supplier_id;
         $pfi->released_amount = $request->released_amount;
+        $pfi->payment_status = PFI::PFI_PAYMENT_STATUS_UNPAID;
 
         $destinationPath = 'PFI_document_withoutsign';
         $destination = 'PFI_document_withsign';
@@ -462,5 +463,12 @@ class PFIController extends Controller
         $data['pendingItemUnitPrices'] = $pendingPfiItemUnitPrices;
         return $data;
 
+    }
+    public function paymentStatusUpdate(Request $request, $id) {
+        info($id);
+        $pfi = PFI::find($id);
+        $pfi->payment_status = $request->payment_status;
+        $pfi->save();
+        return redirect()->back()->with('success', 'Payment Status Updated Successfully.');
     }
 }

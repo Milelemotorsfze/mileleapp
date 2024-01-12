@@ -11,6 +11,11 @@ class PFI extends Model
     use HasFactory, SoftDeletes;
     protected $table = "pfi";
     public const PFI_STATUS_NEW = 'New';
+    public const PFI_PAYMENT_STATUS_PAID = 'PAID';
+    public const PFI_PAYMENT_STATUS_UNPAID = 'UNPAID';
+    public const PFI_PAYMENT_STATUS_PARTIALY_PAID = 'PARTIALY PAID';
+    public const PFI_PAYMENT_STATUS_CANCELLED = 'CANCELLED';
+
     public $appends = [
         'pfi_items'
     ];
