@@ -3,7 +3,7 @@
 <html>
 <head>
     <style>
-        /*@page { size: 700pt }*/
+        @page { size: A4; }
         .content{
             font-family: arial, sans-serif;
             background-color: #f6f5f5;
@@ -21,8 +21,9 @@
         }
         .overlay-image {
             position: absolute;
-            top: {{ $height }}px;
+            {{--top: {{ $height }}px;--}}
             left: {{ $width }}px;
+            bottom: 50px;
             z-index: 1;
         }
         #so-details td {
@@ -198,15 +199,15 @@
                 <td class="hide" style="border: none" ></td>
             </tr>
             <tr style="background-color: #FFFFFF">
-                <td style="border: none;font-size: 14px;">Signature
+                <td style="border: none;color: #0f0f0f">
                     <span style="margin-left: 3px;margin-bottom: 10px">
                         @if($letterOfIndent->signature)
-                            <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
+                            <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 60px;width: 140px">
                         @endif
                     </span>
                 </td>
                 <td style="border: none">
-                    <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 150px; height: 150px;"></img>
+                    <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 150px; height: 140px;"></img>
                 </td>
                 <td style="border: none;text-align: end">TOTAL</td>
                 <td style="background-color: #000000;border: none" ></td>

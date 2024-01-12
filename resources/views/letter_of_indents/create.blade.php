@@ -697,6 +697,7 @@
 
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
+            $('#inventory-quantity-'+index).val("");
             var modelYear =  $('#model-year-'+index).val();
             var model = $('#model-'+index).val();
             var sfx = e.params.data.id;
@@ -724,12 +725,14 @@
             $('#model-year-'+index).empty();
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
+            $('#inventory-quantity-'+index).val("");
 
         });
         $(document.body).on('select2:unselect', ".model-years", function (e) {
             let index = $(this).attr('data-index');
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
+            $('#inventory-quantity-'+index).val("");
 
             var modelYear = e.params.data.id;
             var model = $('#model-'+index).val();

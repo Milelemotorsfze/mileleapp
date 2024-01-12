@@ -33,9 +33,11 @@
         }
         .overlay-image {
             position: absolute;
-            top: {{ $height }}px;
-            left: 200px;
             z-index: 1;
+{{--            top: {{ $height }}px;--}}
+            left:  {{ $width }}px;
+            bottom: 50px;
+
         }
 
     </style>
@@ -131,17 +133,16 @@
                 <p class="fw-bold">VAT NOT APPLICABLE (EXPORT BILL) </p>
                 <p>NET TOTAL VALUE (USD) TOTAL </p>
                 <p>INVOICE VALUE (AED) </p>
-                <img src="{{ public_path('images/trans_car_seal.png') }}" class="overlay-image" style="height: 125px;width: 120px">
+                <img src="{{ public_path('images/trans_car_seal.png') }}" class="overlay-image" style="height: 125px;width: 120px;">
             </td>
-            <td class="bg-light-grey"> </td>
-            <td class="bg-light-grey"></td>
-            <td class="bg-light-grey"></td>
+            <td class="bg-light-grey text-dark fw-bold" > </td>
+            <td class="bg-light-grey text-dark fw-bold" ></td>
+            <td class="bg-light-grey text-dark fw-bold" ></td>
         </tr>
     </table>
-    <div class="row">
+    <div class="row" style="margin-bottom: 20px;">
         <div style="text-align: center;position: absolute;bottom:0">
             Note: If you have queries or concerns please feel free to contact us on the information provided above.
-
         </div>
     </div>
 </div>

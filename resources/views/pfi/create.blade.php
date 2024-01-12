@@ -378,7 +378,7 @@
             let addedPfiCount = $('#added-pfi-count').val();
             if(addedPfiCount <= 0) {
                 e.preventDefault();
-                alertify.confirm('Atleast One Variant item is Mandatory in PFI.').set({title:"Alert !"})
+                alertify.confirm('Atleast one vehicle item is mandatory in PFI.').set({title:"Alert !"})
             }else {
                 if($("#form-create").valid()) {
                     $('#form-create').submit();
@@ -489,7 +489,7 @@
                    calculatePfiAmount();
                    showOrHideItemsDiv();
             }else{
-                alertify.confirm('Atleast One item is Mandatory in PFI.You can not delete item.').set({title:"Alert !"})
+                alertify.confirm('Atleast One vehicle item is Mandatory in PFI.You can not delete item.').set({title:"Alert !"})
             }
         }
 

@@ -297,6 +297,7 @@ class LetterOfIndentController extends Controller
         $pdf = new \setasign\Fpdi\Tcpdf\Fpdi();
 
         $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
         $files[] = 'LOI/'.$filename;
 
         foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument) {

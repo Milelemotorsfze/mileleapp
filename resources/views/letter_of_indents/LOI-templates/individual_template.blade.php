@@ -22,13 +22,6 @@
 
         }
 
-        {{--.overlay-image {--}}
-        {{--    position: absolute;--}}
-        {{--    top: {{ $height }}px;--}}
-        {{--    left: {{ $width }}px;--}}
-        {{--    z-index: 1;--}}
-        {{--}--}}
-
         .last{
             text-align: end;
             margin-left: 20px;
@@ -109,16 +102,4 @@
 
 @endsection
 
-{{--<script type="text/javascript">--}}
-
-{{--    var height = document.getElementById('so-items').offsetHeight;--}}
-{{--    const values = ["200", "500", "300", "400", "600"];--}}
-{{--    const random = Math.floor(Math.random() * values.length);--}}
-{{--    var pixel = values[random];--}}
-
-{{--    var imagePosition = 500;--}}
-
-{{--    $('.overlay-image').css('left', pixel+'px');--}}
-{{--    // $('.overlay-image').css('top', imagePosition+'px' )--}}
-{{--</script>--}}
 

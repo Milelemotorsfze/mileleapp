@@ -703,6 +703,9 @@
 
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
+            $('#inventory-quantity-'+index).val("");
+            $('#model-year-'+index).empty();
+
             var modelYear =  $('#model-year-'+index).val();
             var model = $('#model-'+index).val();
             var sfx = e.params.data.id;
@@ -710,7 +713,6 @@
                 appendModelYear(index, model[0],sfx,modelYear[0])
             }
             appendSFX(index,model[0],sfx)
-            $('#model-year-'+index).empty();
 
         });
         $(document.body).on('select2:unselect', ".models", function (e) {
@@ -730,12 +732,14 @@
             $('#model-year-'+index).empty();
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
+            $('#inventory-quantity-'+index).val("");
 
         });
         $(document.body).on('select2:unselect', ".model-years", function (e) {
             let index = $(this).attr('data-index');
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
+            $('#inventory-quantity-'+index).val("");
 
             var modelYear = e.params.data.id;
             var model = $('#model-'+index).val();
