@@ -170,7 +170,11 @@
                                                             <label for="choices-single-default" class="form-label"> Employee Verified At :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span>{{\Carbon\Carbon::parse($data->employee_action_at)->format('d M y, H:i:s')}}</span>
+                                                        <span>
+                                                            @if($data->employee_action_at != '')
+                                                            {{\Carbon\Carbon::parse($data->employee_action_at)->format('d M y, H:i:s')}}
+                                                            @endif
+                                                        </span>
                                                         </div>
                                                         @endif
                                                     </div>

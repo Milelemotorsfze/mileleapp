@@ -11,6 +11,9 @@ use DB;
 use Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserActivityController;
+use App\Models\HRM\Employee\EmployeeProfile;
+use App\Models\HRM\Approvals\ApprovalByPositions;
+use App\Models\Masters\MasterDivisionWithHead;
 
 class EmployeeLeaveController extends Controller
 {
@@ -27,8 +30,11 @@ class EmployeeLeaveController extends Controller
     public function edit() {
         return view('hrm.leave.edit');
     }
-    public function show(string $id) {
-        return view('hrm.leave.show');
+    public function show($id) {
+        $data = Leave::where('id',$id)->first();
+        $previous = Leave::where('id', '<', $id)->max('id');
+        $next = Leave::where('id', '>', $id)->min('id');
+        return view('hrm.leave.show',compact('data','previous','next'));
     }
     public function createOrEdit($id) {
         if($id == 'new') {
@@ -36,18 +42,17 @@ class EmployeeLeaveController extends Controller
             $previous = $next = '';
         }
         else {
-            $data = Leave::find($id);
+            $data = Leave::where('id',$id)->with('user.empProfile.designation','user.empProfile.department','user.empProfile.location')->first();
             $previous = Leave::where('status',$data->status)->where('id', '<', $id)->max('id');
             $next = Leave::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
-        $masterEmployees = User::whereHas('empProfile')->select('id','name')->get();
+        $masterEmployees = User::whereHas('empProfile')->with('empProfile.department','empProfile.designation','empProfile.location')->select('id','name')->get();
         return view('hrm.leave.create',compact('id','data','previous','next','masterEmployees'));
     }
     public function storeOrUpdate(Request $request, $id) { 
         $validator = Validator::make($request->all(), [
-            'id' => 'required',
+            'employee_id' => 'required',
             'type_of_leave' => 'required',
-            'type_of_leave_description' => 'required',
             'leave_start_date' => 'required',
             'leave_end_date' => 'required',
             'total_no_of_days' => 'required',
@@ -64,16 +69,20 @@ class EmployeeLeaveController extends Controller
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
-                $employee = EmployeeProfile::where('user_id',$request->id)->get();
+                $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
-                $departmentHead = DepartmentHeadApprovals::where('department_id',$employee->department_id)->first();
+                // $departmentHead = DepartmentHeadApprovals::where('department_id',$employee->department_id)->first();
                 $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
                 $input = $request->all();
                 if($id == 'new') {
                     $input['created_by'] = $authId;   
                     $input['hr_manager_id'] = $HRManager->handover_to_id;                
-                    $input['department_head_id'] = $departmentHead->approval_by_id;
+                    $input['department_head_id'] = $employee->team_lead_or_reporting_manager;
                     $input['division_head_id'] = $divisionHead->approval_handover_to;
+                    $input['alternative_home_contact_no'] = $request->alternative_home_contact_no['full'];
+                    if($request->type_of_leave != 'others') {
+                        $input['type_of_leave_description'] = NULL;
+                    }
                     $createRequest = Leave::create($input);
                     $history['leave_id'] = $createRequest->id;
                     $history['icon'] = 'icons8-document-30.png';
@@ -81,7 +90,7 @@ class EmployeeLeaveController extends Controller
                     $createHistory = LeaveHistory::create($history);
                     $history2['leave_id'] = $createRequest->id;
                     $history2['icon'] = 'icons8-send-30.png';
-                    $history2['message'] = 'Employee hiring request send to '.$hiringManager->approved_by_position_name.' ( '.$hiringManager->handover_to_name.' - '.$hiringManager->handover_to_email.' ) for approval';
+                    $history2['message'] = 'Employee hiring request send to Employee ( '.$employee->first_name.' '.$employee->last_name.' - '.$employee->personal_email_address.' ) for approval';
                     $createHistory2 = LeaveHistory::create($history2);
                     (new UserActivityController)->createActivity('Employee Leave Request Created');
                     $successMessage = "Employee Leave Request Created Successfully";
@@ -89,17 +98,39 @@ class EmployeeLeaveController extends Controller
                 else {
                     $update = Leave::find($id);
                     if($update) {
-                        $update->id = $request->id;
+                        $update->employee_id = $request->employee_id;
                         $update->type_of_leave = $request->type_of_leave;
-                        $update->type_of_leave_description = $request->type_of_leave_description;
+                        if($request->type_of_leave != 'others') {
+                            $update->type_of_leave_description == NULL;
+                        }
+                        else {
+                            $update->type_of_leave_description = $request->type_of_leave_description;
+                        }
                         $update->leave_start_date = $request->leave_start_date;
                         $update->leave_end_date = $request->leave_end_date;
                         $update->total_no_of_days = $request->total_no_of_days;
                         $update->no_of_paid_days = $request->no_of_paid_days;
                         $update->no_of_unpaid_days = $request->no_of_unpaid_days;
                         $update->address_while_on_leave = $request->address_while_on_leave;
-                        $update->alternative_home_contact_no = $request->alternative_home_contact_no;
+                        $update->alternative_home_contact_no = $request->alternative_home_contact_no['full'];
                         $update->alternative_personal_email = $request->alternative_personal_email;
+                        $update->status = 'pending';
+                        $update->action_by_employee = 'pending';
+                        $update->employee_action_at = NULL;
+                        // $update->comments_by_employee = NULL;
+                        // $update->advance_or_loan_balance = 0.00;
+                        // $update->others = NULL;
+                        $update->action_by_hr_manager = NULL;
+                        $update->hr_manager_id = $HRManager->handover_to_id;  
+                        $update->hr_manager_action_at = NULL;
+                        // $update->comments_by_hr_manager =NULL:
+                        $update->action_by_department_head = NULL;
+                        $update->department_head_id = $employee->team_lead_or_reporting_manager;
+                        $update->department_head_action_at = NULL;
+                        // $update->comments_by_department_head = NULL;
+                        // $update->to_be_replaced_by 
+                        $update->action_by_division_head = NULL;
+                        $update->division_head_action_at = NULL;
                         $update->updated_by = $authId;
                         $update->update();
                         $history['leave_id'] = $id;
@@ -111,11 +142,12 @@ class EmployeeLeaveController extends Controller
                     }
                 }
                 DB::commit();
-                return redirect()->route('leave.index')
+                return redirect()->route('employee_leave.index')
                                     ->with('success',$successMessage);
             } 
             catch (\Exception $e) {
                 DB::rollback();
+                dd($e);
             }
         }
     }
