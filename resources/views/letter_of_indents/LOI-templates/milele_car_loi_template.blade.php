@@ -108,13 +108,6 @@
                             <tr>
                                 <td>
                                     <span style="margin-right: 50px;padding-right: 50px"> To </span>
-                                    {{--                                <span>--}}
-                                    {{--                                @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)--}}
-                                    {{--                                        {{ $letterOfIndent->customer->name }}--}}
-                                    {{--                                    @else--}}
-                                    {{--                                        {{ $letterOfIndent->customer->company ?? ''}}--}}
-                                    {{--                                    @endif--}}
-                                    {{--                        </span>--}}
                                 </td>
                             </tr>
                             <tr>
@@ -197,13 +190,13 @@
                                     </span>
                                 </td>
                                 <td style="border: none">
-                                    <img class="overlay-image" src="{{ url('milele_seal.png') }}" style="width: 170px; height: 150px;"></img>
+                                    <img class="overlay-image" src="{{ url('milele_seal.png') }}" style="width: 170px; height: 140px;"></img>
                                 </td>
                                 <td style="border: none;text-align: end">SALES VAT</td>
                                 <td  style="border: none;background-color: black;color: black" ></td>
                             </tr>
                             <tr style="background-color: #FFFFFF">
-                                <td style="border: none">Signature :
+                                <td style="border: none">
                                     @if($letterOfIndent->signature)
                                         <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
                                     @endif
@@ -240,7 +233,7 @@
         const random = Math.floor(Math.random() * values.length);
 
         var imageWidth = values[random];
-
+        console.log(imageWidth);
         var headerHeight = (6 * tableFooterHeight);
 
         var imageHeight = height - headerHeight;

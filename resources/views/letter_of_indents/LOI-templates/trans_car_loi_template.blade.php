@@ -1,7 +1,7 @@
 @extends('layouts.main')
 @section('content')
     <style>
-        /*@page { size: A4; }*/
+        @page { size: A4; }
         @media only screen and (min-device-width: 1200px)
         {
             .container{
@@ -38,7 +38,7 @@
 
     </style>
 <div class="row">
-    <div class="container" id="full-page">
+    <div class="container" >
         <form action="{{ route('letter-of-indents.generate-loi') }}">
             <input type="hidden" name="height" id="total-height" value="">
             <input type="hidden" name="width" id="width" value="">
@@ -52,7 +52,7 @@
             <button type="submit" class="btn btn-primary mr-3"> Download <i class="fa fa-download"></i></button>
         </div>
         </form>
-        <div class="container" style="margin-right: 50px;margin-left: 50px;">
+        <div class="container" style="margin-right: 50px;margin-left: 50px;" id="full-page">
             <img src="{{  url('images/trans_car_logo.png') }}"  alt="logo" style="width: 100px;height: 100px; margin-left: auto;display: block;
             margin-right: auto;">
             </span>
@@ -124,7 +124,7 @@
                         <td class="bg-light-grey "></td>
                     </tr>
                 @endforeach
-                <tr class="bg-light-grey text-dark fw-bold"">
+                <tr class="bg-light-grey text-dark fw-bold">
                 <td colspan="5"  >1B. LOGISTICS </td>
                 </tr>
                 <tr>
@@ -141,24 +141,25 @@
                         <p class="fw-bold">VAT NOT APPLICABLE (EXPORT BILL) </p>
                         <p>NET TOTAL VALUE (USD) TOTAL </p>
                         <p>INVOICE VALUE (AED) </p>
-                        <img src="{{ url('images/trans_car_seal.png') }}" class="overlay-image" style="height: 125px;width: 150px">
+                        <img src="{{ url('images/trans_car_seal.png') }}" class="overlay-image" style="height: 125px;width: 140px">
                     </td>
-                    <td class="bg-light-grey"> </td>
-                    <td class="bg-light-grey"></td>
-                    <td class="bg-light-grey"></td>
+                    <td class="bg-light-grey text-dark fw-bold"> </td>
+                    <td class="bg-light-grey text-dark fw-bold" ></td>
+                    <td class="bg-light-grey text-dark fw-bold" ></td>
                 </tr>
             </table>
             <div class="pb-2 ">
                 <div style="text-align: center;bottom: 0">
                     Note: If you have queries or concerns please feel free to contact us on the information provided above.
                 </div>
+                <p id="test"></p>
         </div>
 
     </div>
 </div>
     <script type="text/javascript">
         var height = document.getElementById('full-page').offsetHeight;
-        const values = ["500", "300", "400"];
+        const values = ["240", "260", "220"];
         const random = Math.floor(Math.random() * values.length);
         var imageWidth = values[random];
         console.log(imageWidth);
