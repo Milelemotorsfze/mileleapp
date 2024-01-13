@@ -45,17 +45,17 @@ class EmployeeLiabilityController extends Controller
             ['action_by_employee','rejected'],
             ['employee_id',$authId],
             ])->latest()->get();
-        $reportingManagerPendings = Liability::where([
+        $ReportingManagerPendings = Liability::where([
             ['action_by_employee','approved'],
             ['action_by_department_head','pending'],
             ['department_head_id',$authId],
             ])->latest()->get();
-        $reportingManagerApproved = Liability::where([
+        $ReportingManagerApproved = Liability::where([
             ['action_by_employee','approved'],
             ['action_by_department_head','approved'],
             ['department_head_id',$authId],
             ])->latest()->get();
-        $reportingManagerRejected = Liability::where([
+        $ReportingManagerRejected = Liability::where([
             ['action_by_employee','approved'],
             ['action_by_department_head','rejected'],
             ['department_head_id',$authId],
@@ -123,7 +123,7 @@ class EmployeeLiabilityController extends Controller
             ['action_by_division_head','rejected'],
             ['division_head_id',$authId],
             ])->latest()->get();
-        return view('hrm.onBoarding.liability.approvals',compact('page','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','employeePendings',
+        return view('hrm.liability.approvals',compact('page','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','employeePendings',
         'employeeApproved','employeeRejected','HRManagerPendings','HRManagerApproved','HRManagerRejected','ReportingManagerPendings','ReportingManagerApproved',
         'ReportingManagerRejected','financeManagerPendings','financeManagerApproved','financeManagerRejected'));
     }

@@ -124,15 +124,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id)}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-										</a>
-									</li>
-                                    <li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('employee-hiring-job-description.create-or-edit',['id' => $data->id, 'hiring_id' => $data->hiring_request_id])}}">
-											<i class="fa fa-edit" aria-hidden="true"></i> Edit
-										</a>
-									</li>
+								
+									@canany(['view-job-description-details'])
+									@php
+									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-job-description-details']);
+									@endphp
+									@if ($hasPermission) 
+										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id)}}">
+												<i class="fa fa-eye" aria-hidden="true"></i> View Details
+											</a>
+										</li>
+									@endif
+									@endcanany
+
+									@canany(['edit-job-description'])
+									@php
+									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-job-description']);
+									@endphp
+									@if ($hasPermission) 
+										<li>
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('employee-hiring-job-description.create-or-edit',['id' => $data->id, 'hiring_id' => $data->hiring_request_id])}}">
+												<i class="fa fa-edit" aria-hidden="true"></i> Edit
+											</a>
+										</li>
+									@endif
+									@endcanany
+
+                                    
                                     <li>
 										@if(isset($type))
 											@if($type == 'approve')
@@ -225,9 +243,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<td>{{$approvedOne->createdBy->name ?? ''}}</td>
 							<td>{{$approvedOne->created_at ?? ''}}</td>
 							<td>
-										<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id)}}">
+								@canany(['view-job-description-details'])
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-job-description-details']);
+								@endphp
+								@if ($hasPermission) 
+								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i>
 										</a>
+								@endif
+								@endcanany
+										
 							</td>
 							<div class="modal fade" id="cancelled-hiring-request-{{$approvedOne->id}}"
 								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -402,9 +428,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<td>{{$rejectedOne->hr_manager_action_at ?? ''}}</td>
 							<td>{{$rejectedOne->comments_by_hr_manager ?? ''}}</td>
 							<td>
-							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id)}}">
+							@canany(['view-job-description-details'])
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-job-description-details']);
+								@endphp
+								@if ($hasPermission) 
+								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->employeeHiringRequest->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
 							</a>
+								@endif
+								@endcanany
+							
 							</td>
 						</tr>
 						@endforeach

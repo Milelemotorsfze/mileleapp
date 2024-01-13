@@ -192,9 +192,9 @@
 	}
 </style>
 @section('content')
-@canany(['create-employee-hiring-request','edit-employee-hiring-request'])
+@canany(['create-liability','current-user-create-liability','edit-liability','current-user-edit-liability'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability','current-user-create-liability','edit-liability','current-user-edit-liability']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">

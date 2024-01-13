@@ -1,17 +1,17 @@
 @extends('layouts.table')
 @section('content')
-@canany(['create-joining-report','edit-joining-report','view-joining-report-listing'])
+@canany(['create-joining-report','current-user-create-joining-report','edit-joining-report','current-user-edit-joining-report','view-joining-report-listing','current-user-view-joining-report-listing'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','edit-joining-report','view-joining-report-listing']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','current-user-create-joining-report','edit-joining-report','current-user-edit-joining-report','view-joining-report-listing','current-user-view-joining-report-listing']);
 @endphp
 @if ($hasPermission)                                           
 <div class="card-header">
 	<h4 class="card-title">
 		New Employee Joining Report Info
 	</h4>	
-	@canany(['create-joining-report'])
+	@canany(['create-joining-report','current-user-create-joining-report'])
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report']);
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','current-user-create-joining-report']);
 	@endphp
 	@if ($hasPermission)
 	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('joining_report.create') }}">
@@ -46,9 +46,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 </div>
 <div class="portfolio">
 	<ul class="nav nav-pills nav-fill" id="my-tab">
-        @canany(['edit-joining-report','view-joining-report-listing'])
+        @canany(['edit-joining-report','current-user-edit-joining-report','view-joining-report-listing','current-user-view-joining-report-listing'])
         @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-report','view-joining-report-listing']);
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-report','current-user-edit-joining-report','view-joining-report-listing','current-user-view-joining-report-listing']);
         @endphp
         @if ($hasPermission)
 		<li class="nav-item">
@@ -106,16 +106,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
+								@canany(['view-joining-report-details','current-user-view-joining-report-details'])
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details','current-user-view-joining-report-details']);
+								@endphp
+								@if ($hasPermission) 
                                     <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i> View Details
 										</a>
 									</li>
+
+								@endif
+								@endcanany
 									@if($data->department_head_action_at == NULL)
-                                    <li>
+									@canany(['edit-joining-report','current-user-edit-joining-report'])
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-report','current-user-edit-joining-report']);
+								@endphp
+								@if ($hasPermission) 
+								<li>
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('joining_report.edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 										</a>
 									</li>
+
+								@endif
+								@endcanany
+                                    
 									@endif
                                     <li>
 										@if(isset($type))
@@ -200,9 +217,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<td>{{ $data->remarks ?? '' }}</td>
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
 							<td>
+							@canany(['view-joining-report-details','current-user-view-joining-report-details'])
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details','current-user-view-joining-report-details']);
+								@endphp
+								@if ($hasPermission) 
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
 									<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
+
+								@endif
+								@endcanany
+								
 							</td>
 						</tr>
 						@endforeach
@@ -247,9 +273,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<td>{{ $data->remarks ?? '' }}</td>
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
 							<td>
+							@canany(['view-joining-report-details','current-user-view-joining-report-details'])
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details','current-user-view-joining-report-details']);
+								@endphp
+								@if ($hasPermission) 
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
 									<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
+								@endif
+								@endcanany
+								
 							</td>
 						</tr>
 						@endforeach
