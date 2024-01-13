@@ -1,17 +1,17 @@
 @extends('layouts.table')
 @section('content')
-@canany(['create-job-description','edit-job-description','view-pending-job-description-list','view-approved-job-description-list','view-rejected-job-description-list','view-job-description-details','view-job-description-approvals-details'])
+@canany(['create-liability','current-user-create-liability','edit-liability','current-user-edit-liability','view-liability-list','current-user-view-liability-list'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description','edit-job-description','view-pending-job-description-list','view-approved-job-description-list','view-rejected-job-description-list','view-job-description-details','view-job-description-approvals-details']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability','current-user-create-liability','edit-liability','current-user-edit-liability','view-liability-list','current-user-view-liability-list']);
 @endphp
 @if ($hasPermission)                                           
 <div class="card-header">
 	<h4 class="card-title">
 		Employee Liability Info
 	</h4>	
-	@canany(['create-job-description'])
+	@canany(['create-liability','current-user-create-liability'])
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability','current-user-create-liability']);
 	@endphp
 	@if ($hasPermission)
 	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('employee-liability.create-or-edit','new') }}">
@@ -46,36 +46,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 </div>
 <div class="portfolio">
 	<ul class="nav nav-pills nav-fill" id="my-tab">
-        @canany(['edit-job-description','view-pending-job-description-list'])
-        @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-job-description','view-pending-job-description-list']);
-        @endphp
-        @if ($hasPermission)
+        
 		<li class="nav-item">
 			<a class="nav-link active" data-bs-toggle="pill" href="#pending-hiring-requests">Pending</a>
 		</li>
-		@endif
-        @endcanany
-		@canany(['edit-job-description','view-pending-job-description-list'])
-        @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-job-description','view-pending-job-description-list']);
-        @endphp
-        @if ($hasPermission)
+		
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#approved-hiring-requests">Approved</a>
 		</li>
-		@endif
-        @endcanany
-		@canany(['edit-job-description','view-pending-job-description-list'])
-        @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-job-description','view-pending-job-description-list']);
-        @endphp
-        @if ($hasPermission)
+		
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#rejected-hiring-requests">Rejected</a>
 		</li>
-        @endif
-        @endcanany
+       
 	</ul>
 </div>
 <div class="tab-content" id="selling-price-histories" >
@@ -126,15 +109,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
+								@canany(['view-liability-details','current-user-view-liability-details'])
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-liability-details','current-user-view-liability-details']);
+								@endphp
+								@if ($hasPermission)  
                                     <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_liability.show',$data->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i> View Details
 										</a>
 									</li>
-                                    <li>
+								@endif
+								@endcanany
+
+								@canany([edit-liability,current-user-edit-liability])
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole([edit-liability,current-user-edit-liability]);
+								@endphp
+								@if ($hasPermission)  
+									<li>
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('employee-liability.create-or-edit',$data->id) }}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 										</a>
 									</li>
+								@endif
+								@endcanany
+
+                                    
                                     <li>
 										@if(isset($type))
 											@if($type == 'approve')
@@ -215,9 +215,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<td>{{ $data->amount_per_installment ?? ''}}</td>	
 							<td>{{ $data->reason ?? ''}}</td>
 							<td>
-										<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_liability.show',$data->id)}}">
+							@canany(['view-liability-details','current-user-view-liability-details'])
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-liability-details','current-user-view-liability-details']);
+								@endphp
+								@if ($hasPermission)  
+								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_liability.show',$data->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i>
 										</a>
+								@endif
+								@endcanany
+										
 							</td>
 							<div class="modal fade" id="cancelled-hiring-request-{{$data->id}}"
 								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -382,9 +390,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							<td>{{ $data->amount_per_installment ?? ''}}</td>	
 							<td>{{ $data->reason ?? ''}}</td>		
 							<td>
-							<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_liability.show',$data->id)}}">
+							@canany(['view-liability-details','current-user-view-liability-details'])
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-liability-details','current-user-view-liability-details']);
+								@endphp
+								@if ($hasPermission)  
+								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_liability.show',$data->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
 							</a>
+								@endif
+								@endcanany
+							
 							</td>
 						</tr>
 						@endforeach

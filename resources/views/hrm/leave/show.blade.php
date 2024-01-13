@@ -23,9 +23,9 @@
 }
 </style>
 @section('content')
-@canany(['view-joining-report-details'])
+@canany(['view-leave-details','current-user-view-leave-details'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details','current-user-view-leave-details']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">

@@ -194,9 +194,9 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 @section('content')
-@canany(['create-employee-hiring-request','edit-employee-hiring-request'])
+@canany(['create-leave','current-user-create-leave','edit-leave','current-user-edit-leave'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','current-user-create-leave','edit-leave','current-user-edit-leave']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">

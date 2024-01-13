@@ -228,7 +228,7 @@
 </style>
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-passport-request','current-user-edit-passport-request']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">

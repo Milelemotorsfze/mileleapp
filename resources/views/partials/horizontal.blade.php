@@ -105,14 +105,20 @@
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                         <i data-feather="file-text"></i>
-                                        <span data-key="t-extra-pages">HR</span>
+                                        <span data-key="t-extra-pages">
+                                            @if(auth()->user()->selected_role == 20 OR auth()->user()->selected_role == 19 OR auth()->user()->selected_role == 1)
+                                            HR
+                                            @elseif(auth()->user()->selected_role == 30)
+                                            Employee
+                                            @endif
+                                        </span>
                                         <div class="arrow-down"></div>
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="topnav-more">
 
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee.index') }}"  id="topnav-utility" role="button">
+                                        <!-- <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee.index') }}"  id="topnav-utility" role="button">
                                             <span data-key="t-utility">Employee Relation</span>
-                                        </a>
+                                        </a> -->
                                         <div class="dropdown">
                                             @canany(['create-employee-hiring-request','edit-employee-hiring-request','view-all-pending-hiring-request-listing',
                                             'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
@@ -201,9 +207,9 @@
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                @canany(['view-joining-report-listing'])
+                                                @canany(['view-joining-report-listing','current-user-view-joining-report-listing'])
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('joining_report.index') }}" class="dropdown-item" data-key="t-login">Joining Report</a>
@@ -241,9 +247,9 @@
                                             @endcanany
                                         </div>
                                         <div class="dropdown">
-                                            @canany(['view-passport-request-list'])
+                                            @canany(['view-passport-request-list','current-user-view-passport-request-list'])
                                             @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list']);
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list','current-user-view-passport-request-list']);
                                             @endphp
                                             @if ($hasPermission)
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
@@ -251,17 +257,17 @@
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                @canany(['view-passport-request-list'])
+                                                @canany(['view-passport-request-list','current-user-view-passport-request-list'])
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list','current-user-view-passport-request-list']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('passport_request.index') }}" class="dropdown-item" data-key="t-login">Passport Submit</a>
                                                 @endif
                                                 @endcanany
-                                                @canany(['view-passport-request-list'])
+                                                @canany(['view-passport-request-list','current-user-view-passport-request-list'])
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list','current-user-view-passport-request-list']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('passport_release.index') }}" class="dropdown-item" data-key="t-login">Passport Release</a>
@@ -271,9 +277,9 @@
                                             @endif
                                             @endcanany
                                         </div>
-                                        @canany(['view-liability-list'])
+                                        @canany(['view-liability-list','current-user-view-liability-list'])
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-liability-list']);
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-liability-list','current-user-view-liability-list']);
                                         @endphp
                                         @if ($hasPermission)
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee_liability.index') }}"  id="topnav-utility" role="button">
@@ -281,9 +287,9 @@
                                         </a>
                                         @endif
                                         @endcanany
-                                        @canany(['view-leave-list'])
+                                        @canany(['view-leave-list','view-current-user-leave-list'])
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-list']);
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-list','view-current-user-leave-list']);
                                         @endphp
                                         @if ($hasPermission)
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee_leave.index') }}"  id="topnav-utility" role="button">

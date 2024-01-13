@@ -200,9 +200,9 @@
 	}
 </style>
 @section('content')
-@canany([edit-joining-report])
+@canany(['edit-joining-report','current-user-edit-joining-report'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole([edit-joining-report]);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-report','current-user-edit-joining-report']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
