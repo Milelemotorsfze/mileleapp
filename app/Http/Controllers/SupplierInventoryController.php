@@ -73,8 +73,14 @@ class SupplierInventoryController extends Controller
                 ->pluck('model_year');
         }
 
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
+            ->get();
 
-        return view('supplier_inventories.list_update', compact('supplierInventories'));
+        return view('supplier_inventories.list_update', compact('supplierInventories','suppliers'));
     }
     public function create()
     {
@@ -146,6 +152,7 @@ class SupplierInventoryController extends Controller
                             $altercolourcode = "0" . $colourcode;
                             $extColour = substr($altercolourcode, 0, 3);
                             $intColour = substr($altercolourcode, -2);
+                            $colourcode = $extColour.''.$intColour;
 
                         }
                         if($extColour) {
@@ -177,7 +184,7 @@ class SupplierInventoryController extends Controller
                     $uploadFileContents[$i]['sfx'] = $filedata[2];
                     $uploadFileContents[$i]['chasis'] = !empty($filedata[3]) ? $filedata[3] : NULL;
                     $uploadFileContents[$i]['engine_number'] = $filedata[4];
-                    $uploadFileContents[$i]['color_code'] = $filedata[5];
+                    $uploadFileContents[$i]['color_code'] = $colourcode;
                     $uploadFileContents[$i]['pord_month'] = $filedata[6];
                     $uploadFileContents[$i]['po_arm'] = $filedata[7];
                     if (!empty($filedata[8])) {
@@ -676,24 +683,24 @@ class SupplierInventoryController extends Controller
         }
     }
     public function updateInventory(Request $request) {
-//        info($request->all());
+        info($request->all());
         $updatedDatas = $request->selectedUpdatedDatas;
 
         foreach ($updatedDatas as $data) {
             $inventoryId = $data['id'];
             $fieldName = $data['field'];
             $fieldValue = $data['value'];
-            info($fieldName);
+
             $inventory = SupplierInventory::find($inventoryId);
             if($fieldName == 'model_year') {
-                info("inside loop");
+
                 $masterModel = MasterModel::where('model', $inventory->masterModel->model)
                     ->where('sfx', $inventory->masterModel->sfx)
                     ->where('model_year', $fieldValue)
                     ->first();
                 $inventory->master_model_id = $masterModel->id;
             }else if($fieldName == 'eta_import') {
-
+                info($fieldValue);
                 $inventory->$fieldName = Carbon::parse($fieldValue)->format('Y-m-d');
             }
             else if($fieldName == 'pord_month') {
@@ -727,6 +734,49 @@ class SupplierInventoryController extends Controller
 
                 $inventory->$fieldName = $fieldValue;
                 $inventory->master_model_id = $masterModel->id;
+            }else if($fieldName == 'color_code') {
+                if($fieldValue) {
+                    $colourcode = $fieldValue;
+                    $colourcodecount = strlen($fieldValue);
+
+                    if ($colourcodecount == 5) {
+                        $extColour = substr($colourcode, 0, 3);
+                        $intColour = substr($colourcode,  -2);
+
+                    }
+                    if ($colourcodecount == 4) {
+
+                        $altercolourcode = "0" . $colourcode;
+                        $extColour = substr($altercolourcode, 0, 3);
+                        $intColour = substr($altercolourcode, -2);
+                        $fieldValue = $extColour.''.$intColour;
+                    }
+                    if($extColour) {
+                        $extColourRow = ColorCode::where('code', $extColour)
+                            ->where('belong_to', ColorCode::EXTERIOR)
+                            ->first();
+                        $exteriorColor = "";
+                        if ($extColourRow)
+                        {
+                            $exteriorColor = $extColourRow->name;
+                            $exteriorColorId = $extColourRow->id;
+                        }
+                    }
+                    if($intColour) {
+                        $intColourRow = ColorCode::where('code', $intColour)
+                            ->where('belong_to', ColorCode::INTERIOR)
+                            ->first();
+                        $interiorColor = "";
+                        if ($intColourRow)
+                        {
+                            $interiorColor = $intColourRow->name;
+                            $interiorColorId = $intColourRow->id;
+                        }
+                    }
+                    $inventory->$fieldName = $fieldValue;
+                    $inventory->interior_color_code_id = $interiorColorId;
+                    $inventory->exterior_color_code_id = $exteriorColorId;
+                }
             }
             else{
                $inventory->$fieldName = $fieldValue;
@@ -1221,6 +1271,37 @@ class SupplierInventoryController extends Controller
            }else{
                $data = $modelYear;
            }
+
+       return response($data);
+    }
+    public function isExistColorCode(Request $request) {
+        info("reached");
+        info($request->all());
+        $colourcode = $request->color_code;
+        $colourcodecount = strlen($colourcode);
+
+        if ($colourcodecount == 5) {
+            $extColour = substr($colourcode, 0, 3);
+            $intColour = substr($colourcode,  -2);
+        }
+        if ($colourcodecount == 4) {
+
+            $altercolourcode = "0" . $colourcode;
+            $extColour = substr($altercolourcode, 0, 3);
+            $intColour = substr($altercolourcode, -2);
+        }
+
+        $extColourRow = ColorCode::where('code', $extColour)
+            ->where('belong_to', ColorCode::EXTERIOR)
+            ->first();
+        $intColourRow = ColorCode::where('code', $intColour)
+            ->where('belong_to', ColorCode::INTERIOR)
+            ->first();
+
+        $data = 0;
+       if($intColourRow && $extColourRow) {
+           $data = 1;
+       }
 
        return response($data);
     }
