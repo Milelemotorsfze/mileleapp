@@ -132,6 +132,9 @@ class SupplierInventoryController extends Controller
             $colourname = NULL;
 
             $date = Carbon::now()->format('Y-m-d');
+            $unavailableExtColours = [];
+            $unavailableIntColours = [];
+
             while (($filedata = fgetcsv($file, 5000, ",")) !== FALSE) {
                 $num = count($filedata);
                 if ($i > 0 && $num == $numberOfFields)
@@ -164,6 +167,8 @@ class SupplierInventoryController extends Controller
                             {
                                 $exteriorColor = $extColourRow->name;
                                 $exteriorColorId = $extColourRow->id;
+                            }else{
+                                $unavailableExtColours[]  = $extColour;
                             }
                         }
                         if($intColour) {
@@ -175,6 +180,8 @@ class SupplierInventoryController extends Controller
                             {
                                 $interiorColor = $intColourRow->name;
                                 $interiorColorId = $intColourRow->id;
+                            }else{
+                                $unavailableIntColours[] = $intColour;
                             }
                         }
                     }
@@ -254,6 +261,12 @@ class SupplierInventoryController extends Controller
             $newModelsWithSteerings = [];
             $j=0;
 
+            if(count($unavailableIntColours) || count($unavailableIntColours)) {
+             $extColors = implode(',', array_unique($unavailableExtColours));
+             $intColors = implode(',', array_unique($unavailableIntColours));
+                return redirect()->back()->with('error','These Colour codes are not available in the Master Data.
+                Exterior Color codes are '.$extColors." and Interior Color Codes are ".$intColors.".");
+            }
             foreach($uploadFileContents as $uploadFileContent) {
                 $chaisis[] = $uploadFileContent['chasis'];
 
@@ -418,7 +431,7 @@ class SupplierInventoryController extends Controller
 
                                             $isNullChaisis = $SimilarRowWithNullChaisis;
                                         }else{
-                                            info("null chasis smilar data not exist");
+                                            info("null chasis smilar data not exist delete row add as new row");
 
                                             $isNullChaisis = $isNullChaisis->first();
                                         }
@@ -683,7 +696,7 @@ class SupplierInventoryController extends Controller
         }
     }
     public function updateInventory(Request $request) {
-        info($request->all());
+
         $updatedDatas = $request->selectedUpdatedDatas;
 
         foreach ($updatedDatas as $data) {
