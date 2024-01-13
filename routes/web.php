@@ -382,6 +382,7 @@ Route::get('/d', function () {
     Route::post('supplier-inventories/update-inventory', [SupplierInventoryController::class,'updateInventory'])->name('update-inventory');
     Route::get('/check-unique-chasis', [SupplierInventoryController::class,'checkChasisUnique'])->name('supplier-inventories.unique-chasis');
     Route::get('/check-production-month', [SupplierInventoryController::class,'checkProductionMonth'])->name('supplier-inventories.checkProductionMonth');
+    Route::get('/isExistColorCode', [SupplierInventoryController::class,'isExistColorCode'])->name('supplier-inventories.isExistColorCode');
 
 
     //BL Module

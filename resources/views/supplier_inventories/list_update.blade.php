@@ -40,26 +40,27 @@
                 </div>
             @endif
         </div>
-        @foreach ($supplierInventories as $key => $supplierInventory)
-{{--            <input type="date" class="form-control widthinput" id="basicpill-firstname-input" name="date"--}}
-{{--                 >--}}
-
-        @endforeach
         <div class="table-responsive p-2">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
                 <thead class="bg-soft-secondary">
                 <tr>
                     <th>S.No</th>
+                    <th>Country</th>
+                    <th>Dealer</th>
+                    <th>Vendor</th>
                     <th>Model</th>
                     <th>SFX</th>
                     <th>Model Year</th>
                     <th>Variant</th>
                     <th>Chasis</th>
                     <th>Engine Number</th>
+                    <th>Color Code</th>
+                    <th>Interior Color</th>
+                    <th>Exterior Color</th>
                     <th>ETA Import Date</th>
                     <th>Production Month</th>
-                    <th>po ams</th>
-{{--                    <th>Colour Code</th>--}}
+                    <th>DN Number</th>
+                    <th>PO AMS</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -67,7 +68,34 @@
                     @foreach ($supplierInventories as $key => $supplierInventory)
                         <tr>
                             <td>{{ ++$i }}</td>
-                            <td>  {{ $supplierInventory->masterModel->model ?? '' }}</td>
+                            <td>
+                                <select class="country" data-field="country" data-id="{{ $supplierInventory->id }}" id="country-editable-{{$supplierInventory->id}}">
+                                    <option value="UAE" {{ $supplierInventory->country == 'UAE' ? 'selected' : '' }} >UAE</option>
+                                    <option value="Belguim" {{ $supplierInventory->country == 'Belguim' ? 'selected' : '' }}>Belguim</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="whole_sales" data-field="whole_sales" data-id="{{ $supplierInventory->id }}" id="whole_sales-editable-{{$supplierInventory->id}}">
+                                    <option value="{{ \App\Models\SupplierInventory::DEALER_TRANS_CARS }}"
+                                        {{ $supplierInventory->whole_sales == \App\Models\SupplierInventory::DEALER_TRANS_CARS ? 'selected' : ''}} >
+                                        Trans Cars
+                                    </option>
+                                    <option value="{{\App\Models\SupplierInventory::DEALER_MILELE_MOTORS}}"
+                                        {{ $supplierInventory->whole_sales == \App\Models\SupplierInventory::DEALER_MILELE_MOTORS ? 'selected' : ''}} >
+                                        Milele Motors
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <select  class="supplier" data-field="supplier_id" data-id="{{ $supplierInventory->id }}" id="supplier_id-editable-{{$supplierInventory->id}}">
+                                    @foreach($suppliers as $supplier)
+                                        <option value="{{ $supplier->id }}" {{ $supplierInventory->supplier_id == $supplier->id ? 'selected' : '' }}>
+                                            {{ $supplier->supplier }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td>{{ $supplierInventory->masterModel->model ?? '' }}</td>
                             <td> {{ $supplierInventory->masterModel->sfx ?? '' }}</td>
                             <td>
                                 <select  class="model-year" data-field="model_year" data-id="{{ $supplierInventory->id }}" id="model_year-editable-{{$supplierInventory->id}}">
@@ -78,22 +106,30 @@
                                    @endforeach
                                 </select>
                             </td>
-                            <td > {{ $supplierInventory->masterModel->variant->name ?? '' }}</td>
-                            <td data-field="chasis" id="chasis-editable-{{$supplierInventory->id}}" contenteditable="true" data-id="{{$supplierInventory->id}}" > {{ $supplierInventory->chasis }} </td>
+                            <td> {{ $supplierInventory->masterModel->variant->name ?? '' }}</td>
+                            <td data-field="chasis" id="chasis-editable-{{$supplierInventory->id}}" contenteditable="true" data-id="{{$supplierInventory->id}}" >
+                                {{ $supplierInventory->chasis }}
+                            </td>
                             <td  data-field="engine_number" id="engine_number-editable-{{$supplierInventory->id}}"
-                                 contenteditable="true" data-id="{{$supplierInventory->id}}" > {{ $supplierInventory->engine_number ?? '' }}</td>
+                                 contenteditable="true" data-id="{{$supplierInventory->id}}" > {{ $supplierInventory->engine_number ?? '' }}
+                            </td>
+                            <td  data-field="color_code" id="color_code-editable-{{$supplierInventory->id}}"
+                                 contenteditable="true" data-id="{{$supplierInventory->id}}">{{ $supplierInventory->color_code }}
+                            </td>
+                            <td>{{ $supplierInventory->interiorColor->name ?? '' }}</td>
+                            <td>{{ $supplierInventory->exteriorColor->name ?? '' }}</td>
                             <td class="eta-import">
                                 <input type="date" class="eta-import form-control" data-field="eta_import" id="eta_import-editable-{{$supplierInventory->id}}"
                                        data-id="{{$supplierInventory->id}}" value="{{ $supplierInventory->eta_import }}" >
-
                             </td>
                             <td data-field="pord_month" class="pord_month"  id="pord_month-editable-{{$supplierInventory->id}}"  contenteditable="true"
                                 data-id="{{$supplierInventory->id}}" >{{$supplierInventory->pord_month}}
                             </td>
+                            <td data-field="delivery_note"  id="delivery_note-editable-{{$supplierInventory->id}}"  contenteditable="true"
+                                data-id="{{$supplierInventory->id}}" >{{$supplierInventory->delivery_note}} </td>
 
                             <td data-field="po_arm" class="po_arm"  id="po_arm-editable-{{$supplierInventory->id}}"  contenteditable="true"
                                 data-id="{{$supplierInventory->id}}" >{{ $supplierInventory->po_arm }}</td>
-{{--                            <td>{{  }}</td>--}}
 
                         </tr>
                 @endforeach
@@ -114,7 +150,6 @@
                 var id = $(this).data('id');
                 var field = $(this).data('field');
                 validData(field,id);
-
                 if(feildValidInput == true) {
                     addUpdatedData(id,field);
                 }
@@ -122,6 +157,34 @@
 
             $('#dtBasicExample3 tbody td').on('change', '.model-year', function () {
 
+                var id = $(this).data('id');
+                var field = $(this).data('field');
+                if(feildValidInput == true) {
+                    addUpdatedData(id, field);
+                }
+            });
+            $('#dtBasicExample3 tbody td').on('change', '.supplier', function () {
+                var id = $(this).data('id');
+                var field = $(this).data('field');
+                if(feildValidInput == true) {
+                    addUpdatedData(id, field);
+                }
+            });
+            $('#dtBasicExample3 tbody td').on('change', '.eta-import', function () {
+                var id = $(this).data('id');
+                var field = $(this).data('field');
+                if(feildValidInput == true) {
+                    addUpdatedData(id, field);
+                }
+            });
+            $('#dtBasicExample3 tbody td').on('change', '.country', function () {
+                var id = $(this).data('id');
+                var field = $(this).data('field');
+                if(feildValidInput == true) {
+                    addUpdatedData(id, field);
+                }
+            });
+            $('#dtBasicExample3 tbody td').on('change', '.whole_sales', function () {
                 var id = $(this).data('id');
                 var field = $(this).data('field');
                 if(feildValidInput == true) {
@@ -138,8 +201,7 @@
                     if($.isNumeric(value) == true){
                         feildValidInput = true;
                         removeValidationError(InputId);
-                        console.log(value);
-                        console.log(value.length);
+
                         if(value.length != 6) {
                             $msg = "Characters length should be 6";
                             showValidationError(InputId,$msg);
@@ -171,9 +233,7 @@
                         $msg = "Only Numeric is allowed";
                         showValidationError(InputId,$msg);
                     }
-
-                }
-                if(field == 'chasis') {
+                }else if(field == 'chasis') {
                     let InputId = 'chasis-editable-'+id;
 
                     let url = '{{ route('supplier-inventories.unique-chasis') }}';
@@ -187,7 +247,7 @@
                         },
                         dataType : 'json',
                         success: function(data) {
-                            console.log(data);
+
                             if(data == 1) {
                                 $msg = "This chasis is already existing";
                                 showValidationError(InputId, $msg);
@@ -196,22 +256,54 @@
                             }
                         }
                     });
-                }
-            }
-            $('#dtBasicExample3 tbody td').on('change', '.eta-import', function () {
-                var id = $(this).data('id');
-                var field = $(this).data('field');
-                addUpdatedData(id,field);
+                }else if(field == 'color_code') {
 
-            });
+                    let url = '{{ route('supplier-inventories.isExistColorCode') }}';
+                    let InputId = 'color_code-editable-'+id;
+                    let colorCode = $('#'+InputId).text();
+
+                    if(colorCode.length > 5 ) {
+                        $msg = "Maximum length is 5";
+                        showValidationError(InputId,$msg);
+
+                    }else if(colorCode.length < 4) {
+                        $msg = "Minimum length is 4";
+                        showValidationError(InputId,$msg);
+                    }else{
+                        removeValidationError(InputId);
+                    }
+
+                    if(colorCode.length == 5 || colorCode.length == 4) {
+                        $.ajax({
+                            type:"GET",
+                            url: url,
+                            data: {
+                                color_code: colorCode,
+                            },
+                            dataType : 'json',
+                            success: function(data) {
+                                if(data == 0) {
+                                    $msg = "This color code is not existing in our master Color Codes.";
+                                    showValidationError(InputId, $msg);
+                                }else{
+                                    removeValidationError(InputId);
+                                }
+                            }
+                        });
+                    }
+                }
+
+            }
+
              $('.update-inventory-btn').on('click', function () {
                  if(feildValidInput == true) {
                      var selectedUpdatedDatas = [];
+
                      $.each(updatedData,function(key,value) {
                          var splitValue = value.split('-');
                          var cellId = splitValue[1] +'-editable-' + splitValue[0];
 
-                         if(splitValue[1] == 'model_year' ) {
+                         if(splitValue[1] == 'model_year' || splitValue[1] == 'supplier_id' ||  splitValue[1] == 'eta_import' ) {
                              var cellValue = $('#'+ cellId).val();
                          }else{
                              var cellValue = $('#'+ cellId).text();
@@ -219,7 +311,6 @@
                          selectedUpdatedDatas.push({id: splitValue[0],field: splitValue[1], value: cellValue});
 
                      });
-                     // console.log("test data");
 
                      let url = '{{ route('update-inventory') }}';
                      $.ajax({

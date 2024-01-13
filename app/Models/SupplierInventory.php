@@ -44,6 +44,14 @@ class SupplierInventory extends Model
     {
         return $this->belongsTo(MasterModel::class);
     }
+    public function interiorColor()
+    {
+        return $this->belongsTo(ColorCode::class,'interior_color_code_id','id');
+    }
+    public function exteriorColor()
+    {
+        return $this->belongsTo(ColorCode::class,'exterior_color_code_id','id');
+    }
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
