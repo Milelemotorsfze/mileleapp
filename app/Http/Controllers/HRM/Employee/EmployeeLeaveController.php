@@ -162,9 +162,30 @@ class EmployeeLeaveController extends Controller
     }
     public function index() {
         $page = 'listing';
-        $pendings = Leave::where('status','pending')->latest()->get();
-        $approved = Leave::where('status','approved')->latest()->get();
-        $rejected = Leave::where('status','rejected')->latest()->get();
+        $pendings = Leave::where('status','pending');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-leave-list'])) {
+            $pendings = $pendings->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-current-user-leave-list'])) {
+            $pendings = $pendings->where('employee_id',$authId)->latest();
+        }
+        $pendings = $pendings->get();
+        $approved = Leave::where('status','approved');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-leave-list'])) {
+            $approved = $approved->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-current-user-leave-list'])) {
+            $approved = $approved->where('employee_id',$authId)->latest();
+        }
+        $approved = $approved->get();
+        $rejected = Leave::where('status','rejected');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-leave-list'])) {
+            $rejected = $rejected->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-current-user-leave-list'])) {
+            $rejected = $rejected->where('employee_id',$authId)->latest();
+        }
+        $rejected =$rejected->get();
         $leavePersonReplacedBy = User::whereHas('empProfile')->get();
         return view('hrm.leave.index',compact('pendings','approved','rejected','page','leavePersonReplacedBy'));
     }

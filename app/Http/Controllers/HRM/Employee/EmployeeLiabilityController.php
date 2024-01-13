@@ -205,9 +205,30 @@ class EmployeeLiabilityController extends Controller
     }
     public function index() {
         $page = 'listing';
-        $pendings = Liability::where('status','pending')->latest()->get();
-        $approved = Liability::where('status','approved')->latest()->get();
-        $rejected = Liability::where('status','rejected')->latest()->get();
+        $pendings = Liability::where('status','pending');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-liability-list'])) {
+            $pendings = $pendings->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-liability-list'])) {
+            $pendings = $pendings->where('employee_id',$authId)->latest();
+        }
+        $pendings = $pendings->get();
+        $approved = Liability::where('status','approved');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-liability-list'])) {
+            $approved = $approved->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-liability-list'])) {
+            $approved = $approved->where('employee_id',$authId)->latest();
+        }
+        $approved = $approved->get();
+        $rejected = Liability::where('status','rejected');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-liability-list'])) {
+            $rejected = $rejected->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-liability-list'])) {
+            $rejected = $rejected->where('employee_id',$authId)->latest();
+        }
+        $rejected = $rejected->get();
         return view('hrm.liability.index',compact('pendings','approved','rejected','page'));
     }
     public function create() {

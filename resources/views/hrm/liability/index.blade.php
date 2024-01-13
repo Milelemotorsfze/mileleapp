@@ -121,9 +121,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 								@endif
 								@endcanany
 
-								@canany([edit-liability,current-user-edit-liability])
+								@canany(['edit-liability,current-user-edit-liability'])
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole([edit-liability,current-user-edit-liability]);
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-liability,current-user-edit-liability']);
 								@endphp
 								@if ($hasPermission)  
 									<li>

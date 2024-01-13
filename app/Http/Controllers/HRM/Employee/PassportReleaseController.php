@@ -113,9 +113,30 @@ class PassportReleaseController extends Controller
         return view('hrm.passport.passport_release.edit',compact('data','masterEmployees','submissionPurpose','releasePurpose'));
     }
     public function index() {
-        $pendings = PassportRelease::where('release_submit_status','pending')->latest()->get();
-        $approved = PassportRelease::where('release_submit_status','approved')->latest()->get();
-        $rejected = PassportRelease::where('release_submit_status','rejected')->latest()->get();
+        $pendings = PassportRelease::where('release_submit_status','pending');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list'])) {
+            $pendings = $pendings->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-passport-request-list'])) {
+            $pendings = $pendings->where('employee_id',$authId)->latest();
+        }
+        $pendings =$pendings->get();
+        $approved = PassportRelease::where('release_submit_status','approved');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list'])) {
+            $approved = $approved->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-passport-request-list'])) {
+            $approved = $approved->where('employee_id',$authId)->latest();
+        }
+        $approved =$approved->get();
+        $rejected = PassportRelease::where('release_submit_status','rejected');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list'])) {
+            $rejected = $rejected->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-passport-request-list'])) {
+            $rejected = $rejected->where('employee_id',$authId)->latest();
+        }
+        $rejected =$rejected->get();
         return view('hrm.passport.passport_release.index',compact('pendings','approved','rejected'));
     }
     public function requestAction(Request $request) {
