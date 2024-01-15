@@ -373,7 +373,6 @@
                     extension: "pdf"
                 },
                 loi_signature: {
-                    // required_check: true,
                     extension: "png|jpeg|jpg|svg"
                 },
                 messages: {
@@ -846,10 +845,6 @@
            });
         }
        function appendModelYear(index,unSelectedmodel,unSelectedsfx,unSelectedmodelYear) {
-            console.log(index);
-            console.log(unSelectedmodel);
-           console.log(unSelectedsfx);
-           console.log(unSelectedmodelYear);
 
            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 

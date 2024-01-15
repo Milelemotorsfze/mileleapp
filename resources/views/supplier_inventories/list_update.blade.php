@@ -1,25 +1,32 @@
 @extends('layouts.table')
 @section('content')
-    <style>
-
-    </style>
-{{--    @php--}}
-{{--        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-view-all');--}}
-{{--    @endphp--}}
-{{--    @if ($hasPermission)--}}
+    @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-view-all');
+    @endphp
+    @if ($hasPermission)
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">
                 Inventory Stock
             </h4>
-{{--            @can('supplier-inventory-list-edit')--}}
-{{--                @php--}}
-{{--                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-view-all');--}}
-{{--                @endphp--}}
-{{--                @if ($hasPermission)--}}
-                    <a  class="btn btn-sm btn-info float-end update-inventory-btn" href="#" > Update</a>
-{{--                @endif--}}
-{{--            @endcan--}}
+                <div class="ml-auto float-end">
+                    @can('supplier-inventory-list')
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list');
+                        @endphp
+                        @if ($hasPermission)
+                            <a href="{{ route('supplier-inventories.index') }}" class="btn btn-soft-green me-md-2 btn-sm"><i class="fa fa-th-large"></i></a>
+                        @endif
+                    @endcan
+                    @can('supplier-inventory-edit')
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-edit');
+                        @endphp
+                        @if ($hasPermission)
+                             <a  class="btn btn-sm btn-info float-end update-inventory-btn" href="#" > Update</a>
+                        @endif
+                    @endcan
+                </div>
         </div>
         <div class="card-body">
             @if (count($errors) > 0)
@@ -137,7 +144,7 @@
             </table>
         </div>
     </div>
-{{--    @endif--}}
+    @endif
 @endsection
 @push('scripts')
     <script type="text/javascript">
