@@ -206,7 +206,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Create Joining Report</h4>
+	<h4 class="card-title"> Create New Employee Joining Report</h4>
 	
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee-hiring-request.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
@@ -240,7 +240,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 			<div class="col-xxl-3 col-lg-4 col-md-4" id="employee_code_div">
 				<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
 				<input id="employee_code" type="text" class="form-control widthinput @error('employee_code') is-invalid @enderror" name="employee_code"
-                                placeholder="Candidate Name" value="{{$candidate->employee_code}}" autocomplete="employee_code" autofocus>
+                                placeholder="Employee Code" value="{{$candidate->employee_code}}" autocomplete="employee_code" autofocus>
 			</div>
 			<div class="col-xxl-3 col-lg-4 col-md-4" id="designation_div">
 				<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
@@ -266,11 +266,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 						<fieldset style="margin-top:5px;" class="radio-div-container">
                             <div class="row some-class">
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="type" name="type" value="trial" id="trial" />
-                                    <label for="trial">Trial Period</label>
+                                    <input type="radio" class="type" name="new_emp_joining_type" value="trial_period" id="trial_period" />
+                                    <label for="trial_period">Trial Period</label>
                                 </div>
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="type" name="type" value="permanent" id="permanent" />
+                                    <input type="radio" class="type" name="new_emp_joining_type" value="permanent" id="permanent" />
                                     <label for="permanent">Permanent</label>
                                 </div>
                             </div>
@@ -285,8 +285,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
-							<label for="permanent_joining_location_id" class="col-form-label text-md-end">{{ __('Choose Location') }}</label>
-							<select name="permanent_joining_location_id" id="permanent_joining_location_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
+							<label for="joining_location" class="col-form-label text-md-end">{{ __('Choose Location') }}</label>
+							<select name="joining_location" id="joining_location" multiple="true" class="form-control widthinput" onchange="" autofocus>
 								@foreach($masterlocations as $location)
 									<option value="{{$location->id}}">{{$location->name}}</option>
 								@endforeach
@@ -336,10 +336,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
             maximumSelectionLength: 1,
             placeholder:"Choose Employee Name",
         });
-		$('#permanent_joining_location_id').select2({
+		$('#joining_location').select2({
             allowClear: true,
 			maximumSelectionLength: 1,
-            placeholder:"Choose Employee Hiring Request UUID",
+            placeholder:"Choose Joining Location",
         });	
         $('#team_lead_or_reporting_manager').select2({
             allowClear: true,
@@ -380,10 +380,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 			joining_date: {
 				required: true,
 			},
-            permanent_joining_location_id: {
+            joining_location: {
                 required: true,
             },
-            type: {
+            new_emp_joining_type: {
                 required: true,
             },
             joining_type: {

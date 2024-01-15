@@ -200,13 +200,13 @@
 	}
 </style>
 @section('content')
-@canany(['edit-joining-report','current-user-edit-joining-report'])
+@canany(['create-joining-report','current-user-create-joining-report'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-report','current-user-edit-joining-report']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','current-user-create-joining-report']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Edit Joining Report</h4>
+	<h4 class="card-title"> Create Vacations Or Leave Joining Report</h4>
 	
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee-hiring-request.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
@@ -221,9 +221,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 		</ul>
 	</div>
 	@endif
-	<form id="joiningReportForm" name="joiningReportForm" enctype="multipart/form-data" method="POST" action="{{route('joining_report.update',$data->id)}}">
+	<form id="joiningReportForm" name="joiningReportForm" enctype="multipart/form-data" method="POST" action="{{route('joining_report.store')}}">
 		@csrf
-		@method('PUT')
 		<div class="card">
 		<div class="card-body">
 			<div class="row">
@@ -232,87 +231,66 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 					<span class="error">* </span>
 					<label for="employee_id" class="col-form-label text-md-end">{{ __('Employee Name') }}</label>
 					<select name="employee_id" id="employee_id" multiple="true" class="employee_id form-control widthinput" onchange="" autofocus>
-						@foreach($candidates as $candidate)
-							<option value="{{$candidate->id}}" @if($data->employee_id == $candidate->id) selected @endif>{{$candidate->first_name}} {{$candidate->last_name}}</option>
+						@foreach($employees as $employee)
+							<option value="{{$employee->id}}">{{$employee->name}}</option>
 						@endforeach
 					</select>
 				</div>
 			</div>
 			<div class="col-xxl-3 col-lg-4 col-md-4" id="employee_code_div">
-			<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
-            <input id="employee_code" type="text" class="form-control widthinput @error('employee_code') is-invalid @enderror" name="employee_code"
-                                placeholder="Candidate Name" value="{{$candidate->employee_code}}" autocomplete="employee_code" autofocus>
-			<!-- <center><span id="employee_code"></span></center> -->
+				<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
+				<input id="employee_code" type="text" class="form-control widthinput @error('employee_code') is-invalid @enderror" name="employee_code"
+                                placeholder="employee Code" autocomplete="employee_code" autofocus>
 			</div>
 			<div class="col-xxl-3 col-lg-4 col-md-4" id="designation_div">
-			<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
-			<center><span id="designation">{{$data->employee->designation->name ?? ''}}</span></center>
+				<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
+				<center><span id="designation"></span></center>
 			</div>
             <div class="col-xxl-3 col-lg-4 col-md-4" id="department_div">
-			<center><label for="department" class="col-form-label text-md-end"><strong>{{ __('Department') }}</strong></label></center>
-			<center><span id="department">{{$data->employee->department->name ?? ''}}</span></center>
+				<center><label for="department" class="col-form-label text-md-end"><strong>{{ __('Department') }}</strong></label></center>
+				<center><span id="department"></span></center>
 			</div>
 			</div>
 			</div>
 		</div>
 		<div class="card">
 			<div class="card-header">
-				<h4 class="card-title">Joining Information</h4>
+				<h4 class="card-title">Leave Joining Information</h4>
 			</div>
 			<div class="card-body">
 				<div class="row">
-                    <input type="hidden" name="joining_type" value="new_employee">
-                    <div class="col-xxl-3 col-lg-3 col-md-3 radio-main-div">
-						<span class="error">* </span>
-						<label for="type" class="col-form-label text-md-end">{{ __('Joining Type') }}</label>
-						<fieldset style="margin-top:5px;" class="radio-div-container">
-                            <div class="row some-class">
-                                <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="type" name="new_emp_joining_type" value="trial_period" id="trial_period" @if($data->new_emp_joining_type == 'trial_period') checked @endif />
-                                    <label for="trial_period">Trial Period</label>
-                                </div>
-                                <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="type" name="new_emp_joining_type" value="permanent" id="permanent" @if($data->new_emp_joining_type == 'permanent') checked @endif />
-                                    <label for="permanent">Permanent</label>
-                                </div>
-                            </div>
-                        </fieldset>
-					</div>
-                    <div class="col-xxl-3 col-lg-6 col-md-6">
+                    <input type="hidden" name="joining_type" value="vacations_or_leave">
+                    <div class="col-xxl-4 col-lg-4 col-md-4">
                         <span class="error">* </span>
                         <label for="joining_date" class="col-form-label text-md-end">{{ __('Joining Date') }}</label>
                         <input id="joining_date" type="date" class="form-control widthinput @error('joining_date') is-invalid @enderror" name="joining_date"
-                                placeholder="Candidate Name" value="{{$data->joining_date ?? ''}}" autocomplete="joining_date" autofocus>
+                                placeholder="Candidate Name" value="" autocomplete="joining_date" autofocus>
                     </div>
-					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+					<div class="col-xxl-4 col-lg-4 col-md-4 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="joining_location" class="col-form-label text-md-end">{{ __('Choose Location') }}</label>
 							<select name="joining_location" id="joining_location" multiple="true" class="form-control widthinput" onchange="" autofocus>
 								@foreach($masterlocations as $location)
-									<option value="{{$location->id}}" @if($location->id == $data->joining_location) selected @endif>{{$location->name}}</option>
+									<option value="{{$location->id}}">{{$location->name}}</option>
 								@endforeach
 							</select>
 						</div>
 					</div>
-                    <div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
-						<div class="dropdown-option-div">
-							<span class="error">* </span>
-							<label for="team_lead_or_reporting_manager" class="col-form-label text-md-end">{{ __('Choose Reporting Manager') }}</label>
-							<select name="team_lead_or_reporting_manager" id="team_lead_or_reporting_manager" multiple="true" class="form-control widthinput" onchange="" autofocus>
-								@foreach($reportingTo as $reportingToId)
-									<option value="{{$reportingToId->id}}" @if($reportingToId->id == $data->department_head_id) selected @endif >{{$reportingToId->name}}</option>
-								@endforeach
-							</select>
-						</div>
-					</div>
+					<div class="col-xxl-4 col-lg-4 col-md-4">
+					<label for="choose_leaves" class="col-form-label text-md-end">{{ __('Choose Leaves') }}</label> </br>  
+					<select name="choose_leaves[]" id="choose_leaves" multiple="true" class="form-control widthinput" onchange="" autofocus>
+						
+					</select>
 				</div>
+				</div>
+				
                 <div class="row">
                     <div class="col-xxl-12 col-lg-12 col-md-12">
 						<label for="additional_remarks" class="col-form-label text-md-end">{{ __('Remarks') }}</label>
 					</div>
                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                        <textarea rows="5" name="remarks" placeholder="Enter Remarks" class="form-control">{{$data->remarks}}</textarea>
+                        <textarea rows="5" name="remarks" placeholder="Enter Remarks" class="form-control"></textarea>
                     </div>
                 </div>
 			</div>
@@ -328,11 +306,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
-    var candidates = {!! json_encode($candidates) !!};
+    var employees = {!! json_encode($employees) !!};
 	$(document).ready(function () {
-        // $('#employee_code_div').hide();
-		// $('#designation_div').hide();
-		// $('#department_div').hide();
+        $('#employee_code_div').hide();
+		$('#designation_div').hide();
+		$('#department_div').hide();
         $('#employee_id').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -341,24 +319,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 		$('#joining_location').select2({
             allowClear: true,
 			maximumSelectionLength: 1,
-            placeholder:"Choose Employee Hiring Request UUID",
-        });	
-        $('#team_lead_or_reporting_manager').select2({
+            placeholder:"Choose Employee Joining Location",
+        });
+		$('#choose_leaves').select2({
             allowClear: true,
-			maximumSelectionLength: 1,
-            placeholder:"Choose Reporting Manager",
-        });	
+            placeholder:"Choose Employee Leaves",
+        });
 		$('.employee_id').change(function (e) {
 			var employeeId = $('#employee_id').val();
 			if(employeeId != '') {
-				if(candidates.length > 0) {
-					for(var i=0; i<candidates.length; i++) {						
-						if(candidates[i].id == employeeId) {
+				if(employees.length > 0) {
+					for(var i=0; i<employees.length; i++) {						
+						if(employees[i].id == employeeId) {
 							$('#employee_code_div').show();
                             $('#designation_div').show();
                             $('#department_div').show();
-							document.getElementById('designation').textContent=candidates[i].designation.name;
-                            document.getElementById('department').textContent=candidates[i].department.name;
+							document.getElementById('designation').textContent=employees[i].emp_profile.designation.name;
+                            document.getElementById('department').textContent=employees[i].emp_profile.department.name;  
+							document.getElementById('employee_code').value=employees[i].emp_profile.employee_code;
+							for(var j=0; j<employees[i].approved_leaves.length; j++) {
+								$('#choose_leaves').append('<option value="'+employees[i].approved_leaves[j].id+'">'+employees[i].approved_leaves[j].leave_type+' ('+employees[i].approved_leaves[j].leave_start_date+' To '+employees[i].approved_leaves[j].leave_end_date+')</option>')
+								// .append('<option value="'+ value +'" > File '+ key +'(' + value + ')'+'</option>');
+							}
 						}
 					}
 				}               
@@ -385,18 +367,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
             joining_location: {
                 required: true,
             },
-            new_emp_joining_type: {
-                required: true,
-            },
-            joining_type: {
-                required: true,
-            },
             employee_code: {
                 required: true,
             },
-            team_lead_or_reporting_manager: {
-                required: true,
-            },
+			choose_leaves: {
+				required:true,
+			},
         },
 		errorPlacement: function ( error, element ) {
             error.addClass( "invalid-feedback font-size-13" );

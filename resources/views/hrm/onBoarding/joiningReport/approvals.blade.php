@@ -73,9 +73,9 @@
                                             <td>{{ $data->employee->employee_code ?? '' }}</td>
                                             <td>{{ $data->employee->designation->name ?? '' }}</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
-                                            <td>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</td>
-                                            <td>{{ $data->trial_period_joining_date ?? $data->permanent_joining_date ?? '' }}</td>
-                                            <td>{{ $data->permanentJoiningLocation->name ?? '' }}</td>
+                                            <td>{{ $data->joining_type_name ?? ''}}</td>
+                                            <td>{{ $data->joining_date ?? '' }}</td>
+                                            <td>{{ $data->joiningLocation->name ?? '' }}</td>
                                             <td>{{ $data->reportingManager->name ?? '' }}</td>
                                             <td>{{ $data->remarks ?? '' }}</td>
                                             <td>{{ $data->preparedBy->name ?? '' }}</td>
@@ -145,9 +145,9 @@
                                             <td>{{ $data->employee->employee_code ?? '' }}</td>
                                             <td>{{ $data->employee->designation->name ?? '' }}</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
-                                            <td>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</td>
-                                            <td>{{ $data->trial_period_joining_date ?? $data->permanent_joining_date ?? '' }}</td>
-                                            <td>{{ $data->permanentJoiningLocation->name ?? '' }}</td>
+                                            <td>{{ $data->joining_type_name ?? ''}}</td>
+                                            <td>{{ $data->joining_date ?? '' }}</td>
+                                            <td>{{ $data->joiningLocation->name ?? '' }}</td>
                                             <td>{{ $data->reportingManager->name ?? '' }}</td>
                                             <td>{{ $data->remarks ?? '' }}</td>
                                             <td>{{ $data->preparedBy->name ?? '' }}</td>
@@ -192,9 +192,9 @@
                                             <td>{{ $data->employee->employee_code ?? '' }}</td>
                                             <td>{{ $data->employee->designation->name ?? '' }}</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
-                                            <td>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</td>
-                                            <td>{{ $data->trial_period_joining_date ?? $data->permanent_joining_date ?? '' }}</td>
-                                            <td>{{ $data->permanentJoiningLocation->name ?? '' }}</td>
+                                            <td>{{ $data->joining_type_name ?? ''}}</td>
+                                            <td>{{ $data->joining_date ?? '' }}</td>
+                                            <td>{{ $data->joiningLocation->name ?? '' }}</td>
                                             <td>{{ $data->reportingManager->name ?? '' }}</td>
                                             <td>{{ $data->remarks ?? '' }}</td>
                                             <td>{{ $data->preparedBy->name ?? '' }}</td>
@@ -263,9 +263,9 @@
                                             <td>{{ $data->employee->employee_code ?? '' }}</td>
                                             <td>{{ $data->employee->designation->name ?? '' }}</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
-                                            <td>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</td>
-                                            <td>{{ $data->trial_period_joining_date ?? $data->permanent_joining_date ?? '' }}</td>
-                                            <td>{{ $data->permanentJoiningLocation->name ?? '' }}</td>
+                                            <td>{{ $data->joining_type_name ?? ''}}</td>
+                                            <td>{{ $data->joining_date ?? '' }}</td>
+                                            <td>{{ $data->joiningLocation->name ?? '' }}</td>
                                             <td>{{ $data->reportingManager->name ?? '' }}</td>
                                             <td>{{ $data->remarks ?? '' }}</td>
                                             <td>{{ $data->preparedBy->name ?? '' }}</td>
@@ -334,9 +334,9 @@
                                             <td>{{ $data->employee->employee_code ?? '' }}</td>
                                             <td>{{ $data->employee->designation->name ?? '' }}</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
-                                            <td>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</td>
-                                            <td>{{ $data->trial_period_joining_date ?? $data->permanent_joining_date ?? '' }}</td>
-                                            <td>{{ $data->permanentJoiningLocation->name ?? '' }}</td>
+                                            <td>{{ $data->joining_type_name ?? ''}}</td>
+                                            <td>{{ $data->joining_date ?? '' }}</td>
+                                            <td>{{ $data->joiningLocation->name ?? '' }}</td>
                                             <td>{{ $data->reportingManager->name ?? '' }}</td>
                                             <td>{{ $data->remarks ?? '' }}</td>
                                             <td>{{ $data->preparedBy->name ?? '' }}</td>
@@ -381,9 +381,9 @@
                                             <td>{{ $data->employee->employee_code ?? '' }}</td>
                                             <td>{{ $data->employee->designation->name ?? '' }}</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
-                                            <td>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</td>
-                                            <td>{{ $data->trial_period_joining_date ?? $data->permanent_joining_date ?? '' }}</td>
-                                            <td>{{ $data->permanentJoiningLocation->name ?? '' }}</td>
+                                            <td>{{ $data->joining_type_name ?? ''}}</td>
+                                            <td>{{ $data->joining_date ?? '' }}</td>
+                                            <td>{{ $data->joiningLocation->name ?? '' }}</td>
                                             <td>{{ $data->reportingManager->name ?? '' }}</td>
                                             <td>{{ $data->remarks ?? '' }}</td>
                                             <td>{{ $data->preparedBy->name ?? '' }}</td>
@@ -451,9 +451,9 @@
                                             <td>{{ $data->employee->employee_code ?? '' }}</td>
                                             <td>{{ $data->employee->designation->name ?? '' }}</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
-                                            <td>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</td>
-                                            <td>{{ $data->trial_period_joining_date ?? $data->permanent_joining_date ?? '' }}</td>
-                                            <td>{{ $data->permanentJoiningLocation->name ?? '' }}</td>
+                                            <td>{{ $data->joining_type_name ?? ''}}</td>
+                                            <td>{{ $data->joining_date ?? '' }}</td>
+                                            <td>{{ $data->joiningLocation->name ?? '' }}</td>
                                             <td>{{ $data->reportingManager->name ?? '' }}</td>
                                             <td>{{ $data->remarks ?? '' }}</td>
                                             <td>{{ $data->preparedBy->name ?? '' }}</td>
@@ -522,9 +522,9 @@
                                             <td>{{ $data->employee->employee_code ?? '' }}</td>
                                             <td>{{ $data->employee->designation->name ?? '' }}</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
-                                            <td>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</td>
-                                            <td>{{ $data->trial_period_joining_date ?? $data->permanent_joining_date ?? '' }}</td>
-                                            <td>{{ $data->permanentJoiningLocation->name ?? '' }}</td>
+                                            <td>{{ $data->joining_type_name ?? ''}}</td>
+                                            <td>{{ $data->joining_date ?? '' }}</td>
+                                            <td>{{ $data->joiningLocation->name ?? '' }}</td>
                                             <td>{{ $data->reportingManager->name ?? '' }}</td>
                                             <td>{{ $data->remarks ?? '' }}</td>
                                             <td>{{ $data->preparedBy->name ?? '' }}</td>
@@ -569,9 +569,9 @@
                                             <td>{{ $data->employee->employee_code ?? '' }}</td>
                                             <td>{{ $data->employee->designation->name ?? '' }}</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
-                                            <td>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</td>
-                                            <td>{{ $data->trial_period_joining_date ?? $data->permanent_joining_date ?? '' }}</td>
-                                            <td>{{ $data->permanentJoiningLocation->name ?? '' }}</td>
+                                            <td>{{ $data->joining_type_name ?? ''}}</td>
+                                            <td>{{ $data->joining_date ?? '' }}</td>
+                                            <td>{{ $data->joiningLocation->name ?? '' }}</td>
                                             <td>{{ $data->reportingManager->name ?? '' }}</td>
                                             <td>{{ $data->remarks ?? '' }}</td>
                                             <td>{{ $data->preparedBy->name ?? '' }}</td>
@@ -639,9 +639,9 @@
                                             <td>{{ $data->employee->employee_code ?? '' }}</td>
                                             <td>{{ $data->employee->designation->name ?? '' }}</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
-                                            <td>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</td>
-                                            <td>{{ $data->trial_period_joining_date ?? $data->permanent_joining_date ?? '' }}</td>
-                                            <td>{{ $data->permanentJoiningLocation->name ?? '' }}</td>
+                                            <td>{{ $data->joining_type_name ?? ''}}</td>
+                                            <td>{{ $data->joining_date ?? '' }}</td>
+                                            <td>{{ $data->joiningLocation->name ?? '' }}</td>
                                             <td>{{ $data->reportingManager->name ?? '' }}</td>
                                             <td>{{ $data->remarks ?? '' }}</td>
                                             <td>{{ $data->preparedBy->name ?? '' }}</td>
@@ -710,9 +710,9 @@
                                             <td>{{ $data->employee->employee_code ?? '' }}</td>
                                             <td>{{ $data->employee->designation->name ?? '' }}</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
-                                            <td>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</td>
-                                            <td>{{ $data->trial_period_joining_date ?? $data->permanent_joining_date ?? '' }}</td>
-                                            <td>{{ $data->permanentJoiningLocation->name ?? '' }}</td>
+                                            <td>{{ $data->joining_type_name ?? ''}}</td>
+                                            <td>{{ $data->joining_date ?? '' }}</td>
+                                            <td>{{ $data->joiningLocation->name ?? '' }}</td>
                                             <td>{{ $data->reportingManager->name ?? '' }}</td>
                                             <td>{{ $data->remarks ?? '' }}</td>
                                             <td>{{ $data->preparedBy->name ?? '' }}</td>
@@ -757,9 +757,9 @@
                                             <td>{{ $data->employee->employee_code ?? '' }}</td>
                                             <td>{{ $data->employee->designation->name ?? '' }}</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
-                                            <td>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</td>
-                                            <td>{{ $data->trial_period_joining_date ?? $data->permanent_joining_date ?? '' }}</td>
-                                            <td>{{ $data->permanentJoiningLocation->name ?? '' }}</td>
+                                            <td>{{ $data->joining_type_name ?? ''}}</td>
+                                            <td>{{ $data->joining_date ?? '' }}</td>
+                                            <td>{{ $data->joiningLocation->name ?? '' }}</td>
                                             <td>{{ $data->reportingManager->name ?? '' }}</td>
                                             <td>{{ $data->remarks ?? '' }}</td>
                                             <td>{{ $data->preparedBy->name ?? '' }}</td>

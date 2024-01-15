@@ -414,6 +414,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 	var oldData = {!! json_encode($data) !!};
 	var id = {!! json_encode($id) !!}
 	$(document).ready(function () {
+		$('#employee_id').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder:"Choose Employee Name",
+        });
 		if(id == 'new') {
 			$("#employee_code_div").hide();
 			$("#joining_date_div").hide();

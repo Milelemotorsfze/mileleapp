@@ -406,4 +406,10 @@ class User extends Authenticatable
     public function empProfile() {
         return $this->hasOne(EmployeeProfile::class, 'user_id')->where('type','employee');
     }
+    public function approvedLeaves() {
+        return $this->hasMany(Leave::class, 'employee_id')->where([
+            ['status','approved'],
+            ['joining_reports_id',NULL],
+        ]);
+    }
 }

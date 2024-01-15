@@ -300,6 +300,8 @@ Route::get('/d', function () {
     Route::controller(JoiningReportController::class)->group(function(){
         Route::post('joining_report_action', 'requestAction')->name('joiningReport.action');
         Route::get('joining_report_approval_awaiting', 'approvalAwaiting')->name('joiningReport.approvalAwaiting');
+        Route::get('employee_joining_report/{type}','index')->name('employee_joining_report.index');
+        Route::get('create_joining_report/{type}','create')->name('create_joining_report.create');
     });
     // Asset Allocation
     Route::resource('asset_allocation', AssetAllocationController::class);

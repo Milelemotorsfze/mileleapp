@@ -147,7 +147,7 @@
 	{
 	background-color: #ddd;
 	}
-	/* Create an active/current tablink class */
+	/* edit an active/current tablink class */
 	.tab h6.active
 	{
 	background-color: #ccc;
@@ -206,7 +206,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Edit Joining Report</h4>
+	<h4 class="card-title"> Edit Internal Transfer Joining Report</h4>
 	
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee-hiring-request.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
@@ -223,7 +223,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 	@endif
 	<form id="joiningReportForm" name="joiningReportForm" enctype="multipart/form-data" method="POST" action="{{route('joining_report.update',$data->id)}}">
 		@csrf
-		@method('PUT')
+        @method("PUT")
 		<div class="card">
 		<div class="card-body">
 			<div class="row">
@@ -232,76 +232,87 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 					<span class="error">* </span>
 					<label for="employee_id" class="col-form-label text-md-end">{{ __('Employee Name') }}</label>
 					<select name="employee_id" id="employee_id" multiple="true" class="employee_id form-control widthinput" onchange="" autofocus>
-						@foreach($candidates as $candidate)
-							<option value="{{$candidate->id}}" @if($data->employee_id == $candidate->id) selected @endif>{{$candidate->first_name}} {{$candidate->last_name}}</option>
+						@foreach($employees as $employee)
+							<option value="{{$employee->id}}" @if($data->employee_id == $employee->id) selected @endif>{{$employee->name}}</option>
 						@endforeach
 					</select>
 				</div>
 			</div>
 			<div class="col-xxl-3 col-lg-4 col-md-4" id="employee_code_div">
-			<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
-            <input id="employee_code" type="text" class="form-control widthinput @error('employee_code') is-invalid @enderror" name="employee_code"
-                                placeholder="Candidate Name" value="{{$candidate->employee_code}}" autocomplete="employee_code" autofocus>
-			<!-- <center><span id="employee_code"></span></center> -->
+				<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
+				<input id="employee_code" type="text" class="form-control widthinput @error('employee_code') is-invalid @enderror" name="employee_code"
+                                placeholder="Employee Code" value="{{ $data->user->empProfile->employee_code ?? ''}}" autocomplete="employee_code" autofocus>
 			</div>
 			<div class="col-xxl-3 col-lg-4 col-md-4" id="designation_div">
-			<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
-			<center><span id="designation">{{$data->employee->designation->name ?? ''}}</span></center>
+				<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
+				<center><span id="designation">{{ $data->user->empProfile->designation->name ?? ''}}</span></center>
 			</div>
             <div class="col-xxl-3 col-lg-4 col-md-4" id="department_div">
-			<center><label for="department" class="col-form-label text-md-end"><strong>{{ __('Department') }}</strong></label></center>
-			<center><span id="department">{{$data->employee->department->name ?? ''}}</span></center>
+				<center><label for="department" class="col-form-label text-md-end"><strong>{{ __('Department') }}</strong></label></center>
+				<center><span id="department">{{ $data->user->empProfile->department->name ?? ''}}</span></center>
 			</div>
 			</div>
 			</div>
 		</div>
 		<div class="card">
 			<div class="card-header">
-				<h4 class="card-title">Joining Information</h4>
+				<h4 class="card-title">Internal Transfer Information</h4>
 			</div>
 			<div class="card-body">
 				<div class="row">
-                    <input type="hidden" name="joining_type" value="new_employee">
-                    <div class="col-xxl-3 col-lg-3 col-md-3 radio-main-div">
-						<span class="error">* </span>
-						<label for="type" class="col-form-label text-md-end">{{ __('Joining Type') }}</label>
-						<fieldset style="margin-top:5px;" class="radio-div-container">
-                            <div class="row some-class">
-                                <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="type" name="new_emp_joining_type" value="trial_period" id="trial_period" @if($data->new_emp_joining_type == 'trial_period') checked @endif />
-                                    <label for="trial_period">Trial Period</label>
-                                </div>
-                                <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="type" name="new_emp_joining_type" value="permanent" id="permanent" @if($data->new_emp_joining_type == 'permanent') checked @endif />
-                                    <label for="permanent">Permanent</label>
-                                </div>
-                            </div>
-                        </fieldset>
-					</div>
-                    <div class="col-xxl-3 col-lg-6 col-md-6">
-                        <span class="error">* </span>
-                        <label for="joining_date" class="col-form-label text-md-end">{{ __('Joining Date') }}</label>
-                        <input id="joining_date" type="date" class="form-control widthinput @error('joining_date') is-invalid @enderror" name="joining_date"
-                                placeholder="Candidate Name" value="{{$data->joining_date ?? ''}}" autocomplete="joining_date" autofocus>
-                    </div>
-					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+                    <input type="hidden" name="joining_type" value="internal_transfer">
+                    <div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
-							<label for="joining_location" class="col-form-label text-md-end">{{ __('Choose Location') }}</label>
-							<select name="joining_location" id="joining_location" multiple="true" class="form-control widthinput" onchange="" autofocus>
-								@foreach($masterlocations as $location)
-									<option value="{{$location->id}}" @if($location->id == $data->joining_location) selected @endif>{{$location->name}}</option>
+							<label for="transfer_from_department_id" class="col-form-label text-md-end">{{ __('Transfer From Department') }}</label>
+							<select name="transfer_from_department_id" id="transfer_from_department_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
+								@foreach($masterDepartments as $department)
+									<option value="{{$department->id}}" @if($data->transfer_from_department_id == $department->id) selected @endif>{{$department->name}}</option>
 								@endforeach
 							</select>
 						</div>
 					</div>
-                    <div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+                    <div class="col-xxl-4 col-lg-6 col-md-6">
+                        <span class="error">* </span>
+                        <label for="transfer_from_date" class="col-form-label text-md-end">{{ __('Transfer From Date') }}</label>
+                        <input id="transfer_from_date" type="date" class="form-control widthinput @error('transfer_from_date') is-invalid @enderror" name="transfer_from_date"
+                                placeholder="Transfer From Date" value="{{$data->transfer_from_date}}" autocomplete="transfer_from_date" autofocus>
+                    </div>
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
-							<label for="team_lead_or_reporting_manager" class="col-form-label text-md-end">{{ __('Choose Reporting Manager') }}</label>
-							<select name="team_lead_or_reporting_manager" id="team_lead_or_reporting_manager" multiple="true" class="form-control widthinput" onchange="" autofocus>
-								@foreach($reportingTo as $reportingToId)
-									<option value="{{$reportingToId->id}}" @if($reportingToId->id == $data->department_head_id) selected @endif >{{$reportingToId->name}}</option>
+							<label for="transfer_from_location_id" class="col-form-label text-md-end">{{ __('Transfer From Location') }}</label>
+							<select name="transfer_from_location_id" id="transfer_from_location_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
+								@foreach($masterlocations as $location)
+									<option value="{{$location->id}}" @if($data->transfer_from_location_id == $location->id) selected @endif>{{$location->name}}</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
+                    <div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+						<div class="dropdown-option-div">
+							<span class="error">* </span>
+							<label for="transfer_to_department_id" class="col-form-label text-md-end">{{ __('Transfer To Department') }}</label>
+							<select name="transfer_to_department_id" id="transfer_to_department_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
+								@foreach($masterDepartments as $department)
+									<option value="{{$department->id}}" @if($data->transfer_to_department_id == $department->id) selected @endif>{{$department->name}}</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
+                    <div class="col-xxl-4 col-lg-6 col-md-6">
+                        <span class="error">* </span>
+                        <label for="joining_date" class="col-form-label text-md-end">{{ __('Transfer To Date') }}</label>
+                        <input id="joining_date" type="date" class="form-control widthinput @error('joining_date') is-invalid @enderror" name="joining_date"
+                                placeholder="Transfer From Date" value="{{$data->joining_date}}" autocomplete="joining_date" autofocus>
+                    </div>
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+						<div class="dropdown-option-div">
+							<span class="error">* </span>
+							<label for="joining_location" class="col-form-label text-md-end">{{ __('Transfer To Location') }}</label>
+							<select name="joining_location" id="joining_location" multiple="true" class="form-control widthinput" onchange="" autofocus>
+								@foreach($masterlocations as $location)
+									<option value="{{$location->id}}" @if($data->joining_location == $location->id) selected @endif>{{$location->name}}</option>
 								@endforeach
 							</select>
 						</div>
@@ -318,7 +329,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 			</div>
 		</div>
 		<div class="col-xxl-12 col-lg-12 col-md-12">
-			<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+			<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="edit" id="submit">Submit</button>
 		</div>
 	</form>
 </div>
@@ -328,11 +339,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
-    var candidates = {!! json_encode($candidates) !!};
+    var employees = {!! json_encode($employees) !!};
 	$(document).ready(function () {
-        // $('#employee_code_div').hide();
-		// $('#designation_div').hide();
-		// $('#department_div').hide();
         $('#employee_id').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -343,22 +351,34 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 			maximumSelectionLength: 1,
             placeholder:"Choose Employee Hiring Request UUID",
         });	
-        $('#team_lead_or_reporting_manager').select2({
+        $('#transfer_from_location_id').select2({
             allowClear: true,
 			maximumSelectionLength: 1,
-            placeholder:"Choose Reporting Manager",
+            placeholder:"Choose Transfer From Location",
+        });	
+        $('#transfer_from_department_id').select2({
+            allowClear: true,
+			maximumSelectionLength: 1,
+            placeholder:"Choose Transfer From Department",
+        });	
+        $('#transfer_to_department_id').select2({
+            allowClear: true,
+			maximumSelectionLength: 1,
+            placeholder:"Choose Transfer To Department",
         });	
 		$('.employee_id').change(function (e) {
 			var employeeId = $('#employee_id').val();
 			if(employeeId != '') {
-				if(candidates.length > 0) {
-					for(var i=0; i<candidates.length; i++) {						
-						if(candidates[i].id == employeeId) {
+				if(employees.length > 0) {
+					for(var i=0; i<employees.length; i++) {						
+						if(employees[i].id == employeeId) {
+                            console.log(employees[i]);
 							$('#employee_code_div').show();
                             $('#designation_div').show();
                             $('#department_div').show();
-							document.getElementById('designation').textContent=candidates[i].designation.name;
-                            document.getElementById('department').textContent=candidates[i].department.name;
+							document.getElementById('designation').textContent=employees[i].designation.name;
+                            document.getElementById('department').textContent=employees[i].department.name;
+                            document.getElementById('employee_code').textContent=employees[i].employee_code;
 						}
 					}
 				}               
@@ -385,16 +405,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
             joining_location: {
                 required: true,
             },
-            new_emp_joining_type: {
+            transfer_from_department_id: {
                 required: true,
             },
-            joining_type: {
+            transfer_from_date: {
                 required: true,
             },
-            employee_code: {
+            transfer_from_location_id: {
                 required: true,
             },
-            team_lead_or_reporting_manager: {
+            transfer_to_department_id: {
                 required: true,
             },
         },
