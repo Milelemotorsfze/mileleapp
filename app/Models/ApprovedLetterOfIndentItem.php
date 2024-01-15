@@ -20,4 +20,8 @@ class ApprovedLetterOfIndentItem extends Model
     {
         return $this->hasOne(LOIItemPurchaseOrder::class,'approved_loi_id','id');
     }
+    public function pfi()
+    {
+        return $this->belongsTo(PFI::class,'pfi_id','id');
+    }
 }

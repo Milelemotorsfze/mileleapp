@@ -332,6 +332,21 @@ public function getBrandsAndModelLines(Request $request)
                     $loiPurchaseOrder->purchase_order_id = $purchasingOrderId;
                     $loiPurchaseOrder->quantity = $variantsQuantity[$variant] ?? '';
                     $loiPurchaseOrder->save();
+
+//                    $masterModel = MasterModel::find($approvedLoiItem->masterModel->id);
+//
+//                    $inventoryItem = SupplierInventory::where('supplier_id', $approvedLoiItem->pfi->supplier_id)
+//                        ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+//                        ->whereNull('delivery_note')
+//                        ->where('whole_sales', $request->whole_sales)
+//                        ->where('master_model_id', $masterModel->id)
+//                        ->whereNull('purchase_order_id')
+//                        ->orderBy('id','ASC')
+//                        ->take($variantsQuantity[$variant])
+//                        ->get();
+//
+//                    info($inventoryItem);
+
                 }
             }
     }

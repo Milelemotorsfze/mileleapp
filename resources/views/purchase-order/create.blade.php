@@ -70,7 +70,7 @@
                         <input type="hidden" value="{{ $vendor }}" name="vendors_id">
                         <div class="col-lg-2 col-md-6 col-sm-12">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label font-size-13 ">Payment Terms</label>
+                                <label for="choices-single-default" class="form-label font-size-13 ">PO Number</label>
                                 <input type="text" name="po_number" id="po_number" required class="form-control"  placeholder="Enter PO Number" value="{{old('po_number')}}">
                                 <span id="poNumberError" class="text-danger"></span>
                             </div>

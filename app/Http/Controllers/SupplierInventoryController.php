@@ -536,7 +536,6 @@ class SupplierInventoryController extends Controller
                                         $supplierInventory->delivery_note   = $uploadFileContent['delivery_note'];
                                         $supplierInventory->save();
                                     }
-
                                 }
                             } else
                             {
@@ -733,7 +732,7 @@ class SupplierInventoryController extends Controller
                     ->first();
                 $inventory->master_model_id = $masterModel->id;
             }else if($fieldName == 'eta_import') {
-                info($fieldValue);
+
                 $inventory->$fieldName = Carbon::parse($fieldValue)->format('Y-m-d');
             }
             else if($fieldName == 'pord_month') {
