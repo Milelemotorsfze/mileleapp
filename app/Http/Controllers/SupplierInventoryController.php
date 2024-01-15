@@ -194,8 +194,22 @@ class SupplierInventoryController extends Controller
                     $uploadFileContents[$i]['color_code'] = $colourcode;
                     $uploadFileContents[$i]['pord_month'] = $filedata[6];
                     $uploadFileContents[$i]['po_arm'] = $filedata[7];
+                    if(!empty($filedata[6])) {
+                      if(strlen($filedata[6]) != 6){
+                          return redirect()->back()->with('error', 'Invalid Production Month '.$filedata[6].', Production month length should be exactly 6!');
+                      }else{
+                          $productionMonth = substr($filedata[6],  -2);
+                          if($productionMonth < 0 || $productionMonth > 12) {
+                              return redirect()->back()->with('error', 'Invalid Production Month '.$filedata[6].', Last 2 digit indicating Invalid month!');
+                          }
+                      }
+                    }
                     if (!empty($filedata[8])) {
-                        $filedata[8] = \Illuminate\Support\Carbon::parse($filedata[8])->format('Y-m-d');
+                        try {
+                            $filedata[8] = \Illuminate\Support\Carbon::parse($filedata[8])->format('Y-m-d');
+                        } catch (\Exception $e) {
+                            return redirect()->back()->with('error', 'Invalid date, Please enter valid ETA import date!') ;
+                        }
                     }else {
                         $filedata[8] = NULL;
                     }
@@ -264,6 +278,7 @@ class SupplierInventoryController extends Controller
             if(count($unavailableIntColours) || count($unavailableIntColours)) {
              $extColors = implode(',', array_unique($unavailableExtColours));
              $intColors = implode(',', array_unique($unavailableIntColours));
+
                 return redirect()->back()->with('error','These Colour codes are not available in the Master Data.
                 Exterior Color codes are '.$extColors." and Interior Color Codes are ".$intColors.".");
             }
@@ -359,6 +374,7 @@ class SupplierInventoryController extends Controller
                         if ($supplierInventories->count() <= 0)
                         {
                             info("no row existing with model,sfx model year so add new row");
+
                             // model and sfx not existing in Suplr Invtry => new row
                             $newlyAddedRows[$i]['model'] = $uploadFileContent['model'];
                             $newlyAddedRows[$i]['sfx'] = $uploadFileContent['sfx'];
