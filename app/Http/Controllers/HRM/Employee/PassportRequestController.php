@@ -103,9 +103,30 @@ class PassportRequestController extends Controller
         'reportingManagerApproved','reportingManagerRejected','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','hrManagerPendings','hrManagerApproved','hrManagerRejected'));
     }
     public function index() {
-        $pendings = PassportRequest::where('submit_status','pending')->latest()->get();
-        $approved = PassportRequest::where('submit_status','approved')->latest()->get();
-        $rejected = PassportRequest::where('submit_status','rejected')->latest()->get();
+        $pendings = PassportRequest::where('submit_status','pending');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list'])) {
+            $pendings = $pendings->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-passport-request-list'])) {
+            $pendings = $pendings->where('employee_id',$authId)->latest();
+        }
+        $pendings =$pendings->get();
+        $approved = PassportRequest::where('submit_status','approved');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list'])) {
+            $approved = $approved->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-passport-request-list'])) {
+            $approved = $approved->where('employee_id',$authId)->latest();
+        }
+        $approved =$approved->get();
+        $rejected = PassportRequest::where('submit_status','rejected');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list'])) {
+            $rejected = $rejected->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-passport-request-list'])) {
+            $rejected = $rejected->where('employee_id',$authId)->latest();
+        }
+        $rejected =$rejected->get();
         return view('hrm.passport.passport_request.index',compact('pendings','approved','rejected'));
     }
     // public function create() {
