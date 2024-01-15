@@ -231,36 +231,59 @@
                                                 <div class="col-lg-12">
                                                     <div class="row">
                                                         <div class="col-12">
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-center">Customer</label>
+                                                            <div class="row">
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <dt class="form-label font-size-13 text-muted">Customer :</dt>
                                                                 </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{  $letterOfIndent->customer->name }}" class="form-control" readonly >
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                    <dl> {{  $letterOfIndent->customer->name }}</dl>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <dt class="form-label font-size-13 text-muted">Category :</dt>
+                                                                </div>
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                    <dl>{{ $letterOfIndent->category }} </dl>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row ">
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <dt class="form-label font-size-13 text-muted">LOI Date :</dt>
+                                                                </div>
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                    <dl> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }} </dl>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <dt class="form-label font-size-13 text-muted">So Number :</dt>
+                                                                </div>
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                    <dl>{{ $letterOfIndent->so_number }} </dl>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <dt class="form-label font-size-13 text-muted">Destination :</dt>
+                                                                </div>
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                    <dl>{{ $letterOfIndent->destination }} </dl>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <dt class="form-label font-size-13 text-muted">Prefered Location :</dt>
+                                                                </div>
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                    <dl>{{ $letterOfIndent->prefered_location }} </dl>
                                                                 </div>
                                                             </div>
                                                             <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">Category</label>
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <label class="form-label font-size-13 text-muted">Reason :</label>
                                                                 </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
-                                                                </div>
-                                                            </div>
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">LOI Date</label>
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}"
-                                                                           readonly class="form-control">
-                                                                </div>
-                                                            </div>
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">Reason</label>
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
                                                                     <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>
                                                                 </div>
                                                             </div>
@@ -286,39 +309,57 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body p-3">
-                                                <div class="col-lg-12">
+                                                 <div class="col-12">
                                                     <div class="row">
-                                                        <div class="col-12">
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-center">Customer</label>
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{  $letterOfIndent->customer->name }}" class="form-control" readonly >
-                                                                </div>
-                                                            </div>
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">Category</label>
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">LOI Date</label>
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}"
-                                                                           readonly class="form-control">
-                                                                </div>
-                                                            </div>
-                                                            <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
-                                                            <input type="hidden" value="APPROVE" id="status-approve">
+                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                            <dt class="form-label font-size-13 text-muted">Customer :</dt>
+                                                        </div>
+                                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                                            <dl> {{  $letterOfIndent->customer->name }}</dl>
                                                         </div>
                                                     </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                            <dt class="form-label font-size-13 text-muted">Category :</dt>
+                                                        </div>
+                                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                                            <dl>{{ $letterOfIndent->category }} </dl>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                            <dt class="form-label font-size-13 text-muted">LOI Date :</dt>
+                                                        </div>
+                                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                                            <dl> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }} </dl>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                            <dt class="form-label font-size-13 text-muted">So Number :</dt>
+                                                        </div>
+                                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                                            <dl>{{ $letterOfIndent->so_number }} </dl>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                            <dt class="form-label font-size-13 text-muted">Destination :</dt>
+                                                        </div>
+                                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                                            <dl>{{ $letterOfIndent->destination }} </dl>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                            <dt class="form-label font-size-13 text-muted">Prefered Location :</dt>
+                                                        </div>
+                                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                                            <dl>{{ $letterOfIndent->prefered_location }} </dl>
+                                                        </div>
+                                                    </div>
+                                                    <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
+                                                    <input type="hidden" value="APPROVE" id="status-approve">
                                                 </div>
                                             </div>
                                             <div class="modal-footer">

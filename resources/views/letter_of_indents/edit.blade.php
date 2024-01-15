@@ -176,7 +176,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">Signature</label>
-                        <input type="file" id="signature" name="loi_signature" class="form-control widthinput" accept="application/pdf">
+                        <input type="file" id="signature" name="loi_signature" class="form-control widthinput" accept="image/*">
                     </div>
                 </div>
             </div>
@@ -512,9 +512,15 @@
                 "files[]": {
                     extension: "pdf"
                 },
+                loi_signature: {
+                    extension: "png|jpeg|jpg|svg"
+                },
                 messages: {
                     file: {
                         extension: "Please upload pdf file"
+                    },
+                    loi_signature:{
+                        extension: "Please upload Image file format (png,jpeg,jpg,svg)"
                     }
                 }
             },

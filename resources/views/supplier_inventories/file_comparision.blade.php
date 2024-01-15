@@ -108,13 +108,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-dark mt-4 compare-button "> Compare </button>
+                    <div class="col-12 justify-content-center">
+                        <button type="submit" class="btn btn-primary mt-4 text-center compare-button"> Compare </button>
                         <a href="{{ route('supplier-inventories.file-comparision') }}">
-                            <button type="button" class="btn btn-dark mt-4 "> Refresh </button>
+                            <button type="button" class="btn btn-info text-center mt-4 "> Refresh </button>
                         </a>
                     </div>
-                    </br>
+
                 </form>
                 <div class="container report-div" >
                        <h2 style="text-align: center">Supplier Inventory Reports</h2>

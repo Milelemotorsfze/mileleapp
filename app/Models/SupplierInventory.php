@@ -65,7 +65,7 @@ class SupplierInventory extends Model
 
         $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->whereNull('eta_import');
+            ->whereNull('delivery_note');
         if (!empty(request()->start_date) && !empty(request()->end_date)) {
             $startDate = Carbon::parse(request()->start_date)->format('Y-m-d');
             $endDate =  Carbon::parse(request()->end_date)->format('Y-m-d');
@@ -122,7 +122,7 @@ class SupplierInventory extends Model
 
         $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->whereNull('eta_import')
+            ->whereNull('delivery_note')
             ->whereNull('chasis')
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
         if (!$supplierInventories) {
@@ -142,7 +142,7 @@ class SupplierInventory extends Model
             ->where('master_models.model', $masterModel->model)
             ->where('master_models.sfx', $masterModel->sfx)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->whereNull('eta_import')
+            ->whereNull('delivery_note')
             ->groupBy('color_code');
 
         if (!empty(request()->start_date) && !empty(request()->end_date)) {

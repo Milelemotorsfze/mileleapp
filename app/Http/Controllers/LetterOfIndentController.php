@@ -837,7 +837,7 @@ class LetterOfIndentController extends Controller
                                     ->where('whole_sales', $request->whole_sales)
                                     ->whereNotIn('id', $chasisUpdatedRowIds)
                                     ->whereNull('chasis')
-                                    //->whereNull('eta_import')
+                                    //->whereNull('delivery_note')
                                     ->count();
                                 $modelSfxValuePair = $uploadFileContent['model']."_".$uploadFileContent['sfx'];
                                 $countblankchasis[] = $modelSfxValuePair;
@@ -948,7 +948,7 @@ class LetterOfIndentController extends Controller
                             ->where('color_code', $uploadFileContent['color_code'])
                             ->where('pord_month', $uploadFileContent['pord_month'])
                             ->where('po_arm', $uploadFileContent['po_arm'])
-                            // ->whereNull('eta_import')
+                            // ->whereNull('delivery_note')
                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
                         if ($isExistSupplier->count() > 0)
                         {
@@ -985,7 +985,7 @@ class LetterOfIndentController extends Controller
                         ->where('supplier_id', $request->supplier_id)
                         ->where('whole_sales', $request->whole_sales)
                         ->whereNotIn('id', $excelRows)
-                        // ->whereNull('eta_import')
+                        // ->whereNull('delivery_note')
                         ->get();
                     foreach ($deletedRows as $deletedRow) {
                         $deletedRow->status = SupplierInventory::VEH_STATUS_DELETED;
@@ -996,7 +996,7 @@ class LetterOfIndentController extends Controller
                         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                         ->where('supplier_id', $request->supplier_id)
                         ->where('whole_sales', $request->whole_sales)
-                        // ->whereNull('eta_import')
+                        // ->whereNull('delivery_note')
                         ->get();
                     if ($preivousDatas->count() > 0) {
                         foreach ($preivousDatas as $preivousData)

@@ -9,17 +9,25 @@
         <h4 class="card-title">
             Inventory Lists
         </h4>
-            @can('supplier-inventory-edit')
-                @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-edit');
-                @endphp
-                @if ($hasPermission)
-                    <div class="ml-auto float-end">
-                        <a href="{{ route('supplier-inventories.create') }}" class="btn btn-primary me-md-2">Upload CSV File</a>
-                    </div>
-                    <br>
-                @endif
-            @endcan
+
+            <div class="ml-auto float-end">
+                @can('supplier-inventory-list-view-all')
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-view-all');
+                    @endphp
+                    @if ($hasPermission)
+                        <a href="{{ route('supplier-inventories.view-all') }}" class="btn btn-soft-green me-md-2 btn-sm"><i class="fa fa-table"></i></a>
+                    @endif
+                @endcan
+                @can('supplier-inventory-edit')
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-edit');
+                    @endphp
+                    @if ($hasPermission)
+                        <a href="{{ route('supplier-inventories.create') }}" class="btn btn-info me-md-2 btn-sm">Upload CSV File</a>
+                    @endif
+                @endcan
+            </div>
     </div>
         <div class="card-body">
             <form id="form-list" action="{{route('supplier-inventories.index')}}" >
@@ -49,7 +57,7 @@
                     <div class="col-md-2">
                         <button type="submit"  class="btn btn-primary mt-4 search">Search</button>
                         <a href="{{route('supplier-inventories.index')}}">
-                            <button type="button"  class="btn btn-primary mt-4 ">Refresh</button>
+                            <button type="button"  class="btn btn-info mt-4 ">Refresh</button>
                         </a>
                     </div>
                 </div>

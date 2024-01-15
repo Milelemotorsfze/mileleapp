@@ -176,7 +176,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">Signature:</label>
-                        <input type="file" id="signature-upload" name="loi_signature" accept="application/pdf" class="form-control widthinput">
+                        <input type="file" id="signature-upload" name="loi_signature" accept="image/*" class="form-control widthinput">
                     </div>
                 </div>
             </div>
@@ -373,15 +373,14 @@
                     extension: "pdf"
                 },
                 loi_signature: {
-                    // required_check: true,
-                    extension: "pdf"
+                    extension: "png|jpeg|jpg|svg"
                 },
                 messages: {
                     file: {
                         extension: "Please upload pdf file"
                     },
                     loi_signature:{
-                        extension: "Please upload Pdf file!"
+                        extension: "Please upload Image file format (png,jpeg,jpg,svg)"
                     }
                 },
             }
@@ -846,10 +845,6 @@
            });
         }
        function appendModelYear(index,unSelectedmodel,unSelectedsfx,unSelectedmodelYear) {
-            console.log(index);
-            console.log(unSelectedmodel);
-           console.log(unSelectedsfx);
-           console.log(unSelectedmodelYear);
 
            var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
 
