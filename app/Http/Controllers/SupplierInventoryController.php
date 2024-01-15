@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Imports\SupplierInventoryImport;
 use App\Models\Brand;
 use App\Models\ColorCode;
+use App\Models\DemandList;
 use App\Models\MasterModel;
 use App\Models\ModelYearCalculationCategory;
 use App\Models\Supplier;
@@ -108,8 +109,6 @@ class SupplierInventoryController extends Controller
 
         if ($request->file('file'))
         {
-
-            DB::beginTransaction();
 
             $errors = [];
             $numberOfFields = 10;
@@ -335,6 +334,8 @@ class SupplierInventoryController extends Controller
             {
                 if(!$request->has('is_add_new'))
                 {
+                    DB::beginTransaction();
+
                     $i = 0;
                     $countblankchasis = [];
                     $newlyAddedRows = [];
@@ -384,7 +385,7 @@ class SupplierInventoryController extends Controller
 
                             $supplierInventory = new SupplierInventory();
                             $supplierInventory->master_model_id = $modelId;
-                            $supplierInventory->supplier_id       = $uploadFileContent['supplier_id'];
+                            $supplierInventory->supplier_id     = $uploadFileContent['supplier_id'];
                             $supplierInventory->chasis          = $uploadFileContent['chasis'];
                             $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                             $supplierInventory->color_code      = $uploadFileContent['color_code'];
@@ -650,60 +651,63 @@ class SupplierInventoryController extends Controller
 
                 }
                 else{
-                    info("test");
-                    info($uploadFileContents);
-                    foreach ($uploadFileContents as $uploadFileContent)
-                    {
-                        $model = MasterModel::where('model', $uploadFileContent['model'])
-                            ->where('sfx', $uploadFileContent['sfx'])
-                            ->where('steering', $uploadFileContent['steering'])
-                            ->where('model_year', $uploadFileContent['model_year'])
-                            ->first();
-                        info($model->id);
 
-                        $supplierInventory = new SupplierInventory();
+                    DB::beginTransaction();
 
-                        $supplierInventory->master_model_id = $model->id;
-                        $supplierInventory->chasis          = $uploadFileContent['chasis'];
-                        $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
-                        $supplierInventory->color_code      = $uploadFileContent['color_code'];
-                        $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
-                        $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
-                        $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
-                        $supplierInventory->is_add_new     	= !empty($request->is_add_new) ? true : false;
-                        $supplierInventory->supplier_id     = $uploadFileContent['supplier_id'];
-                        $supplierInventory->whole_sales	    = $uploadFileContent['whole_sales'];
-                        $supplierInventory->country     	= $uploadFileContent['country'];
-                        $supplierInventory->delivery_note   = $uploadFileContent['delivery_note'];
-                        $supplierInventory->date_of_entry   = $date;
-                        $supplierInventory->upload_status   = SupplierInventory::UPLOAD_STATUS_ACTIVE;
-                        $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
-                        $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
-                        $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                        $supplierInventory->save();
+                        foreach ($uploadFileContents as $uploadFileContent)
+                        {
+                            $model = MasterModel::where('model', $uploadFileContent['model'])
+                                ->where('sfx', $uploadFileContent['sfx'])
+                                ->where('steering', $uploadFileContent['steering'])
+                                ->where('model_year', $uploadFileContent['model_year'])
+                                ->first();
+
+                            $supplierInventory = new SupplierInventory();
+
+                            $supplierInventory->master_model_id = $model->id;
+                            $supplierInventory->chasis          = $uploadFileContent['chasis'];
+                            $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
+                            $supplierInventory->color_code      = $uploadFileContent['color_code'];
+                            $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
+                            $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                            $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
+                            $supplierInventory->is_add_new     	= !empty($request->is_add_new) ? true : false;
+                            $supplierInventory->supplier_id     = $uploadFileContent['supplier_id'];
+                            $supplierInventory->whole_sales	    = $uploadFileContent['whole_sales'];
+                            $supplierInventory->country     	= $uploadFileContent['country'];
+                            $supplierInventory->delivery_note   = $uploadFileContent['delivery_note'];
+                            $supplierInventory->date_of_entry   = $date;
+                            $supplierInventory->upload_status   = SupplierInventory::UPLOAD_STATUS_ACTIVE;
+                            $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
+                            $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
+                            $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
+                            $supplierInventory->save();
 
 
-//                        $supplierInventoryHistory = new SupplierInventoryHistory();
-//
-//                        $supplierInventoryHistory->master_model_id = $model->id;
-//                        $supplierInventoryHistory->chasis          = $uploadFileContent['chasis'];
-//                        $supplierInventoryHistory->engine_number   = $uploadFileContent['engine_number'];
-//                        $supplierInventoryHistory->color_code      = $uploadFileContent['color_code'];
-//                        $supplierInventoryHistory->pord_month      = $uploadFileContent['pord_month'];
-//                        $supplierInventoryHistory->po_arm          = $uploadFileContent['po_arm'];
-//                        $supplierInventoryHistory->eta_import      = $uploadFileContent['eta_import'];
-//                        $supplierInventoryHistory->is_add_new      = !empty($request->is_add_new) ? true : false;
-//                        $supplierInventoryHistory->supplier_id     = $uploadFileContent['supplier_id'];
-//                        $supplierInventoryHistory->whole_sales	   = $uploadFileContent['whole_sales'];
-//                        $supplierInventoryHistory->country     	   = $uploadFileContent['country'];
-//                        $supplierInventoryHistory->date_of_entry   = $date;
-//                        $supplierInventoryHistory->upload_status   = SupplierInventory::UPLOAD_STATUS_ACTIVE;
-//                        $supplierInventoryHistory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
-//                        $supplierInventoryHistory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
-//                        $supplierInventoryHistory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-//                        $supplierInventoryHistory->save();
+                            $supplierInventoryHistory = new SupplierInventoryHistory();
 
-                    }
+                            $supplierInventoryHistory->master_model_id = $model->id;
+                            $supplierInventoryHistory->chasis          = $uploadFileContent['chasis'];
+                            $supplierInventoryHistory->engine_number   = $uploadFileContent['engine_number'];
+                            $supplierInventoryHistory->color_code      = $uploadFileContent['color_code'];
+                            $supplierInventoryHistory->pord_month      = $uploadFileContent['pord_month'];
+                            $supplierInventoryHistory->po_arm          = $uploadFileContent['po_arm'];
+                            $supplierInventoryHistory->eta_import      = $uploadFileContent['eta_import'];
+                            $supplierInventoryHistory->is_add_new      = !empty($request->is_add_new) ? true : false;
+                            $supplierInventoryHistory->supplier_id     = $uploadFileContent['supplier_id'];
+                            $supplierInventoryHistory->whole_sales	   = $uploadFileContent['whole_sales'];
+                            $supplierInventoryHistory->country     	   = $uploadFileContent['country'];
+    //                        $supplierInventoryHistory->delivery_note   = $uploadFileContent['delivery_note'];
+                            $supplierInventoryHistory->date_of_entry   = $date;
+                            $supplierInventoryHistory->upload_status   = SupplierInventory::UPLOAD_STATUS_ACTIVE;
+                            $supplierInventoryHistory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
+                            $supplierInventoryHistory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
+                            $supplierInventoryHistory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
+                            $supplierInventoryHistory->save();
+
+                        }
+
+                    DB::commit();
 
                     return redirect()->route('supplier-inventories.create')->with('message','supplier inventory updated successfully');
                 }
@@ -1293,7 +1297,7 @@ class SupplierInventoryController extends Controller
        $isExistModelCombination =  MasterModel::where('model', $supplierInventory->masterModel->model)
             ->where('sfx', $supplierInventory->masterModel->sfx)
             ->where('model_year', $modelYear)
-           ->first();
+            ->first();
 
            if($isExistModelCombination) {
                $data = 1;
@@ -1304,8 +1308,7 @@ class SupplierInventoryController extends Controller
        return response($data);
     }
     public function isExistColorCode(Request $request) {
-        info("reached");
-        info($request->all());
+
         $colourcode = $request->color_code;
         $colourcodecount = strlen($colourcode);
 

@@ -15,7 +15,7 @@
                 @endphp
                 @if ($hasPermission)
                     <div class="ml-auto float-end">
-                        <a href="{{ route('supplier-inventories.create') }}" class="btn btn-primary me-md-2">Upload CSV File</a>
+                        <a href="{{ route('supplier-inventories.create') }}" class="btn btn-info me-md-2">Upload CSV File</a>
                     </div>
                     <br>
                 @endif
@@ -49,7 +49,7 @@
                     <div class="col-md-2">
                         <button type="submit"  class="btn btn-primary mt-4 search">Search</button>
                         <a href="{{route('supplier-inventories.index')}}">
-                            <button type="button"  class="btn btn-primary mt-4 ">Refresh</button>
+                            <button type="button"  class="btn btn-info mt-4 ">Refresh</button>
                         </a>
                     </div>
                 </div>
