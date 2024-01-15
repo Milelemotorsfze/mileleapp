@@ -114,7 +114,7 @@ class LOIItemsController extends Controller
             $supplierInventoriesIds = SupplierInventory::whereIn('master_model_id', $masterModelIds)
                 ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                 ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-                ->whereNull('eta_import')
+                ->whereNull('delivery_note')
                 ->whereNull('status')
                 ->take($quantity)
                 ->pluck('id');

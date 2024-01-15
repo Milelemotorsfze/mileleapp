@@ -71,7 +71,7 @@ class LetterOfIndentItem extends Model
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
             ->whereNull('status')
-            ->whereNull('eta_import')
+            ->whereNull('delivery_note')
             ->count();
 
         return $inventoryCount;

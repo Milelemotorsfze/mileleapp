@@ -28,7 +28,7 @@ class SupplierInventoryController extends Controller
         $supplierInventories = SupplierInventory::with('masterModel')
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-//            ->whereNull('eta_import')
+            ->whereNull('delivery_note')
             ->groupBy('master_model_id')
             ->orderBy('id','desc');
 
@@ -546,7 +546,7 @@ class SupplierInventoryController extends Controller
 //                                    ->where('whole_sales', $request->whole_sales)
 //                                    ->whereNotIn('id', $chasisUpdatedRowIds)
 //                                    ->whereNull('chasis')
-//                                    //->whereNull('eta_import')
+//                                    //->whereNull('delivery_note')
 //                                    ->count();
 //                                $modelSfxValuePair = $uploadFileContent['model']."_".$uploadFileContent['sfx'];
 //                                $countblankchasis[] = $modelSfxValuePair;
@@ -858,11 +858,11 @@ class SupplierInventoryController extends Controller
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('supplier_id', $request->supplier_id)
             ->where('whole_sales', $request->whole_sales)
-//            ->whereNull('eta_import')
+//            ->whereNull('delivery_note')
             ->get();
         $secondFileRowDetails = SupplierInventory::whereDate('date_of_entry', $request->second_file)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-//            ->whereNull('eta_import')
+//            ->whereNull('delivery_note')
             ->where('supplier_id', $request->supplier_id)
             ->where('whole_sales', $request->whole_sales)
             ->get();
@@ -875,7 +875,7 @@ class SupplierInventoryController extends Controller
                 ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                 ->where('supplier_id', $request->supplier_id)
                 ->where('whole_sales', $request->whole_sales);
-//                ->whereNull('eta_import');
+//                ->whereNull('delivery_note');
             if ($supplierInventories->count() <= 0) {
                 // model and sfx not existing in Suplr Invtry => new row
                 $newlyAddedRows[$i]['model'] = $masterModel->model;
@@ -895,7 +895,7 @@ class SupplierInventoryController extends Controller
                     $isNullChaisis = SupplierInventory::whereDate('date_of_entry', $request->first_file)
                         ->where('master_model_id', $secondFileRowDetail['master_model_id'])
                         ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-//                        ->whereNull('eta_import')
+//                        ->whereNull('delivery_note')
                         ->where('supplier_id', $request->supplier_id)
                         ->where('whole_sales', $request->whole_sales)
                         ->whereNull('chasis');
@@ -1011,7 +1011,7 @@ class SupplierInventoryController extends Controller
                         ->where('whole_sales', $request->whole_sales)
                         ->whereNotIn('id', $chasisUpdatedRowIds)
                         ->whereNull('chasis')
-//                         ->whereNull('eta_import')
+//                         ->whereNull('delivery_note')
                         ->count();
                     $modelSfxValuePair = $masterModel->model."_".$masterModel->sfx;
                     $countblankchasis[] = $modelSfxValuePair;
@@ -1161,11 +1161,11 @@ class SupplierInventoryController extends Controller
                 ->where('color_code', $firstFileRowDetail['color_code'])
                 ->where('pord_month', $firstFileRowDetail['pord_month'])
                 ->where('po_arm', $firstFileRowDetail['po_arm']);
-//                ->whereNull('eta_import');
+//                ->whereNull('delivery_note');
                 $firstFileRow = $masterModel->model."_".$masterModel->sfx."_".$firstFileRowDetail['chasis']."_".
                                 $firstFileRowDetail['engine_number']."_".$firstFileRowDetail['color_code']."_".
                                 $firstFileRowDetail['pord_month']."_". $firstFileRowDetail['po_arm'];
-//                                ->whereNull('eta_import')
+//                                ->whereNull('delivery_note')
             if ($isExistSupplier->count() > 0)
             {
                 if ($isExistSupplier->count() != $groupedFirstFileCount[$firstFileRow])
@@ -1218,7 +1218,7 @@ class SupplierInventoryController extends Controller
         $supplierInventories = SupplierInventory::with('masterModel')
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
 //            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-//            ->whereNull('eta_import')
+            ->whereNull('delivery_note')
             ->groupBy('master_model_id');
 
         if (!empty($request->start_date) && !empty($request->end_date)) {

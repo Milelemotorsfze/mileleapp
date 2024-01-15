@@ -561,7 +561,7 @@ public function checkcreatevins(Request $request)
     }
     public function updatepurchasingData(Request $request)
 {
-    
+
     $updatedData = $request->json()->all();
 
     foreach ($updatedData as $data) {
@@ -982,6 +982,7 @@ public function paymentrelconfirmvendors($id)
                 $similarModelIds = MasterModel::where('model', $masterModel->model)
                     ->where('steering', $masterModel->steering)
                     ->where('sfx', $masterModel->sfx)
+                    ->where('model_year', $masterModel->model_year)
                     ->pluck('id')->toArray();
                 // find the supplier and dealer
                $supplier_id = $vehicle->purchasingOrder->LOIPurchasingOrder->approvedLOI->letterOfIndent->supplier_id ?? '';
@@ -993,7 +994,7 @@ public function paymentrelconfirmvendors($id)
                    ->where('supplier_id', $supplier_id)
                    ->where('whole_sales', $dealer)
                    ->whereIn('master_model_id', $similarModelIds)
-//                    ->whereNull('eta_import')
+                    ->whereNull('delivery_note')
                    ->first();
 //               info($supplierInventory->id);
                if($supplierInventory) {
