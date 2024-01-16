@@ -175,7 +175,10 @@ class MasterModelController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $masterModel = MasterModel::find($id);
+        $masterModel->delete();
+
+        return response(true);
     }
     public function getLoiDescription(Request $request) {
 
