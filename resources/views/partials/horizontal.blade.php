@@ -212,17 +212,8 @@
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
                                                 @endphp
                                                 @if ($hasPermission)
-                                                <a href="{{ route('joining_report.index') }}" class="dropdown-item" data-key="t-login">Joining Report</a>
-                                                <!-- <div class="dropdown">
-                                                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                        <span data-key="t-utility"> Joining Report</span>
-                                                        <div class="arrow-down"></div>
-                                                    </a>
-                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                        <a href="{{ route('joining_report.index') }}" class="dropdown-item" data-key="t-login">Trial Period Joining</a>
-                                                        <a href="{{ route('joining_report.index') }}" class="dropdown-item" data-key="t-login">Permanent Joining</a>
-                                                    </div>
-                                                </div> -->
+                                                <a href="{{ route('employee_joining_report.index','new_employee') }}" class="dropdown-item" data-key="t-login">Joining Report</a>
+                                                
                                                 @endif
                                                 @endcanany
                                                 @canany(['view-asset-allocation-request-listing'])
@@ -297,6 +288,45 @@
                                         </a>
                                         @endif
                                         @endcanany
+                                        <div class="dropdown">
+                                            @canany(['view-joining-report-listing','current-user-view-joining-report-listing'])
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
+                                            @endphp
+                                            @if ($hasPermission)
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Joining Report</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @canany(['view-joining-report-listing','current-user-view-joining-report-listing'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('employee_joining_report.index','new_employee') }}" class="dropdown-item" data-key="t-login">New Employee</a>
+                                                @endif
+                                                @endcanany
+                                                @canany(['view-joining-report-listing','current-user-view-joining-report-listing'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('employee_joining_report.index','internal_transfer') }}" class="dropdown-item" data-key="t-login">Internal Transfer</a>
+                                                @endif
+                                                @endcanany
+                                                @canany(['view-joining-report-listing','current-user-view-joining-report-listing'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('employee_joining_report.index','vacations_or_leave') }}" class="dropdown-item" data-key="t-login">Vacations Or Leave</a>
+                                                @endif
+                                                @endcanany
+                                            </div>
+                                            @endif
+                                            @endcanany
+                                        </div>
                                     </div>
                                 </li>
                                 @endif
@@ -638,6 +668,31 @@
                                         </div>
                                     </div>
                                     @endif
+
+                                    <!-- @if(Auth::user()->liability_request_approval['can'] == true OR Auth::user()->leave_request_approval['can'] == true)
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                            <span data-key="t-utility"> Joining Report @if((Auth::user()->liability_request_approval['count']) > 0 OR (Auth::user()->leave_request_approval['count']) > 0)
+                                            <span class="approval-count">{{Auth::user()->liability_request_approval['count']+Auth::user()->leave_request_approval['count']}}</span>
+                                                @endif
+                                            </span>
+                                            <div class="arrow-down"></div>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                            @if(Auth::user()->liability_request_approval['can'] == true)
+                                            <a href="{{ route('liability.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">Liability
+                                                @if(Auth::user()->liability_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->liability_request_approval['count']}}</span> @endif
+                                            </a>
+                                            @endif
+                                            @if(Auth::user()->leave_request_approval['can'] == true)
+                                            <a href="{{ route('leave.approvalAwaiting') }}" class="dropdown-item" data-key="t-login">Leave
+                                                @if(Auth::user()->leave_request_approval['count'] > 0) <span class="approval-count">{{Auth::user()->leave_request_approval['count']}}</span> @endif
+                                            </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @endif -->
+
 
                                 </div>
                             </li>

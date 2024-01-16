@@ -121,17 +121,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                     <span>
-                                        @if($data->trial_period_joining_date)
-                                        {{\Carbon\Carbon::parse($data->trial_period_joining_date)->format('d M Y')}}
-                                    @elseif($data->permanent_joining_date)
-                                    {{\Carbon\Carbon::parse($data->permanent_joining_date)->format('d M Y')}}
-                                    @endif</span>
+                                        {{ $data->joining_type_name ?? ''}}</span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Location :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->permanentJoiningLocation->name ?? '' }}</span>
+                                    <span>{{ $data->joiningLocation->name ?? '' }}</span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Remarks :</label>

@@ -28,7 +28,7 @@
 									@if(isset($data->is_auth_user_can_approve['current_approve_person']))
 									{{$data->is_auth_user_can_approve['current_approve_person']}}
 									@endif
-								</div>579.67
+								</div>
 							</div>
 							@if(isset($data->is_auth_user_can_approve['current_approve_position']))
 							<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
