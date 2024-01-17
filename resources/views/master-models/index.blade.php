@@ -38,10 +38,34 @@
                 @endif
             </div>
             <div class="m-3">
-                {!! $html->table(['class' => 'table table-bordered table-striped table-responsive thead-dark']) !!}
+                {!! $html->table(['class' => 'table table-bordered table-striped table-responsive thead-dark','id'=> 'model-table']) !!}
             </div>
     @endif
         @endcan
+    <script>
+        $('#model-table').on('click', '.btn-delete', function (e) {
+            var url = $(this).data('url');
+            var id = $(this).data('id');
+            var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            _method: 'DELETE',
+                            id: id,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            location.reload();
+                            alertify.success('Model Deleted successfully.');
+                        }
+                    });
+                }
+            }).set({title:"Delete Item"})
+        });
+    </script>
 @endsection
 @push('scripts')
     {!! $html->scripts() !!}

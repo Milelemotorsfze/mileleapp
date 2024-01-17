@@ -1022,12 +1022,12 @@
                                                     </a>
                                                     <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                                         @can('list-customer')
-{{--                                                            @php--}}
-{{--                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-customer');--}}
-{{--                                                            @endphp--}}
-{{--                                                            @if ($hasPermission)--}}
+                                                            @php
+                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-customer');
+                                                            @endphp
+                                                            @if ($hasPermission)
                                                                 <a href="{{route('dm-customers.index')}}" class="dropdown-item" data-key="t-login">List Customers </a>
-{{--                                                            @endif--}}
+                                                            @endif
                                                         @endcan
                                                         @can('list-master-models')
                                                             @php
