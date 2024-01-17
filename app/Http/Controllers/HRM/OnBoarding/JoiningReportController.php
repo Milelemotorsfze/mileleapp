@@ -415,6 +415,7 @@ class JoiningReportController extends Controller
         $preparedByPendings = JoiningReport::where([
             ['action_by_prepared_by','pending'],
             ['prepared_by_id',$authId],
+            ['joining_type','internal_transfer']
             ])->latest()->get();
         $preparedByApproved = JoiningReport::where([
             ['action_by_prepared_by','approved'],
@@ -443,24 +444,24 @@ class JoiningReportController extends Controller
                 $q->where('user_id', $authId);
             })->latest()->get();
         if($HRManager) {
-            $HRManagerPendings = JoiningReport::where([
-                ['action_by_prepared_by','approved'],
-                ['action_by_employee','approved'],
-                ['action_by_hr_manager','pending'],
-                ['hr_manager_id',$authId],
-                ])->latest()->get();
-            $HRManagerApproved = JoiningReport::where([
-                ['action_by_prepared_by','approved'],
-                ['action_by_employee','approved'],
-                ['action_by_hr_manager','approved'],
-                ['hr_manager_id',$authId],
-                ])->latest()->get();
-            $HRManagerRejected = JoiningReport::where([
-                ['action_by_prepared_by','approved'],
-                ['action_by_employee','approved'],                
-                ['action_by_hr_manager','rejected'],
-                ['hr_manager_id',$authId],
-                ])->latest()->get();
+        $HRManagerPendings = JoiningReport::where([
+            ['action_by_prepared_by','approved'],
+            ['action_by_employee','approved'],
+            ['action_by_hr_manager','pending'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
+        $HRManagerApproved = JoiningReport::where([
+            ['action_by_prepared_by','approved'],
+            ['action_by_employee','approved'],
+            ['action_by_hr_manager','approved'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
+        $HRManagerRejected = JoiningReport::where([
+            ['action_by_prepared_by','approved'],
+            ['action_by_employee','approved'],                
+            ['action_by_hr_manager','rejected'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
         }
         $ReportingManagerPendings = JoiningReport::where([
             ['action_by_prepared_by','approved'],

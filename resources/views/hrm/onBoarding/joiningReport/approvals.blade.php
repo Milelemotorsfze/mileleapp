@@ -69,9 +69,27 @@
 										@foreach ($preparedByPendings as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}</td>
-                                            <td>{{ $data->employee->employee_code ?? '' }}</td>
-                                            <td>{{ $data->employee->designation->name ?? '' }}</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->name ?? ''}}
+												@endif
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->employee_code ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->employee_code ?? ''}}
+												@endif												
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->designation->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->designation->name ?? '' }}
+												@endif													
+											</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
@@ -139,11 +157,28 @@
 										<div hidden>{{$i=0;}}</div>
 										@foreach ($preparedByApproved as $key => $data)
 										<tr data-id="1">
-										<td>{{ ++$i }}</td>
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}</td>
-                                            <td>{{ $data->employee->employee_code ?? '' }}</td>
-                                            <td>{{ $data->employee->designation->name ?? '' }}</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->name ?? ''}}
+												@endif
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->employee_code ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->employee_code ?? ''}}
+												@endif												
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->designation->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->designation->name ?? '' }}
+												@endif													
+											</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
@@ -188,9 +223,27 @@
 										@foreach ($preparedByRejected as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}</td>
-                                            <td>{{ $data->employee->employee_code ?? '' }}</td>
-                                            <td>{{ $data->employee->designation->name ?? '' }}</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->name ?? ''}}
+												@endif
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->employee_code ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->employee_code ?? ''}}
+												@endif												
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->designation->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->designation->name ?? '' }}
+												@endif													
+											</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
@@ -259,9 +312,27 @@
 										@foreach ($employeePendings as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}</td>
-                                            <td>{{ $data->employee->employee_code ?? '' }}</td>
-                                            <td>{{ $data->employee->designation->name ?? '' }}</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->name ?? ''}}
+												@endif
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->employee_code ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->employee_code ?? ''}}
+												@endif												
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->designation->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->designation->name ?? '' }}
+												@endif													
+											</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
@@ -330,9 +401,27 @@
 										@foreach ($employeeApproved as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}</td>
-                                            <td>{{ $data->employee->employee_code ?? '' }}</td>
-                                            <td>{{ $data->employee->designation->name ?? '' }}</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->name ?? ''}}
+												@endif
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->employee_code ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->employee_code ?? ''}}
+												@endif												
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->designation->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->designation->name ?? '' }}
+												@endif													
+											</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
@@ -377,9 +466,27 @@
 										@foreach ($employeeRejected as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}</td>
-                                            <td>{{ $data->employee->employee_code ?? '' }}</td>
-                                            <td>{{ $data->employee->designation->name ?? '' }}</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->name ?? ''}}
+												@endif
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->employee_code ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->employee_code ?? ''}}
+												@endif												
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->designation->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->designation->name ?? '' }}
+												@endif													
+											</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
@@ -447,9 +554,27 @@
 										@foreach ($HRManagerPendings as $key => $data)
 										<tr data-id="1">
 											<td>{{ ++$i }}</td>
-											<td>{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}</td>
-                                            <td>{{ $data->employee->employee_code ?? '' }}</td>
-                                            <td>{{ $data->employee->designation->name ?? '' }}</td>
+											<td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->name ?? ''}}
+												@endif
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->employee_code ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->employee_code ?? ''}}
+												@endif												
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->designation->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->designation->name ?? '' }}
+												@endif													
+											</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
@@ -518,9 +643,27 @@
 										@foreach ($HRManagerApproved as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}</td>
-                                            <td>{{ $data->employee->employee_code ?? '' }}</td>
-                                            <td>{{ $data->employee->designation->name ?? '' }}</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->name ?? ''}}
+												@endif
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->employee_code ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->employee_code ?? ''}}
+												@endif												
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->designation->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->designation->name ?? '' }}
+												@endif													
+											</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
@@ -565,9 +708,27 @@
 										@foreach ($HRManagerRejected as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}</td>
-                                            <td>{{ $data->employee->employee_code ?? '' }}</td>
-                                            <td>{{ $data->employee->designation->name ?? '' }}</td>
+											<td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->name ?? ''}}
+												@endif
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->employee_code ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->employee_code ?? ''}}
+												@endif												
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->designation->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->designation->name ?? '' }}
+												@endif													
+											</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
@@ -635,9 +796,27 @@
 										@foreach ($ReportingManagerPendings as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}</td>
-                                            <td>{{ $data->employee->employee_code ?? '' }}</td>
-                                            <td>{{ $data->employee->designation->name ?? '' }}</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->name ?? ''}}
+												@endif
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->employee_code ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->employee_code ?? ''}}
+												@endif												
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->designation->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->designation->name ?? '' }}
+												@endif													
+											</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
@@ -706,9 +885,27 @@
 										@foreach ($ReportingManagerApproved as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}</td>
-                                            <td>{{ $data->employee->employee_code ?? '' }}</td>
-                                            <td>{{ $data->employee->designation->name ?? '' }}</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->name ?? ''}}
+												@endif
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->employee_code ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->employee_code ?? ''}}
+												@endif												
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->designation->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->designation->name ?? '' }}
+												@endif													
+											</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
@@ -753,9 +950,27 @@
 										@foreach ($ReportingManagerRejected as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}</td>
-                                            <td>{{ $data->employee->employee_code ?? '' }}</td>
-                                            <td>{{ $data->employee->designation->name ?? '' }}</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->name ?? ''}}
+												@endif
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->employee_code ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->employee_code ?? ''}}
+												@endif												
+											</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+													{{ $data->employee->designation->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+													{{ $data->user->empProfile->designation->name ?? '' }}
+												@endif													
+											</td>
                                             <td>{{ $data->employee->department->name ?? '' }}</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
