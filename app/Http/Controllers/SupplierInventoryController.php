@@ -285,8 +285,13 @@ class SupplierInventoryController extends Controller
                 return redirect()->back()->with('error','These Colour codes are not available in the Master Data.
                 Exterior Color codes are '.$extColors." and Interior Color Codes are ".$intColors.".");
             }
+            $excelPairs = [];
             foreach($uploadFileContents as $uploadFileContent) {
+
                 $chaisis[] = $uploadFileContent['chasis'];
+                if(empty($uploadFileContent['chasis'])) {
+                    $excelPairs[] = $uploadFileContent['model'] . "_" . $uploadFileContent['sfx'];
+                }
 
                 // CHCEKING NEW MODEL SFX MODEL YEAR COMBINATION EXISTING ///////////
 
@@ -319,6 +324,23 @@ class SupplierInventoryController extends Controller
                 }
                 $j++;
             }
+
+                // get the null chasis row count by model and sfx.
+            $inventories = SupplierInventory::where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                ->where('supplier_id', $request->supplier_id)
+                ->where('whole_sales', $request->whole_sales)
+                ->whereNull('chasis')
+                ->get();
+
+            $existingItems = [];
+            foreach ($inventories as $inventory) {
+                $existingItems[] = $inventory->masterModel->model .'_'.$inventory->masterModel->sfx;
+            }
+
+            $groupedExcelPairs =  array_count_values($excelPairs);
+            $groupedExistingPairs = array_count_values($existingItems);
+
+
             // CHCEK CHASIS EXISTING WITH ALREDY UPLOADED DATA.
             $chaisisNumbers = array_filter($chaisis);
             $uniqueChaisis =  array_unique($chaisisNumbers);
@@ -349,12 +371,7 @@ class SupplierInventoryController extends Controller
                     $excelValuePair = [];
                     $noChangeRowIds = [];
                     $chasisUpdatedRowIds = [];
-                    foreach ($uploadFileContents as $uploadFileContent) {
-                        $csvValuePair = $uploadFileContent['model'] . "_" . $uploadFileContent['sfx'] . "_" . $uploadFileContent['chasis'] . "_" .
-                            $uploadFileContent['engine_number'] . "_" . $uploadFileContent['color_code'] . "_" . $uploadFileContent['pord_month'] . "_" .
-                            $uploadFileContent['po_arm'];
-                        $excelValuePair[] = $csvValuePair;
-                    }
+
                     foreach ($uploadFileContents as $uploadFileContent)
                     {
                         $model = MasterModel::where('model', $uploadFileContent['model'])
@@ -423,6 +440,9 @@ class SupplierInventoryController extends Controller
                                 ->where('color_code', $uploadFileContent['color_code'])
                                 ->where('pord_month', $uploadFileContent['pord_month'])
                                 ->where('po_arm', $uploadFileContent['po_arm'])
+                                ->whereNotIn('id', $noChangeRowIds)
+                                ->whereNotIn('id', $updatedRowsIds)
+                                ->whereNotIn('id', $newlyAddedRowIds)
                                 ->where('eta_import', $uploadFileContent['eta_import'])
                                 ->where('delivery_note', $uploadFileContent['delivery_note'])
                                 ->first();
@@ -631,28 +651,42 @@ class SupplierInventoryController extends Controller
                                             $supplierInventory->save();
                                         }
                                     }
-                                } else {
-                                    //                                $nullChaisisCount = SupplierInventory::where('master_model_id', $modelId)
-                                    //                                    ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-                                    //                                    ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-                                    //                                    ->where('supplier_id', $request->supplier_id)
-                                    //                                    ->where('whole_sales', $request->whole_sales)
-                                    //                                    ->whereNotIn('id', $chasisUpdatedRowIds)
-                                    //                                    ->whereNull('chasis')
-                                    //                                    //->whereNull('delivery_note')
-                                    //                                    ->count();
-                                    //                                $modelSfxValuePair = $uploadFileContent['model']."_".$uploadFileContent['sfx'];
-                                    //                                $countblankchasis[] = $modelSfxValuePair;
-                                    //                                $groupedCountValue =  array_count_values($countblankchasis);
-                                    //                                if ($groupedCountValue[$modelSfxValuePair] > $nullChaisisCount)
-                                    //                                {
-                                    //                                    $newlyAddedRows[$i]['model'] = $uploadFileContent['model'];
-                                    //                                    $newlyAddedRows[$i]['sfx'] = $uploadFileContent['sfx'];
-                                    //                                    $newlyAddedRows[$i]['chasis'] = $uploadFileContent['chasis'];
-                                    //                                    $newlyAddedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
-                                    //                                    $newlyAddedRows[$i]['color_code'] = $uploadFileContent['color_code'];
-                                    //
-                                    //                                }else
+                                }
+                                else {
+                                    info("no chasis found=> chcek for updation or add new row");
+                                    $modelSfxValuePair = $uploadFileContent['model']."_".$uploadFileContent['sfx'];
+                                    info($groupedExcelPairs[$modelSfxValuePair]);
+                                    info($groupedExistingPairs[$modelSfxValuePair]);
+                                    if($groupedExcelPairs[$modelSfxValuePair] == $groupedExistingPairs[$modelSfxValuePair]) {
+
+                                        info("both colum count equal => clear case of row updation find the row ");
+                                    }else if($groupedExcelPairs[$modelSfxValuePair] > $groupedExistingPairs[$modelSfxValuePair]) {
+                                        info("coming row count is > existing chance for adding row also check any row updation is there");
+                                    }else{
+                                        info("coming row count is lesser it may be deleted or updation");
+                                    }
+
+//                                                                    $nullChaisisCount = SupplierInventory::where('master_model_id', $modelId)
+//                                                                        ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+//                                                                        ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+//                                                                        ->where('supplier_id', $request->supplier_id)
+//                                                                        ->where('whole_sales', $request->whole_sales)
+//                                                                        ->whereNotIn('id', $chasisUpdatedRowIds)
+//                                                                        ->whereNull('chasis')
+//                                                                        //->whereNull('delivery_note')
+//                                                                        ->count();
+//
+//                                                                    $countblankchasis[] = $modelSfxValuePair;
+//                                                                    $groupedCountValue =  array_count_values($countblankchasis);
+//                                                                    if ($groupedCountValue[$modelSfxValuePair] > $nullChaisisCount)
+//                                                                    {
+//                                                                        $newlyAddedRows[$i]['model'] = $uploadFileContent['model'];
+//                                                                        $newlyAddedRows[$i]['sfx'] = $uploadFileContent['sfx'];
+//                                                                        $newlyAddedRows[$i]['chasis'] = $uploadFileContent['chasis'];
+//                                                                        $newlyAddedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
+//                                                                        $newlyAddedRows[$i]['color_code'] = $uploadFileContent['color_code'];
+//
+//                                                                    }else
                                     //                                {
                                     //                                    $supplierInventory = $supplierInventories->whereNull('chasis')->first();
                                     //                                    $supplierInventory1 = $supplierInventories->whereNull('chasis')
