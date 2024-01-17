@@ -1,6 +1,8 @@
 <?php
 use App\Http\Controllers\Masters\MasterJobPositionController;
 use App\Http\Controllers\Masters\MasterSpecificIndustryExperienceController;
+use App\Http\Controllers\Masters\DivisionController;
+use App\Http\Controllers\Masters\DepartmentController;
 use App\Http\Controllers\HRM\Hiring\EmployeeHiringRequestController;
 use App\Http\Controllers\HRM\Hiring\EmployeeHiringQuestionnaireController;
 use App\Http\Controllers\HRM\Hiring\JobDescriptionController;
@@ -239,6 +241,10 @@ Route::get('/d', function () {
 
     // HRM Module
     // Masters
+    // Master Division and head
+    Route::resource('division', DivisionController::class);
+    // Master Department and head
+    Route::resource('department', DepartmentController::class);
     // Master Job Position
     Route::resource('master-job-position', MasterJobPositionController::class);
       // Master Specific Industry Experience

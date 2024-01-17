@@ -37,7 +37,7 @@ class HRMMastersSeeder extends Seeder
             ['id' => 1,'name' => 'Operations','division_head_id'=> 26,'approval_handover_to'=>10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
             ['id' => 2,'name' => 'Corporate','division_head_id'=> 2,'approval_handover_to'=>10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
             ['id' => 3,'name' => 'Sales','division_head_id'=> 31,'approval_handover_to'=>10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
-            ['id' => 4,'name' => 'Demand Planning','division_head_id'=> 46,'approval_handover_to'=>10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
+            ['id' => 4,'name' => 'Demand Planning','division_head_id'=> 2,'approval_handover_to'=>10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
         ]);
         DB::table('master_departments')->insert([
             ['id' => 1,'name' => 'Accounting & Finance Department','division_id'=> 1,'department_head_id' => 10,'approval_by_id'=>10,'status' => 'active','created_by' => 16,'created_at' => Carbon::now()->format('Y-m-d H:i:s'),],

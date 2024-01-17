@@ -4,6 +4,7 @@ namespace App\Models\Masters;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class MasterDivisionWithHead extends Model
 {
@@ -18,4 +19,10 @@ class MasterDivisionWithHead extends Model
         'updated_by',
         'deleted_by'
     ];
+    public function divisionHead() {
+        return $this->hasOne(User::class,'id','division_head_id');
+    }
+    public function approvalHandoverTo() {
+        return $this->hasOne(User::class,'id','approval_handover_to');
+    }
 }
