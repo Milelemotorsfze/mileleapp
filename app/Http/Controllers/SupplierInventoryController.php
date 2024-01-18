@@ -342,9 +342,9 @@ class SupplierInventoryController extends Controller
 
 
             // CHCEK CHASIS EXISTING WITH ALREDY UPLOADED DATA.
+
             $chaisisNumbers = array_filter($chaisis);
             $uniqueChaisis =  array_unique($chaisisNumbers);
-
             if(count($chaisisNumbers) !== count($uniqueChaisis)) {
                 return redirect()->back()->with('error', "Duplicate Chasis Number found in Your File! Please upload file with unique Chasis Number.");
             }
@@ -447,6 +447,7 @@ class SupplierInventoryController extends Controller
                                 ->where('delivery_note', $uploadFileContent['delivery_note'])
                                 ->first();
 
+                            info($isSimilarRowExist);
                             info("model sfx modelyear combination row existing");
                             if(empty($isSimilarRowExist)) {
 
@@ -458,13 +459,15 @@ class SupplierInventoryController extends Controller
 
                                     // Store the Count into Update the Row with data
                                     $supplierInventory = SupplierInventory::whereIn('master_model_id', $modelIds)
-                                        //                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                                        //   ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                         ->where('supplier_id', $request->supplier_id)
                                         ->where('whole_sales', $request->whole_sales)
                                         ->whereNotIn('id', $noChangeRowIds)
+                                        ->whereNotIn('id', $newlyAddedRowIds)
+                                        ->whereNotIn('id', $updatedRowsIds)
                                         ->where('chasis', $uploadFileContent['chasis'])
-                                        ->whereNull('delivery_note')
+//                                        ->whereNull('delivery_note') unable to find row when have delivery note
 //                                        ->where(function ($query) use($deliveryNote) {
 //                                            $query->whereNull('delivery_note')
 //                                                ->orwhere('delivery_note', $deliveryNote);
@@ -481,6 +484,8 @@ class SupplierInventoryController extends Controller
                                             ->where('supplier_id', $request->supplier_id)
                                             ->where('whole_sales', $request->whole_sales)
                                             ->whereNotIn('id', $noChangeRowIds)
+                                            ->whereNotIn('id', $newlyAddedRowIds)
+                                            ->whereNotIn('id', $updatedRowsIds)
                                             ->whereNull('chasis')
                                             ->where(function ($query) use($deliveryNote) {
                                                 $query->whereNull('delivery_note')
@@ -655,14 +660,139 @@ class SupplierInventoryController extends Controller
                                 else {
                                     info("no chasis found=> chcek for updation or add new row");
                                     $modelSfxValuePair = $uploadFileContent['model']."_".$uploadFileContent['sfx'];
-                                    info($groupedExcelPairs[$modelSfxValuePair]);
-                                    info($groupedExistingPairs[$modelSfxValuePair]);
-                                    if($groupedExcelPairs[$modelSfxValuePair] == $groupedExistingPairs[$modelSfxValuePair]) {
+
+                                    $excelPairCount = $groupedExcelPairs[$modelSfxValuePair];
+                                    if(array_key_exists($modelSfxValuePair, $groupedExistingPairs)) {
+                                        $existingPairCount = $groupedExistingPairs[$modelSfxValuePair];
+
+                                    }else{
+                                        $existingPairCount = 0;
+
+                                    }
+
+                                    if($excelPairCount == $existingPairCount) {
+                                        $inventoryRow = SupplierInventory::whereIn('master_model_id', $modelIds)
+                                            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                                            ->where('supplier_id', $request->supplier_id)
+                                            ->where('whole_sales', $request->whole_sales)
+                                            ->whereNull('chasis')
+                                            ->whereNotIn('id', $noChangeRowIds)
+                                            ->whereNotIn('id', $updatedRowsIds)
+                                            ->whereNotIn('id', $newlyAddedRowIds)
+                                            ->where(function ($query) use($deliveryNote) {
+                                                $query->whereNull('delivery_note')
+                                                    ->orwhere('delivery_note', $deliveryNote);
+                                            })
+                                            ->first();
+                                        if(!empty($inventoryRow)) {
+                                            $updatedRowsIds[] = $inventoryRow->id;
+
+                                            $inventoryRow->engine_number   = $uploadFileContent['engine_number'];
+                                            $inventoryRow->color_code      = $uploadFileContent['color_code'];
+                                            $inventoryRow->pord_month      = $uploadFileContent['pord_month'];
+                                            $inventoryRow->po_arm          = $uploadFileContent['po_arm'];
+                                            $inventoryRow->eta_import      = $uploadFileContent['eta_import'];
+                                            $inventoryRow->delivery_note   = $uploadFileContent['delivery_note'];
+                                            $inventoryRow->save();
+
+                                            $updatedRows[$i]['model'] = $uploadFileContent['model'];
+                                            $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
+                                            $updatedRows[$i]['chasis'] = $uploadFileContent['chasis'];
+                                            $updatedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
+                                            $updatedRows[$i]['color_code'] = $uploadFileContent['color_code'];
+                                        }
 
                                         info("both colum count equal => clear case of row updation find the row ");
-                                    }else if($groupedExcelPairs[$modelSfxValuePair] > $groupedExistingPairs[$modelSfxValuePair]) {
-                                        info("coming row count is > existing chance for adding row also check any row updation is there");
+
+                                    }else if($excelPairCount > $existingPairCount) {
+                                        // check for engine number is changed or not
+                                        $nullChasisRow = SupplierInventory::whereIn('master_model_id', $modelIds)
+                                            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                                            ->where('supplier_id', $request->supplier_id)
+                                            ->where('whole_sales', $request->whole_sales)
+                                            ->whereNull('chasis')
+                                            ->whereNotIn('id', $noChangeRowIds)
+                                            ->whereNotIn('id', $updatedRowsIds)
+                                            ->whereNotIn('id', $newlyAddedRowIds)->first();
+
+                                        if(!empty($nullChasisRow)) {
+                                            info("no existing row with chasis found => update row");
+                                            $updatedRowsIds[] = $nullChasisRow->id;
+
+                                            $nullChasisRow->engine_number   = $uploadFileContent['engine_number'];
+                                            $nullChasisRow->color_code      = $uploadFileContent['color_code'];
+                                            $nullChasisRow->pord_month      = $uploadFileContent['pord_month'];
+                                            $nullChasisRow->po_arm          = $uploadFileContent['po_arm'];
+                                            $nullChasisRow->eta_import      = $uploadFileContent['eta_import'];
+                                            $nullChasisRow->delivery_note   = $uploadFileContent['delivery_note'];
+                                            $nullChasisRow->save();
+
+                                            $updatedRows[$i]['model'] = $uploadFileContent['model'];
+                                            $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
+                                            $updatedRows[$i]['chasis'] = $uploadFileContent['chasis'];
+                                            $updatedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
+                                            $updatedRows[$i]['color_code'] = $uploadFileContent['color_code'];
+                                        }else{
+                                            info("no existing row with no chasis found => add new row");
+
+                                            $newlyAddedRows[$i]['model'] = $uploadFileContent['model'];
+                                            $newlyAddedRows[$i]['sfx'] = $uploadFileContent['sfx'];
+                                            $newlyAddedRows[$i]['chasis'] = $uploadFileContent['chasis'];
+                                            $newlyAddedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
+                                            $newlyAddedRows[$i]['color_code'] = $uploadFileContent['color_code'];
+
+                                            $supplierInventory = new SupplierInventory();
+                                            $supplierInventory->master_model_id = $modelId;
+                                            $supplierInventory->supplier_id     = $uploadFileContent['supplier_id'];
+                                            $supplierInventory->chasis          = $uploadFileContent['chasis'];
+                                            $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
+                                            $supplierInventory->color_code      = $uploadFileContent['color_code'];
+                                            $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
+                                            $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                                            $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
+                                            $supplierInventory->is_add_new     	= false;
+                                            $supplierInventory->whole_sales	    = $uploadFileContent['whole_sales'];
+                                            $supplierInventory->country     	= $uploadFileContent['country'];
+                                            $supplierInventory->delivery_note   = $uploadFileContent['delivery_note'];
+                                            $supplierInventory->date_of_entry   = $date;
+                                            $supplierInventory->upload_status   = SupplierInventory::UPLOAD_STATUS_ACTIVE;
+                                            $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
+                                            $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
+                                            $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
+                                            $supplierInventory->save();
+
+                                            $newlyAddedRowIds[] = $supplierInventory->id;
+                                            info("coming row count is > existing chance for adding row also check any row updation is there");
+                                        }
+
                                     }else{
+                                        $nullChasisRow = SupplierInventory::whereIn('master_model_id', $modelIds)
+                                            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                                            ->where('supplier_id', $request->supplier_id)
+                                            ->where('whole_sales', $request->whole_sales)
+                                            ->whereNull('chasis')
+                                            ->whereNotIn('id', $noChangeRowIds)
+                                            ->whereNotIn('id', $updatedRowsIds)
+                                            ->whereNotIn('id', $newlyAddedRowIds)->first();
+
+                                        if(!empty($nullChasisRow)) {
+                                            info("no existing row with chasis found => update row");
+                                            $updatedRowsIds[] = $nullChasisRow->id;
+
+                                            $nullChasisRow->engine_number   = $uploadFileContent['engine_number'];
+                                            $nullChasisRow->color_code      = $uploadFileContent['color_code'];
+                                            $nullChasisRow->pord_month      = $uploadFileContent['pord_month'];
+                                            $nullChasisRow->po_arm          = $uploadFileContent['po_arm'];
+                                            $nullChasisRow->eta_import      = $uploadFileContent['eta_import'];
+                                            $nullChasisRow->delivery_note   = $uploadFileContent['delivery_note'];
+                                            $nullChasisRow->save();
+
+                                            $updatedRows[$i]['model'] = $uploadFileContent['model'];
+                                            $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
+                                            $updatedRows[$i]['chasis'] = $uploadFileContent['chasis'];
+                                            $updatedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
+                                            $updatedRows[$i]['color_code'] = $uploadFileContent['color_code'];
+                                        }
                                         info("coming row count is lesser it may be deleted or updation");
                                     }
 
@@ -768,11 +898,42 @@ class SupplierInventoryController extends Controller
                             }
 
                         }$i++;
+
+                        $supplierInventoryHistory = new SupplierInventoryHistory();
+
+                        $supplierInventoryHistory->master_model_id = $model->id;
+                        $supplierInventoryHistory->chasis          = $uploadFileContent['chasis'];
+                        $supplierInventoryHistory->engine_number   = $uploadFileContent['engine_number'];
+                        $supplierInventoryHistory->color_code      = $uploadFileContent['color_code'];
+                        $supplierInventoryHistory->pord_month      = $uploadFileContent['pord_month'];
+                        $supplierInventoryHistory->po_arm          = $uploadFileContent['po_arm'];
+                        $supplierInventoryHistory->eta_import      = $uploadFileContent['eta_import'];
+                        $supplierInventoryHistory->is_add_new      = !empty($request->is_add_new) ? true : false;
+                        $supplierInventoryHistory->supplier_id     = $uploadFileContent['supplier_id'];
+                        $supplierInventoryHistory->whole_sales	   = $uploadFileContent['whole_sales'];
+                        $supplierInventoryHistory->country     	   = $uploadFileContent['country'];
+                        $supplierInventoryHistory->delivery_note   = $uploadFileContent['delivery_note'];
+                        $supplierInventoryHistory->date_of_entry   = $date;
+                        $supplierInventoryHistory->upload_status   = SupplierInventory::UPLOAD_STATUS_ACTIVE;
+                        $supplierInventoryHistory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
+                        $supplierInventoryHistory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
+                        $supplierInventoryHistory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
+                        $supplierInventoryHistory->save();
                     }
                         // to find deleted rows
                         // group the value pair to get count of duplicate data
 
-                        $deletedRows = [];
+                        $deletedRows = SupplierInventory::where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                            ->where('supplier_id', $request->supplier_id)
+                            ->where('whole_sales', $request->whole_sales)
+                            ->whereNotIn('id', $noChangeRowIds)
+                            ->whereNotIn('id', $updatedRowsIds)
+                            ->whereNotIn('id', $newlyAddedRowIds)->get();
+                        foreach ($deletedRows as $deletedRow) {
+                            $deletedRow->status = SupplierInventory::VEH_STATUS_DELETED;
+                            $deletedRow->save();
+                        }
+//                        $deletedRows->update(['status'=> SupplierInventory::VEH_STATUS_DELETED]);
                         info("updated rows");
                         info($updatedRowsIds);
 
@@ -781,6 +942,9 @@ class SupplierInventoryController extends Controller
 
                     info("no change row Ids");
                     info($noChangeRowIds);
+
+
+
                     DB::commit();
 
                     $pdf = Pdf::loadView('supplier_inventories.reports', compact('newlyAddedRows',
@@ -835,7 +999,7 @@ class SupplierInventoryController extends Controller
                             $supplierInventoryHistory->supplier_id     = $uploadFileContent['supplier_id'];
                             $supplierInventoryHistory->whole_sales	   = $uploadFileContent['whole_sales'];
                             $supplierInventoryHistory->country     	   = $uploadFileContent['country'];
-    //                        $supplierInventoryHistory->delivery_note   = $uploadFileContent['delivery_note'];
+                            $supplierInventoryHistory->delivery_note   = $uploadFileContent['delivery_note'];
                             $supplierInventoryHistory->date_of_entry   = $date;
                             $supplierInventoryHistory->upload_status   = SupplierInventory::UPLOAD_STATUS_ACTIVE;
                             $supplierInventoryHistory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;

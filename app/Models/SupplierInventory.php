@@ -91,7 +91,7 @@ class SupplierInventory extends Model
         $masterModel = MasterModel::find($this->master_model_id);
         $masterModelIds = MasterModel::where('steering', $masterModel->steering)
             ->where('model', $masterModel->model)
-            ->where('model_year', $masterModel->model_year)
+//            ->where('model_year', $masterModel->model_year)
             ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
 
         $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
