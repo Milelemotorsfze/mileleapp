@@ -38,18 +38,18 @@
 }
 </style>
 @section('content')
-@canany(['view-birthday-po-details'])
+@canany(['view-ticket-details','view-ticket-details-of-current-user'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-details']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-ticket-details','view-ticket-details-of-current-user']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Employee Liability Details</h4>
+	<h4 class="card-title"> Employee Ticket Allowance PO Details</h4>
 	@if($previous != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('birthday_gift.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('ticket_allowance.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
 	@endif
 	@if($next != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('birthday_gift.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('ticket_allowance.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
 	@endif
 	<a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 	@if (count($errors) > 0)
@@ -138,18 +138,30 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-d
             <div class="col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Birthday Gift PO Details</h4>
+                        <h4 class="card-title">Ticket Allowance PO Details</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Birthday Gift PO Year :</label>
+                                <label for="choices-single-default" class="form-label"> Ticket Allowance Eligibility Year :</label>
+                            </div>
+                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                <span>{{$data->eligibility_year}}</span>
+                            </div>
+                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                <label for="choices-single-default" class="form-label"> Ticket Allowance Eligibility Date :</label>
+                            </div>
+                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                <span>{{ $data->eligibility_date ?? '' }}</span>
+                            </div>
+                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                <label for="choices-single-default" class="form-label"> Ticket Allowance PO Year :</label>
                             </div>
                             <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                 <span>{{$data->po_year}}</span>
                             </div>
                             <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Birthday Gift PO Number :</label>
+                                <label for="choices-single-default" class="form-label"> Ticket Allowance PO Number :</label>
                             </div>
                             <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                 <span>{{ $data->po_number ?? '' }}</span>
@@ -179,7 +191,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-d
             <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">All BirthDay Gift PO Details</h4>
+                        <h4 class="card-title">All Ticket Allowance PO Details</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -187,8 +199,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-d
                                 <thead>
                                     <tr>
                                         <th>Sl No</th>
-                                        <th>Birthday Gift PO For Year</th>
-                                        <th>Birthday Gift PO Number</th>
+                                        <th>Ticket Allowance Eligibility Year</th>
+                                        <th>Ticket Allowance Eligibility Date</th>
+                                        <th>Ticket Allowance PO For Year</th>
+                                        <th>Ticket Allowance PO Number</th>
                                         <th>Created At</th>
                                         <th>Created By</th>
                                         <th>Updated At</th>
@@ -200,6 +214,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-d
                                     @foreach($all as $one)
                                     <tr>
                                         <td>{{ ++$i }}</td>
+                                        <td>{{ $one->eligibility_year ?? ''}}</td>
+                                        <td>{{ $one->eligibility_date ?? ''}}</td>
                                         <td>{{ $one->po_year ?? ''}}</td>
                                         <td>{{ $one->po_number ?? ''}}</td>
                                         <td>

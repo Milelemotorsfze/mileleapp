@@ -360,16 +360,32 @@
                                             @endcanany
                                         </div>
                                         <div class="dropdown">
-                                            @canany(['view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user'])
+                                            @canany(['list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'])
                                             @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user']);
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-increment','list-current-user-increment','view-all-list-insurance','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user']);
                                             @endphp
                                             @if ($hasPermission)
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility"> Employee</span>
+                                                <span data-key="t-utility">Compensation & Benefits</span>
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @canany(['list-all-increment','list-current-user-increment'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-increment','list-current-user-increment']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('increment.index') }}" class="dropdown-item" data-key="t-login">Salary Increment</a>
+                                                @endif
+                                                @endcanany
+                                                @canany(['view-all-list-insurance','view-current-user-list-insurance'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-list-insurance','view-current-user-list-insurance']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('insurance.index') }}" class="dropdown-item" data-key="t-login">Insurance</a>
+                                                @endif
+                                                @endcanany
                                                 @canany(['view-birthday-po-list'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-list']);
@@ -1255,17 +1271,17 @@
                                 </li>
                                 @endif
                                 @endcan
-                                
-                                @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['document-edit']);
-                                @endphp
-                                @if ($hasPermission)
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicles.viewall') }}" id="topnav-more" role="button">
                                         <i data-feather="server"></i>
                                         <span data-key="t-extra-pages">View All</span>
                                     </a>
                                 </li>
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['document-edit']);
+                                @endphp
+                                @if ($hasPermission)
+                                
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('logisticsdocuments.index') }}" id="topnav-more" role="button">
                                         <i data-feather="list"></i>
