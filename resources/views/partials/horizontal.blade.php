@@ -137,7 +137,7 @@
                                                 @if ($hasPermission)
                                                 <a href="{{ route('division.index') }}" class="dropdown-item" data-key="t-login">Divisions</a>
                                                 @endif
-                                                @endcanany    
+                                                @endcanany
 
                                                 @canany(['view-department-listing','view-current-user-department-lising'])
                                                 @php
@@ -146,7 +146,7 @@
                                                 @if ($hasPermission)
                                                 <a href="{{ route('department.index') }}" class="dropdown-item" data-key="t-login">Department</a>
                                                 @endif
-                                                @endcanany                                                                                        
+                                                @endcanany
                                             </div>
                                             @endif
                                             @endcanany
@@ -245,7 +245,7 @@
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('employee_joining_report.index','new_employee') }}" class="dropdown-item" data-key="t-login">Joining Report</a>
-                                                
+
                                                 @endif
                                                 @endcanany
                                                 @canany(['view-asset-allocation-request-listing'])
@@ -1151,7 +1151,7 @@
                                         </div>
                                         @endif
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('brands.index');
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-list');
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">
@@ -1223,7 +1223,7 @@
                                 </li>
                                 @endif
                                 @endcan
-                                
+
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['document-edit']);
                                 @endphp
