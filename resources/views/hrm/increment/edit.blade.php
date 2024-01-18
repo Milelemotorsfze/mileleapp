@@ -3,14 +3,14 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 @section('content')
-@canany(['edit-ticket-po'])
+@canany(['edit-insurance'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-insurance']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title">Edit Employee Ticket Allowance PO</h4>
-	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('ticket_allowance.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+	<h4 class="card-title">Edit Employee Insurance</h4>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('insurance.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
 	@if (count($errors) > 0)
@@ -23,7 +23,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
 		</ul>
 	</div>
 	@endif		
-		<form id="ticketAllowanceForm" name="ticketAllowanceForm" enctype="multipart/form-data" method="POST" action="{{route('ticket_allowance.update',$data->id)}}">
+		<form id="insuranceForm" name="insuranceForm" enctype="multipart/form-data" method="POST" action="{{route('insurance.update',$data->id)}}">
 		@csrf
 		@method("PUT")
 		<div class="row">
@@ -72,31 +72,72 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
 		</div>
 		<div class="card">
 			<div class="card-header">
-				<h4 class="card-title">Birthday Gift PO Information</h4>
+				<h4 class="card-title">Insurance Information</h4>
 			</div>
 			<div class="card-body">
 				<div class="row">
 					<div class="col-xxl-3 col-lg-3 col-md-3">
                     	<span class="error">* </span>
-						<label for="eligibility_year" class="col-form-label text-md-end">{{ __('Ticket Allowance Eligibility Year') }}</label>						
-						<input type="text" class="form-control widthinput" name="eligibility_year" id="eligibility_year" onkeydown="return false;" value=""/>                               
+						<label for="insurance_policy_number" class="col-form-label text-md-end">{{ __('Insurance Policy Number') }}</label>						
+						<input type="text" class="form-control widthinput" name="insurance_policy_number" id="insurance_policy_number" 
+						placeholder="Insurance Policy Number" value="{{$data->insurance_policy_number ?? ''}}"/>                               
                     </div>
 					<div class="col-xxl-3 col-lg-3 col-md-3">
                     	<span class="error">* </span>
-						<label for="eligibility_date" class="col-form-label text-md-end">{{ __('Ticket Allowance Eligibility Date') }}</label>						
-						<input type="date" class="form-control widthinput" name="eligibility_date" id="eligibility_date" onkeydown="return false;" value="{{$data->eligibility_date ?? ''}}"/>                               
-                    </div>  
-                    <div class="col-xxl-3 col-lg-3 col-md-3">
+						<label for="insurance_card_number" class="col-form-label text-md-end">{{ __('Insurance Card Number') }}</label>						
+						<input type="text" class="form-control widthinput" name="insurance_card_number" id="insurance_card_number" 
+						placeholder="Insurance Card Number" value="{{$data->insurance_card_number ?? ''}}"/>                               
+                    </div>                
+                    <div class="col-xxl-2 col-lg-2 col-md-2">
                     	<span class="error">* </span>
-						<label for="po_year" class="col-form-label text-md-end">{{ __('Ticket Allowance PO For Year') }}</label>
-						<input type="text" class="form-control widthinput" name="po_year" id="po_year" onkeydown="return false;" value=""/>                                 
+						<label for="insurance_policy_start_date" class="col-form-label text-md-end">{{ __('Insurance Policy Start Date') }}</label>						
+						<input type="date" class="form-control widthinput" name="insurance_policy_start_date" id="insurance_policy_start_date" 
+						onkeydown="return false;" value="{{$data->insurance_policy_start_date ?? ''}}"/>                               
                     </div>
-                    <div class="col-xxl-3 col-lg-3 col-md-3">
+                    <div class="col-xxl-2 col-lg-2 col-md-2">
                     	<span class="error">* </span>
-						<label for="po_number" class="col-form-label text-md-end">{{ __('Ticket Allowance PO Number') }}</label>
-						<input type="text" name="po_number" id="po_number" class="form-control widthinput" placeholder="Enter Ticket Allowance PO Number"
-							aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->po_number ?? ''}}">
+						<label for="insurance_policy_end_date" class="col-form-label text-md-end">{{ __('Insurance Policy End Date') }}</label>
+						<input type="date" name="insurance_policy_end_date" id="insurance_policy_end_date"
+								class="form-control widthinput" placeholder="Enter Ticket Allowance PO Number"
+								 aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->insurance_policy_end_date ?? ''}}">
                     </div>
+					<div class="col-xxl-2 col-lg-2 col-md-2">
+						<span class="error">* </span>
+						<label for="insurance_image" class="col-form-label text-md-end">{{ __('Insurance Copy Upload') }}</label>
+						<input type="file" class="form-control widthinput" id="insurance" name="insurance_image" accept="application/pdf, image/*">
+					</div>
+				</div>
+			</div>
+		</div>		
+		</br>
+		<div class="card preview-div">
+			<div class="card-body">
+				<div class="row">			
+					<div class="col-lg-12 col-md-12 col-sm-12 mt-12">
+						<span class="fw-bold col-form-label text-md-end" id="insurance-label"></span>
+						<div id="insurance-preview">
+						@if(isset($data->insurance_image))
+						<div id="insurance-preview1">
+							<div class="row">
+								<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+									<h6 class="fw-bold text-center mb-1" style="float:left;">insurance</h6>
+								</div>
+								<div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+									<button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+									<a href="{{ url('hrm/employee/insurance/' . $data->insurance_image) }}" download class="text-white">
+									Download
+									</a>
+									</button>
+									<button  type="button" class="btn btn-sm btn-danger mb-1 delete-button" style="float:right;"
+										data-file-type="insurance"> Delete</button>
+								</div>
+							</div>
+							<iframe src="{{ url('hrm/employee/insurance/' . $data->insurance_image) }}" height="800" alt="insurance"></iframe>                                                                           
+						</div>
+						@endif										
+						</div>
+					</div>
+					<input type="hidden" id="insurance-file-delete" name="is_insurance_delete" value="">   									
 				</div>
 			</div>
 		</div>
@@ -114,21 +155,35 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
 	
 	var data = {!! json_encode($employees) !!};
     var oldData = {!! json_encode($data) !!};
-	var poYear = null;
-		poYear = Number('{{$data->po_year}}');
-	var eligibilityYear = null;
-		eligibilityYear = Number('{{$data->eligibility_year}}');
+	const fileInputinsurance = document.querySelector("#insurance");
+	const previewFileinsurance = document.querySelector("#insurance-preview");
+	fileInputinsurance.addEventListener("change", function(event) {
+		$('.preview-div').attr('hidden', false);
+		const files = event.target.files;
+		while (previewFileinsurance.firstChild) {
+			previewFileinsurance.removeChild(previewFileinsurance.firstChild);
+		}
+		const file = files[0];
+		if (file.type.match("application/pdf"))
+		{
+			document.getElementById('insurance-label').textContent="insurance";
+			const objectUrl = URL.createObjectURL(file);
+			const iframe = document.createElement("iframe");
+			iframe.src = objectUrl;
+			iframe.height = "800";
+			previewFileinsurance.appendChild(iframe);
+		}
+		else if (file.type.match("image/*"))
+		{
+			document.getElementById('insurance-label').textContent="insurance";
+			const objectUrl = URL.createObjectURL(file);
+			const image = new Image();
+			image.src = objectUrl;
+			iframe.height = "800";
+			previewFileinsurance.appendChild(image);
+		}
+    });
 	$(document).ready(function () {
-		$("#po_year").yearpicker({
-			year: poYear,
-			startYear: 2019,
-			endYear: 2050,
-		});
-		$("#eligibility_year").yearpicker({
-			year: eligibilityYear,
-			startYear: 2019,
-			endYear: 2050,
-		});
 		if(oldData.user.emp_profile.employee_code != null) {
 			document.getElementById('employee_code').textContent=oldData.user.emp_profile.employee_code;
 		}
@@ -214,25 +269,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
 	jQuery.validator.addMethod("alphaNumeric", function(value, element) {
 		return this.optional(element) || /^[a-zA-Z0-9 ]*$/.test(value);
 	}, "Letters and Numbers only Allowed");
-	$('#ticketAllowanceForm').validate({ // initialize the plugin
+	$('#insuranceForm').validate({ // initialize the plugin
         rules: {
 			employee_id: {
                 required: true,
             },
-			po_year: {
+			insurance_policy_number: {
 				required: true,
-			},   
-			eligibility_year: {
+				alphaNumeric:true,
+			}, 
+			insurance_card_number: {
 				required: true,
-			},   
-			eligibility_date: {
+				alphaNumeric:true,
+			}, 
+			insurance_policy_start_date: {
 				required: true,
 			},           
-            po_number: {
+            insurance_policy_end_date: {
                 required: true,
-				alphaNumeric:true,
             },
         },
+    });
+	$('.delete-button').on('click',function() {
+		var fileType = $(this).attr('data-file-type');
+		if (confirm('Are you sure you want to Delete this item ?')) {
+				$('#insurance-preview1').remove();
+				$('#insurance-file-delete').val(1);
+		}
     });
 </script>
 @endsection

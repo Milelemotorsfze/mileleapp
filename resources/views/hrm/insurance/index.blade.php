@@ -10,22 +10,22 @@
 	}
 </style>
 @section('content')
-@canany(['create-ticket-po','edit-ticket-po','view-ticket-listing','view-ticket-listing-of-current-user','view-ticket-details','view-ticket-details-of-current-user'])
+@canany(['create-insurance','edit-insurance','view-all-list-insurance','view-current-user-list-insurance','view-all-insurance-details','view-current-user-insurance-details'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po','edit-ticket-po','view-ticket-listing','view-ticket-listing-of-current-user','view-ticket-details','view-ticket-details-of-current-user']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance','edit-insurance','view-all-list-insurance','view-current-user-list-insurance','view-all-insurance-details','view-current-user-insurance-details']);
 @endphp
 @if ($hasPermission)                                           
 <div class="card-header">
 	<h4 class="card-title">
-		Employee Ticket Allowance PO Info
+		Employee Insurance Info
 	</h4>	
-	@canany(['create-ticket-po'])
+	@canany(['create-insurance'])
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po']);
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']);
 	@endphp
 	@if ($hasPermission)
-	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('ticket_allowance.create') }}">
-      <i class="fa fa-plus" aria-hidden="true"></i> New Ticket Allowance PO
+	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('insurance.create') }}">
+      <i class="fa fa-plus" aria-hidden="true"></i> New Insurance
     </a>
 	@endif
 	@endcanany	
@@ -66,11 +66,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po',
                             <th>Employee Code</th>
 							<th>Designation</th>
                             <th>Department</th>
-							<th>Location</th>
-							<th>Ticket Allowance Eligibility Year</th>
-							<th>Ticket Allowance Eligibility Date</th>
-							<th>Ticket Allowance PO for Year</th>
-							<th>Ticket Allowance PO Number</th>
+							<!-- <th>Location</th> -->
+							<th>Insurance Policy Number</th>
+							<th>Insurance Card Number</th>
+							<th>Insurance Policy Start Date</th>
+							<th>Insurance Policy End Date</th>
+                            <th>Insurance Cancellation Done</th>
                             <th>Created By</th>
                             <th>Updated By</th>
                             <th>Updated At</th>
@@ -87,11 +88,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po',
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
-							<td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-							<td>{{ $data->eligibility_year ?? ''}}</td>
-							<td>{{ $data->eligibility_date ?? ''}}</td>
-							<td>{{ $data->po_year ?? ''}}</td>
-							<td>{{ $data->po_number ?? ''}}</td>
+							<!-- <td>{{ $data->user->empProfile->location->name ?? '' }}</td> -->
+							<td>{{ $data->insurance_policy_number ?? ''}}</td>
+							<td>{{ $data->insurance_card_number ?? ''}}</td>
+							<td>{{ $data->insurance_policy_start_date ?? ''}}</td>
+							<td>{{ $data->insurance_policy_end_date ?? ''}}</td>
+                            <td>{{ $data->insurance_cancellation_done ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>{{ $data->updatedBy->name ?? ''}}</td>
 							<td>
@@ -99,22 +101,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po',
                                 {{ \Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}</td>	
                                 @endif							
 							<td>							
-								@canany(['view-ticket-details','view-ticket-details-of-current-user'])
+								@canany(['view-all-insurance-details','view-current-user-insurance-details'])
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-ticket-details','view-ticket-details-of-current-user']);
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-insurance-details','view-current-user-insurance-details']);
 								@endphp
 								@if ($hasPermission) 
-								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('ticket_allowance.show',$data->id)}}">
+								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('insurance.show',$data->id)}}">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                 </a>
 								@endif
 								@endcanany
-								@canany(['edit-ticket-po'])
+								@canany(['edit-insurance'])
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-insurance']);
 								@endphp
 								@if ($hasPermission) 								
-                                <a title="Edit" class="btn btn-sm btn-info" href="{{route('ticket_allowance.edit',$data->id)}}">
+                                <a title="Edit" class="btn btn-sm btn-info" href="{{route('insurance.edit',$data->id)}}">
                                     <i class="fa fa-edit" aria-hidden="true"></i>
                                 </a>
 								@endif

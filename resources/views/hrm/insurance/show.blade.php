@@ -38,18 +38,18 @@
 }
 </style>
 @section('content')
-@canany(['view-birthday-po-details'])
+@canany(['view-all-insurance-details','view-current-user-insurance-details'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-details']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-insurance-details','view-current-user-insurance-details']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Employee Birthday Gift PO Details</h4>
+	<h4 class="card-title"> Employee Insurance Details</h4>
 	@if($previous != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('birthday_gift.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('insurance.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
 	@endif
 	@if($next != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('birthday_gift.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('insurance.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
 	@endif
 	<a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 	@if (count($errors) > 0)
@@ -138,21 +138,47 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-d
             <div class="col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Birthday Gift PO Details</h4>
+                        <h4 class="card-title">Insurance Details</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Birthday Gift PO Year :</label>
+                                <label for="choices-single-default" class="form-label"> Insurance Policy Number :</label>
                             </div>
                             <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{$data->po_year}}</span>
+                                <span>{{$data->insurance_policy_number ?? ''}}</span>
                             </div>
                             <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Birthday Gift PO Number :</label>
+                                <label for="choices-single-default" class="form-label"> Insurance Card Number :</label>
                             </div>
                             <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{ $data->po_number ?? '' }}</span>
+                                <span>{{ $data->insurance_card_number ?? '' }}</span>
+                            </div>
+                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                <label for="choices-single-default" class="form-label"> Insurance Policy Start Date :</label>
+                            </div>
+                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                <span>
+                                    @if($data->insurance_policy_start_date != NULL)
+                                        {{\Carbon\Carbon::parse($data->insurance_policy_start_date)->format('d M Y') ?? ''}}
+                                    @endif
+                                </span>
+                            </div>
+                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                <label for="choices-single-default" class="form-label"> Insurance Policy End Date :</label>
+                            </div>
+                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                <span>
+                                    @if($data->insurance_policy_end_date != NULL)
+                                        {{\Carbon\Carbon::parse($data->insurance_policy_end_date)->format('d M Y') ?? ''}}
+                                    @endif
+                                </span>
+                            </div>
+                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                <label for="choices-single-default" class="form-label"> Insurance Cancellation Done :</label>
+                            </div>
+                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                <span>{{ $data->insurance_cancellation_done ?? '' }}</span>
                             </div>
                             <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                 <label for="choices-single-default" class="form-label"> Date :</label>
@@ -177,9 +203,38 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-d
         </div>
         <div class="row">
             <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                <div class="card preview-div">
+                    <div class="card-body">
+                        <div class="row">			
+                            <div class="col-lg-12 col-md-12 col-sm-12 mt-12">
+                                <span class="fw-bold col-form-label text-md-end" id="insurance-label"></span>
+                                <div id="insurance-preview">
+                                @if(isset($data->insurance_image))
+                                <div id="insurance-preview1">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
+                                            <h6 class="fw-bold text-center mb-1" style="float:left;">insurance</h6>
+                                        </div>
+                                        <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                                            <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
+                                            <a href="{{ url('hrm/employee/insurance/' . $data->insurance_image) }}" download class="text-white">
+                                            Download
+                                            </a>
+                                            </button>                                           
+                                        </div>
+                                    </div>
+                                    <iframe src="{{ url('hrm/employee/insurance/' . $data->insurance_image) }}" height="500" alt="insurance"></iframe>                                                                           
+                                </div>
+                                @endif										
+                                </div>
+                            </div>
+                            <input type="hidden" id="insurance-file-delete" name="is_insurance_delete" value="">   									
+                        </div>
+                    </div>
+                </div>
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">All BirthDay Gift PO Details</h4>
+                        <h4 class="card-title">All Ticket Allowance PO Details</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -187,8 +242,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-d
                                 <thead>
                                     <tr>
                                         <th>Sl No</th>
-                                        <th>Birthday Gift PO For Year</th>
-                                        <th>Birthday Gift PO Number</th>
+                                        <th>Insurance Policy Number</th>
+                                        <th>Insurance Card Number</th>
+                                        <th>Insurance Policy Start Date</th>
+                                        <th>Insurance Policy End Date</th>
+                                        <th>Insurance Cancellation Done</th>
                                         <th>Created At</th>
                                         <th>Created By</th>
                                         <th>Updated At</th>
@@ -200,8 +258,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-d
                                     @foreach($all as $one)
                                     <tr>
                                         <td>{{ ++$i }}</td>
-                                        <td>{{ $one->po_year ?? ''}}</td>
-                                        <td>{{ $one->po_number ?? ''}}</td>
+                                        <td>{{ $one->insurance_policy_number ?? ''}}</td>
+                                        <td>{{ $one->insurance_card_number ?? ''}}</td>
+                                        <td>
+                                            @if($data->insurance_policy_start_date != NULL)
+                                                {{\Carbon\Carbon::parse($data->insurance_policy_start_date)->format('d M Y') ?? ''}}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($data->insurance_policy_end_date != NULL)
+                                                {{\Carbon\Carbon::parse($data->insurance_policy_end_date)->format('d M Y') ?? ''}}
+                                            @endif
+                                        </td>
+                                        <td>{{ $one->insurance_cancellation_done ?? ''}}</td>
                                         <td>
                                             @if($data->created_at != NULL)
                                                 {{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
@@ -215,7 +284,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-d
                                         </td>
                                         <td> @if($one->updated_by != NULL)
                                             {{$one->updatedBy->name ?? ''}}
-                                            @endif</td>
+                                            @endif
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>

@@ -10,22 +10,22 @@
 	}
 </style>
 @section('content')
-@canany(['create-ticket-po','edit-ticket-po','view-ticket-listing','view-ticket-listing-of-current-user','view-ticket-details','view-ticket-details-of-current-user'])
+@canany(['create-increment','edit-increment','list-all-increment','list-current-user-increment','all-increment-details','current-user-increment-details'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po','edit-ticket-po','view-ticket-listing','view-ticket-listing-of-current-user','view-ticket-details','view-ticket-details-of-current-user']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-increment','edit-increment','list-all-increment','list-current-user-increment','all-increment-details','current-user-increment-details']);
 @endphp
 @if ($hasPermission)                                           
 <div class="card-header">
 	<h4 class="card-title">
-		Employee Ticket Allowance PO Info
+		Employee Salary Increment Info
 	</h4>	
-	@canany(['create-ticket-po'])
+	@canany(['create-increment'])
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po']);
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-increment']);
 	@endphp
 	@if ($hasPermission)
-	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('ticket_allowance.create') }}">
-      <i class="fa fa-plus" aria-hidden="true"></i> New Ticket Allowance PO
+	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('increment.create') }}">
+      <i class="fa fa-plus" aria-hidden="true"></i> New increment
     </a>
 	@endif
 	@endcanany	
@@ -66,11 +66,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po',
                             <th>Employee Code</th>
 							<th>Designation</th>
                             <th>Department</th>
-							<th>Location</th>
-							<th>Ticket Allowance Eligibility Year</th>
-							<th>Ticket Allowance Eligibility Date</th>
-							<th>Ticket Allowance PO for Year</th>
-							<th>Ticket Allowance PO Number</th>
+							<!-- <th>Location</th> -->
+							<th>Basic Salary (AED)</th>
+							<th>Other Allowances (AED)</th>
+							<th>Total Salary (AED)</th>
+							<th>Increment Effective Date</th>
+                            <th>Increment Amount (AED)</th>
+                            <th>Revised Basic Salary (AED)</th>
+                            <th>Revised Other Allowance (AED)</th>
+                            <th>Revised Total Salary (AED)</th>
                             <th>Created By</th>
                             <th>Updated By</th>
                             <th>Updated At</th>
@@ -87,11 +91,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po',
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
-							<td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-							<td>{{ $data->eligibility_year ?? ''}}</td>
-							<td>{{ $data->eligibility_date ?? ''}}</td>
-							<td>{{ $data->po_year ?? ''}}</td>
-							<td>{{ $data->po_number ?? ''}}</td>
+							<!-- <td>{{ $data->user->empProfile->location->name ?? '' }}</td> -->
+							<td>{{ $data->basic_salary ?? ''}}</td>
+							<td>{{ $data->other_allowances ?? ''}}</td>
+							<td>{{ $data->total_salary ?? ''}}</td>
+							<td>{{ $data->increament_effective_date ?? ''}}</td>
+                            <td>{{ $data->increment_amount ?? ''}}</td>
+                            <td>{{ $data->revised_basic_salary ?? ''}}</td>
+							<td>{{ $data->revised_other_allowance ?? ''}}</td>
+                            <td>{{ $data->revised_total_salary ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>{{ $data->updatedBy->name ?? ''}}</td>
 							<td>
@@ -99,22 +107,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po',
                                 {{ \Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}</td>	
                                 @endif							
 							<td>							
-								@canany(['view-ticket-details','view-ticket-details-of-current-user'])
+								@canany(['all-increment-details','current-user-increment-details'])
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-ticket-details','view-ticket-details-of-current-user']);
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['all-increment-details','current-user-increment-details']);
 								@endphp
 								@if ($hasPermission) 
-								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('ticket_allowance.show',$data->id)}}">
+								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('increment.show',$data->id)}}">
                                     <i class="fa fa-eye" aria-hidden="true"></i>
                                 </a>
 								@endif
 								@endcanany
-								@canany(['edit-ticket-po'])
+								@canany(['edit-increment'])
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-increment']);
 								@endphp
 								@if ($hasPermission) 								
-                                <a title="Edit" class="btn btn-sm btn-info" href="{{route('ticket_allowance.edit',$data->id)}}">
+                                <a title="Edit" class="btn btn-sm btn-info" href="{{route('increment.edit',$data->id)}}">
                                     <i class="fa fa-edit" aria-hidden="true"></i>
                                 </a>
 								@endif

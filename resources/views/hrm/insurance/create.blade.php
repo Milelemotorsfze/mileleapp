@@ -3,14 +3,14 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 @section('content')
-@canany(['edit-ticket-po'])
+@canany(['create-insurance'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title">Edit Employee Ticket Allowance PO</h4>
-	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('ticket_allowance.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+	<h4 class="card-title">Create Employee Insurance</h4>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('insurance.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
 	@if (count($errors) > 0)
@@ -23,9 +23,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
 		</ul>
 	</div>
 	@endif		
-		<form id="ticketAllowanceForm" name="ticketAllowanceForm" enctype="multipart/form-data" method="POST" action="{{route('ticket_allowance.update',$data->id)}}">
+		<form id="insuranceForm" name="insuranceForm" enctype="multipart/form-data" method="POST" action="{{route('insurance.store')}}">
 		@csrf
-		@method("PUT")
 		<div class="row">
 			<div class="col-xxl-12 col-lg-6 col-md-6">
 				<p><span style="float:right;" class="error">* Required Field</span></p>
@@ -43,7 +42,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
 						<label for="employee_id" class="col-form-label text-md-end">{{ __('Employee Name') }}</label>
                         <select name="employee_id" id="employee_id" multiple="true" class="employee_id form-control widthinput" onchange="" autofocus>
                             @foreach($employees as $employee)
-                                <option value="{{$employee->id}}" @if($data->employee_id == $employee->id) selected @endif>{{$employee->name}}</option>
+                                <option value="{{$employee->id}}">{{$employee->name}}</option>
                             @endforeach
                         </select>
 					</div>	
@@ -72,37 +71,55 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
 		</div>
 		<div class="card">
 			<div class="card-header">
-				<h4 class="card-title">Birthday Gift PO Information</h4>
+				<h4 class="card-title">Insurance Information</h4>
 			</div>
 			<div class="card-body">
-				<div class="row">
+				<div class="row"> 
 					<div class="col-xxl-3 col-lg-3 col-md-3">
-                    	<span class="error">* </span>
-						<label for="eligibility_year" class="col-form-label text-md-end">{{ __('Ticket Allowance Eligibility Year') }}</label>						
-						<input type="text" class="form-control widthinput" name="eligibility_year" id="eligibility_year" onkeydown="return false;" value=""/>                               
-                    </div>
+						<span class="error">* </span>
+						<label for="insurance_policy_number" class="col-form-label text-md-end">{{ __('Insurance Policy Number') }}</label>						
+						<input type="text" class="form-control widthinput" name="insurance_policy_number" id="insurance_policy_number" placeholder="Insurance Policy Number" value=""/>                               
+					</div>
 					<div class="col-xxl-3 col-lg-3 col-md-3">
-                    	<span class="error">* </span>
-						<label for="eligibility_date" class="col-form-label text-md-end">{{ __('Ticket Allowance Eligibility Date') }}</label>						
-						<input type="date" class="form-control widthinput" name="eligibility_date" id="eligibility_date" onkeydown="return false;" value="{{$data->eligibility_date ?? ''}}"/>                               
-                    </div>  
-                    <div class="col-xxl-3 col-lg-3 col-md-3">
-                    	<span class="error">* </span>
-						<label for="po_year" class="col-form-label text-md-end">{{ __('Ticket Allowance PO For Year') }}</label>
-						<input type="text" class="form-control widthinput" name="po_year" id="po_year" onkeydown="return false;" value=""/>                                 
-                    </div>
-                    <div class="col-xxl-3 col-lg-3 col-md-3">
-                    	<span class="error">* </span>
-						<label for="po_number" class="col-form-label text-md-end">{{ __('Ticket Allowance PO Number') }}</label>
-						<input type="text" name="po_number" id="po_number" class="form-control widthinput" placeholder="Enter Ticket Allowance PO Number"
-							aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->po_number ?? ''}}">
-                    </div>
+						<span class="error">* </span>
+						<label for="insurance_card_number" class="col-form-label text-md-end">{{ __('Insurance Card Number') }}</label>						
+						<input type="text" class="form-control widthinput" name="insurance_card_number" id="insurance_card_number" placeholder="Insurance Card Number" value=""/>                               
+					</div>                
+					<div class="col-xxl-2 col-lg-2 col-md-2">
+						<span class="error">* </span>
+						<label for="insurance_policy_start_date" class="col-form-label text-md-end">{{ __('Insurance Policy Start Date') }}</label>						
+						<input type="date" class="form-control widthinput" name="insurance_policy_start_date" id="insurance_policy_start_date" onkeydown="return false;" value=""/>                               
+					</div>
+					<div class="col-xxl-2 col-lg-2 col-md-2">
+						<span class="error">* </span>
+						<label for="insurance_policy_end_date" class="col-form-label text-md-end">{{ __('Insurance Policy End Date') }}</label>
+						<input type="date" name="insurance_policy_end_date" id="insurance_policy_end_date" class="form-control widthinput" 
+						placeholder="Enter Ticket Allowance PO Number" aria-label="measurement" aria-describedby="basic-addon2" value="">
+					</div>
+					<div class="col-xxl-2 col-lg-2 col-md-2">
+						<span class="error">* </span>
+						<label for="insurance_image" class="col-form-label text-md-end">{{ __('Insurance Copy Upload') }}</label>
+						<input type="file" class="form-control widthinput" id="insurance" name="insurance_image" accept="application/pdf, image/*">
+					</div>					
+				</div>
+			</div>
+		</div>
+		<div class="card preview-div" hidden>
+			<div class="card-body">
+				<div class="row">			
+					<div class="col-lg-12 col-md-12 col-sm-12 mt-12">
+						<span class="fw-bold col-form-label text-md-end" id="insurance-label"></span>
+						<div id="insurance-preview">										
+						</div>
+					</div>
+					<input type="hidden" id="insurance-file-delete" name="is_insurance_delete" value="">   									
 				</div>
 			</div>
 		</div>
 		<div class="col-xxl-12 col-lg-12 col-md-12">
-			<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="edit" id="submit">Submit</button>
-		</div></br></br></br></br></br>
+			<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+		</div>
+</br></br></br></br></br>
 	</form>
 </div>
 <div class="overlay"></div>
@@ -111,39 +128,41 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
-	
+	const fileInputinsurance = document.querySelector("#insurance");
+	const previewFileinsurance = document.querySelector("#insurance-preview");
+	fileInputinsurance.addEventListener("change", function(event) {
+		$('.preview-div').attr('hidden', false);
+		const files = event.target.files;
+		while (previewFileinsurance.firstChild) {
+			previewFileinsurance.removeChild(previewFileinsurance.firstChild);
+		}
+		const file = files[0];
+		if (file.type.match("application/pdf"))
+		{
+			document.getElementById('insurance-label').textContent="insurance";
+			const objectUrl = URL.createObjectURL(file);
+			const iframe = document.createElement("iframe");
+			iframe.src = objectUrl;
+			iframe.height = "800";
+			previewFileinsurance.appendChild(iframe);
+		}
+		else if (file.type.match("image/*"))
+		{
+			document.getElementById('insurance-label').textContent="insurance";
+			const objectUrl = URL.createObjectURL(file);
+			const image = new Image();
+			image.src = objectUrl;
+			iframe.height = "800";
+			previewFileinsurance.appendChild(image);
+		}
+    });
 	var data = {!! json_encode($employees) !!};
-    var oldData = {!! json_encode($data) !!};
-	var poYear = null;
-		poYear = Number('{{$data->po_year}}');
-	var eligibilityYear = null;
-		eligibilityYear = Number('{{$data->eligibility_year}}');
 	$(document).ready(function () {
-		$("#po_year").yearpicker({
-			year: poYear,
-			startYear: 2019,
-			endYear: 2050,
-		});
-		$("#eligibility_year").yearpicker({
-			year: eligibilityYear,
-			startYear: 2019,
-			endYear: 2050,
-		});
-		if(oldData.user.emp_profile.employee_code != null) {
-			document.getElementById('employee_code').textContent=oldData.user.emp_profile.employee_code;
-		}
-		if(oldData.user.emp_profile.company_joining_date != null) {
-			document.getElementById('joining_date').textContent=oldData.user.emp_profile.company_joining_date;
-		}
-		if(oldData.user.emp_profile.designation != null) {
-			document.getElementById('designation').textContent=oldData.user.emp_profile.designation.name;
-		}
-		if(oldData.user.emp_profile.department != null) {
-			document.getElementById('department').textContent=oldData.user.emp_profile.department.name;
-		}
-		if(oldData.user.emp_profile.location != null) {
-			document.getElementById('location').textContent=oldData.user.emp_profile.location.name;
-		}		
+		$("#employee_code_div").hide();
+		$("#joining_date_div").hide();
+		$("#designation_div").hide();
+		$("#department_div").hide();
+		$("#location_div").hide();
 		$('#employee_id').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -214,24 +233,29 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
 	jQuery.validator.addMethod("alphaNumeric", function(value, element) {
 		return this.optional(element) || /^[a-zA-Z0-9 ]*$/.test(value);
 	}, "Letters and Numbers only Allowed");
-	$('#ticketAllowanceForm').validate({ // initialize the plugin
+	$('#insuranceForm').validate({ // initialize the plugin
         rules: {
 			employee_id: {
                 required: true,
             },
-			po_year: {
+			insurance_policy_number: {
 				required: true,
-			},   
-			eligibility_year: {
+				alphaNumeric:true,
+			}, 
+			insurance_card_number: {
 				required: true,
-			},   
-			eligibility_date: {
+				alphaNumeric:true,
+			}, 
+			insurance_policy_start_date: {
 				required: true,
 			},           
-            po_number: {
+            insurance_policy_end_date: {
                 required: true,
-				alphaNumeric:true,
             },
+			insurance_image: { 
+				required: true,
+				extension: "docx|rtf|doc|pdf|jpg|jpeg",
+			},
         },
     });
 </script>

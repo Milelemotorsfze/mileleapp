@@ -4,8 +4,12 @@ namespace App\Http\Controllers\HRM\Employee;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\HRM\Employee\TicketAllowance;
+use App\Models\HRM\Employee\TicketAllowance;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Validator;
+use DB;
+use App\Http\Controllers\UserActivityController;
 
 class TicketAllowancePOController extends Controller
 {
@@ -30,6 +34,8 @@ class TicketAllowancePOController extends Controller
             'employee_id' => 'required',
             'po_year' => 'required',
             'po_number' => 'required',
+            'eligibility_year' => 'required',
+            'eligibility_date' => 'required',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
@@ -41,10 +47,10 @@ class TicketAllowancePOController extends Controller
                 $input = $request->all();
                 $input['created_by'] = $authId; 
                 $createRequest = TicketAllowance::create($input);
-                (new UserActivityController)->createActivity('Employee Birthday Gift PO Created');
-                $successMessage = "Employee Birthday Gift PO Created Successfully";                   
+                (new UserActivityController)->createActivity('Employee Ticket Allowance PO Created');
+                $successMessage = "Employee Ticket Allowance PO Created Successfully";                   
                 DB::commit();
-                return redirect()->route('birthday_gift.index')->with('success',$successMessage);
+                return redirect()->route('ticket_allowance.index')->with('success',$successMessage);
             }
             catch (\Exception $e) {
                 DB::rollback();
@@ -64,6 +70,8 @@ class TicketAllowancePOController extends Controller
             'employee_id' => 'required',
             'po_year' => 'required',
             'po_number' => 'required',
+            'eligibility_year' => 'required',
+            'eligibility_date' => 'required',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
@@ -77,13 +85,15 @@ class TicketAllowancePOController extends Controller
                     $update->employee_id = $request->employee_id;
                     $update->po_year = $request->po_year;
                     $update->po_number = $request->po_number;
+                    $update->eligibility_year = $request->eligibility_year;
+                    $update->eligibility_date = $request->eligibility_date;
                     $update->updated_by = $authId;
                     $update->update();
                 }
-                (new UserActivityController)->createActivity('Employee Birthday Gift PO Updated');
-                $successMessage = "Employee Birthday Gift PO Updated Successfully";                   
+                (new UserActivityController)->createActivity('Employee Ticket Allowance PO Updated');
+                $successMessage = "Employee Ticket Allowance PO Updated Successfully";                   
                 DB::commit();
-                return redirect()->route('birthday_gift.index')->with('success',$successMessage);
+                return redirect()->route('ticket_allowance.index')->with('success',$successMessage);
             }
             catch (\Exception $e) {
                 DB::rollback();
@@ -95,7 +105,7 @@ class TicketAllowancePOController extends Controller
         $data = TicketAllowance::where('id',$id)->first();
         $previous = TicketAllowance::where('id', '<', $id)->max('id');
         $next = TicketAllowance::where('id', '>', $id)->min('id');
-        $all = TicketAllowance::where('employee_id',$data->employee_id)->latest('')->get();
+        $all = TicketAllowance::where('employee_id',$data->employee_id)->latest('po_year')->get();
         return view('hrm.ticketAllowancePO.show',compact('data','previous','next','all'));
     }
 }
