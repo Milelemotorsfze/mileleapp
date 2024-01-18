@@ -359,6 +359,38 @@
                                             @endif
                                             @endcanany
                                         </div>
+                                        <div class="dropdown">
+                                            @canany(['view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user'])
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user']);
+                                            @endphp
+                                            @if ($hasPermission)
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Employee</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @canany(['view-birthday-po-list'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-list']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('birthday_gift.index') }}" class="dropdown-item" data-key="t-login">Birthday Gift</a>
+                                                @endif
+                                                @endcanany
+                                                @canany(['view-ticket-listing','view-ticket-listing-of-current-user'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-ticket-listing','view-ticket-listing-of-current-user']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('ticket_allowance.index') }}" class="dropdown-item" data-key="t-login">Ticket Allowance</a>
+                                                @endif
+                                                @endcanany
+                                                
+                                            </div>
+                                            @endif
+                                            @endcanany
+                                        </div>
                                     </div>
                                 </li>
                                 @endif

@@ -12,6 +12,8 @@ use App\Http\Controllers\HRM\Employee\PassportRequestController;
 use App\Http\Controllers\HRM\Employee\PassportReleaseController;
 use App\Http\Controllers\HRM\Employee\EmployeeLeaveController;
 use App\Http\Controllers\HRM\Employee\EmployeeLiabilityController;
+use App\Http\Controllers\HRM\Employee\BirthDayGiftPOController;
+use App\Http\Controllers\HRM\Employee\TicketAllowancePOController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -343,7 +345,11 @@ Route::get('/d', function () {
         Route::get('leave_approval_awaiting', 'approvalAwaiting')->name('leave.approvalAwaiting');
     });
 
+    // Employee Birthday Gift PO
+    Route::resource('birthday_gift', BirthDayGiftPOController::class);
 
+     // Employee Ticket Allowance PO
+     Route::resource('ticket_allowance', TicketAllowancePOController::class);
     // Demand & Planning Module
 
     // suppliers
