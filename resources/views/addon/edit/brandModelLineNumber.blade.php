@@ -677,12 +677,12 @@
             allowClear: true,
         });
         $("#selectModelYearStart"+supplier+"Des"+index).yearpicker({
-            year: 2023,
+            year: 2024,
             startYear: 2019,
             endYear: 2050,
         });
         $("#selectModelYearEnd"+supplier+"Des"+index).yearpicker({
-            year: 2023,
+            year: 2024,
             startYear: 2019,
             endYear: 2050,
         });

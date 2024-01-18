@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Masters\MasterDivisionWithHead;
 use App\Models\User;
+use Validator;
+use DB;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\UserActivityController;
 
 class DivisionController extends Controller
 {
