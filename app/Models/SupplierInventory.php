@@ -19,6 +19,7 @@ class SupplierInventory extends Model
     public const DEALER_TRANS_CARS = "Trans Cars";
     public const DEALER_MILELE_MOTORS = "Milele Motors";
     public const UPLOAD_STATUS_ACTIVE = "Active";
+    public const STATUS_DELIVERY_CONFIRMED = "Delivery Confirmed";
     public const UPLOAD_STATUS_INACTIVE = "Inactive";
 
     protected $appends = [
@@ -42,7 +43,7 @@ class SupplierInventory extends Model
     ];
     public function masterModel()
     {
-        return $this->belongsTo(MasterModel::class);
+        return $this->belongsTo(MasterModel::class,'master_model_id','id');
     }
     public function interiorColor()
     {
@@ -64,15 +65,17 @@ class SupplierInventory extends Model
             ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
 
         $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
-            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->whereNull('delivery_note');
-        if (!empty(request()->start_date) && !empty(request()->end_date)) {
-            $startDate = Carbon::parse(request()->start_date)->format('Y-m-d');
-            $endDate =  Carbon::parse(request()->end_date)->format('Y-m-d');
-            $supplierInventories = $supplierInventories->whereBetween('date_of_entry',[$startDate,$endDate]);
-        }else{
-            $supplierInventories = $supplierInventories->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
-        }
+//            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
+
+//            ->whereNull('delivery_note');
+//        if (!empty(request()->start_date) && !empty(request()->end_date)) {
+//            $startDate = Carbon::parse(request()->start_date)->format('Y-m-d');
+//            $endDate =  Carbon::parse(request()->end_date)->format('Y-m-d');
+//            $supplierInventories = $supplierInventories->whereBetween('date_of_entry',[$startDate,$endDate]);
+//        }else{
+//            $supplierInventories = $supplierInventories->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
+//        }
 
         if (!$supplierInventories) {
              return 0;
@@ -91,7 +94,6 @@ class SupplierInventory extends Model
         $masterModel = MasterModel::find($this->master_model_id);
         $masterModelIds = MasterModel::where('steering', $masterModel->steering)
             ->where('model', $masterModel->model)
-//            ->where('model_year', $masterModel->model_year)
             ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
 
         $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
@@ -99,11 +101,11 @@ class SupplierInventory extends Model
             ->whereNull('delivery_note')
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
 
-        if (!empty(request()->start_date) && !empty(request()->end_date)) {
-            $startDate = Carbon::parse(request()->start_date)->format('Y-m-d');
-            $endDate =  Carbon::parse(request()->end_date)->format('Y-m-d');
-            $supplierInventories = $supplierInventories->whereBetween('date_of_entry',[$startDate,$endDate]);
-        }
+//        if (!empty(request()->start_date) && !empty(request()->end_date)) {
+//            $startDate = Carbon::parse(request()->start_date)->format('Y-m-d');
+//            $endDate =  Carbon::parse(request()->end_date)->format('Y-m-d');
+//            $supplierInventories = $supplierInventories->whereBetween('date_of_entry',[$startDate,$endDate]);
+//        }
 //        else{
 //            $supplierInventories = $supplierInventories->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
 //        }
