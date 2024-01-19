@@ -23,7 +23,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
 		</ul>
 	</div>
 	@endif		
-		<form id="incrementForm" name="incrementForm" enctype="multipart/form-data" method="POST" action="{{route('insurance.store')}}">
+		<form id="incrementForm" name="incrementForm" method="POST" action="{{route('increment.store')}}" enctype="multipart/form-data" target="_self">
 		@csrf
 		<div class="row">
 			<div class="col-xxl-12 col-lg-6 col-md-6">
@@ -94,10 +94,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4">
 						<span class="error">* </span>
-						<label for="increment_amount" class="col-form-label text-md-end">{{ __('Increment Amount') }}</label>
+						<label for="increment_amount" class="col-form-label text-md-end">{{ __('Increment Amount (AED)') }}</label>
 						<div class="input-group">
 							<input id="increment_amount" type="number" min="0" step="any" class="form-control widthinput @error('increment_amount') is-invalid @enderror"
-								name="increment_amount" placeholder="Least Purchase Price ( AED )" value="{{ old('increment_amount') }}"  autocomplete="increment_amount" autofocus>
+								name="increment_amount" placeholder="Increment Amount (AED)" value="{{ old('increment_amount') }}"  autocomplete="increment_amount" autofocus>
 							<div class="input-group-append">
 								<span class="input-group-text widthinput" id="basic-addon2">AED</span>
 							</div>
@@ -105,10 +105,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
 					</div>	
 					<div class="col-xxl-4 col-lg-4 col-md-4">
 						<span class="error">* </span>
-						<label for="revised_basic_salary" class="col-form-label text-md-end">{{ __('Revised Basic Salary') }}</label>
+						<label for="revised_basic_salary" class="col-form-label text-md-end">{{ __('Revised Basic Salary (AED)') }}</label>
 						<div class="input-group">
 							<input id="revised_basic_salary" type="number" min="0" step="any" class="form-control widthinput @error('revised_basic_salary') is-invalid @enderror"
-								name="revised_basic_salary" placeholder="Least Purchase Price ( AED )" value="{{ old('revised_basic_salary') }}"  autocomplete="revised_basic_salary" autofocus>
+								name="revised_basic_salary" placeholder="Revised Basic Salary (AED)" value="{{ old('revised_basic_salary') }}"  autocomplete="revised_basic_salary" autofocus>
 							<div class="input-group-append">
 								<span class="input-group-text widthinput" id="basic-addon2">AED</span>
 							</div>
@@ -116,10 +116,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4">
 						<span class="error">* </span>
-						<label for="revised_other_allowance" class="col-form-label text-md-end">{{ __('Revised Other Allowance') }}</label>
+						<label for="revised_other_allowance" class="col-form-label text-md-end">{{ __('Revised Other Allowance (AED)') }}</label>
 						<div class="input-group">
 							<input id="revised_other_allowance" type="number" min="0" step="any" class="form-control widthinput @error('revised_other_allowance') is-invalid @enderror"
-								name="revised_other_allowance" placeholder="Least Purchase Price ( AED )" value="{{ old('revised_other_allowance') }}"  autocomplete="revised_other_allowance" autofocus>
+								name="revised_other_allowance" placeholder="Revised Other Allowance (AED)" value="{{ old('revised_other_allowance') }}"  autocomplete="revised_other_allowance" autofocus>
 							<div class="input-group-append">
 								<span class="input-group-text widthinput" id="basic-addon2">AED</span>
 							</div>
@@ -127,10 +127,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
 					</div>	
 					<div class="col-xxl-4 col-lg-4 col-md-4">
 						<span class="error">* </span>
-						<label for="revised_total_salary" class="col-form-label text-md-end">{{ __('Revised Total Salary') }}</label>
+						<label for="revised_total_salary" class="col-form-label text-md-end">{{ __('Revised Total Salary (AED)') }}</label>
 						<div class="input-group">
 							<input id="revised_total_salary" type="number" min="0" step="any" class="form-control widthinput @error('revised_total_salary') is-invalid @enderror"
-								name="revised_total_salary" placeholder="Least Purchase Price ( AED )" value="{{ old('revised_total_salary') }}"  autocomplete="revised_total_salary" autofocus>
+								name="revised_total_salary" placeholder="Revised Total Salary (AED)" value="{{ old('revised_total_salary') }}"  autocomplete="revised_total_salary" autofocus>
 							<div class="input-group-append">
 								<span class="input-group-text widthinput" id="basic-addon2">AED</span>
 							</div>
@@ -138,10 +138,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4">
 						<span class="error">* </span>
-						<label for="insurance_image" class="col-form-label text-md-end">{{ __('Related Documents Upload') }}</label>
+						<label for="salaryIncrement_image" class="col-form-label text-md-end">{{ __('Related Documents Upload') }}</label>
 						<div class="input-group">
-							<input id="purchase_price" type="number" min="0" step="any" class="form-control widthinput @error('purchase_price') is-invalid @enderror"
-								name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}"  autocomplete="purchase_price" autofocus>
+						<input type="file" class="form-control widthinput" multiple id="salaryIncrement-file" name="salaryIncrement[]"
+                                                            placeholder="Upload salaryIncrement (First & Second page)" accept="application/pdf, image/*">
 							<div class="input-group-append">
 								<span class="input-group-text widthinput" id="basic-addon2">AED</span>
 							</div>
@@ -154,11 +154,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
 			<div class="card-body">
 				<div class="row">			
 					<div class="col-lg-12 col-md-12 col-sm-12 mt-12">
-						<span class="fw-bold col-form-label text-md-end" id="insurance-label"></span>
-						<div id="insurance-preview">										
-						</div>
+						<span class="fw-bold col-form-label text-md-end" id="salaryIncrement-label"></span>
+						<div id="salaryIncrement-file-preview">
+                        </div>
 					</div>
-					<input type="hidden" id="insurance-file-delete" name="is_insurance_delete" value="">   									
+					<input type="hidden" id="salaryIncrement-file-delete" name="is_salaryIncrement_delete" value="">   									
 				</div>
 			</div>
 		</div>
@@ -174,34 +174,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
-	const fileInputinsurance = document.querySelector("#insurance");
-	const previewFileinsurance = document.querySelector("#insurance-preview");
-	fileInputinsurance.addEventListener("change", function(event) {
+	const fileInputsalaryIncrement = document.querySelector("#salaryIncrement-file");
+	const previewFilesalaryIncrement = document.querySelector("#salaryIncrement-file-preview");
+	fileInputsalaryIncrement.addEventListener("change", function(event) {
 		$('.preview-div').attr('hidden', false);
 		const files = event.target.files;
-		while (previewFileinsurance.firstChild) {
-			previewFileinsurance.removeChild(previewFileinsurance.firstChild);
+		document.getElementById('salaryIncrement-label').textContent="salaryIncrement";
+		for (let i = 0; i < files.length; i++) {
+			const file = files[i];
+			if (file.type.match("application/pdf")) {
+				const objectUrl = URL.createObjectURL(file);
+				const iframe = document.createElement("iframe");
+				iframe.src = objectUrl;
+				previewFilesalaryIncrement.appendChild(iframe);
+			} else if (file.type.match("image/*")) {
+				const objectUrl = URL.createObjectURL(file);
+				const image = new Image();
+				image.src = objectUrl;
+				previewFilesalaryIncrement.appendChild(image);
+			}
 		}
-		const file = files[0];
-		if (file.type.match("application/pdf"))
-		{
-			document.getElementById('insurance-label').textContent="insurance";
-			const objectUrl = URL.createObjectURL(file);
-			const iframe = document.createElement("iframe");
-			iframe.src = objectUrl;
-			iframe.height = "800";
-			previewFileinsurance.appendChild(iframe);
-		}
-		else if (file.type.match("image/*"))
-		{
-			document.getElementById('insurance-label').textContent="insurance";
-			const objectUrl = URL.createObjectURL(file);
-			const image = new Image();
-			image.src = objectUrl;
-			iframe.height = "800";
-			previewFileinsurance.appendChild(image);
-		}
-    });
+	});
 	var data = {!! json_encode($employees) !!};
 	$(document).ready(function () {
 		$("#employee_code_div").hide();
@@ -209,6 +202,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
 		$("#designation_div").hide();
 		$("#department_div").hide();
 		$("#location_div").hide();
+		$("#basic_salary_div").hide();
+		$("#other_allowances_div").hide();		
+		$("#total_salary_div").hide();
 		$('#employee_id').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -222,6 +218,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
                 $("#designation_div").hide();
                 $("#department_div").hide();
                 $("#location_div").hide();
+				$("#basic_salary_div").hide();
+                $("#other_allowances_div").hide();
+                $("#total_salary_div").hide();
             }
             else {
 				document.getElementById('employee_code').textContent = '';
@@ -229,6 +228,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
 				document.getElementById('designation').textContent = '';
 				document.getElementById('department').textContent = '';
 				document.getElementById('location').textContent = '';
+				document.getElementById('basic_salary').textContent = '';
+				document.getElementById('other_allowances').textContent = '';
+				document.getElementById('total_salary').textContent = '';
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].id == Number(selectedEmpId)) {
 						if(data[i].emp_profile.employee_code != null) {
@@ -246,6 +248,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
 						if(data[i].emp_profile.location != null) {
 							document.getElementById('location').textContent=data[i].emp_profile.location.name;
 						}
+						if(data[i].emp_profile.basic_salary != null) {
+							document.getElementById('basic_salary').textContent=data[i].emp_profile.basic_salary + ' AED';
+						}
+						if(data[i].emp_profile.other_allowances != null) {
+							document.getElementById('other_allowances').textContent=data[i].emp_profile.other_allowances + ' AED';
+						}
+						if(data[i].emp_profile.total_salary != null) {
+							document.getElementById('total_salary').textContent=data[i].emp_profile.total_salary + ' AED';
+						}
                     }
                 }
                 $("#employee_code_div").show();
@@ -253,6 +264,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
                 $("#designation_div").show();
                 $("#department_div").show();
                 $("#location_div").show();
+				$("#basic_salary_div").show();
+                $("#other_allowances_div").show();
+                $("#total_salary_div").show();
             }     
         });
 	});	
@@ -276,33 +290,52 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']
             }
         }
     });
-	jQuery.validator.addMethod("alphaNumeric", function(value, element) {
-		return this.optional(element) || /^[a-zA-Z0-9 ]*$/.test(value);
-	}, "Letters and Numbers only Allowed");
+	jQuery.validator.addMethod(
+		"money",
+		function(value, element) {
+			var isValidMoney = /^\d{0,5}(\.\d{0,2})?$/.test(value);
+			return this.optional(element) || isValidMoney;
+		},
+		"Please enter a valid amount "
+	);
 	$('#incrementForm').validate({ // initialize the plugin
         rules: {
 			employee_id: {
                 required: true,
             },
-			insurance_policy_number: {
+			increament_effective_date: {
 				required: true,
-				alphaNumeric:true,
 			}, 
-			insurance_card_number: {
+			increment_amount: {
 				required: true,
-				alphaNumeric:true,
+				money: true,
 			}, 
-			insurance_policy_start_date: {
+			revised_basic_salary: {
 				required: true,
+				money: true,
 			},           
-            insurance_policy_end_date: {
+            revised_other_allowance: {
                 required: true,
+				money: true,
             },
-			insurance_image: { 
+			revised_total_salary: {
 				required: true,
-				extension: "docx|rtf|doc|pdf|jpg|jpeg",
-			},
+				money: true,
+			}
+			// increment_docs: { 
+			// 	required: true,
+			// 	extension: "docx|rtf|doc|pdf|jpg|jpeg",
+			// },
         },
     });
+	// $('.delete-button').on('click',function() {
+	// 	var fileType = $(this).attr('data-file-type');
+	// 	if (confirm('Are you sure you want to Delete this item ?')) {
+	// 		if(fileType == 'salaryIncrement') {
+	// 			$('#salaryIncrement-size-photograph-preview1').remove();
+	// 			$('#photo-file-delete').val(1);
+	// 		}
+	// 	}
+	// });
 </script>
 @endsection

@@ -407,6 +407,59 @@
                                             @endif
                                             @endcanany
                                         </div>
+                                        <div class="dropdown">
+                                            @canany(['list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'])
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-increment','list-current-user-increment','view-all-list-insurance','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user']);
+                                            @endphp
+                                            @if ($hasPermission)
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Off Boarding</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @canany(['list-all-increment','list-current-user-increment'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-increment','list-current-user-increment']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="" class="dropdown-item" data-key="t-login">Resignation</a>
+                                                @endif
+                                                @endcanany
+                                                @canany(['view-all-list-insurance','view-current-user-list-insurance'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-list-insurance','view-current-user-list-insurance']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="" class="dropdown-item" data-key="t-login">Termination</a>
+                                                @endif
+                                                @endcanany
+                                            </div>
+                                            @endif
+                                            @endcanany
+                                        </div>
+                                        <div class="dropdown">
+                                            @canany(['list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'])
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-increment','list-current-user-increment','view-all-list-insurance','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user']);
+                                            @endphp
+                                            @if ($hasPermission)
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Reimbursement</span>
+                                            </a>
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Over Time Application</span>
+                                            </a>
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">My Reportees</span>
+                                            </a>
+                                            
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Payroll</span>
+                                            </a>
+                                            @endif
+                                            @endcanany
+                                        </div>
                                     </div>
                                 </li>
                                 @endif

@@ -373,6 +373,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 										</a>
 										@endif
 										@endcanany
+										@if(isset($approvedOne->jobDescription))
+										@canany(['create-job-description'])
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
+										@endphp
+										@if ($hasPermission)
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Job Description" class="btn btn-sm btn-secondary" href="{{ route('employee-hiring-job-description.create-or-edit', ['id' => $approvedOne->jobDescription->id, 'hiring_id' => $approvedOne->id]) }}">
+										<i class="fa fa-address-card" aria-hidden="true"></i> Edit Job Description
+										</a>
+										@endif
+										@endcanany
+										@else
 										@canany(['create-job-description'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
@@ -383,6 +395,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 										</a>
 										@endif
 										@endcanany
+										@endif
+
+										
 										<!-- <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Interview Summary Report" class="btn btn-sm btn-warning" href="{{route('interview-summary-report.create-or-edit',$approvedOne->id)}}">
 										<i class="fa fa-plus" aria-hidden="true"></i> Interview Summary
 										</a> -->

@@ -10,6 +10,8 @@ use App\Models\User;
 use Validator;
 use DB;
 use App\Http\Controllers\UserActivityController;
+use App\Models\HRM\Employee\EmployeeProfile;
+use App\Models\EmpDoc;
 
 class IncrementController extends Controller
 {
@@ -32,11 +34,11 @@ class IncrementController extends Controller
     public function store(Request $request) {
         $validator = Validator::make($request->all(), [
             'employee_id' => 'required',
-            'increment_policy_number' => 'required',
-            'increment_card_number' => 'required',
-            'increment_policy_start_date' => 'required',
-            'increment_policy_end_date' => 'required',
-            'increment_image' => 'required',
+            'increament_effective_date' => 'required',
+            'increment_amount' => 'required',
+            'revised_basic_salary' => 'required',
+            'revised_other_allowance' => 'required',
+            'revised_total_salary' => 'required',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
@@ -45,18 +47,37 @@ class IncrementController extends Controller
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
+                $emp = EmployeeProfile::where('user_id',$request->employee_id)->first();                
                 $input = $request->all();
-                if($request->increment_image) {                       
-                    $incrementFileName = auth()->id() . '_' . time() . '.'. $request->increment_image->extension();
-                    $type = $request->increment_image->getClientMimeType();
-                    $size = $request->increment_image->getSize();
-                    $request->increment_image->move(public_path('hrm/employee/increment'), $incrementFileName);
-                    $input['increment_image'] = $incrementFileName; 
+                if($emp) {
+                    $input['basic_salary'] = $emp->basic_salary; 
+                    $input['other_allowances'] = $emp->other_allowances; 
+                    $input['total_salary'] = $emp->total_salary; 
                 }
                 $input['created_by'] = $authId; 
                 $createRequest = Increment::create($input);
-                (new UserActivityController)->createActivity('Employee increment Created');
-                $successMessage = "Employee increment Created Successfully";                   
+                if($emp) {
+                    $emp->basic_salary = $request->revised_basic_salary;
+                    $emp->other_allowances = $request->revised_other_allowance;
+                    $emp->total_salary = $request->revised_total_salary;
+                    $emp->update();
+                    (new UserActivityController)->createActivity('Employee Salary Updated');
+                }
+                if ($request->hasFile('salaryIncrement')) {
+                    foreach ($request->file('salaryIncrement') as $file) {
+                        $extension = $file->getClientOriginalExtension();
+                        $fileName = time().'_salary_increment_'.$file->getClientOriginalName();
+                        $destinationPath = 'hrm/employee/salary_increment';
+                        $file->move($destinationPath, $fileName);        
+                        $CandidateDocument = new EmpDoc();
+                        $CandidateDocument->emp_profile_id = $emp->id;
+                        $CandidateDocument->document_name = 'Salary Increment';
+                        $CandidateDocument->document_path = $fileName;
+                        $CandidateDocument->save();
+                    }
+                }
+                (new UserActivityController)->createActivity('Employee Salary Increment Created');
+                $successMessage = "Employee Salary Increment Created Successfully";                   
                 DB::commit();
                 return redirect()->route('increment.index')->with('success',$successMessage);
             }
@@ -80,6 +101,7 @@ class IncrementController extends Controller
             'increment_card_number' => 'required',
             'increment_policy_start_date' => 'required',
             'increment_policy_end_date' => 'required',
+            'increment_image' => 'required',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);

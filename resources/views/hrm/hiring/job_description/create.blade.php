@@ -85,7 +85,7 @@
 </style>
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('create-job-description');
 @endphp
 @if ($hasPermission)
 <div class="card-header">

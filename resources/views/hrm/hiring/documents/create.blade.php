@@ -439,7 +439,7 @@
                                                     <div class="col-xxl-3 col-lg-6 col-md-6">
                                                         <label for="first_name" class="col-form-label text-md-end">{{ __('Emirates ID') }}</label>
                                                         <input type="file" class="form-control" id="emirates-id-file" name="emirates_id"
-                                                            placeholder="Upload Trade License" accept="application/pdf, image/*">
+                                                            placeholder="Upload Emirates ID" accept="application/pdf, image/*">
                                                     </div>
                                                     <div class="col-xxl-3 col-lg-6 col-md-6">
                                                         <span class="error">* </span>
@@ -451,19 +451,19 @@
                                                         <span class="error">* </span>
                                                         <label for="first_name" class="col-form-label text-md-end">{{ __('National ID (First & Second page)') }}</label>
                                                         <input type="file" class="form-control" multiple id="national-id-file" name="national_id[]"
-                                                            placeholder="Upload Passport (First & Second page)" accept="application/pdf, image/*">
+                                                            placeholder="Upload National ID (First & Second page)" accept="application/pdf, image/*">
                                                     </div>
                                                     <div class="col-xxl-3 col-lg-6 col-md-6">
                                                         <span class="error">* </span>
                                                         <label for="first_name" class="col-form-label text-md-end">{{ __('Attested Educational Documents') }}</label>
                                                         <input type="file" class="form-control" multiple id="educational-docs" name="educational_docs[]"
-                                                            placeholder="Upload Passport (First & Second page)" accept="application/pdf, image/*">
+                                                            placeholder="Upload Attested Educational Documents" accept="application/pdf, image/*">
                                                     </div>
                                                     <div class="col-xxl-3 col-lg-6 col-md-6">
                                                         <span class="error">* </span>
                                                         <label for="first_name" class="col-form-label text-md-end">{{ __('Attested Professional Diplomas / Certificates') }}</label>
                                                         <input type="file" class="form-control" multiple id="professional-diploma-certificates" name="professional_diploma_certificates[]"
-                                                            placeholder="Upload Passport (First & Second page)" accept="application/pdf, image/*">
+                                                            placeholder="Upload Attested Professional Diplomas / Certificates" accept="application/pdf, image/*">
                                                     </div>
                                                 </div>
                                                 <div class="card preview-div" hidden>

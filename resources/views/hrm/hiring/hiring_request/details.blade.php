@@ -124,7 +124,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                         <span>
                             {{ $data->type_of_role_name ?? '' }}
                             @if($data->type_of_role_name == 'Replacement')
-                            (' for' {{ $data->replacement_for_employee_name ?? '' }})
+                            ( for {{ $data->replacement_for_employee_name ?? '' }})
                             @endif
                         </span>
                     </div>

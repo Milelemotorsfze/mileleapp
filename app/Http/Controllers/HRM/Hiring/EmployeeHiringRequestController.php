@@ -117,7 +117,7 @@ class EmployeeHiringRequestController extends Controller
         }
         $masterdepartments = MasterDepartment::where('status','active')->select('id','name')->get();
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
-        $masterJobPositions = MasterJobPosition::where('status','active')->select('id','name')->get();
+        $masterJobPositions = MasterJobPosition::select('id','name')->get();
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
         $requestedByUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
         $reportingToUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
@@ -160,8 +160,8 @@ class EmployeeHiringRequestController extends Controller
             return redirect()->back()->withInput()->withErrors($validator);
         }
         else {
-            // DB::beginTransaction();
-            // try {
+            DB::beginTransaction();
+            try {
                 $authId = Auth::id();
                 $teamLeadOrReportingManager = EmployeeProfile::where('user_id',$request->requested_by)->first();
                 $department = MasterDepartment::where('id',$request->department_id)->first();
@@ -215,22 +215,39 @@ class EmployeeHiringRequestController extends Controller
                         }
                         $update->explanation_of_new_hiring = $request->explanation_of_new_hiring;
                         $update->updated_by = $authId;
+                        $update->action_by_department_head = 'pending';
+                        $update->department_head_action_at = NULL;
+                        // $update->comments_by_department_head = NULL;
+                        $update->action_by_hiring_manager = NULL;
+                        $update->hiring_manager_action_at =  NULL;
+                        // $update->comments_by_hiring_manager = NULL;
+                        $update->action_by_division_head = NULL;
+                        $update->division_head_action_at = NULL;
+                        // $update->comments_by_division_head = NULL;
+                        $update->action_by_hr_manager = NULL;
+                        $update->hr_manager_action_at = NULL;
+                        // $update->comments_by_hr_manager = NULL;                     
                         $update->update();
                         $history['hiring_request_id'] = $id;
                         $history['icon'] = 'icons8-edit-30.png';
                         $history['message'] = 'Employee hiring request edited by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
                         $createHistory = EmployeeHiringRequestHistory::create($history);
+                        $history2['hiring_request_id'] = $id;
+                        $history2['icon'] = 'icons8-send-30.png';
+                        $history2['message'] = 'Employee hiring request send to Team Lead / Reporting Manager ( '.$teamLeadOrReportingManager->teamLeadOrReportingManager->name.' - '.$teamLeadOrReportingManager->teamLeadOrReportingManager->email.' ) for approval';
+                        $createHistory2 = EmployeeHiringRequestHistory::create($history2);
                         (new UserActivityController)->createActivity('Employee Hiring Request Edited');
                         $successMessage = "Employee Hiring Request Updated Successfully";
                     }
                 }
-                // DB::commit();
+                DB::commit();
                 return redirect()->route('employee-hiring-request.index')
                                     ->with('success',$successMessage);
-            // } 
-            // catch (\Exception $e) {
-            //     DB::rollback();
-            // }
+            } 
+            catch (\Exception $e) {
+                DB::rollback();
+                dd($e);
+            }
         }
     }
     public function show($id) {

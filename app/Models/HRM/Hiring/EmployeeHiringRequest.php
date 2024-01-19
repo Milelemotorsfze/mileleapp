@@ -266,23 +266,27 @@ class EmployeeHiringRequest extends Model
             $isAuthUserCanApprove['can_approve'] = true;
             $isAuthUserCanApprove['current_approve_position'] = 'Team Lead / Reporting Manager';
             $isAuthUserCanApprove['current_approve_person'] = $this->department_head_name;
+            $isAuthUserCanApprove['comments'] = $this->comments_by_department_head;
         }
         else if($this->action_by_department_head =='approved' && $this->action_by_hiring_manager == 'pending' && $this->hiring_manager_id == $authId) { 
             $isAuthUserCanApprove['can_approve'] = true;
             $isAuthUserCanApprove['current_approve_position'] = 'Recruiting Manager';
             $isAuthUserCanApprove['current_approve_person'] = $this->hiring_manager_name;
+            $isAuthUserCanApprove['comments'] = $this->comments_by_hiring_manager;
         }
         else if($this->action_by_department_head =='approved' && $this->action_by_hiring_manager == 'approved' && $this->action_by_division_head == 'pending' && 
             $this->division_head_id == $authId) {
                 $isAuthUserCanApprove['can_approve'] = true;
                 $isAuthUserCanApprove['current_approve_position'] = 'Division Head';
                 $isAuthUserCanApprove['current_approve_person'] = $this->divisionHead->name;
+                $isAuthUserCanApprove['comments'] = $this->comments_by_division_head;
         }
         else if($this->action_by_department_head =='approved' && $this->action_by_hiring_manager == 'approved' && $this->action_by_division_head == 'approved' && 
             $this->action_by_hr_manager == 'pending' && $this->hr_manager_id == $authId) {
                 $isAuthUserCanApprove['can_approve'] = true;
                 $isAuthUserCanApprove['current_approve_position'] = 'HR Manager';
                 $isAuthUserCanApprove['current_approve_person'] = $this->hr_manager_name;
+                $isAuthUserCanApprove['comments'] = $this->comments_by_hr_manager;
         }
         return $isAuthUserCanApprove;
     }

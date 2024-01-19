@@ -62,7 +62,7 @@ class CandidatePersonalInfoController extends Controller
                 $template['from_name'] = 'Milele Matrix';
                 $subject = 'Milele - Candidate Documents Request Form';
                 Mail::send(
-                        "hrm.hiring.personal_info.email",
+                        "hrm.hiring.documents.email",
                         ["data"=>$data] ,
                         function($msg) use ($data,$template,$subject) {
                             $msg->to($data['email'], $data['name'])
@@ -76,7 +76,7 @@ class CandidatePersonalInfoController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                info($e);
+                dd($e);
             }
         }
     }

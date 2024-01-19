@@ -102,9 +102,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-questionnaire-details']);
         @endphp
         @if ($hasPermission)
+        @if(isset($data->questionnaire) OR isset($data->jobDescription)) 
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#questionnaire-and-job-descriptions">Questionnaire and Job Description</a>
 		</li>
+        @endif
         @endif
         @endcanany
 
@@ -113,9 +115,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
         @endphp
         @if ($hasPermission)
+        @if(count($data->allInterview) > 0)
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#interview-summary-report">Interview Summary Report</a>
 		</li>
+        @endif
         @endif
         @endcanany
 	</ul>
@@ -420,6 +424,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-questionnaire
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
 @endphp
 @if ($hasPermission)
+@if(count($data->allInterview) > 0)
 <div class="tab-content">
 	<div class="tab-pane fade show" id="interview-summary-report">
         <br>
@@ -428,6 +433,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
         </div>
     </div>
 </div>
+@endif
 @endif
 @endcanany
 </div>
