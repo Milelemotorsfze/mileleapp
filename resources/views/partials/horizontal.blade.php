@@ -1271,11 +1271,6 @@
                                 </li>
                                 @endif
                                 @endcan
-
-                                @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['document-edit']);
-                                @endphp
-                                @if ($hasPermission)
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicles.viewall') }}" id="topnav-more" role="button">
                                         <i data-feather="server"></i>
