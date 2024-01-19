@@ -351,8 +351,6 @@ class SupplierInventoryController extends Controller
 
             $chaisisNumbers = array_filter($chaisis);
             $uniqueChaisis =  array_unique($chaisisNumbers);
-            info($chaisisNumbers);
-            info($uniqueChaisis);
 
             if(count($chaisisNumbers) !== count($uniqueChaisis)) {
                 return redirect()->back()->with('error', "Duplicate Chasis Number found in Your File! Please upload file with unique Chasis Number.");
@@ -883,7 +881,7 @@ class SupplierInventoryController extends Controller
                             ->whereNotIn('id', $updatedRowsIds)
                             ->whereNotIn('id', $newlyAddedRowIds)->get();
                         foreach ($deletedRows as $deletedRow) {
-                            $deletedRow->status = SupplierInventory::VEH_STATUS_DELETED;
+                            $deletedRow->upload_status = SupplierInventory::VEH_STATUS_DELETED;
                             $deletedRow->save();
                         }
 //                        $deletedRows->update(['status'=> SupplierInventory::VEH_STATUS_DELETED]);
