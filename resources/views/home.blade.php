@@ -34,24 +34,183 @@
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-log-activity');
         @endphp
         @if ($hasPermission)
-<div class="card">
+            <div class="card">
                             <div class="card-body px-0">
                                 <div class="table-responsive px-3">
                                 <div class="card-header align-items-center ">
                             <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Sales Persons Pending Leads</h4>
-</div>
+                            </div>
                                 <table id="dtBasicExample2" class="table table-striped table-bordered">
                                                 <thead class="bg-soft-secondary">
                                             <tr>
                                                 <th>Sales Person</th>
                                                 <th>Pending Leads</th>
+                                                <th>Response Time</th>
+                                                <th>Open Leads</th>
+                                                <th>Lead Closed</th>
+                                                <th>Lead Closed Time</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($leadsCount as $lead)
+                                        @forelse ($leadsCount as $lead)
+                                        <tr>
+                                            <td>{{ $lead->salespersonname }}</td>
+                                            <td>{{ $lead->lead_count }}</td>
+                                            @php
+                                                $responsetime = null;
+                                                $responsetime = DB::table('calls')
+                                                    ->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id')
+                                                    ->where('calls.status', '!=', 'New')
+                                                    ->where('calls.sales_person', '=', $lead->sales_person)
+                                                    ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, calls.created_at, prospectings.created_at)) as average_response_time'))
+                                                    ->first();
+                                            @endphp
+                                            <td>{{ $responsetime ? number_format($responsetime->average_response_time, 0) . ' Hrs' : 'N/A' }}</td>
+                                            @php
+                                               $openLeadsCount = DB::table('calls')
+                                                ->where(function ($query) use ($lead) {
+                                                    $query->where('calls.status', '!=', 'Closed')
+                                                        ->orWhere('calls.status', '!=', 'Rejected');
+                                                })
+                                                ->where('calls.sales_person', '=', $lead->sales_person)
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $openLeadsCount }}</td>
+                                            @php
+                                               $closedLeadsCount = DB::table('calls')
+                                                ->where(function ($query) use ($lead) {
+                                                    $query->where('calls.status', '=', 'Closed')
+                                                        ->orWhere('calls.status', '=', 'Rejected');
+                                                })
+                                                ->where('calls.sales_person', '=', $lead->sales_person)
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $closedLeadsCount }}</td>
+                                            @php
+                                            $closedtime = null;
+                                            $closedtime = DB::table('calls')
+                                                ->leftJoin('lead_closed', 'calls.id', '=', 'lead_closed.call_id')
+                                                ->where('calls.status', '!=', 'New')
+                                                ->where('calls.sales_person', '=', $lead->sales_person)
+                                                ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, calls.created_at, lead_closed.created_at)) as average_closed_time'))
+                                                ->first();
+                                            @endphp
+                                            <td>{{ $closedtime ? $closedtime->average_closed_time : 'N/A' }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="2" class="text-center">No pending leads found.</td>
+                                        </tr>
+                                    @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- end card body -->
+                        </div>
+                        @endif
+                        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-log-activity');
+        @endphp
+        @if ($hasPermission)
+            <div class="card">
+                            <div class="card-body px-0">
+                                <div class="table-responsive px-3">
+                                <div class="card-header align-items-center ">
+                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Sales Person KPI</h4>
+</div>
+                                <table id="dtBasicExample3" class="table table-striped table-bordered">
+                                                <thead class="bg-soft-secondary">
+                                            <tr>
+                                                <th>Sales Person</th>
+                                                <th>Walking / Direct Leads</th>
+                                                <th>Marketing Target Ideas</th>
+                                                <th>Export Sale</th>
+                                                <th>Local Sale</th>
+                                                <th>Lease to Own</th>
+                                                <th>Google Review</th>
+                                                <th>Service kits</th>
+                                                <th>Shipping</th>
+                                                <th>Accessiors</th>
+                                                <th>Unique Customers</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($sales_personsname as $sales_personsname)
                                                 <tr>
-                                                    <td>{{ $lead->name }}</td>
-                                                    <td>{{ $lead->lead_count }}</td>
+                                                    <td>{{ $sales_personsname->name }}</td>
+                                                @php
+                                                $callCount = '';
+                                                $callCount = DB::table('calls')
+                                                ->where('calls.created_by', '=', $sales_personsname->id)
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $callCount }}</td>
+                                            @php
+                                                $marketingtarget = '';
+                                                $marketingtarget = DB::table('strategies')
+                                                ->where('strategies.target_sales_person', '=', $sales_personsname->id)
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $marketingtarget }}</td>
+                                            @php
+                                                $exportsales = '';
+                                                $exportsales = DB::table('so')
+                                                ->where('so.sales_person_id', '=', $sales_personsname->id)
+                                                ->where('so.sales_type', '=', "Export")
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $exportsales }}</td>
+                                            @php
+                                                $localsale = '';
+                                                $localsale = DB::table('so')
+                                                ->where('so.sales_person_id', '=', $sales_personsname->id)
+                                                ->where('so.sales_type', '=', "Local")
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $localsale }}</td>
+                                            @php
+                                                $callCount = '';
+                                                $callCount = DB::table('calls')
+                                                ->where('calls.created_by', '=', $sales_personsname->id)
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $callCount }}</td>
+                                            @php
+                                                $callCount = '';
+                                                $callCount = DB::table('calls')
+                                                ->where('calls.created_by', '=', $sales_personsname->id)
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $callCount }}</td>
+                                            @php
+                                                $callCount = '';
+                                                $callCount = DB::table('calls')
+                                                ->where('calls.created_by', '=', $sales_personsname->id)
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $callCount }}</td>
+                                            @php
+                                                $callCount = '';
+                                                $callCount = DB::table('calls')
+                                                ->where('calls.created_by', '=', $sales_personsname->id)
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $callCount }}</td>
+                                            @php
+                                                $callCount = '';
+                                                $callCount = DB::table('calls')
+                                                ->where('calls.created_by', '=', $sales_personsname->id)
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $callCount }}</td>
+                                            @php
+                                                $callCount = '';
+                                                $callCount = DB::table('calls')
+                                                ->where('calls.created_by', '=', $sales_personsname->id)
+                                                ->count();
+                                            @endphp
+                                            <td>{{ $callCount }}</td>
                                                 </tr>
                                             @empty
                                                 <tr>

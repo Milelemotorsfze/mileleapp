@@ -94,6 +94,10 @@ use App\Http\Controllers\SalesPersonStatusController;
 use App\Http\Controllers\PortsController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\PaymentTermsController;
+use App\Http\Controllers\SalesTargetsController;
+use App\Http\Controllers\ClientAccountTransitionController;
+
+
 /*
 /*
 |--------------------------------------------------------------------------
@@ -481,6 +485,8 @@ Route::get('/d', function () {
 
      // Variants
     Route::resource('variants', VariantController::class);
+    Route::post('variants/modifications', [VariantController::class,'variantmodifications'])->name('variants.variantmodifications');
+    Route::get('/variants/addons/{id}', [VariantController::class, 'variantsaddons'])->name('variants.variantsaddons');
     Route::get('variant-prices/{id}/edit/type/{type}', [VariantPriceController::class,'edit'])->name('variant-price.edit');
     Route::resource('variant-prices', VariantPriceController::class);
     Route::get('/getSpecificationDetails/{id}', [VariantController::class, 'getSpecificationDetails']);
@@ -730,3 +736,16 @@ Route::get('/d', function () {
 
     //Payment Terms
     Route::resource('paymentterms', PaymentTermsController::class);
+    Route::resource('salestargets', SalesTargetsController::class);
+    
+    //Customers
+    Route::get('sales/customers', [CustomerController::class, 'salescustomers'])->name('salescustomers.index');
+    Route::get('sales/customers/create', [CustomerController::class, 'createcustomers'])->name('salescustomers.create');
+    Route::post('sales/customers/store', [CustomerController::class, 'storecustomers'])->name('salescustomers.store');
+    Route::get('sales/customers/view-history/{clientId}', [CustomerController::class, 'viewHistory'])->name('salescustomers.viewHistory');
+    Route::get('sales/customers/view/{clientId}', [CustomerController::class, 'viewcustomers'])->name('salescustomers.viewcustomers');
+    Route::get('sales/customers/leadsview/{clientId}', [CustomerController::class, 'viewleads'])->name('salescustomers.viewleads');
+    Route::get('sales/customers/qoutationview/{clientId}', [CustomerController::class, 'qoutationview'])->name('salescustomers.qoutationview');
+    Route::get('/clienttransitions/{client_id}', [ClientAccountTransitionController::class, 'clienttransitionsview'])->name('clienttransitions.clienttransitions');
+    Route::resource('clienttransitions', ClientAccountTransitionController::class);
+

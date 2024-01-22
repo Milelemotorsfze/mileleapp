@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use App\Models\AddonDetails;
 use App\Models\UserActivities;
 use App\Models\AddonSellingPrice;
+use App\Models\ModelHasRoles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Calls;
@@ -215,21 +216,27 @@ $totalvariantss = [
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-log-activity');
         if ($hasPermission)
         {
-            $leadsCount = DB::table('calls')
+    $leadsCount = DB::table('calls')
     ->join('users', 'calls.sales_person', '=', 'users.id')
     ->where('calls.status', '=', 'New')
     ->groupBy('users.name')
-    ->select('users.name', DB::raw('count(*) as lead_count'))
+    ->select('users.name as salespersonname', DB::raw('count(*) as lead_count'), 'calls.*')
+    ->get();
+    $sales_personsname = ModelHasRoles::where('role_id', 7)
+    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+    ->where('users.status', 'active')
+    ->where('users.sales_rap', 'Yes')
     ->get();
         }
         else{
+            $sales_personsname = [];
             $leadsCount = [];
         }
        return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData',
            'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
            'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
            'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
-            'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount'));
+            'recentlyAddedSpareParts','recentlyAddedKits', 'leadsCount', 'sales_personsname'));
     }
     public function marketingupdatechart(Request $request)
     {

@@ -157,10 +157,15 @@
                                 <a data-placement="top" href="{{ route('variants.edit', $variant->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
                                 </a>
                                 </td> -->
+                                @if($variant->category != "Modified")
                                 <td class="nowrap-td">
+                                <a data-placement="top" href="{{ route('variants.variantsaddons', $variant->id) }}" class="btn btn-primary btn-sm"><i class="fa fa fa-plus">Add Addons</i>
+                                </a>
+                                <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
                                 <a data-placement="top" href="{{ route('variants.edit', $variant->id) }}" class="btn btn-info btn-sm"><i class="fa fa fa-clone">Duplicate</i>
                                 </a>
                                 </td>
+                                @endif
                             @endif
                             <!-- @can('variants-delete')
                                 @if($variant->is_deletable == true)
@@ -211,7 +216,6 @@ $(document).ready(function () {
       if (d === 12 || d === 13) {
         return;
       }
-
       var selectWrapper = $('<div class="select-wrapper"></div>');
       var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
         .appendTo(selectWrapper)

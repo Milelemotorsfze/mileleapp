@@ -512,9 +512,6 @@
                                 </li>
                                 @endif
                                 @endcanany
-
-
-
                                 @canany(['warranty-create', 'warranty-list','addon-create','accessories-list','spare-parts-list','kit-list'])
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create','warranty-list','addon-create','accessories-list','spare-parts-list','kit-list']);
@@ -877,6 +874,11 @@
                                                 <span data-key="t-utility">Leads Data Center</span>
                                             </a>
                                         </div>
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.datacenter') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Google Review</span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </li>
                                 <li class="nav-item dropdown">
@@ -931,6 +933,17 @@
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
                                         <i data-feather="film"></i>
                                         <span data-key="t-extra-pages">Leads</span>
+                                    </a>
+                                </li>
+                                @endif
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
+                                @endphp
+                                @if ($hasPermission)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('salestargets.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="crosshair"></i>
+                                        <span data-key="t-extra-pages">Sales Targets</span>
                                     </a>
                                 </li>
                                 @endif
@@ -1331,12 +1344,17 @@
                                 </li>
                                 @endif
                                 @endcan
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['stock-full-view']);
+                                @endphp
+                                @if ($hasPermission)
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicles.viewall') }}" id="topnav-more" role="button">
                                         <i data-feather="server"></i>
                                         <span data-key="t-extra-pages">View All</span>
                                     </a>
                                 </li>
+                                @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['document-edit']);
                                 @endphp

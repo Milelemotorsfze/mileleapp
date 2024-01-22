@@ -83,84 +83,21 @@ input[type=number]::-webkit-outer-spin-button {
             <p><span style="float:right;" class="error">* Required Field</span></p>
 			</div>  
 			<form action="" method="post" enctype="multipart/form-data">
-            <div class="row">
-            <div class="col-lg-4 col-md-6">
-            <span class="error">* </span>
-            <label for="customertype">Customer Type:</label>
-            <select class="form-control" id="customertype" name="customertype" required>
-            <option value="" disabled selected>Select an Customer Type</option>
-                <option value="individual">Individual</option>
-                <option value="company">Company</option>
-                <option value="government">Government</option>
-            </select>
-            </div>
-            </div>
                 <div class="row"> 
-					<div class="col-lg-4 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                     <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
-                        {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control', 'required' => 'required')) !!}
+                    <label for="basicpill-firstname-input" class="form-label">Customer : </label>
+                    <select id="client_id" name="client_id" class="form-control">
+                        @foreach ($clients as $client)
+                            <option value="{{ $client->client->id }}">{{ $client->client->name }}</option>
+                        @endforeach
+                    </select>
                     </div>
                     <div class="col-lg-4 col-md-6">
                     <span class="error">* </span>
-                    <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
-                    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number">
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                    <span class="error">*</span>
-                    <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
-                    {!! Form::email('email', null, array('id' => 'email', 'placeholder' => 'Email','class' => 'form-control', 'required' => 'required')) !!}
-                    <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
-                    <div id="emailError" class="error-text"></div>
-                    </div>
-                    <div class="col-lg-4 col-md-6" id="companyNameField" style="display: none;">
-                        <label for="basicpill-firstname-input" class="form-label">Company Name : </label>
-                        <input type="text" id="company_name" name="company_name" class="form-control" placeholder="Company Name">
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                    <span class="error">* </span>
-                    <label for="basicpill-firstname-input" class="form-label">Source:</label>
-                    <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput" required>
-                    <datalist id="milelemotorsList">
-                    @foreach ($LeadSource as $source)
-                    <option value="{{ $source->source_name }}">{{ $source->source_name }}</option>
-                    @endforeach
-                    </datalist>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                    <span class="error">*</span>
-                    <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
-                    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" required>
-                    <datalist id="laList">
-                        <option value="English" data-value="English">English</option>
-                        <option value="Arabic" data-value="English">Arabic</option>
-                        <option value="Russian" data-value="English">Russian</option>
-                        <option value="Urdu" data-value="English">Urdu</option>
-                        <option value="Hindi" data-value="English">Hindi</option>
-                        <option value="Kannada" data-value="English">Kannada</option>
-                        <option value="French" data-value="English">French</option>
-                        <option value="Malayalam" data-value="English">Malayalam</option>
-                        <option value="Tamil" data-value="English">Tamil</option>
-                        <option value="Spanish" data-value="English">Spanish</option>
-                        <option value="Portuguese" data-value="English">Portuguese</option>
-                        <option value="Shona" data-value="English">Shona</option>
-                    </datalist>
-                </div>
-                    <div class="col-xs-4 col-sm-12 col-md-4">
-                    <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Destination / Nationality : </label>
-                        <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput" required>
-                    <datalist id="loList">
-                    @foreach ($countries as $country)
-                    <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
-                    @endforeach
-                    </datalist>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                        <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Shipping Type : </label>
-                        <select class="form-control" id="shippingtype" name="type" required>
-                        <option value="" disabled selected>Select an Shipping Type</option>
+                    <label for="basicpill-firstname-input" class="form-label">Shipping Type : </label>
+                    <select class="form-control" id="shippingtype" name="type" required>
+                    <option value="" disabled selected>Select an Shipping Type</option>
                     <option value="Export" data-value="Export">Export</option>
                     <option value="Local" data-value="Local">Local</option>
                     <option value="Other" data-value="Other">Other</option>
@@ -174,18 +111,6 @@ input[type=number]::-webkit-outer-spin-button {
                     <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
                     @endforeach
                     </datalist>
-                    </div>
-                    <div class="col-lg-4 col-md-6" id="tradeLicenseField" style="display: none;">
-                    <label for="basicpill-firstname-input" class="form-label">Trade License : </label>
-                    <input type="file" id="tradelicense" class="form-control" name="tradelicense">
-                    </div>
-                    <div class="col-lg-4 col-md-6" id="tenderLicenseField" style="display: none;">
-                    <label for="basicpill-firstname-input" class="form-label">Tender Copy : </label>
-                    <input type="file" id="tender" class="form-control" name="tender">
-                    </div>
-                    <div class="col-lg-4 col-md-6" id="passportField" style="display: none;">
-                    <label for="basicpill-firstname-input" class="form-label">Passport : </label>
-                    <input type="file" id="passport" class="form-control" name="passport">
                     </div>
                     </div>
                     </br>
@@ -238,14 +163,35 @@ input[type=number]::-webkit-outer-spin-button {
 @endif
 @endsection
 @push('scripts')
+<script>
+    $(document).ready(function() {
+        function toggleFields() {
+            var shippingtype = document.getElementById("shippingtype");
+            var countryexp = document.getElementById("countryexp");
+            if (shippingtype && countryexp) {
+                if (shippingtype.value === "Export") {
+                    countryexp.style.display = "block";
+                } else {
+                    countryexp.style.display = "none";
+                }
+            }
+        }
+        toggleFields();
+        var shippingTypeElement = document.getElementById("shippingtype");
+        if (shippingTypeElement) {
+            shippingTypeElement.addEventListener("change", toggleFields);
+        }
+    });
+</script>
     <script type="text/javascript">
+        $(document).ready(function () {
+            $('select[name="client_id"]').select2();
+        });
 $(document).ready(function() {
   var max_fields = 10;
   var wrapper = $("#row-container");
   var add_button = $(".add-row-btn");
   var x = 1;
-
-  // Function to filter and update the dropdown list
   function updateDropdownList() {
     var selectedValues = $('input[name="model_line_id[]"]').map(function() {
       return $(this).val();
@@ -318,49 +264,6 @@ $(document).ready(function() {
     updateDropdownList();
   });
 });
-document.getElementById('languageInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
-            }
-        }
-        input.setCustomValidity('Please select a valid Language from the list.');
-    });
-    document.getElementById('locationInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
-            }
-        }
-        input.setCustomValidity('Please select a valid Location from the list.');
-    });
-    document.getElementById('milelemotorsInput').addEventListener('input', function(event) {
-        var input = event.target;
-        var list = input.getAttribute('list');
-        var options = document.querySelectorAll('#' + list + ' option');
-        var inputValue = input.value;
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-            if (option.value === inputValue) {
-                input.setCustomValidity('');
-                return;
-            }
-        }
-        input.setCustomValidity('Please select a valid Source from the list.');
-    });
     document.getElementById('brandInput').addEventListener('input', function(event) {
         var input = event.target;
         var list = input.getAttribute('list');
@@ -434,7 +337,7 @@ document.getElementById('languageInput').addEventListener('input', function(even
             newValue = '+' + newValue;
         }
         if (newValue.length > 15) {
-            newValue = newValue.slice(0, 15); // Truncate to 15 digits
+            newValue = newValue.slice(0, 15);
         }
         input.value = newValue;
     });
@@ -448,89 +351,7 @@ document.getElementById('languageInput').addEventListener('input', function(even
     });
 });
 </script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var customertypeDropdown = document.getElementById("customertype");
 
-        if (customertypeDropdown) {
-            customertypeDropdown.addEventListener("change", toggleFields);
-        }
-        function toggleFields() {
-            var customerType = customertypeDropdown.value;
-            var companyNameField = document.getElementById("companyNameField");
-            var tradeLicenseField = document.getElementById("tradeLicenseField");
-            var Tradelicense = document.getElementById("tenderLicenseField");
-            var Passport = document.getElementById("passportField");
-            if (customerType === "company") {
-                companyNameField.style.display = "block";
-                tradeLicenseField.style.display = "block";
-                Passport.style.display = "none";
-                Tradelicense.style.display = "none";
-            } 
-            else if (customerType === "government") {
-                Tradelicense.style.display = "block";
-                companyNameField.style.display = "none";
-                tradeLicenseField.style.display = "none";
-                Passport.style.display = "none";
-            }
-            else if (customerType === "individual") {
-                companyNameField.style.display = "none";
-                tradeLicenseField.style.display = "none";
-                Tradelicense.style.display = "none";
-                Passport.style.display = "block";
-            }
-        }
-    });
-</script>
-<script>
-   document.addEventListener("DOMContentLoaded", function() {
-    var purtype = document.getElementById("shippingtype");
-    if (purtype) {
-        purtype.addEventListener("change", toggleFields);
-    }
-    function toggleFields() {
-        var selectedType = purtype.value;
-        var countryofexport = document.getElementById("countryexp");
-
-        if (selectedType === "Export") {
-            countryofexport.style.display = "block";
-        } else {
-            countryofexport.style.display = "none";
-        }
-    }
-});
-$(document).ready(function() {
-        $('#phone, #email').on('input', function() {
-            var phone = $('#phone').val();
-            var email = $('#email').val();
-            $.ajax({
-                url: "{{ route('checkExistence') }}",
-                method: 'POST',
-                data: {
-                    phone: phone,
-                    email: email,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    $('#phoneCount').text('Phone count: ' + response.phoneCount);
-                    $('#emailCount').text('Email count: ' + response.emailCount);
-                    if (response.phoneCount > 0 || response.emailCount > 0) {
-                        // var customerNames = response.customerNames.join(', ');
-                        // var message = 'Customer Names: ' + customerNames + '<br>';
-                        message = 'Phone Count: ' + response.phoneCount + '<br>';
-                        message += 'Email Count: ' + response.emailCount;
-                        var buttonHtml = '<a href="{{ route('repeatedcustomers') }}?phone=' + encodeURIComponent(phone) + '&email=' + email + '" class="btn btn-primary">See Details</a>';
-                        message += '<br>' + buttonHtml;
-                        
-                        $('#flashMessage').html('<div class="alert alert-info">' + message + '</div>');
-                    } else {
-                        $('#flashMessage').html('');
-                    }
-                }
-            });
-        });
-    });
-</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>
 @endpush
