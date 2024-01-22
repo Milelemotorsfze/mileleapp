@@ -439,17 +439,24 @@
                                             @endcanany
                                         </div>
                                         <div class="dropdown">
-                                            @canany(['list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'])
+                                            @canany(['list-all-overtime','list-current-user-overtime','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'])
                                             @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-increment','list-current-user-increment','view-all-list-insurance','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user']);
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-overtime','list-current-user-overtime','view-all-list-insurance','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user']);
                                             @endphp
                                             @if ($hasPermission)
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Reimbursement</span>
                                             </a>
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                            @canany(['list-all-overtime','list-current-user-overtime'])
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-overtime','list-current-user-overtime']);
+                                            @endphp
+                                            @if ($hasPermission)
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('overtime.index') }}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Over Time Application</span>
                                             </a>
+                                            @endif
+                                            @endcanany
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">My Reportees</span>
                                             </a>

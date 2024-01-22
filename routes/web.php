@@ -16,6 +16,7 @@ use App\Http\Controllers\HRM\Employee\BirthDayGiftPOController;
 use App\Http\Controllers\HRM\Employee\TicketAllowancePOController;
 use App\Http\Controllers\HRM\Employee\InsuranceController;
 use App\Http\Controllers\HRM\Employee\IncrementController;
+use App\Http\Controllers\HRM\Employee\OverTimeController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -357,6 +358,8 @@ Route::get('/d', function () {
     Route::resource('insurance', InsuranceController::class);
     // Employee Increment
     Route::resource('increment', IncrementController::class);
+    // Employee Overtime Application
+    Route::resource('overtime', OverTimeController::class);
     
     // Demand & Planning Module
 
