@@ -12,6 +12,9 @@ use App\Models\Variantlog;
 use App\Models\ModelSpecification;
 use App\Models\ModelSpecificationOption;
 use App\Models\VariantItems;
+use App\Models\AddonTypes;
+use App\Models\AddonDetails;
+use App\Models\ModifiedVariants;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
@@ -605,4 +608,143 @@ public function savespecification(Request $request)
     }
     return response()->json(['message' => 'Option added successfully'], 200);
 }
-}
+    public function variantsaddons(string $id)
+    {
+        (new UserActivityController)->createActivity('Modified the Variants');
+        $variant = Varaint::findOrFail($id);
+        $brand = Brand::findOrFail($variant->brands_id);
+        $masterModelLine = MasterModelLines::findOrFail($variant->master_model_lines_id);
+        $modelspecifications = ModelSpecification::where('master_model_lines_id', $variant->master_model_lines_id)->get();
+        $addonsdetails = AddonTypes::where('brand_id', $brand->id)
+        ->where('model_id', $masterModelLine->id)
+        ->orWhereNull('model_id')
+        ->get();
+    $addonDetailsIds = $addonsdetails->pluck('addon_details_id');
+    $addonsaccessores = AddonDetails::where('addon_type_name', 'P')
+        ->whereIn('id', $addonDetailsIds)
+        ->get();
+    $spareparts = AddonDetails::where('addon_type_name', 'SP')
+        ->whereIn('id', $addonDetailsIds)
+        ->get();
+        return view('variants.addons',compact('variant','brand','masterModelLine', 'addonsaccessores', 'spareparts', 'modelspecifications'));
+    }
+    public function variantmodifications(Request $request)
+    {
+    $matchingerror = "";
+    $masterModelLineId = $request->input('master_model_lines_id');
+    $variant = $request->input('varaint');
+    $attributes = $request->input('attributes');
+    $accessories = $request->input('accessories');
+    $spareparts = $request->input('spareparts');
+    if($spareparts)
+    {
+    $sparepartsCount = count($spareparts);
+    }
+    else
+    {
+        $sparepartsCount = 0;
+    }
+    if($attributes)
+    {
+    $attributesCount = count($attributes);
+    }
+    else
+    {
+        $attributesCount = 0;  
+    }
+    $modified_variant_ids = ModifiedVariants::where('base_varaint_id', $variant)->groupBy('modified_varaint_id')->pluck('modified_varaint_id');
+    $existingVariant = [];
+    $maxExistingVariantCount = 0;
+    if($modified_variant_ids)
+    {
+    foreach ($modified_variant_ids as $id) {
+    $existingVariant = ModifiedVariants::where('base_varaint_id', $variant)
+        ->where('modified_varaint_id', $id)
+        ->where(function ($query) use ($attributes, $accessories, $attributesCount) { 
+            for ($i = 0; $i < $attributesCount; $i++) {
+                $currentAttributes = $attributes[$i];
+                $currentAccessories = $accessories[$i];
+                $query->orWhere(function ($subQuery) use ($currentAttributes, $currentAccessories) {
+                    $subQuery->where('modified_variant_items', $currentAttributes)
+                        ->where('addons_id', $currentAccessories);
+                });
+            }
+        })
+        ->get();
+        $modified_variant_counts = ModifiedVariants::where('base_varaint_id', $variant)->where('modified_varaint_id', $id)->count();
+        $existingVariantCount = count($existingVariant);
+        if($modified_variant_counts === $existingVariantCount)
+        {
+        if ($existingVariantCount > $maxExistingVariantCount) {
+            $maxExistingVariantCount = $existingVariantCount;
+        }
+        }
+    }
+    }
+    if($attributesCount === $maxExistingVariantCount)
+    {
+        return redirect()->back()->with('message', 'Variant already exists.');
+    }
+    else
+    {
+    $existingVariantsname = ModifiedVariants::where('base_varaint_id', $variant)->latest()->first();
+    if($existingVariantsname)
+    {
+        $existingvariantname = $existingVariantsname->name;
+        $nextVariantName = ++$existingvariantname;
+    }
+    else 
+    {
+        $nextVariantName = "A";
+    }
+    $variantfull = Varaint::findOrFail($variant);
+    $newvariant = New Varaint();
+    $oldname = $variantfull->name;
+    $newvariant->name = $oldname . $nextVariantName;
+    $newvariant->engine = $variantfull->engine;
+    $newvariant->fuel_type = $variantfull->fuel_type;
+    $newvariant->gearbox = $variantfull->gearbox;
+    $newvariant->master_model_lines_id = $variantfull->master_model_lines_id;
+    $newvariant->brands_id = $variantfull->brands_id;
+    $newvariant->master_models_id = $variantfull->master_models_id;
+    $newvariant->my = $variantfull->my;
+    $newvariant->drive_train = $variantfull->drive_train;
+    $newvariant->coo = $variantfull->coo;
+    $newvariant->steering = $variantfull->steering;
+    $newvariant->upholestry = $variantfull->upholestry;
+    $newvariant->detail = $variantfull->detail;
+    $newvariant->model_detail = $variantfull->model_detail;
+    $newvariant->category = "Modified";
+    $newvariant->save();
+    $count = count($attributes);
+    if($count >= 1)
+    {
+    for ($i = 0; $i < $count; $i++) {
+    $newModifiedVariant = new ModifiedVariants();
+    $newModifiedVariant->name = $nextVariantName;
+    $newModifiedVariant->modified_variant_items = $attributes[$i];
+    $newModifiedVariant->addons_id = $accessories[$i];
+    $newModifiedVariant->base_varaint_id = $variantfull->id;
+    $newModifiedVariant->modified_varaint_id = $newvariant->id;
+    $newModifiedVariant->save();
+    }
+    }
+    if($spareparts)
+    {
+    $countsp = count($spareparts);
+    if($countsp >= 1)
+    {
+    for ($i = 0; $i < $countsp; $i++) {
+    $newModifiedVariantsp = new ModifiedVariants();
+    $newModifiedVariantsp->name = $nextVariantName;
+    $newModifiedVariantsp->addons_id = $spareparts[$i];
+    $newModifiedVariantsp->base_varaint_id = $variantfull->id;
+    $newModifiedVariantsp->modified_varaint_id = $newvariant->id;
+    $newModifiedVariantsp->save();
+    }
+    }
+    }
+    return redirect()->back()->with('message', 'Variant created successfully.');
+    }
+    }
+    }

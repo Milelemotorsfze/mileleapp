@@ -142,13 +142,19 @@ input[type=number]::-webkit-outer-spin-button
           </div>
       @endif
       @can('sales-view')
-      <a class="btn btn-sm btn-success float-end" href="{{ route('dailyleads.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
+      <a class="btn btn-sm btn-info float-end" href="{{ route('salescustomers.index') }}" text-align: right>
+        <i class="fa fa-users" aria-hidden="true"></i> Customers
       </a>
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <a class="btn btn-sm btn-primary float-end" href="{{ route('booking.index') }}" text-align: right>
         <i class="fa fa-info" aria-hidden="true"></i> Bookings
       </a>
+      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+      <a class="btn btn-sm btn-success float-end" href="{{ route('dailyleads.create') }}" text-align: right>
+        <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
+      </a>
+     
+      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <!-- <a class="btn btn-sm btn-primary float-end" href="" text-align: right>
         <i class="fa fa-info" aria-hidden="true"></i> Bookings (Coming Soon)
       </a> -->

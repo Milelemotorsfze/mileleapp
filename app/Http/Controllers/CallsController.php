@@ -921,7 +921,7 @@ return view('calls.resultbrand', compact('data'));
                 $call->created_by = Auth::id();
                 $call->status = "New";
                 $call->location = $row[3];
-                $call->save();
+                $call->save(); 
                 if ($model_line_name !== null) {
                     $modelLine = MasterModelLines::where('model_line', $model_line_name)->first();
                     if ($modelLine) {

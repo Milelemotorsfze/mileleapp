@@ -17,6 +17,7 @@ use App\Models\Brand;
 use App\Models\So;
 use App\Models\Prospecting;
 use App\Models\Salesdemand;
+use App\Models\SalespersonOfClients;
 use App\Models\Negotiation;
 use App\Models\Booking;
 use App\Models\Clients;
@@ -210,12 +211,14 @@ class DailyleadsController extends Controller
         $useractivities->activity = "Create the New Direct Lead";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->whereIn('id', [6, 16, 35, 40])->get();
         $countries = CountryListFacade::getList('en');
+        $salespersonId = auth()->user()->id;
+        $clients = SalespersonOfClients::with('client')
+        ->where('sales_person_id', $salespersonId)
+        ->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        return view('dailyleads.create', compact('countries', 'modelLineMasters', 'LeadSource'));
+        return view('dailyleads.create', compact('modelLineMasters', 'clients', 'countries'));
     }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -231,79 +234,33 @@ class DailyleadsController extends Controller
         $modelLineIds = json_decode($modelLineIdsRaw, true);
         $modelLineIds = array_map('strval', $modelLineIds);
         }
-        $this->validate($request, [
-            'phone' => 'nullable|required_without:email',
-            'email' => 'nullable|required_without:phone|email',
-            'location' => 'required',
-            'milelemotors' => 'required',
-            'language' => 'required',
-            'type' => 'required',
-        ]);
-        $existingClient = Calls::where('phone', $request->input('phone'))
-        ->orWhere('email', $request->input('email'))
-        ->first();
+        $client = Clients::find($request->input('client_id'));
         $date = Carbon::now();
         $date->setTimezone('Asia/Dubai');
+        $dataValue = LeadSource::where('source_name', $client->source)->value('id');
         $formattedDate = $date->format('Y-m-d H:i:s');
-        $dataValue = LeadSource::where('source_name', $request->input('milelemotors'))->value('id');
         $data = [
-            'name' => $request->input('name'),
+            'name' => $client->name,
             'source' => $dataValue,
-            'email' => $request->input('email'),
+            'email' => $client->email,
             'type' => $request->input('type'),
             'sales_person' => Auth::id(),
             'remarks' => $request->input('remarks'),
-            'location' => $request->input('location'),
-            'phone' => $request->input('phone'),
+            'location' => $client->destination,
+            'phone' => $client->phone,
             'custom_brand_model' => $request->input('custom_brand_model'),
-            'language' => $request->input('language'),
+            'language' => $client->lauguage,
             'created_at' => $formattedDate,
             'created_by' => Auth::id(),
             'status' => "New",
+            'priority' => "High",
             'customer_coming_type' => "Direct From Sales",
         ];
         $calls = new Calls($data);
         $calls->save();
-        $customertype = $request->input('customertype');
-        if($existingClient)
-        {
-            $clientid = ClientLeads::where('calls_id', $existingClient->id)->first();
-            if($clientid)
-            {
-                $customers = Clients::find($clientid->clients_id) ?? new Clients();
-
-            }
-            else {
-                $customers = New Clients(); 
-            }
-        }
-        else{
-            $customers = New Clients(); 
-        }
-        $customers->customertype = $customertype;
-        if($customertype === "company")
-        {
-        $file = $request->file('tradelicense');
-        $path = $file->store('tradelicenses');
-        $customers->tradelicense = $path;
-        }
-        else if ($customertype === "government")
-        {
-            $file = $request->file('tender');
-            $path = $file->store('tenders');
-            $customers->tender = $path;
-        }
-        else 
-        {
-            $file = $request->file('passport');
-            $path = $file->store('passports');
-        $customers->passport = $path;
-        }
-        $customers->countryofexport = $request->input('countryofexport');
-        $customers->save();
         $clientleads = New ClientLeads();
         $clientleads->calls_id = $calls->id; 
-        $clientleads->clients_id = $customers->id;
+        $clientleads->clients_id = $client->id;
         $clientleads->save();
         $lastRecord = Calls::where('created_by', $data['created_by'])
                    ->orderBy('id', 'desc')
@@ -376,13 +333,11 @@ class DailyleadsController extends Controller
     $calls = Calls::where('status', $status)->get();
 
     $data = [];
-
     foreach ($calls as $call) {
         $modelLines = CallsRequirement::where('lead_id', $call->id)
             ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
             ->pluck('master_model_lines.model_line')
             ->toArray();
-
         $data[] = [
             'created_at' => $call->created_at,
             'name' => $call->name,
@@ -541,6 +496,33 @@ public function saveprospecting(Request $request)
     $call->status = 'Prospecting';
     $call->priority = $request->has('priority') ? $request->priority : '';
     $call->save();
+    $existingclients = Clients::where('phone', $call->phone)->orwhere('email', $call->email);
+    $existingleads = ClientLeads::where('calls_id', $call->id);
+    if(!$existingleads)
+    {
+    if($existingclients)
+    {
+        $clientleads = New ClientLeads();
+        $clientleads->calls_id = $call->id; 
+        $clientleads->clients_id = $existingclients->id;
+        $clientleads->save();  
+    }
+    else
+    {
+        $client = New Clients();
+        $client->name = $call->name;
+        $client->phone = $call->phone;
+        $client->email = $call->email;
+        $client->source = $call->source;
+        $client->lauguage = $call->language;
+        $client->destination = $call->location;
+        $client->save();
+        $clientleads = New ClientLeads();
+        $clientleads->calls_id = $call->id; 
+        $clientleads->clients_id =  $client->id;
+        $clientleads->save();  
+    }
+    }
     return response()->json(['success' => true]);
 	}
     public function savedemand(Request $request)
