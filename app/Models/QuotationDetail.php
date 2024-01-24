@@ -14,10 +14,10 @@ class QuotationDetail extends Model
     }
     public function shippingPort()
     {
-        return $this->belongsTo(MasterShippingPort::class);
+        return $this->belongsTo(MasterShippingPorts::class);
     }
     public function shippingPortOfLoad()
     {
-        return $this->belongsTo(MasterShippingPort::class,'to_shipping_port_id','id');
+        return $this->belongsTo(MasterShippingPorts::class,'to_shipping_port_id','id');
     }
 }

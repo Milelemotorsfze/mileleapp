@@ -469,12 +469,11 @@ Route::get('/d', function () {
     Route::post('quotation-data/vehicles-insert', [QuotationController::class,'addvehicles'])->name('quotation.vehicles-insert');
     Route::get('/quotation/shipping-port', [QuotationController::class,'getShippingPort'])->name('quotation.shipping_ports');
     Route::get('/quotation/shipping-charges', [QuotationController::class,'getShippingCharges'])->name('quotation.shipping_charges');
-
         Route::get('/get-vehicle-count/{userId}', function($userId) {
     $count = DB::table('vehiclescarts')->where('created_by', $userId)->count();
     return $count;
     });
-
+    Route::post('dailyleads/getvins', [QuotationController::class, 'getvinsqoutation'])->name('dailyleads.getvinsqoutation');
     // vehicle pictures
      Route::get('vehicle-pictures/variant-details', [VehiclePicturesController::class,'getVariantDetail'])->name('vehicle-pictures.variant-details');
      Route::resource('vehicle-pictures', VehiclePicturesController::class);
