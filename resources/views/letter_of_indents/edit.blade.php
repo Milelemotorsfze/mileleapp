@@ -120,7 +120,7 @@
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
                         <input type="date" class="form-control widthinput" id="basicpill-firstname-input" name="date"
-                               value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}">
+                               value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}"  max="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}" >
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">

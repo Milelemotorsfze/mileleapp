@@ -67,7 +67,7 @@
                     @csrf
                     <input type="hidden" name="po_from" value="DEMAND_PLANNING">
                     <div class="row">
-                        <input type="hidden" value="{{ $vendor }}" name="vendors_id">
+                        <input type="hidden" value="{{ $pfi->supplier_id }}" name="vendors_id">
                         <div class="col-lg-2 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label font-size-13 ">PO Number</label>
@@ -111,11 +111,10 @@
                             <div class="col-lg-1 col-md-6">
                                 <label for="engineNumber" class="form-label">Engine Number:</label>
                             </div>
-{{--                            <div class="col-lg-1 col-md-6">--}}
-{{--                                <label for="exColour" class="form-label">Territory:</label>--}}
-{{--                            </div>--}}
-
-                            <div class="col-lg-2 col-md-6">
+                            <div class="col-lg-1 col-md-6">
+                                <label for="unitPrice" class="form-label">Unit Price:</label>
+                            </div>
+                            <div class="col-lg-1 col-md-6">
                                 <label for="QTY" class="form-label">VIN:</label>
                             </div>
                         </div>
@@ -124,19 +123,22 @@
                     <div class="row">
                         <div class="row">
                             <div class="col-lg-2 col-md-6">
-                                <label for="brandInput" class="form-label">Variant:</label>
+                                <label class="form-label">Variant</label>
                             </div>
                             <div class="col-lg-2 col-md-6">
-                                <label for="QTY" class="form-label">Brand:</label>
+                                <label  class="form-label">Brand</label>
                             </div>
-                            <div class="col-lg-3 col-md-6">
-                                <label for="QTY" class="form-label">Model Line:</label>
+                            <div class="col-lg-2 col-md-6">
+                                <label  class="form-label">Model Line</label>
                             </div>
-                            <div class="col-lg-3 col-md-6">
-                                <label for="QTY" class="form-label">Variant Detail:</label>
+                            <div class="col-lg-2 col-md-6">
+                                <label  class="form-label">Variant Detail</label>
+                            </div>
+                            <div class="col-lg-2 col-md-6">
+                                <label  class="form-label">Unit Price</label>
                             </div>
                             <div class="col-lg-1 col-md-6">
-                                <label for="QTY" class="form-label">QTY:</label>
+                                <label  class="form-label">QTY</label>
                             </div>
                         </div>
                         @foreach($pfiVehicleVariants as $key => $pfiVehicleVariant)
@@ -144,27 +146,34 @@
                                 <input type="hidden" name="approved_loi_ids[]" value="{{$pfiVehicleVariant->id}}">
                                 <input type="hidden" id="master-model-id-{{$key}}" value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->id ?? ''}}">
                                 <div class="col-lg-2 col-md-6">
-                                    <input type="text" placeholder="Select Variants"  list="variantslist"
-                                           class="form-control mb-1" id="variant-id-{{$key}}" autocomplete="off"
-                                           data-id="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant_id}}"
-                                           value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->name ?? ''}}" readonly>
+                                    <select class="form-control mb-2" id="variant-id-{{$key}}" >
+                                        @foreach($pfiVehicleVariant->variants  as $variant)
+                                            <option value="{{ $variant->id }}"
+                                                {{ $variant->id == $pfiVehicleVariant->letterOfIndentItem->masterModel->variant_id ? 'selected' : ''  }} >{{ $variant->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                                 <div class="col-lg-2 col-md-6">
                                     <input type="text"   class="form-control" placeholder="Brand" id="brand-{{$key}}"
                                            value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}}" readonly>
                                 </div>
-                                <div class="col-lg-3 col-md-6">
+                                <div class="col-lg-2 col-md-6">
                                     <input type="text"  class="form-control" id="master-model-line-{{$key}}"
                                            value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? ''}}"
                                            placeholder="Model Line" readonly>
                                 </div>
-                                <div class="col-lg-3 col-md-6">
+                                <div class="col-lg-2 col-md-6">
                                     <input type="text" id="variant-detail-{{$key}}" class="form-control"  placeholder="Variants Detail" readonly
                                            value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->detail ?? ''}}">
                                 </div>
+                                <div class="col-lg-2 col-md-6">
+                                    <input type="text"  class="form-control" id="unit-price-{{$key}}"
+                                           value="{{ $pfiVehicleVariant->unit_price }}"
+                                           placeholder="Unit Price" readonly>
+                                </div>
                                 <div class="col-lg-1 col-md-6">
                                     <input type="number" id="quantity-{{$key}}" min="0"  oninput="checkQuantity({{$key}})" data-quantity="{{$pfiVehicleVariant->quantity}}"
-                                           class="form-control qty-{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant_id}}" value="{{ $pfiVehicleVariant->quantity }}" placeholder="QTY">
+                                      data-id="{{ $pfiVehicleVariant->id }}"  class="form-control qty-{{$pfiVehicleVariant->id}}" value="{{ $pfiVehicleVariant->quantity }}" placeholder="QTY">
                                     <span class="QuantityError-{{$key}} text-danger"></span>
                                 </div>
                             </div>
@@ -264,17 +273,17 @@
             for (var i = 0; i < variantQuantity; i++) {
                 checkQuantity(i);
                 var qty = $('#quantity-'+i).val();
-
                 var actualQuantity = $('#quantity-'+i).attr('data-quantity');
                 var remaingQuantity = parseInt(actualQuantity) - parseInt(qty);
                 $('#quantity-'+i).attr('data-quantity',remaingQuantity);
                 $('#quantity-'+i).val(remaingQuantity);
-                var selectedVariant = $('#variant-id-'+i).val();
+                var selectedVariant = $('#variant-id-'+i).find(":selected").text();
                 var brand = $('#brand-'+i).val();
                 var masterModelLine = $('#master-model-line-'+i).val();
                 var detail = $('#variant-detail-'+i).val();
-                var variantId = $('#variant-id-'+i).attr('data-id');
                 var masterModelId = $('#master-model-id-'+i).val();
+                var dataid = $('#quantity-'+i).attr('data-id');
+                var price = $('#unit-price-'+i).val();
 
                 for (var j = 0; j < qty; j++) {
                     var newRow = $('<div class="row row-space"></div>');
@@ -285,11 +294,11 @@
                     var detailCol = $('<div class="col-lg-2 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
                     var exColourCol = $('<div class="col-lg-1 col-md-6"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
                     var intColourCol = $('<div class="col-lg-1 col-md-6"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
-                    var vinCol = $('<div class="col-lg-2 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
+                    var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
                     var estimatedCol = $('<div class="col-lg-1 col-md-6"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
-                    // var territory = $('<div class="col-lg-1 col-md-6"><input type="text" name="territory[]" class="form-control"></div>');
                     var engineNumber = $('<div class="col-lg-1 col-md-6"><input type="text" name="engine_number[]" class="form-control"></div>');
-                    var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" data-variant-id="'+ variantId +'" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
+                    var unitPrice = $('<div class="col-lg-1 col-md-6"><input type="text"  value="' + price + '" name="unit_price[]" readonly class="form-control"></div>');
+                    var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" data-approved-id="' + dataid + '" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
                     // Populate Exterior Colors dropdown
                     var exColourDropdown = exColourCol.find('select');
                     for (var id in exColours) {
@@ -304,7 +313,7 @@
                             intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
                         }
                     }
-                    newRow.append(masterModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, vinCol, removeBtn);
+                    newRow.append(masterModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol, removeBtn);
                     $('#variantRowsContainer').append(newRow);
                 }
             }
@@ -317,13 +326,14 @@
 
         $(this).closest('.row').remove();
 
-        var variantId = $(this).attr('data-variant-id');
-        var selectedQuantity = $('.qty-'+variantId).val();
-        var variantQuantity = $('.qty-'+variantId).attr('data-quantity');
+        var Id = $(this).attr('data-approved-id');
+
+        var selectedQuantity = $('.qty-'+Id).val();
+        var variantQuantity = $('.qty-'+Id).attr('data-quantity');
         var remainingQty = parseInt(variantQuantity) + 1;
-        $('.qty-'+variantId).attr('data-quantity',remainingQty);
+        $('.qty-'+Id).attr('data-quantity',remainingQty);
         var latestQuantity = parseInt(selectedQuantity) + 1;
-        $('.qty-'+variantId).val(latestQuantity);
+        $('.qty-'+Id).val(latestQuantity);
 
         if ($('#variantRowsContainer').find('.row').length === 1) {
             $('.bar').hide();

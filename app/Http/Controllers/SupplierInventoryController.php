@@ -6,6 +6,7 @@ use App\Imports\SupplierInventoryImport;
 use App\Models\Brand;
 use App\Models\ColorCode;
 use App\Models\DemandList;
+use App\Models\LetterOfIndent;
 use App\Models\MasterModel;
 use App\Models\ModelYearCalculationCategory;
 use App\Models\Supplier;
@@ -292,6 +293,11 @@ class SupplierInventoryController extends Controller
             $chasis = [];
 
             foreach($uploadFileContents as $uploadFileContent) {
+
+//                $LOIs = LetterOfIndent::where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
+//                                        ->where('dealers', $request->whole_sales)
+//                                        ->where('date', )
+
 //                    info($uploadFileContent['model_year']);
 //                    info($uploadFileContent['model']);
 //                    info($uploadFileContent['sfx']);

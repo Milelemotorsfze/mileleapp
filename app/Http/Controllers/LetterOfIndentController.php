@@ -103,6 +103,16 @@ class LetterOfIndentController extends Controller
      */
     public function create()
     {
+//        $LOI = LetterOfIndent::where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
+//            ->whereBetween('date',[Carbon::now()->subMonth(6), Carbon::now()])
+//            ->where('dealers', 'Trans Cars')
+//            ->whereHas('letterOfIndentItems', function ($query) {
+//                $query()
+//            })
+//            ->get();
+//
+//        dd($LOI->pluck('date'));
+
         $countries = Country::all();
         $customers = Customer::all();
         $models = MasterModel::whereNotNull('transcar_loi_description')->groupBy('model')->orderBy('id','ASC')->get();
@@ -115,6 +125,7 @@ class LetterOfIndentController extends Controller
      */
     public function store(Request $request)
     {
+
 //        dd($request->all());
 
         $request->validate([

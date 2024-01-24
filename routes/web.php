@@ -59,12 +59,12 @@ use App\Http\Controllers\HiringController;
 use App\Http\Controllers\LeadSourceController;
 use App\Http\Controllers\LOIItemsController;
 use App\Http\Controllers\StrategyController;
-use App\Http\Controllers\LOIDocumentsController;
+//use App\Http\Controllers\LOIDocumentsController;
 use App\Http\Controllers\Repeatedcustomers;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SupplierAddonController;
 use App\Http\Controllers\PFIController;
-use App\Http\Controllers\DemandPlanningSupplierController;
+//use App\Http\Controllers\DemandPlanningSupplierController;
 use App\Http\Controllers\VehiclePicturesController;
 use App\Http\Controllers\PurchasingOrderController;
 use App\Http\Controllers\MovementController;
@@ -364,7 +364,7 @@ Route::get('/d', function () {
     Route::resource('increment', IncrementController::class);
     // Employee Overtime Application
     Route::resource('overtime', OverTimeController::class);
-    
+
     // Demand & Planning Module
 
     // suppliers
@@ -737,7 +737,7 @@ Route::get('/d', function () {
     //Payment Terms
     Route::resource('paymentterms', PaymentTermsController::class);
     Route::resource('salestargets', SalesTargetsController::class);
-    
+
     //Customers
     Route::get('sales/customers', [CustomerController::class, 'salescustomers'])->name('salescustomers.index');
     Route::get('sales/customers/create', [CustomerController::class, 'createcustomers'])->name('salescustomers.create');
