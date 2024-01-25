@@ -42,11 +42,9 @@ class DemandPlanningPurchaseOrderController extends Controller
 
             $pfiVehicleVariant->quantity = $pfiVehicleVariant->quantity - $alreadyAddedQuantity;
             $masterModel = MasterModel::find($pfiVehicleVariant->letterOfIndentItem->masterModel->id);
-            $pfiVehicleVariant->variants = Varaint::whereHas('masterModel', function ($query) use($masterModel) {
-                $query->where('model', $masterModel->model)
-                    ->where('sfx', $masterModel->sfx);
-            })
-            ->get();
+            $pfiVehicleVariant->masterModels = MasterModel::where('model', $masterModel->model)
+                                            ->where('sfx', $masterModel->sfx)
+                                            ->get();
         }
 
         $exColours = ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();

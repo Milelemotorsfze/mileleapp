@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ApprovedLetterOfIndentItem;
+use App\Models\LetterOfIndentItem;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\MasterModel;
 use App\Models\PFI;
@@ -307,11 +308,14 @@ public function getBrandsAndModelLines(Request $request)
                     $territorys = $territory[$key];
                     $vehicle->territory = $territorys;
                 }
-                $vehicle->po_id = $purchasingOrderId;
+                $vehicle->purchasing_order_id = $purchasingOrderId;
                 $vehicle->status = "Not Approved";
                 // payment status need to update
                 if($request->input('master_model_id')) {
+                    info($key);
+
                     $masterModelId = $request->input('master_model_id');
+                    info($masterModelId[$key]);
                     $vehicle->master_model_id = $masterModelId[$key];
                 }
 
@@ -417,7 +421,7 @@ public function getBrandsAndModelLines(Request $request)
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
-{
+    {
     $useractivities =  New UserActivities();
         $useractivities->activity = "Update the Purchased order details";
         $useractivities->users_id = Auth::id();
@@ -967,7 +971,9 @@ public function paymentreleasesrejected($id)
 public function paymentrelconfirmdebited($id)
 {
     $vehicle = Vehicles::find($id);
+    info($vehicle->id);
     if ($vehicle) {
+        DB::beginTransaction();
         $vehicle->status = 'Payment Completed';
         $vehicle->payment_status = 'Payment Completed';
         $vehicle->save();
@@ -992,10 +998,31 @@ public function paymentrelconfirmdebited($id)
                 $paymentlogs->created_by = auth()->user()->id;
                 $paymentlogs->save();
                 if($vehicle->master_model_id) {
+                    info("payment completion stage");
                     // get the loi item and update the utilization quantity
+                   $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
+                                        ->pluck('approved_loi_id');
 
+                   $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
 
+                   $possibleIds = MasterModel::where('model', $vehicle->masterModel->model)
+                                    ->where('sfx', $vehicle->masterModel->sfx)->pluck('id')->toArray();
+                    info($possibleIds);
+                   foreach ($loiItemIds as $loiItemId) {
+                       $item = LetterOfIndentItem::find($loiItemId);
+                       if(in_array($item->master_model_id, $possibleIds)) {
+                           info("id existing");
+                           if($item->utilized_quantity < $item->approved_quantity) {
+                               info("quantity is less and updated");
+                               $item->utilized_quantity = $item->utilized_quantity + 1;
+                               $item->save();
+                               break;
+                           }
+
+                       }
+                   }
                 }
+                DB::commit();
         return redirect()->back()->with('success', 'Payment Payment Completed confirmed. Vehicle status updated.');
     }
     return redirect()->back()->with('error', 'Vehicle not found.');
@@ -1020,32 +1047,32 @@ public function paymentrelconfirmvendors($id)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
-            if($vehicle->master_model_id) {
-                $masterModel = MasterModel::find($vehicle->master_model_id);
-                $similarModelIds = MasterModel::where('model', $masterModel->model)
-                    ->where('steering', $masterModel->steering)
-                    ->where('sfx', $masterModel->sfx)
-                    ->where('model_year', $masterModel->model_year)
-                    ->pluck('id')->toArray();
-                // find the supplier and dealer
-               $supplier_id = $vehicle->purchasingOrder->LOIPurchasingOrder->approvedLOI->letterOfIndent->supplier_id ?? '';
-               $dealer = $vehicle->purchasingOrder->LOIPurchasingOrder->approvedLOI->letterOfIndent->dealers ?? '';
-              // dd($supplier_id);
-                // check the eta import date update time
-               $supplierInventory = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-                   ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-                   ->where('supplier_id', $supplier_id)
-                   ->where('whole_sales', $dealer)
-                   ->whereIn('master_model_id', $similarModelIds)
-                    ->whereNull('delivery_note')
-                   ->first();
-//               info($supplierInventory->id);
-               if($supplierInventory) {
-                   $supplierInventory->veh_status = SupplierInventory::VEH_STATUS_VENDOR_CONFIRMED;
-                   $supplierInventory->save();
-               }
-
-            }
+//            if($vehicle->master_model_id) {
+//                $masterModel = MasterModel::find($vehicle->master_model_id);
+//                $similarModelIds = MasterModel::where('model', $masterModel->model)
+//                    ->where('steering', $masterModel->steering)
+//                    ->where('sfx', $masterModel->sfx)
+//                    ->where('model_year', $masterModel->model_year)
+//                    ->pluck('id')->toArray();
+//                // find the supplier and dealer
+//               $supplier_id = $vehicle->purchasingOrder->LOIPurchasingOrder->approvedLOI->letterOfIndent->supplier_id ?? '';
+//               $dealer = $vehicle->purchasingOrder->LOIPurchasingOrder->approvedLOI->letterOfIndent->dealers ?? '';
+//              // dd($supplier_id);
+//                // check the eta import date update time
+//               $supplierInventory = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+//                   ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+//                   ->where('supplier_id', $supplier_id)
+//                   ->where('whole_sales', $dealer)
+//                   ->whereIn('master_model_id', $similarModelIds)
+//                    ->whereNull('delivery_note')
+//                   ->first();
+////               info($supplierInventory->id);
+//               if($supplierInventory) {
+//                   $supplierInventory->veh_status = SupplierInventory::VEH_STATUS_VENDOR_CONFIRMED;
+//                   $supplierInventory->save();
+//               }
+//
+//            }
 
         return redirect()->back()->with('success', 'Vendor Confirmed confirmed. Vehicle status updated.');
     }
@@ -1270,7 +1297,35 @@ public function allpaymentreqssfinpay(Request $request)
                            $paymentlogs->vehicle_id = $vehicle->id;
                            $paymentlogs->created_by = auth()->user()->id;
                            $paymentlogs->save();
+
+                       if($vehicle->master_model_id) {
+                           info("payment completion stage");
+                           // get the loi item and update the utilization quantity
+                           $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
+                               ->pluck('approved_loi_id');
+
+                           $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
+                           $masterModel = MasterModel::find($vehicle->master_model_id);
+                           $possibleIds = MasterModel::where('model', $masterModel->model)
+                               ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
+                           info($possibleIds);
+                           foreach ($loiItemIds as $loiItemId) {
+                               $item = LetterOfIndentItem::find($loiItemId);
+                               if(in_array($item->master_model_id, $possibleIds)) {
+                                   info("id existing");
+                                   if($item->utilized_quantity < $item->approved_quantity) {
+                                       info("quantity is less and updated");
+                                       info($item->id);
+                                       $item->utilized_quantity = $item->utilized_quantity + 1;
+                                       $item->save();
+                                       break;
+                                   }
+
+                               }
+                           }
+                       }
                    }
+
                    return redirect()->back()->with('success', 'Payment Status Updated');
               }
               public function allpaymentintreqpocomp(Request $request)

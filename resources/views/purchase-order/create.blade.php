@@ -146,10 +146,12 @@
                                 <input type="hidden" name="approved_loi_ids[]" value="{{$pfiVehicleVariant->id}}">
                                 <input type="hidden" id="master-model-id-{{$key}}" value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->id ?? ''}}">
                                 <div class="col-lg-2 col-md-6">
-                                    <select class="form-control mb-2" id="variant-id-{{$key}}" >
-                                        @foreach($pfiVehicleVariant->variants  as $variant)
-                                            <option value="{{ $variant->id }}"
-                                                {{ $variant->id == $pfiVehicleVariant->letterOfIndentItem->masterModel->variant_id ? 'selected' : ''  }} >{{ $variant->name }}</option>
+                                    <select class="form-control mb-2 variants" id="variant-id-{{$key}}" data-key="{{$key}}" >
+                                        @foreach($pfiVehicleVariant->masterModels as $masterModel)
+                                            <option value="{{ $masterModel->variant_id }}" data-model-id="{{$masterModel->id}}"
+                                                    data-brand="{{ $masterModel->variant->brand->brand_name ?? '' }}"  data-model-line="{{ $masterModel->variant->master_model_lines->model_line ?? '' }}"
+                                                    data-variant-detail="{{ $masterModel->variant->detail ?? '' }}"
+                                                {{ $masterModel->variant_id == $pfiVehicleVariant->letterOfIndentItem->masterModel->variant_id ? 'selected' : ''  }} >{{ $masterModel->variant->name ?? '' }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -278,6 +280,7 @@
                 $('#quantity-'+i).attr('data-quantity',remaingQuantity);
                 $('#quantity-'+i).val(remaingQuantity);
                 var selectedVariant = $('#variant-id-'+i).find(":selected").text();
+
                 var brand = $('#brand-'+i).val();
                 var masterModelLine = $('#master-model-line-'+i).val();
                 var detail = $('#variant-detail-'+i).val();
@@ -360,6 +363,20 @@
                 }
             }
         });
+    });
+
+    $('.variants').on('change', function() {
+        var key = $(this).attr('data-key');
+        console.log(key);
+        var model = $(this).find('option:selected').attr("data-model-id");
+        var brand = $(this).find('option:selected').attr("data-brand");
+        var modelLine = $(this).find('option:selected').attr("data-model-line");
+        var variantDetail = $(this).find('option:selected').attr("data-variant-detail");
+
+        $('#master-model-id-'+key).val(model);
+        $('#brand-'+key).val(brand);
+        $('#master-model-line-'+key).val(modelLine);
+        $('#variant-detail-'+key).val(variantDetail);
     });
 
     $('#submit-button').click(function(e) {

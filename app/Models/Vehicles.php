@@ -58,7 +58,11 @@ class Vehicles extends Model
     }
     public function purchasingOrder()
     {
-    return $this->belongsTo(PurchasingOrder::class, 'purchasing_order_id');
+        return $this->belongsTo(PurchasingOrder::class, 'purchasing_order_id');
+    }
+    public function masterModel()
+    {
+        return $this->belongsTo(MasterModel::class,'master_model_id','id');
     }
 
 public function latestRemarkSales()

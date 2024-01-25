@@ -98,7 +98,7 @@ th.nowrap-td {
         @php
         $userId = auth()->user()->id;
         $alreadyapproved = DB::table('purchasing_order')
-        ->where('created_by', $userId)                    
+        ->where('created_by', $userId)
         ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -166,7 +166,7 @@ th.nowrap-td {
         </tr>
     </tbody>
   </table>
-</div> 
+</div>
 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details');
                     @endphp
@@ -332,7 +332,7 @@ th.nowrap-td {
 <tr onclick="window.location='{{ route('purchasing.filterpendingdebits', ['status' => 'Approved']) }}';">
     <td style="font-size: 12px;">
         <a href="{{ route('purchasing.filterpendingdebits', ['status' => 'Approved']) }}">
-        Pending Payment Completion 
+        Pending Payment Completion
         </a>
     </td>
     <td style="font-size: 12px;">
@@ -464,7 +464,7 @@ $pendingvendorfol = DB::table('purchasing_order')
     </thead>
     <tbody>
       @php
-   
+
     $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->count();
     $vehiclescountpaymentreq = DB::table('vehicles')
     ->where('purchasing_order_id', $purchasingOrder->id)
@@ -489,7 +489,7 @@ $pendingvendorfol = DB::table('purchasing_order')
         <tr>
         <td style="font-size: 12px;">In Progress</td>
         <td style="font-size: 12px;">{{$vehiclescountpaymentreq}}</td>
-        </tr>  
+        </tr>
         <tr>
         <td style="font-size: 12px;">Incoming Stock</td>
         <td colspan="3" style="font-size: 12px;">{{$vendorpaymentconfirm}}</td>
@@ -531,7 +531,7 @@ $(document).ready(function() {
 
       selectWrapper.appendTo($(column.header()));
       $(column.header()).addClass('nowrap-td');
-      
+
       column.data().unique().sort().each(function(d, j) {
         select.append('<option value="' + d + '">' + d + '</option>');
       });
