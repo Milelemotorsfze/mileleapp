@@ -165,6 +165,9 @@
                                 <a data-placement="top" href="{{ route('variants.edit', $variant->id) }}" class="btn btn-info btn-sm"><i class="fa fa fa-clone">Duplicate</i>
                                 </a>
                                 </td>
+                                @else
+                                <td class="nowrap-td">
+                                </td>
                                 @endif
                             @endif
                             <!-- @can('variants-delete')

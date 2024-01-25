@@ -67,7 +67,6 @@
                                         @foreach ($modelspecifications as $modelspecifications)
                                             <option value="{{ $modelspecifications->id }}">{{ $modelspecifications->name }}</option>
                                         @endforeach
-                                        <option value="addons">New Addon</option>
                                     </select>
                                 </div>
                             </div>

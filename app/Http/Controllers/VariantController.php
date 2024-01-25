@@ -683,7 +683,7 @@ public function savespecification(Request $request)
     }
     if($attributesCount === $maxExistingVariantCount)
     {
-        return redirect()->back()->with('message', 'Variant already exists.');
+        return redirect()->route('variants.index')->with('message', 'Variant already exists.');
     }
     else
     {
@@ -744,7 +744,7 @@ public function savespecification(Request $request)
     }
     }
     }
-    return redirect()->back()->with('message', 'Variant created successfully.');
+    return redirect()->route('variants.index')->with('message', 'Variant created successfully.');
     }
     }
     }

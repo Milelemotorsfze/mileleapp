@@ -124,6 +124,41 @@
 	<br>
 </div>
 <div class="card-body">
+<div class="modal fade" id="vinmodal" tabindex="-1" role="dialog" aria-labelledby="vinmodalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fs-5" id="adoncode">Add New VIN</h5>
+          <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <!-- Table for VIN and Action columns -->
+          <table class="table">
+            <thead>
+              <tr>
+                <th>VIN</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="vinTableBody">
+              <!-- VIN and Action rows will be dynamically added here -->
+            </tbody>
+          </table>
+
+          <!-- Text field and "Add More" button -->
+          <div class="mb-3">
+            <label for="vinInput" class="form-label">VIN</label>
+            <input type="text" class="form-control" id="vinInput">
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="addVinRow()">Add</button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="submit_b_492" class="btn btn-primary btn-sm" onclick="submitModal()">Submit</button>
+        </div>
+      </div>
+  </div>
+</div>
 <div class="modal fade" id="addAgentModal" tabindex="-1" role="dialog" aria-labelledby="addAgentModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <form id="form-update2_492" method="POST">
@@ -1289,7 +1324,6 @@ $(document).ready(function () {
     $('#form-update2_492').submit(function (e) {
         e.preventDefault();
         var formData = new FormData($(this)[0]);
-
         $.ajax({
             url: "{{ route('agents.store') }}",
             method: 'POST',
@@ -2077,8 +2111,9 @@ $(document).ready(function () {
                 var directAdd = 'Direct-Add';
                 var removeButtonHtml = '<button type="button" class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
                 if (row['button_type'] === 'Vehicle' || row['table_type'] === 'vehicle-table') {
-                    var addonsButtonHtml = '<button type="button" class="btn btn-primary btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-type="' + row.model_type + '" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '" data-row-id="' + row.id + '">Addons</button>';
-                    return removeButtonHtml + addonsButtonHtml;
+                    var addonsButtonHtml = '<button type="button" class="btn btn-success btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-type="' + row.model_type + '" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '" data-row-id="' + row.id + '"><i class="fa fa-asterisk"></i></button>';
+                    var vinButtonHtml = '<button type="button" class="btn btn-primary btn-sm vin-button" style="margin-left: 5px; border-radius: 10px;" data-model-type="' + row.model_type + '" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '" data-row-id="' + row.id + '"><i class="fa fa-car"></i></button>';
+                    return removeButtonHtml + addonsButtonHtml + vinButtonHtml;
                 } else {
                     return removeButtonHtml;
                 }
@@ -2120,7 +2155,8 @@ $(document).ready(function () {
                         '<input type="hidden" name="model_description_ids[]" value="'+ row['model_description_id'] +'" >' +
                         '<input type="hidden" name="is_addon[]" value="'+ addon +'" ><input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
                         '<input type="hidden" name="uuids[]" value="'+ uuid +'" > <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
-                        '<input type="text"  value="'+ amount +'" class="total-amount-editable form-control" name="total_amounts[]" id="total-amount-'+ row['index'] +'" readonly />';
+                        '<input type="text"  value="'+ amount +'" class="total-amount-editable form-control" name="total_amounts[]" id="total-amount-'+ row['index'] +'" readonly />'+
+                        '<input type="hidden" name="vinnumbers[]" value="' + row['hiddenVIN'] + '" />' ;
                 }
             },
             {
@@ -3128,8 +3164,6 @@ $(document).ready(function () {
         return isEditable;
     }
         });
-    </script>
-  <script>
             $('#dtBasicExample2').on('click', '.addons-button', function () {
                 var Indexdatarows = $(this).data('index');
                 var modaltype = $(this).data('model-type');
@@ -3461,6 +3495,83 @@ $(document).ready(function () {
                     }
                 }
             });
+            // Initialize VIN data from local storage
+  var vinData = JSON.parse(localStorage.getItem('vinData')) || {};
+  $('#dtBasicExample2').on('click', '.vin-button', function () {
+  var RowId = $(this).data('number');
+  // Set the RowId in the modal trigger button
+  $('#vinmodal').data('rowId', RowId);
+  // Retrieve VINs from localStorage for the clicked row
+  var storedVins = JSON.parse(localStorage.getItem('vinData'))[RowId] || [];
+  // Populate modal table with stored VINs
+  populateModalTable(RowId, storedVins);
+  $('#vinmodal').modal('show');
+});
+$('#vinmodal').on('shown.bs.modal', function () {
+  var RowId = $('#vinmodal').data('rowId');
+  var storedVins = JSON.parse(localStorage.getItem('vinData'))[RowId] || [];
+  populateModalTable(RowId, storedVins);
+});
+  function populateModalTable(RowId) {
+    console.log(RowId);
+    $('#vinTableBody').empty();
+    if (vinData.hasOwnProperty(RowId)) {
+      var savedVins = vinData[RowId];
+      for (var i = 0; i < savedVins.length; i++) {
+        var vin = savedVins[i];
+        var rowHtml = '<tr><td>' + vin + '</td><td><button type="button" class="btn btn-danger btn-sm removeVinRow">Remove</button></td></tr>';
+        $('#vinTableBody').append(rowHtml);
+      }
+    }
+  }
+
+  function addVinRow(RowId) {
+    var RowId = $('#vinmodal').data('rowId');
+    var vinInput = $('#vinInput').val();
+    if (!vinData.hasOwnProperty(RowId)) {
+      vinData[RowId] = [];
+    }
+    vinData[RowId].push(vinInput);
+    populateModalTable(RowId);
+    $('#vinInput').val('');
+  }
+  $(document).on('click', '.removeVinRow', function () {
+  var RowId = $('#vinmodal').data('rowId');
+  var vinToRemove = $(this).closest('tr').find('td:first').text();
+  if (vinData.hasOwnProperty(RowId)) {
+    vinData[RowId] = vinData[RowId].filter(function (vin) {
+      return vin !== vinToRemove;
+    });
+    populateModalTable(RowId);
+  }
+});
+function submitModal() {
+    var RowId = $('#vinmodal').data('rowId');
+    var mainTable = $('#dtBasicExample2').DataTable();
+    var storedVins = JSON.parse(localStorage.getItem('vinData'))[RowId] || [];
+    var savedVins = vinData[RowId];
+    updateSecondTable(RowId, savedVins);
+    $('#vinmodal').modal('hide');
+}
+function updateSecondTable(RowId, savedVins) {
+    var secondTable = $('#dtBasicExample2').DataTable();
+    var data = secondTable.rows().data().toArray();
+    for (var i = 0; i < data.length; i++) {
+        var rowData = data[i];
+        console.log(rowData['number']);
+        if (rowData['number'] === RowId) {
+            var secondTableRow = secondTable.row(i);
+            if (secondTableRow && secondTableRow.node()) {
+                var existingData = secondTableRow.data();
+                existingData['hiddenVIN'] = savedVins.join(', ');
+                secondTableRow.data(existingData).draw();
+                // console.log('Updated Row Data:', existingData);
+                return;
+            }
+        }
+    }
+    console.error('Row with RowId ' + RowId + ' not found in the second table.');
+}
             $('#addonDataTable').on('click', '.add-button-addonsinner', function () {
                 var table = $('#addonDataTable').DataTable();
                 var rowData = [];
@@ -3701,6 +3812,5 @@ $(document).ready(function () {
 
                 });
             }
-
         </script>
 @endpush
