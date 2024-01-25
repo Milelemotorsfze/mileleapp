@@ -43,7 +43,13 @@ class LetterOfIndentController extends Controller
         $partialApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
             ->whereIn('status', [LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED,LetterOfIndent::LOI_STATUS_APPROVED])
-            ->cursor();
+            ->get();
+        foreach ($partialApprovedLOIs as $partialApprovedLOI) {
+            $partialApprovedLOI->utilized_quantity = LetterOfIndentItem::where('letter_of_indent_id', $partialApprovedLOI->id)
+                ->sum('utilized_quantity');
+            $partialApprovedLOI->total_quantity = LetterOfIndentItem::where('letter_of_indent_id', $partialApprovedLOI->id)
+                ->sum('quantity');
+        }
         $supplierApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
             ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
