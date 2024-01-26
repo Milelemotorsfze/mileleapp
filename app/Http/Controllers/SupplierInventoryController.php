@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\ColorCode;
 use App\Models\DemandList;
 use App\Models\LetterOfIndent;
+use App\Models\LetterOfIndentItem;
 use App\Models\MasterModel;
 use App\Models\ModelYearCalculationCategory;
 use App\Models\Supplier;
@@ -113,7 +114,6 @@ class SupplierInventoryController extends Controller
 
         if ($request->file('file'))
         {
-
             $errors = [];
             $numberOfFields = 10;
             $file = $request->file('file');
@@ -394,10 +394,9 @@ class SupplierInventoryController extends Controller
                         $inventoryHistory->upload_status = SupplierInventory::UPLOAD_STATUS_INACTIVE;
                         $inventoryHistory->save();
                     }
-
+                    $dealer = $request->whole_sales;
                     foreach ($uploadFileContents as $uploadFileContent)
                     {
-
                         $model = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->where('model_year', $uploadFileContent['model_year'])
@@ -410,6 +409,16 @@ class SupplierInventoryController extends Controller
                         $modelIds = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->pluck('id')->toArray();
+
+//                        $LOIItems = LetterOfIndentItem::with('LOI')->whereIn('master_model_id', $modelIds)
+//                                    ->whereHas('LOI', function ($query) use($modelIds, $dealer) {
+//                                        $query->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
+//                                            ->whereBetween('date',[Carbon::now()->subMonth(6), Carbon::now()])
+//                                            ->where('dealers', $dealer);
+//                                    })
+//                                    ->whereRaw('utilized_quantity < approved_quantity')
+//                                    ->orderBy('letter_of_indent_id','ASC')
+//                                    ->first();
 
                         $deliveryNote = $uploadFileContent['delivery_note'];
                         // after having DN data their is no changes for data of thata ro.so consider the data without eta import for inventory
