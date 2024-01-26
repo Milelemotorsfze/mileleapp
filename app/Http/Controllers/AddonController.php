@@ -391,7 +391,7 @@ class AddonController extends Controller {
                     }
 
                 }
-                if($addon->AddonTypes->count() > 3) {
+                if($addon->is_all_brands == 'no' && $addon->AddonTypes->count() > 3) {
                     $html .= '<div class="row justify-content-center mt-1">
                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                             <button title="View More Model Descriptions" class="btn btn-sm btn-info view-more text-center"
