@@ -579,21 +579,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	           if(id != '')
 	           {
 	               $('#addnewAddonButton').hide();
-	               $.ajax
-	               ({
-	                   url: '/addons/existingImage/'+id,
-	                   type: "GET",
-	                   dataType: "json",
-	                   success:function(data)
-	                   {
+	            //    $.ajax
+	            //    ({
+	            //        url: '/addons/existingImage/'+id,
+	            //        type: "GET",
+	            //        dataType: "json",
+	            //        success:function(data)
+	            //        {
 	                       $msg = "";
 	                       // removeAddonTypeError($msg);
 	                       removeAddonNameError($msg);
-	                       $('#addon_code').val(data.newAddonCode);
-	                       $("#addon_type").val(data.addon_type.addon_type);
+	                    //    $('#addon_code').val(data.newAddonCode);
+	                    //    $("#addon_type").val(data.addon_type.addon_type);
 	                       $("#selectBrandMo1").removeAttr('disabled');
-	                   }
-	               });
+	            //        }
+	            //    });
 	           }
 	           else
 	           {

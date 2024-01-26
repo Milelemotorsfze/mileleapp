@@ -1148,7 +1148,7 @@ class AddonController extends Controller {
         $price = '';
         $price = SupplierAddons::where('addon_details_id',$addonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
         $addonDetails->LeastPurchasePrices = $price;
-        $addons = Addon::select('id','name','addon_type')->get();
+        $addons = Addon::where('addon_type',$addonDetails->addon_type_name)->select('id','name','addon_type')->get();
         $existingBrandId = [];
         $existingBrandModel = [];
         if($addonDetails->is_all_brands == 'no') {
