@@ -62,8 +62,8 @@ class SupplierInventory extends Model
     public function getTotalQuantityAttribute()
     {
         $masterModel = MasterModel::find($this->master_model_id);
-        $masterModelIds = MasterModel::where('steering', $masterModel->steering)
-            ->where('model', $masterModel->model)
+        $masterModelIds = MasterModel:: where('model', $masterModel->model)
+//            ->where('steering', $masterModel->steering)
             ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
 
         $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
@@ -94,13 +94,12 @@ class SupplierInventory extends Model
     public function getActualQuantityAttribute()
     {
         $masterModel = MasterModel::find($this->master_model_id);
-        $masterModelIds = MasterModel::where('steering', $masterModel->steering)
-            ->where('model', $masterModel->model)
+        $masterModelIds = MasterModel::where('model', $masterModel->model)
+//            ->where('steering', $masterModel->steering)
             ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
 
         $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->whereNull('delivery_note')
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
 
 //        if (!empty(request()->start_date) && !empty(request()->end_date)) {
@@ -120,13 +119,13 @@ class SupplierInventory extends Model
     public function getQuantityWithoutChasisAttribute()
     {
         $masterModel = MasterModel::find($this->master_model_id);
-        $masterModelIds = MasterModel::where('steering', $masterModel->steering)
-            ->where('model', $masterModel->model)
+        $masterModelIds = MasterModel::where('model', $masterModel->model)
+//            ->where('steering', $masterModel->steering)
             ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
 
         $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->whereNull('delivery_note')
+//            ->whereNull('delivery_note')
             ->whereNull('chasis')
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
         if (!$supplierInventories) {
@@ -142,7 +141,7 @@ class SupplierInventory extends Model
         $supplierInventories =  DB::table('supplier_inventories')
             ->select(DB::raw('count(color_code) AS color_code_count, color_code'))
             ->join('master_models',  'supplier_inventories.master_model_id', '=','master_models.id')
-            ->where('master_models.steering', $masterModel->steering)
+//            ->where('master_models.steering', $masterModel->steering)
             ->where('master_models.model', $masterModel->model)
             ->where('master_models.sfx', $masterModel->sfx)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
