@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LetterOfIndentItem extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 //    public $timestamps = false;
     protected $appends = [
         'steering',
