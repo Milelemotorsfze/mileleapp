@@ -173,8 +173,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-list']);
   })
 
   function statusChange(id, status) {
-    let url = '{{ route('
-    warranty - brands.status - change ') }}';
+    let url = '{{ route('warranty-brands.status-change') }}';
     if (status == 'active') {
       var message = 'Active';
     } else {
