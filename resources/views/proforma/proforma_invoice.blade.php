@@ -175,7 +175,7 @@
                             <?php $shippingPerVehiclequantityPrice = $shippingChargeDistriAmount / $vehicle->quantity;
                             $vehicleUnitPrice = $vehicle->vehicle_unit_price + $shippingPerVehiclequantityPrice;
                             $totalAmount = $vehicleUnitPrice * $vehicle->quantity ?>
-                        <td>  {{ $vehicle->vehicle_unit_price }}<span style="font-weight: bold;font-size: 14px;" > {{ $key+1 }}. </span> {{ $vehicle->description }}</td>
+                        <td><span style="font-weight: bold;font-size: 14px;" > {{ $key+1 }}. </span> {{ $vehicle->description }}</td>
                         <td> {{$vehicle->system_code_currency ."". $vehicle->system_code_amount }}</td>
                         <td>{{ $vehicle->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($vehicleUnitPrice, 2) }} </td>

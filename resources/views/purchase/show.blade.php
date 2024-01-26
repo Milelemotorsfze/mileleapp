@@ -350,26 +350,26 @@
                             <tbody>
                             @foreach($vehicles as $vehicles)
                                 <tr>
-                                @php
-                            $variant = DB::table('varaints')->where('id', $vehicles->varaints_id)->first();
-                            $name = $variant->name;
-                            $exColour = $vehicles->ex_colour ? DB::table('color_codes')->where('id', $vehicles->ex_colour)->first() : null;
-                            $ex_colours = $exColour ? $exColour->name : null;
-                            $intColour = $vehicles->int_colour ? DB::table('color_codes')->where('id', $vehicles->int_colour)->first() : null;
-                            $int_colours = $intColour ? $intColour->name : null;
-                            $detail = $variant->detail;
-                            $brands_id = $variant->brands_id;
-                            $master_model_lines_id = $variant->master_model_lines_id;
-                            $brand = DB::table('brands')->where('id', $brands_id)->first();
-                            $brand_names = $brand->brand_name;
-                            $master_model_lines_ids = DB::table('master_model_lines')->where('id', $master_model_lines_id)->first();
-                            $model_line = $master_model_lines_ids->model_line;
-                            @endphp
+{{--                                @php--}}
+{{--                            $variant = DB::table('varaints')->where('id', $vehicles->varaints_id)->first();--}}
+{{--                            $name = $variant->name;--}}
+{{--                            $exColour = $vehicles->ex_colour ? DB::table('color_codes')->where('id', $vehicles->ex_colour)->first() : null;--}}
+{{--                            $ex_colours = $exColour ? $exColour->name : null;--}}
+{{--                            $intColour = $vehicles->int_colour ? DB::table('color_codes')->where('id', $vehicles->int_colour)->first() : null;--}}
+{{--                            $int_colours = $intColour ? $intColour->name : null;--}}
+{{--                            $detail = $variant->detail;--}}
+{{--                            $brands_id = $variant->brands_id;--}}
+{{--                            $master_model_lines_id = $variant->master_model_lines_id;--}}
+{{--                            $brand = DB::table('brands')->where('id', $brands_id)->first();--}}
+{{--                            $brand_names = $brand->brand_name;--}}
+{{--                            $master_model_lines_ids = DB::table('master_model_lines')->where('id', $master_model_lines_id)->first();--}}
+{{--                            $model_line = $master_model_lines_ids->model_line;--}}
+{{--                            @endphp--}}
                             <td>{{ $vehicles->id }}</td>
-                            <td>{{ ucfirst(strtolower($brand_names)) }}</td>
-                            <td>{{ ucfirst(strtolower($model_line)) }}</td>
-                            <td>{{ ucfirst($name) }}</td>
-                            <td>{{ ucfirst(strtolower($detail)) }}</td>
+                            <td>{{ ucfirst(strtolower("dfhfg")) }}</td>
+                            <td>{{ ucfirst(strtolower("")) }}</td>
+                            <td>{{ ucfirst("") }}</td>
+                            <td>{{ ucfirst(strtolower("")) }}</td>
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                             @endphp

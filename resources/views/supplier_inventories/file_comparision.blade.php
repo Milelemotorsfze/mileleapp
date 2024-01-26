@@ -67,9 +67,9 @@
                     <div class="row">
                         <div class="col-lg-3 col-md-3">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label text-muted">Supplier</label>
+                                <label for="choices-single-default" class="form-label text-muted">Vendor</label>
                                 <select class="form-control" autofocus name="supplier_id" id="supplier">
-                                    <option value="" disabled>Select The Supplier</option>
+                                    <option value="" disabled>Select The Vendor</option>
                                     @foreach($suppliers as $supplier)
                                         <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
                                     @endforeach
@@ -186,8 +186,8 @@
 
                            @foreach($deletedRows as $deletedRow)
                                <tr>
-                                   <td>{{ $deletedRow['model'] }}</td>
-                                   <td>{{ $deletedRow['sfx'] }}</td>
+                                   <td>{{ $deletedRow->masterModel->model ?? '' }}</td>
+                                   <td>{{ $deletedRow->masterModel->sfx ?? '' }}</td>
                                    <td>{{ $deletedRow['chasis']  }}</td>
                                    <td>{{ $deletedRow['engine_number'] }}</td>
                                    <td>{{ $deletedRow['color_code'] }}</td>

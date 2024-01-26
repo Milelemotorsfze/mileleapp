@@ -168,15 +168,15 @@ input[type=number]::-webkit-outer-spin-button
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab2">Prospecting</a>
       </li>
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab3">Demands</a>
-      </li>
+      </li> -->
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab4">Quotation</a>
       </li>
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab5">Negotiation</a>
-      </li>
+      </li> -->
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab6">Sales Order</a>
       </li>
@@ -288,7 +288,7 @@ input[type=number]::-webkit-outer-spin-button
       <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Demand</a></li>
       <!-- <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li> -->
       <li><a class="dropdown-item"href="{{route('qoutation.proforma_invoice',['callId'=> $calls->id]) }}">Quotation</a></li>
-      <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Negotiation</a></li>
+      <!-- <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Negotiation</a></li> -->
       <!-- <li><a class="dropdown-item" href="{{ route('booking.create', ['call_id' => $calls->id]) }}">Booking Vehicles</a></li> -->
       <!-- <li><a class="dropdown-item" href="">Booking (Coming Soon)</a></li> -->
       <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Sales Order</a></li>
@@ -562,7 +562,24 @@ input[type=number]::-webkit-outer-spin-button
       </div>
     </div>
   </div>
-  <div class="modal fade" id="rejectionModal" tabindex="-1" aria-labelledby="rejectionModalLabel" aria-hidden="true">
+  <div class="modal fade" id="vinsModal" tabindex="-1" aria-labelledby="vinsModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="vinsModalLabel">VINs</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id ="vinsModalContent">
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="rejectionModal" tabindex="-1" aria-labelledby="rejectionModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -660,6 +677,8 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Remarks & Messages</th>
                   <th>Prospectings Date</th>
                   <th>Prospectings Notes</th>
+                  <th>Demand Date</th>
+                  <th>Demand Notes</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -985,6 +1004,50 @@ function openModalqualified(callId) {
 function openModalr(callId) {
   $('#rejectionModal').data('call-id', callId);
   $('#rejectionModal').modal('show');
+}
+function displayModal(response) {
+  var modalContent = $('#vinsModalContent');
+  modalContent.empty();
+
+  response.forEach(function(data) {
+    if (data.quotationVins && data.quotationVins.length > 0) {
+      modalContent.append('<table style="border: 1px solid #ddd;" class="table table-bordered">');
+      modalContent.append('<thead><tr><th style="border: 1px solid #ddd;">Description</th><th style="border: 1px solid #ddd;">VIN Numbers</th></tr></thead>');
+      modalContent.append('<tbody>');
+      // Get the rowspan for the description
+      var rowspan = data.quotationVins.length;
+      data.quotationVins.forEach(function(vinEntry, index) {
+        // Display the description only in the first row
+        if (index === 0) {
+          modalContent.append('<tr><td rowspan="' + rowspan + '">' + data.description + '</td><td>' + vinEntry.vin + '</td></tr>');
+        } else {
+          modalContent.append('<tr><td>' + vinEntry.vin + '</td></tr>');
+        }
+      });
+      modalContent.append('</tbody>');
+      modalContent.append('</table>');
+    }
+  });
+}
+// Your existing openvins function remains unchanged
+function openvins(callId) {
+  $('#vinsModal').data('call-id', callId);
+  $.ajax({
+    url: "{{ route('dailyleads.getvinsqoutation') }}",
+    method: 'POST',
+    data: {
+      callId: callId,
+      _token: '{{ csrf_token() }}'
+    },
+    success: function(response) {
+      console.log(response);
+      displayModal(response);
+      $('#vinsModal').modal('show');
+    },
+    error: function(error) {
+      console.error('Error:', error);
+    }
+  });
 }
 function reloadDataTable(sectionId) {
     let dataTableValue;
@@ -1475,6 +1538,27 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
         }
     }
 },
+{ data: 'ddate', name: 'ddate', searchable: false },
+                {
+    data: 'dsalesnotes',
+    name: 'dsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'dsalesnotes_' + row.id;
+
+        if (data && data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 {
                     data: 'id',
                     name: 'id',
@@ -1590,7 +1674,6 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
@@ -1725,10 +1808,10 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
                                     <li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openvins(${data})">VINs</a></li>
                                 </ul>
                             </div>`;
                     }

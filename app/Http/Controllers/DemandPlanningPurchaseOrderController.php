@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\ApprovedLetterOfIndentItem;
 use App\Models\ColorCode;
 use App\Models\LOIItemPurchaseOrder;
+use App\Models\MasterModel;
+use App\Models\PFI;
 use App\Models\Supplier;
 use App\Models\SupplierType;
+use App\Models\Varaint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -27,13 +30,8 @@ class DemandPlanningPurchaseOrderController extends Controller
     {
         (new UserActivityController)->createActivity('Open Purchase Order create Section');
 
-        $approvedLOIItem = ApprovedLetterOfIndentItem::find($request->id);
-        $vendor = $approvedLOIItem->letterOfIndentItem->LOI->supplier_id ?? '';
-//        $vendors = Supplier::with('supplierTypes')
-//            ->whereHas('supplierTypes', function ($query){
-//                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
-//            })
-//            ->get();
+        $pfi = Pfi::find($request->id);
+
         $pfiVehicleVariants = ApprovedLetterOfIndentItem::select('*', DB::raw('sum(quantity) as quantity'))
             ->where('pfi_id', $request->id)
             ->groupBy('letter_of_indent_item_id')
@@ -41,13 +39,18 @@ class DemandPlanningPurchaseOrderController extends Controller
         foreach ($pfiVehicleVariants as $pfiVehicleVariant) {
             $alreadyAddedQuantity = LOIItemPurchaseOrder::where('approved_loi_id', $pfiVehicleVariant->id)
                 ->sum('quantity');
+
             $pfiVehicleVariant->quantity = $pfiVehicleVariant->quantity - $alreadyAddedQuantity;
+            $masterModel = MasterModel::find($pfiVehicleVariant->letterOfIndentItem->masterModel->id);
+            $pfiVehicleVariant->masterModels = MasterModel::where('model', $masterModel->model)
+                                            ->where('sfx', $masterModel->sfx)
+                                            ->get();
         }
 
         $exColours = ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
         $intColours = ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
         return view('purchase-order.create', compact('pfiVehicleVariants',
-            'exColours','intColours','vendor'));
+            'exColours','intColours','pfi'));
     }
 
     /**

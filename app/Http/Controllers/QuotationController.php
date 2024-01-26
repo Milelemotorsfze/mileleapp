@@ -21,6 +21,7 @@ use App\Models\Shipping;
 use App\Models\ShippingCertification;
 use App\Models\ShippingDocuments;
 use App\Models\Varaint;
+use App\Models\QuotationVins;
 use App\Models\Vehicles;
 use App\Models\Vehiclescarts;
 use App\Models\MasterModelLines;
@@ -66,33 +67,24 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
-//        dd($request->all());
-//        $request->validate([
-//            'prices' => 'required'
-//        ]);
         $isVehicle = 0;
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
-//
         DB::beginTransaction();
-
         $call = Calls::find($request->calls_id);
         $call->status = 'Quoted';
         $call->save();
-
         $call->company_name = $request->company_name;
         $call->name = $request->name;
         $call->phone = $request->phone;
         $call->email = $request->email;
         $call->address = $request->address;
         $call->save();
-
         $quotation = new Quotation();
         if($request->currency == 'AED') {
             $quotation->deal_value = $request->total;
         }else{
             $quotation->deal_value = $request->deal_value;
-
         }
         $quotation->sales_notes = $request->remarks;
         $quotation->created_by = Auth::id();
@@ -114,7 +106,6 @@ class QuotationController extends Controller
         $quotationDetail->to_shipping_port_id   = $request->to_shipping_port_id;
         $quotationDetail->place_of_supply  = $request->place_of_supply;
         $quotationDetail->document_validity  = $request->document_validity;
-//        $quotationDetail->system_code  = $request->system_code;
         $quotationDetail->payment_terms  = $request->payment_terms;
         $quotationDetail->representative_name = $request->representative_name;
         $quotationDetail->representative_number = $request->representative_number;
@@ -123,7 +114,6 @@ class QuotationController extends Controller
         $quotationDetail->agents_id = $request->agents_id;
         $quotationDetail->advance_amount = $request->advance_amount;
         $quotationDetail->save();
-
         if($request->agents_id) {
             $agentCommission = new AgentCommission();
             $agentCommission->commission = $request->system_code ?? '';
@@ -133,7 +123,6 @@ class QuotationController extends Controller
             $agentCommission->created_by = Auth::id();
             $agentCommission->save();
         }
-
         $commissionAED = 0;
         $quotationItemIds = [];
 
@@ -158,10 +147,7 @@ class QuotationController extends Controller
            $quotationItem->is_addon = $request->is_addon[$key];
            $quotationItem->is_enable = isset($request->is_hide[$key]) ? true : false;
            $quotationItem->created_by = Auth::id();
-
-
            if($request->types[$key] == 'Shipping') {
-
                $item = Shipping::find($request->reference_ids[$key]);
 
            }else if($request->types[$key] == 'Certification') {
@@ -176,13 +162,12 @@ class QuotationController extends Controller
                if($request->reference_ids[$key] != 'Other')
                {
                    $item = Varaint::find($request->reference_ids[$key]);
+                   
                }
 
                $isVehicle = 1;
                $quotationItem->brand_id = $request->brand_ids[$key];
                $quotationItem->model_line_id = $request->model_line_ids[$key];
-
-
            }else if($request->types[$key] == 'Other') {
                $item = OtherLogisticsCharges::find($request->reference_ids[$key]);
 
@@ -208,9 +193,7 @@ class QuotationController extends Controller
                $quotationItem->brand_id = $request->brand_ids[$key];
                $quotationItem->model_line_id = $request->model_line_ids[$key];
                $quotationItem->model_description_id = $request->model_description_ids[$key];
-
            }else if($request->types[$key] == 'Addon') {
-//                info("it is an directly addon which refer the master addon table id with reference id");
                 info($request->reference_ids[$key]);
                if($request->reference_ids[$key] != 'Other') {
                    info("not other");
@@ -222,27 +205,30 @@ class QuotationController extends Controller
                $quotationItem->brand_id = $request->brand_ids[$key];
                $quotationItem->model_line_id = $request->model_line_ids[$key];
                $quotationItem->model_description_id = $request->model_description_ids[$key];
-
+               info($request->model_description_ids[$key]);
            }
-//           get the unique number in one array for all column
             if($item) {
                 info("item not found");
                 $quotationItem->reference()->associate($item);
 
             }
             $quotationItem->save();
-
             if($isVehicle == 1){
-//               $arrayKeys = array_keys($request->addonUUIDs, $vehicleUUID);
                 if ($request->uuids[$key]) {
+                    $vinArray = explode(',', $request->vinnumbers[$key]);
+                    foreach ($vinArray as $vin) {
+                        if ($vin !== "undefined" && $vin !== null && !empty($vin)) {
+                    $vinupdate = New QuotationVins();
+                    $vinupdate->quotation_items_id = $quotationItem->id;
+                    $vinupdate->vin =$vin;
+                    $vinupdate->save();
+                    }
+                }
                    array_push($quotationItemIds, $quotationItem->id);
-                    // At least one match...
-//                    $quotationSubItemKeys[$quotationItem->id] = $arrayKeys;
                 }
             }
             $isVehicle = 0;
         }
-
         $quotationDetail->system_code = $commissionAED;
         $quotationDetail->save();
         foreach ($quotationItemIds as $itemId) {
@@ -265,65 +251,45 @@ class QuotationController extends Controller
         }
         DB::commit();
         $quotationDetail = QuotationDetail::with('country')->find($quotationDetail->id);
-
-//        $quotation = Quotation::find(8);
-//        $call = Calls::find($quotation->calls_id);
-//        $quotationDetail = QuotationDetail::with('country')->where('quotation_id', 8)->orderBy('id','DESC')->first();
-
         $vehicles =  QuotationItem::where("reference_type", 'App\Models\Varaint')
             ->where('quotation_id', $quotation->id)->get();
-
         $otherVehicles = QuotationItem::whereNull('reference_type')
             ->whereNull('reference_id')
             ->where('quotation_id', $quotation->id)
             ->where('is_enable', true)
             ->where('is_addon', false)
             ->get();
-        // vehicle which is added by directly add option with out varaint
         $vehicleWithBrands = QuotationItem::where('quotation_id', $quotation->id)
                 ->whereIn("reference_type", ['App\Models\Brand','App\Models\MasterModelLines'])
                 ->where('is_addon', false)
                 ->get();
-
-//        $variants = QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
-//            ->where('quotation_id', $quotation->id)
-//            ->where('is_addon', false)->get();
-
         $alreadyAddedQuotationIds = QuotationSubItem::where('quotation_id', $quotation->id)
                          ->pluck('quotation_item_id')->toArray();
-
         $directlyAddedAddons =  QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
             ->where('quotation_id', $quotation->id)
             ->whereNotIn('id', $alreadyAddedQuotationIds)
             ->where('is_enable', true)
             ->where('is_addon', true)->get();
-
         $hidedDirectlyAddedAddonSum =  QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
             ->where('quotation_id', $quotation->id)
             ->whereNotIn('id', $alreadyAddedQuotationIds)
             ->where('is_enable', false)
             ->where('is_addon', true)
             ->sum('total_amount');
-
         $addons = QuotationItem::whereIn('reference_type',['App\Models\AddonDetails','App\Models\Addon'])
             ->whereNotIn('id', $alreadyAddedQuotationIds)
             ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
-
         $OtherAddons = QuotationItem::whereNull('reference_type')
             ->whereNull('reference_id')
             ->where('quotation_id', $quotation->id)
             ->where('is_enable', true)
             ->where('is_addon', true)->get();
-
         $hidedAddonSum = QuotationItem::where('reference_type','App\Models\AddonDetails')
             ->whereNotIn('id', $alreadyAddedQuotationIds)
-//            ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)
             ->where('is_enable', false)->sum('total_amount');
-
         $addonsTotalAmount = $hidedDirectlyAddedAddonSum + $hidedAddonSum;
-
         $shippingCharges = QuotationItem::where('reference_type','App\Models\Shipping')
             ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
@@ -336,9 +302,7 @@ class QuotationController extends Controller
         $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
             ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
-
         $salesPersonDetail = EmployeeProfile::where('user_id', Auth::id())->first();
-
         $data = [];
         $data['sales_person'] = Auth::user()->name;
         $data['sales_office'] = 'Central 191';
@@ -351,13 +315,11 @@ class QuotationController extends Controller
         $data['client_address'] = $call->address;
         $data['document_number'] = $quotation->id;
         $data['company'] = $call->company_name;
-
         $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
         if($salesPersonDetail) {
             $data['sales_office'] = $salesPersonDetail->office;
             $data['sales_phone'] = $salesPersonDetail->contact_number;
         }
-
         $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
             ->where('quotation_id', $quotation->id)
             ->whereIn('reference_type',['App\Models\ShippingDocuments','App\Models\Shipping',
@@ -370,27 +332,19 @@ class QuotationController extends Controller
         }else{
             $shippingChargeDistriAmount = 0;
         }
-
-//        return view('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
-//            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','variants','directlyAddedAddons','addonsTotalAmount'));
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','directlyAddedAddons','addonsTotalAmount',
         'otherVehicles','vehicleWithBrands','OtherAddons','shippingChargeDistriAmount'));
-
-//        return $pdfFile->stream('test.pdf');
-
         $filename = 'quotation_'.$quotation->id.'.pdf';
         $generatedPdfDirectory = public_path('Quotations');
         $directory = public_path('storage/quotation_files');
         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
         $pdfFile->save($generatedPdfDirectory . '/' . $filename);
-
         $pdf = $this->pdfMerge($quotation->id);
         $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d').'.pdf';
         $pdf->Output($directory.'/'.$file,'F');
         $quotation->file_path = 'quotation_files/'.$file;
         $quotation->save();
-
         return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation created successfully.');
     }
     public function pdfMerge($quotationId)
@@ -558,4 +512,31 @@ public function addqaddone(Request $request)
         info($shippingCharges);
         return $shippingCharges;
     }
+    public function getvinsqoutation(Request $request)
+    {
+        $callId = $request->input('callId');
+        $quotations = Quotation::where('calls_id', $callId)->pluck('id');
+        $response = [];
+    
+        foreach ($quotations as $quotation) {
+            $quotationItems = QuotationItem::whereIn('reference_type', ['App\Models\Brand', 'App\Models\MasterModelLines', 'App\Models\Varaint'])
+                ->where('quotation_id', $quotation)
+                ->get();
+    
+            foreach ($quotationItems as $quotationItem) {
+                $description = $quotationItem->description;
+                $quotationVins = QuotationVins::where('quotation_items_id', $quotationItem->id)->get();
+    
+                if ($quotationVins->isNotEmpty()) {
+                    $responseData = [
+                        'description' => $description,
+                        'quotationVins' => $quotationVins->toArray(),
+                    ];
+                    $response[] = $responseData;
+                }
+            }
+        }
+    
+        return response()->json($response);
+    }    
 }

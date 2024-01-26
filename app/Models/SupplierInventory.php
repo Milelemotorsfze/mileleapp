@@ -21,6 +21,8 @@ class SupplierInventory extends Model
     public const UPLOAD_STATUS_ACTIVE = "Active";
     public const STATUS_DELIVERY_CONFIRMED = "Delivery Confirmed";
     public const UPLOAD_STATUS_INACTIVE = "Inactive";
+    public const DN_STATUS_WAITING = "WAITING";
+
 
     protected $appends = [
         'color_codes',

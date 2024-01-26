@@ -85,7 +85,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
-                        <input type="date" class="form-control widthinput" id="basicpill-firstname-input"  name="date">
+                        <input type="date" class="form-control widthinput" id="date" max="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}"  name="date">
                         @error('date')
                         <span role="alert">
                             <strong>{{ $message }}</strong>
@@ -277,7 +277,7 @@
 @endsection
 @push('scripts')
 
-    <script>
+    <script type="text/javascript">
 
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
