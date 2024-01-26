@@ -6,6 +6,11 @@ use App\Models\Country;
 use App\Models\MasterShippingPorts;
 use App\Models\OtherLogisticsCharges;
 use App\Models\Setting;
+use App\Models\Quotation;
+use App\Models\QuotationClient;
+use App\Models\QuotationDetail;
+use App\Models\QuotationItem;
+use App\Models\QuotationSubItem;
 use App\Models\Shipping;
 use Illuminate\Support\Facades\DB;
 use App\Models\ShippingCertification;
@@ -13,6 +18,7 @@ use App\Models\ShippingDocuments;
 use App\Models\ShippingMedium;
 use Illuminate\Http\Request;
 use App\Models\Calls;
+use App\Models\QuotationVins;
 use App\Models\Brand;
 use App\Models\AddonDescription;
 use App\Models\MasterModelLines;
@@ -467,5 +473,36 @@ class ProformaInvoiceController extends Controller {
         ]);  
     }
     }
+    }
+    public function proforma_invoice_edit($callId) {
+        $quotation = Quotation::where('calls_id', $callId)->first();
+        $quotation_details = QuotationDetail::where('quotation_id', $quotation->id)->first();
+        $quotationitems = QuotationItem::where('quotation_id', $quotation->id)->get();
+        foreach ($quotationitems as $quotationitem) {
+            $quotation_vins = QuotationVins::where('quotation_items_id', $quotationitem->id)->get();
+        }
+        $brands = Brand::all();
+        $callDetails = Calls::where('id', $callId)->first();
+        $assessoriesDesc = AddonDescription::whereHas('Addon', function($q) {
+            $q->where('addon_type','P');
+        })->get();
+        $sparePartsDesc = AddonDescription::whereHas('Addon', function($q) {
+            $q->where('addon_type','SP');
+        })->get();
+        $kitsDesc = AddonDescription::whereHas('Addon', function($q) {
+            $q->where('addon_type','K');
+        })->get();
+        $countries = Country::all();
+        $shippingPorts = MasterShippingPorts::all();
+        $shippings = ShippingMedium::all();
+        $shippingDocuments = ShippingDocuments::all();
+        $certifications = ShippingCertification::all();
+        $otherDocuments = OtherLogisticsCharges::all();
+        $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
+        $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
+        $usd_to_eru_rate = Setting::where('key', 'usd_to_euro_convertion_rate')->first();
+        return view('proforma.invoice_edit', compact('callDetails', 'brands','assessoriesDesc',
+            'sparePartsDesc','kitsDesc','shippings','certifications','countries','shippingPorts',
+           'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate', 'quotation_details', 'quotation_vins', 'quotation', 'quotationitems'));
     }
     }

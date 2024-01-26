@@ -144,6 +144,7 @@
                         @foreach($pfiVehicleVariants as $key => $pfiVehicleVariant)
                             <div class="row">
                                 <input type="hidden" name="approved_loi_ids[]" value="{{$pfiVehicleVariant->id}}">
+                                <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiVehicleVariant->id}}" value="0">
                                 <input type="hidden" id="master-model-id-{{$key}}" value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->id ?? ''}}">
                                 <div class="col-lg-2 col-md-6">
                                     <select class="form-control mb-2 variants" id="variant-id-{{$key}}" data-key="{{$key}}" >
@@ -287,6 +288,9 @@
                 var masterModelId = $('#master-model-id-'+i).val();
                 var dataid = $('#quantity-'+i).attr('data-id');
                 var price = $('#unit-price-'+i).val();
+                var existingQuantity =  $('#item-quantity-selected-'+dataid).val();
+                var latestQty = parseInt(existingQuantity) + parseInt(qty);
+                $('#item-quantity-selected-'+dataid).val(latestQty);
 
                 for (var j = 0; j < qty; j++) {
                     var newRow = $('<div class="row row-space"></div>');
@@ -333,10 +337,15 @@
 
         var selectedQuantity = $('.qty-'+Id).val();
         var variantQuantity = $('.qty-'+Id).attr('data-quantity');
+        console.log(variantQuantity);
         var remainingQty = parseInt(variantQuantity) + 1;
         $('.qty-'+Id).attr('data-quantity',remainingQty);
+
         var latestQuantity = parseInt(selectedQuantity) + 1;
         $('.qty-'+Id).val(latestQuantity);
+        var previousCount =   $('#item-quantity-selected-'+Id).val();
+        var latestCount = previousCount - 1;
+        $('#item-quantity-selected-'+Id).val(latestCount);
 
         if ($('#variantRowsContainer').find('.row').length === 1) {
             $('.bar').hide();

@@ -366,10 +366,10 @@
 {{--                            $model_line = $master_model_lines_ids->model_line;--}}
 {{--                            @endphp--}}
                             <td>{{ $vehicles->id }}</td>
-                            <td>{{ ucfirst(strtolower("dfhfg")) }}</td>
-                            <td>{{ ucfirst(strtolower("")) }}</td>
-                            <td>{{ ucfirst("") }}</td>
-                            <td>{{ ucfirst(strtolower("")) }}</td>
+                            <td>{{ ucfirst(strtolower($vehicles->variant->brand->brand_name)) }}</td>
+                            <td>{{ ucfirst(strtolower($vehicles->variant->master_model_lines->model_line)) }}</td>
+                            <td>{{ ucfirst($vehicles->variant->name) }}</td>
+                            <td>{{ ucfirst(strtolower($vehicles->variant->detail)) }}</td>
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                             @endphp

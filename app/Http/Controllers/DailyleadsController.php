@@ -107,7 +107,7 @@ class DailyleadsController extends Controller
                     DB::raw("DATE_FORMAT(quotations.date, '%d-%b-%Y') as qdate"),
                     'quotations.sales_notes as qsalesnotes',
                     DB::raw("IFNULL(quotations.file_path, '') as file_path"),
-                    DB::raw("CONCAT(quotations.deal_value, ' ', quotations.currency) as ddealvalues"),
+                    DB::raw("CONCAT(quotations.deal_value, ' ', quotations.currency) as ddealvalues"), ('quotations.signature_status as signature_status')
                 ]);
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
             } elseif ($status === 'Negotiation') {

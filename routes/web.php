@@ -96,6 +96,7 @@ use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\PaymentTermsController;
 use App\Http\Controllers\SalesTargetsController;
 use App\Http\Controllers\ClientAccountTransitionController;
+use App\Http\Controllers\SalesOrderController;
 
 
 /*
@@ -109,6 +110,7 @@ use App\Http\Controllers\ClientAccountTransitionController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('clientsignature/{uniqueNumber}/{quotationId}', [QuotationController::class, 'showBySignature'])->name('quotation.showBySignature');
 Route::match(['get', 'post'], '/whatsapp/receive', [WebhookController::class, 'sendMessage']);
 Route::get('/react-page', function () {
     return view('react-app.index');
@@ -116,6 +118,7 @@ Route::get('/react-page', function () {
 Route::get('/d', function () {
     return view('addon.ff');
 });
+
 
     Auth::routes();
     Route::controller(AuthOtpController::class)->group(function(){
@@ -132,6 +135,7 @@ Route::get('/d', function () {
         Route::get('createPassword/otp/verification/{user_id}/{email}/{password}/{password_confirmation}', 'verification')->name('createPassword.verification');
     });
     Route::post('/otp/login', [LoginController::class, 'loginWithOtp'])->name('otp.getlogin');
+
     Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Dashboard
     Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -236,6 +240,7 @@ Route::get('/d', function () {
       //Profoma Invoice
       Route::controller(ProformaInvoiceController::class)->group(function(){
         Route::get('/proforma_invoice/{callId}', 'proforma_invoice')->name('qoutation.proforma_invoice');
+        Route::get('/proforma_invoice_edit/{callId}', 'proforma_invoice_edit')->name('qoutation.proforma_invoice_edit');
         Route::get('/get-model-lines/addon-booking/{brandId}/{type}', 'getaddonModels')->name('quotation.getaddonmodel');
         Route::get('/get-model-descriptions/addon-booking/{modelLineId}/{type}', 'getaddonModelDescriptions')->name('quotation.getmodeldescription');
         Route::get('/get-booking-accessories/{addonId}/{brandId}/{modelLineId}', 'getbookingAccessories')->name('booking.getbookingAccessories');
@@ -474,6 +479,7 @@ Route::get('/d', function () {
     return $count;
     });
     Route::post('dailyleads/getvins', [QuotationController::class, 'getvinsqoutation'])->name('dailyleads.getvinsqoutation');
+    Route::post('dailyleads/getlink', [QuotationController::class, 'getqoutationlink'])->name('dailyleads.getqoutationlink');
     // vehicle pictures
      Route::get('vehicle-pictures/variant-details', [VehiclePicturesController::class,'getVariantDetail'])->name('vehicle-pictures.variant-details');
      Route::resource('vehicle-pictures', VehiclePicturesController::class);
@@ -748,3 +754,5 @@ Route::get('/d', function () {
     Route::get('/clienttransitions/{client_id}', [ClientAccountTransitionController::class, 'clienttransitionsview'])->name('clienttransitions.clienttransitions');
     Route::resource('clienttransitions', ClientAccountTransitionController::class);
 
+    //Sales Order
+    Route::get('/saleorder/{callId}', [SalesOrderController::class, 'createsalesorder'])->name('salesorder.createsalesorder');

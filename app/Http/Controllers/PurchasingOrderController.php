@@ -268,9 +268,9 @@ public function getBrandsAndModelLines(Request $request)
                 $purchasingOrderItem = new PurchasingOrderItems();
                 $purchasingOrderItem->variant_id = $variantId;
                 $purchasingOrderItem->purchasing_order_id = $purchasingOrderId;
-                if($request->po_from == 'DEMAND_PLANNING') {
-                    $purchasingOrderItem->qty = $variantsQuantity[$variant->name];
-                }
+                    if($request->po_from == 'DEMAND_PLANNING') {
+                        $purchasingOrderItem->qty = $variantsQuantity[$variant->name];
+                    }
 
                 $purchasingOrderItem->save();
             }
@@ -312,10 +312,7 @@ public function getBrandsAndModelLines(Request $request)
                 $vehicle->status = "Not Approved";
                 // payment status need to update
                 if($request->input('master_model_id')) {
-                    info($key);
-
                     $masterModelId = $request->input('master_model_id');
-                    info($masterModelId[$key]);
                     $vehicle->master_model_id = $masterModelId[$key];
                 }
 
@@ -340,41 +337,20 @@ public function getBrandsAndModelLines(Request $request)
             }
                 if($request->po_from == 'DEMAND_PLANNING') {
                     $loiItemsOfPurcahseOrders = $request->approved_loi_ids;
-                    $variantsQuantity = array_count_values($variantNames);
                     foreach($loiItemsOfPurcahseOrders as $key => $loiItemsOfPurchaseOrder) {
 
                         $approvedLoiItem = ApprovedLetterOfIndentItem::Find($loiItemsOfPurchaseOrder);
                         $pfi = PFI::find($approvedLoiItem->pfi_id);
                         $pfi->status = 'PO Initiated';
                         $pfi->save();
-                        $variant = $approvedLoiItem->letterOfIndentItem->masterModel->variant->name;
                         $loiPurchaseOrder = new LOIItemPurchaseOrder();
                         $loiPurchaseOrder->approved_loi_id = $loiItemsOfPurchaseOrder;
                         $loiPurchaseOrder->purchase_order_id = $purchasingOrderId;
-                        $loiPurchaseOrder->quantity = $variantsQuantity[$variant] ?? '';
+                        $loiPurchaseOrder->quantity = $request->item_quantity_selected[$key] ?? '';
                         $loiPurchaseOrder->save();
-
-//                        $masterModel = MasterModel::find($approvedLoiItem->letterOfIndentItem->masterModel->id);
-//                        if($masterModel) {
-//                            $inventoryItem = SupplierInventory::where('supplier_id', $approvedLoiItem->pfi->supplier_id)
-//                                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-//                                ->whereNull('delivery_note')
-//                                ->where('whole_sales', $request->whole_sales)
-//                                ->where('master_model_id', $masterModel->id)
-//                                ->whereNull('purchase_order_id')
-//                                ->orderBy('id','ASC')
-//                                ->take($variantsQuantity[$variant])
-//                                ->get();
-//                            //
-//                        }
-    //
-
-    //                    info($inventoryItem);
 
                     }
                 }
-
-
         }
         DB::commit();
     return redirect()->route('purchasing-order.index')->with('success', 'PO Created successfully!');

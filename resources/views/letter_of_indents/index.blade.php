@@ -449,7 +449,10 @@
                                             <th>Utilization Qty Update</th>
                                         @endif
                                     @endcan
+                                    <th>Total Quantity</th>
+                                    <th>Utilized Quantity</th>
                                     <th width="100">LOI </th>
+
                                     <th width="150px">Actions</th>
                                 </tr>
                                 </thead>
@@ -482,6 +485,8 @@
                                             @endif
                                         @endcan
                                         </td>
+                                        <td> {{ $letterOfIndent->total_quantity }} </td>
+                                        <td> {{ $letterOfIndent->utilized_quantity }} </td>
                                         <td>
                                             <select class="form-control" onchange="location = this.value;">
                                                 <option value="">Select Template</option>

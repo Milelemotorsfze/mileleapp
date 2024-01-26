@@ -72,13 +72,13 @@
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
-                                    <select class="form-control" name="accessories[]" id="accessories">
+                                <select class="form-control" name="accessories[]" id="accessories">
                                     <option disabled selected>Please Select the Accessories</option>
                                         @foreach ($addonsaccessores as $addon)
                                             @php
                                                 $addonName = DB::table('addons')->where('id', $addon->addon_id)->first();
                                             @endphp 
-                                            <option value="{{ $addonName->id }}">{{ $addonName->name }} - {{ $addon->addon_code }}</option>
+                                            <option value="{{ $addonName->id }}">{{ $addonName->name }} - {{ $addon->AddonDescription->description ?? '' }}- {{ $addon->addon_code }}</option>
                                         @endforeach
                                     </select>
                                 </div>

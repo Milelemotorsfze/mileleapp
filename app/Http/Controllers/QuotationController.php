@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Addon;
 use App\Models\AddonDetails;
+use Illuminate\Support\Str;
 use App\Models\AgentCommission;
 use App\Models\Country;
 use App\Models\HRM\Employee\EmployeeProfile;
@@ -343,8 +344,15 @@ class QuotationController extends Controller
         $pdf = $this->pdfMerge($quotation->id);
         $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d').'.pdf';
         $pdf->Output($directory.'/'.$file,'F');
-        $quotation->file_path = 'quotation_files/'.$file;
+        $quotation->file_path = 'quotation_files/'.$file; 
         $quotation->save();
+        $uniqueString = Str::random(10);
+        $timestamp = now()->timestamp;
+        $uniqueNumber = $uniqueString . $timestamp;
+        $signatureLink = config('app.base_url') . '/'.'clientsignature/' . $uniqueNumber . '/' . $quotation->id;
+        $newsignatures = Quotation::find($quotation->id);
+        $newsignatures->signature_link = $signatureLink;
+        $newsignatures->save();
         return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation created successfully.');
     }
     public function pdfMerge($quotationId)
@@ -538,5 +546,21 @@ public function addqaddone(Request $request)
         }
     
         return response()->json($response);
-    }    
+    }  
+    public function getqoutationlink(Request $request)
+    {
+        $callId = $request->input('callId');
+        $response = Quotation::where('calls_id', $callId)->pluck('signature_link');    
+        return response()->json($response);
+    }  
+    public function showBySignature($uniqueNumber, $quotationId)
+    {
+        $quotation = Quotation::find($quotationId);
+        if ($quotation) {
+            $pdfPath = asset('storage/' . $quotation->file_path);
+                return view('quotation.showsignpage', ['quotation' => $quotation, 'pdfPath' => $pdfPath]);
+        } else {
+            abort(404, 'Quotation not found');
+        }
+    }
 }
