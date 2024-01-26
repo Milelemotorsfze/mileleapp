@@ -368,6 +368,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 						onclick="showImage()"/>
 				</center>
 			</div>
+			@if($addonDetails->addon_type_name == 'SP')
 			<div class="card" id="partNumberDiv">
 				<div class="card-header">
 					<h4 class="card-title">
@@ -404,6 +405,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 					</div>
 				</div>
 			</div>
+			@endif
 			@include('addon.edit.brandModel')
 			<div class="card"  id="kitSupplier" >
 				<div class="card-header">
@@ -496,7 +498,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 @endcan
 <script type="text/javascript">
 	var data = {!! json_encode($addonDetails) !!};
-	//  console.log(data.fixing_charges_included);
+	//  console.log(data.addon_type_name);
 	   var selectedSuppliers = [];
 	   var oldselectedSuppliers = [];
 	   var ifModelLineExist = [];
@@ -693,27 +695,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	           if(id != '')
 	           {
 	               $('#addnewAddonButton').hide();
-	               $.ajax
-	               ({
-	                   url: '/addons/existingImage/'+id,
-	                   type: "GET",
-	                   dataType: "json",
-	                   success:function(data)
-	                   {
+	            //    $.ajax
+	            //    ({
+	            //        url: '/addons/existingImage/'+id,
+	            //        type: "GET",
+	            //        dataType: "json",
+	            //        success:function(data)
+	            //        {
 	                       $msg = "";
 	                       removeAddonTypeError($msg);
 	                       removeAddonNameError($msg);
-	                       $('#addon_code').val(data.newAddonCode);
-	                       $("#addon_type").val(data.addon_type.addon_type);
-	                       var value = data.addon_type.addon_type;
+	                    //    $('#addon_code').val(data.newAddonCode);
+	                    //    $("#addon_type").val(data.addon_type.addon_type);
+	                    //    var value = data.addon_type.addon_type;
+								var value = data.addon_type_name;
 	                       currentAddonType = value;
 	                       if(value != '')
 	                       {
 	                           uniqueCheck(value,id);
 	                       }
 	                       $("#selectBrandMo1").removeAttr('disabled');
-	                   }
-	               });
+	            //        }
+	            //    });
 	           }
 	           else
 	           {

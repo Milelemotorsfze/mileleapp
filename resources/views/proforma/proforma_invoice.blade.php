@@ -74,9 +74,9 @@
                 <tr>
                     <td style="font-weight: bold;">Document No :</td>
                     <td>{{ $data['document_number'] }}</td>
-                    <td style="font-weight: bold;">Customer ID :</td>
+                    <td style="font-weight: bold;">Customer:</td>
                     <td> {{ $data['client_id'] }}</td>
-                    <td style="font-weight: bold;"> @if($quotation->shipping_method == 'EXW') Final Destination : @else Place Of Supply :  @endif</td>
+                    <td style="font-weight: bold;"> @if($quotation->shipping_method == 'EXW') Final Des : @else Place Of Supply :  @endif</td>
                     <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->country->name ?? '' }} @else
                         {{ $quotationDetail->place_of_supply }}  @endif </td>
 
@@ -92,12 +92,12 @@
 
                 </tr>
                 <tr>
-                    <td style="font-weight: bold;">Document Validity :</td>
+                    <td style="font-weight: bold;">Validity :</td>
                     <td>{{ $quotationDetail->document_validity }} @if($quotationDetail->document_validity == 1) Day @else Days @endif</td>
                     <td style="font-weight: bold;">Person :</td>
                     <td>{{  $data['client_name']  }} </td>
                     <td style="font-weight: bold;">
-                        @if($quotation->shipping_method == 'EXW') Port Of Discharge :@endif </td>
+                        @if($quotation->shipping_method == 'EXW') POD :@endif </td>
                     <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->shippingPort->name ?? ''   }} @endif </td>
                 </tr>
 
@@ -107,7 +107,7 @@
                     <td style="font-weight: bold;">Phone :</td>
                     <td>{{  $data['client_phone']  }} </td>
                     <td style="font-weight: bold;">
-                        @if($quotation->shipping_method == 'EXW') Port Of Loading :@endif </td>
+                        @if($quotation->shipping_method == 'EXW') POL :@endif </td>
                     <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->shippingPortOfLoad->name ??''   }} @endif </td>
                 </tr>
                 <tr>
