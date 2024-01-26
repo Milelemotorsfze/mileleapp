@@ -16,7 +16,20 @@
     50% { opacity: 0; }
     100% { opacity: 1; }
 }
-
+/* Add styles for the badges */
+.badge {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+}
+.badge-success {
+    background-color: #28a745; /* Green color for 'Signed' */
+    color: #fff;
+}
+.badge-danger {
+    background-color: #dc3545; /* Red color for 'Unsigned' */
+    color: #fff;
+}
 .blink {
     animation: blink 1s infinite;
 }
@@ -291,7 +304,8 @@ input[type=number]::-webkit-outer-spin-button
       <!-- <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Negotiation</a></li> -->
       <!-- <li><a class="dropdown-item" href="{{ route('booking.create', ['call_id' => $calls->id]) }}">Booking Vehicles</a></li> -->
       <!-- <li><a class="dropdown-item" href="">Booking (Coming Soon)</a></li> -->
-      <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Sales Order</a></li>
+      <!-- <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Sales Order</a></li> -->
+      <!-- <li><a class="dropdown-item"href="{{route('salesorder.createsalesorder',['callId'=> $calls->id]) }}">Sales Order</a></li> -->
       <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li>
       @endcan
     </ul>
@@ -562,6 +576,23 @@ input[type=number]::-webkit-outer-spin-button
       </div>
     </div>
   </div>
+  <div class="modal fade" id="linkModal" tabindex="-1" aria-labelledby="linkModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="linkModalLabel">Quotation Link</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <p id="linkInModal"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="copyLink()">Copy</button>
+      </div>
+	        </div>
+    </div>
+  </div>
   <div class="modal fade" id="vinsModal" tabindex="-1" aria-labelledby="vinsModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -753,6 +784,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Deal Values</th>
                   <th>Qoutation Notes</th>
                   <th>View Qoutation</th>
+                  <th>Signature Status</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -1009,27 +1041,58 @@ function displayModal(response) {
   var modalContent = $('#vinsModalContent');
   modalContent.empty();
 
-  response.forEach(function(data) {
+  response.forEach(function (data) {
     if (data.quotationVins && data.quotationVins.length > 0) {
-      modalContent.append('<table style="border: 1px solid #ddd;" class="table table-bordered">');
-      modalContent.append('<thead><tr><th style="border: 1px solid #ddd;">Description</th><th style="border: 1px solid #ddd;">VIN Numbers</th></tr></thead>');
+      // Start the table with Bootstrap classes and additional styling
+      modalContent.append('<div class="table-responsive" style="width:100%;"><table class="table table-bordered table-striped table-editable table-edits table">');
+      modalContent.append('<thead class="bg-soft-secondary"><tr><th class="text-center" style="border: 1px solid #dee2e6; width:50%;">Description</th><th class="text-center" style="border: 1px solid #dee2e6; width:50%;">VIN Numbers</th></tr></thead>');
       modalContent.append('<tbody>');
       // Get the rowspan for the description
       var rowspan = data.quotationVins.length;
-      data.quotationVins.forEach(function(vinEntry, index) {
+      data.quotationVins.forEach(function (vinEntry, index) {
         // Display the description only in the first row
         if (index === 0) {
-          modalContent.append('<tr><td rowspan="' + rowspan + '">' + data.description + '</td><td>' + vinEntry.vin + '</td></tr>');
+          modalContent.append('<tr><td rowspan="' + rowspan + '" style="border: 1px solid #dee2e6;">' + data.description + '</td><td class="text-center" style="border: 1px solid #dee2e6;">' + vinEntry.vin + '</td></tr>');
         } else {
-          modalContent.append('<tr><td>' + vinEntry.vin + '</td></tr>');
+          modalContent.append('<tr><td class="text-center" style="border: 1px solid #dee2e6;">' + vinEntry.vin + '</td></tr>');
         }
       });
-      modalContent.append('</tbody>');
-      modalContent.append('</table>');
+
+      // End the table and the table-responsive div
+      modalContent.append('</tbody></table></div>');
     }
   });
 }
-// Your existing openvins function remains unchanged
+
+function opensignaturelink(callId) {
+  $.ajax({
+    url: "{{ route('dailyleads.getqoutationlink') }}",
+    method: 'POST',
+    data: {
+      callId: callId,
+      _token: '{{ csrf_token() }}'
+    },
+    success: function(response) {
+      console.log(response);
+      var link = response;
+      $('#linkInModal').text(link);
+      $('#linkModal').modal('show');
+    },
+    error: function(error) {
+      console.error('Error:', error);
+    }
+  });
+}
+function copyLink() {
+  var linkText = document.getElementById("linkInModal").textContent;
+  navigator.clipboard.writeText(linkText)
+    .then(function() {
+      alertify.success('Link Copy successfully');
+    })
+    .catch(function(err) {
+      console.error('Unable to copy link to clipboard', err);
+    });
+}
 function openvins(callId) {
   $('#vinsModal').data('call-id', callId);
   $.ajax({
@@ -1574,8 +1637,6 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Demand</a></li>
                                     <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
                             </div>`;
@@ -1674,7 +1735,6 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
                             </div>`;
@@ -1795,26 +1855,48 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
         }
     }
 },
+{
+                data: 'signature_status',
+                name: 'quotations.signature_status',
+                render: function(data, type, row) {
+                    if (data === 'Signed') {
+                        return '<span class="badge badge-success">' + data + '</span>';
+                    } else {
+                        return '<span class="badge badge-danger">' + 'Not Signed' + '</span>';
+                    }
+                }
+            },
                 {
                     data: 'id',
                     name: 'id',
                     render: function (data, type, row) {
-                      const bookingUrl = `{{ url('booking/create') }}/${data}`;
-                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
-                        return `
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                    <li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openvins(${data})">VINs</a></li>
-                                </ul>
-                            </div>`;
-                    }
+    const bookingUrl = `{{ url('booking/create') }}/${data}`;
+    const qoutationUrlEdit = `{{ url('/proforma_invoice_edit/') }}/${data}`;
+    const soUrl = `{{ url('/saleorder/') }}/${data}`;
+    let salesOrderOption = '';
+    let signedlink = '';
+    if (row.signature_status === 'Signed') {
+        salesOrderOption = `<li><a class="dropdown-item" href="${soUrl}">Sales Order</a></li>`;
+    }
+    else
+    {
+      signedlink = `<li><a class="dropdown-item" href="#" onclick="opensignaturelink(${data})">Signature Link</a></li>`;
+    }
+    return `
+        <div class="dropdown">
+            <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                <i class="fa fa-bars" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>
+                <li><a class="dropdown-item"href="${qoutationUrlEdit}">Update Qoutation</a></li>
+                ${salesOrderOption} <!-- Include the salesOrderOption here -->
+                <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                <li><a class="dropdown-item" href="#" onclick="openvins(${data})">VINs</a></li>
+                ${signedlink}
+            </ul>
+        </div>`;
+}
                 },
             ]
         });
@@ -1973,7 +2055,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                     searchable: false,
                     render: function (data, type, row) {
                       const bookingUrl = `{{ url('booking/create') }}/${data}`;
-                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
+                      const qoutationUrlEdit = `{{ url('/proforma_invoice_edit/') }}/${data}`;
+                      const soUrl = `{{ url('/saleorder/') }}/${data}`; 
                         return `
                             <div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
@@ -1982,7 +2065,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                                 <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
                                 <li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
+                                <li><a class="dropdown-item"href="${qoutationUrlEdit}">Update Qoutation</a></li>
+                                <li><a class="dropdown-item"href="${soUrl}">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
                             </div>`;
@@ -2347,7 +2431,6 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
             ]
         });
     });
-    // Add an event listener to handle "Read More" clicks
     function toggleRemarks(uniqueId) {
     const $truncatedText = $('#' + uniqueId + '_truncated');
     const $fullText = $('#' + uniqueId + '_full');
