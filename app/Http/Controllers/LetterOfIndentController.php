@@ -203,9 +203,23 @@ class LetterOfIndentController extends Controller
                     ->where('model_year', $request->model_year[$key])
                     ->first();
                 if($masterModel) {
+                    $latestRow = LetterOfIndentItem::withTrashed()->orderBy('id', 'desc')->first();
+                    $length = 7;
+                    $offset = 4;
+                    $prefix = "LOI-";
+                    if($latestRow){
+                        $latestUUID =  $latestRow->uuid;
+                        $latestUUIDNumber = substr($latestUUID, $offset, $length);
+                        $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
+                        $code =  $prefix.$newCode;
+                    }else{
+                        $code = $prefix.'001';
+                    }
+
                     $LOIItem = new LetterOfIndentItem();
                     $LOIItem->letter_of_indent_id  = $LOI->id;
                     $LOIItem->master_model_id = $masterModel->id ?? '';
+                    $LOIItem->uuid = $code;
                     $LOIItem->quantity = $quantity;
                     $LOIItem->save();
                 }

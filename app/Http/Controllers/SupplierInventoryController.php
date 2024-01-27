@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\ColorCode;
 use App\Models\DemandList;
 use App\Models\LetterOfIndent;
+use App\Models\LetterOfIndentItem;
 use App\Models\MasterModel;
 use App\Models\ModelYearCalculationCategory;
 use App\Models\Supplier;
@@ -27,7 +28,7 @@ class SupplierInventoryController extends Controller
     {
         (new UserActivityController)->createActivity('Open Supplier Inventory List Page');
 
-        $supplierInventories = SupplierInventory::select('master_model_id','upload_status','veh_status')
+        $supplierInventories = SupplierInventory::select('master_model_id','upload_status','veh_status','supplier_id','whole_sales')
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
             ->leftJoin('master_models', 'master_models.id', '=', 'supplier_inventories.master_model_id')
             ->groupBy('master_models.model','master_models.sfx');
@@ -51,7 +52,7 @@ class SupplierInventoryController extends Controller
         foreach ($supplierInventories as $supplierInventory) {
             $modelIds = MasterModel::where('model', $supplierInventory->masterModel->model)
                         ->where('sfx', $supplierInventory->masterModel->sfx)
-                        ->where('steering', $supplierInventory->masterModel->steering)
+//                        ->where('steering', $supplierInventory->masterModel->steering)
                         ->pluck('id');
 
             $supplierInventory->childRows =  SupplierInventory::with('masterModel')
@@ -113,7 +114,6 @@ class SupplierInventoryController extends Controller
 
         if ($request->file('file'))
         {
-
             $errors = [];
             $numberOfFields = 10;
             $file = $request->file('file');
@@ -341,6 +341,7 @@ class SupplierInventoryController extends Controller
 
                 // get the null chasis row count by model and sfx.
             $inventories = SupplierInventory::where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                 ->where('supplier_id', $request->supplier_id)
                 ->where('whole_sales', $request->whole_sales)
                 ->whereNull('chasis')
@@ -393,7 +394,7 @@ class SupplierInventoryController extends Controller
                         $inventoryHistory->upload_status = SupplierInventory::UPLOAD_STATUS_INACTIVE;
                         $inventoryHistory->save();
                     }
-
+                    $dealer = $request->whole_sales;
                     foreach ($uploadFileContents as $uploadFileContent)
                     {
                         $model = MasterModel::where('model', $uploadFileContent['model'])
@@ -409,10 +410,20 @@ class SupplierInventoryController extends Controller
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->pluck('id')->toArray();
 
+//                        $LOIItems = LetterOfIndentItem::with('LOI')->whereIn('master_model_id', $modelIds)
+//                                    ->whereHas('LOI', function ($query) use($modelIds, $dealer) {
+//                                        $query->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
+//                                            ->whereBetween('date',[Carbon::now()->subMonth(6), Carbon::now()])
+//                                            ->where('dealers', $dealer);
+//                                    })
+//                                    ->whereRaw('utilized_quantity < approved_quantity')
+//                                    ->orderBy('letter_of_indent_id','ASC')
+//                                    ->first();
+
                         $deliveryNote = $uploadFileContent['delivery_note'];
                         // after having DN data their is no changes for data of thata ro.so consider the data without eta import for inventory
                         $supplierInventories = SupplierInventory::whereIn('master_model_id', $modelIds)
-//                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                             ->where('supplier_id', $request->supplier_id)
                             ->where('whole_sales', $request->whole_sales)
@@ -454,7 +465,7 @@ class SupplierInventoryController extends Controller
                             $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                             $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                             $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                            if($uploadFileContent['delivery_note']) {
+                            if($uploadFileContent['delivery_note'] && $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
                                 $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                             }
                             $supplierInventory->save();
@@ -463,7 +474,7 @@ class SupplierInventoryController extends Controller
 
                         } else {
                             $isSimilarRowExist =  SupplierInventory::whereIn('master_model_id', $modelIds)
-//                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                 ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                 ->where('supplier_id', $request->supplier_id)
                                 ->where('whole_sales', $request->whole_sales)
@@ -491,7 +502,7 @@ class SupplierInventoryController extends Controller
 
                                     // Store the Count into Update the Row with data
                                     $supplierInventory = SupplierInventory::whereIn('master_model_id', $modelIds)
-                                        //   ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                                        ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                         ->where('supplier_id', $request->supplier_id)
                                         ->where('whole_sales', $request->whole_sales)
@@ -512,7 +523,7 @@ class SupplierInventoryController extends Controller
                                         info("chasis matching row not avaialble, case of chasis updation ore new chaisi row add");
                                         //adding new row simply
                                         $isNullChaisis = SupplierInventory::whereIn('master_model_id', $modelIds)
-    //                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                             ->where('supplier_id', $request->supplier_id)
                                             ->where('whole_sales', $request->whole_sales)
@@ -563,7 +574,8 @@ class SupplierInventoryController extends Controller
 
                                                 $rowWithoutUpdate = SupplierInventory::whereIn('id', $isNullChaisisIds)->whereNotIn('id', $newlyAddedRowIds)
                                                     ->whereNotIn('id', $updatedRowsIds)
-                                                    ->whereNotIn('id', $noChangeRowIds)->first();
+                                                    ->whereNotIn('id', $noChangeRowIds)
+                                                    ->first();
 
                                                 info($rowWithoutUpdate);
 
@@ -580,7 +592,8 @@ class SupplierInventoryController extends Controller
                                                     $rowWithoutUpdate->delivery_note   = $uploadFileContent['delivery_note'];
                                                     $rowWithoutUpdate->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                                     $rowWithoutUpdate->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                                    if($uploadFileContent['delivery_note']) {
+                                                    if($uploadFileContent['delivery_note'] &&
+                                                        $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
                                                         $rowWithoutUpdate->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                                     }
                                                     $rowWithoutUpdate->save();
@@ -616,7 +629,8 @@ class SupplierInventoryController extends Controller
                                                     $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                                                     $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                                     $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                                    if($uploadFileContent['delivery_note']) {
+                                                    if($uploadFileContent['delivery_note'] &&
+                                                        $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
                                                         $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                                     }
                                                     $supplierInventory->save();
@@ -652,7 +666,8 @@ class SupplierInventoryController extends Controller
                                             $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                                             $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                             $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                            if($uploadFileContent['delivery_note']) {
+                                            if($uploadFileContent['delivery_note'] &&
+                                                $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
                                                 $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                             }
                                             $supplierInventory->save();
@@ -697,7 +712,8 @@ class SupplierInventoryController extends Controller
                                             $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                                             $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
                                             $supplierInventory->delivery_note   = $uploadFileContent['delivery_note'];
-                                            if($uploadFileContent['delivery_note']) {
+                                            if($uploadFileContent['delivery_note'] &&
+                                                $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
                                                 $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                             }
                                             $supplierInventory->save();
@@ -714,11 +730,10 @@ class SupplierInventoryController extends Controller
 
                                     }else{
                                         $existingPairCount = 0;
-
                                     }
-
                                     if($excelPairCount == $existingPairCount) {
                                         $inventoryRow = SupplierInventory::whereIn('master_model_id', $modelIds)
+                                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                             ->where('supplier_id', $request->supplier_id)
                                             ->where('whole_sales', $request->whole_sales)
@@ -742,7 +757,7 @@ class SupplierInventoryController extends Controller
                                             $inventoryRow->delivery_note   = $uploadFileContent['delivery_note'];
                                             $inventoryRow->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                             $inventoryRow->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                            if($uploadFileContent['delivery_note']) {
+                                            if($uploadFileContent['delivery_note'] && $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
                                                 $inventoryRow->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                             }
                                             $inventoryRow->save();
@@ -759,13 +774,15 @@ class SupplierInventoryController extends Controller
                                     }else if($excelPairCount > $existingPairCount) {
                                         // check for engine number is changed or not
                                         $nullChasisRow = SupplierInventory::whereIn('master_model_id', $modelIds)
+                                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                             ->where('supplier_id', $request->supplier_id)
                                             ->where('whole_sales', $request->whole_sales)
                                             ->whereNull('chasis')
                                             ->whereNotIn('id', $noChangeRowIds)
                                             ->whereNotIn('id', $updatedRowsIds)
-                                            ->whereNotIn('id', $newlyAddedRowIds)->first();
+                                            ->whereNotIn('id', $newlyAddedRowIds)
+                                            ->first();
 
                                         if(!empty($nullChasisRow)) {
                                             info("no existing row with chasis found => update row");
@@ -779,7 +796,7 @@ class SupplierInventoryController extends Controller
                                             $nullChasisRow->delivery_note   = $uploadFileContent['delivery_note'];
                                             $nullChasisRow->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                             $nullChasisRow->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                            if($uploadFileContent['delivery_note']) {
+                                            if($uploadFileContent['delivery_note'] && $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
                                                 $nullChasisRow->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                             }
                                             $nullChasisRow->save();
@@ -817,7 +834,7 @@ class SupplierInventoryController extends Controller
                                             $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                                             $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                             $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                            if($uploadFileContent['delivery_note']) {
+                                            if($uploadFileContent['delivery_note'] && $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
                                                 $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                             }
                                             $supplierInventory->save();
@@ -829,6 +846,7 @@ class SupplierInventoryController extends Controller
                                     }else{
                                         $nullChasisRow = SupplierInventory::whereIn('master_model_id', $modelIds)
                                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                             ->where('supplier_id', $request->supplier_id)
                                             ->where('whole_sales', $request->whole_sales)
                                             ->whereNull('chasis')
@@ -848,7 +866,7 @@ class SupplierInventoryController extends Controller
                                             $nullChasisRow->delivery_note   = $uploadFileContent['delivery_note'];
                                             $nullChasisRow->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                             $nullChasisRow->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                                            if($uploadFileContent['delivery_note']) {
+                                            if($uploadFileContent['delivery_note'] && $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
                                                 $nullChasisRow->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                             }
                                             $nullChasisRow->save();
@@ -888,7 +906,7 @@ class SupplierInventoryController extends Controller
                         $supplierInventoryHistory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                         $supplierInventoryHistory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                         $supplierInventoryHistory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                        if($uploadFileContent['delivery_note']) {
+                        if($uploadFileContent['delivery_note'] && $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
                             $supplierInventoryHistory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                         }
                         $supplierInventoryHistory->save();
@@ -897,11 +915,13 @@ class SupplierInventoryController extends Controller
                         // group the value pair to get count of duplicate data
 
                         $deletedRows = SupplierInventory::where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                             ->where('supplier_id', $request->supplier_id)
                             ->where('whole_sales', $request->whole_sales)
                             ->whereNotIn('id', $noChangeRowIds)
                             ->whereNotIn('id', $updatedRowsIds)
                             ->whereNotIn('id', $newlyAddedRowIds)->get();
+
                         foreach ($deletedRows as $deletedRow) {
                             $deletedRow->upload_status = SupplierInventory::VEH_STATUS_DELETED;
                             $deletedRow->save();
@@ -921,10 +941,8 @@ class SupplierInventoryController extends Controller
                     $pdf = Pdf::loadView('supplier_inventories.reports', compact('newlyAddedRows',
                         'updatedRows','deletedRows'));
                     return $pdf->download('report.pdf');
-
                 }
                 else{
-
                      DB::beginTransaction();
 
                     $supplierInventoryHistories = SupplierInventoryHistory::all();
@@ -961,7 +979,7 @@ class SupplierInventoryController extends Controller
                         $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                         $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                         $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                        if($uploadFileContent['delivery_note']) {
+                        if($uploadFileContent['delivery_note'] && $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
                             $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                         }
                         $supplierInventory->save();
@@ -985,7 +1003,7 @@ class SupplierInventoryController extends Controller
                         $supplierInventoryHistory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                         $supplierInventoryHistory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                         $supplierInventoryHistory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                        if($uploadFileContent['delivery_note']) {
+                        if($uploadFileContent['delivery_note'] && $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
                             $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                         }
                         $supplierInventoryHistory->save();
@@ -997,10 +1015,92 @@ class SupplierInventoryController extends Controller
                     return redirect()->route('supplier-inventories.create')->with('message','supplier inventory updated successfully');
                 }
             }
-
         }
+
+//        $inventoryItems = SupplierInventory::where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+//            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+//            ->where('supplier_id', $request->supplier_id)
+//            ->where('whole_sales', $request->whole_sales)
+//            ->where(function ($query)  {
+//                $query->whereNull('delivery_note')
+//                    ->orwhere('delivery_note', SupplierInventory::DN_STATUS_WAITING);
+//            })
+//        ->get();
+
+
+//        $alreadyAddedIds = [];
+//        $QtyfullyAddedIds = [];
+//        foreach ($inventoryItems as $inventoryItem) {
+//            info("inventory item");
+//            info($inventoryItem->id);
+//            info("master model id");
+//            info($inventoryItem->master_model_id);
+//
+//            $modelIds = MasterModel::where('model', $inventoryItem->masterModel->model)
+//                ->where('sfx', $inventoryItem->masterModel->sfx)
+//                ->pluck('id')->toArray();
+//
+//                $dealer = $request->whole_sales;
+//                info("master model ids");
+//                info($modelIds);
+//
+//                $LOIItems = LetterOfIndentItem::with('LOI')->whereIn('master_model_id', $modelIds)
+//                    ->whereHas('LOI', function ($query) use($modelIds, $dealer) {
+//                        $query->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
+//                            ->whereBetween('date',[Carbon::now()->subMonth(6), Carbon::now()])
+//                            ->where('dealers', $dealer);
+//                    })
+//                    ->whereNotIn('id', $QtyfullyAddedIds)
+//                    ->whereRaw('utilized_quantity < approved_quantity')
+//                    ->orderBy('letter_of_indent_id','ASC')
+//                    ->pluck('id');
+//
+//                info("LOI Items");
+//                info($LOIItems);
+//
+//                $LOIItem = LetterOfIndentItem::with('LOI')->whereIn('master_model_id', $modelIds)
+//                            ->whereHas('LOI', function ($query) use($modelIds, $dealer) {
+//                                $query->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
+//                                    ->whereBetween('date',[Carbon::now()->subMonth(6), Carbon::now()])
+//                                    ->where('dealers', $dealer);
+//                            })
+//                            ->whereNotIn('id', $QtyfullyAddedIds)
+//                            ->whereRaw('utilized_quantity < approved_quantity')
+//                            ->orderBy('letter_of_indent_id','ASC')
+////                            ->pluck('id')->toArray();
+//                            ->first();
+//                info("LOI ID");
+//
+//
+//                if($LOIItem) {
+//                    info($LOIItem);
+//                    $remaingQuantity = $LOIItem->approved_quantity - $LOIItem->utilized_quantity;
+//                    $assignedQuantity = 0;
+//                    if(array_key_exists($LOIItem->id, $alreadyAddedIds)) {
+//                        $assignedQuantity = $alreadyAddedIds[$LOIItem->id];
+//                        $actualQuantityRemaining = $remaingQuantity - $assignedQuantity;
+//                    }else{
+//                        $actualQuantityRemaining = $remaingQuantity;
+//                    }
+//                    info("remaining quantity");
+//                    info($actualQuantityRemaining);
+//
+//                    if($actualQuantityRemaining <= $LOIItem->approved_quantity) {
+//
+//                        if($actualQuantityRemaining <= 1) {
+//                            $QtyfullyAddedIds[] = $LOIItem->id;
+//                        }
+//                        info($QtyfullyAddedIds);
+//
+//                        $alreadyAddedIds[$LOIItem->id] = $assignedQuantity + 1;
+//                        $inventoryItem->letter_of_indent_item_id = $LOIItem->id;
+//                        $inventoryItem->save();
+//                    }
+//                }
+//            }
     }
     public function updateInventory(Request $request) {
+        (new UserActivityController)->createActivity('Update the Supplier Inventories');
 
         $updatedDatas = $request->selectedUpdatedDatas;
 
@@ -1097,7 +1197,7 @@ class SupplierInventoryController extends Controller
                 }
             }else if($fieldName == 'delivery_note') {
                 $inventory->$fieldName = $fieldValue;
-                $inventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+//                $inventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
             }
             else{
                $inventory->$fieldName = $fieldValue;

@@ -110,7 +110,7 @@
             <td>{{ $deletedRow->color_code }}</td>
         </tr>
     @endforeach
-    @if(!$deletedRows)
+    @if($deletedRows->count() <= 0)
         <tr>
             <td colspan="5" style="text-align: center" >No data Deleted</td>
         </tr>

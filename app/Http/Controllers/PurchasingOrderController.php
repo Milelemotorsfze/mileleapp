@@ -900,6 +900,8 @@ public function paymentreleasesconfirm($id)
 {
     $vehicle = Vehicles::find($id);
     if ($vehicle) {
+        DB::beginTransaction();
+
         $vehicle->status = 'Payment Requested';
         $vehicle->payment_status = 'Payment Release Approved';
         $vehicle->save();
@@ -916,6 +918,33 @@ public function paymentreleasesconfirm($id)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
+            if($vehicle->master_model_id) {
+                info("payment completion stage");
+                // get the loi item and update the utilization quantity
+                $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
+                    ->pluck('approved_loi_id');
+
+                $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
+
+                $possibleIds = MasterModel::where('model', $vehicle->masterModel->model)
+                    ->where('sfx', $vehicle->masterModel->sfx)->pluck('id')->toArray();
+                info($possibleIds);
+                foreach ($loiItemIds as $loiItemId) {
+                    $item = LetterOfIndentItem::find($loiItemId);
+                    if(in_array($item->master_model_id, $possibleIds)) {
+                        info("id existing");
+                        if($item->utilized_quantity < $item->approved_quantity) {
+                            info("quantity is less and updated");
+                            $item->utilized_quantity = $item->utilized_quantity + 1;
+                            $item->save();
+                            break;
+                        }
+
+                    }
+                }
+            }
+            DB::commit();
+
         return redirect()->back()->with('success', 'Payment Payment Release Approved confirmed. Vehicle status updated.');
     }
     return redirect()->back()->with('error', 'Vehicle not found.');
@@ -973,31 +1002,7 @@ public function paymentrelconfirmdebited($id)
                 $paymentlogs->vehicle_id = $vehicle->id;
                 $paymentlogs->created_by = auth()->user()->id;
                 $paymentlogs->save();
-                if($vehicle->master_model_id) {
-                    info("payment completion stage");
-                    // get the loi item and update the utilization quantity
-                   $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
-                                        ->pluck('approved_loi_id');
 
-                   $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
-
-                   $possibleIds = MasterModel::where('model', $vehicle->masterModel->model)
-                                    ->where('sfx', $vehicle->masterModel->sfx)->pluck('id')->toArray();
-                    info($possibleIds);
-                   foreach ($loiItemIds as $loiItemId) {
-                       $item = LetterOfIndentItem::find($loiItemId);
-                       if(in_array($item->master_model_id, $possibleIds)) {
-                           info("id existing");
-                           if($item->utilized_quantity < $item->approved_quantity) {
-                               info("quantity is less and updated");
-                               $item->utilized_quantity = $item->utilized_quantity + 1;
-                               $item->save();
-                               break;
-                           }
-
-                       }
-                   }
-                }
                 DB::commit();
         return redirect()->back()->with('success', 'Payment Payment Completed confirmed. Vehicle status updated.');
     }
@@ -1122,27 +1127,54 @@ public function purchasingallupdateStatusrel(Request $request)
         ->where('purchasing_order_id', $id)
         ->get();
     foreach ($vehicles as $vehicle) {
-    if ($status == 'Approved') {
-            $paymentStatus = 'Payment Release Approved';
-        } elseif ($status == 'Rejected') {
-            $paymentStatus = 'Payment Release Rejected';
-        }
-        DB::table('vehicles')
-            ->where('id', $vehicle->id)
-            ->update(['payment_status' => $paymentStatus]);
-        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-        $currentDateTime = Carbon::now($dubaiTimeZone);
-        $vehicleslog = new Vehicleslog();
-        $vehicleslog->time = $currentDateTime->toTimeString();
-        $vehicleslog->date = $currentDateTime->toDateString();
-        $vehicleslog->status = 'Payment Initiated Status';
-        $vehicleslog->vehicles_id = $vehicle->id;
-        $vehicleslog->field = 'Payment Status';
-        $vehicleslog->old_value = 'Payment Initiated';
-        $vehicleslog->new_value = $paymentStatus;
-        $vehicleslog->created_by = auth()->user()->id;
-        $vehicleslog->role = Auth::user()->selectedRole;
-        $vehicleslog->save();
+        if ($status == 'Approved') {
+                $paymentStatus = 'Payment Release Approved';
+            } elseif ($status == 'Rejected') {
+                $paymentStatus = 'Payment Release Rejected';
+            }
+            DB::table('vehicles')
+                ->where('id', $vehicle->id)
+                ->update(['payment_status' => $paymentStatus]);
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+            $vehicleslog = new Vehicleslog();
+            $vehicleslog->time = $currentDateTime->toTimeString();
+            $vehicleslog->date = $currentDateTime->toDateString();
+            $vehicleslog->status = 'Payment Initiated Status';
+            $vehicleslog->vehicles_id = $vehicle->id;
+            $vehicleslog->field = 'Payment Status';
+            $vehicleslog->old_value = 'Payment Initiated';
+            $vehicleslog->new_value = $paymentStatus;
+            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->role = Auth::user()->selectedRole;
+            $vehicleslog->save();
+
+            if($vehicle->master_model_id) {
+//                info("payment completion stage");
+                // get the loi item and update the utilization quantity
+                $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
+                    ->pluck('approved_loi_id');
+
+                $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
+                $masterModel = MasterModel::find($vehicle->master_model_id);
+                $possibleIds = MasterModel::where('model', $masterModel->model)
+                    ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
+//                info($possibleIds);
+                foreach ($loiItemIds as $loiItemId) {
+                    $item = LetterOfIndentItem::find($loiItemId);
+                    if(in_array($item->master_model_id, $possibleIds)) {
+//                        info("id existing");
+                        if($item->utilized_quantity < $item->approved_quantity) {
+//                            info("quantity is less and updated");
+//                            info($item->id);
+                            $item->utilized_quantity = $item->utilized_quantity + 1;
+                            $item->save();
+                            break;
+                        }
+
+                    }
+                }
+            }
     }
     return redirect()->back()->with('success', 'Payment Status Updated');
 }
@@ -1274,32 +1306,7 @@ public function allpaymentreqssfinpay(Request $request)
                            $paymentlogs->created_by = auth()->user()->id;
                            $paymentlogs->save();
 
-                       if($vehicle->master_model_id) {
-                           info("payment completion stage");
-                           // get the loi item and update the utilization quantity
-                           $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
-                               ->pluck('approved_loi_id');
 
-                           $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
-                           $masterModel = MasterModel::find($vehicle->master_model_id);
-                           $possibleIds = MasterModel::where('model', $masterModel->model)
-                               ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
-                           info($possibleIds);
-                           foreach ($loiItemIds as $loiItemId) {
-                               $item = LetterOfIndentItem::find($loiItemId);
-                               if(in_array($item->master_model_id, $possibleIds)) {
-                                   info("id existing");
-                                   if($item->utilized_quantity < $item->approved_quantity) {
-                                       info("quantity is less and updated");
-                                       info($item->id);
-                                       $item->utilized_quantity = $item->utilized_quantity + 1;
-                                       $item->save();
-                                       break;
-                                   }
-
-                               }
-                           }
-                       }
                    }
 
                    return redirect()->back()->with('success', 'Payment Status Updated');
