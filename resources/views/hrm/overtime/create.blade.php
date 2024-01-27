@@ -1,5 +1,12 @@
 @extends('layouts.main')
 @include('layouts.formstyle')
+<!-- <style>
+     .paragraph-class 
+    {
+        color: red;
+        font-size:11px;
+    }
+    </style> -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <!-- <script src="{{ asset('libs/jquery/jquery.min.js') }}"></script> -->
 @section('content')
@@ -42,6 +49,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 			</div>
 			<div class="card-body">
 				<div class="row">
+                    <!-- <div class="col-xxl-2 col-lg-2 col-md-2">
+                        <label for="start_datetime" class="col-form-label text-md-end">{{ __('Overtime Start Date & Time') }}</label>
+                        <input id="start_datetime" type="datetime-local" class="form-control widthinput @error('start_datetime') is-invalid @enderror" 
+                        name="start_datetime" value="" autocomplete="start_datetime" autofocus>
+                    </div>
+                    <div class="col-xxl-2 col-lg-2 col-md-2">
+                        <label for="end_datetime" class="col-form-label text-md-end">{{ __('Overtime End Date & Time') }}</label>
+                        <input id="end_datetime" type="datetime-local" class="form-control widthinput @error('end_datetime') is-invalid @enderror" 
+                        name="end_datetime" value="" autocomplete="end_datetime" autofocus>
+                    </div> -->
                     <div class="col-xxl-4 col-lg-4 col-md-4">
 						<span class="error">* </span>
 						<label for="employee_id" class="col-form-label text-md-end">{{ __('Employee Name') }}</label>
@@ -170,21 +187,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
                 <div class="row form_field_outer_row" id="${index}">														
                     <div class="col-xxl-2 col-lg-2 col-md-2">
                         <label for="start_datetime" class="col-form-label text-md-end">{{ __('Overtime Start Date & Time') }}</label>
-                        <input id="start_datetime_${index}" type="datetime-local" class="form-control widthinput @error('start_datetime') is-invalid @enderror" 
+                        <input id="start_datetime_${index}" type="datetime-local" class="start_datetime form-control widthinput @error('start_datetime') is-invalid @enderror" 
                         name="overtime[${index}][start_datetime]" value="" autocomplete="start_datetime" autofocus data-index="${index}" onchange="maxDate(${index})">
+                        <span id="start_date_error_${index}"></span>
                     </div>
                     <div class="col-xxl-2 col-lg-2 col-md-2">
                         <label for="end_datetime" class="col-form-label text-md-end">{{ __('Overtime End Date & Time') }}</label>
                         <input id="end_datetime_${index}" type="datetime-local" class="form-control widthinput @error('end_datetime') is-invalid @enderror" 
-                        name="overtime[${index}][end_datetime]" value="" autocomplete="end_datetime" autofocus data-index="${index}">
+                        name="overtime[${index}][end_datetime]" value="" autocomplete="end_datetime" autofocus data-index="${index}" onchange="maxDate(${index})">
+                        <span id="end_date_error_${index}"></span>
                     </div>
                     <div class="col-xxl-7 col-lg-7 col-md-7">
                         <label for="remarks" class="col-form-label text-md-end">{{ __('Remarks') }}</label>
                         <input id="remarks_${index}" type="text" class="remarks form-control widthinput @error('remarks') is-invalid @enderror" 
                         name="overtime[${index}][remarks]" placeholder="Please Enter Remarks" value="" autocomplete="remarks" autofocus data-index="${index}">
-                    </div>
-                    <input type="hidden" value="" id="max_${index}">
-                    <input type="hidden" value="" id="min_${index}">
+                        
+                        </div>
                     <div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                         <a class="btn_round remove_node_btn_frm_field" title="Remove Row">
                         <i class="fas fa-trash-alt"></i>
@@ -192,16 +210,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
                     </div>
                 </div>
             `);
-            $("#start_datetime_"+index).rules('add', {
-                required:true,
-            });
-            $("#end_datetime_"+index).rules('add', {
-                required:true,
-                // max: function(){ return $("#start_datetime_"+index).val();},
-            });
-        }	
-	});	
+            // $("#start_datetime_"+index).rules('add', {
+            //     required:true, 
+            // //     // lessThan: "#end_datetime_"+index,              
+            // });
+            // $("#end_datetime_"+index).rules('add', {
+            //     required:true,
+            //     greaterThan: "#start_datetime_"+index,
+            //     timeDifferenceValidate: [index],
 
+
+            //     // checkA: true,
+            //     // max: function(){ return $("#start_datetime_"+index).val();},
+            // });
+        }	
+
+        
+	});	
  
 	jQuery.validator.setDefaults({
         errorClass: "is-invalid",
@@ -223,6 +248,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
             }
         }
     });
+
+    // jQuery.validator.addMethod("greaterThan", function(value, element, params) {
+    //     if (!/Invalid|NaN/.test(new Date(value))) {
+    //         return new Date(value) > new Date($(params).val());
+    //     }
+    //     else {
+    //         var startTime = $(params).val();
+    //         var endTime = value;
+    //         var timeDifference = calculateTimeDifference(startTime, endTime);
+    //     }
+    //     return isNaN(value) && isNaN($(params).val()) 
+    //         || (Number(value) > Number($(params).val())); 
+    // },'Must be greater than overtime start date and time.');
+
+    // jQuery.validator.addMethod("timeDifferenceValidate", function(value, element, params) {
+    //     var startTime = $("#start_datetime_"+params[0]).val();
+    //     var endTime = $("#end_datetime_"+params[0]).val();
+    //     var timeDifference = calculateTimeDifference(startTime, endTime);
+    //     return timeDifference <= 1440;
+    // },'The time difference must be less than or equal to 24 hours');
+    // function calculateTimeDifference(startTime, endTime) {
+    //     var oneM = 1000 * 60;
+    //     var sMS = new Date(startTime);
+    //     var eMS = new Date(endTime);
+    //     var timeDifference =  Math.round((eMS.getTime() - sMS.getTime()) / oneM);
+    //     return timeDifference;
+    // }
 	$('#employeeOvertimeForm').validate({ // initialize the plugin
         rules: {
 			employee_id: {
@@ -230,13 +282,127 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
             },
         },
     });
+    // $.validator.prototype.checkForm=function() {
+    //     this.prepareForm();
+    //     for(var i = 0,elements = (this.currentElements =this.elements());elements[i];i++ ) {
+    //         if(this.findByName( elements[i].name ).length !=undefined && this.findByName( elements[i].name ).length > 1) {
+    //             for(varcnt = 0;cnt <this.findByName( elements[i].name ).length;cnt++) {
+    //                 this.check(this.findByName( elements[i].name )[cnt] );
+    //             }
+    //         }
+    //         else {
+    //             this.check( elements[i] );
+    //         }
+    //     }
+    //     return this.valid();
+    // };
+
     function maxDate(index) {
-        var date = new Date(this.valueAsNumber);
-  date.setDate(date.getDate() + 1);
-  $("#max_"_index)[0].valueAsNumber = +date;
-  
-  console.log(new Date(this.value)) // retrieving as data
-        // $("#max_"_index).val();
+        $msg = '';
+        hideStartDateError(index, $msg);
+        hideEndDateError(index, $msg);
+        var startTime = $("#start_datetime_"+index).val();
+        var endTime = $("#end_datetime_"+index).val();
+        if(startTime == '') {
+            $msg = 'Start Date & Time is Required.';
+            showStartDateError(index, $msg);
+            return false;
+        }
+        if(endTime == '') {
+            $msg = 'End Date & Time is Required.';
+            showEndDateError(index, $msg);
+            return false;
+        }
+        if(startTime != '' && endTime != '' && startTime >= endTime) {
+            $msg = 'Must be greater than overtime start date and time.';
+            showEndDateError(index, $msg);
+            return false;
+        }
+        else if(startTime != '' && endTime != '' && startTime < endTime) {
+            var oneM = 1000 * 60;
+            var sMS = new Date(startTime);
+            var eMS = new Date(endTime);
+            var timeDifference =  Math.round((eMS.getTime() - sMS.getTime()) / oneM);
+            if(timeDifference > 1440) {
+                $msg = 'The time difference must be less than or equal to 24 hours.';
+                showEndDateError(index, $msg);   
+                return false;
+            }
+            else {
+                document.querySelectorAll('.form_field_outer_row').forEach(function(DayIndex) {
+                    var DayIndexId = '';
+                    DayIndexId = DayIndex.id;
+                    if($("#start_datetime_"+DayIndexId).val() != '' && $("#end_datetime_"+DayIndexId).val() != '') {
+                        if($("#start_datetime_"+DayIndexId).val() >= startTime && startTime >= $("#end_datetime_"+DayIndexId).val()) {
+                            alert('hi');
+                            // $msg = 'This start datetime is alredy added'; 
+                            // showStartDateError(index, $msg);
+                            // return false;
+                        }
+                        else
+                        {
+                            alert('sssss');
+                        }
+                    }
+    //                 if(($("#start_datetime_"+DayIndexId).val() != '' && $("#end_datetime_"+DayIndexId).val() != '') && ($("#start_datetime_"+DayIndexId).val() <= startTime <= $("#end_datetime_"+DayIndexId).val())) {
+    // $msg = 'This start datetime is alredy added'; alert($msg);
+    //                     showStartDateError(DayIndexId, $msg);
+    //                     return false;
+    //                 }
+    //                 if(($("#start_datetime_"+DayIndexId).val() != '' && $("#end_datetime_"+DayIndexId).val() != '') && ($("#start_datetime_"+DayIndexId).val() <= endTime <= $("#end_datetime_"+DayIndexId).val())) {
+
+    //                         $msg = 'This end datetime is alredy added';
+    //                     showEndDateError(DayIndexId, $msg);
+    //                     return false;
+    //                 }
+                    // if((($("#start_datetime_"+DayIndexId).val()) != '' && ($("#end_datetime_"+DayIndexId).val()) != '') && (($("#start_datetime_"+DayIndexId).val()) >= startTime >= ($("#end_datetime_"+DayIndexId).val()))) {
+                    //     $msg = 'This start datetime is alredy added'; alert($msg);
+                    //     showStartDateError(DayIndexId, $msg);
+                    //     return false;
+                    // }
+                    // if((($("#start_datetime_"+DayIndexId).val()) != '' && ($("#end_datetime_"+DayIndexId).val()) != '') && ($("#start_datetime_"+DayIndexId).val()) >= endTime >= ($("#end_datetime_"+DayIndexId).val())) {
+                    //     $msg = 'This end datetime is alredy added';
+                    //     showEndDateError(DayIndexId, $msg);
+                    //     return false;
+                    // }
+                });
+            }
+        }
     }
+    function showStartDateError(index, $msg) {
+        document.getElementById("start_date_error_"+index).textContent=$msg;
+        document.getElementById("start_datetime_"+index).classList.add("is-invalid");
+        document.getElementById("start_date_error_"+index).classList.add("paragraph-class"); 
+    }
+    function showEndDateError(index, $msg) {
+        document.getElementById("end_date_error_"+index).textContent=$msg;
+        document.getElementById("end_datetime_"+index).classList.add("is-invalid");
+        document.getElementById("end_date_error_"+index).classList.add("paragraph-class");    
+    }
+    function hideStartDateError(index, $msg) {
+        document.getElementById("start_date_error_"+index).textContent=$msg;
+        document.getElementById("start_datetime_"+index).classList.remove("is-invalid");
+        document.getElementById("start_date_error_"+index).classList.remove("paragraph-class");
+    }
+    function hideEndDateError(index, $msg) {
+        document.getElementById("end_date_error_"+index).textContent=$msg;
+        document.getElementById("end_datetime_"+index).classList.remove("is-invalid");
+        document.getElementById("end_date_error_"+index).classList.remove("paragraph-class");
+    }
+	$('form').on('submit', function (e) {
+        // var cusid_ele = document.getElementsByClassName('form_field_outer_row');
+        document.querySelectorAll('.form_field_outer_row').forEach(function(overtimeDay) {
+            var currentId = '';
+            currentId = overtimeDay.id;
+            if(maxDate(currentId) == false){
+                e.preventDefault();
+            }
+          
+            // console.log(overtimeDay.id);
+    // Now do something with my button
+});
+    //     console.log(cusid_ele);
+    //     // e.preventDefault();
+	});
 </script>
 @endsection
