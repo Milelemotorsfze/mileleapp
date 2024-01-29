@@ -21,15 +21,42 @@ class OverTime extends Model
     ];
     protected $appends = [
         'total_hours',
+        'current_status',
     ];
     public function getTotalHoursAttribute() {
-        $totalHours = '';
-        // $times = 
-        // $t1 = Carbon::parse('2016-07-05 12:29:16');
-        // $t2 = Carbon::parse('2016-07-04 13:30:10');
-        // $diff = $t1->diff($t2);
-        // dd($diff->h);
-        return $totalHours;
+        $sumMinutes = 0;
+        foreach($this->times as $time) {
+            $explodedTime = explode(':', $time->hours); 
+            $eachminutes = $explodedTime[0]*60+$explodedTime[1];
+            $sumMinutes = $sumMinutes+$eachminutes;
+        }
+        $hours = floor($sumMinutes/60);
+        $minutes = $sumMinutes - ($hours * 60);
+        $sumTime = $hours.':'.$minutes;
+        return $sumTime;
+    }
+    public function getCurrentStatusAttribute() {
+        $currentStatus = '';
+        if($this->status == 'approved') {
+            $currentStatus = 'Approved';
+        }
+        else if($this->status == 'rejected') {
+            $currentStatus = 'Rejected';
+        }
+        // Approvals =>  Employee -------> HR Manager -----------> Reporting Manager ---------> Division Head
+        else if($this->status == 'pending' && $this->action_by_employee == 'pending') {
+            $currentStatus = "Employee's Approval Awaiting";
+        }
+        else if($this->status == 'pending' && $this->action_by_hr_manager == 'pending') {
+            $currentStatus = "HR Manager's Approval Awaiting";
+        }
+        else if($this->status == 'pending' && $this->action_by_department_head == 'pending') {
+            $currentStatus = "Reporting Manager's Approval Awaiting";
+        }
+        else if($this->status == 'pending' && $this->action_by_division_head == 'pending') {
+            $currentStatus = "Division Head's Approval Awaiting";
+        }
+        return $currentStatus;
     }
     public function user() {
         return $this->hasOne(User::class,'id','employee_id');
@@ -48,5 +75,11 @@ class OverTime extends Model
     }
     public function times() {
         return $this->hasMany(OverTimeDateTime::class,'over_times_id','id');
+    }
+    public function minStartDateTime() {
+        return $this->hasOne(OverTimeDateTime::class,'over_times_id','id')->ofMany('start_datetime','min');
+    }
+    public function maxStartDateTime() {
+        return $this->hasOne(OverTimeDateTime::class,'over_times_id','id')->ofMany('end_datetime','max');
     }
 }

@@ -107,12 +107,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->location->name ?? '' }}</td>
 							<td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>	
-							<td></td>									
+							<td>{{ $data->total_hours ?? ''}}</td>
+							<td>
+								@if($data->minStartDateTime->start_datetime != '')
+								{{\Carbon\Carbon::parse($data->minStartDateTime->start_datetime)->format('d M Y') ?? ''}}
+								@endif
+							</td>
+							<td>
+								@if($data->maxStartDateTime->end_datetime != '')
+									{{\Carbon\Carbon::parse($data->maxStartDateTime->end_datetime)->format('d M Y') ?? ''}}
+								@endif
+							</td>
+							<td>{{ $data->reportingManager->name ?? ''}}</td>
+							<td>{{ $data->divisionHead->name ?? ''}}</td>	
+							<td>{{ $data->current_status ?? ''}}</td>									
 							<td>
 							<div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
