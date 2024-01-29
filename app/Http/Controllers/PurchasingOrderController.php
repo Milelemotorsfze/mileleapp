@@ -919,27 +919,21 @@ public function paymentreleasesconfirm($id)
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
             if($vehicle->master_model_id) {
-                info("payment completion stage");
                 // get the loi item and update the utilization quantity
                 $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
                     ->pluck('approved_loi_id');
 
                 $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
-
                 $possibleIds = MasterModel::where('model', $vehicle->masterModel->model)
                     ->where('sfx', $vehicle->masterModel->sfx)->pluck('id')->toArray();
-                info($possibleIds);
                 foreach ($loiItemIds as $loiItemId) {
                     $item = LetterOfIndentItem::find($loiItemId);
                     if(in_array($item->master_model_id, $possibleIds)) {
-                        info("id existing");
                         if($item->utilized_quantity < $item->approved_quantity) {
-                            info("quantity is less and updated");
                             $item->utilized_quantity = $item->utilized_quantity + 1;
                             $item->save();
                             break;
                         }
-
                     }
                 }
             }
@@ -1150,8 +1144,6 @@ public function purchasingallupdateStatusrel(Request $request)
             $vehicleslog->save();
 
             if($vehicle->master_model_id) {
-//                info("payment completion stage");
-                // get the loi item and update the utilization quantity
                 $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
                     ->pluck('approved_loi_id');
 
@@ -1159,14 +1151,10 @@ public function purchasingallupdateStatusrel(Request $request)
                 $masterModel = MasterModel::find($vehicle->master_model_id);
                 $possibleIds = MasterModel::where('model', $masterModel->model)
                     ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
-//                info($possibleIds);
                 foreach ($loiItemIds as $loiItemId) {
                     $item = LetterOfIndentItem::find($loiItemId);
                     if(in_array($item->master_model_id, $possibleIds)) {
-//                        info("id existing");
                         if($item->utilized_quantity < $item->approved_quantity) {
-//                            info("quantity is less and updated");
-//                            info($item->id);
                             $item->utilized_quantity = $item->utilized_quantity + 1;
                             $item->save();
                             break;
