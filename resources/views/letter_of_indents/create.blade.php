@@ -834,6 +834,7 @@
                },
                success:function (data) {
                    $('#loi-description-'+index).val("");
+
                    let quantity = data.quantity;
                    let modelId = data.master_model_id;
                    var LOIDescription = data.loi_description;

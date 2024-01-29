@@ -8,6 +8,7 @@ use App\Models\ColorCode;
 use App\Models\DemandList;
 use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
+use App\Models\LOIMappingCriteria;
 use App\Models\MasterModel;
 use App\Models\ModelYearCalculationCategory;
 use App\Models\Supplier;
@@ -294,14 +295,6 @@ class SupplierInventoryController extends Controller
 
             foreach($uploadFileContents as $uploadFileContent) {
 
-//                $LOIs = LetterOfIndent::where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
-//                                        ->where('dealers', $request->whole_sales)
-//                                        ->where('date', )
-
-//                    info($uploadFileContent['model_year']);
-//                    info($uploadFileContent['model']);
-//                    info($uploadFileContent['sfx']);
-
                 $chasis[] = $uploadFileContent['chasis'];
                 if(empty($uploadFileContent['chasis'])) {
                     $excelPairs[] = $uploadFileContent['model'] . "_" . $uploadFileContent['sfx'];
@@ -409,16 +402,6 @@ class SupplierInventoryController extends Controller
                         $modelIds = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->pluck('id')->toArray();
-
-//                        $LOIItems = LetterOfIndentItem::with('LOI')->whereIn('master_model_id', $modelIds)
-//                                    ->whereHas('LOI', function ($query) use($modelIds, $dealer) {
-//                                        $query->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
-//                                            ->whereBetween('date',[Carbon::now()->subMonth(6), Carbon::now()])
-//                                            ->where('dealers', $dealer);
-//                                    })
-//                                    ->whereRaw('utilized_quantity < approved_quantity')
-//                                    ->orderBy('letter_of_indent_id','ASC')
-//                                    ->first();
 
                         $deliveryNote = $uploadFileContent['delivery_note'];
                         // after having DN data their is no changes for data of thata ro.so consider the data without eta import for inventory
@@ -935,6 +918,7 @@ class SupplierInventoryController extends Controller
 
                         info("no change row Ids");
                         info($noChangeRowIds);
+                    $this->LOIItemIdMapping($request);
 
                     DB::commit();
 
@@ -1010,6 +994,8 @@ class SupplierInventoryController extends Controller
 
                     }
 
+                    $this->LOIItemIdMapping($request);
+
                     DB::commit();
 
                     return redirect()->route('supplier-inventories.create')->with('message','supplier inventory updated successfully');
@@ -1017,87 +1003,93 @@ class SupplierInventoryController extends Controller
             }
         }
 
-//        $inventoryItems = SupplierInventory::where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-//            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-//            ->where('supplier_id', $request->supplier_id)
-//            ->where('whole_sales', $request->whole_sales)
-//            ->where(function ($query)  {
-//                $query->whereNull('delivery_note')
-//                    ->orwhere('delivery_note', SupplierInventory::DN_STATUS_WAITING);
-//            })
-//        ->get();
+    }
+    public function LOIItemIdMapping(Request $request) {
 
+        $inventoryItems = SupplierInventory::where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->where('supplier_id', $request->supplier_id)
+            ->where('whole_sales', $request->whole_sales)
+            ->where(function ($query)  {
+                $query->whereNull('delivery_note')
+                    ->orwhere('delivery_note', SupplierInventory::DN_STATUS_WAITING);
+            })
+            ->get();
 
-//        $alreadyAddedIds = [];
-//        $QtyfullyAddedIds = [];
-//        foreach ($inventoryItems as $inventoryItem) {
+        $alreadyAddedIds = [];
+        $QtyfullyAddedIds = [];
+        foreach ($inventoryItems as $inventoryItem) {
 //            info("inventory item");
 //            info($inventoryItem->id);
 //            info("master model id");
 //            info($inventoryItem->master_model_id);
-//
-//            $modelIds = MasterModel::where('model', $inventoryItem->masterModel->model)
-//                ->where('sfx', $inventoryItem->masterModel->sfx)
-//                ->pluck('id')->toArray();
-//
-//                $dealer = $request->whole_sales;
-//                info("master model ids");
-//                info($modelIds);
-//
-//                $LOIItems = LetterOfIndentItem::with('LOI')->whereIn('master_model_id', $modelIds)
-//                    ->whereHas('LOI', function ($query) use($modelIds, $dealer) {
-//                        $query->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
-//                            ->whereBetween('date',[Carbon::now()->subMonth(6), Carbon::now()])
-//                            ->where('dealers', $dealer);
-//                    })
-//                    ->whereNotIn('id', $QtyfullyAddedIds)
-//                    ->whereRaw('utilized_quantity < approved_quantity')
-//                    ->orderBy('letter_of_indent_id','ASC')
-//                    ->pluck('id');
-//
-//                info("LOI Items");
-//                info($LOIItems);
-//
-//                $LOIItem = LetterOfIndentItem::with('LOI')->whereIn('master_model_id', $modelIds)
-//                            ->whereHas('LOI', function ($query) use($modelIds, $dealer) {
-//                                $query->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
-//                                    ->whereBetween('date',[Carbon::now()->subMonth(6), Carbon::now()])
-//                                    ->where('dealers', $dealer);
-//                            })
-//                            ->whereNotIn('id', $QtyfullyAddedIds)
-//                            ->whereRaw('utilized_quantity < approved_quantity')
-//                            ->orderBy('letter_of_indent_id','ASC')
-////                            ->pluck('id')->toArray();
-//                            ->first();
-//                info("LOI ID");
-//
-//
-//                if($LOIItem) {
-//                    info($LOIItem);
-//                    $remaingQuantity = $LOIItem->approved_quantity - $LOIItem->utilized_quantity;
-//                    $assignedQuantity = 0;
-//                    if(array_key_exists($LOIItem->id, $alreadyAddedIds)) {
-//                        $assignedQuantity = $alreadyAddedIds[$LOIItem->id];
-//                        $actualQuantityRemaining = $remaingQuantity - $assignedQuantity;
-//                    }else{
-//                        $actualQuantityRemaining = $remaingQuantity;
-//                    }
-//                    info("remaining quantity");
-//                    info($actualQuantityRemaining);
-//
-//                    if($actualQuantityRemaining <= $LOIItem->approved_quantity) {
-//
-//                        if($actualQuantityRemaining <= 1) {
-//                            $QtyfullyAddedIds[] = $LOIItem->id;
-//                        }
-//                        info($QtyfullyAddedIds);
-//
-//                        $alreadyAddedIds[$LOIItem->id] = $assignedQuantity + 1;
-//                        $inventoryItem->letter_of_indent_item_id = $LOIItem->id;
-//                        $inventoryItem->save();
-//                    }
-//                }
-//            }
+
+            $modelIds = MasterModel::where('model', $inventoryItem->masterModel->model)
+                ->where('sfx', $inventoryItem->masterModel->sfx)
+                ->pluck('id')->toArray();
+
+            $dealer = $request->whole_sales;
+//            info("master model ids");
+//            info($modelIds);
+
+            $loiMappingCriterias = LOIMappingCriteria::orderBy('order','ASC')->get();
+
+            foreach ($loiMappingCriterias as $loiMappingCriteria) {
+                $value = $loiMappingCriteria->value;
+//                info("month/ YEAR");
+//                info($value);
+                if($loiMappingCriteria->value_type == LOIMappingCriteria::TYPE_MONTH) {
+                    $whereColumn =  Carbon::now()->subMonth($value);
+                }else{
+                    $whereColumn =  Carbon::now()->subYear($value);
+                }
+
+                $LOIItem = LetterOfIndentItem::with('LOI')->whereIn('master_model_id', $modelIds)
+                            ->whereHas('LOI', function ($query) use($modelIds, $dealer, $whereColumn) {
+                                $query->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
+                                    ->whereBetween('date',[$whereColumn, Carbon::now()])
+                                    ->where('dealers', $dealer);
+                            })
+                            ->whereNotIn('id', $QtyfullyAddedIds)
+                            ->whereRaw('utilized_quantity < quantity')
+                            ->orderBy('letter_of_indent_id','ASC')
+                            ->first();
+
+                if($LOIItem) {
+//                   info("item exist");
+                     break;
+                }
+            }
+
+//            info("LOI ID");
+
+            if($LOIItem) {
+//                info($LOIItem);
+                $remaingQuantity = $LOIItem->quantity - $LOIItem->utilized_quantity;
+                $assignedQuantity = 0;
+                if(array_key_exists($LOIItem->id, $alreadyAddedIds)) {
+                    $assignedQuantity = $alreadyAddedIds[$LOIItem->id];
+                    $actualQuantityRemaining = $remaingQuantity - $assignedQuantity;
+                }else{
+                    $actualQuantityRemaining = $remaingQuantity;
+                }
+
+//                info("remaining quantity");
+//                info($actualQuantityRemaining);
+
+                if($actualQuantityRemaining <= $LOIItem->quantity) {
+
+                    if($actualQuantityRemaining <= 1) {
+                        $QtyfullyAddedIds[] = $LOIItem->id;
+                    }
+//                    info($QtyfullyAddedIds);
+
+                    $alreadyAddedIds[$LOIItem->id] = $assignedQuantity + 1;
+                    $inventoryItem->letter_of_indent_item_id = $LOIItem->id;
+                    $inventoryItem->save();
+                }
+            }
+        }
     }
     public function updateInventory(Request $request) {
         (new UserActivityController)->createActivity('Update the Supplier Inventories');
@@ -1239,6 +1231,7 @@ class SupplierInventoryController extends Controller
             })
             ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
+
         $newlyAddedRows = [];
         $updatedRows = [];
         $updatedRowsIds = [];

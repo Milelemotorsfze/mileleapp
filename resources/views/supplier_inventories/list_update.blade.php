@@ -59,6 +59,7 @@
                     <th>SFX</th>
                     <th>Model Year</th>
                     <th>Variant</th>
+                    <th>LOI</th>
                     <th>Chasis</th>
                     <th>Engine Number</th>
                     <th>Color Code</th>
@@ -114,6 +115,7 @@
                                 </select>
                             </td>
                             <td> {{ $supplierInventory->masterModel->variant->name ?? '' }}</td>
+                            <td>{{ $supplierInventory->letterOfIndentItem->uuid ?? '' }}</td>
                             <td data-field="chasis" id="chasis-editable-{{$supplierInventory->id}}" contenteditable="true" data-id="{{$supplierInventory->id}}" >
                                 {{ $supplierInventory->chasis }}
                             </td>
