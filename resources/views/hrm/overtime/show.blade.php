@@ -156,6 +156,36 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['all-overtime-detai
                             <h4 class="card-title">Overtime Information</h4>
                         </div>
                         <div class="card-body">
+                        <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                                    <label for="choices-single-default" class="form-label"> Start Date & Time :</label>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                                    <span>@if($data->minStartDateTime->start_datetime != '')
+								{{\Carbon\Carbon::parse($data->minStartDateTime->start_datetime)->format('d M Y') ?? ''}}
+								@endif</span>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                                    <label for="choices-single-default" class="form-label"> Total Number Of Overtime Hours :</label>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                                    <span>{{ $data->total_hours ?? '' }}</span>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                                    <label for="choices-single-default" class="form-label"> End Date & Time :</label>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                                    <span>@if($data->maxStartDateTime->end_datetime != '')
+									{{\Carbon\Carbon::parse($data->maxStartDateTime->end_datetime)->format('d M Y') ?? ''}}
+								@endif</span>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                                    <label for="choices-single-default" class="form-label"> Current Status :</label>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-6 col-12">
+                                    <span>{{ $data->current_status ?? '' }}</span>
+                                </div>                       
+                            </div>
                             <div class="row">
                                 <table>
                                     <thead>

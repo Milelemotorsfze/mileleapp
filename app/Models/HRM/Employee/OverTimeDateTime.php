@@ -26,4 +26,7 @@ class OverTimeDateTime extends Model
         $Hours = $diff->h.':'.$diff->i;
         return $Hours;
     }
+    public function overtime() {
+        return $this->belongsTo(OverTime::class,'over_times_id','id');
+    }
 }

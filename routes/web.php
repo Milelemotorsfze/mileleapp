@@ -369,7 +369,9 @@ Route::get('/d', function () {
     Route::resource('increment', IncrementController::class);
     // Employee Overtime Application
     Route::resource('overtime', OverTimeController::class);
-
+    Route::controller(OverTimeController::class)->group(function(){
+        Route::post('checkOvertimeAlreadyExist', 'checkOvertimeAlreadyExist')->name('overtimr.checkOvertimeAlreadyExist');
+    });
     // Demand & Planning Module
 
     // suppliers

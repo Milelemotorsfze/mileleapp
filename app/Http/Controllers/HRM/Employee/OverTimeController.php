@@ -109,4 +109,27 @@ class OverTimeController extends Controller
         $next = OverTime::where('id', '>', $id)->min('id');
         return view('hrm.overtime.show',compact('data','previous','next'));
     }
+    public function checkOvertimeAlreadyExist(Request $request) {
+        $isAlreadyExist['startTime'] = 'no';
+        $isAlreadyExist['endTime'] = 'no';
+        if($request->startTime != '' && $request->endTime != '' && $request->EmpId != '') {
+            $startTime = OverTimeDateTime::where('start_datetime','<=',$request->startTime)
+                ->where('end_datetime','>=',$request->startTime)
+                ->whereHas('overtime', function($q) use($request) {
+                        $q->where('employee_id',$request->EmpId[0]);
+                })->get();
+            if(count($startTime) > 0) {
+                $isAlreadyExist['startTime'] = 'yes';
+            }
+            $endTime = OverTimeDateTime::where('start_datetime','<=',$request->endTime)
+                ->where('end_datetime','>=',$request->endTime)
+                ->whereHas('overtime', function($q) use($request) {
+                        $q->where('employee_id',$request->EmpId[0]);
+                })->get();
+            if(count($endTime) > 0) {
+                $isAlreadyExist['endTime'] = 'yes';
+            }
+        }
+        return response()->json($isAlreadyExist);
+    }
 }
