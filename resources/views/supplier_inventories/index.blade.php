@@ -75,7 +75,7 @@
                     <th>Total QTY</th>
                     <th>Actual QTY</th>
                     <th>Qty Without Chaisis </th>
-{{--                    <th>Group By Colors</th>--}}
+                    <th>Group By Colors</th>
                     <th>View Items</th>
                 </tr>
                 </thead>
@@ -96,40 +96,40 @@
                         <td>{{ $supplierInventory->total_quantity }}</td>
                         <td>{{ $supplierInventory->actual_quantity }}</td>
                         <td>{{ $supplierInventory->quantity_without_chasis }}</td>
-{{--                        <td>--}}
-{{--                            @foreach($supplierInventory->color_codes as $row)--}}
-{{--                                @php--}}
-{{--                                    $color_code = $row->color_code;--}}
-{{--                                    $color_codeqty = $row->color_code_count;--}}
-{{--                                    $code_nameex = "(Colour Not Listed)  ".$color_code;--}}
-{{--                                    $colourcode = $color_code;--}}
-{{--                                    $colourcodecount = strlen($colourcode);--}}
-{{--                                    $extcolour = NULL;--}}
-{{--                                    if($colourcodecount == 5)--}}
-{{--                                    {--}}
-{{--                                    $extcolour = substr($colourcode, 0, 3);--}}
-{{--                                    }--}}
-{{--                                    if ($colourcodecount == 4)--}}
-{{--                                    {--}}
-{{--                                    $altercolourcode = "0".$colourcode;--}}
-{{--                                    $extcolour = substr($altercolourcode, 0, 3);--}}
-{{--                                    }--}}
+                        <td>
+                            @foreach($supplierInventory->color_codes as $row)
+                                @php
+                                    $color_code = $row->color_code;
+                                    $color_codeqty = $row->color_code_count;
+                                    $code_nameex = "(Colour Not Listed)  ".$color_code;
+                                    $colourcode = $color_code;
+                                    $colourcodecount = strlen($colourcode);
+                                    $extcolour = NULL;
+                                    if($colourcodecount == 5)
+                                    {
+                                    $extcolour = substr($colourcode, 0, 3);
+                                    }
+                                    if ($colourcodecount == 4)
+                                    {
+                                    $altercolourcode = "0".$colourcode;
+                                    $extcolour = substr($altercolourcode, 0, 3);
+                                    }
 
-{{--                                    $query =  \Illuminate\Support\Facades\DB::table('color_codes')--}}
-{{--                                    ->select('parent')--}}
-{{--                                    ->where('code','=', $extcolour)--}}
-{{--                                    ->groupBy('parent')--}}
-{{--                                    ->get();--}}
+                                    $query =  \Illuminate\Support\Facades\DB::table('color_codes')
+                                    ->select('parent')
+                                    ->where('code','=', $extcolour)
+                                    ->groupBy('parent')
+                                    ->get();
 
-{{--                                    foreach ($query as $row)--}}
-{{--                                    {--}}
-{{--                                        $code_nameex = $row->parent;--}}
-{{--                                    }--}}
-{{--                                @endphp--}}
-{{--                               {{  $code_nameex }} : {{$color_codeqty }}--}}
-{{--                                <br>--}}
-{{--                            @endforeach--}}
-{{--                        </td>--}}
+                                    foreach ($query as $row)
+                                    {
+                                        $code_nameex = $row->parent;
+                                    }
+                                @endphp
+                               {{  $code_nameex }} : {{$color_codeqty }}
+                                <br>
+                            @endforeach
+                        </td>
                         <td>
                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-details-{{$supplierInventory->master_model_id}}">
                                 View Items

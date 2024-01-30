@@ -51,6 +51,7 @@ class SupplierInventoryController extends Controller
 
         $supplierInventories = $supplierInventories->get();
         foreach ($supplierInventories as $supplierInventory) {
+
             $modelIds = MasterModel::where('model', $supplierInventory->masterModel->model)
                         ->where('sfx', $supplierInventory->masterModel->sfx)
 //                        ->where('steering', $supplierInventory->masterModel->steering)
@@ -62,6 +63,7 @@ class SupplierInventoryController extends Controller
                     ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                     ->orderBy('id','desc')
                     ->get();
+
         }
         return view('supplier_inventories.index', compact('supplierInventories','suppliers'));
     }
@@ -291,10 +293,10 @@ class SupplierInventoryController extends Controller
                 Exterior Color codes are '.$extColors." and Interior Color Codes are ".$intColors.".");
             }
             $excelPairs = [];
-            $chasis = [];
+//            $chasis = [];
 
             foreach($uploadFileContents as $uploadFileContent) {
-                $chasis[] = $uploadFileContent['chasis'];
+//                $chasis[] = $uploadFileContent['chasis'];
                 if(empty($uploadFileContent['chasis'])) {
                     $excelPairs[] = $uploadFileContent['model'] . "_" . $uploadFileContent['sfx'];
                 }
@@ -349,12 +351,12 @@ class SupplierInventoryController extends Controller
 
             // CHCEK CHASIS EXISTING WITH ALREDY UPLOADED DATA.
 
-            $chasisNumbers = array_filter($chasis);
-            $uniqueChaisis =  array_unique($chasisNumbers);
+//            $chasisNumbers = array_filter($chasis);
+//            $uniqueChaisis =  array_unique($chasisNumbers);
 
-            if(count($chasisNumbers) !== count($uniqueChaisis)) {
-                return redirect()->back()->with('error', "Duplicate Chasis Number found in Your File! Please upload file with unique Chasis Number.");
-            }
+//            if(count($chasisNumbers) !== count($uniqueChaisis)) {
+//                return redirect()->back()->with('error', "Duplicate Chasis Number found in Your File! Please upload file with unique Chasis Number.");
+//            }
 
             $newModelsWithSteerings = array_map("unserialize", array_unique(array_map("serialize", $newModelsWithSteerings)));
             $newModels = array_map("unserialize", array_unique(array_map("serialize", $newModels)));
@@ -371,14 +373,11 @@ class SupplierInventoryController extends Controller
                     DB::beginTransaction();
 
                     $i = 0;
-                    $countblankchasis = [];
                     $newlyAddedRows = [];
                     $newlyAddedRowIds = [];
                     $updatedRows = [];
                     $updatedRowsIds = [];
-                    $excelValuePair = [];
                     $noChangeRowIds = [];
-                    $chasisUpdatedRowIds = [];
 
                     $supplierInventoryHistories = SupplierInventoryHistory::all();
 
@@ -389,6 +388,7 @@ class SupplierInventoryController extends Controller
                     $dealer = $request->whole_sales;
                     foreach ($uploadFileContents as $uploadFileContent)
                     {
+
                         $model = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->where('model_year', $uploadFileContent['model_year'])
@@ -421,38 +421,46 @@ class SupplierInventoryController extends Controller
                         if ($supplierInventories->count() <= 0)
                         {
                             info("no row existing with model,sfx model year so => add new row");
+                            $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])
+                                ->whereNotNull('chasis')
+                                ->first();
+                            if($isChasisExist) {
+                                info("case 1");
+                                return redirect()->back()->with('error', $uploadFileContent['chasis']." Chasis already existing");
 
-                            // model and sfx not existing in Suplr Invtry => new row
-                            $newlyAddedRows[$i]['model'] = $uploadFileContent['model'];
-                            $newlyAddedRows[$i]['sfx'] = $uploadFileContent['sfx'];
-                            $newlyAddedRows[$i]['chasis'] = $uploadFileContent['chasis'];
-                            $newlyAddedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
-                            $newlyAddedRows[$i]['color_code'] = $uploadFileContent['color_code'];
+                            }else {
+                                // model and sfx not existing in Suplr Invtry => new row
+                                $newlyAddedRows[$i]['model'] = $uploadFileContent['model'];
+                                $newlyAddedRows[$i]['sfx'] = $uploadFileContent['sfx'];
+                                $newlyAddedRows[$i]['chasis'] = $uploadFileContent['chasis'];
+                                $newlyAddedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
+                                $newlyAddedRows[$i]['color_code'] = $uploadFileContent['color_code'];
 
-                            $supplierInventory = new SupplierInventory();
-                            $supplierInventory->master_model_id = $modelId;
-                            $supplierInventory->supplier_id     = $uploadFileContent['supplier_id'];
-                            $supplierInventory->chasis          = $uploadFileContent['chasis'];
-                            $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
-                            $supplierInventory->color_code      = $uploadFileContent['color_code'];
-                            $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
-                            $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
-                            $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
-                            $supplierInventory->is_add_new     	= false;
-                            $supplierInventory->whole_sales	    = $uploadFileContent['whole_sales'];
-                            $supplierInventory->country     	= $uploadFileContent['country'];
-                            $supplierInventory->delivery_note   = $uploadFileContent['delivery_note'];
-                            $supplierInventory->date_of_entry   = $date;
-                            $supplierInventory->upload_status   = SupplierInventory::UPLOAD_STATUS_ACTIVE;
-                            $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
-                            $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
-                            $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
-                            if($uploadFileContent['delivery_note'] && $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
-                                $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                $supplierInventory = new SupplierInventory();
+                                $supplierInventory->master_model_id = $modelId;
+                                $supplierInventory->supplier_id = $uploadFileContent['supplier_id'];
+                                $supplierInventory->chasis = $uploadFileContent['chasis'];
+                                $supplierInventory->engine_number = $uploadFileContent['engine_number'];
+                                $supplierInventory->color_code = $uploadFileContent['color_code'];
+                                $supplierInventory->pord_month = $uploadFileContent['pord_month'];
+                                $supplierInventory->po_arm = $uploadFileContent['po_arm'];
+                                $supplierInventory->eta_import = $uploadFileContent['eta_import'];
+                                $supplierInventory->is_add_new = false;
+                                $supplierInventory->whole_sales = $uploadFileContent['whole_sales'];
+                                $supplierInventory->country = $uploadFileContent['country'];
+                                $supplierInventory->delivery_note = $uploadFileContent['delivery_note'];
+                                $supplierInventory->date_of_entry = $date;
+                                $supplierInventory->upload_status = SupplierInventory::UPLOAD_STATUS_ACTIVE;
+                                $supplierInventory->veh_status = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
+                                $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
+                                $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
+                                if ($uploadFileContent['delivery_note'] && $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
+                                    $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                }
+                                $supplierInventory->save();
+
+                                $newlyAddedRowIds[] = $supplierInventory->id;
                             }
-                            $supplierInventory->save();
-
-                            $newlyAddedRowIds[] = $supplierInventory->id;
 
                         } else {
                             $isSimilarRowExist =  SupplierInventory::whereIn('master_model_id', $modelIds)
@@ -538,9 +546,13 @@ class SupplierInventoryController extends Controller
                                             info($SimilarRowWithNullChaisis);
                                             if(!empty($SimilarRowWithNullChaisis)) {
                                                 info("null chasis with smilar data exist");
-                                                $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])->first();
+                                                $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])
+                                                    ->whereNotNull('chasis')
+                                                    ->first();
+
                                                 if($isChasisExist) {
-                                                    return redirect()->back('error')->with('error', "Chasis already existing");
+                                                    info("case 2");
+                                                    return redirect()->back()->with('error', $uploadFileContent['chasis']." Chasis already existing");
 
                                                 }else{
                                                     //  $isNullChaisis = $SimilarRowWithNullChaisis;
@@ -559,9 +571,12 @@ class SupplierInventoryController extends Controller
                                                 info("null chasis smilar data not exist => check if any similar model sfx row without having any update yet.");
                                                 info($newlyAddedRowIds);
                                                 info($updatedRowsIds);
-                                                $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])->first();
+                                                $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])
+                                                    ->whereNotNull('chasis')
+                                                    ->first();
                                                 if($isChasisExist) {
-                                                    return redirect()->back('error')->with('error', "Chasis already existing");
+                                                    info("case 3");
+                                                    return redirect()->back()->with('error', $uploadFileContent['chasis']." Chasis already existing");
 
                                                 }else{
                                                     $rowWithoutUpdate = SupplierInventory::whereIn('id', $isNullChaisisIds)->whereNotIn('id', $newlyAddedRowIds)
@@ -634,11 +649,39 @@ class SupplierInventoryController extends Controller
                                             }
 
                                         } else {
-                                            $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])->first();
+
+                                            $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])
+                                                ->whereNotNull('chasis')
+                                                ->first();
                                             if($isChasisExist) {
-                                                return redirect()->back('error')->with('error', $uploadFileContent['chasis']." Chasis already existing");
+
+                                                $updatedRowsIds[] = $isChasisExist->id;
+                                                $updatedRows[$i]['model'] = $uploadFileContent['model'];
+                                                $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
+                                                $updatedRows[$i]['chasis'] = $uploadFileContent['chasis'];
+                                                $updatedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
+                                                $updatedRows[$i]['color_code'] = $uploadFileContent['color_code'];
+
+                                                $isChasisExist->engine_number   = $uploadFileContent['engine_number'];
+                                                $isChasisExist->color_code      = $uploadFileContent['color_code'];
+                                                $isChasisExist->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
+                                                $isChasisExist->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
+                                                $isChasisExist->pord_month      = $uploadFileContent['pord_month'];
+                                                $isChasisExist->po_arm          = $uploadFileContent['po_arm'];
+                                                $isChasisExist->eta_import      = $uploadFileContent['eta_import'];
+                                                $isChasisExist->delivery_note   = $uploadFileContent['delivery_note'];
+                                                if($uploadFileContent['delivery_note'] &&
+                                                    $uploadFileContent['delivery_note'] != SupplierInventory::DN_STATUS_WAITING) {
+                                                    $isChasisExist->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                                }
+                                                $isChasisExist->save();
+
+                                                info("case 4");
+
+//                                                return redirect()->back()->with('error', $uploadFileContent['chasis']." Chasis already existing");
 
                                             }else{
+                                                // already checking chasis above condition.
                                                 info("new chaisis with existing model and sfx => add row");
                                                 // new chaisis with existing model and sfx => add row ,
                                                 $newlyAddedRows[$i]['model'] = $uploadFileContent['model'];
@@ -741,12 +784,14 @@ class SupplierInventoryController extends Controller
                                             ->whereNotIn('id', $noChangeRowIds)
                                             ->whereNotIn('id', $updatedRowsIds)
                                             ->whereNotIn('id', $newlyAddedRowIds)
-                                            ->where(function ($query) use($deliveryNote) {
-                                                $query->whereNull('delivery_note')
-                                                    ->orwhere('delivery_note', $deliveryNote);
-                                            })
+//                                            ->where(function ($query) use($deliveryNote) {
+//                                                $query->whereNull('delivery_note')
+//                                                    ->orwhere('delivery_note', SupplierInventory::DN_STATUS_WAITING);
+//                                            })
                                             ->first();
                                         if(!empty($inventoryRow)) {
+                                            info("null row exist");
+                                            info($inventoryRow->id);
                                             $updatedRowsIds[] = $inventoryRow->id;
 
                                             $inventoryRow->engine_number   = $uploadFileContent['engine_number'];
@@ -767,7 +812,10 @@ class SupplierInventoryController extends Controller
                                             $updatedRows[$i]['chasis'] = $uploadFileContent['chasis'];
                                             $updatedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
                                             $updatedRows[$i]['color_code'] = $uploadFileContent['color_code'];
+                                        }else{
+
                                         }
+                                        info($updatedRowsIds);
 
                                         info("both colum count equal => clear case of row updation find the row ");
 
@@ -782,6 +830,10 @@ class SupplierInventoryController extends Controller
                                             ->whereNotIn('id', $noChangeRowIds)
                                             ->whereNotIn('id', $updatedRowsIds)
                                             ->whereNotIn('id', $newlyAddedRowIds)
+//                                            ->where(function ($query) use($deliveryNote) {
+//                                                $query->whereNull('delivery_note')
+//                                                    ->orwhere('delivery_note', SupplierInventory::DN_STATUS_WAITING);
+//                                            })
                                             ->first();
 
                                         if(!empty($nullChasisRow)) {
@@ -808,9 +860,12 @@ class SupplierInventoryController extends Controller
                                             $updatedRows[$i]['color_code'] = $uploadFileContent['color_code'];
 
                                         }else{
-                                            $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])->first();
+                                            $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])
+                                                ->whereNotNull('chasis')
+                                                ->first();
                                             if($isChasisExist) {
-                                                return redirect()->back('error')->with('error', $uploadFileContent['chasis']." Chasis already existing");
+                                                info("case 5");
+                                                return redirect()->back()->with('error', $uploadFileContent['chasis']." Chasis already existing");
 
                                             }else{
                                                 info("no existing row with no chasis found => add new row");
@@ -942,6 +997,7 @@ class SupplierInventoryController extends Controller
 
                         info("no change row Ids");
                         info($noChangeRowIds);
+
                     $this->LOIItemIdMapping($request);
 
                     DB::commit();
@@ -967,9 +1023,11 @@ class SupplierInventoryController extends Controller
                             ->where('steering', $uploadFileContent['steering'])
                             ->where('model_year', $uploadFileContent['model_year'])
                             ->first();
-                        $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])->first();
+                        $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])
+                            ->whereNotNull('chasis')->first();
                         if($isChasisExist) {
-                            return redirect()->back('error')->with('error', $uploadFileContent['chasis']." Chasis already existing");
+                            info("case 6");
+                            return redirect()->back()->with('error', $uploadFileContent['chasis']." Chasis already existing");
 
                         }else{
 
