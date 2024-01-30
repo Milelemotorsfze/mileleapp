@@ -460,7 +460,7 @@
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">My Reportees</span>
                                             </a>
-                                            
+
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Payroll</span>
                                             </a>
@@ -1155,7 +1155,15 @@
                                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-master-models');
                                                             @endphp
                                                             @if ($hasPermission)
-                                                                <a href="{{route('master-models.index')}}" class="dropdown-item" data-key="t-login"> Model Lists</a>
+                                                                <a href="{{route('master-models.index')}}" class="dropdown-item" data-key="t-login"> List Models </a>
+                                                            @endif
+                                                        @endcan
+                                                        @can('list-loi-mapping-criterias')
+                                                            @php
+                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-loi-mapping-criterias');
+                                                            @endphp
+                                                            @if ($hasPermission)
+                                                                <a href="{{route('loi-mapping-criterias.index')}}" class="dropdown-item" data-key="t-login"> LOI Mapping Months </a>
                                                             @endif
                                                         @endcan
                                                         <div class="dropdown">

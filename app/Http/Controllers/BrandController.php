@@ -60,13 +60,13 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
+        (new UserActivityController)->createActivity('Create New Brand');
+
         $validator = Validator::make($request->all(), [
             'brand_name' => 'required|unique:brands,brand_name',
         ]);
         if ($validator->fails() ) {
-            info("yes");
             if($request->request_from == 'Quotation') {
-                info("inside condition");
                 $data['error'] = $validator->messages()->first();
                 return response($data);
             }else{
@@ -114,7 +114,7 @@ class BrandController extends Controller
     public function update(Request $request, Brand $brand)
     {
         (new UserActivityController)->createActivity('update Brand Information');
-        $this->validate($request, [
+        $this->validate($request,[
             'brand_name' => 'required|unique:brands,brand_name,'.$brand->id,
         ]);
 
