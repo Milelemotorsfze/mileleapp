@@ -293,10 +293,9 @@ class SupplierInventoryController extends Controller
                 Exterior Color codes are '.$extColors." and Interior Color Codes are ".$intColors.".");
             }
             $excelPairs = [];
-//            $chasis = [];
 
             foreach($uploadFileContents as $uploadFileContent) {
-//                $chasis[] = $uploadFileContent['chasis'];
+
                 if(empty($uploadFileContent['chasis'])) {
                     $excelPairs[] = $uploadFileContent['model'] . "_" . $uploadFileContent['sfx'];
                 }
@@ -348,15 +347,6 @@ class SupplierInventoryController extends Controller
 
             $groupedExcelPairs =  array_count_values($excelPairs);
             $groupedExistingPairs = array_count_values($existingItems);
-
-            // CHCEK CHASIS EXISTING WITH ALREDY UPLOADED DATA.
-
-//            $chasisNumbers = array_filter($chasis);
-//            $uniqueChaisis =  array_unique($chasisNumbers);
-
-//            if(count($chasisNumbers) !== count($uniqueChaisis)) {
-//                return redirect()->back()->with('error', "Duplicate Chasis Number found in Your File! Please upload file with unique Chasis Number.");
-//            }
 
             $newModelsWithSteerings = array_map("unserialize", array_unique(array_map("serialize", $newModelsWithSteerings)));
             $newModels = array_map("unserialize", array_unique(array_map("serialize", $newModels)));
@@ -501,10 +491,10 @@ class SupplierInventoryController extends Controller
                                         ->whereNotIn('id', $updatedRowsIds)
                                         ->where('chasis', $uploadFileContent['chasis'])
 //                                        ->whereNull('delivery_note') unable to find row when have delivery note
-                                        ->where(function ($query) use($deliveryNote) {
-                                            $query->whereNull('delivery_note')
-                                                ->orwhere('delivery_note', $deliveryNote);
-                                        })
+//                                        ->where(function ($query) use($deliveryNote) {
+//                                            $query->whereNull('delivery_note')
+//                                                ->orwhere('delivery_note', $deliveryNote);
+//                                        })
                                     ->first();
 
                                     info($supplierInventory);
@@ -520,11 +510,11 @@ class SupplierInventoryController extends Controller
                                             ->whereNotIn('id', $noChangeRowIds)
                                             ->whereNotIn('id', $newlyAddedRowIds)
                                             ->whereNotIn('id', $updatedRowsIds)
-                                            ->whereNull('chasis')
-                                            ->where(function ($query) use($deliveryNote) {
-                                                $query->whereNull('delivery_note')
-                                                    ->orwhere('delivery_note', $deliveryNote);
-                                            });
+                                            ->whereNull('chasis');
+//                                            ->where(function ($query) use($deliveryNote) {
+//                                                $query->whereNull('delivery_note')
+//                                                    ->orwhere('delivery_note', $deliveryNote);
+//                                            });
                                         $isNullChaisisIds = $isNullChaisis->pluck('id');
 
                                         info($isNullChaisis->get());
@@ -675,10 +665,6 @@ class SupplierInventoryController extends Controller
                                                     $isChasisExist->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                                 }
                                                 $isChasisExist->save();
-
-                                                info("case 4");
-
-//                                                return redirect()->back()->with('error', $uploadFileContent['chasis']." Chasis already existing");
 
                                             }else{
                                                 // already checking chasis above condition.
@@ -1106,25 +1092,16 @@ class SupplierInventoryController extends Controller
         $alreadyAddedIds = [];
         $QtyfullyAddedIds = [];
         foreach ($inventoryItems as $inventoryItem) {
-//            info("inventory item");
-//            info($inventoryItem->id);
-//            info("master model id");
-//            info($inventoryItem->master_model_id);
 
             $modelIds = MasterModel::where('model', $inventoryItem->masterModel->model)
                 ->where('sfx', $inventoryItem->masterModel->sfx)
                 ->pluck('id')->toArray();
-
             $dealer = $request->whole_sales;
-//            info("master model ids");
-//            info($modelIds);
-
             $loiMappingCriterias = LOIMappingCriteria::orderBy('order','ASC')->get();
 
             foreach ($loiMappingCriterias as $loiMappingCriteria) {
                 $value = $loiMappingCriteria->value;
-//                info("month/ YEAR");
-//                info($value);
+
                 if($loiMappingCriteria->value_type == LOIMappingCriteria::TYPE_MONTH) {
                     $whereColumn =  Carbon::now()->subMonth($value);
                 }else{
@@ -1143,15 +1120,11 @@ class SupplierInventoryController extends Controller
                             ->first();
 
                 if($LOIItem) {
-//                   info("item exist");
                      break;
                 }
             }
 
-//            info("LOI ID");
-
             if($LOIItem) {
-//                info($LOIItem);
                 $remaingQuantity = $LOIItem->quantity - $LOIItem->utilized_quantity;
                 $assignedQuantity = 0;
                 if(array_key_exists($LOIItem->id, $alreadyAddedIds)) {
@@ -1160,17 +1133,11 @@ class SupplierInventoryController extends Controller
                 }else{
                     $actualQuantityRemaining = $remaingQuantity;
                 }
-
-//                info("remaining quantity");
-//                info($actualQuantityRemaining);
-
                 if($actualQuantityRemaining <= $LOIItem->quantity) {
 
                     if($actualQuantityRemaining <= 1) {
                         $QtyfullyAddedIds[] = $LOIItem->id;
                     }
-//                    info($QtyfullyAddedIds);
-
                     $alreadyAddedIds[$LOIItem->id] = $assignedQuantity + 1;
                     $inventoryItem->letter_of_indent_item_id = $LOIItem->id;
                     $inventoryItem->save();
@@ -1274,9 +1241,11 @@ class SupplierInventoryController extends Controller
                     $inventory->interior_color_code_id = $interiorColorId;
                     $inventory->exterior_color_code_id = $exteriorColorId;
                 }
-            }else if($fieldName == 'delivery_note') {
+            }else if($fieldName == 'delivery_note' ) {
                 $inventory->$fieldName = $fieldValue;
-//                $inventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                if($fieldValue && $fieldValue !== SupplierInventory::DN_STATUS_WAITING) {
+                    $inventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                }
             }
             else{
                $inventory->$fieldName = $fieldValue;

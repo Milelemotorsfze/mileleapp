@@ -149,7 +149,7 @@ class SupplierInventory extends Model
         if(request()->dealers){
             $supplierInventories = $supplierInventories->where('whole_sales', request()->dealers);
         }
-            info($supplierInventories->get());
+
         return $supplierInventories->get();
     }
 
