@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Addon;
 use App\Models\AddonDetails;
+use setasign\Fpdi\Fpdi;
+use Smalot\PdfParser\Parser;
 use Illuminate\Support\Str;
 use App\Models\AgentCommission;
 use App\Models\Country;
@@ -18,6 +20,7 @@ use App\Models\QuotationDetail;
 use App\Models\QuotationItem;
 use App\Models\QuotationSubItem;
 use App\Models\Setting;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Shipping;
 use App\Models\ShippingCertification;
 use App\Models\ShippingDocuments;
@@ -27,7 +30,7 @@ use App\Models\Vehicles;
 use App\Models\Vehiclescarts;
 use App\Models\MasterModelLines;
 use App\Models\CartAddon;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\DomPDF\Facade;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -556,11 +559,61 @@ public function addqaddone(Request $request)
     public function showBySignature($uniqueNumber, $quotationId)
     {
         $quotation = Quotation::find($quotationId);
-        if ($quotation) {
-            $pdfPath = asset('storage/' . $quotation->file_path);
-                return view('quotation.showsignpage', ['quotation' => $quotation, 'pdfPath' => $pdfPath]);
-        } else {
-            abort(404, 'Quotation not found');
+        if($quotation->signature_status === "Signed")
+        {
+        
         }
+        else{
+            $pdfPath = asset('storage/' . $quotation->file_path);
+            $logo = asset("images/proforma/milele_logo.png");
+                return view('quotation.showsignpage', ['quotation' => $quotation, 'pdfPath' => $pdfPath, 'logo' => $logo, 'filepath' => $quotation->file_path, 'qoutation_id' => $quotation->id]);
+        }
+            }
+    public function submitSignature(Request $request)
+    {
+        $pdfPath = $request->input('pdf_path');
+        $quotationId = $request->input('qoutation_id');
+        $signatureData = $request->input('signature_data');
+        $decodedImage = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $signatureData)); // Remove data URL prefix
+        $pngImagePath = storage_path('app/public/signatures/') . uniqid() . '.png';
+        file_put_contents($pngImagePath, $decodedImage);
+        $pdf = new Fpdi();
+        $pageCount = $pdf->setSourceFile(public_path('storage/quotation_files/' . basename($pdfPath)));
+        for ($pageNumber = 1; $pageNumber <= $pageCount; $pageNumber++) {
+            $pdf->AddPage();
+            $templateId = $pdf->importPage($pageNumber);
+            $pdf->useTemplate($templateId);
+            $text = $this->extractTextFromPage($pdfPath, $pageNumber);
+            $signatureY = $this->calculateSignaturePosition($pdf, $pageNumber, $text);
+            $x = 100;
+            $pdf->Image($pngImagePath, $x, $signatureY, 50, 20);
+        }
+        $outputPath = public_path('storage/quotation_files/' . basename($pdfPath)); // Use the same filename as the original PDF
+        $pdf->Output($outputPath, 'F');
+        unlink($pngImagePath);
+        $quotation = Quotation::find($quotationId);
+        $quotation->signature_status = "Signed";
+        $quotation->signature_link = null;
+        $quotation->save();
+        return redirect()->back()->with('success', 'Thank you! Your signature has been successfully submitted.');
     }
+private function calculateSignaturePosition($pdf, $pageNumber, $text)
+{
+    $pageHeight = $pdf->getPageHeight();
+    $signatureY = $pageHeight - 30;
+    return $signatureY;
+}
+
+private function extractTextFromPage($pdfPath, $pageNumber)
+{
+    $parser = new Parser();
+    $pdf = $parser->parseFile(public_path('storage/quotation_files/' . basename($pdfPath)));
+    $pages = $pdf->getPages();
+    if (isset($pages[$pageNumber])) {
+        $text = $pages[$pageNumber]->getText();
+        return $text;
+    } else {
+        return 'Page not found';
+    }
+}
 }

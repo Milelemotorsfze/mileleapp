@@ -16,4 +16,8 @@ class Quotation extends Model
         'file_path',
     ];
     public $timestamps = false;
+    public function quotationdetails()
+    {
+        return $this->hasOne(QuotationDetail::class);
+    }
 }

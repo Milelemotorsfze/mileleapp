@@ -12,6 +12,10 @@ class QuotationItem extends Model
     {
         return $this->morphTo();
     }
+    public function quotationVins()
+{
+    return $this->hasMany(QuotationVins::class, 'quotation_items_id');
+}
     public $appends = [
         'quotation_addon_items',
         'vehicle_unit_price',
