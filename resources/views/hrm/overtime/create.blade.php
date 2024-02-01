@@ -356,6 +356,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
                     //     showEndDateError(index, $msg);
                     // }
                     // else {
+                        
                         var EmpId = ''; 
                         EmpId = $("#employee_id").val();
                         $.ajax({
