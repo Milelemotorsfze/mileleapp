@@ -31,6 +31,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 	</div>
 	@endif	
     <form id="employeeOvertimeForm" name="employeeOvertimeForm" enctype="multipart/form-data" method="POST" action="{{route('overtime.store')}}">
+    <!-- method="POST" action="{{route('overtime.store')}}" -->
         @csrf
 		<div class="row">
 			<!-- <div class="col-xxl-2 col-lg-6 col-md-6">
@@ -116,6 +117,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
 	var data = {!! json_encode($employees) !!};
+    var isDateExistDB = false;
 	$(document).ready(function () {
         addChild();
 			$("#passport_number_div").hide();
@@ -210,24 +212,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
                     </div>
                 </div>
             `);
-//             onchange="maxDate(${index})"
-// onchange="maxDate(${index})"
-            // $("#start_datetime_"+index).rules('add', {
-            //     required:true, 
-            // //     // lessThan: "#end_datetime_"+index,              
-            // });
-            // $("#end_datetime_"+index).rules('add', {
-            //     required:true,
-            //     greaterThan: "#start_datetime_"+index,
-            //     timeDifferenceValidate: [index],
-
-
-            //     // checkA: true,
-            //     // max: function(){ return $("#start_datetime_"+index).val();},
-            // });
         }	
-
-        
 	});	
  
 	jQuery.validator.setDefaults({
@@ -250,55 +235,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
             }
         }
     });
-
-    // jQuery.validator.addMethod("greaterThan", function(value, element, params) {
-    //     if (!/Invalid|NaN/.test(new Date(value))) {
-    //         return new Date(value) > new Date($(params).val());
-    //     }
-    //     else {
-    //         var startTime = $(params).val();
-    //         var endTime = value;
-    //         var timeDifference = calculateTimeDifference(startTime, endTime);
-    //     }
-    //     return isNaN(value) && isNaN($(params).val()) 
-    //         || (Number(value) > Number($(params).val())); 
-    // },'Must be greater than overtime start date and time.');
-
-    // jQuery.validator.addMethod("timeDifferenceValidate", function(value, element, params) {
-    //     var startTime = $("#start_datetime_"+params[0]).val();
-    //     var endTime = $("#end_datetime_"+params[0]).val();
-    //     var timeDifference = calculateTimeDifference(startTime, endTime);
-    //     return timeDifference <= 1440;
-    // },'The time difference must be less than or equal to 24 hours');
-    // function calculateTimeDifference(startTime, endTime) {
-    //     var oneM = 1000 * 60;
-    //     var sMS = new Date(startTime);
-    //     var eMS = new Date(endTime);
-    //     var timeDifference =  Math.round((eMS.getTime() - sMS.getTime()) / oneM);
-    //     return timeDifference;
-    // }
-	$('#employeeOvertimeForm').validate({ // initialize the plugin
+    $('#employeeOvertimeForm').validate({ // initialize the plugin
         rules: {
 			employee_id: {
                 required: true,
             },
         },
     });
-    // $.validator.prototype.checkForm=function() {
-    //     this.prepareForm();
-    //     for(var i = 0,elements = (this.currentElements =this.elements());elements[i];i++ ) {
-    //         if(this.findByName( elements[i].name ).length !=undefined && this.findByName( elements[i].name ).length > 1) {
-    //             for(varcnt = 0;cnt <this.findByName( elements[i].name ).length;cnt++) {
-    //                 this.check(this.findByName( elements[i].name )[cnt] );
-    //             }
-    //         }
-    //         else {
-    //             this.check( elements[i] );
-    //         }
-    //     }
-    //     return this.valid();
-    // };
-
     function maxDate(index) {
         // $msg = '';
         // hideStartDateError(index, $msg);
@@ -327,145 +270,52 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
         //         showEndDateError(index, $msg);   
         //     }
         //     else {
-        //         document.querySelectorAll('.form_field_outer_row').forEach(function(DayIndex) {
-        //             var DayIndexId = '';
-        //             DayIndexId = DayIndex.id;
-        //             if($("#start_datetime_"+DayIndexId).val() != '' && $("#end_datetime_"+DayIndexId).val() != '') {
-        //                 if($("#start_datetime_"+DayIndexId).val() != '' && $("#end_datetime_"+DayIndexId).val() != '') {
-        //                     if($("#start_datetime_"+DayIndexId).val() <= startTime && startTime <= $("#end_datetime_"+DayIndexId).val()) {
-        //                         $msg = 'This start datetime is already added'; 
-        //                         showStartDateError(index, $msg);
-        //                     }
-        //                     else if($("#start_datetime_"+DayIndexId).val() <= endTime && endTime <= $("#end_datetime_"+DayIndexId).val()) {
-        //                         $msg = 'This end datetime is already added'; 
-        //                         showEndDateError(index, $msg);
-        //                     }
-        //                     else {
-        //                         var EmpId = ''; 
-        //                         EmpId = $("#employee_id").val();
-        //                         $.ajax({
-        //                             url:"{{url('checkOvertimeAlreadyExist')}}",
-        //                             type: "POST",
-        //                             data:{
-        //                                 startTime: startTime,
-        //                                 endTime: endTime,
-        //                                 EmpId: EmpId,
-        //                                 _token: '{{csrf_token()}}'
-        //                             },
-        //                             dataType : 'json',
-        //                             success: function(data) {
-        //                                 if(data.startTime == 'yes') {
-        //                                     $msg = 'This start datetime is already exist in database'; 
-        //                                     showStartDateError(index, $msg);
-        //                                 }
-        //                                 if(data.endTime == 'yes') {
-        //                                     $msg = 'This end datetime is already exist in database'; 
-        //                                     showEndDateError(index, $msg);
-        //                                 }
-        //                             }
-        //                         }); 
-        //                     }
-        //                 }
-        //             }
-        //         });
+        //         // document.querySelectorAll('.form_field_outer_row').forEach(function(DayIndex) {
+        //         //     var DayIndexId = '';
+        //         //     DayIndexId = DayIndex.id;
+        //         //     if($("#start_datetime_"+DayIndexId).val() != '' && $("#end_datetime_"+DayIndexId).val() != '') {
+        //         //         if($("#start_datetime_"+DayIndexId).val() != '' && $("#end_datetime_"+DayIndexId).val() != '') {
+        //         //             if($("#start_datetime_"+DayIndexId).val() <= startTime && startTime <= $("#end_datetime_"+DayIndexId).val()) {
+        //         //                 $msg = 'This start datetime is already added'; 
+        //         //                 showStartDateError(index, $msg);
+        //         //             }
+        //         //             else if($("#start_datetime_"+DayIndexId).val() <= endTime && endTime <= $("#end_datetime_"+DayIndexId).val()) {
+        //         //                 $msg = 'This end datetime is already added'; 
+        //         //                 showEndDateError(index, $msg);
+        //         //             }
+        //         //             else {
+        //         //                 var EmpId = ''; 
+        //         //                 EmpId = $("#employee_id").val();
+        //         //                 $.ajax({
+        //         //                     url:"{{url('checkOvertimeAlreadyExist')}}",
+        //         //                     type: "POST",
+        //         //                     data:{
+        //         //                         startTime: startTime,
+        //         //                         endTime: endTime,
+        //         //                         EmpId: EmpId,
+        //         //                         _token: '{{csrf_token()}}'
+        //         //                     },
+        //         //                     dataType : 'json',
+        //         //                     success: function(data) {
+        //         //                         if(data.startTime == 'yes') {
+        //         //                             $msg = 'This start datetime is already exist in database'; 
+        //         //                             showStartDateError(index, $msg);
+        //         //                             isDateExistDB = true;
+        //         //                         }
+        //         //                         if(data.endTime == 'yes') {
+        //         //                             $msg = 'This end datetime is already exist in database'; 
+        //         //                             showEndDateError(index, $msg);
+        //         //                             isDateExistDB = true;
+        //         //                         }
+        //         //                     }
+        //         //                 }); 
+        //         //             }
+        //         //         }
+        //         //     }
+        //         // });
         //     }
         // }
     }
-    // function maxDateSubmit(index,formInputError,e) {
-    //     $msg = '';
-    //     hideStartDateError(index, $msg);
-    //     hideEndDateError(index, $msg);
-    //     var startTime = $("#start_datetime_"+index).val();
-    //     var endTime = $("#end_datetime_"+index).val();
-    //     var formInputError = false;
-    //     if(startTime == '') {
-    //         $msg = 'Start Date & Time is Required.';
-    //         showStartDateError(index, $msg);
-    //         formInputError = true;
-    //         e.preventDefault();
-    //     }
-    //     if(endTime == '') {
-    //         $msg = 'End Date & Time is Required.';
-    //         showEndDateError(index, $msg);
-    //         formInputError = true;
-    //         e.preventDefault();
-    //     }
-    //     if(startTime != '' && endTime != '' && startTime >= endTime) {
-    //         $msg = 'Must be greater than overtime start date and time.';
-    //         showEndDateError(index, $msg);
-    //         formInputError = true;
-    //         e.preventDefault();
-    //     }
-    //     else if(startTime != '' && endTime != '' && startTime < endTime) {
-    //         var oneM = 1000 * 60;
-    //         var sMS = new Date(startTime);
-    //         var eMS = new Date(endTime);
-    //         var timeDifference =  Math.round((eMS.getTime() - sMS.getTime()) / oneM);
-    //         if(timeDifference > 1440) {
-    //             $msg = 'The time difference must be less than or equal to 24 hours.';
-    //             showEndDateError(index, $msg);   
-    //             formInputError = true;
-    //             e.preventDefault();
-    //         }
-    //         else {
-    //             document.querySelectorAll('.form_field_outer_row').forEach(function(DayIndex) {
-    //                 var DayIndexId = '';
-    //                 DayIndexId = DayIndex.id;
-    //                 if(DayIndexId != index) {
-    //                     if($("#start_datetime_"+DayIndexId).val() != '' && $("#end_datetime_"+DayIndexId).val() != '') {
-    //                         if($("#start_datetime_"+DayIndexId).val() <= startTime && startTime <= $("#end_datetime_"+DayIndexId).val()) {
-    //                             $msg = 'This start datetime is already added'; 
-    //                             showStartDateError(index, $msg);
-    //                             formInputError = true;
-    //                             e.preventDefault();
-    //                         }
-    //                         else if($("#start_datetime_"+DayIndexId).val() <= endTime && endTime <= $("#end_datetime_"+DayIndexId).val()) {
-    //                             $msg = 'This end datetime is already added'; 
-    //                             showEndDateError(index, $msg);
-    //                             formInputError = true;
-    //                             e.preventDefault();
-    //                         }
-    //                     }
-    //                 }
-    //             });
-    //         }
-    //     }
-    //     if(formInputError == false) {
-    //         var EmpId = ''; 
-    //         EmpId = $("#employee_id").val();
-    //         document.querySelectorAll('.form_field_outer_row').forEach(function(DayIndex) {
-    //             var DayIndexId = '';
-    //             DayIndexId = DayIndex.id;
-    //             if(DayIndexId != index) {
-    //                 e.preventDefault();
-    //                 $.ajax({
-    //                     url:"{{url('checkOvertimeAlreadyExist')}}",
-    //                     type: "POST",
-    //                     data:{
-    //                         startTime: startTime,
-    //                         endTime: endTime,
-    //                         EmpId: EmpId,
-    //                         _token: '{{csrf_token()}}'
-    //                     },
-    //                     dataType : 'json',
-    //                     success: function(data) {
-    //                         if(data.startTime == 'yes') {
-    //                             $msg = 'This start datetime is already exist in database'; 
-    //                             showStartDateError(index, $msg);
-    //                         }
-    //                         if(data.endTime == 'yes') {
-    //                             $msg = 'This end datetime is already exist in database'; 
-    //                             showEndDateError(index, $msg);
-    //                         }
-    //                         if(data.startTime == 'no' && data.endTime == 'no') {
-    //                             document.location.href="{{route('overtime.store') }}";
-    //                         }
-    //                     }
-    //                 }); 
-    //             }
-    //         });
-    //     }
-    // }
     function showStartDateError(index, $msg) {
         document.getElementById("start_date_error_"+index).textContent=$msg;
         document.getElementById("start_datetime_"+index).classList.add("is-invalid");
@@ -486,101 +336,65 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
         document.getElementById("end_datetime_"+index).classList.remove("is-invalid");
         document.getElementById("end_date_error_"+index).classList.remove("paragraph-class");
     }
-    // function maxDateSubmit(index,formInputError,e) {
-    //     $msg = '';
-    //     hideStartDateError(index, $msg);
-    //     hideEndDateError(index, $msg);
-    //     var startTime = $("#start_datetime_"+index).val();
-    //     var endTime = $("#end_datetime_"+index).val();
-    //     var formInputError = false;
-    //     if(startTime == '') {
-    //         $msg = 'Start Date & Time is Required.';
-    //         showStartDateError(index, $msg);
-    //         formInputError = true;
-    //         e.preventDefault();
-    //     }
-    //     if(endTime == '') {
-    //         $msg = 'End Date & Time is Required.';
-    //         showEndDateError(index, $msg);
-    //         formInputError = true;
-    //         e.preventDefault();
-    //     }
-    //     if(startTime != '' && endTime != '' && startTime >= endTime) {
-    //         $msg = 'Must be greater than overtime start date and time.';
-    //         showEndDateError(index, $msg);
-    //         formInputError = true;
-    //         e.preventDefault();
-    //     }
-    //     else if(startTime != '' && endTime != '' && startTime < endTime) {
-    //         var oneM = 1000 * 60;
-    //         var sMS = new Date(startTime);
-    //         var eMS = new Date(endTime);
-    //         var timeDifference =  Math.round((eMS.getTime() - sMS.getTime()) / oneM);
-    //         if(timeDifference > 1440) {
-    //             $msg = 'The time difference must be less than or equal to 24 hours.';
-    //             showEndDateError(index, $msg);   
-    //             formInputError = true;
-    //             e.preventDefault();
-    //         }
-    //         else {
-    //             document.querySelectorAll('.form_field_outer_row').forEach(function(DayIndex) {
-    //                 var DayIndexId = '';
-    //                 DayIndexId = DayIndex.id;
-    //                 if(DayIndexId != index) {
-    //                     if($("#start_datetime_"+DayIndexId).val() != '' && $("#end_datetime_"+DayIndexId).val() != '') {
-    //                         if($("#start_datetime_"+DayIndexId).val() <= startTime && startTime <= $("#end_datetime_"+DayIndexId).val()) {
-    //                             $msg = 'This start datetime is already added'; 
-    //                             showStartDateError(index, $msg);
-    //                             formInputError = true;
-    //                             e.preventDefault();
-    //                         }
-    //                         else if($("#start_datetime_"+DayIndexId).val() <= endTime && endTime <= $("#end_datetime_"+DayIndexId).val()) {
-    //                             $msg = 'This end datetime is already added'; 
-    //                             showEndDateError(index, $msg);
-    //                             formInputError = true;
-    //                             e.preventDefault();
-    //                         }
-    //                     }
-    //                 }
-    //             });
-    //         }
-    //     }
-    //     if(formInputError == false) {
-    //         var EmpId = ''; 
-    //         EmpId = $("#employee_id").val();
-    //         document.querySelectorAll('.form_field_outer_row').forEach(function(DayIndex) {
-    //             var DayIndexId = '';
-    //             DayIndexId = DayIndex.id;
-    //             if(DayIndexId != index) {
-    //                 e.preventDefault();
-    //                 $.ajax({
-    //                     url:"{{url('checkOvertimeAlreadyExist')}}",
-    //                     type: "POST",
-    //                     data:{
-    //                         startTime: startTime,
-    //                         endTime: endTime,
-    //                         EmpId: EmpId,
-    //                         _token: '{{csrf_token()}}'
-    //                     },
-    //                     dataType : 'json',
-    //                     success: function(data) {
-    //                         if(data.startTime == 'yes') {
-    //                             $msg = 'This start datetime is already exist in database'; 
-    //                             showStartDateError(index, $msg);
-    //                         }
-    //                         if(data.endTime == 'yes') {
-    //                             $msg = 'This end datetime is already exist in database'; 
-    //                             showEndDateError(index, $msg);
-    //                         }
-    //                         if(data.startTime == 'no' && data.endTime == 'no') {
-    //                             document.location.href="{{route('overtime.store') }}";
-    //                         }
-    //                     }
-    //                 }); 
-    //             }
-    //         });
-    //     }
-    // }
+    function checkDateInDB() {
+        var isAllGood = [];
+        document.querySelectorAll('.form_field_outer_row').forEach(function(DayIndex) {
+            var DayIndexId = '';
+            DayIndexId = DayIndex.id;
+            if($("#start_datetime_"+DayIndexId).val() != '' && $("#end_datetime_"+DayIndexId).val() != '') {
+                if($("#start_datetime_"+DayIndexId).val() != '' && $("#end_datetime_"+DayIndexId).val() != '') {
+                    var startTime = '';
+                    var endTime = '';
+                    startTime = $("#start_datetime_"+DayIndexId).val();
+                    endTime = $("#end_datetime_"+DayIndexId).val();
+                    // if($("#start_datetime_"+DayIndexId).val() <= startTime && startTime <= $("#end_datetime_"+DayIndexId).val()) {
+                    //     $msg = 'This start datetime is already added'; 
+                    //     showStartDateError(index, $msg);
+                    // }
+                    // else if($("#start_datetime_"+DayIndexId).val() <= endTime && endTime <= $("#end_datetime_"+DayIndexId).val()) {
+                    //     $msg = 'This end datetime is already added'; 
+                    //     showEndDateError(index, $msg);
+                    // }
+                    // else {
+                        var EmpId = ''; 
+                        EmpId = $("#employee_id").val();
+                        $.ajax({
+                            url:"{{url('checkOvertimeAlreadyExist')}}",
+                            type: "POST",
+                            data:{
+                                startTime: startTime,
+                                endTime: endTime,
+                                EmpId: EmpId,
+                                _token: '{{csrf_token()}}'
+                            },
+                            dataType : 'json',
+                            success: function(data) {
+                                if(data.startTime == 'yes') {
+                                    $msg = 'This start datetime is already exist in database'; 
+                                    showStartDateError(DayIndexId, $msg);
+                                    isAllGood.push(DayIndexId);
+                                    // return isAllGood;
+                                }
+                                if(data.endTime == 'yes') {
+                                    $msg = 'This end datetime is already exist in database'; 
+                                    showEndDateError(DayIndexId, $msg);
+                                    isAllGood.push(DayIndexId);
+                                    // return isAllGood;
+                                }
+                            }
+                        }); 
+                    // }
+                    alert('hi'); alert(isAllGood);
+                }
+            }
+        });
+        var uniqueValueCount = isAllGood.length;
+	    if(uniqueValueCount > 0) {
+	        return false;
+	    }else{
+	        return true;
+	    }
+    }
 	$('form').on('submit', function (e) {
         var formInputError = false;
         document.querySelectorAll('.form_field_outer_row').forEach(function(overtimeDay) {
@@ -645,48 +459,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
             }
         }
         if(formInputError == false) {
-            var EmpId = ''; 
-            EmpId = $("#employee_id").val();
-            document.querySelectorAll('.form_field_outer_row').forEach(function(DayIndex) {
-                var DayIndexId = '';
-                DayIndexId = DayIndex.id;
-                // if(DayIndexId != index) {
-                    e.preventDefault();
-                    $.ajax({
-                        url:"{{url('checkOvertimeAlreadyExist')}}",
-                        type: "POST",
-                        data:{
-                            startTime: startTime,
-                            endTime: endTime,
-                            EmpId: EmpId,
-                            _token: '{{csrf_token()}}'
-                        },
-                        dataType : 'json',
-                        success: function(data) {
-                            if(data.startTime == 'yes') {
-                                $msg = 'This start datetime is already exist in database'; 
-                                showStartDateError(index, $msg);
-                            }
-                            if(data.endTime == 'yes') {
-                                $msg = 'This end datetime is already exist in database'; 
-                                showEndDateError(index, $msg);
-                            }
-                            if(data.startTime == 'no' && data.endTime == 'no') {
-                                // $(this).unbind('submit').submit()
-                                document.location.href="{{route('overtime.store') }}";
-                            }
-                        }
-                    }); 
-                // }
-            });
+            // checkDateInDB();
+            if(checkDateInDB() == true) {
+                alert('is good');
+            }
+            else {
+                alert('is not good');
+            }
         }
-            // maxDateSubmit(currentId,formInputError,e);
-        //     if(maxDate(currentId) == false){
-        //         e.preventDefault();
-        //     }
-        //     else {
-        //         uniqueCheckTime(currentId,e); 
-        //     }
+        else if(formInputError == true) {
+            e.preventDefault();
+        }
         });
 	});
 </script>

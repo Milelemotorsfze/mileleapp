@@ -372,7 +372,7 @@ Route::get('/d', function () {
     // Employee Overtime Application
     Route::resource('overtime', OverTimeController::class);
     Route::controller(OverTimeController::class)->group(function(){
-        Route::post('checkOvertimeAlreadyExist', 'checkOvertimeAlreadyExist')->name('overtimr.checkOvertimeAlreadyExist');
+        Route::post('checkOvertimeAlreadyExist', 'checkOvertimeAlreadyExist')->name('overtime.checkOvertimeAlreadyExist');
     });
     // Demand & Planning Module
 
