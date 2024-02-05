@@ -22,8 +22,10 @@ class OverTimeDateTime extends Model
         $Hours = '';
         $t1 = Carbon::parse($this->start_datetime);
         $t2 = Carbon::parse($this->end_datetime);
-        $diff = $t1->diff($t2);
-        $Hours = $diff->h.':'.$diff->i;
+        $minutes = $t2->diffInMinutes($t1);
+        $h = floor($minutes/60);
+        $m = $minutes - ($h*60);
+        $Hours = $h.':'.$m;
         return $Hours;
     }
     public function overtime() {

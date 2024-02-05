@@ -22,9 +22,11 @@ class OverTime extends Model
     protected $appends = [
         'total_hours',
         'current_status',
+        'is_auth_user_can_approve',
     ];
     public function getTotalHoursAttribute() {
         $sumMinutes = 0;
+        $sumTime = '';
         foreach($this->times as $time) {
             $explodedTime = explode(':', $time->hours); 
             $eachminutes = $explodedTime[0]*60+$explodedTime[1];
@@ -43,20 +45,48 @@ class OverTime extends Model
         else if($this->status == 'rejected') {
             $currentStatus = 'Rejected';
         }
-        // Approvals =>  Employee -------> HR Manager -----------> Reporting Manager ---------> Division Head
+        // Approvals =>  Employee -----------> Reporting Manager ---------> Division Head-------> HR Manager 
         else if($this->status == 'pending' && $this->action_by_employee == 'pending') {
             $currentStatus = "Employee's Approval Awaiting";
-        }
-        else if($this->status == 'pending' && $this->action_by_hr_manager == 'pending') {
-            $currentStatus = "HR Manager's Approval Awaiting";
         }
         else if($this->status == 'pending' && $this->action_by_department_head == 'pending') {
             $currentStatus = "Reporting Manager's Approval Awaiting";
         }
         else if($this->status == 'pending' && $this->action_by_division_head == 'pending') {
             $currentStatus = "Division Head's Approval Awaiting";
+        }      
+        else if($this->status == 'pending' && $this->action_by_hr_manager == 'pending') {
+            $currentStatus = "HR Manager's Approval Awaiting";
         }
         return $currentStatus;
+    }
+    public function getIsAuthUserCanApproveAttribute() {
+        $isAuthUserCanApprove = [];
+        $authId = Auth::id();
+        // Approvals =>  Employee -----------> Reporting Manager ---------> Division Head-------> HR Manager 
+        if($this->action_by_employee =='pending' && $this->employee_id == $authId) {
+            $isAuthUserCanApprove['can_approve'] = true;
+            $isAuthUserCanApprove['current_approve_position'] = 'Employee';
+            $isAuthUserCanApprove['current_approve_person'] = $this->user->name;
+        }
+        else if($this->action_by_employee =='approved' && $this->action_by_department_head == 'pending' && $this->department_head_id == $authId) { 
+            $isAuthUserCanApprove['can_approve'] = true;
+            $isAuthUserCanApprove['current_approve_position'] = 'Reporting Manager';
+            $isAuthUserCanApprove['current_approve_person'] = $this->reportingManager->name;
+        }
+        else if($this->action_by_employee =='approved' && $this->action_by_department_head == 'approved' && $this->action_by_division_head == 'pending' && 
+            $this->division_head_id == $authId) {
+                $isAuthUserCanApprove['can_approve'] = true;
+                $isAuthUserCanApprove['current_approve_position'] = 'Division Head';
+                $isAuthUserCanApprove['current_approve_person'] = $this->divisionHead->name;
+        }
+        else if($this->action_by_employee =='approved' && $this->action_by_department_head == 'approved' && $this->action_by_division_head == 'approved' && 
+            $this->action_by_hr_manager == 'pending' && $this->hr_manager_id == $authId) {
+                $isAuthUserCanApprove['can_approve'] = true;
+                $isAuthUserCanApprove['current_approve_position'] = 'HR Manager';
+                $isAuthUserCanApprove['current_approve_person'] = $this->hrManager->name;
+        }
+        return $isAuthUserCanApprove;
     }
     public function user() {
         return $this->hasOne(User::class,'id','employee_id');

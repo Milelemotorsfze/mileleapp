@@ -373,6 +373,8 @@ Route::get('/d', function () {
     Route::resource('overtime', OverTimeController::class);
     Route::controller(OverTimeController::class)->group(function(){
         Route::post('checkOvertimeAlreadyExist', 'checkOvertimeAlreadyExist')->name('overtime.checkOvertimeAlreadyExist');
+        Route::post('overtime_request_action', 'requestAction')->name('overtimeRequest.action');
+        Route::get('overtime_approval_awaiting', 'approvalAwaiting')->name('overtime.approvalAwaiting');
     });
     // Demand & Planning Module
 

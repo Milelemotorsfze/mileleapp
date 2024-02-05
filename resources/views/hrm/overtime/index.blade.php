@@ -145,24 +145,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 								@endphp
 								@if ($hasPermission) 
 								<li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('employee-leave.create-or-edit',$data->id)}}">
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('overtime.edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 										</a>
 									</li>
 								@endif
 								@endcanany
-
-                                    
-                                    
                                     <li>
 										@if(isset($type))
 											@if($type == 'approve')
 												<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-													data-bs-target="#approve-employee-leave-request-{{$data->id}}">
+													data-bs-target="#approve-employee-overtime-request-{{$data->id}}">
 													<i class="fa fa-thumbs-up" aria-hidden="true"></i>  Approve 
 												</button>
 												<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-													data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+													data-bs-target="#reject-employee-overtime-request-{{$data->id}}">
 													<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 												</button>
 											@endif
@@ -170,11 +167,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 											@if(isset($data->is_auth_user_can_approve['can_approve']))
 												@if($data->is_auth_user_can_approve['can_approve'] == true)
 													<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-														data-bs-target="#approve-employee-leave-request-{{$data->id}}">
+														data-bs-target="#approve-employee-overtime-request-{{$data->id}}">
 														<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 													</button>
 													<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-														data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+														data-bs-target="#reject-employee-overtime-request-{{$data->id}}">
 														<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 													</button>
 												@endif
@@ -184,7 +181,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
                                 </ul>
                             </div>
 							</td>
-							@include('hrm.leave.approve_reject_modal')					
+							@include('hrm.overtime.approve_reject_modal')					
 						</tr>
 						@endforeach
 					</tbody>
@@ -206,16 +203,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
                             <th>Department</th>
 							<th>Location</th>
 							<th>Joining Date</th>
-							<th>Leave Type</th>
-                            <th>Leave Details</th>
-                            <th>Leave Start Date</th>
-                            <th>Leave End Date</th>
-							<th>Total Number Of Days</th>
-							<th>Number Of Paid Days(If Any)</th>
-							<th>Number Of Unpaid Days(If Any)</th>
-							<th>Address While On Leave</th>
-							<th>Home Contact Number</th>
-							<th>Personal Email</th>
+                            <th>Total Number Of Overtime Hours</th>
+                            <th>Overtime Start Date</th>
+                            <th>Overtime End Date</th>
+							<th>Name Of Reporting Manager</th>
+							<th>Name Of Division Head</th>
+							<th>Status</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -223,24 +216,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 						<div hidden>{{$i=0;}}</div>
 						@foreach ($approved as $key => $data)
 						<tr data-id="1">
-							<td>{{ ++$i }}</td>
-                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+						<td>{{ ++$i }}</td>
+							<td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
 							<td>{{ $data->user->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->location->name ?? '' }}</td>
 							<td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
-							<td>{{ $data->leave_type ?? ''}}</td>
-							<td>{{ $data->type_of_leave_description ?? ''}}</td>
-							<td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-							<td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
-							<td>{{ $data->total_no_of_days ?? ''}}</td>	
-							<td>{{ $data->no_of_paid_days ?? ''}}</td>		
-							<td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
-							<td>{{ $data->address_while_on_leave ?? ''}}</td>		
-							<td>{{ $data->alternative_home_contact_no ?? ''}}</td>		
-							<td>{{ $data->alternative_personal_email ?? ''}}</td>		
+							<td>{{ $data->total_hours ?? ''}}</td>
+							<td>
+								@if($data->minStartDateTime->start_datetime != '')
+								{{\Carbon\Carbon::parse($data->minStartDateTime->start_datetime)->format('d M Y') ?? ''}}
+								@endif
+							</td>
+							<td>
+								@if($data->maxStartDateTime->end_datetime != '')
+									{{\Carbon\Carbon::parse($data->maxStartDateTime->end_datetime)->format('d M Y') ?? ''}}
+								@endif
+							</td>
+							<td>{{ $data->reportingManager->name ?? ''}}</td>
+							<td>{{ $data->divisionHead->name ?? ''}}</td>	
+							<td>{{ $data->current_status ?? ''}}</td>		
 							<td>
 							@canany(['current-user-overtime-details','all-overtime-details'])
 								@php
@@ -389,16 +386,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
                             <th>Department</th>
 							<th>Location</th>
 							<th>Joining Date</th>
-							<th>Leave Type</th>
-                            <th>Leave Details</th>
-                            <th>Leave Start Date</th>
-                            <th>Leave End Date</th>
-							<th>Total Number Of Days</th>
-							<th>Number Of Paid Days(If Any)</th>
-							<th>Number Of Unpaid Days(If Any)</th>
-							<th>Address While On Leave</th>
-							<th>Home Contact Number</th>
-							<th>Personal Email</th>
+                            <th>Total Number Of Overtime Hours</th>
+                            <th>Overtime Start Date</th>
+                            <th>Overtime End Date</th>
+							<th>Name Of Reporting Manager</th>
+							<th>Name Of Division Head</th>
+							<th>Status</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -414,16 +407,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->location->name ?? '' }}</td>
 							<td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
-							<td>{{ $data->leave_type ?? ''}}</td>
-							<td>{{ $data->type_of_leave_description ?? ''}}</td>
-							<td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-							<td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
-							<td>{{ $data->total_no_of_days ?? ''}}</td>	
-							<td>{{ $data->no_of_paid_days ?? ''}}</td>		
-							<td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
-							<td>{{ $data->address_while_on_leave ?? ''}}</td>		
-							<td>{{ $data->alternative_home_contact_no ?? ''}}</td>		
-							<td>{{ $data->alternative_personal_email ?? ''}}</td>		
+							<td>{{ $data->total_hours ?? ''}}</td>
+							<td>
+								@if($data->minStartDateTime->start_datetime != '')
+								{{\Carbon\Carbon::parse($data->minStartDateTime->start_datetime)->format('d M Y') ?? ''}}
+								@endif
+							</td>
+							<td>
+								@if($data->maxStartDateTime->end_datetime != '')
+									{{\Carbon\Carbon::parse($data->maxStartDateTime->end_datetime)->format('d M Y') ?? ''}}
+								@endif
+							</td>
+							<td>{{ $data->reportingManager->name ?? ''}}</td>
+							<td>{{ $data->divisionHead->name ?? ''}}</td>	
+							<td>{{ $data->current_status ?? ''}}</td>		
 							<td>
 							@canany(['current-user-overtime-details','all-overtime-details'])
 								@php
@@ -465,7 +462,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 				$('#to_be_replaced_by_'+pendings[i].id).select2({
 					allowClear: true,
 					placeholder:"Choose To Be Replaced By Name",
-					dropdownParent: $('#approve-employee-leave-request-'+pendings[i].id)
+					dropdownParent: $('#approve-employee-overtime-request-'+pendings[i].id)
 				});
 			}
 		}

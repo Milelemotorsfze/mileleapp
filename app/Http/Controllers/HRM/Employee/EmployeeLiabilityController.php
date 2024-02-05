@@ -178,6 +178,9 @@ class EmployeeLiabilityController extends Controller
                     $update->action_by_division_head = 'approved';
                 }
             }
+            if($request->status == 'rejected') {
+                $update->status = 'rejected'; 
+            }
             $update->update();
             $history['liability_id'] = $update->id;
             if($request->status == 'approved') {

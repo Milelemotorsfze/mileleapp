@@ -272,52 +272,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['all-overtime-detai
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="col-lg-12 col-md-12 col-sm-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <center><h4 class="card-title">HR Manager</h4></center>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            Name :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                        {{ $data->hrManager->name ?? '' }}
-                                        </div>
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            Status :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                        <label class="badge texttransform @if($data->action_by_hr_manager =='pending') badge-soft-info 
-                                        @elseif($data->action_by_hr_manager =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->action_by_hr_manager ?? ''}}</label>
-                                        </div>
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            Date & Time :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                            @if($data->hr_manager_action_at != '')
-                                        {{ \Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s') }}
-                                            @endif
-                                        </div>
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            Others :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->others ?? ''}}
-                                        </div>
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            Comments :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->comments_by_hr_manager ?? ''}}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <div class="card">
                                 <div class="card-header">
@@ -346,12 +300,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['all-overtime-detai
                                             @if($data->department_head_action_at != '')
                                         {{ \Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s') }}
                                         @endif
-                                        </div>
-                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                            To Be Replaced By :
-                                        </div>
-                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                            {{$data->toBeReplacedBy->name ?? ''}}
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Comments :
@@ -397,6 +345,45 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['all-overtime-detai
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
                                             {{$data->comments_by_division_head ?? ''}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <center><h4 class="card-title">HR Manager</h4></center>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Name :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                        {{ $data->hrManager->name ?? '' }}
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Status :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                        <label class="badge texttransform @if($data->action_by_hr_manager =='pending') badge-soft-info 
+                                        @elseif($data->action_by_hr_manager =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->action_by_hr_manager ?? ''}}</label>
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Date & Time :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            @if($data->hr_manager_action_at != '')
+                                        {{ \Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s') }}
+                                            @endif
+                                        </div>
+                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                            Comments :
+                                        </div>
+                                        <div class="col-lg-10 col-md-12 col-sm-12">
+                                            {{$data->comments_by_hr_manager ?? ''}}
                                         </div>
                                     </div>
                                 </div>
