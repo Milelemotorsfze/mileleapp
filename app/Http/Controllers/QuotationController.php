@@ -555,7 +555,7 @@ class QuotationController extends Controller
                     }
                 }
                 $existingBookings = BookingRequest::where('quotation_items_id', $quotationItem->id)
-                ->where('quotations_id', $quotationId)
+                ->where('quotations_id', $qoutationid)
                 ->get();
                 foreach ($existingBookings as $existingBooking) {
                     $vinarrys = explode(',', $request->vinnumbers);

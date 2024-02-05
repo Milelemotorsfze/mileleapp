@@ -22,7 +22,7 @@ public function varaint()
 }
 public function addon()
 {
-    return $this->belongsTo(Addon::class, 'reference_id');
+    return $this->belongsTo(AddonDetails::class, 'reference_id');
 }
 public function shippingdocuments()
 {
