@@ -146,8 +146,13 @@
           </table>
 
           <!-- Text field and "Add More" button -->
-          <div class="mb-3">
-            <label for="vinInput" class="form-label">VIN</label>
+          div class="mb-3">
+            <label for="vinInput" class="form-label">Stock VIN</label>
+            <select id="vehicle-dropdown" class="form-control">
+                </select>
+                </div>
+            <div class="mb-3">
+            <label for="vinInput" class="form-label">Custom VIN</label>
             <input type="text" class="form-control" id="vinInput">
           </div>
           <button type="button" class="btn btn-primary btn-sm" onclick="addVinRow()">Add</button>
@@ -3499,6 +3504,42 @@ $(document).ready(function () {
   var vinData = JSON.parse(localStorage.getItem('vinData')) || {};
   $('#dtBasicExample2').on('click', '.vin-button', function () {
   var RowId = $(this).data('number');
+  $.ajax({
+    url: '/get-vehicles-vin',
+    type: 'POST',
+    data: {
+      RowId: RowId,
+      _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+    },
+    success: function(response) {
+  // Clear existing options
+  $('#vehicle-dropdown').empty();
+  
+  // Add placeholder option
+  $('#vehicle-dropdown').append($('<option>', {
+    value: '',
+    text: 'Please select Vin',
+    selected: true
+  }));
+
+  // Populate dropdown with vehicles
+  response.vehicles.forEach(function(vehicle) {
+    $('#vehicle-dropdown').append($('<option>', {
+      value: vehicle.vin,
+      text: vehicle.vin
+    }));
+  });
+  $('#vehicle-dropdown').select2({
+    dropdownCssClass: "my-select2-dropdown" // Add a custom class to the dropdown
+}).on('select2:open', function (e) {
+    $('.my-select2-dropdown').css('z-index', 99999); // Set a high z-index when the dropdown is opened
+});
+},
+    error: function(xhr, status, error) {
+      // Handle error
+      console.error(xhr.responseText);
+    }
+  });
   // Set the RowId in the modal trigger button
   $('#vinmodal').data('rowId', RowId);
   // Retrieve VINs from localStorage for the clicked row
@@ -3526,15 +3567,24 @@ $('#vinmodal').on('shown.bs.modal', function () {
   }
 
   function addVinRow(RowId) {
-    var RowId = $('#vinmodal').data('rowId');
-    var vinInput = $('#vinInput').val();
+  var RowId = $('#vinmodal').data('rowId');
+  var vinInput = $('#vinInput').val();
+  var selectedVehicle = $('#vehicle-dropdown').val();
+  if (selectedVehicle) {
+    vinInput = selectedVehicle;
+  }
+
+  if (vinInput !== '') {
     if (!vinData.hasOwnProperty(RowId)) {
       vinData[RowId] = [];
     }
     vinData[RowId].push(vinInput);
     populateModalTable(RowId);
-    $('#vinInput').val('');
   }
+  $('#vinInput').val('');
+  $('#vehicle-dropdown').val('');
+  $('#vehicle-dropdown option[value=""]').prop('selected', true).text('Please select Vin');
+}
   $(document).on('click', '.removeVinRow', function () {
   var RowId = $('#vinmodal').data('rowId');
   var vinToRemove = $(this).closest('tr').find('td:first').text();

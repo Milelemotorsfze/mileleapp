@@ -477,7 +477,7 @@ class ProformaInvoiceController extends Controller {
     public function proforma_invoice_edit($callId) {
         $quotation = Quotation::where('calls_id', $callId)->first();
         $quotation_details = QuotationDetail::where('quotation_id', $quotation->id)->first();
-        $quotationitems = QuotationItem::where('quotation_id', $quotation->id)->get();
+        $quotationitems = QuotationItem::with('varaint')->with('addon')->with('quotationVins')->with('shippingdocuments')->with('shippingcertification')->with('otherlogisticscharges')->where('quotation_id', $quotation->id)->get();
         foreach ($quotationitems as $quotationitem) {
             $quotation_vins = QuotationVins::where('quotation_items_id', $quotationitem->id)->get();
         }
@@ -501,8 +501,9 @@ class ProformaInvoiceController extends Controller {
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
         $usd_to_eru_rate = Setting::where('key', 'usd_to_euro_convertion_rate')->first();
+        $existingItemsJson = json_encode($quotationitems);
         return view('proforma.invoice_edit', compact('callDetails', 'brands','assessoriesDesc',
             'sparePartsDesc','kitsDesc','shippings','certifications','countries','shippingPorts',
-           'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate', 'quotation_details', 'quotation_vins', 'quotation', 'quotationitems'));
+           'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate', 'quotation_details', 'quotation_vins', 'quotation', 'quotationitems', 'existingItemsJson', 'callId'));
     }
     }

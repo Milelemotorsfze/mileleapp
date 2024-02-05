@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\QuotationItem;
 use App\Models\Brand;
 use App\Models\Varaint;
+use App\Models\Soitems;
 use App\Models\MasterModelLines;
 
 use Illuminate\Http\Request;
@@ -151,7 +152,21 @@ class SalesOrderController extends Controller
                 $closed->so_id = $so->id;
                 $closed->save();
                 $vins = $request->input('vehicle_vin');
-                Vehicles::whereIn('vin', $vins)->update(['so_id' => $so->id]);
+                $allVins = [];
+                    foreach ($vins as $selectedVins) {
+                        $allVins = array_merge($allVins, $selectedVins);
+                    }
+                Vehicles::whereIn('vin', $allVins)->update(['so_id' => $so->id]);
+                foreach ($vins as $quotationItemId => $selectedVins) {
+                    foreach ($selectedVins as $selectedVin) {
+                        $vehicle = Vehicles::where('vin', $selectedVin)->first();
+                        $soVinRelationship = new Soitems();
+                        $soVinRelationship->so_id = $so->id;
+                        $soVinRelationship->quotation_items_id = $quotationItemId;
+                        $soVinRelationship->vehicles_id = $vehicle->id;
+                        $soVinRelationship->save();
+                    }
+                }
                 return redirect()->route('dailyleads.index')->with('success', 'Sales Order created successfully.'); 
             }  
         }

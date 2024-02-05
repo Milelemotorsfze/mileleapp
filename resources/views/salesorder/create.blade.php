@@ -8,7 +8,7 @@
         </h4>
     </div>
     <div class="card-body">
-    <form action="{{ route('salesorder.storesalesorder', ['QuotationId' => $quotation->id]) }}" id="form-create" method="POST">
+    <form onsubmit="return checkForDuplicateVINs();" action="{{ route('salesorder.storesalesorder', ['QuotationId' => $quotation->id]) }}" id="form-create" method="POST">
     @csrf
             <div class="row">
             <h6>SO Details</h6>
@@ -27,35 +27,36 @@
     </div>
         <hr>
         <div class="row">
-        <h6>Vehicles</h6>
-            <div class="col-md-12">
-                @foreach($quotationItems as $quotationItem)
-                <div class="mb-1">
-                    <h6>{{ $quotationItem->description }}</h6>
-                    <div class="row">
-                        @for ($i = 0; $i < $quotationItem->quantity; $i++)
-                        <div class="col-md-2 mb-3">
-                            <select name="vehicle_vin[]" class="form-control select2">
-                                <option value="" disabled>Select VIN</option>
-                                @foreach($vehicles[$quotationItem->id] as $vehicle)
-                                @if($vehicle->inspection_status != "Pending")
-                                @php
-                                    $selected = '';
-                                    if ($quotationVin = $quotationItem->quotationVins->where('quotation_items_id', $vehicle->vin)->first()) {
-                                        $selected = 'selected';
-                                    }
-                                @endphp
-                                    <option value="{{ $vehicle->vin }}" {{ $selected }}>{{ $vehicle->vin }}</option>
-                                @endif
-                                @endforeach
-                            </select>
-                        </div>
-                        @endfor
-                    </div>
+    <h6>Vehicles</h6>
+    <div class="col-md-12">
+        @foreach($quotationItems as $quotationItem)
+        <div class="mb-1">
+            <h6>{{ $quotationItem->description }}</h6>
+            <div class="row">
+                @for ($i = 0; $i < $quotationItem->quantity; $i++)
+                <div class="col-md-2 mb-3">
+                    <select name="vehicle_vin[{{ $quotationItem->id }}][]" class="form-control select2">
+                        <option value="" disabled>Select VIN</option>
+                        @foreach($vehicles[$quotationItem->id] as $vehicle)
+                        @if($vehicle->inspection_status != "Pending")
+                        @php
+                            $selected = '';
+                            if ($quotationVin = $quotationItem->quotationVins->where('quotation_items_id', $vehicle->vin)->first()) {
+                                $selected = 'selected';
+                            }
+                        @endphp
+                        <option value="{{ $vehicle->vin }}" {{ $selected }}>{{ $vehicle->vin }}</option>
+                        @endif
+                        @endforeach
+                    </select>
                 </div>
-                @endforeach
+                @endfor
             </div>
+            <input type="hidden" name="quotation_item_id[]" value="{{ $quotationItem->id }}">
         </div>
+        @endforeach
+    </div>
+</div>
         <hr>
         <h6>Payments</h6>
         <div class="row">
@@ -131,5 +132,26 @@
             updateBalancePayment();
         });
     });
+</script>
+<script>
+// JavaScript code to check for duplicate VINs
+function checkForDuplicateVINs() {
+    var selectedVINs = {};
+    var dropdowns = document.querySelectorAll('select[name^="vehicle_vin"]');
+    
+    for (var i = 0; i < dropdowns.length; i++) {
+        var selectedOption = dropdowns[i].value;
+        
+        if (selectedOption && selectedOption !== '') {
+            if (selectedVINs[selectedOption]) {
+                // Duplicate VIN found, display an error message and prevent form submission
+                alert('Duplicate VIN ' + selectedOption + ' selected. Please select a unique VIN for each vehicle.');
+                return false; // Prevent form submission
+            }
+            selectedVINs[selectedOption] = true;
+        }
+    }
+    return true; // No duplicate VINs found, allow form submission
+}
 </script>
 @endpush

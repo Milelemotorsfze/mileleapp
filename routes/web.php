@@ -766,3 +766,6 @@ Route::get('/d', function () {
     Route::post('/saleorderstore/{QuotationId}', [SalesOrderController::class, 'storesalesorder'])->name('salesorder.storesalesorder');
     Route::post('/preorderstore/{QuotationId}', [PreOrderController::class, 'storepreorder'])->name('preorder.storespreorder');
     Route::get('/variants_details/{id}', [VariantController::class, 'getvariantsdetails'])->name('variants.getvariantsdetails');
+    Route::post('/get-vehicles-vin', [QuotationController::class, 'getVehiclesvins']);
+
+
