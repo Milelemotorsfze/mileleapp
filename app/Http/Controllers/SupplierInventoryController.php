@@ -137,7 +137,7 @@ class SupplierInventoryController extends Controller
             $uploadFileContents = [];
             $colourname = NULL;
 
-            $date = Carbon::tomorrow()->format('Y-m-d');
+            $date = Carbon::today()->format('Y-m-d');
             $unavailableExtColours = [];
             $unavailableIntColours = [];
 

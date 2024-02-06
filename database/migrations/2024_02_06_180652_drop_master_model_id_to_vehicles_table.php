@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-    
         Schema::table('vehicles', function (Blueprint $table) {
-            // $table->dropForeign('vehicles_master_model_id_foreign');
+            // $table->dropIndex(['master_model_id']);
+            $table->dropForeign(['master_model_id']);
+            // $table->dropColumn(['master_model_id']);
+            $table->foreign('master_model_id')->references('id')->on('master_models');
             // $table->foreign('master_model_id')->references('id')->on('master_models');
         });
     }
