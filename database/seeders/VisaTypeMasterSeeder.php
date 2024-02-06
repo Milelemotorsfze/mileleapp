@@ -75,5 +75,17 @@ class VisaTypeMasterSeeder extends Seeder
             ['id' => 12,'name' => 'E-Gate Card','type' => 'release','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
             ['id' => 13,'name' => 'Other, please specify','type' => 'release','created_at' => Carbon::now()->format('Y-m-d H:i:s'),],
         ]);
+        DB::table('seperation_types')->insert([
+            ['id' => 1,'name' => 'Contract terminated by Employee'],
+            ['id' => 2,'name' => 'Contract Terminated by Employer'],
+            ['id' => 3,'name' => 'Employee Proceeding for Leave'],
+            ['id' => 4,'name' => 'Other'],
+        ]);
+        DB::table('separation_replacement_types')->insert([
+            ['id' => 1,'name' => 'HRF raised by Line Manager'],
+            ['id' => 2,'name' => 'Position made redundant'],
+            ['id' => 3,'name' => 'Position filled within Team Member'],
+            ['id' => 4,'name' => 'Other'],
+        ]);
     }
 }
