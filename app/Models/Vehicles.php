@@ -64,6 +64,10 @@ class Vehicles extends Model
     {
         return $this->belongsTo(MasterModel::class,'master_model_id','id');
     }
+    public function vehiclePurchasingCost()
+    {
+        return $this->hasOne(VehiclePurchasingCost::class, 'vehicles_id');
+    }    
 
 public function latestRemarkSales()
     {
