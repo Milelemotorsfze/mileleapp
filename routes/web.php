@@ -99,6 +99,7 @@ use App\Http\Controllers\PaymentTermsController;
 use App\Http\Controllers\SalesTargetsController;
 use App\Http\Controllers\ClientAccountTransitionController;
 use App\Http\Controllers\SalesOrderController;
+use App\Http\Controllers\PreOrderController;
 
 
 /*
@@ -113,6 +114,7 @@ use App\Http\Controllers\SalesOrderController;
 |
 */
 Route::get('clientsignature/{uniqueNumber}/{quotationId}', [QuotationController::class, 'showBySignature'])->name('quotation.showBySignature');
+Route::post('/submit-signature', [QuotationController::class, 'submitSignature']);
 Route::match(['get', 'post'], '/whatsapp/receive', [WebhookController::class, 'sendMessage']);
 Route::get('/react-page', function () {
     return view('react-app.index');
@@ -372,7 +374,9 @@ Route::get('/d', function () {
     // Employee Overtime Application
     Route::resource('overtime', OverTimeController::class);
     Route::controller(OverTimeController::class)->group(function(){
-        Route::post('checkOvertimeAlreadyExist', 'checkOvertimeAlreadyExist')->name('overtimr.checkOvertimeAlreadyExist');
+        Route::post('checkOvertimeAlreadyExist', 'checkOvertimeAlreadyExist')->name('overtime.checkOvertimeAlreadyExist');
+        Route::post('overtime_request_action', 'requestAction')->name('overtimeRequest.action');
+        Route::get('overtime_approval_awaiting', 'approvalAwaiting')->name('overtime.approvalAwaiting');
     });
     // Demand & Planning Module
 
@@ -754,3 +758,10 @@ Route::get('/d', function () {
 
     //Sales Order
     Route::get('/saleorder/{callId}', [SalesOrderController::class, 'createsalesorder'])->name('salesorder.createsalesorder');
+    Route::get('/preorder/{callId}', [PreOrderController::class, 'createpreorder'])->name('preorder.createpreorder');
+    Route::post('/saleorderstore/{QuotationId}', [SalesOrderController::class, 'storesalesorder'])->name('salesorder.storesalesorder');
+    Route::post('/preorderstore/{QuotationId}', [PreOrderController::class, 'storepreorder'])->name('preorder.storespreorder');
+    Route::get('/variants_details/{id}', [VariantController::class, 'getvariantsdetails'])->name('variants.getvariantsdetails');
+    Route::post('/get-vehicles-vin', [QuotationController::class, 'getVehiclesvins']);
+
+

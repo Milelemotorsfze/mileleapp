@@ -18,6 +18,7 @@ use App\Models\HRM\Employee\JoiningReport;
 use App\Models\HRM\Employee\PassportRelease;
 use App\Models\HRM\Employee\Liability;
 use App\Models\HRM\Employee\Leave;
+use App\Models\HRM\Employee\OverTime;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
@@ -50,6 +51,7 @@ class User extends Authenticatable
         'liability_request_approval',
         'leave_request_approval',
         'advance_or_loan_balance',
+        'overtime_request_approval',
     ];
     public function getPassportWithAttribute() {
         $passportWith = 'with_employee';
@@ -380,6 +382,43 @@ class User extends Authenticatable
     }
     public function getSelectedRoleAttribute() {
         return $this->attributes['selected_role'] ?? $this->roles()->first()->name;
+    }
+    public function getOvertimeRequestApprovalAttribute() {
+        $authId = $this->id;
+        $overtimeRequestApproval['can'] = false;
+        $overtimeRequestApproval['count'] = 0;
+         // employee -------> Reporting Manager  ----Finance Manager--------->HR Manager-------->Division Head
+        //  Employee -----------> Reporting Manager ---------> Division Head-------> HR Manager 
+        $employeePendings = $employeeApproved = $employeeRejected = 
+        $reportingManagerPendings = $reportingManagerApproved = $reportingManagerRejected = 
+        $divisionHeadPendings = $divisionHeadApproved = $divisionHeadRejected = 
+        $hrPendings = $hrApproved = $hrRejected = [];
+
+        $employeePendings = OverTime::where([['action_by_employee','pending'],['employee_id',$this->id],])->latest()->get();
+        $employeeApproved = OverTime::where([['action_by_employee','approved'],['employee_id',$this->id],])->latest()->get();
+        $employeeRejected = OverTime::where([['action_by_employee','rejected'],['employee_id',$this->id],])->latest()->get();
+        $reportingManagerPendings = OverTime::where([['action_by_employee','approved'],['action_by_department_head','pending'],['department_head_id',$this->id],])->latest()->get();
+        $reportingManagerApproved = OverTime::where([['action_by_employee','approved'],['action_by_department_head','approved'],['department_head_id',$this->id],])->latest()->get();
+        $reportingManagerRejected = OverTime::where([['action_by_employee','approved'],['action_by_department_head','rejected'],['department_head_id',$this->id],])->latest()->get();
+        $divisionHeadPendings = OverTime::where([['action_by_employee','approved'],['action_by_department_head','approved'],['action_by_division_head','pending'],
+            ['division_head_id',$this->id],])->latest()->get();
+        $divisionHeadApproved = OverTime::where([['action_by_employee','approved'],['action_by_department_head','approved'],['action_by_division_head','approved'],
+            ['division_head_id',$this->id],])->latest()->get();
+        $divisionHeadRejected = OverTime::where([['action_by_employee','approved'],['action_by_department_head','approved'],['action_by_division_head','rejected'],
+            ['division_head_id',$this->id],])->latest()->get();  
+        $hrPendings = OverTime::where([['action_by_employee','approved'],['action_by_department_head','approved'],['action_by_division_head','approved'],
+            ['action_by_hr_manager','pending'],['hr_manager_id',$this->id],])->latest()->get();
+        $hrApproved = OverTime::where([['action_by_employee','approved'],['action_by_department_head','approved'],['action_by_division_head','approved'],
+            ['action_by_hr_manager','approved'],['hr_manager_id',$this->id],])->latest()->get();
+        $hrRejected = OverTime::where([['action_by_employee','approved'],['action_by_department_head','approved'],['action_by_division_head','approved'],
+            ['action_by_hr_manager','rejected'],['hr_manager_id',$this->id],])->latest()->get();  
+        if(count($employeePendings) > 0 OR count($employeeApproved) > 0 OR count($employeeRejected) > 0 OR count($reportingManagerPendings) > 0 OR 
+        count($reportingManagerApproved) > 0 OR count($reportingManagerRejected) > 0 
+        OR count($hrPendings) > 0 OR count($hrApproved) > 0 OR count($hrRejected) > 0 OR count($divisionHeadPendings) > 0 OR count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0) {
+            $overtimeRequestApproval['can'] = true;
+            $overtimeRequestApproval['count'] = count($employeePendings) + count($reportingManagerPendings) + count($hrPendings) + count($divisionHeadPendings);
+        }
+        return $overtimeRequestApproval;
     }
     public function hasPermissionForSelectedRole($permissionName) {
         $selectedRole = $this->selected_role;

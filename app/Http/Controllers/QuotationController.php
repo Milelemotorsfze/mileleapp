@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Addon;
 use App\Models\AddonDetails;
+use setasign\Fpdi\Fpdi;
+use Smalot\PdfParser\Parser;
 use Illuminate\Support\Str;
 use App\Models\AgentCommission;
 use App\Models\Country;
@@ -18,6 +20,7 @@ use App\Models\QuotationDetail;
 use App\Models\QuotationItem;
 use App\Models\QuotationSubItem;
 use App\Models\Setting;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Shipping;
 use App\Models\ShippingCertification;
 use App\Models\ShippingDocuments;
@@ -27,7 +30,11 @@ use App\Models\Vehicles;
 use App\Models\Vehiclescarts;
 use App\Models\MasterModelLines;
 use App\Models\CartAddon;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\So;
+use App\Models\Soitems;
+use App\Models\BookingRequest;
+use Barryvdh\DomPDF\Facade;
+use App\Models\Booking;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -223,6 +230,20 @@ class QuotationController extends Controller
                     $vinupdate->quotation_items_id = $quotationItem->id;
                     $vinupdate->vin =$vin;
                     $vinupdate->save();
+                    $vinupdate->vin = trim(strtolower($vinupdate->vin));
+                    $vehiclesvins = Vehicles::where('vin', $vinupdate->vin)->first();
+                    if($vehiclesvins){
+                    $booking = New BookingRequest();
+                    $booking->date = now()->toDateString();
+                    $booking->vehicle_id = $vehiclesvins->id;
+                    $booking->calls_id = $request->calls_id; 
+                    $booking->created_by =  Auth::id();
+                    $booking->status = 'New';
+                    $booking->days = '3';
+                    $booking->quotation_items_id = $quotationItem->id;
+                    $booking->quotations_id = $quotation->id;
+                    $booking->save();
+                    }
                     }
                 }
                    array_push($quotationItemIds, $quotationItem->id);
@@ -414,7 +435,403 @@ class QuotationController extends Controller
      */
     public function update(Request $request, quotation $quotation)
     {
+    $qoutationid = request()->input('quotationid');
+    $isVehicle = 0;
+    $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
+    $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
+    DB::beginTransaction();
+    $call = Calls::find($request->calls_id);
+    $call->status = 'Quoted';
+    $call->company_name = $request->company_name;
+    $call->name = $request->name;
+    $call->phone = $request->phone;
+    $call->email = $request->email;
+    $call->address = $request->address;
+    $call->save();
+    $quotation = Quotation::find($qoutationid);
+    if($request->currency == 'AED') {
+        $quotation->deal_value = $request->total;
+    }else{
+        $quotation->deal_value = $request->deal_value;
+    }
+    $quotation->sales_notes = $request->remarks;
+    $quotation->created_by = Auth::id();
+    $quotation->calls_id = $request->calls_id;
+    $quotation->currency = $request->currency;
+    $quotation->document_type = $request->document_type;
+    $quotation->date = Carbon::now();
+    if($request->document_type == 'Proforma') {
+        $quotation->document_type = 'Proforma Invoice';
+    }
+    $quotation->shipping_method = $request->shipping_method;
+    $quotation->save();
+    $quotationDetail = QuotationDetail::where('quotation_id', $qoutationid)->first();
+    if ($quotationDetail) {
+    $quotationDetail->quotation_id  = $quotation->id;
+        $quotationDetail->country_id  = $request->country_id;
+        $quotationDetail->incoterm  = $request->incoterm;
+        $quotationDetail->shipping_port_id   = $request->from_shipping_port_id;
+        $quotationDetail->to_shipping_port_id   = $request->to_shipping_port_id;
+        $quotationDetail->place_of_supply  = $request->place_of_supply;
+        $quotationDetail->document_validity  = $request->document_validity;
+        $quotationDetail->payment_terms  = $request->payment_terms;
+        $quotationDetail->representative_name = $request->representative_name;
+        $quotationDetail->representative_number = $request->representative_number;
+        $quotationDetail->cb_name = $request->selected_cb_name;
+        $quotationDetail->cb_number = $request->cb_number;
+        $quotationDetail->agents_id = $request->agents_id;
+        $quotationDetail->advance_amount = $request->advance_amount;
+        $quotationDetail->save();
+        }
+        $commissionAED = 0;
+        $quotationItemIds = [];
+        $existingQuotationItems = QuotationItem::where('quotation_id', $qoutationid)->get();
+        $soexisting = So::where('quotation_id', $qoutationid)->get();
+        foreach ($existingQuotationItems as $quotationItem) {
+            if(!in_array($quotationItem->id, $request->vehiclesitemsid)) {
+                if ($soexisting->isNotEmpty()) {
+                    $soitems = Soitems::where('quotation_items_id', $quotationItem->id)->get();
+                    if ($soitems->isNotEmpty()) {
+                        foreach ($soitems as $soitem) {
+                            $vehicle = Vehicles::find($soitem->vehicles_id);
+                            if ($vehicle) {
+                                $vehicle->so_id = null;
+                                $vehicle->save();
+                                Soitems::where('vehicles_id', $vehicle->id)->delete();
+                            }
+                        }
+                    }
+                }
+                $existingSubItemd = QuotationSubItem::where('quotation_id', $qoutationid)
+                ->where('quotation_item_parent_id', $quotationItem->id)
+                ->get(); 
+                if ($existingSubItemd->isNotEmpty()) {
+                    foreach ($existingSubItemd as $existingSubItem) {
+                        $existingSubItem->delete();
+                    }
+                }
+                $existingbooking = BookingRequest::where('quotation_items_id', $quotationItem->id)->where('quotations_id', $qoutationid)->get();
+                if ($existingbooking->isNotEmpty()) {
+                    foreach ($existingbooking as $existingbookings) {
+                        $existingapproved = Booking::where('booking_requests_id', $existingbooking->id)->first();
+                        if($existingapproved)
+                        {
+                            $existingapproved->booking_end_date = now()->toDateString();
+                            $existingapproved->save();
+                            $vehicle = Vehicles::find($existingapproved->vehicle_id);
+                            if ($vehicle) {
+                                $vehicle->reservation_end_date = now()->toDateString();
+                                $vehicle->save();
+                            }
+                        }
+                        else
+                        {
+                        $existingbookings->delete();
+                        }
+                    }
+                }
+                $quotationItem->delete();
+            }
+            else {
+                $key = array_search($quotationItem->id, $request->vehiclesitemsid);
+                if ($quotationItem->quantity != $request->quantities[$key]) {
+                $quantityDifference = $quotationItem->quantity - $request->quantities[$key];
+                if ($soexisting->isNotEmpty()) {
+                    $soitems = Soitems::where('quotation_items_id', $quotationItem->id)->get();
+                    if ($soitems->isNotEmpty()) {
+                        $vehicles = [];
+                        foreach ($soitems as $soitem) {
+                            $vehicle = Vehicles::find($soitem->vehicles_id);
+                            if ($vehicle) {
+                                $vehicles[] = $vehicle;
+                            }
+                        }
+                        $vehiclesToDelete = array_slice($vehicles, 0, $quantityDifference);
+                        foreach ($vehiclesToDelete as $vehicle) {
+                            $vehicle->so_id = null;
+                            $vehicle->save();
+                            Soitems::where('vehicles_id', $vehicle->id)->delete();
+                        }
+                    }
+                }
+                $existingBookings = BookingRequest::where('quotation_items_id', $quotationItem->id)
+                ->where('quotations_id', $qoutationid)
+                ->get();
+                foreach ($existingBookings as $existingBooking) {
+                    $vinarrys = explode(',', $request->vinnumbers);
+                    if ($vin !== "undefined" && $vin !== null && !empty($vin)) {
+                        $vehicleIds = Vehicles::whereIn('vin', $vinarrys)->pluck('id')->toArray();
+                    }                    
+                    $existingApproved = Booking::where('booking_requests_id', $existingBooking->id)->whereNotIn('vehicle_id', $vehicleIds)->first();
+                    if ($existingApproved) {
+                        $quantityDifference = $quotationItem->quantity - $request->quantities[$key];
+                        $vehiclesToUpdate = min($quantityDifference, $existingApproved->quantity);
+                        if ($vehiclesToUpdate > 0) {
+                            $existingApproved->booking_end_date = now()->toDateString();
+                            $existingApproved->save();
+                            $vehicle = Vehicles::find($existingApproved->vehicle_id);
+                            if ($vehicle) {
+                                $vehicle->reservation_end_date = now()->toDateString();
+                                $vehicle->save();
+                            }
+                        }
+                    } else {
+                        $existingBooking->delete();
+                    }
+            }            
+            }
+        }
+    }
+        foreach ($request->prices as $key => $price) {
+            $item = "";
+            if($request->system_code_currency[$key] == 'U') {
+                $amount = $request->system_code_amount[$key] * $aed_to_usd_rate->value;
+            }else{
+                $amount = $request->system_code_amount[$key];
+            }
+           $commissionAED = $commissionAED + $amount;
+           if(isset($request->vehiclesitemsid[$key])) {
+            $quotationItem = QuotationItem::find($request->vehiclesitemsid[$key]);
+            } else {
+                $quotationItem = new QuotationItem();
+            }
+           $quotationItem->unit_price = $price;
+           $quotationItem->quantity = $request->quantities[$key];
+           $quotationItem->description = $request->descriptions[$key];
+           $quotationItem->total_amount = $request->total_amounts[$key];
+           $quotationItem->system_code_amount = $request->system_code_amount[$key];
+           $quotationItem->system_code_currency = $request->system_code_currency[$key];
+           $quotationItem->quotation_id = $qoutationid;
+           $quotationItem->uuid = $request->uuids[$key];
+           $quotationItem->is_addon = $request->is_addon[$key];
+           $quotationItem->is_enable = isset($request->is_hide[$key]) ? true : false;
+           $quotationItem->created_by = Auth::id();
+           if($request->types[$key] == 'Shipping') {
+               $item = Shipping::find($request->reference_ids[$key]);
 
+           }else if($request->types[$key] == 'Certification') {
+
+               $item = ShippingCertification::find($request->reference_ids[$key]);
+
+           }else if($request->types[$key] == 'Shipping-Document') {
+
+               $item = ShippingDocuments::find($request->reference_ids[$key]);
+
+           }else if($request->types[$key] == 'Vehicle') {
+               if($request->reference_ids[$key] != 'Other')
+               {
+                   $item = Varaint::find($request->reference_ids[$key]);
+                   
+               }
+               $isVehicle = 1;
+               $quotationItem->brand_id = $request->brand_ids[$key];
+               $quotationItem->model_line_id = $request->model_line_ids[$key];
+           }else if($request->types[$key] == 'Other') {
+               $item = OtherLogisticsCharges::find($request->reference_ids[$key]);
+
+           }else if($request->types[$key] == 'ModelLine') {
+               $item = MasterModelLines::find($request->reference_ids[$key]);
+                  $isVehicle = 1;
+
+               $quotationItem->brand_id = $request->brand_ids[$key];
+               $quotationItem->model_line_id = $request->model_line_ids[$key];
+
+           }else if($request->types[$key] == 'Brand') {
+               $item = Brand::find($request->reference_ids[$key]);
+                 $isVehicle = 1;
+
+               $quotationItem->brand_id = $request->brand_ids[$key];
+               $quotationItem->model_line_id = $request->model_line_ids[$key];
+
+           } else if($request->types[$key] == 'Accessory' || $request->types[$key] == 'SparePart' || $request->types[$key] == 'Kit') {
+               $item = AddonDetails::find($request->reference_ids[$key]);
+               $quotationItem->addon_type = $request->addon_types[$key];
+               $quotationItem->brand_id = $request->brand_ids[$key];
+               $quotationItem->model_line_id = $request->model_line_ids[$key];
+               $quotationItem->model_description_id = $request->model_description_ids[$key];
+           }else if($request->types[$key] == 'Addon') {
+               if($request->reference_ids[$key] != 'Other') {
+                   $item = Addon::find($request->reference_ids[$key]);
+               }
+               $quotationItem->addon_type = $request->addon_types[$key];
+               $quotationItem->brand_id = $request->brand_ids[$key];
+               $quotationItem->model_line_id = $request->model_line_ids[$key];
+               $quotationItem->model_description_id = $request->model_description_ids[$key];
+           }
+            if($item && !isset($request->vehiclesitemsid[$key])) {
+                $quotationItem->reference()->associate($item);
+            }
+            $quotationItem->save();
+            if($isVehicle == 1){ 
+                if ($request->uuids[$key]) {
+                    $vinArray = explode(',', $request->vinnumbers[$key]);
+                    QuotationVins::where('quotation_items_id', $quotationItem->id)->delete();
+                    foreach ($vinArray as $vin) {
+                    if ($vin !== "undefined" && $vin !== null && !empty($vin)) {
+                    $vinupdate = New QuotationVins();
+                    $vinupdate->quotation_items_id = $quotationItem->id;
+                    $vinupdate->vin =$vin;
+                    $vinupdate->save();
+                    $vinupdate->vin = trim(strtolower($vinupdate->vin));
+                    $vehiclesvins = Vehicles::where('vin', $vinupdate->vin)->first();
+                    if($vehiclesvins){
+                    $existingbooking = BookingRequest::where('vehicle_id', $vehiclesvins->id)->where('quotations_id', $qoutationid)->first();
+                    if(!$existingbooking){
+                    $booking = New BookingRequest();
+                    $booking->date = now()->toDateString();
+                    $booking->vehicle_id = $vehiclesvins->id;
+                    $booking->calls_id = $request->calls_id; 
+                    $booking->created_by =  Auth::id();
+                    $booking->status = 'New';
+                    $booking->days = '3';
+                    $booking->quotation_items_id = $quotationItem->id;
+                    $booking->quotations_id = $qoutationid;
+                    $booking->save();
+                    }
+                }
+                }
+                }
+                   array_push($quotationItemIds, $quotationItem->id);
+                }
+            }
+            $isVehicle = 0;
+        }
+        if($request->agents_id) {
+            $agentCommission = AgentCommission::where('quotation_id', $qoutationid); 
+            $agentCommission->commission = $commissionAED ?? '';
+            $agentCommission->status = 'Quotation';
+            $agentCommission->agents_id  =  $request->agents_id ?? '';
+            $agentCommission->created_by = Auth::id();
+            $agentCommission->save();
+        }
+        $quotationDetail->system_code = $commissionAED;
+        $quotationDetail->save();
+        foreach ($quotationItemIds as $itemId) {
+            $quotationItemRow = QuotationItem::find($itemId);
+            $subItemIds = QuotationItem::where('uuid', $quotationItemRow->uuid)
+                                    ->whereNot('id',$quotationItemRow->id)
+                                    ->whereNotNull('uuid')
+                                    ->where('quotation_id', $quotation->id)->pluck('id')->toArray();
+            if($subItemIds) {
+                foreach ($subItemIds as $subItemId) {
+                    $existingSubItem = QuotationSubItem::where('quotation_id', $quotation->id)
+                                ->where('quotation_item_parent_id', $itemId)
+                                ->where('quotation_item_id', $subItemId)
+                                ->exists();
+            if (!$existingSubItem) {
+                    $quotationSubItem = new QuotationSubItem();
+                    $quotationSubItem->quotation_id = $quotation->id;
+                    $quotationSubItem->quotation_item_parent_id = $itemId;
+                    $quotationSubItem->quotation_item_id = $subItemId;
+                    $quotationSubItem->save();
+            }
+                }
+            }
+        }
+        DB::commit();
+        $quotationDetail = QuotationDetail::with('country')->find($quotationDetail->id);
+        $vehicles =  QuotationItem::where("reference_type", 'App\Models\Varaint')
+            ->where('quotation_id', $quotation->id)->get();
+        $otherVehicles = QuotationItem::whereNull('reference_type')
+            ->whereNull('reference_id')
+            ->where('quotation_id', $quotation->id)
+            ->where('is_enable', true)
+            ->where('is_addon', false)
+            ->get();
+        $vehicleWithBrands = QuotationItem::where('quotation_id', $quotation->id)
+                ->whereIn("reference_type", ['App\Models\Brand','App\Models\MasterModelLines'])
+                ->where('is_addon', false)
+                ->get();
+        $alreadyAddedQuotationIds = QuotationSubItem::where('quotation_id', $quotation->id)
+                         ->pluck('quotation_item_id')->toArray();
+        $directlyAddedAddons =  QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
+            ->where('quotation_id', $quotation->id)
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('is_enable', true)
+            ->where('is_addon', true)->get();
+        $hidedDirectlyAddedAddonSum =  QuotationItem::where("reference_type", 'App\Models\MasterModelLines')
+            ->where('quotation_id', $quotation->id)
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('is_enable', false)
+            ->where('is_addon', true)
+            ->sum('total_amount');
+        $addons = QuotationItem::whereIn('reference_type',['App\Models\AddonDetails','App\Models\Addon'])
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+        $OtherAddons = QuotationItem::whereNull('reference_type')
+            ->whereNull('reference_id')
+            ->where('quotation_id', $quotation->id)
+            ->where('is_enable', true)
+            ->where('is_addon', true)->get();
+        $hidedAddonSum = QuotationItem::where('reference_type','App\Models\AddonDetails')
+            ->whereNotIn('id', $alreadyAddedQuotationIds)
+            ->where('quotation_id', $quotation->id)
+            ->where('is_enable', false)->sum('total_amount');
+        $addonsTotalAmount = $hidedDirectlyAddedAddonSum + $hidedAddonSum;
+        $shippingCharges = QuotationItem::where('reference_type','App\Models\Shipping')
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+        $shippingDocuments = QuotationItem::where('reference_type','App\Models\ShippingDocuments')
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+        $otherDocuments = QuotationItem::where('reference_type','App\Models\OtherLogisticsCharges')
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+        $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
+            ->where('is_enable', true)
+            ->where('quotation_id', $quotation->id)->get();
+        $salesPersonDetail = EmployeeProfile::where('user_id', Auth::id())->first();
+        $data = [];
+        $data['sales_person'] = Auth::user()->name;
+        $data['sales_office'] = 'Central 191';
+        $data['sales_phone'] = '';
+        $data['sales_email'] = Auth::user()->email;
+        $data['client_id'] = $call->id;
+        $data['client_email'] = $call->email;
+        $data['client_name'] = $call->name;
+        $data['client_phone'] = $call->phone;
+        $data['client_address'] = $call->address;
+        $data['document_number'] = $quotation->id;
+        $data['company'] = $call->company_name;
+        $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
+        if($salesPersonDetail) {
+            $data['sales_office'] = $salesPersonDetail->office;
+            $data['sales_phone'] = $salesPersonDetail->contact_number;
+        }
+        $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
+            ->where('quotation_id', $quotation->id)
+            ->whereIn('reference_type',['App\Models\ShippingDocuments','App\Models\Shipping',
+                'App\Models\ShippingCertification','App\Models\OtherLogisticsCharges'])
+            ->sum('total_amount');
+        $vehicleCount = $vehicles->count() + $otherVehicles->count() + $vehicleWithBrands->count();
+        if($vehicleCount > 0) {
+            $shippingChargeDistriAmount = $shippingHidedItemAmount / $vehicleCount;
+        }else{
+            $shippingChargeDistriAmount = 0;
+        }
+        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
+            'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','directlyAddedAddons','addonsTotalAmount',
+        'otherVehicles','vehicleWithBrands','OtherAddons','shippingChargeDistriAmount'));
+        $filename = 'quotation_'.$quotation->id.'.pdf';
+        $generatedPdfDirectory = public_path('Quotations');
+        $directory = public_path('storage/quotation_files');
+        \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+        $pdfFile->save($generatedPdfDirectory . '/' . $filename);
+        $pdf = $this->pdfMerge($quotation->id);
+        $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d').'.pdf';
+        $pdf->Output($directory.'/'.$file,'F');
+        $quotation->file_path = 'quotation_files/'.$file; 
+        $quotation->save();
+        $uniqueString = Str::random(10);
+        $timestamp = now()->timestamp;
+        $uniqueNumber = $uniqueString . $timestamp;
+        $signatureLink = config('app.base_url') . '/'.'clientsignature/' . $uniqueNumber . '/' . $quotation->id;
+        $newsignatures = Quotation::find($quotation->id);
+        $newsignatures->signature_link = $signatureLink;
+        $newsignatures->signature_status = null;
+        $newsignatures->save();
+        return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation created successfully.');
     }
 
     /**
@@ -556,11 +973,100 @@ public function addqaddone(Request $request)
     public function showBySignature($uniqueNumber, $quotationId)
     {
         $quotation = Quotation::find($quotationId);
-        if ($quotation) {
-            $pdfPath = asset('storage/' . $quotation->file_path);
-                return view('quotation.showsignpage', ['quotation' => $quotation, 'pdfPath' => $pdfPath]);
-        } else {
-            abort(404, 'Quotation not found');
+        if($quotation->signature_status === "Signed")
+        {
+        
         }
+        else{
+            $pdfPath = asset('storage/' . $quotation->file_path);
+            $logo = asset("images/proforma/milele_logo.png");
+                return view('quotation.showsignpage', ['quotation' => $quotation, 'pdfPath' => $pdfPath, 'logo' => $logo, 'filepath' => $quotation->file_path, 'qoutation_id' => $quotation->id]);
+        }
+            }
+    public function submitSignature(Request $request)
+    {
+        $pdfPath = $request->input('pdf_path');
+        $quotationId = $request->input('qoutation_id');
+        $signatureData = $request->input('signature_data');
+        $decodedImage = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $signatureData)); // Remove data URL prefix
+        $pngImagePath = storage_path('app/public/signatures/') . uniqid() . '.png';
+        file_put_contents($pngImagePath, $decodedImage);
+        $pdf = new Fpdi();
+        $pageCount = $pdf->setSourceFile(public_path('storage/quotation_files/' . basename($pdfPath)));
+        for ($pageNumber = 1; $pageNumber <= $pageCount; $pageNumber++) {
+            $pdf->AddPage();
+            $templateId = $pdf->importPage($pageNumber);
+            $pdf->useTemplate($templateId);
+            $text = $this->extractTextFromPage($pdfPath, $pageNumber);
+            $signatureY = $this->calculateSignaturePosition($pdf, $pageNumber, $text);
+            $x = 100;
+            $pdf->Image($pngImagePath, $x, $signatureY, 50, 20);
+        }
+        $outputPath = public_path('storage/quotation_files/' . basename($pdfPath)); // Use the same filename as the original PDF
+        $pdf->Output($outputPath, 'F');
+        unlink($pngImagePath);
+        $quotation = Quotation::find($quotationId);
+        $quotation->signature_status = "Signed";
+        $quotation->signature_link = null;
+        $quotation->save();
+        return redirect()->back()->with('success', 'Thank you! Your signature has been successfully submitted.');
     }
+private function calculateSignaturePosition($pdf, $pageNumber, $text)
+{
+    $pageHeight = $pdf->getPageHeight();
+    $signatureY = $pageHeight - 30;
+    return $signatureY;
+}
+
+private function extractTextFromPage($pdfPath, $pageNumber)
+{
+    $parser = new Parser();
+    $pdf = $parser->parseFile(public_path('storage/quotation_files/' . basename($pdfPath)));
+    $pages = $pdf->getPages();
+    if (isset($pages[$pageNumber])) {
+        $text = $pages[$pageNumber]->getText();
+        return $text;
+    } else {
+        return 'Page not found';
+    }
+}
+public function getVehiclesvins(Request $request)
+{
+    $RowId = $request->input('RowId');
+    $quotationItem = QuotationItem::where('uuid', $RowId)->first();
+    switch ($quotationItem->reference_type) {
+        case 'App\Models\Varaint':
+            $vehicles = Vehicles::where('varaints_id', $quotationItem->reference_id)
+                   ->where(function ($query) {
+                       $query->whereNull('reservation_end_date')
+                             ->orWhere('reservation_end_date', '<', Carbon::now());
+                   })
+                   ->whereNull('so_id')
+                   ->get();
+            break;
+        case 'App\Models\MasterModelLines':
+            $variants = Varaint::where('id', $quotationItem->reference_id)->get();
+            $vehicles = Vehicles::whereIn('varaints_id', $variants->pluck('id'))->where(function ($query) {
+                $query->whereNull('reservation_end_date')
+                      ->orWhere('reservation_end_date', '<', Carbon::now());
+            })
+            ->whereNull('so_id')
+            ->get();
+            break;
+        case 'App\Models\Brand':
+            $masterModelLines = MasterModelLines::where('id', $quotationItem->reference_id)->get();
+            $variants = Varaint::whereIn('master_model_lines_id', $masterModelLines->pluck('id'))->get();
+            $vehicles = Vehicles::whereIn('varaints_id', $variants->pluck('id'))->where(function ($query) {
+                $query->whereNull('reservation_end_date')
+                      ->orWhere('reservation_end_date', '<', Carbon::now());
+            })
+            ->whereNull('so_id')
+            ->get();
+            break;
+        default:
+            $vehicles = [];
+            break;
+    }
+    return response()->json(['vehicles' => $vehicles]);
+}
 }

@@ -5,6 +5,13 @@
      div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
+.my-select2-dropdown {
+    z-index: 99999;
+}
+
+.select2-search__field {
+    z-index: 99999;
+}
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
   padding: 4px 8px 4px 8px;
   text-align: center;
@@ -132,7 +139,6 @@
           <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body p-4">
-          <!-- Table for VIN and Action columns -->
           <table class="table">
             <thead>
               <tr>
@@ -141,13 +147,15 @@
               </tr>
             </thead>
             <tbody id="vinTableBody">
-              <!-- VIN and Action rows will be dynamically added here -->
             </tbody>
           </table>
-
-          <!-- Text field and "Add More" button -->
           <div class="mb-3">
-            <label for="vinInput" class="form-label">VIN</label>
+            <label for="vinInput" class="form-label">Stock VIN</label>
+            <select id="vehicle-dropdown" class="form-control">
+                </select>
+                </div>
+            <div class="mb-3">
+            <label for="vinInput" class="form-label">Custom VIN</label>
             <input type="text" class="form-control" id="vinInput">
           </div>
           <button type="button" class="btn btn-primary btn-sm" onclick="addVinRow()">Add</button>
@@ -217,8 +225,10 @@
     </form>
   </div>
   </div>
-    <form action="{{ route('quotation-items.store') }}" id="form-create" method="POST" >
+  <form action="{{ route('quotation-items.update', ['quotation_item' => $quotation->id]) }}" id="form-create" method="POST">
         @csrf
+        @method('PUT')
+        <input type="hidden" name="quotationid" value="{{$quotation->id}}"/>
         <div class="row">
             <div class="col-sm-4">
                 <div class="row">
@@ -2123,17 +2133,14 @@
             $('#kits_model_description').empty().append('<option value="">Select Model Description</option>');
         }
     });
-    var quotationItems = @json($quotationItems ?? []);
     var secondTable = $('#dtBasicExample2').DataTable({
         searching: false,
         paging: false,
         scrollY: false,
         sorting: false,
-        data: quotationItems,
         columnDefs: [
             {
     targets: -1,
-    data: null,
             render: function (data, type, row, index) {
                 var directAdd = 'Direct-Add';
                 var removeButtonHtml = '<button type="button" class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
@@ -2148,11 +2155,11 @@
             },
             {
                 targets: -2,
-                data: null,
                 render: function (data, type, row) {
                     var price = "";
                     var uuid = "";
                     var addon = 0;
+                    var itemid = row.itemid ? row.itemid : "";
                     if(row['button_type'] == 'Vehicle') {
                         var price = row[8];
                         var uuid = row['number'];
@@ -2166,8 +2173,13 @@
                         var uuid = row['rowId'];
                         var addon = 1;
                     }
+                    if(row['edit_page'] == 'editpage')
+                    {
+                    var price = row[8];
+                    }
                     // calculate
-                    var amount = price * 1;
+                    var quantityValue = row.qty ? row.qty : 1;
+                    var amount = price * quantityValue;
                     if(row['table_type'] == 'vehicle-table') {
                         var uuid = row['number'];
                         // $('#checkbox-'+ row['index']).prop('disabled', true);
@@ -2176,22 +2188,22 @@
                         var addon = 1;
                         var uuid = row['rowId'];
                     }
-
                     return '<input type="hidden" name="addon_types[]" value="'+ row['addon_type'] +'" > <input type="hidden" name="brand_ids[]" value="'+ row['brand_id'] +'" >' +
                         '<input type="hidden" name="model_line_ids[]" value="'+ row['model_line_id'] +'" >' +
                         '<input type="hidden" name="model_description_ids[]" value="'+ row['model_description_id'] +'" >' +
                         '<input type="hidden" name="is_addon[]" value="'+ addon +'" ><input type="hidden" value="'+ row['model_type'] +'" name="types[]" >' +
                         '<input type="hidden" name="uuids[]" value="'+ uuid +'" > <input type="hidden" name="reference_ids[]" value="'+ row['id'] +'"  >' +
+                        '<input type="hidden" name="vehiclesitemsid[]" value="'+ itemid +'" >'+
                         '<input type="text"  value="'+ amount +'" class="total-amount-editable form-control" name="total_amounts[]" id="total-amount-'+ row['index'] +'" readonly />'+
                         '<input type="hidden" name="vinnumbers[]" value="' + row['hiddenVIN'] + '" />' ;
                 }
             },
             {
                 targets: -5,
-                data: null,
                 render: function (data, type, row) {
+                    var systemcode = row.systemcode ? row.systemcode : 1;
                     return '<div class="input-group"> ' +
-                                '<input type="number" min="0"  value="1" step="1" class="system-code form-control"  name="system_code_amount[]"  id="system-code-amount-'+ row['index'] +'" />' +
+                                '<input type="number" min="0"  value="' + systemcode + '" step="1" class="system-code form-control"  name="system_code_amount[]"  id="system-code-amount-'+ row['index'] +'" />' +
                                 '<div class="input-group-append"> ' +
                                     '<select class="form-control system-code-currency" name="system_code_currency[]"  id="system-code-currency-'+ row['index'] +'">' +
                                         '<option value="A">A</option><option value="U">U</option>' +
@@ -2202,14 +2214,13 @@
             },
             {
                 targets: -3,
-                data: null,
                 render: function (data, type, row) {
-                    return '<input type="number" min="0"  value="1" step="1" class="qty-editable form-control" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)"  required name="quantities[]"  id="quantity-'+ row['index'] +'" />';
-                }
+                var quantityValue = row.qty ? row.qty : 1;
+                return '<input type="number" min="0" value="' + quantityValue + '" step="1" class="qty-editable form-control" onkeypress="return /[0-9a-zA-Z]/i.test(event.key)" required name="quantities[]" id="quantity-' + row['index'] + '" />';
+            }
             },
             {
                 targets: -7,
-                data: null,
                 render: function (data, type, row) {
                     var combinedValue = "";
                     var tableType = row['button_type'];
@@ -2219,7 +2230,6 @@
                         var interiorColor = row[6];
                         var exteriorColor = row[7];
                         var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
-
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
                         combinedValue = row[2]+', '+row[3];
@@ -2228,6 +2238,7 @@
                         combinedValue = row[2] + ' , ' + row[3];
 
                     }else if(row['button_type'] == 'Direct-Add') {
+                        console.log(row['button_type']);
                         var comma0 = comma1 = comma2 = comma3 = comma4 = comma5 = ", ";
                         if(row[1] == "") {
                             var comma0 = " ";
@@ -2247,12 +2258,20 @@
                         if(row[6] == "") {
                             var comma5 = " ";
                         }
-                        combinedValue =  row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5]+ comma5 + row[6];
-                        if(row['table_type'] !== 'vehicle-table') {
-
-                            combinedValue = row[0] + comma0 + combinedValue;
+                        if(row['edit_page'] == 'editpage')
+                        {
+                        combinedValue =  row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5];
                         }
-
+                        else
+                        {
+                        combinedValue =  row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5]+ comma5 + row[6];
+                        }
+                        if(row['table_type'] !== 'vehicle-table') {
+                            if(row[0] != "")
+                            {
+                            combinedValue = row[0] + comma0 + combinedValue;
+                            }
+                        }
                         if(row['table_type'] == 'vehicle-table') {
                             var tableType = "Vehicle";
                         }
@@ -2260,7 +2279,7 @@
 
                     // $('#checkbox-2').attr('disabled', true);
                     var arrayIndex = row['index'] - 1;
-
+                    console.log(combinedValue);
                     return '<div class="row" style="flex-wrap: unset;margin-left: 2px;">' +
                         '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;" data-table-type="'+ tableType +'" name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide"' +
                         ' checked id="checkbox-'+ row['index'] +'"> ' +
@@ -2270,19 +2289,23 @@
             },
             {
                 targets: -6,
-                data: null,
                 render: function (data, type, row) {
                     var code = "";
                     if(row['button_type'] == 'Vehicle') {
                         var code = row[4];
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
-
                         var code = row[1];
                     }else if(row['button_type'] == 'Direct-Add') {
-
+                        if(row['edit_page'] == 'editpage')
+                        {
+                            var code = row[6]; 
+                        }
+                        else
+                        {
                         if(row[2] != 'Other') {
                             var code = row[2];
+                        }
                         }
                         if(row['table_type'] == 'vehicle-table' && row[6] != "") {
                             var code = row[6];
@@ -2297,7 +2320,6 @@
             },
             {
                 targets: -4,
-                data: null,
                 render: function (data, type, row) {
                     var price = "";
                     if(row['button_type'] == 'Vehicle') {
@@ -2306,6 +2328,10 @@
                         var price = row[4];
                     }else{
                         var price = row[4];
+                    }
+                    if(row['edit_page'] == 'editpage')
+                    {
+                    var price = row[8];
                     }
                     var currency = $('#currency').val();
 
@@ -2625,7 +2651,6 @@
         row['button_type'] = 'Direct-Add';
         row['index'] = index;
         row['number'] = uniqueNumber;
-
         if(tableType == 'kit-table' || tableType == 'spare-part-table' || tableType == 'accessories-table'){
             if(addonId != "") {
                 table.row.add(row).draw();
@@ -2635,12 +2660,9 @@
                 table.row.add(row).draw();
             }
         }
-
         $('.total-div').attr('hidden', false);
-
         enableOrDisableSubmit();
         showPriceInSelectedValue();
-
     });
     $(document).on('click', '.add-button', function() {
         var secondTable = $('#dtBasicExample2').DataTable();
@@ -3526,6 +3548,42 @@
   var vinData = JSON.parse(localStorage.getItem('vinData')) || {};
   $('#dtBasicExample2').on('click', '.vin-button', function () {
   var RowId = $(this).data('number');
+  $.ajax({
+    url: '/get-vehicles-vin',
+    type: 'POST',
+    data: {
+      RowId: RowId,
+      _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+    },
+    success: function(response) {
+  // Clear existing options
+  $('#vehicle-dropdown').empty();
+  
+  // Add placeholder option
+  $('#vehicle-dropdown').append($('<option>', {
+    value: '',
+    text: 'Please select Vin',
+    selected: true
+  }));
+
+  // Populate dropdown with vehicles
+  response.vehicles.forEach(function(vehicle) {
+    $('#vehicle-dropdown').append($('<option>', {
+      value: vehicle.vin,
+      text: vehicle.vin
+    }));
+  });
+  $('#vehicle-dropdown').select2({
+    dropdownCssClass: "my-select2-dropdown" // Add a custom class to the dropdown
+}).on('select2:open', function (e) {
+    $('.my-select2-dropdown').css('z-index', 99999); // Set a high z-index when the dropdown is opened
+});
+},
+    error: function(xhr, status, error) {
+      // Handle error
+      console.error(xhr.responseText);
+    }
+  });
   // Set the RowId in the modal trigger button
   $('#vinmodal').data('rowId', RowId);
   // Retrieve VINs from localStorage for the clicked row
@@ -3553,15 +3611,24 @@ $('#vinmodal').on('shown.bs.modal', function () {
   }
 
   function addVinRow(RowId) {
-    var RowId = $('#vinmodal').data('rowId');
-    var vinInput = $('#vinInput').val();
+  var RowId = $('#vinmodal').data('rowId');
+  var vinInput = $('#vinInput').val();
+  var selectedVehicle = $('#vehicle-dropdown').val();
+  if (selectedVehicle) {
+    vinInput = selectedVehicle;
+  }
+
+  if (vinInput !== '') {
     if (!vinData.hasOwnProperty(RowId)) {
       vinData[RowId] = [];
     }
     vinData[RowId].push(vinInput);
     populateModalTable(RowId);
-    $('#vinInput').val('');
   }
+  $('#vinInput').val('');
+  $('#vehicle-dropdown').val('');
+  $('#vehicle-dropdown option[value=""]').prop('selected', true).text('Please select Vin');
+}
   $(document).on('click', '.removeVinRow', function () {
   var RowId = $('#vinmodal').data('rowId');
   var vinToRemove = $(this).closest('tr').find('td:first').text();
@@ -3585,14 +3652,12 @@ function updateSecondTable(RowId, savedVins) {
     var data = secondTable.rows().data().toArray();
     for (var i = 0; i < data.length; i++) {
         var rowData = data[i];
-        console.log(rowData['number']);
         if (rowData['number'] === RowId) {
             var secondTableRow = secondTable.row(i);
             if (secondTableRow && secondTableRow.node()) {
                 var existingData = secondTableRow.data();
                 existingData['hiddenVIN'] = savedVins.join(', ');
                 secondTableRow.data(existingData).draw();
-                // console.log('Updated Row Data:', existingData);
                 return;
             }
         }
@@ -3800,19 +3865,15 @@ function updateSecondTable(RowId, savedVins) {
                 }
                 $('#total_in_selected_currency').val(totalAmount.toFixed(3));
                 if(currency == 'USD') {
-                    // USD TO AED CONVERSION
                     var value = '{{ $aed_to_usd_rate->value }}';
                     var total = parseFloat(totalAmount) * value;
                     $('#total').val(total.toFixed(3));
                 }else if(currency == 'EUR') {
-                    // EUR TO AED CONVERSION
                     var value = '{{ $aed_to_eru_rate->value }}';
                     var total = parseFloat(totalAmount) * value;
                     $('#total').val(total.toFixed(3));
                 }
-
                 enableOrDisableSubmit();
-
             }
             function enableOrDisableSubmit(){
                 var secondTable = $('#dtBasicExample2').DataTable();
@@ -3839,5 +3900,146 @@ function updateSecondTable(RowId, savedVins) {
 
                 });
             }
+    $(document).ready(function() {
+    var existingItemsJson = <?php echo $existingItemsJson; ?>;
+    var secondTable = $('#dtBasicExample2').DataTable();
+    existingItemsJson.forEach(function(existings) {
+    var description =  existings.description; 
+    var uniqueNumber = existings.uuid;
+    var row = [];
+        var addon = "";
+        var brand = "";
+        var modelLine = "";
+        var modelNumber = "";
+        var variant = "";
+        var interiorColor = "";
+        var exteriorColor = "";
+        row['brand_id'] = "";
+        row['model_line_id'] = "";
+        row['model_description_id'] = "";
+        row['addon_type'] = "";
+        row['rowId'] = "";
+        if(existings.addon_type === null)
+        {
+        if (existings.reference_type.length === 18) {
+            row['model_type'] = 'Vehicle';
+            row['table_type'] = 'vehicle-table';
+            code = existings.varaint.name; 
+        }
+        else if(existings.reference_type.length === 16)
+        {
+            row['model_type'] = 'Brand';
+            row['table_type'] = 'vehicle-table';
+            code = existings.varaint.name;  
+            addon = existings.varaint.name; 
+        }
+        else if(existings.reference_type.length === 27){
+            row['model_type'] = 'ModelLine';
+            row['table_type'] = 'vehicle-table';
+            code = existings.varaint.name; 
+            addon = existings.varaint.name; 
+        }
+        else 
+        {
+            if(existings.shippingdocuments != null)
+        {
+            code = existings.shippingdocuments.code;
+        }
+        else if (existings.otherlogisticscharges != null)
+        {
+            code = existings.otherlogisticscharges.code;
+        }
+        else if (existings.shippingcertification != null)
+        {
+            code = existings.shippingcertification.code;
+        }
+            row['model_type'] = 'Other'; 
+        }
+        if (existings.quotation_vins && Array.isArray(existings.quotation_vins)) {
+            var vins = [];
+            existings.quotation_vins.forEach(function(quotationVin) {
+                var vin = quotationVin.vin;
+                vins.push(vin);
+            });
+            var hiddenVIN = vins.join(', ');
+            row['hiddenVIN'] = hiddenVIN;
+            var RowId = existings.uuid;
+            var vinData = JSON.parse(localStorage.getItem('vinData')) || {};
+            vinData[RowId] = vins;
+            localStorage.setItem('vinData', JSON.stringify(vinData));
+        }
+        }
+        else
+        {
+        if(existings.addon_type === "P")
+        {
+        row['table_type'] = 'accessories-table';
+        code = existings.addon.addon_code;
+        row['model_type'] = 'Accessory';
+        }
+        if(existings.addon_type === "SP")
+        {
+        row['table_type'] = 'spare-part-table';
+        code = existings.addon.addon_code;
+        row['model_type'] = 'SparePart';
+        }
+        if(existings.addon_type === "K")
+        {
+        row['table_type'] = 'kit-table';
+        code = existings.addon.addon_code;
+        row['model_type'] = 'Kit';
+        }
+        }
+        row['brand_id'] = existings.brand_id;
+        row['model_line_id'] = existings.model_line_id;
+        row['id'] =  existings.brand_id;
+        row['addon_type'] = existings.addon_type;
+        row['model_description_id'] = existings.model_description_id;
+        row['qty'] = existings.quantity;
+        row['systemcode'] = existings.system_code_amount;
+        row['edit_page'] = 'editpage';
+        row['itemid'] = existings.id;
+        var index = secondTable.data().length + 1;
+        row.push(addon);
+        row.push(description);
+        row.push(modelLine);
+        row.push(modelNumber);
+        row.push(interiorColor);
+        row.push(exteriorColor);
+        row.push(code);
+        row.push(existings.unit_price);
+        row.push(existings.unit_price);
+        row['index'] = index;
+        row['number'] = uniqueNumber;
+        row['button_type'] = 'Direct-Add';
+        secondTable.row.add(row).draw();
+        $('.total-div').attr('hidden', false);
+        enableOrDisableSubmit();
+        showPriceInSelectedValue();
+        calculateTotalSum();
+    });
+    function showPriceInSelectedValue() {
+            var count = secondTable.data().length;
+            var currency = $('#currency').val();
+            if(count > 0) {
+                if (currency != 'AED') {
+                    var shippingMethod = $('.shipping_method:checked').val();
+                    if (shippingMethod == 'EXW') {
+                        $('.total-div').attr("hidden", false)
+                    } else {
+                        $('.total-div').attr("hidden", true)
+                    }
+                    $('#selected-currency-div').attr("hidden", false);
+                    $('#selected-currency').html(currency);
+
+                } else {
+                    $('.total-div').attr("hidden", false);
+                    $('#selected-currency-div').attr("hidden", true);
+                    $('#selected-currency').html("");
+                    $('#total_in_selected_currency').val(" ");
+                }
+            }
+        }
+});
         </script>
 @endpush

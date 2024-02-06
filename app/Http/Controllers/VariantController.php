@@ -747,4 +747,28 @@ public function savespecification(Request $request)
     return redirect()->route('variants.index')->with('message', 'Variant created successfully.');
     }
     }
+    public function getvariantsdetails($id)
+    {
+        $modifiedVariants = null; // Initialize $modifiedVariants variable
+        
+        $variants = Varaint::where('id', $id)->first();
+        if($variants->category === "Modified")
+        {
+            $modifiedVariants = ModifiedVariants::where('modified_varaint_id', $variants->id)->with('modifiedVariantItems', 'addon')->get();
+            $basevarintsid = ModifiedVariants::where('modified_varaint_id', $variants->id)->first();
+            $variantItems = VariantItems::where('varaint_id', $basevarintsid->base_varaint_id)->with('model_specification', 'model_specification_option')->get();
+        }
+        else
+        {
+            $variantItems = VariantItems::where('varaint_id', $id)->with('model_specification', 'model_specification_option')->get();
+        }
+        
+        info($variants->base_varaint_id);
+        
+        return response()->json([
+            'variants' => $variants,
+            'variantItems' => $variantItems,
+            'modifiedVariants' => $modifiedVariants ?? null,
+        ]);
+    }    
     }

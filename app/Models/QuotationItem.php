@@ -12,6 +12,30 @@ class QuotationItem extends Model
     {
         return $this->morphTo();
     }
+    public function quotationVins()
+{
+    return $this->hasMany(QuotationVins::class, 'quotation_items_id');
+}
+public function varaint()
+{
+    return $this->belongsTo(Varaint::class, 'reference_id');
+}
+public function addon()
+{
+    return $this->belongsTo(AddonDetails::class, 'reference_id');
+}
+public function shippingdocuments()
+{
+    return $this->belongsTo(ShippingDocuments::class, 'reference_id');
+}
+public function shippingcertification()
+{
+    return $this->belongsTo(ShippingCertification::class, 'reference_id');
+}
+public function otherlogisticscharges()
+{
+    return $this->belongsTo(OtherLogisticsCharges::class, 'reference_id');
+}
     public $appends = [
         'quotation_addon_items',
         'vehicle_unit_price',

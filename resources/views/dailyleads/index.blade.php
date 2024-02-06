@@ -213,7 +213,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                 <th>Priority</th>
-                  <th>Date</th>
+                  <th>Lead Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
@@ -696,7 +696,7 @@ input[type=number]::-webkit-outer-spin-button
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table" style = "width:100%;">
             <thead class="bg-soft-secondary">
                 <tr>
-                  <th>Date</th>
+                  <th>Lead Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
@@ -731,7 +731,7 @@ input[type=number]::-webkit-outer-spin-button
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table" style = "width:100%;">
             <thead class="bg-soft-secondary">
                 <tr>
-                  <th>Date</th>
+                  <th>Lead Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
@@ -766,7 +766,7 @@ input[type=number]::-webkit-outer-spin-button
             <table id="dtBasicExample4" class="table table-striped table-editable table-edits table" style = "width:100%;">
             <thead class="bg-soft-secondary">
                 <tr>
-                  <th>Date</th>
+                  <th>Lead Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
@@ -806,7 +806,7 @@ input[type=number]::-webkit-outer-spin-button
             <table id="dtBasicExample5" class="table table-striped table-editable table-edits table" style = "width:100%;">
             <thead class="bg-soft-secondary">
                 <tr>
-                  <th>Date</th>
+                  <th>Lead Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
@@ -849,7 +849,7 @@ input[type=number]::-webkit-outer-spin-button
             <table id="dtBasicExample6" class="table table-striped table-editable table-edits table" style = "width:100%;">
             <thead class="bg-soft-secondary">
                 <tr>
-                  <th>Date</th>
+                  <th>Lead Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
@@ -867,15 +867,15 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Qoutation Values</th>
                   <th>Qoutation Notes</th>
                   <th>View Qoutation</th>
-                  <th>Negotiation Date</th>
+                  <!-- <th>Negotiation Date</th>
                   <th>Negotiation Values</th>
                   <th>Negotiation Notes</th>
-                  <th>View Re-Qoutation</th>
+                  <th>View Re-Qoutation</th> -->
                   <th>Sales Date</th>
                   <th>Sales Values</th>
                   <th>Sales Notes</th>
                   <th>So Number</th>
-                  <th>Booking Vehicles</th>
+                  <!-- <th>Booking Vehicles</th> -->
                 </tr>
               </thead>
             </table>
@@ -896,7 +896,7 @@ input[type=number]::-webkit-outer-spin-button
             <table id="dtBasicExample7" class="table table-striped table-editable table-edits table" style = "width:100%;">
             <thead class="bg-soft-secondary">
                 <tr>
-                  <th>Date</th>
+                  <th>Lead Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
@@ -914,10 +914,10 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Qoutation Values</th>
                   <th>Qoutation Notes</th>
                   <th>View Qoutation</th>
-                  <th>Negotiation Date</th>
+                  <!-- <th>Negotiation Date</th>
                   <th>Negotiation Values</th>
                   <th>Negotiation Notes</th>
-                  <th>View Re-Qoutation</th>
+                  <th>View Re-Qoutation</th> -->
                   <th>Reject Date</th>
                   <th>Reject Reason</th>
                   <th>Reject Notes</th>
@@ -1866,38 +1866,42 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                     }
                 }
             },
-                {
-                    data: 'id',
-                    name: 'id',
-                    render: function (data, type, row) {
-    const bookingUrl = `{{ url('booking/create') }}/${data}`;
-    const qoutationUrlEdit = `{{ url('/proforma_invoice_edit/') }}/${data}`;
-    const soUrl = `{{ url('/saleorder/') }}/${data}`;
-    let salesOrderOption = '';
-    let signedlink = '';
-    if (row.signature_status === 'Signed') {
-        salesOrderOption = `<li><a class="dropdown-item" href="${soUrl}">Sales Order</a></li>`;
+            {
+    data: 'id',
+    name: 'id',
+    render: function (data, type, row) {
+        const bookingUrl = `{{ url('booking/create') }}/${data}`;
+        const quotationUrlEdit = `{{ url('/proforma_invoice_edit/') }}/${data}`;
+        const soUrl = `{{ url('/saleorder/') }}/${data}`;
+        const preorderUrl = `{{ url('/preorder/') }}/${data}`;
+        let salesOrderOption = '';
+        let booking = '';
+        let preorder = '';
+        let signedlink = '';
+        if (row.signature_status === 'Signed') {
+            salesOrderOption = `<li><a class="dropdown-item" href="${soUrl}">Sales Order</a></li>`;
+            booking = `<li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>`;
+            preorder = `<li><a class="dropdown-item" href="${preorderUrl}">Pre Order</a></li>`;
+        } else {
+            signedlink = `<li><a class="dropdown-item" href="#" onclick="opensignaturelink(${data})">Signature Link</a></li>`;
+        }
+        return `
+            <div class="dropdown">
+                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                    <i class="fa fa-bars" aria-hidden="true"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item"href="${quotationUrlEdit}">Update Quotation</a></li>
+                    ${booking}
+                    ${preorder}
+                    ${salesOrderOption}
+                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="openvins(${data})">VINs</a></li>
+                    ${signedlink}
+                </ul>
+            </div>`;
     }
-    else
-    {
-      signedlink = `<li><a class="dropdown-item" href="#" onclick="opensignaturelink(${data})">Signature Link</a></li>`;
-    }
-    return `
-        <div class="dropdown">
-            <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
-                <i class="fa fa-bars" aria-hidden="true"></i>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>
-                <li><a class="dropdown-item"href="${qoutationUrlEdit}">Update Qoutation</a></li>
-                ${salesOrderOption} <!-- Include the salesOrderOption here -->
-                <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
-                <li><a class="dropdown-item" href="#" onclick="openvins(${data})">VINs</a></li>
-                ${signedlink}
-            </ul>
-        </div>`;
-}
-                },
+},
             ]
         });
        dataTable5 =  $('#dtBasicExample5').DataTable({
@@ -2185,42 +2189,42 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
         }
     }
 },
-                { data: 'ndate', name: 'ndate', searchable: false},
-                { data: 'ndealvalues', name: 'ndealvalues', searchable: false},
-                {
-    data: 'nsalesnotes',
-    name: 'nsalesnotes',
-    searchable: false,
-    render: function (data, type, row) {
-        const maxLength = 20;
-        const uniqueId = 'nsalesnotes_' + row.id;
+//                 { data: 'ndate', name: 'ndate', searchable: false},
+//                 { data: 'ndealvalues', name: 'ndealvalues', searchable: false},
+//                 {
+//     data: 'nsalesnotes',
+//     name: 'nsalesnotes',
+//     searchable: false,
+//     render: function (data, type, row) {
+//         const maxLength = 20;
+//         const uniqueId = 'nsalesnotes_' + row.id;
 
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
-{
-    data: 'nfile_path',
-    name: 'nfile_path',
-    searchable: false,
-    render: function (data, type, row) {
-        if (data) {
-            return `
-                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfilen('${data}')"></i>
-            `;
-        } else {
-            return '';
-        }
-    }
-},
+//         if (data && data.length > maxLength) {
+//             const truncatedText = data.substring(0, maxLength);
+//             return `
+//                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+//                 <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+//                 <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+//             `;
+//         } else {
+//             return `<span class="remarks-text">${data}</span>`;
+//         }
+//     }
+// },
+// {
+//     data: 'nfile_path',
+//     name: 'nfile_path',
+//     searchable: false,
+//     render: function (data, type, row) {
+//         if (data) {
+//             return `
+//                 <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfilen('${data}')"></i>
+//             `;
+//         } else {
+//             return '';
+//         }
+//     }
+// },
                 { data: 'cdate', name: 'cdate', searchable: false},
                 { data: 'cdealvalues', name: 'ndealvalues', searchable: false},
                 {
@@ -2244,18 +2248,18 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
     }
 },
                 { data: 'so_number', name: 'so_number', searchable: false},
-                {
-    data: 'id',
-    name: 'id',
-    searchable: false,
-    render: function (data, type, row) {
-        const bookingUrl = `{{ url('booking/create') }}/${data}`;
-        return `
-            <a class="btn btn-sm btn-info" href="${bookingUrl}" title="Booking">
-                <i class="fa fa-car" aria-hidden="true"></i>
-            </a>`;
-    }
-},
+//                 {
+//     data: 'id',
+//     name: 'id',
+//     searchable: false,
+//     render: function (data, type, row) {
+//         const bookingUrl = `{{ url('booking/create') }}/${data}`;
+//         return `
+//             <a class="btn btn-sm btn-info" href="${bookingUrl}" title="Booking">
+//                 <i class="fa fa-car" aria-hidden="true"></i>
+//             </a>`;
+//     }
+// },
             ]
         });
         dataTable7 =   $('#dtBasicExample7').DataTable({
@@ -2371,42 +2375,42 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
         }
     }
 },
-                { data: 'ndate', name: 'ndate', searchable: false},
-                { data: 'ndealvalues', name: 'ndealvalues', searchable: false},
-                {
-    data: 'nsalesnotes',
-    name: 'nsalesnotes',
-    searchable: false,
-    render: function (data, type, row) {
-        const maxLength = 20;
-        const uniqueId = 'nsalesnotes_' + row.id;
+//                 { data: 'ndate', name: 'ndate', searchable: false},
+//                 { data: 'ndealvalues', name: 'ndealvalues', searchable: false},
+//                 {
+//     data: 'nsalesnotes',
+//     name: 'nsalesnotes',
+//     searchable: false,
+//     render: function (data, type, row) {
+//         const maxLength = 20;
+//         const uniqueId = 'nsalesnotes_' + row.id;
 
-        if (data && data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
-{
-    data: 'nfile_path',
-    name: 'nfile_path',
-    searchable: false,
-    render: function (data, type, row) {
-        if (data) {
-            return `
-                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfilen('${data}')"></i>
-            `;
-        } else {
-            return '';
-        }
-    }
-},
+//         if (data && data.length > maxLength) {
+//             const truncatedText = data.substring(0, maxLength);
+//             return `
+//                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+//                 <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+//                 <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+//             `;
+//         } else {
+//             return `<span class="remarks-text">${data}</span>`;
+//         }
+//     }
+// },
+// {
+//     data: 'nfile_path',
+//     name: 'nfile_path',
+//     searchable: false,
+//     render: function (data, type, row) {
+//         if (data) {
+//             return `
+//                 <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfilen('${data}')"></i>
+//             `;
+//         } else {
+//             return '';
+//         }
+//     }
+// },
                 { data: 'rdate', name: 'rdate', searchable: false},
                 { data: 'reason', name: 'reason', searchable: false },
                 {
