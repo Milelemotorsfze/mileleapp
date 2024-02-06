@@ -5,6 +5,9 @@
     background-color: white !important;
     border: 1px solid black  !important;
 }
+.short-text {
+  display: none;
+}
 .upernac {
     margin-top: 1.8rem!important;
 }
@@ -65,6 +68,14 @@
             <div class="card-body">
             <div class="row">
     <div class="col-lg-9 col-md-6 col-sm-12">
+    <div class="row">
+        <div class="col-lg-2 col-md-3 col-sm-12">
+        <label for="choices-single-default" class="form-label"><strong>PO Type</strong></label>
+    </div>
+    <div class="col-lg-6 col-md-9 col-sm-12">
+        <span>{{ $purchasingOrder->po_type }}</span>
+    </div>
+        </div>
         <div class="row">
         <div class="col-lg-2 col-md-3 col-sm-12">
         <label for="choices-single-default" class="form-label"><strong>PO Date</strong></label>
@@ -87,6 +98,46 @@
     </div>
     <div class="col-lg-6 col-md-9 col-sm-12">
         <span>{{ count($vehicles) }}</span>
+    </div>
+        </div>
+        <div class="row">
+        <div class="col-lg-2 col-md-3 col-sm-12">
+        <label for="choices-single-default" class="form-label"><strong>Payment Terms</strong></label>
+    </div>
+    <div class="col-lg-6 col-md-9 col-sm-12">
+        <span>{{ $paymentterms->name }} - {{ $paymentterms->description }}</span>
+    </div>
+        </div>
+        <div class="row">
+        <div class="col-lg-2 col-md-3 col-sm-12">
+        <label for="choices-single-default" class="form-label"><strong>Total Cost</strong></label>
+    </div>
+    <div class="col-lg-6 col-md-9 col-sm-12">
+        <span>{{ $purchasingOrder->totalcost }} - {{ $purchasingOrder->currency }}</span>
+    </div>
+        </div>
+        <div class="row">
+        <div class="col-lg-2 col-md-3 col-sm-12">
+        <label for="choices-single-default" class="form-label"><strong>Shipping Method</strong></label>
+    </div>
+    <div class="col-lg-6 col-md-9 col-sm-12">
+        <span>{{$purchasingOrder->shippingmethod}}</span>
+    </div>
+        </div>
+        <div class="row">
+        <div class="col-lg-2 col-md-3 col-sm-12">
+        <label for="choices-single-default" class="form-label"><strong>Shipping Cost</strong></label>
+    </div>
+    <div class="col-lg-6 col-md-9 col-sm-12">
+        <span>{{$purchasingOrder->shippingcost}}</span>
+    </div>
+        </div>
+        <div class="row">
+        <div class="col-lg-2 col-md-3 col-sm-12">
+        <label for="choices-single-default" class="form-label"><strong>POL / POD / FD</strong></label>
+    </div>
+    <div class="col-lg-6 col-md-9 col-sm-12">
+        <span>{{$purchasingOrder->pol}} / {{$purchasingOrder->pod}} / {{$purchasingOrder->fd}}</span>
     </div>
         </div>
         <div class="row">
@@ -332,6 +383,7 @@
                                 <th>Model Line</th>
                                 <th>Variant</th>
                                 <th>Variants Detail</th>
+                                <th>Price</th>
                                 <th  style="vertical-align: middle;" id="int_color">Exterior Color</th>
                                 <th  style="vertical-align: middle;" id="ex_color">Interior Color</th>
                                 <th>VIN Number</th>
@@ -369,7 +421,12 @@
                             <td>{{ ucfirst(strtolower($vehicles->variant->brand->brand_name)) }}</td>
                             <td>{{ ucfirst(strtolower($vehicles->variant->master_model_lines->model_line)) }}</td>
                             <td>{{ ucfirst($vehicles->variant->name) }}</td>
-                            <td>{{ ucfirst(strtolower($vehicles->variant->detail)) }}</td>
+                            <td>
+                            <span class="full-text">{{ ucfirst(strtolower($vehicles->variant->detail)) }}</span>
+                            <span class="short-text"></span>
+                            <a href="#" class="read-more">Read more</a>
+                          </td>
+                          <td>{{ ucfirst($vehicles->VehiclePurchasingCost->unit_price) }}</td>
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                             @endphp
@@ -650,15 +707,16 @@
                     <table id="dtBasicExampledata" class="table table-striped table-editable table-edits table table-bordered">
                 <thead class="bg-soft-secondary">
                             <tr >
+                            <th>Variants</th>
                             <th>Brand</th>
                                 <th>Model Line</th>
-                                <th>Variants</th>
-                                <th>Variants Detail</th>
                                 <th>Exterior Color</th>
                                 <th>Interior Color</th>
+                                <th>Unit Price</th>
+                                <th>Estimated Arrival</th>
+                                <th>Engine Number</th>
                                 <th>VIN</th>
                                 <th>Territory</th>
-                                <th>Estimated Arrival</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
@@ -680,6 +738,7 @@
                 <div class="col-lg-1 col-md-6">
                 <label for="QTY" class="form-label">Brand:</label>
                 <input type="text" id="brands_id" name="brands_id" class="form-control" placeholder="Brand" readonly>
+                <input type="hidden" id="currency" name="currency" class="form-control" readonly value="{{$purchasingOrder->currency}}">
             </div>
             <div class="col-lg-3 col-md-6">
                 <label for="QTY" class="form-label">Model Line:</label>
@@ -688,6 +747,10 @@
             <div class="col-lg-4 col-md-6">
                 <label for="QTY" class="form-label">Variants Detail:</label>
                 <input type="text" id="details" name="details" class="form-control" placeholder="Variants Detail" readonly>
+            </div>
+            <div class="col-lg-1 col-md-6">
+            <label for="unitprice" class="form-label">Unit Price:</label>
+        <input type="number" id="unit_price" name="unit_price" class="form-control" placeholder="Unit Price">
             </div>
             <div class="col-lg-1 col-md-6">
                 <label for="QTY" class="form-label">QTY:</label>
@@ -1175,6 +1238,8 @@ fetch('{{ route('purchasing.updateData') }}', {
         return;
     }
     var qty = $('#QTY').val();
+    var unitPrice = $('#unit_price').val();
+    console.log(unitPrice);
     var detail = variantOption.data('detail');
     var brand = variantOption.data('brands_id');
     var masterModelLine = variantOption.data('master_model_lines_id');
@@ -1189,36 +1254,34 @@ fetch('{{ route('purchasing.updateData') }}', {
             var variantCol = $('<td><input type="hidden" name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>' + selectedVariant + '</td>');
             var brandCol = $('<td>' + brand + '</td>');
             var masterModelLineCol = $('<td>' + masterModelLine + '</td>');
-            var detailCol = $('<td>' + detail + '</td>');
             var estimatedCol = $('<td><input type="date" name="estimated_arrival[]" class="form-control"></td>');
             var territoryCol = $('<td><input type="text" name="territory[]" class="form-control"></td>');
             var exColourCol = $('<td><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></td>');
             var intColourCol = $('<td><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></td>');
+            var unitPriceCol = $('<td><input type="text" name="unit_prices[]" value="' + unitPrice + '" class="form-control" readonly></td>');
             var vinCol = $('<td><input type="text" name="vin[]" class="form-control" placeholder="VIN"></td>');
+            var territory = $('<td><input type="text" name="territory[]" class="form-control"></td>');
+            var engineCol = $('<td><input type="text" name="engine_number[]" class="form-control" placeholder="Engine"></td>');
             var removeBtnCol = $('<td><button type="button" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></td>');
-// Populate Exterior Colors dropdown
-var exColourDropdown = exColourCol.find('select');
+             var exColourDropdown = exColourCol.find('select');
             for (var id in exColours) {
                 if (exColours.hasOwnProperty(id)) {
                     exColourDropdown.append($('<option></option>').attr('value', id).text(exColours[id]));
                 }
             }
-            // Populate Interior Colors dropdown
             var intColourDropdown = intColourCol.find('select');
             for (var id in intColours) {
                 if (intColours.hasOwnProperty(id)) {
                     intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
                 }
             }
-
-            newRow.append(brandCol, masterModelLineCol, variantCol, detailCol, exColourCol, intColourCol, vinCol, territoryCol, estimatedCol, removeBtnCol);
+            newRow.append(variantCol, brandCol, masterModelLineCol,exColourCol, intColourCol, unitPriceCol, estimatedCol,engineCol, vinCol, territory, removeBtnCol);
             $('#dtBasicExampledata tbody').append(newRow);
         }
         $('#variants_id').val('');
         $('#QTY').val('');
         $('#variantRowsContainer').show();
     });
-
     $(document).on('click', '.remove-row-btn', function() {
     var rowToRemove = $(this).closest('tr');
     var variant = rowToRemove.find('input[name="variant_id[]"]').val();
@@ -1514,5 +1577,28 @@ console.log(data);
       window.location.reload();
     });
 }
+$(document).ready(function() {
+  var maxLength = 50;
+  var $text = $('.full-text');
+  var $shortText = $('.short-text');
+  var fullText = $text.text();
+  var shortText = fullText.substr(0, maxLength);
+  $text.text(shortText);
+  $shortText.text(fullText.substring(maxLength));
+  
+  $('.read-more').click(function(event) {
+    event.preventDefault();
+    var $this = $(this);
+    if ($this.text() === 'Read more') {
+      $this.text('Read less');
+      $text.hide();
+      $shortText.show();
+    } else {
+      $this.text('Read more');
+      $text.show();
+      $shortText.hide();
+    }
+  });
+});
 </script>
 @endsection

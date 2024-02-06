@@ -16,6 +16,7 @@ use App\Models\Brand;
 use App\Models\MasterModelLines;
 use App\Models\Supplier;
 use App\Models\Vehicles;
+use App\Models\VehiclePurchasingCost;
 use App\Models\Movement;
 use App\Models\PaymentTerms;
 use App\Models\PaymentLog;
@@ -243,7 +244,7 @@ public function getBrandsAndModelLines(Request $request)
         $purchasingOrder->po_date = $poDate;
         $purchasingOrder->vendors_id = $vendors_id;
         $purchasingOrder->po_type = $po_type;
-//        $purchasingOrder->payment_term_id = $payment_term_id;
+        $purchasingOrder->payment_term_id = $request->input('payment_term_id');
         $purchasingOrder->currency = $request->input('currency');
         $purchasingOrder->shippingmethod = $request->input('shippingmethod');
         $purchasingOrder->shippingcost = $request->input('shippingcost');
@@ -280,8 +281,7 @@ public function getBrandsAndModelLines(Request $request)
             $estimated_arrival = $request->input('estimated_arrival');
             $engine_number = $request->input('engine_number');
             $territory = $request->input('territory');
-            $unit_prices = $request->input('unit_price');
-
+            $unit_prices = $request->input('unit_prices');
             $count = count($variantNames);
             foreach ($variantNames as $key => $variantName) {
                 if ($variantName === null && $key === $count - 1) {
@@ -290,12 +290,10 @@ public function getBrandsAndModelLines(Request $request)
                 $variantId = Varaint::where('name', $variantName)->pluck('id')->first();
                 $vin = $vins[$key];
                 $ex_colour = $ex_colours[$key];
-               info($key);
                 $unit_price = $unit_prices[$key];
                 $int_colour = $int_colours[$key];
                 $estimation_arrival = $estimated_arrival[$key];
                 $engine = $engine_number[$key];
-
                 $vehicle = new Vehicles();
                 $vehicle->varaints_id = $variantId;
                 $vehicle->vin = $vin;
@@ -315,8 +313,12 @@ public function getBrandsAndModelLines(Request $request)
                     $masterModelId = $request->input('master_model_id');
                     $vehicle->master_model_id = $masterModelId[$key];
                 }
-
                 $vehicle->save();
+                $vehiclecost = New VehiclePurchasingCost();
+                $vehiclecost->currency = $request->input('currency');
+                $vehiclecost->unit_price = $unit_price;
+                $vehiclecost->vehicles_id = $vehicle->id;
+                $vehiclecost->save();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                 $currentDateTime = Carbon::now($dubaiTimeZone);
                 $purchasinglog = new Purchasinglog();
@@ -369,6 +371,7 @@ public function getBrandsAndModelLines(Request $request)
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
         ->get();
     $purchasingOrder = PurchasingOrder::findOrFail($id);
+    $paymentterms = PaymentTerms::findorfail($purchasingOrder->payment_term_id);
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
     $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
     $vehicleslog = Vehicleslog::whereIn('vehicles_id', $vehicles->pluck('id'))->get();
@@ -379,7 +382,7 @@ public function getBrandsAndModelLines(Request $request)
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
-           ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog','purchasinglog'));
+           ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog','purchasinglog','paymentterms'));
     }
 
     public function edit($id)
@@ -418,6 +421,8 @@ public function getBrandsAndModelLines(Request $request)
         $int_colours = $request->input('int_colour');
         $estimated_arrival = $request->input('estimated_arrival');
         $territory = $request->input('territory');
+        $engine_number = $request->input('engine_number');
+        $unit_prices = $request->input('unit_prices');
         $count = count($variantNames);
         foreach ($variantNames as $key => $variantName) {
         if ($variantName === null && $key === $count - 1) {
@@ -426,8 +431,10 @@ public function getBrandsAndModelLines(Request $request)
         $variantId = Varaint::where('name', $variantName)->pluck('id')->first();
         $ex_colour = $ex_colours[$key];
         $int_colour = $int_colours[$key];
+        $engine = $engine_number[$key];
         $estimated_arrivals = $estimated_arrival[$key];
         $territorys = $territory[$key];
+        $unit_price = $unit_prices[$key];
         $vin = $vins[$key];
         $vehicle = new Vehicles();
         $vehicle->varaints_id = $variantId;
@@ -439,6 +446,11 @@ public function getBrandsAndModelLines(Request $request)
         $vehicle->purchasing_order_id = $purchasingOrderId;
         $vehicle->status = "New Vehicles";
         $vehicle->save();
+        $vehiclecost = New VehiclePurchasingCost();
+        $vehiclecost->currency = $request->input('currency');
+        $vehiclecost->unit_price = $unit_price;
+        $vehiclecost->vehicles_id = $vehicle->id;
+        $vehiclecost->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
         $purchasinglog = new Purchasinglog();
