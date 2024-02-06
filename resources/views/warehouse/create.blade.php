@@ -81,7 +81,7 @@ input[type=number]::-webkit-outer-spin-button {
             </div>
         @endif
         {!! Form::open(array('route' => 'purchasing-order.store','method'=>'POST', 'id' => 'purchasing-order')) !!}
-    <div class="row">
+<div class="row">
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">PO Date : </label>
@@ -90,7 +90,7 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">Payment Terms : </label>
-            <select name="payment_term_id" class="form-select" id="payment_term">
+            <select name="payment_term_id" class="form-select" id="payment_term" required>
                                 <option value="" selected>Select Payment Term</option>
                                 @foreach($payments as $payment)
                                     <option value="{{ $payment->id }}">{{ $payment->name }}</option>
@@ -126,6 +126,9 @@ input[type=number]::-webkit-outer-spin-button {
                                     <option value="JPY">JPY</option>
             </select>
         </div>
+        <div class="col-lg-2 col-md-6">
+        <div>Total Price: <span id="totalUnitPriceInput" style="font-weight: bold; font-size: larger;">0</span></div>
+</div>
     </div>
     <div id="variantRowsContainer" style="display: none;">
         <div class="bar">Stock Vehicles</div>
@@ -223,19 +226,20 @@ input[type=number]::-webkit-outer-spin-button {
           </div>
           <div class="col-lg-3 col-md-6">
               <label for="Incoterm" class="form-label">Port of Loading:</label>
-              <input type="number" id="pol" name="pol" class="form-control" placeholder="Port of Loading">
+              <input type="text" id="pol" name="pol" class="form-control" placeholder="Port of Loading">
           </div>
           <div class="col-lg-3 col-md-6">
               <label for="Incoterm" class="form-label">Port of Discharge:</label>
-              <input type="number" id="pod" name="pod" class="form-control" placeholder="Port of Discharge">
+              <input type="text" id="pod" name="pod" class="form-control" placeholder="Port of Discharge">
           </div>
           <div class="col-lg-3 col-md-6">
               <label for="Incoterm" class="form-label">Final Destination:</label>
-              <input type="number" id="fd" name="fd" class="form-control" placeholder="Final Destination">
+              <input type="text" id="fd" name="fd" class="form-control" placeholder="Final Destination">
           </div>
             </div>
             <br>
             <br>
+            <input type="hidden" name="totalcost" id="totalUnitPriceInputHidden" value="0">
     <div class="col-lg-12 col-md-12">
         <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" id="submit-button"/>
     </div>
@@ -279,6 +283,7 @@ $(document).ready(function() {
             $('#SelectVariantsId').val(selectedVariant);
         }
     });
+    var totalUnitPrice = 0;
     $('.add-row-btn').click(function() {
     var selectedVariant = $('#variants_id').val();
     var variantOption = $('#variantslist').find('option[value="' + selectedVariant + '"]');
@@ -304,12 +309,13 @@ $(document).ready(function() {
             var detailCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
             var exColourCol = $('<div class="col-lg-1 col-md-6"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
             var intColourCol = $('<div class="col-lg-1 col-md-6"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
-            var unitPriceCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="unit_price[]" value="' + unitPrice + '" class="form-control" readonly></div>'); // Add unit price
+            var unitPriceCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="unit_prices[]" value="' + unitPrice + '" class="form-control" readonly></div>'); // Add unit price
             var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
             var estimatedCol = $('<div class="col-lg-1 col-md-6"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
             var engineCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="engine_number[]" class="form-control" placeholder="Engine"></div>');
             var territory = $('<div class="col-lg-1 col-md-6"><input type="text" name="territory[]" class="form-control"></div>');
             var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
+            var unitPrice = parseFloat(unitPriceCol.find('input').val());
             // Populate Exterior Colors dropdown
             var exColourDropdown = exColourCol.find('select');
             for (var id in exColours) {
@@ -324,9 +330,12 @@ $(document).ready(function() {
                 intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
             }
         }
+        totalUnitPrice += unitPrice;
             newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, unitPriceCol, estimatedCol,engineCol, vinCol, territory, removeBtn);
             $('#variantRowsContainer').append(newRow);
         }
+        $('#totalUnitPriceInput').text(totalUnitPrice);
+        $('#totalUnitPriceInputHidden').val(totalUnitPrice);
         $('#variants_id').val('');
         $('#QTY').val('');
         $('#variantRowsContainer').show();
@@ -334,6 +343,8 @@ $(document).ready(function() {
 
     $(document).on('click', '.remove-row-btn', function() {
         var variant = $(this).closest('.row').find('input[name="variant_id[]"]').val();
+        var unitPriceToRemove = parseFloat($(this).closest('.row').find('input[name="unit_price[]"]').val());
+        totalUnitPrice -= unitPriceToRemove;
         var existingOption = $('#variantslist').find('option[value="' + variant + '"]');
         if (existingOption.length === 0) {
             var variantOption = $('<option value="' + variant + '">' + variant + '</option>');
@@ -345,6 +356,8 @@ $(document).ready(function() {
                 $(this).removeClass('row-space');
             }
         });
+        $('#totalUnitPriceInput').text(totalUnitPrice);
+        $('#totalUnitPriceInputHidden').val(totalUnitPrice);
         if ($('#variantRowsContainer').find('.row').length === 1) {
             $('.bar').hide();
             $('#variantRowsContainer').hide();
