@@ -379,6 +379,7 @@ Route::get('/d', function () {
     // Demand & Planning Module
 
     // suppliers
+    
     //    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
 
     // Demands
