@@ -10,6 +10,7 @@ use App\Models\PFI;
 use App\Models\Supplier;
 use App\Models\SupplierType;
 use App\Models\Varaint;
+use App\Models\PaymentTerms;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -49,8 +50,9 @@ class DemandPlanningPurchaseOrderController extends Controller
 
         $exColours = ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
         $intColours = ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
+        $paymentTerms = PaymentTerms::all();
         return view('purchase-order.create', compact('pfiVehicleVariants',
-            'exColours','intColours','pfi'));
+            'exColours','intColours','pfi','paymentTerms'));
     }
 
     /**

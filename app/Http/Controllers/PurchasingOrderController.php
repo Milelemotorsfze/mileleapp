@@ -230,7 +230,14 @@ public function getBrandsAndModelLines(Request $request)
      */
     public function store(Request $request)
     {
-//        dd($request->all());
+        
+        $this->validate($request, [
+            'payment_term_id' => 'required',
+            'po_type' => 'required',
+            'vendors_id' => 'required',
+            'po_number' => 'required'
+        ]);
+
         DB::beginTransaction();
 
         $useractivities =  New UserActivities();
@@ -930,7 +937,7 @@ public function paymentreleasesconfirm($id)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
-            if($vehicle->master_model_id) {
+            if($vehicle->model_id) {
                 // get the loi item and update the utilization quantity
                 $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
                     ->pluck('approved_loi_id');
@@ -940,7 +947,7 @@ public function paymentreleasesconfirm($id)
                     ->where('sfx', $vehicle->masterModel->sfx)->pluck('id')->toArray();
                 foreach ($loiItemIds as $loiItemId) {
                     $item = LetterOfIndentItem::find($loiItemId);
-                    if(in_array($item->master_model_id, $possibleIds)) {
+                    if(in_array($item->model_id, $possibleIds)) {
                         if($item->utilized_quantity < $item->approved_quantity) {
                             $item->utilized_quantity = $item->utilized_quantity + 1;
                             $item->save();
@@ -1155,17 +1162,17 @@ public function purchasingallupdateStatusrel(Request $request)
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
 
-            if($vehicle->master_model_id) {
+            if($vehicle->model_id) {
                 $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
                     ->pluck('approved_loi_id');
 
                 $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
-                $masterModel = MasterModel::find($vehicle->master_model_id);
+                $masterModel = MasterModel::find($vehicle->model_id);
                 $possibleIds = MasterModel::where('model', $masterModel->model)
                     ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
                 foreach ($loiItemIds as $loiItemId) {
                     $item = LetterOfIndentItem::find($loiItemId);
-                    if(in_array($item->master_model_id, $possibleIds)) {
+                    if(in_array($item->model_id, $possibleIds)) {
                         if($item->utilized_quantity < $item->approved_quantity) {
                             $item->utilized_quantity = $item->utilized_quantity + 1;
                             $item->save();

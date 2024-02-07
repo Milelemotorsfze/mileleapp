@@ -70,6 +70,7 @@
                         <input type="hidden" value="{{ $pfi->supplier_id }}" name="vendors_id">
                         <div class="col-lg-2 col-md-6 col-sm-12">
                             <div class="mb-3">
+                            <span class="error" style="color:red">* </span>
                                 <label for="choices-single-default" class="form-label font-size-13 ">PO Number</label>
                                 <input type="text" name="po_number" id="po_number" required class="form-control"  placeholder="Enter PO Number" value="{{old('po_number')}}">
                                 <span id="poNumberError" class="text-danger"></span>
@@ -77,11 +78,47 @@
                         </div>
                         <div class="col-lg-2 col-md-6 col-sm-12">
                             <div class="mb-3">
+                            <span class="error" style="color:red">* </span>
                                 <label for="choices-single-default" class="form-label font-size-13 ">PO Date</label>
-                                <input type="date" name="po_date" id="po_date" class="form-control" placeholder="Enter PO Date"
+                                <input type="date" name="po_date" id="po_date" class="form-control" required  placeholder="Enter PO Date"
                                        value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
                                 <span id="poDateError" class="text-danger"></span>
                             </div>
+                        </div>
+                        <div class="col-lg-2 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <span class="error" style="color:red">* </span>
+                                <label for="choices-single-default" class="form-label font-size-13 ">Payment Terms</label>
+                              <select name="payment_term_id" class="form-control" id="payment_term_id" required>
+                                @foreach($paymentTerms as $paymentTerm)
+                                    <option value="{{ $paymentTerm->id }}" >{{ $paymentTerm->name }}</option>
+                                @endforeach
+                              </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-6">
+                            <label for="basicpill-firstname-input" class="form-label">PO Type: </label>
+                            <select class="form-control" autofocus name="po_type" required>
+                                <option value="Normal">Normal</option>
+                                <option value="Payment Adjustment">Payment Adjustment</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-1 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label font-size-13 "> Vendor </label>
+                                <input type="text" class="form-control" readonly value="{{ $pfi->supplier->supplier ?? '' }}">
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                              
+                                <label for="choices-single-default" class="form-label font-size-13 "> Currency </label>
+                                <input type="text" class="form-control" name="currency" readonly value="{{ $pfi->currency ?? '' }}">
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-md-6">
+                            <label class="form-label">Total Unit Prices:</label>
+                            <input type="text" name="total_cost" class="form-control" readonly id="total-price" value="0" placeholder="Total Unit Price">
                         </div>
                     </div>
                     <div id="variantRowsContainer" style="display: none;">
@@ -187,6 +224,37 @@
                             </button>
                         </div>
                     </div>
+                    <div class="bar">Shipping</div>
+                    <div class="row">
+                        <div class="col-lg-1 col-md-6">
+                            <label for="Incoterm" class="form-label">Shipping Method:</label>
+                            <select class="form-control" id="shippingmethod" name="shippingmethod">
+                                <option value="EXW">EXW</option>    
+                                <option value="CNF">CNF</option>
+                                <option value="CIF">CIF</option>
+                                <option value="FOB">FOB</option>
+                                <option value="Local">Local</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-6">
+                            <label for="Incoterm" class="form-label">Shipping Cost:</label>
+                            <input type="number" id="shippingcost" name="shippingcost" class="form-control" placeholder="Shipping Cost">
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <label for="Incoterm" class="form-label">Port of Loading:</label>
+                            <input type="text" id="pol" name="pol" class="form-control" placeholder="Port of Loading">
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <label for="Incoterm" class="form-label">Port of Discharge:</label>
+                            <input type="text" id="pod" name="pod" class="form-control" placeholder="Port of Discharge">
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <label for="Incoterm" class="form-label">Final Destination:</label>
+                            <input type="text" id="fd" name="fd" class="form-control" placeholder="Final Destination">
+                        </div>
+                
+                    </div>
+                    <br><br>
                       <div class="row">
                           <button type="submit" class="btn btncenter btn-success" id="submit-button">Submit</button>
                       </div>
@@ -269,10 +337,12 @@
         // if(formValid == true) {
             $('.bar').show();
             var variantQuantity = '{{ $pfiVehicleVariants->count() }}';
+            var price = 0;
 
             // Move the declaration and assignment inside the click event function
             var exColours = <?= json_encode($exColours) ?>;
             var intColours = <?= json_encode($intColours) ?>;
+            var sum = $('#total-price').val();
             for (var i = 0; i < variantQuantity; i++) {
                 checkQuantity(i);
                 var qty = $('#quantity-'+i).val();
@@ -291,6 +361,9 @@
                 var existingQuantity =  $('#item-quantity-selected-'+dataid).val();
                 var latestQty = parseInt(existingQuantity) + parseInt(qty);
                 $('#item-quantity-selected-'+dataid).val(latestQty);
+                var unitPrices = price * qty;
+                var sum = parseInt(sum) + parseInt(unitPrices);
+                $('#total-price').val(sum);
 
                 for (var j = 0; j < qty; j++) {
                     var newRow = $('<div class="row row-space"></div>');
@@ -304,8 +377,8 @@
                     var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
                     var estimatedCol = $('<div class="col-lg-1 col-md-6"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
                     var engineNumber = $('<div class="col-lg-1 col-md-6"><input type="text" name="engine_number[]" class="form-control"></div>');
-                    var unitPrice = $('<div class="col-lg-1 col-md-6"><input type="text"  value="' + price + '" name="unit_price[]" readonly class="form-control"></div>');
-                    var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" data-approved-id="' + dataid + '" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
+                    var unitPrice = $('<div class="col-lg-1 col-md-6"><input type="text" value="' + price + '" name="unit_prices[]" readonly class="form-control"></div>');
+                    var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" data-unit-price="'+ price +'" data-approved-id="' + dataid + '" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
                     // Populate Exterior Colors dropdown
                     var exColourDropdown = exColourCol.find('select');
                     for (var id in exColours) {
@@ -322,6 +395,8 @@
                     }
                     newRow.append(masterModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol, removeBtn);
                     $('#variantRowsContainer').append(newRow);
+
+                    
                 }
             }
 
@@ -329,15 +404,15 @@
         // }
 
     });
+    
     $(document).on('click', '.remove-row-btn', function() {
 
         $(this).closest('.row').remove();
 
         var Id = $(this).attr('data-approved-id');
-
         var selectedQuantity = $('.qty-'+Id).val();
+       
         var variantQuantity = $('.qty-'+Id).attr('data-quantity');
-        console.log(variantQuantity);
         var remainingQty = parseInt(variantQuantity) + 1;
         $('.qty-'+Id).attr('data-quantity',remainingQty);
 
@@ -351,6 +426,12 @@
             $('.bar').hide();
             $('#variantRowsContainer').hide();
         }
+
+        var price = $(this).attr('data-unit-price');
+        var totalPrice = $('#total-price').val();
+        var remainingPrice = totalPrice - price;
+        $('#total-price').val(remainingPrice);
+  
     });
     $('#po_number').on('change', function() {
         var poNumber = $('#po_number').val();
