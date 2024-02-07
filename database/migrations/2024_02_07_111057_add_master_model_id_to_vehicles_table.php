@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('vehicles', function (Blueprint $table) {
-            $table->renameColumn('master_model_id', 'test_id');
-            
+            $table->bigInteger('model_id')->unsigned()->index()->nullable()->after('varaints_id');
+            $table->foreign('model_id')->references('id')->on('master_models');
         });
     }
 
@@ -23,7 +23,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('vehicles', function (Blueprint $table) {
-            $table->renameColumn('test_id', 'master_model_id');
+            $table->dropIndex(['model_id']);
+            $table->dropForeign(['model_id']);
+            $table->dropColumn(['model_id']);
         });
     }
 };
