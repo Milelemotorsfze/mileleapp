@@ -311,7 +311,7 @@ public function getBrandsAndModelLines(Request $request)
                 // payment status need to update
                 if($request->input('master_model_id')) {
                     $masterModelId = $request->input('master_model_id');
-                    $vehicle->master_model_id = $masterModelId[$key];
+                    $vehicle->model_id = $masterModelId[$key];
                 }
                 $vehicle->save();
                 $vehiclecost = New VehiclePurchasingCost();
