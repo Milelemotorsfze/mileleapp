@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Models\Master;
+namespace App\Models\Masters;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SeperationTypes extends Model
+class SeparationReplacementTypes extends Model
 {
     use HasFactory;
-    protected $table = "seperation_types";
+    protected $table = "separation_replacement_types";
     protected $fillable = [
         'name',
     ];
