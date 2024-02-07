@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\HRM\Employee\Separation;
-use App\Models\Masters\SeperationTypes;
+use App\Models\Masters\SeparationTypes;
 use App\Models\Masters\SeparationReplacementTypes;
+use App\Models\User;
 
 class SeparationController extends Controller
 {
@@ -15,9 +16,9 @@ class SeparationController extends Controller
         $employees = User::whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
-        $separationTypes = SeperationTypes::all();
+        $separationTypes = SeparationTypes::all();
         $replacementTypes = SeparationReplacementTypes::all();
-        return view('hrm.overtime.create',compact('employees','separationTypes','replacementTypes'));
+        return view('hrm.separation.create',compact('employees','separationTypes','replacementTypes'));
     }
     public function index() {
         $pendings = Separation::where('status','pending');
@@ -44,6 +45,6 @@ class SeparationController extends Controller
             $rejected = $rejected->where('employee_id',$authId)->latest();
         }
         $rejected =$rejected->get();
-        return view('hrm.seperation.index',compact('pendings','approved','rejected'));
+        return view('hrm.separation.index',compact('pendings','approved','rejected'));
     }
 }
