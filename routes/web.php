@@ -19,6 +19,7 @@ use App\Http\Controllers\HRM\Employee\TicketAllowancePOController;
 use App\Http\Controllers\HRM\Employee\InsuranceController;
 use App\Http\Controllers\HRM\Employee\IncrementController;
 use App\Http\Controllers\HRM\Employee\OverTimeController;
+use App\Http\Controllers\HRM\Employee\SeparationController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -378,6 +379,13 @@ Route::get('/d', function () {
         Route::post('overtime_request_action', 'requestAction')->name('overtimeRequest.action');
         Route::get('overtime_approval_awaiting', 'approvalAwaiting')->name('overtime.approvalAwaiting');
     });
+     // Employee Overtime Application
+     Route::resource('separation-handover', SeparationController::class);
+    //  Route::controller(OverTimeController::class)->group(function(){
+    //      Route::post('checkOvertimeAlreadyExist', 'checkOvertimeAlreadyExist')->name('overtime.checkOvertimeAlreadyExist');
+    //      Route::post('overtime_request_action', 'requestAction')->name('overtimeRequest.action');
+    //      Route::get('overtime_approval_awaiting', 'approvalAwaiting')->name('overtime.approvalAwaiting');
+    //  });
     // Demand & Planning Module
 
     // suppliers

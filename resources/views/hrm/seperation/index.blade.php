@@ -10,22 +10,22 @@
 	}
 </style>
 @section('content')
-@canany(['create-overtime','edit-overtime','list-all-overtime','list-current-user-overtime','all-overtime-details','current-user-overtime-details'])
+@canany(['create-separation-employee-handover','edit-separation-employee-handover','list-all-separation-employee-handover','list-current-user-separation-handover','all-separation-employee-handover-details','current-user-separation-handover-details'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','edit-overtime','list-all-overtime','list-current-user-overtime','all-overtime-details','current-user-overtime-details']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-employee-handover','edit-separation-employee-handover','list-all-separation-employee-handover','list-current-user-separation-handover','all-separation-employee-handover-details','current-user-separation-handover-details']);
 @endphp
 @if ($hasPermission)                                           
 <div class="card-header">
 	<h4 class="card-title">
-		Employee Overtime Info
+    Separation Employee Handover Info
 	</h4>	
-	@canany(['create-overtime'])
+	@canany(['create-separation-employee-handover'])
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime']);
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-employee-handover']);
 	@endphp
 	@if ($hasPermission)
-	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('overtime.create') }}">
-      <i class="fa fa-plus" aria-hidden="true"></i> New Overtime
+	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('separation-handover.create') }}">
+      <i class="fa fa-plus" aria-hidden="true"></i> New Separation Employee Handover
     </a>
 	@endif
 	@endcanany
@@ -127,9 +127,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-								@canany(['current-user-overtime-details','all-overtime-details','current-user-overtime-details'])
+								@canany(['current-user-overtime-details','all-separation-employee-handover-details','current-user-separation-handover-details'])
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['current-user-overtime-details','all-overtime-details','current-user-overtime-details']);
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['current-user-overtime-details','all-separation-employee-handover-details','current-user-separation-handover-details']);
 								@endphp
 								@if ($hasPermission) 
 								<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('overtime.show',$data->id)}}">
@@ -139,9 +139,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 								@endif
 								@endcanany
 
-								@canany(['edit-overtime'])
+								@canany(['edit-separation-employee-handover'])
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-overtime']);
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-separation-employee-handover']);
 								@endphp
 								@if ($hasPermission) 
 								<li>
@@ -239,9 +239,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 							<td>{{ $data->divisionHead->name ?? ''}}</td>	
 							<td>{{ $data->current_status ?? ''}}</td>		
 							<td>
-							@canany(['current-user-overtime-details','all-overtime-details','current-user-overtime-details'])
+							@canany(['current-user-overtime-details','all-separation-employee-handover-details','current-user-separation-handover-details'])
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['current-user-overtime-details','all-overtime-details','current-user-overtime-details']);
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['current-user-overtime-details','all-separation-employee-handover-details','current-user-separation-handover-details']);
 								@endphp
 								@if ($hasPermission) 
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('overtime.show',$data->id)}}">
@@ -422,9 +422,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 							<td>{{ $data->divisionHead->name ?? ''}}</td>	
 							<td>{{ $data->current_status ?? ''}}</td>		
 							<td>
-							@canany(['current-user-overtime-details','all-overtime-details','current-user-overtime-details'])
+							@canany(['current-user-overtime-details','all-separation-employee-handover-details','current-user-separation-handover-details'])
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['current-user-overtime-details','all-overtime-details','current-user-overtime-details']);
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['current-user-overtime-details','all-separation-employee-handover-details','current-user-separation-handover-details']);
 								@endphp
 								@if ($hasPermission) 
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('overtime.show',$data->id)}}">
