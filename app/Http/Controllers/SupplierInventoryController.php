@@ -137,7 +137,7 @@ class SupplierInventoryController extends Controller
             $uploadFileContents = [];
             $colourname = NULL;
 
-            $date = Carbon::tomorrow()->format('Y-m-d');
+            $date = Carbon::today()->format('Y-m-d');
             $unavailableExtColours = [];
             $unavailableIntColours = [];
 
@@ -337,7 +337,7 @@ class SupplierInventoryController extends Controller
                 ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                 ->where('supplier_id', $request->supplier_id)
                 ->where('whole_sales', $request->whole_sales)
-                ->whereNull('chasis')
+//                ->whereNull('chasis')
                 ->get();
 
             $existingItems = [];
@@ -491,10 +491,10 @@ class SupplierInventoryController extends Controller
                                         ->whereNotIn('id', $updatedRowsIds)
                                         ->where('chasis', $uploadFileContent['chasis'])
 //                                        ->whereNull('delivery_note') unable to find row when have delivery note
-//                                        ->where(function ($query) use($deliveryNote) {
-//                                            $query->whereNull('delivery_note')
-//                                                ->orwhere('delivery_note', $deliveryNote);
-//                                        })
+                                        ->where(function ($query) use($deliveryNote) {
+                                            $query->whereNull('delivery_note')
+                                                ->orwhere('delivery_note', $deliveryNote);
+                                        })
                                     ->first();
 
                                     info($supplierInventory);
@@ -510,11 +510,12 @@ class SupplierInventoryController extends Controller
                                             ->whereNotIn('id', $noChangeRowIds)
                                             ->whereNotIn('id', $newlyAddedRowIds)
                                             ->whereNotIn('id', $updatedRowsIds)
-                                            ->whereNull('chasis');
-//                                            ->where(function ($query) use($deliveryNote) {
-//                                                $query->whereNull('delivery_note')
-//                                                    ->orwhere('delivery_note', $deliveryNote);
-//                                            });
+                                            ->whereNull('chasis')
+                                            ->where(function ($query) use($deliveryNote) {
+                                                $query->whereNull('delivery_note')
+                                                    ->orwhere('delivery_note', $deliveryNote);
+                                            });
+
                                         $isNullChaisisIds = $isNullChaisis->pluck('id');
 
                                         info($isNullChaisis->get());
@@ -770,10 +771,10 @@ class SupplierInventoryController extends Controller
                                             ->whereNotIn('id', $noChangeRowIds)
                                             ->whereNotIn('id', $updatedRowsIds)
                                             ->whereNotIn('id', $newlyAddedRowIds)
-//                                            ->where(function ($query) use($deliveryNote) {
-//                                                $query->whereNull('delivery_note')
-//                                                    ->orwhere('delivery_note', SupplierInventory::DN_STATUS_WAITING);
-//                                            })
+                                            ->where(function ($query) use($deliveryNote) {
+                                                $query->whereNull('delivery_note')
+                                                    ->orwhere('delivery_note', $deliveryNote);
+                                            })
                                             ->first();
                                         if(!empty($inventoryRow)) {
                                             info("null row exist");
@@ -806,6 +807,10 @@ class SupplierInventoryController extends Controller
                                         info("both colum count equal => clear case of row updation find the row ");
 
                                     }else if($excelPairCount > $existingPairCount) {
+                                        info("excelpair count");
+                                        info($excelPairCount);
+                                        info("database count");
+                                        info($existingPairCount);
                                         // check for engine number is changed or not
                                         $nullChasisRow = SupplierInventory::whereIn('master_model_id', $modelIds)
                                             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
@@ -816,10 +821,10 @@ class SupplierInventoryController extends Controller
                                             ->whereNotIn('id', $noChangeRowIds)
                                             ->whereNotIn('id', $updatedRowsIds)
                                             ->whereNotIn('id', $newlyAddedRowIds)
-//                                            ->where(function ($query) use($deliveryNote) {
-//                                                $query->whereNull('delivery_note')
-//                                                    ->orwhere('delivery_note', SupplierInventory::DN_STATUS_WAITING);
-//                                            })
+                                            ->where(function ($query) use($deliveryNote) {
+                                                $query->whereNull('delivery_note')
+                                                    ->orwhere('delivery_note', $deliveryNote);
+                                            })
                                             ->first();
 
                                         if(!empty($nullChasisRow)) {
