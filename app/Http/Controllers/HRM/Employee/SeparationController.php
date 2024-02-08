@@ -6,12 +6,58 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\HRM\Employee\Separation;
+use App\Models\HRM\Employee\SeparationHistory;
 use App\Models\Masters\SeparationTypes;
 use App\Models\Masters\SeparationReplacementTypes;
 use App\Models\User;
+use Validator;
+use DB;
+use App\Models\HRM\Employee\EmployeeProfile;
+use App\Models\HRM\Approvals\ApprovalByPositions;
+use App\Http\Controllers\UserActivityController;
 
 class SeparationController extends Controller
 {
+    public function store(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'employee_id' => 'required',
+            'last_working_date' => 'required',
+            'separation_type' => 'required',
+            'replacement' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            DB::beginTransaction();
+            try {
+                    $input = $request->all();
+                    $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
+                    $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                    // $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
+                    $input['created_by'] = Auth::id();
+                    $input['hr_manager_id'] = $HRManager->handover_to_id;                
+                    $input['department_head_id'] = $employee->team_lead_or_reporting_manager;
+                    $createRequest = Separation::create($input);
+                    $history['separations_id'] = $createRequest->id;
+                    $history['icon'] = 'icons8-document-30.png';
+                    $history['message'] = 'Separation Employee Handover request created by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
+                    $createHistory = SeparationHistory::create($history);
+                    $history2['separations_id'] = $createRequest->id;
+                    $history2['icon'] = 'icons8-send-30.png';
+                    $history2['message'] = 'Separation Employee Handover request send to Employee ( '.$employee->first_name.' '.$employee->last_name.' - '.$employee->personal_email_address.' ) for approval';
+                    $createHistory2 = SeparationHistory::create($history2);
+                    (new UserActivityController)->createActivity('Separation Employee Handover request Created');
+                    $successMessage = "Separation Employee Handover Created Successfully";                   
+                    DB::commit();
+                    return redirect()->route('separation-handover.index')->with('success',$successMessage); 
+            }
+            catch (\Exception $e) {
+                DB::rollback();
+                dd($e);
+            }
+        }     
+    }
     public function create() {
         $employees = User::whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
