@@ -237,20 +237,13 @@
                             </select>
                         </div>
                         <div class="col-lg-2 col-md-6">
-                            <label for="Incoterm" class="form-label">Shipping Cost:</label>
+                            <label class="form-label">Shipping Cost:</label>
                             <input type="number" id="shippingcost" name="shippingcost" class="form-control" placeholder="Shipping Cost">
                         </div>
+                    
                         <div class="col-lg-3 col-md-6">
-                            <label for="Incoterm" class="form-label">Port of Loading:</label>
-                            <input type="text" id="pol" name="pol" class="form-control" placeholder="Port of Loading">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <label for="Incoterm" class="form-label">Port of Discharge:</label>
-                            <input type="text" id="pod" name="pod" class="form-control" placeholder="Port of Discharge">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <label for="Incoterm" class="form-label">Final Destination:</label>
-                            <input type="text" id="fd" name="fd" class="form-control" placeholder="Final Destination">
+                            <label class="form-label">Prefered Destination:</label>
+                            <input type="text" id="fd" name="fd" class="form-control" placeholder="Prefered Destination" >
                         </div>
                 
                     </div>
