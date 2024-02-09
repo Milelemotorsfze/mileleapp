@@ -124,7 +124,7 @@
                                             <div class="col-lg-4 col-md-6">
                                                 <div class="mb-3">
                                                     <label for="choices-single-default" class="form-label">PFI Number</label>
-                                                    <input type="number" class="form-control" id="pfi_reference_number" autofocus placeholder="Enter PFI Number"
+                                                    <input type="text" class="form-control" id="pfi_reference_number" autofocus placeholder="Enter PFI Number"
                                                            name="pfi_reference_number" value="{{ old('pfi_reference_number') }}">
                                                     <span id="pfi-error" class="text-danger"></span>
                                                 </div>

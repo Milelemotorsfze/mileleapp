@@ -195,7 +195,7 @@ class SupplierInventoryController extends Controller
                             }
                         }
                     }
-
+                    
                     $uploadFileContents[$i]['steering'] = $filedata[0];
                     $uploadFileContents[$i]['model'] = $filedata[1];
                     $uploadFileContents[$i]['sfx'] = $filedata[2];
@@ -350,6 +350,8 @@ class SupplierInventoryController extends Controller
 
             $newModelsWithSteerings = array_map("unserialize", array_unique(array_map("serialize", $newModelsWithSteerings)));
             $newModels = array_map("unserialize", array_unique(array_map("serialize", $newModels)));
+            info($newModelsWithSteerings);
+            info($newModels);
 
             if(count($newModels) > 0 || count($newModelsWithSteerings) > 0)
             {
@@ -512,11 +514,11 @@ class SupplierInventoryController extends Controller
                                             ->whereNotIn('id', $noChangeRowIds)
                                             ->whereNotIn('id', $newlyAddedRowIds)
                                             ->whereNotIn('id', $updatedRowsIds)
-                                            ->whereNull('chasis')
-                                            ->where(function ($query) use($deliveryNote) {
-                                                $query->whereNull('delivery_note')
-                                                    ->orwhere('delivery_note', $deliveryNote);
-                                            });
+                                            ->whereNull('chasis');
+                                            // ->where(function ($query) use($deliveryNote) {
+                                            //     $query->whereNull('delivery_note')
+                                            //         ->orwhere('delivery_note', $deliveryNote);
+                                            // });
 
                                         $isNullChaisisIds = $isNullChaisis->pluck('id');
 
@@ -770,10 +772,11 @@ class SupplierInventoryController extends Controller
                                             ->whereNotIn('id', $noChangeRowIds)
                                             ->whereNotIn('id', $updatedRowsIds)
                                             ->whereNotIn('id', $newlyAddedRowIds)
-                                            ->where(function ($query) use($deliveryNote) {
-                                                $query->whereNull('delivery_note')
-                                                    ->orwhere('delivery_note', $deliveryNote);
-                                            })
+                                            // ->where(function ($query) use($deliveryNote) {
+                                            //     $query->whereNull('delivery_note')
+                                            //         ->orwhere('delivery_note', $deliveryNote);
+                                            // })
+                                            // hide the DN check scenario : - when dn status changing to waiting to any number it unable to find the row
                                             ->first();
                                         if(!empty($inventoryRow)) {
                                             info("null row exist");
@@ -818,10 +821,10 @@ class SupplierInventoryController extends Controller
                                             ->whereNotIn('id', $noChangeRowIds)
                                             ->whereNotIn('id', $updatedRowsIds)
                                             ->whereNotIn('id', $newlyAddedRowIds)
-                                            ->where(function ($query) use($deliveryNote) {
-                                                $query->whereNull('delivery_note')
-                                                    ->orwhere('delivery_note', $deliveryNote);
-                                            })
+                                            // ->where(function ($query) use($deliveryNote) {
+                                            //     $query->whereNull('delivery_note')
+                                            //         ->orwhere('delivery_note', $deliveryNote);
+                                            // })
                                             ->first();
 
                                         if(!empty($nullChasisRow)) {
@@ -1090,12 +1093,15 @@ class SupplierInventoryController extends Controller
             ->where('whole_sales', $request->whole_sales)
             ->where(function ($query)  {
                 $query->whereNull('delivery_note')
-                    ->orwhere('delivery_note', SupplierInventory::DN_STATUS_WAITING);
+                    ->orwhere('delivery_note', SupplierInventory::DN_STATUS_WAITING)
+                    ->orwhere('delivery_note', "waiting");
             })
             ->get();
 
         $alreadyAddedIds = [];
         $QtyfullyAddedIds = [];
+        $pfiQtyAdded = [];
+        
         foreach ($inventoryItems as $inventoryItem) {
 
             $modelIds = MasterModel::where('model', $inventoryItem->masterModel->model)
@@ -1130,6 +1136,8 @@ class SupplierInventoryController extends Controller
             }
 
             if($LOIItem) {
+                $pfiNumber = ApprovedLetterOfIndentItem::where('letter_of_indent_item_id', $LOIItem->id)->first();
+
                 $remaingQuantity = $LOIItem->quantity - $LOIItem->utilized_quantity;
                 $assignedQuantity = 0;
                 if(array_key_exists($LOIItem->id, $alreadyAddedIds)) {

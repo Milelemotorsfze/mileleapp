@@ -220,7 +220,8 @@ class PFIController extends Controller
     }
     public function uniqueCheckPfiReferenceNumber(Request $request) {
 //         return $request->all();
-        $pfi = PFI::where('pfi_reference_number', $request->pfi_reference_number)->first();
+        $pfi = PFI::where('pfi_reference_number', $request->pfi_reference_number)
+                ->whereYear('created_at', Carbon::now()->year)->first();
         if($pfi) {
             return response(true);
         }else{
