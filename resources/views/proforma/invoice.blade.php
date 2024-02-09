@@ -2153,7 +2153,7 @@ $(document).ready(function () {
                         var addon = 1;
                         var uuid = row['rowId'];
                     }
-
+                    console.log(row['model_description_id']);
                     return '<input type="hidden" name="addon_types[]" value="'+ row['addon_type'] +'" > <input type="hidden" name="brand_ids[]" value="'+ row['brand_id'] +'" >' +
                         '<input type="hidden" name="model_line_ids[]" value="'+ row['model_line_id'] +'" >' +
                         '<input type="hidden" name="model_description_ids[]" value="'+ row['model_description_id'] +'" >' +
