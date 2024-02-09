@@ -246,39 +246,39 @@
                 </td>
             </tr>
             <tr>
-                <td>Interior Colour</td>
-                <td>{{$intColor->name}}</td>
-                <td>
-                    <select class="form-control" name="int_colour">
-                    @foreach($intColorall as $intColorall)
-                    <option value="{{$intColorall->id}}" @if($intColorall->id == $intColorr->id) selected @endif>
-                    {{$intColorall->name}}
-                    </option>
-                    @endforeach
-                 </select>
-                </td>
-                <td>
-                    @if($intColor->id == $intColorr->id)
-                        <i class="fas fa-check text-success"></i>
-                        @else
-                        <i class="fas fa-times text-danger"></i>
-                        @endif
-                </td>
-            </tr>
+    <td>Interior Colour</td>
+    <td>{{$vehiclecolour->name}}</td>
+    <td>
+        <select class="form-control" name="int_colour">
+            @foreach($intmaster as $intmaster)
+            <option value="{{$intmaster->id}}" @if($intrequest && $intmaster->id == $intrequest->id) selected @endif>
+                {{$intmaster->name}}
+            </option>
+            @endforeach
+        </select>
+    </td>
+    <td>
+        @if($intrequest && $vehiclecolour->id == $intrequest->id)
+        <i class="fas fa-check text-success"></i>
+        @else
+        <i class="fas fa-times text-danger"></i>
+        @endif
+    </td>
+</tr>
             <tr>
                 <td>Exterior Colour</td>
-                <td>{{$extColor->name}}</td>
+                <td>{{$extvehicle->name}}</td>
                 <td>
                     <select class="form-control" name="ex_colour">
-                    @foreach($extColorall as $exColorall)
-                    <option value="{{$exColorall->id}}" @if($exColorall->id == $extColorr->id) selected @endif>
-                    {{$exColorall->name}}
+                    @foreach($extmaster as $extmaster)
+                    <option value="{{$extmaster->id}}" @if($extrequest && $extmaster->id == $extrequest->id) selected @endif>
+                    {{$extmaster->name}}
                     </option>
                     @endforeach
                  </select>
                 </td>
                 <td>
-                    @if($extColor->id == $extColorr->id)
+                    @if($extrequest && $extvehicle->id == $extrequest->id)
                         <i class="fas fa-check text-success"></i>
                         @else
                         <i class="fas fa-times text-danger"></i>
@@ -956,7 +956,10 @@ function saveincidents() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
             success: function(response) {
-                console.log(response);
+                alertify.success('Incident Update Sucessfully');
+            setTimeout(function() {
+        window.location.reload();
+        }, 1000);
             },
             error: function(error) {
                 console.error(error);

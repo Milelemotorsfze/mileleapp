@@ -20,4 +20,8 @@ class QuotationDetail extends Model
     {
         return $this->belongsTo(MasterShippingPorts::class,'to_shipping_port_id','id');
     }
+    public function paymentterms()
+    {
+        return $this->hasOne(PaymentTerms::class,'id','payment_terms');
+    }
 }

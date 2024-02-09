@@ -84,13 +84,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
                             <th>Employee Code</th>
 							<th>Designation</th>
                             <th>Department</th>
-							<th>Location</th>
+							<!-- <th>Location</th> -->
 							<th>Joining Date</th>
-                            <th>Total Number Of Overtime Hours</th>
-                            <th>Overtime Start Date</th>
-                            <th>Overtime End Date</th>
+							<th>Last Working Date</th>
+							<th>Separation Type</th>
+							<th>Replacement</th>
 							<th>Name Of Reporting Manager</th>
-							<th>Name Of Division Head</th>
 							<th>Status</th>
 							<th>Action</th>
 						</tr>
@@ -105,21 +104,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
-							<td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-							<td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
-							<td>{{ $data->total_hours ?? ''}}</td>
-							<td>
-								@if($data->minStartDateTime->start_datetime != '')
-								{{\Carbon\Carbon::parse($data->minStartDateTime->start_datetime)->format('d M Y') ?? ''}}
-								@endif
-							</td>
-							<td>
-								@if($data->maxStartDateTime->end_datetime != '')
-									{{\Carbon\Carbon::parse($data->maxStartDateTime->end_datetime)->format('d M Y') ?? ''}}
-								@endif
-							</td>
+							<!-- <td>{{ $data->user->empProfile->location->name ?? '' }}</td> -->
+							<td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>							
+							<td>{{ \Carbon\Carbon::parse($data->last_working_date)->format('d M Y') ?? ''}}</td>
+							<td>{{ $data->type->name ?? ''}}</td>
+							<td>{{ $data->replacementName->name ?? ''}}</td>
 							<td>{{ $data->reportingManager->name ?? ''}}</td>
-							<td>{{ $data->divisionHead->name ?? ''}}</td>	
 							<td>{{ $data->current_status ?? ''}}</td>									
 							<td>
 							<div class="dropdown">
@@ -145,7 +135,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
 								@endphp
 								@if ($hasPermission) 
 								<li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('overtime.edit',$data->id)}}">
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('separation-handover.edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 										</a>
 									</li>
@@ -201,13 +191,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
                             <th>Employee Code</th>
 							<th>Designation</th>
                             <th>Department</th>
-							<th>Location</th>
+							<!-- <th>Location</th> -->
 							<th>Joining Date</th>
-                            <th>Total Number Of Overtime Hours</th>
-                            <th>Overtime Start Date</th>
-                            <th>Overtime End Date</th>
 							<th>Name Of Reporting Manager</th>
-							<th>Name Of Division Head</th>
 							<th>Status</th>
 							<th>Action</th>
 						</tr>
@@ -222,21 +208,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
-							<td>{{ $data->user->empProfile->location->name ?? '' }}</td>
+							<!-- <td>{{ $data->user->empProfile->location->name ?? '' }}</td> -->
 							<td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
-							<td>{{ $data->total_hours ?? ''}}</td>
-							<td>
-								@if($data->minStartDateTime->start_datetime != '')
-								{{\Carbon\Carbon::parse($data->minStartDateTime->start_datetime)->format('d M Y') ?? ''}}
-								@endif
-							</td>
-							<td>
-								@if($data->maxStartDateTime->end_datetime != '')
-									{{\Carbon\Carbon::parse($data->maxStartDateTime->end_datetime)->format('d M Y') ?? ''}}
-								@endif
-							</td>
 							<td>{{ $data->reportingManager->name ?? ''}}</td>
-							<td>{{ $data->divisionHead->name ?? ''}}</td>	
 							<td>{{ $data->current_status ?? ''}}</td>		
 							<td>
 							@canany(['current-user-overtime-details','all-separation-employee-handover-details','current-user-separation-handover-details'])
@@ -384,13 +358,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
                             <th>Employee Code</th>
 							<th>Designation</th>
                             <th>Department</th>
-							<th>Location</th>
+							<!-- <th>Location</th> -->
 							<th>Joining Date</th>
-                            <th>Total Number Of Overtime Hours</th>
-                            <th>Overtime Start Date</th>
-                            <th>Overtime End Date</th>
 							<th>Name Of Reporting Manager</th>
-							<th>Name Of Division Head</th>
 							<th>Status</th>
 							<th>Action</th>
 						</tr>
@@ -405,21 +375,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
-							<td>{{ $data->user->empProfile->location->name ?? '' }}</td>
+							<!-- <td>{{ $data->user->empProfile->location->name ?? '' }}</td> -->
 							<td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
-							<td>{{ $data->total_hours ?? ''}}</td>
-							<td>
-								@if($data->minStartDateTime->start_datetime != '')
-								{{\Carbon\Carbon::parse($data->minStartDateTime->start_datetime)->format('d M Y') ?? ''}}
-								@endif
-							</td>
-							<td>
-								@if($data->maxStartDateTime->end_datetime != '')
-									{{\Carbon\Carbon::parse($data->maxStartDateTime->end_datetime)->format('d M Y') ?? ''}}
-								@endif
-							</td>
 							<td>{{ $data->reportingManager->name ?? ''}}</td>
-							<td>{{ $data->divisionHead->name ?? ''}}</td>	
 							<td>{{ $data->current_status ?? ''}}</td>		
 							<td>
 							@canany(['current-user-overtime-details','all-separation-employee-handover-details','current-user-separation-handover-details'])

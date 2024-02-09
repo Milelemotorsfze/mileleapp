@@ -144,9 +144,8 @@
               <!-- VIN and Action rows will be dynamically added here -->
             </tbody>
           </table>
-
           <!-- Text field and "Add More" button -->
-          div class="mb-3">
+          <div class="mb-3">
             <label for="vinInput" class="form-label">Stock VIN</label>
             <select id="vehicle-dropdown" class="form-control">
                 </select>
@@ -2154,7 +2153,7 @@ $(document).ready(function () {
                         var addon = 1;
                         var uuid = row['rowId'];
                     }
-
+                    console.log(row['model_description_id']);
                     return '<input type="hidden" name="addon_types[]" value="'+ row['addon_type'] +'" > <input type="hidden" name="brand_ids[]" value="'+ row['brand_id'] +'" >' +
                         '<input type="hidden" name="model_line_ids[]" value="'+ row['model_line_id'] +'" >' +
                         '<input type="hidden" name="model_description_ids[]" value="'+ row['model_description_id'] +'" >' +

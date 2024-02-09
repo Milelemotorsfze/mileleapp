@@ -2158,6 +2158,10 @@
                 render: function (data, type, row) {
                     var price = "";
                     var uuid = "";
+                    if(row['model_description_id'] == 0)
+                    {
+                        row['model_description_id'] = null;  
+                    }
                     var addon = 0;
                     var itemid = row.itemid ? row.itemid : "";
                     if(row['button_type'] == 'Vehicle') {
@@ -2238,7 +2242,6 @@
                         combinedValue = row[2] + ' , ' + row[3];
 
                     }else if(row['button_type'] == 'Direct-Add') {
-                        console.log(row['button_type']);
                         var comma0 = comma1 = comma2 = comma3 = comma4 = comma5 = ", ";
                         if(row[1] == "") {
                             var comma0 = " ";
@@ -2279,7 +2282,6 @@
 
                     // $('#checkbox-2').attr('disabled', true);
                     var arrayIndex = row['index'] - 1;
-                    console.log(combinedValue);
                     return '<div class="row" style="flex-wrap: unset;margin-left: 2px;">' +
                         '<input type="checkbox" style="height: 20px;width: 15px;margin-right: 5px;" data-table-type="'+ tableType +'" name="is_hide['+ arrayIndex  +']" value="yes" class="checkbox-hide"' +
                         ' checked id="checkbox-'+ row['index'] +'"> ' +
@@ -2892,7 +2894,6 @@
             type: 'GET',
             url: url,
             success: function(response) {
-                console.log(response);
                 var slNo = 0;
                 var data = response.map(function(accessory) {
                     slNo = slNo + 1;
@@ -3221,12 +3222,9 @@
                 if(modaltype == "ModelLine" || modaltype == "Brand" || modaltype == "Vehicle")
                 {
                 var modelLineId = rowbmid;
-                console.log(modelLineId);
-                console.log(modaltype);
                 }
                 else
                 {
-                console.log($(this).data('model-line-id'));
                 var modelLineId = $(this).data('model-line-id');
                 }
                 $('#addonsModal').modal('show');
@@ -3415,7 +3413,6 @@
                             }
 
                             var sparePartBrandName = sparePart.brandModelLineModelDescription;
-                            console.log(sparePart.brandModelLineModelDescription);
                             var sparePartNumber = '';
                             var partNumbersSize = 0;
                             partNumbersSize = (sparePart.part_numbers).length;
@@ -3598,7 +3595,6 @@ $('#vinmodal').on('shown.bs.modal', function () {
   populateModalTable(RowId, storedVins);
 });
   function populateModalTable(RowId) {
-    console.log(RowId);
     $('#vinTableBody').empty();
     if (vinData.hasOwnProperty(RowId)) {
       var savedVins = vinData[RowId];
@@ -3662,7 +3658,6 @@ function updateSecondTable(RowId, savedVins) {
             }
         }
     }
-    console.error('Row with RowId ' + RowId + ' not found in the second table.');
 }
             $('#addonDataTable').on('click', '.add-button-addonsinner', function () {
                 var table = $('#addonDataTable').DataTable();
@@ -3723,7 +3718,6 @@ function updateSecondTable(RowId, savedVins) {
                 var brandId = $(this).data('brand-id');
                 var brandIds = $(this).data('brand-ids');
                 var selectedAddonType = $('#addontypes').val();
-                console.log(selectedAddonType);
                 var modelLineId = $(this).data('model-line-id');
                 var modelLineIds = $(this).data('model-line-ids');
                 var tableType = $(this).attr('data-table');
@@ -3800,7 +3794,6 @@ function updateSecondTable(RowId, savedVins) {
                 rowData['table_type'] = 'addon-table';
                 var subRowId = $(this).data('row-id');
                 var newIndex = parseInt(datainc) + 1;
-                console.log(rowData);
                 var addedRow = mainTable.row.add(rowData).draw();
                 table.row(row).remove().draw();
                 var currentIndex = mainTable.row(addedRow.node()).index();

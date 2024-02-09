@@ -3,13 +3,13 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <!-- <script src="{{ asset('libs/jquery/jquery.min.js') }}"></script> -->
 @section('content')
-@canany(['create-separation-employee-handover','edit-separation-employee-handover'])
+@canany(['edit-separation-employee-handover'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-employee-handover','edit-separation-employee-handover']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-separation-employee-handover']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title">Create Separation Employee Handover Request</h4>
+	<h4 class="card-title">Edit Separation Employee Handover Request</h4>
 	<a style="float:right;" class="btn btn-sm btn-info" href="{{ route('separation-handover.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
@@ -23,7 +23,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
 		</ul>
 	</div>
 	@endif	
-    <form id="separationEmployeeHandoverForm" name="separationEmployeeHandoverForm" enctype="multipart/form-data" method="POST" action="{{route('separation-handover.store')}}">
+    <form id="separationEmployeeHandoverForm" name="separationEmployeeHandoverForm" enctype="multipart/form-data" method="POST" action="{{route('separation-handover.update',$data->id)}}">
         @csrf
 		<div class="row">
 			<div class="col-xxl-12 col-lg-6 col-md-6">
@@ -71,7 +71,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
 						<label for="employee_id" class="col-form-label text-md-end">{{ __('Employee Name') }}</label>
                         <select name="employee_id" id="employee_id" multiple="true" class="employee_id form-control widthinput" autofocus>
                             @foreach($employees as $employee)
-                                <option id="emp_{{$employee->id}}" value="{{$employee->id}}">{{$employee->name}}</option>
+                                <option id="emp_{{$employee->id}}" value="{{$employee->id}}" @if($data->employee_id == $employee->id) selected @endif>{{$employee->name}}</option>
                             @endforeach
                         </select>
 					</div>
@@ -79,10 +79,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
 						<span class="error">* </span>
 						<label for="last_working_date" class="col-form-label text-md-end">{{ __('Last Working Date') }}</label>
                         <input type="date" name="last_working_date" id="last_working_date" class="form-control widthinput" placeholder="Enter Last Working Date"
-								 aria-label="measurement" aria-describedby="basic-addon2" value="">
+								 aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->last_working_date ?? ''}}">
 					</div>
                 </div>
-</br>
+                </br>
                 <div class="row">
                     <div class="col-xxl-2 col-lg-2 col-md-2" id="employee_code_div">
                         <center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
@@ -109,33 +109,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
                         <center><span id="location"></span></center>
                     </div>                  
                 </div>
-</br>
-                <div class="row">
-                    
+                </br>
+                <div class="row">                    
                     <div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
 						<span class="error">* </span>
 						<label for="type" class="col-form-label text-md-end">{{ __('Separation Type') }}</label>
 						<fieldset style="margin-top:5px;" class="radio-div-container">
                             <div class="row some-class">
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="separation_type" name="separation_type" value="1" id="separation_type_1" />
+                                    <input type="radio" class="separation_type" name="separation_type" value="1" id="separation_type_1" @if($data->separation_type == 1) checked @endif/>
                                     <label for="separation_type_1">Contract terminated by Employee</label>
                                 </div>
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="separation_type" name="separation_type" value="2" id="separation_type_2"/>
+                                    <input type="radio" class="separation_type" name="separation_type" value="2" id="separation_type_2" @if($data->separation_type == 2) checked @endif/>
                                     <label for="separation_type_2">Contract Terminated by Employer</label>
                                 </div>
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="separation_type" name="separation_type" value="3" id="separation_type_3" />
+                                    <input type="radio" class="separation_type" name="separation_type" value="3" id="separation_type_3" @if($data->separation_type == 3) checked @endif/>
                                     <label for="separation_type_3">Employee Proceeding for Leave</label>
                                 </div>
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="separation_type" name="separation_type" value="4" id="separation_type_4" />
+                                    <input type="radio" class="separation_type" name="separation_type" value="4" id="separation_type_4" @if($data->separation_type == 4) checked @endif/>
                                     <label for="separation_type_4">Other</label>
                                 </div>
                             </div>
-</br>
-                            <textarea rows="3" id="seperation_type_other" class="form-control" name="seperation_type_other" placeholder="Mention here if separation type is other"></textarea>
+                            </br>
+                            <textarea rows="3" id="seperation_type_other" class="form-control" name="seperation_type_other" placeholder="Mention here if separation type is other">{{$data->seperation_type_other ?? ''}}</textarea>
                         </fieldset>
 					</div>
                     <div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
@@ -144,25 +143,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
 						<fieldset style="margin-top:5px;" class="radio-div-container">
                             <div class="row some-class">
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="replacement" name="replacement" value="1" id="replacement_1" />
+                                    <input type="radio" class="replacement" name="replacement" value="1" id="replacement_1" @if($data->replacement == 1) checked @endif/>
                                     <label for="replacement_1">HRF raised by Line Manager</label>
                                 </div>
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="replacement" name="replacement" value="2" id="replacement_2"/>
+                                    <input type="radio" class="replacement" name="replacement" value="2" id="replacement_2" @if($data->replacement == 2) checked @endif/>
                                     <label for="replacement_2">Position made redundant</label>
                                 </div>
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="replacement" name="replacement" value="3" id="replacement_3" />
+                                    <input type="radio" class="replacement" name="replacement" value="3" id="replacement_3" @if($data->replacement == 3) checked @endif/>
                                     <label for="replacement_3">Position filled within Team Member</label>
                                 </div>
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="replacement" name="replacement" value="4" id="replacement_4" />
+                                    <input type="radio" class="replacement" name="replacement" value="4" id="replacement_4" @if($data->replacement == 4) checked @endif/>
                                     <label for="replacement_4">Other</label>
                                 </div>
                             </div>
                         </fieldset>
-</br>
-                        <textarea rows="3" id="replacement_other" class="form-control" name="replacement_other" placeholder="Mention here if replacement is other"></textarea>
+                        </br>
+                        <textarea rows="3" id="replacement_other" class="form-control" name="replacement_other" placeholder="Mention here if replacement is other">{{$data->replacement_other ?? ''}}</textarea>
 					</div>
 				</div>
 			</div>
@@ -178,7 +177,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
 						<label for="takeover_employee_id" class="col-form-label text-md-end">{{ __('Takeover Employee Name') }}</label>
                         <select name="takeover_employee_id" id="takeover_employee_id" multiple="true" class="takeover_employee_id form-control widthinput" autofocus>
                             @foreach($employees as $employee)
-                                <option id="takeover_emp_{{$employee->id}}" value="{{$employee->id}}">{{$employee->name}}</option>
+                                <option id="takeover_emp_{{$employee->id}}" value="{{$employee->id}}" @if($data->takeover_employee_id == $employee->id) selected @endif>{{$employee->name}}</option>
                             @endforeach
                         </select>
 					</div>
@@ -188,11 +187,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
                         <fieldset style="margin-top:5px;" class="radio-div-container">
                             <div class="row some-class">
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="employment_type" name="employment_type" value="new_hire_under_probation" id="new_hire_under_probation" />
+                                    <input type="radio" class="employment_type" name="employment_type" value="new_hire_under_probation" id="new_hire_under_probation" @if($data->employment_type == 'new_hire_under_probation') checked @endif/>
                                     <label for="new_hire_under_probation">New Hire (Under Probation)</label>
                                 </div>
                                 <div class="col-xxl-6 col-lg-6 col-md-6">
-                                    <input type="radio" class="employment_type" name="employment_type" value="existing_staff" id="existing_staff"/>
+                                    <input type="radio" class="employment_type" name="employment_type" value="existing_staff" id="existing_staff" @if($data->employment_type == 'existing_staff') checked @endif/>
                                     <label for="existing_staff">Existing staff</label>
                                 </div>
                             </div>
@@ -226,7 +225,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
                         <center><span id="takeover_location"></span></center>
                     </div>                  
                 </div>
-</br>
+                </br>
             </div>
 		</div>
 		<div class="col-xxl-12 col-lg-12 col-md-12">
@@ -243,13 +242,29 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
 	var data = {!! json_encode($employees) !!};
     var oldTakeoverEmp = '';
     var oldSeparationEmp = '';
+    var oldData = {!! json_encode($data) !!};
 	$(document).ready(function () {
-        $("#employee_code_div").hide();
-        $("#passport_number_div").hide();
-        $("#joining_date_div").hide();
-        $("#designation_div").hide();
-        $("#department_div").hide();
-        $("#location_div").hide();
+        // $("#employee_code_div").hide();
+        // $("#passport_number_div").hide();
+        // $("#joining_date_div").hide();
+        // $("#designation_div").hide();
+        // $("#department_div").hide();
+        // $("#location_div").hide();
+        if(oldData.user.emp_profile.passport_number != null) {
+            document.getElementById('passport_number').textContent=oldData.user.emp_profile.passport_number;
+        }
+        if(oldData.user.emp_profile.company_joining_date != null) {
+            document.getElementById('joining_date').textContent=oldData.user.emp_profile.company_joining_date;
+        }
+        if(oldData.user.emp_profile.designation != null) {
+            document.getElementById('designation').textContent=oldData.user.emp_profile.designation.name;
+        }
+        if(oldData.user.emp_profile.department != null) {
+            document.getElementById('department').textContent=oldData.user.emp_profile.department.name;
+        }
+        if(oldData.user.emp_profile.location != null) {
+            document.getElementById('location').textContent=oldData.user.emp_profile.location.name;
+        }
         $("#seperation_type_other").hide();
         $("#replacement_other").hide();
         $("#takeover_empdiv").hide();
