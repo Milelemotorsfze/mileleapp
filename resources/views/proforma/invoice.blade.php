@@ -144,9 +144,8 @@
               <!-- VIN and Action rows will be dynamically added here -->
             </tbody>
           </table>
-
           <!-- Text field and "Add More" button -->
-          div class="mb-3">
+          <div class="mb-3">
             <label for="vinInput" class="form-label">Stock VIN</label>
             <select id="vehicle-dropdown" class="form-control">
                 </select>

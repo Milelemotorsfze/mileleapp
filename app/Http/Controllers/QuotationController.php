@@ -369,7 +369,7 @@ class QuotationController extends Controller
         $uniqueString = Str::random(10);
         $timestamp = now()->timestamp;
         $uniqueNumber = $uniqueString . $timestamp;
-        $signatureLink = config('app.base_url') . '/'.'clientsignature/' . $uniqueNumber . '/' . $quotation->id;
+        $signatureLink = config('app.url') . '/'.'clientsignature/' . $uniqueNumber . '/' . $quotation->id;
         $newsignatures = Quotation::find($quotation->id);
         $newsignatures->signature_link = $signatureLink;
         $newsignatures->save();
@@ -825,7 +825,7 @@ class QuotationController extends Controller
         $uniqueString = Str::random(10);
         $timestamp = now()->timestamp;
         $uniqueNumber = $uniqueString . $timestamp;
-        $signatureLink = config('app.base_url') . '/'.'clientsignature/' . $uniqueNumber . '/' . $quotation->id;
+        $signatureLink = config('app.url') . '/'.'clientsignature/' . $uniqueNumber . '/' . $quotation->id;
         $newsignatures = Quotation::find($quotation->id);
         $newsignatures->signature_link = $signatureLink;
         $newsignatures->signature_status = null;

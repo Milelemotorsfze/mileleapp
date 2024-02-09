@@ -439,10 +439,10 @@ input[type=number]::-webkit-outer-spin-button
             <div class="col-md-8">
               <div class="input-group">
               <select name = "currency" class="form-select" id="currency-select-closed">
-      <option value="AED">AED</option>
-      <option value="USD">USD</option>
-      <option value="EURO">EURO</option>
-    </select>
+              <option value="AED">AED</option>
+              <option value="USD">USD</option>
+              <option value="EURO">EURO</option>
+            </select>
                 <input type="number" class="form-control" id="deal-value-input-closed" aria-label="Deal Value">
                 <span class="input-group-text">.00</span>
               </div>
@@ -543,10 +543,10 @@ input[type=number]::-webkit-outer-spin-button
             <div class="col-md-8">
               <div class="input-group">
               <select name = "currency" class="form-select" id="currency-select">
-      <option value="AED">AED</option>
-      <option value="USD">USD</option>
-      <option value="EURO">EURO</option>
-    </select>
+              <option value="AED">AED</option>
+              <option value="USD">USD</option>
+              <option value="EURO">EURO</option>
+            </select>
     <input type="number" class="form-control" id="deal-value-input-qoutation" aria-label="Deal Value">
     <span class="input-group-text">.00</span>
               </div>
@@ -1040,7 +1040,6 @@ function openModalr(callId) {
 function displayModal(response) {
   var modalContent = $('#vinsModalContent');
   modalContent.empty();
-
   response.forEach(function (data) {
     if (data.quotationVins && data.quotationVins.length > 0) {
       // Start the table with Bootstrap classes and additional styling
