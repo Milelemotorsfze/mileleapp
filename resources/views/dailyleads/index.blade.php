@@ -212,7 +212,7 @@ input[type=number]::-webkit-outer-spin-button
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
             <thead class="bg-soft-secondary">
                 <tr>
-                <th>Priority</th>
+                  <th>Priority</th>
                   <th>Lead Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
@@ -264,14 +264,14 @@ input[type=number]::-webkit-outer-spin-button
                     </td>
                     <td><a href="mailto:{{ $calls->email }}">{{ $calls->email }}</a></td>
                     @php
-    $leads_models_brands = DB::table('calls_requirement')
-        ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
-        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-        ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-        ->where('calls_requirement.lead_id', $calls->id)
-        ->get();
-@endphp
-<td>
+                    $leads_models_brands = DB::table('calls_requirement')
+                        ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
+                        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+                        ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                        ->where('calls_requirement.lead_id', $calls->id)
+                        ->get();
+                @endphp
+      <td>
     @php
         $models_brands_string = '';
         foreach ($leads_models_brands as $lead_model_brand) {
@@ -1880,7 +1880,6 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
         let signedlink = '';
         if (row.signature_status === 'Signed') {
             salesOrderOption = `<li><a class="dropdown-item" href="${soUrl}">Sales Order</a></li>`;
-            booking = `<li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>`;
             preorder = `<li><a class="dropdown-item" href="${preorderUrl}">Pre Order</a></li>`;
         } else {
             signedlink = `<li><a class="dropdown-item" href="#" onclick="opensignaturelink(${data})">Signature Link</a></li>`;
@@ -1892,7 +1891,6 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item"href="${quotationUrlEdit}">Update Quotation</a></li>
-                    ${booking}
                     ${preorder}
                     ${salesOrderOption}
                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
@@ -2068,7 +2066,6 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
-                                <li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>
                                 <li><a class="dropdown-item"href="${qoutationUrlEdit}">Update Qoutation</a></li>
                                 <li><a class="dropdown-item"href="${soUrl}">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>

@@ -7,6 +7,24 @@
     <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
     <title>Quotation with Signature</title>
     <style>
+        .custom-file-upload {
+    border: 2px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    color: #333;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.custom-file-upload:hover {
+    background-color: #e9e9e9;
+}
+
+.custom-file-upload i {
+    margin-right: 5px;
+}
         body {
             display: flex;
             flex-direction: column;
@@ -74,13 +92,24 @@
     </center>
     <iframe id="pdf-view" src="{{ $pdfPath }}"></iframe>
     <h1>Signature Please</h1>
+    <strong><p>
+    By affixing my signature to this document, I hereby acknowledge, confirm, and unequivocally commit to adhering to all the terms and conditions delineated herein.
+    </p></strong>
     <div class="row">
         <div class="col-md-12">
+            <div class="col-md-6">
             <input type="hidden" id="canvas-image" name="canvas_image" />
             <div id="canvas-container">
                 <div id="signature-box"></div>
             </div>
-            <center>
+</div>
+<div class="col-md-6">
+<label for="file-upload" class="custom-file-upload">
+    <i class="fas fa-cloud-upload-alt"></i> Uploading Stamp
+</label>
+<input type="file" id="file-upload" name="file_upload" style="display: none;" />
+</div>
+<center>
             <button type="button" id="reset-button">Reset</button>
             <button type="button" id="submit-button">Submit</button>
             </center>
@@ -140,28 +169,30 @@
         });
         document.getElementById('submit-button').addEventListener('click', () => {
             const signatureDataURL = stage.toDataURL();
-const pdfPath = '{{ $pdfPath }}';
-const qoutation_id = '{{ $qoutation_id }}';
-fetch('/submit-signature', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-    },
-    body: JSON.stringify({ signature_data: signatureDataURL, pdf_path: pdfPath,  qoutation_id: qoutation_id}),
-})
-.then(response => {
-    if (response.ok) {
-                document.body.innerHTML = '';
-                document.body.innerHTML = '<h2>Thank you for Signature!</h2>';
-            } else {
-        console.error('Failed to submit signature:', response.statusText);
-    }
-})
-.catch(error => {
-    console.error('Error submitting signature:', error);
-});
-});
+            const pdfPath = '{{ $pdfPath }}';
+            const qoutation_id = '{{ $qoutation_id }}';
+            const stampInput = document.getElementById('file-upload');
+            const stampFile = stampInput.files[0]; // Get the uploaded stamp file
+            fetch('/submit-signature', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({ signature_data: signatureDataURL, pdf_path: pdfPath,  qoutation_id: qoutation_id, stampFile: stampFile}),
+            })
+            .then(response => {
+                if (response.ok) {
+                            document.body.innerHTML = '';
+                            document.body.innerHTML = '<h2>Thank you for Signature!</h2>';
+                        } else {
+                    console.error('Failed to submit signature:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting signature:', error);
+            });
+            });
 </script>
 </body>
 </html>

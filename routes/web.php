@@ -679,6 +679,7 @@ Route::get('/d', function () {
     Route::get('inspection/reinspectionspec/{id}', [InspectionController::class, 'reinspectionspec'])->name('inspection.reinspectionspec');
     Route::get('/get-vehicle-extra-items/{vehicle_id}', [InspectionController::class, 'getVehicleExtraItems']);
     Route::get('/pdi-inspection/{vehicleId}', [ApprovalsController::class, 'getpdiInspectionData']);
+    Route::get('/incident-inspection/{vehicleId}', [ApprovalsController::class, 'getincidentInspectionData']);
     Route::post('inspectionpdiapp/approvals', [ApprovalsController::class,'approvalspdi'])->name('inspectionapprovalpdi.approvalspdi');
     Route::post('inspectionpdiappin/approvals', [ApprovalsController::class,'approvedincidentsonly'])->name('inspectionapprovalpdi.approvedincidentsonly');
     Route::get('incidents/updatevehicledetails', [IncidentController::class, 'updatevehicledetails'])->name('incident.updatevehicledetails');

@@ -271,6 +271,68 @@
     </div>
   </div>
 </div>
+<div class="modal fade pdi-modal" id="incidentModal" tabindex="-1" aria-labelledby="incidentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Incident Inspection Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <div id="buttonContainer" class="d-flex justify-content-end"></div>
+      <br>
+      <input type="hidden" id="inspection_id" name="inspection_id" value="">
+      <div class="row">
+  <div class="col-md-2">
+    <p><strong>Model Line:</strong></p>
+    <p><span id="modelLineincident"></span></p>
+</div>
+    <div class="col-md-2">
+    <p><strong>VIN:</strong></p>
+    <p><span id="vinincident"></span></p>
+    </div>
+    <div class="col-md-2">
+    <p><strong>Interior Color:</strong></p>
+    <p><span id="intColourincident"></span></p>
+    </div>
+    <div class="col-md-2">
+    <p><strong>Exterior Color:</strong></p>
+    <p><span id="extColourincident"></span></p>
+    </div>
+    <div class="col-md-2">
+    <p><strong>Location:</strong></p>
+    <p><span id="locationincident"></span></p>
+  </div>
+  <div class="col-md-2">
+    <p><strong>Model Year:</strong></p>
+    <p><span id="model_yearincident"></span></p>
+  </div>
+</div>
+<br>
+<div id ="incidentContainerincident">
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <p><strong>Manager Remarks</strong></p>
+        <textarea id="mangerremarks" rows="4" placeholder="Enter your remarks here..." style="width: 100%;"></textarea>
+    </div>
+</div>
+        </div>
+      <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-approve');
+                @endphp
+                @if ($hasPermission) 
+                <div id="incidentappincident">
+                </div>
+                @else
+                <button type="button" class="btn btn-success" id="updateButtonpdi">Update</button>
+                @endif
+            </div>
+    </div>
+  </div>
+</div>
   <div class="modal fade works-modal" id="works" tabindex="-1" aria-labelledby="worksLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -579,9 +641,7 @@ for (var i = 0; i < columnCount; i++) {
   }
   reasonsHTML += '</ul></div><div class="col-md-3">';
 }
-
 reasonsHTML += '</div></div>';
-
 $('#reason').html(reasonsHTML);
         $('#drivenBy').text(incidentData.driven_by);
         $('#detail').text(incidentData.detail);
@@ -616,7 +676,130 @@ $('#reason').html(reasonsHTML);
         console.error('Error fetching routine inspection details:', error);
       }
     });
-  }  else if (stage === 'PDI') {
+  }
+  else if (stage === 'Incident')
+  {
+    $.ajax({
+      url: '/incident-inspection/' + vehicleId,
+      method: 'GET',
+      success: function (response) { 
+        var additionalInfo = response.additionalInfo;
+        var grnpicturelink = response.grnpicturelink;
+        var secgrnpicturelink = response.secgrnpicturelink;
+        var PDIpicturelink = response.PDIpicturelink;
+        var modificationpicturelink = response.modificationpicturelink;
+        var Incidentpicturelink = response.Incidentpicturelink;
+        var buttonContainerHtml = '';
+      if (grnpicturelink) {
+        buttonContainerHtml += `<a class="btn btn-sm btn-primary" href="${grnpicturelink}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> GRN Pictures</a>&nbsp;&nbsp;`;
+      }
+      if (secgrnpicturelink) {
+        buttonContainerHtml += `<a class="btn btn-sm btn-primary" href="${secgrnpicturelink}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> GRN-2 Pictures</a>&nbsp;&nbsp;`;
+      }
+      if (PDIpicturelink) {
+        buttonContainerHtml += `<a class="btn btn-sm btn-primary" href="${PDIpicturelink}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> PDI Pictures</a>&nbsp;&nbsp;`;
+      }
+      if (modificationpicturelink) {
+        buttonContainerHtml += `<a class="btn btn-sm btn-primary" href="${modificationpicturelink}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> Modification Pictures</a>&nbsp;&nbsp;`;
+      }
+      if (Incidentpicturelink) {
+        buttonContainerHtml += `<a class="btn btn-sm btn-primary" href="${Incidentpicturelink}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> Incident Pictures</a>`;
+      }
+      if (response.incidentDetails) {
+  var incidentHtml = `
+    <h5>Incident Report</h5>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Incident Type</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.type ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Narration Of Accident / Damage</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.narration ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Damage Details</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.detail ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Driven By</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.driven_by ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Responsibility for Recover the Damages</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.responsivity ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Reason</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.reason ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="row">
+          <div class="col-md-12">
+            ${response.incidentDetails.file_path ? 
+              `<img src="{{ asset('qc/') }}/${response.incidentDetails.file_path}" alt="Incident Image">` : 
+              'No image available'}
+          </div>
+        </div>
+      </div>
+    <br>`;
+  $('#incidentContainerincident').html(incidentHtml);
+  var approvedPdiButton = '<button type="button" class="btn btn-warning" onclick="approvedincidentsonly()">Approved Incident Only</button>';
+        $('#incidentappincident').html(approvedPdiButton);
+    } else {
+        $('#incidentappincident').hide();
+    }
+        $('#modelLineincident').text(additionalInfo.model_line);
+        $('#vinincident').text(additionalInfo.vin);
+        $('#intColourincident').text(additionalInfo.int_colour);
+        $('#extColourincident').text(additionalInfo.ext_colour);
+        $('#locationincident').text(additionalInfo.location);
+        $('#model_yearincident').text(additionalInfo.my);
+        $('#buttonContainer').html(buttonContainerHtml);
+        $('#incidentModal').modal('show');
+      },
+      error: function (error) {
+        console.error('Error fetching routine inspection details:', error);
+      }
+    });
+  }  
+  else if (stage === 'PDI') {
     $.ajax({
       url: '/pdi-inspection/' + vehicleId,
       method: 'GET',

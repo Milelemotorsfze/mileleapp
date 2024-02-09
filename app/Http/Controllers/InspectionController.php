@@ -366,7 +366,6 @@ class InspectionController extends Controller
         $variant_request->fuel_type = $request->input('fuel_type');
         $variant_request->engine = $request->input('engine');
         $variant_request->upholestry = $request->input('upholestry');
-        $variant_request->coo = $request->input('coo');
         $variant_request->drive_train = $request->input('drive_train');
         $variant_request->gearbox = $request->input('gearbox');
         $variant_request->my = $request->input('my');

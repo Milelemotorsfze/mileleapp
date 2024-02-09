@@ -339,7 +339,17 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                { 
+            data: 'detail', 
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (type === 'display' && data.length > 50) {
+                    return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
+                } else {
+                    return data;
+                }
+            }
+        },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'seat', name: 'varaints.seat' },
@@ -359,6 +369,12 @@
                 $('.row-badge1').hide();
             }
         });
+        $('#dtBasicExample1').on('click', '.read-more a', function(e) {
+    e.preventDefault();
+    var rowData = table1.row($(this).closest('tr')).data();
+    // You can handle the "read more" action here, e.g., show a modal with full text.
+    alert("Full text: " + rowData.detail);
+});
         var table2 = $('#dtBasicExample2').DataTable({
             processing: true,
             serverSide: true,
@@ -372,7 +388,17 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                { 
+            data: 'detail', 
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (type === 'display' && data.length > 50) {
+                    return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
+                } else {
+                    return data;
+                }
+            }
+        },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'seat', name: 'varaints.seat' },
@@ -388,6 +414,12 @@
         console.log(api.rows().data().toArray());
     }
         });
+        $('#dtBasicExample2').on('click', '.read-more a', function(e) {
+    e.preventDefault();
+    var rowData = table2.row($(this).closest('tr')).data();
+    // You can handle the "read more" action here, e.g., show a modal with full text.
+    alert("Full text: " + rowData.detail);
+});
         table2.on('draw', function () {
             var rowCount = table2.page.info().recordsDisplay;
             if (rowCount > 0) {
@@ -411,7 +443,17 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                { 
+            data: 'detail', 
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (type === 'display' && data.length > 50) {
+                    return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
+                } else {
+                    return data;
+                }
+            }
+        },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'seat', name: 'varaints.seat' },
@@ -423,6 +465,12 @@
                 { data: 'exterior_color', name: 'ex_color.name' },
             ]
         });
+        $('#dtBasicExample3').on('click', '.read-more a', function(e) {
+    e.preventDefault();
+    var rowData = table3.row($(this).closest('tr')).data();
+    // You can handle the "read more" action here, e.g., show a modal with full text.
+    alert("Full text: " + rowData.detail);
+});
         table3.on('draw', function () {
             var rowCount = table3.page.info().recordsDisplay;
             if (rowCount > 0) {
@@ -448,7 +496,17 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                { 
+            data: 'detail', 
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (type === 'display' && data.length > 50) {
+                    return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
+                } else {
+                    return data;
+                }
+            }
+        },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'seat', name: 'varaints.seat' },
@@ -460,6 +518,12 @@
                 { data: 'exterior_color', name: 'ex_color.name' },
             ]
         });
+        $('#dtBasicExample4').on('click', '.read-more a', function(e) {
+    e.preventDefault();
+    var rowData = table4.row($(this).closest('tr')).data();
+    // You can handle the "read more" action here, e.g., show a modal with full text.
+    alert("Full text: " + rowData.detail);
+});
         table4.on('draw', function () {
             var rowCount = table4.page.info().recordsDisplay;
             if (rowCount > 0) {
@@ -487,7 +551,17 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                { 
+            data: 'detail', 
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (type === 'display' && data.length > 50) {
+                    return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
+                } else {
+                    return data;
+                }
+            }
+        },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'seat', name: 'varaints.seat' },
@@ -499,6 +573,12 @@
                 { data: 'exterior_color', name: 'ex_color.name' },
             ]
         });
+        $('#dtBasicExample5').on('click', '.read-more a', function(e) {
+    e.preventDefault();
+    var rowData = table5.row($(this).closest('tr')).data();
+    // You can handle the "read more" action here, e.g., show a modal with full text.
+    alert("Full text: " + rowData.detail);
+});
         table5.on('draw', function () {
             var rowCount = table5.page.info().recordsDisplay;
             if (rowCount > 0) {
@@ -522,7 +602,17 @@
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
-                { data: 'detail', name: 'varaints.detail' },
+                { 
+            data: 'detail', 
+            name: 'varaints.detail',
+            render: function(data, type, row) {
+                if (type === 'display' && data.length > 50) {
+                    return data.substr(0, 50) + '<span class="read-more">... <a href="#">Read More</a></span>';
+                } else {
+                    return data;
+                }
+            }
+        },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
@@ -531,6 +621,12 @@
                 { data: 'exterior_color', name: 'ex_color.name' },
             ]
         });
+        $('#dtBasicExample6').on('click', '.read-more a', function(e) {
+    e.preventDefault();
+    var rowData = table6.row($(this).closest('tr')).data();
+    // You can handle the "read more" action here, e.g., show a modal with full text.
+    alert("Full text: " + rowData.detail);
+});
         table6.on('draw', function () {
             var rowCount = table6.page.info().recordsDisplay;
             if (rowCount > 0) {

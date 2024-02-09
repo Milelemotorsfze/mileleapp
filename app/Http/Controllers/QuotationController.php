@@ -105,7 +105,6 @@ class QuotationController extends Controller
         }
         $quotation->shipping_method = $request->shipping_method;
         $quotation->save();
-
         $quotationDetail = new QuotationDetail();
         $quotationDetail->quotation_id  = $quotation->id;
         $quotationDetail->country_id  = $request->country_id;
