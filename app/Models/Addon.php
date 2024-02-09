@@ -25,4 +25,7 @@ class Addon extends Model
     public function updatedUser() {
         return $this->belongsTo(User::class,'updated_by','id');
     }
+    public function addondescription() {
+        return $this->belongsTo(AddonDescription::class,'id','addon_id');
+    }
 }
