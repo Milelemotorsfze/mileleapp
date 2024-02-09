@@ -19,6 +19,32 @@ class Separation extends Model
         'action_by_takeover_employee','takeover_employee_action_at','comments_by_takeover_employee','action_by_department_head','department_head_action_at',
         'comments_by_department_head','action_by_hr_manager','hr_manager_id','hr_manager_action_at','comments_by_hr_manager','jd_verified_at','tasks_verified_at',
         'sign_verified_at','created_by','updated_by','deleted_by'];
+    protected $appends = [
+        'current_status',
+    ];
+    public function getCurrentStatusAttribute() {
+        $currentStatus = '';
+        if($this->status == 'approved') {
+            $currentStatus = 'Approved';
+        }
+        else if($this->status == 'rejected') {
+            $currentStatus = 'Rejected';
+        }
+        // Approvals =>  Employee -----------> takeover employee (optional)------>Reporting Manager-------> HR Manager 
+        else if($this->status == 'pending' && $this->action_by_employee == 'pending') {
+            $currentStatus = "Employee's Approval Awaiting";
+        }
+        else if($this->status == 'pending' && $this->takeover_employee_id != NULL && $this->action_by_takeover_employee == 'pending') {
+            $currentStatus = "Takeover Employee's Approval Awaiting";
+        }
+        else if($this->status == 'pending' && $this->action_by_department_head == 'pending') {
+            $currentStatus = "Reporting Manager's Approval Awaiting";
+        }    
+        else if($this->status == 'pending' && $this->action_by_hr_manager == 'pending') {
+            $currentStatus = "HR Manager's Approval Awaiting";
+        }
+        return $currentStatus;
+    } 
     public function user() {
         return $this->hasOne(User::class,'id','employee_id');
     }

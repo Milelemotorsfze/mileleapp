@@ -135,7 +135,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
 								@endphp
 								@if ($hasPermission) 
 								<li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('overtime.edit',$data->id)}}">
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('separation-handover.edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 										</a>
 									</li>
