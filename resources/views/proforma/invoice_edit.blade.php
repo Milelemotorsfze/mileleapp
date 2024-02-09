@@ -3983,6 +3983,7 @@ function updateSecondTable(RowId, savedVins) {
         row['model_type'] = 'Kit';
         }
         }
+        row['modallineidad'] = existings.model_line_id;
         row['brand_id'] = existings.brand_id;
         row['model_line_id'] = existings.model_line_id;
         row['id'] =  existings.brand_id;
