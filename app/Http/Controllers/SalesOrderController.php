@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\DB;
 use App\Models\QuotationItem;
 use App\Models\Brand;
 use App\Models\Varaint;
+use App\Models\PreOrder;
+use App\Models\PreOrdersItems;
+use App\Models\QuotationDetail;
 use App\Models\Soitems;
 use App\Models\MasterModelLines;
 
@@ -75,55 +78,46 @@ class SalesOrderController extends Controller
         //
     }
     public function createsalesorder($callId) {
-        // Retrieve the quotation based on callId
         $quotation = Quotation::where('calls_id', $callId)->first();
-        // Initialize an empty array to store the resulting vehicles
+        $calls = Calls::find($callId);
+        $customerdetails = QuotationDetail::with('country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms')->where('quotation_id', $quotation->id)->first();
         $vehicles = [];
-        // Check if the quotation exists
         if ($quotation) {
-            // Retrieve quotation items based on quotation_id and reference_type
             $quotationItems = QuotationItem::where('quotation_id', $quotation->id)
                 ->whereIn('reference_type', [
                     'App\Models\Varaint',
                     'App\Models\MasterModelLines',
                     'App\Models\Brand'
                 ])->get();
-                // Loop through each quotation item
             foreach ($quotationItems as $item) {
                 switch ($item->reference_type) {
                     case 'App\Models\Varaint':
-                    // Retrieve vehicles associated with this variant
                     $variantId = $item->reference_id;
                     $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
                     $vehicles[$item->id] = $variantVehicles;
                     break;
                 case 'App\Models\MasterModelLines':
-                    // Retrieve variants associated with this MasterModelLines
                     $variants = Variant::where('master_model_lines_id', $item->reference_id)->get();
                     foreach ($variants as $variant) {
-                        // Retrieve vehicles associated with each variant
                         $variantId = $variant->id;
                         $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
                         $vehicles[$item->id] = $variantVehicles;
                     }
                     break;
                 case 'App\Models\Brand':
-                    // Retrieve variants associated with this Brand
                     $variants = Variant::where('brand_id', $item->reference_id)->get();
                     foreach ($variants as $variant) {
-                        // Retrieve vehicles associated with each variant
                         $variantId = $variant->id;
                         $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
                         $vehicles[$item->id] = $variantVehicles;
                     }
                     break;
                 default:
-                    // Handle other reference types if needed
                     break;
                 }
                     }
                     }  
-                    return view('salesorder.create', compact('vehicles', 'quotationItems', 'quotation')); 
+                    return view('salesorder.create', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails')); 
             }  
             public function storesalesorder(Request $request, $quotationId)
             {
@@ -152,12 +146,23 @@ class SalesOrderController extends Controller
                 $closed->so_id = $so->id;
                 $closed->save();
                 $vins = $request->input('vehicle_vin');
-                $allVins = [];
-                    foreach ($vins as $selectedVins) {
-                        $allVins = array_merge($allVins, $selectedVins);
-                    }
-                Vehicles::whereIn('vin', $allVins)->update(['so_id' => $so->id]);
+                $selectedVinsWithNull = [];
+                $selectedVinsWithoutNull = [];
                 foreach ($vins as $quotationItemId => $selectedVins) {
+                    foreach ($selectedVins as $selectedVin) {
+                        if ($selectedVin === null) {
+                            $selectedVinsWithNull[$quotationItemId][] = $selectedVin;
+                        } else {
+                            $selectedVinsWithoutNull[$quotationItemId][] = $selectedVin;
+                        }
+                    }
+                }
+                $allVinsWithoutNull = [];
+                foreach ($selectedVinsWithoutNull as $selectedVins) {
+                    $allVinsWithoutNull = array_merge($allVinsWithoutNull, $selectedVins);
+                }
+                Vehicles::whereIn('vin', $allVinsWithoutNull)->update(['so_id' => $so->id]);
+                foreach ($selectedVinsWithoutNull as $quotationItemId => $selectedVins) {
                     foreach ($selectedVins as $selectedVin) {
                         $vehicle = Vehicles::where('vin', $selectedVin)->first();
                         $soVinRelationship = new Soitems();
@@ -166,6 +171,25 @@ class SalesOrderController extends Controller
                         $soVinRelationship->vehicles_id = $vehicle->id;
                         $soVinRelationship->save();
                     }
+                }
+                if($selectedVinsWithNull)
+                {
+                    $pre_order = new PreOrder();
+                    $pre_order->quotations_id = $quotationId;
+                    $pre_order->requested_by  = Auth::id();
+                    $pre_order->save();
+                    foreach ($selectedVinsWithNull as $quotationItemId => $selectedVins) {
+                        $totalNullVins = count($selectedVins);
+                        $quotationitems = QuotationItem::find($quotationItemId);
+                        $quotationdetails = QuotationDetail::with('country')->where('quotation_id', $quotationId)->first();
+                        $preOrderItem = new PreOrdersItems();
+                        $preOrderItem->countries_id = $quotationdetails->country->id;
+                        $preOrderItem->description = $quotationitems->description; 
+                        $preOrderItem->master_model_lines_id = $quotationitems->model_line_id;
+                        $preOrderItem->preorder_id = $pre_order->id;
+                        $preOrderItem->qty = $totalNullVins;
+                        $preOrderItem->save();
+                    }  
                 }
                 return redirect()->route('dailyleads.index')->with('success', 'Sales Order created successfully.'); 
             }  

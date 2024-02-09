@@ -129,7 +129,6 @@ class ApprovalsController extends Controller
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
                 ->leftJoin('users', 'inspection.created_by', '=', 'users.id')
                 ->where('inspection.status', $status);
-                $data = $data->groupBy('vehicles.id');
             }
                 return DataTables::of($data)
                 ->toJson();
@@ -158,10 +157,10 @@ class ApprovalsController extends Controller
      */
     public function show($id)
     {
-        $useractivities =  New UserActivities();
-        $useractivities->activity = "Open the Approval Page For Approval";
-        $useractivities->users_id = Auth::id();
-        $useractivities->save();
+    $useractivities =  New UserActivities();
+    $useractivities->activity = "Open the Approval Page For Approval";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
     $inspection = Inspection::find($id);
     $vehicle = Vehicles::find($inspection->vehicle_id);
     $grnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN')->pluck('vehicle_picture_link')->first();
@@ -178,10 +177,10 @@ class ApprovalsController extends Controller
     $allBrands = Brand::all();
     $model_line = MasterModelLines::find($variant->master_model_lines_id);
     $model_lines = MasterModelLines::all();
-    $intColor = ColorCode::find($vehicle->int_colour);
-    $intColorall = ColorCode::where('belong_to', 'int')->get();
-    $extColor = ColorCode::find($vehicle->ex_colour);
-    $extColorall = ColorCode::where('belong_to', 'ex')->get();
+    $vehiclecolour = ColorCode::find($vehicle->int_colour);
+    $intmaster = ColorCode::where('belong_to', 'int')->get();
+    $extvehicle = ColorCode::find($vehicle->ex_colour);
+    $extmaster = ColorCode::where('belong_to', 'ex')->get();
     $variant_request = VariantRequest::where('inspection_id', $id)->first();
     $variantRequestItems = VariantRequestItems::where('variant_request_id', $variant_request->id)->get();
     $data = [];
@@ -199,12 +198,12 @@ class ApprovalsController extends Controller
     }
     $brands = Brand::find($variant_request->brands_id);
     $modal = MasterModelLines::find($variant_request->master_model_lines_id);
-    $intColorr = ColorCode::find($variant_request->int_colour);
-    $extColorr = ColorCode::find($variant_request->ex_colour);
+    $intrequest = ColorCode::find($variant_request->int_colour);
+    $extrequest = ColorCode::find($variant_request->ex_colour);
     $extraItems = DB::table('vehicles_extra_items')
         ->where('vehicle_id', $inspection->vehicle_id)
         ->get(['item_name', 'qty']);
-    return view('inspection.approvalview', compact('extColorall','intColorall','intColorr','extColorr','modal','model_lines','data','allBrands','brands','variant_request','Incidentpicturelink','modificationpicturelink','PDIpicturelink', 'secgdnpicturelink', 'gdnpicturelink', 'secgrnpicturelink', 'grnpicturelink', 'extraItems','inspection', 'vehicle', 'variant', 'brand', 'model_line', 'intColor', 'extColor','Incident', 'extra_featuresvalue'));
+    return view('inspection.approvalview', compact('extmaster','intmaster','intrequest','extrequest','modal','model_lines','data','allBrands','brands','variant_request','Incidentpicturelink','modificationpicturelink','PDIpicturelink', 'secgdnpicturelink', 'gdnpicturelink', 'secgrnpicturelink', 'grnpicturelink', 'extraItems','inspection', 'vehicle', 'variant', 'brand', 'model_line', 'vehiclecolour', 'extvehicle','Incident', 'extra_featuresvalue'));
     }
 
     /**
@@ -1148,5 +1147,38 @@ class ApprovalsController extends Controller
             }
         }
         return response()->json(['message' => 'Routine inspection data updated successfully']);
+    }
+    public function getincidentInspectionData($vehicleId)
+    {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open The PDI Inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        $inspection = Inspection::find($vehicleId);
+        $additionalInfo = Vehicles::select('master_model_lines.model_line', 'vehicles.vin', 'color_codes.name as int_colour', 'color_codes.name as ext_colour', 'warehouse.name as location')
+        ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+        ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+        ->leftJoin('color_codes', 'vehicles.int_colour', '=', 'color_codes.id')
+        ->leftJoin('color_codes as ext_color', 'vehicles.ex_colour', '=', 'ext_color.id')
+        ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+        ->where('vehicles.id', $inspection->vehicle_id)
+        ->first();
+        $incidentDetails = Incident::where('inspection_id', $inspection->id)->first();
+        $vehicle = Vehicles::find($inspection->vehicle_id);
+        $grnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN')->pluck('vehicle_picture_link')->first();
+        $secgrnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN-2')->pluck('vehicle_picture_link')->first();
+        $PDIpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'PDI')->pluck('vehicle_picture_link')->first();
+        $modificationpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Modification')->pluck('vehicle_picture_link')->first();
+        $Incidentpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'Incident')->pluck('vehicle_picture_link')->first();
+        return response()->json([
+            'additionalInfo' => $additionalInfo,
+            'grnpicturelink' => $grnpicturelink,
+            'secgrnpicturelink' => $secgrnpicturelink,
+            'PDIpicturelink' => $PDIpicturelink,
+            'modificationpicturelink' => $modificationpicturelink,
+            'Incidentpicturelink' => $Incidentpicturelink,
+            'incidentDetails' => $incidentDetails,
+            'remarks' => $inspection,
+        ]);
     }
 }

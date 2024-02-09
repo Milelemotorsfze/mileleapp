@@ -275,14 +275,15 @@ function openModal(id) {
             // Create a table to display variant details
             var variantDetailsTable = $('<table class="table table-bordered"></table>');
             var variantDetailsBody = $('<tbody></tbody>');
+            variantDetailsBody.append('<tr><th>Attribute</th><th>Options</th><th>Modification Options</th></tr>');
             variantDetailsBody.append('<tr><th>Name</th><td>' + response.variants.name + '</td></tr>');
-            variantDetailsBody.append('<tr><th>Steering</th><td>' + response.variants.steering + '</td></tr>');
-            variantDetailsBody.append('<tr><th>Engine</th><td>' + response.variants.engine + '</td></tr>');
-            variantDetailsBody.append('<tr><th>Production Year</th><td>' + response.variants.my + '</td></tr>');
-            variantDetailsBody.append('<tr><th>Fuel Type</th><td>' + response.variants.fuel_type + '</td></tr>');
-            variantDetailsBody.append('<tr><th>Gear</th><td>' + response.variants.gearbox + '</td></tr>');
-            variantDetailsBody.append('<tr><th>Drive Train</th><td>' + response.variants.drive_train + '</td></tr>');
-            variantDetailsBody.append('<tr><th>Upholstery</th><td>' + response.variants.upholestry + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Steering</th><td>' + response.variants.steering + '</td><td></td></tr>');
+            variantDetailsBody.append('<tr><th>Engine</th><td>' + response.variants.engine + '</td><td></td></tr>');
+            variantDetailsBody.append('<tr><th>Production Year</th><td>' + response.variants.my + '</td><td></td></tr>');
+            variantDetailsBody.append('<tr><th>Fuel Type</th><td>' + response.variants.fuel_type + '</td><td></td></tr>');
+            variantDetailsBody.append('<tr><th>Gear</th><td>' + response.variants.gearbox + '</td><td></td></tr>');
+            variantDetailsBody.append('<tr><th>Drive Train</th><td>' + response.variants.drive_train + '</td><td></tr>');
+            variantDetailsBody.append('<tr><th>Upholstery</th><td>' + response.variants.upholestry + '</td><td></td></tr>');
             variantDetailsTable.append(variantDetailsBody);
             modalBody.append('<h5>Variant Details:</h5>');
             modalBody.append(variantDetailsTable);

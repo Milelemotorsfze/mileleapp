@@ -10,6 +10,308 @@
     <div class="card-body">
     <form onsubmit="return checkForDuplicateVINs();" action="{{ route('salesorder.storesalesorder', ['QuotationId' => $quotation->id]) }}" id="form-create" method="POST">
     @csrf
+    <div class="row">
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-4">
+                        Document Type :
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-check form-check-inline">
+                        <label class="form-check-label" for="inlineCheckbox2">{{$quotation->document_type}}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-2">
+                        Category :
+                    </div>
+                    <div class="col-sm-4">
+                    
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-2">
+                        Currency :
+                    </div>
+                     <div class="col-sm-4">
+                     <label class="form-check-label" for="inlineCheckbox2">{{$quotation->currency}}</label>
+                </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-4">
+<strong>Document Details</strong>
+            </div>
+            <div class="col-sm-4">
+            <strong>Client's Details</strong>
+            </div>
+            <div class="col-sm-4">
+            <strong> Delivery Details</strong>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        <label for="timeRange">Document Validity:</label>
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->document_validity}}</label>
+                </div>
+                </div>
+                @php
+                $user = \Illuminate\Support\Facades\Auth::user();
+                $empProfile = $user->empProfile;
+                @endphp
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Sales Person :
+                    </div>
+                    <div class="col-sm-6">
+                        {{ Auth::user()->name }}
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Sales Office :
+                    </div>
+                    <div class="col-sm-6">
+                    {{ isset($empProfile->office) ? $empProfile->office : '' }}
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Sales Email ID :
+                    </div>
+                    <div class="col-sm-6">
+                        {{ Auth::user()->email }}
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Sales Contact No :
+                    </div>
+                    <div class="col-sm-6">
+                    {{ isset($empProfile->phone) ? $empProfile->phone : '' }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Client Category :
+                    </div>
+                    <div class="col-sm-6">
+                    @if(!$calls->company_name)
+                    <label class="form-check-label">Individual</label>
+                    @else
+                    <label class="form-check-label">Company</label>
+                </div>
+                </div>
+                <div class="row mt-2" id="contact-person-div">
+                    <div class="col-sm-6">
+                        Contact Person :
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$calls->name}}</label>
+                    </div>
+                </div>
+                <div class="row mt-2" id="company-div" >
+                    <div class="col-sm-6">
+                        Company :
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$calls->company_name}}</label>
+                    @endif
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        <label for="timeRange">Customer :</label>
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$calls->name}}</label>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Contact Number :
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$calls->phone}}</label>   
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Email :
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$calls->email}}</label>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Address :
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$calls->address}}</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4" >
+                <div id="export-shipment">
+                    <div class="row mt-2">
+                        <div class="col-sm-6">
+                            Final Destination :
+                        </div>
+                        <div class="col-sm-6">
+                        <label class="form-check-label">
+                            @if ($customerdetails->country)
+                                {{ $customerdetails->country->name }}
+                            @else
+                            @endif
+                        </label>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-6">
+                            Incoterm :
+                        </div>
+                        <div class="col-sm-6">
+                        <label class="form-check-label">{{$customerdetails->incoterm}}</label>
+                    </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-6">
+                            Port of Discharge :
+                        </div>
+                        <div class="col-sm-6">
+                        <label class="form-check-label" for="inlineCheckbox2">
+                            @if ($customerdetails->shippingPort)
+                            {{$customerdetails->shippingPort->shipping_port_id}}
+                            @else
+                            @endif
+                        </label>
+                    </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-6">
+                            Port of Loading :
+                        </div>
+                        <div class="col-sm-6">
+                        <label class="form-check-label" for="inlineCheckbox2">
+                        @if ($customerdetails->shippingPortOfLoad)
+                        {{$customerdetails->shippingPortOfLoad->to_shipping_port_id}}
+                        @else
+                        @endif
+                        </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2" hidden id="local-shipment">
+                    <div class="col-sm-6">
+                        Place of Supply :
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->place_of_supply}}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row mt-2">
+            <div class="col-sm-4">
+                Payment Details
+            </div>
+            <div class="col-sm-8">
+                Client's Representative
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Payment Terms :
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">
+                        @if ($customerdetails->paymentterms)
+                        {{$customerdetails->paymentterms->name}}
+                        @else
+                        @endif
+                    </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Rep Name :
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->representative_name}}</label>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Rep No :
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->representative_number}}</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        CB Name:
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->cb_name}}</label>
+                </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        CB No:
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->cb_number}}</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4"  id="advance-amount-div" hidden>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Advance Amount :
+                    </div>
+                    <div class="col-sm-6">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$customerdetails->advance_amount}}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-sm-12">
+                <div class="row mt-2">
+                    <div class="col-sm-2">
+                        Remarks :
+                    </div>
+                    <div class="col-sm-10">
+                    <label class="form-check-label" for="inlineCheckbox2">{{$quotation->sales_notes}}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
             <div class="row">
             <h6>SO Details</h6>
         <div class="col-md-2 mb-3">
@@ -36,7 +338,7 @@
                 @for ($i = 0; $i < $quotationItem->quantity; $i++)
                 <div class="col-md-2 mb-3">
                     <select name="vehicle_vin[{{ $quotationItem->id }}][]" class="form-control select2">
-                        <option value="" disabled>Select VIN</option>
+                        <option value="" selected>Select VIN</option>
                         @foreach($vehicles[$quotationItem->id] as $vehicle)
                         @if($vehicle->inspection_status != "Pending")
                         @php

@@ -234,8 +234,7 @@ public function getBrandsAndModelLines(Request $request)
         $this->validate($request, [
             'payment_term_id' => 'required',
             'po_type' => 'required',
-            'vendors_id' => 'required',
-            'po_number' => 'required'
+            'vendors_id' => 'required'
         ]);
 
         DB::beginTransaction();

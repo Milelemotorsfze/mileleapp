@@ -44,6 +44,138 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Interior Colour</label>
+                                    <select class="form-control" autofocus name="interior_colour" id="interior_colour">
+                                    <option value="" disabled selected>Select a Colour</option>
+                                    @foreach($int_colours as $int_colours)
+                                    <option value="{{ $int_colours->id }}">
+                                        {{ $int_colours->name }}
+                                    </option>
+                                @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Exterior Colour</label>
+                                    <select class="form-control" autofocus name="exterior_colour" id="exterior_colour">
+                                    <option value="" disabled selected>Select a Colour</option>
+                                    @foreach($ext_colours as $ext_colours)
+                                    <option value="{{ $ext_colours->id }}">
+                                        {{ $ext_colours->name }}
+                                    </option>
+                                @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Model Year</label>
+                                    @php
+                                    $currentYear = date("Y");
+                                    $years = range($currentYear + 10, $currentYear - 10);
+                                    $years = array_reverse($years);
+                                    @endphp
+                                    <select name="my" class="form-control">
+                                        @foreach ($years as $year)
+                                            <option value="{{ $year }}" {{ old('my') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Gear</label>
+                                    <select class="form-control" autofocus name="gearbox" id="gear">
+                                        <option value="AT" {{ old('gearbox') == 'AT' ? 'selected' : '' }}>AT</option>
+                                        <option value="MT" {{ old('gearbox') == 'MT' ? 'selected' : '' }}>MT</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Fuel Type</label>
+                                    <select class="form-control" autofocus name="fuel_type" id="fuel">
+                                        <option value="Petrol" {{ old('fuel_type') == 'Petrol' ? 'selected' : '' }}>Petrol</option>
+                                        <option value="Diesel" {{ old('fuel_type') == 'Diesel' ? 'selected' : '' }}>Diesel</option>
+                                        <option value="PH" {{ old('fuel_type') == 'PH' ? 'selected' : '' }}>PH</option>
+                                        <option value="PHEV" {{ old('fuel_type') == 'PHEV' ? 'selected' : '' }}>PHEV</option>
+                                        <option value="MHEV" {{ old('fuel_type') == 'MHEV' ? 'selected' : '' }}>MHEV</option>
+                                        <option value="EV" {{ old('fuel_type') == 'EV' ? 'selected' : '' }}>EV</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Engine</label>
+                                    <select class="form-control" autofocus name="engine" id="engine">
+                                        <option value="" {{ old('engine') == '' ? 'selected' : '' }}>Please Select The Engine Capacity</option>
+                                        <option value="0.8" {{ old('engine') == '0.8' ? 'selected' : '' }}>0.8</option>
+                                        <option value="1.0" {{ old('engine') == '1.0' ? 'selected' : '' }}>1.0</option>
+                                        <option value="1.2" {{ old('engine') == '1.2' ? 'selected' : '' }}>1.2</option>
+                                        <option value="1.2" {{ old('engine') == '1.2' ? 'selected' : '' }}>1.3</option>
+                                        <option value="1.4" {{ old('engine') == '1.4' ? 'selected' : '' }}>1.4</option>
+                                        <option value="1.5" {{ old('engine') == '1.5' ? 'selected' : '' }}>1.5</option>
+                                        <option value="1.6" {{ old('engine') == '1.6' ? 'selected' : '' }}>1.6</option>
+                                        <option value="1.8" {{ old('engine') == '1.8' ? 'selected' : '' }}>1.8</option>
+                                        <option value="2.0" {{ old('engine') == '2.0' ? 'selected' : '' }}>2.0</option>
+                                        <option value="2.2" {{ old('engine') == '2.2' ? 'selected' : '' }}>2.2</option>
+                                        <option value="2.4" {{ old('engine') == '2.4' ? 'selected' : '' }}>2.4</option>
+                                        <option value="2.5" {{ old('engine') == '2.5' ? 'selected' : '' }}>2.5</option>
+                                        <option value="2.7" {{ old('engine') == '2.7' ? 'selected' : '' }}>2.7</option>
+                                        <option value="2.8" {{ old('engine') == '2.8' ? 'selected' : '' }}>2.8</option>
+                                        <option value="3.0" {{ old('engine') == '3.0' ? 'selected' : '' }}>3.0</option>
+                                        <option value="3.3" {{ old('engine') == '3.3' ? 'selected' : '' }}>3.3</option>
+                                        <option value="3.5" {{ old('engine') == '3.5' ? 'selected' : '' }}>3.5</option>
+                                        <option value="4.0" {{ old('engine') == '4.0' ? 'selected' : '' }}>4.0</option>
+                                        <option value="4.2" {{ old('engine') == '4.2' ? 'selected' : '' }}>4.2</option>
+                                        <option value="4.4" {{ old('engine') == '4.4' ? 'selected' : '' }}>4.4</option>
+                                        <option value="4.5" {{ old('engine') == '4.5' ? 'selected' : '' }}>4.5</option>
+                                        <option value="4.6" {{ old('engine') == '4.6' ? 'selected' : '' }}>4.6</option>
+                                        <option value="4.8" {{ old('engine') == '4.8' ? 'selected' : '' }}>4.8</option>
+                                        <option value="5.3" {{ old('engine') == '5.3' ? 'selected' : '' }}>5.3</option>
+                                        <option value="5.6" {{ old('engine') == '5.6' ? 'selected' : '' }}>5.6</option>
+                                        <option value="5.7" {{ old('engine') == '5.7' ? 'selected' : '' }}>5.7</option>
+                                        <option value="6.0" {{ old('engine') == '6.0' ? 'selected' : '' }}>6.0</option>
+                                        <option value="6.2" {{ old('engine') == '6.2' ? 'selected' : '' }}>6.2</option>
+                                        <option value="6.7" {{ old('engine') == '6.7' ? 'selected' : '' }}>6.7</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Steering</label>
+                                    <select class="form-control" autofocus name="steering" id="steering">
+                                        <option value="LHD" {{ old('steering') == 'LHD' ? 'selected' : '' }}>LHD</option>
+                                        <option value="RHD" {{ old('steering') == 'RHD' ? 'selected' : '' }}>RHD</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Drive Train</label>
+                                    <select class="form-control" autofocus name="drive_train" id="drive_train">
+                                        <option value="AWD" {{ old('drive_train') == 'AWD' ? 'selected' : '' }}>AWD</option>
+                                        <option value="4WD" {{ old('geadrive_trainrbox') == '4WD' ? 'selected' : '' }}>4WD</option>
+                                        <option value="FWD" {{ old('geadrive_trainrbox') == 'FWD' ? 'selected' : '' }}>FWD</option>
+                                        <option value="RWD" {{ old('geadrive_trainrbox') == 'RWD' ? 'selected' : '' }}>RWD</option>
+
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Upholstery</label>
+                                    <select class="form-control" autofocus name="upholestry" id="upholstery">
+                                        <option value="Leather" {{ old('upholstery') == 'Leather' ? 'selected' : '' }}>Leather</option>
+                                        <option value="Fabric" {{ old('upholstery') == 'Fabric' ? 'selected' : '' }}>Fabric</option>
+                                        <option value="Vinyl" {{ old('upholstery') == 'Vinyl' ? 'selected' : '' }}>Vinyl</option>
+                                        <option value="Leather & Fabric" {{ old('upholstery') == 'Leather & Fabric' ? 'selected' : '' }}>Leather & Fabric</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="row" id="specification-details-container">
                             </div>
                             <input type="hidden" name="selected_model_id" id="selected_model_id">
@@ -256,6 +388,8 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
+        $('#interior_colour').select2();
+        $('#exterior_colour').select2();
         $('#enableInputs').change(function() {
             $('#vin, #variant, #newVariantDropdown, #interior_color, #exterior_color').prop('disabled', !this.checked);
         });
@@ -452,6 +586,7 @@ $(document).ready(function() {
                 data.forEach(function(item) {
                     var specification = item.specification;
                     var options = item.options;
+                    if (options.length > 0) {
                     var select = $('<select class="form-control" name="specification_' + specification.id + '"data-specification-id="' + specification.id + '" required>');
                     select.append('<option value="" disabled selected>Select an Option</option>');
 
@@ -472,6 +607,7 @@ $(document).ready(function() {
                     specificationColumn.append('<label class="form-label">' + specification.name + '</label');
                     specificationColumn.append(select);
                     $('#specification-details-container').append(specificationColumn);
+                }
                 });
             }
         });
