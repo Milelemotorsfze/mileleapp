@@ -647,10 +647,6 @@ class QuotationController extends Controller
                $quotationItem->addon_type = $request->addon_types[$key];
                $quotationItem->brand_id = $request->brand_ids[$key];
                $quotationItem->model_line_id = $request->model_line_ids[$key];
-               if($request->model_description_ids[$key])
-               {
-               $quotationItem->model_description_id = $request->model_description_ids[$key];
-               }
            }else if($request->types[$key] == 'Addon') {
                if($request->reference_ids[$key] != 'Other') {
                    $item = Addon::find($request->reference_ids[$key]);
@@ -658,10 +654,6 @@ class QuotationController extends Controller
                $quotationItem->addon_type = $request->addon_types[$key];
                $quotationItem->brand_id = $request->brand_ids[$key];
                $quotationItem->model_line_id = $request->model_line_ids[$key];
-               if($request->model_description_ids[$key])
-               {
-               $quotationItem->model_description_id = $request->model_description_ids[$key];
-               }
            }
             if($item && !isset($request->vehiclesitemsid[$key])) {
                 $quotationItem->reference()->associate($item);
