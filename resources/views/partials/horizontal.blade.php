@@ -1372,7 +1372,7 @@
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicles.viewall') }}" id="topnav-more" role="button">
                                         <i data-feather="server"></i>
-                                        <span data-key="t-extra-pages">View All</span>
+                                        <span data-key="t-extra-pages">Stock Report</span>
                                     </a>
                                 </li>
                                 @endif
