@@ -7,11 +7,11 @@
         @if ($hasPermission)
             <div class="card-header">
                 <h4 class="card-title">
-                    Master Model Lines Specification
+                    Master Model Lines Attributes
                 </h4>
                 <a  class="btn btn-sm btn-info float-end" href="{{ route('model-lines.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
                 <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-                <a class="btn btn-sm btn-success float-end" href="#" onclick="openAddSpecificationModal()"><i class="fa fa-plus" aria-hidden="true"></i> Add New Specification</a>
+                <a class="btn btn-sm btn-success float-end" href="#" onclick="openAddSpecificationModal()"><i class="fa fa-plus" aria-hidden="true"></i> Add New Attributes</a>
             </div>
             <div class="card-body">
                 @if (count($errors) > 0)
@@ -37,13 +37,13 @@
         <div class="modal-content">
             <!-- Modal content goes here -->
             <div class="modal-header">
-                <h5 class="modal-title" id="addSpecificationModalLabel">Add New Specification</h5>
+                <h5 class="modal-title" id="addSpecificationModalLabel">Add New Attributes</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <!-- Text input for the new specification -->
                 <div class="mb-3">
-                    <label for="newSpecificationName" class="form-label">Specification Name</label>
+                    <label for="newSpecificationName" class="form-label">Attributes Name</label>
                     <input type="text" class="form-control" id="newSpecificationName">
                     <input type="hidden" class="form-control" id="model_line_id" value="{{$model_line_id}}">
                 </div>
@@ -102,7 +102,7 @@
                         <thead class="bg-soft-secondary">
                         <tr>
                             <th>Ref.No</th>
-                            <th>Specification</th>
+                            <th>Attributes</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -213,7 +213,7 @@
         // console.log("Saving new specification: " + newSpecificationName);
         // console.log("Saving new specification: " + model_line_id);
         if (newSpecificationName.trim() === '') {
-            alert('Please enter a valid Specification.');
+            alert('Please enter a valid Attributes.');
             return;
         }
         $.ajax({
@@ -225,7 +225,7 @@
                 model_line_id: model_line_id
             },
             success: function (response) {
-                alertify.success('Specification successfully Added');
+                alertify.success('Attributes successfully Added');
                 $('#addSpecificationModal').modal('hide');
                 setTimeout(function() {
                     window.location.reload();

@@ -43,7 +43,7 @@
                             <th>Ref.No</th>
                             <th>Brand</th>
                             <th>Model Line</th>
-                            <th>Specification</th>
+                            <th>Attributes</th>
                             <th>Created By</th>
                             <th>Created At</th>
                             @can('master-model-lines-edit')
