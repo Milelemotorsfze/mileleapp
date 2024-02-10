@@ -949,7 +949,7 @@
                                     </a>
                                 </li>
                                 @endif
-                                @php
+                                <!-- @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
                                 @endphp
                                 @if ($hasPermission)
@@ -960,7 +960,7 @@
                                     </a>
                                 </li>
                                 @endif
-                                @endcan
+                                @endcan -->
                                 @can('part-input-incident')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('part-input-incident');
@@ -1454,9 +1454,9 @@
                                 <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
                     </button>
                     <div id="username-dropdown-menu" class="dropdown-menu dropdown-menu-end" style="top: 100%;">
-                        <a class="dropdown-item" href="{{ route('profile.index') }}">
+                        <!-- <a class="dropdown-item" href="{{ route('profile.index') }}">
                             <i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile
-                        </a>
+                        </a> -->
                         <div class="dropdown-divider"></div>
                         @canany(['user-list-active', 'user-list-inactive', 'user-list-deleted', 'user-create'])
                         @php
