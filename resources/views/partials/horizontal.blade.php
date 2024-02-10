@@ -1225,12 +1225,17 @@
                                         <span data-key="t-extra-pages">Master Data</span>
                                         <div class="arrow-down"></div>
                                     </a>
+                                    @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
+                                @endphp
+                                @if ($hasPermission)
                                     <div class="dropdown-menu" aria-labelledby="topnav-more">
                                     <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('paymentterms.index')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Payment Terms</span>
                                             </a>
                                         </div>
+                                        @endif
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-view');
                                         @endphp
