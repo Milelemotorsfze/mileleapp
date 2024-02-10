@@ -87,6 +87,11 @@ input[type=number]::-webkit-outer-spin-button {
             <label for="basicpill-firstname-input" class="form-label">PO Date : </label>
             <input type="Date" id="po_date" name="po_date" class="form-control" placeholder="PO Date" required value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
         </div>
+        <div class="col-lg-1 col-md-6">
+            <span class="error">* </span>
+            <label for="basicpill-firstname-input" class="form-label">Netsuit PO: </label>
+            <input type="text" id="po_number" name="po_number" class="form-control" placeholder="PO Date" required>
+        </div>
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">Payment Terms : </label>
@@ -115,7 +120,7 @@ input[type=number]::-webkit-outer-spin-button {
                                     <option value="Payment Adjustment">Payment Adjustment</option>
             </select>
         </div>
-        <div class="col-lg-2 col-md-6">
+        <div class="col-lg-1 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">Currency: </label>
             <select class="form-control" autofocus name="currency" required>
@@ -233,8 +238,8 @@ input[type=number]::-webkit-outer-spin-button {
               <input type="text" id="pod" name="pod" class="form-control" placeholder="Port of Discharge">
           </div>
           <div class="col-lg-3 col-md-6">
-              <label for="Incoterm" class="form-label">Final Destination:</label>
-              <input type="text" id="fd" name="fd" class="form-control" placeholder="Final Destination">
+              <label for="Incoterm" class="form-label">Preferred Destination:</label>
+              <input type="text" id="fd" name="fd" class="form-control" placeholder="Preferred Destination">
           </div>
             </div>
             <br>

@@ -263,7 +263,7 @@ public function getBrandsAndModelLines(Request $request)
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
         $updateponum = PurchasingOrder::find($purchasingOrderId);
-        $updateponum->po_number = $purchasingOrderId;
+        $updateponum->po_number = $request->input('po_number');;
         $updateponum->save();
         $variantNames = $request->input('variant_id');
         if($variantNames != null)

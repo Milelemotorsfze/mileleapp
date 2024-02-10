@@ -716,6 +716,8 @@ public function savespecification(Request $request)
     $newvariant->model_detail = $variantfull->model_detail;
     $newvariant->category = "Modified";
     $newvariant->save();
+    if($attributes)
+    {
     $count = count($attributes);
     if($count >= 1)
     {
@@ -727,6 +729,7 @@ public function savespecification(Request $request)
     $newModifiedVariant->base_varaint_id = $variantfull->id;
     $newModifiedVariant->modified_varaint_id = $newvariant->id;
     $newModifiedVariant->save();
+    }
     }
     }
     if($spareparts)
@@ -744,19 +747,28 @@ public function savespecification(Request $request)
     }
     }
     }
+    if(!$spareparts && !$attributes)
+    {
+    $newModifiedVariantvps = new ModifiedVariants();
+    $newModifiedVariantvps->name = $nextVariantName;
+    $newModifiedVariantvps->base_varaint_id = $variantfull->id;
+    $newModifiedVariantvps->modified_varaint_id = $newvariant->id;
+    $newModifiedVariantvps->save();
+    }
     return redirect()->route('variants.index')->with('message', 'Variant created successfully.');
     }
     }
     public function getvariantsdetails($id)
     {
         $modifiedVariants = null; // Initialize $modifiedVariants variable
-        
+        $basevaraint = null;
         $variants = Varaint::where('id', $id)->first();
         if($variants->category === "Modified")
         {
             $modifiedVariants = ModifiedVariants::where('modified_varaint_id', $variants->id)->with('modifiedVariantItems', 'addon')->get();
             $basevarintsid = ModifiedVariants::where('modified_varaint_id', $variants->id)->first();
             $variantItems = VariantItems::where('varaint_id', $basevarintsid->base_varaint_id)->with('model_specification', 'model_specification_option')->get();
+            $basevaraint = Varaint::where('id', $basevarintsid->base_varaint_id)->first();
         }
         else
         {
@@ -769,6 +781,7 @@ public function savespecification(Request $request)
             'variants' => $variants,
             'variantItems' => $variantItems,
             'modifiedVariants' => $modifiedVariants ?? null,
+            'basevaraint' => $basevaraint ?? null,
         ]);
     }    
     }
