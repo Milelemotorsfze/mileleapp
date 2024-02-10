@@ -306,6 +306,7 @@ class SupplierInventoryController extends Controller
                                             ->where('sfx', $uploadFileContent['sfx'])
                                             ->where('model_year',  $uploadFileContent['model_year'])
                                             ->first();
+                                            
 
                 $isModelWithSteeringExist = MasterModel::where('model', $uploadFileContent['model'])
                     ->where('sfx', $uploadFileContent['sfx'])
@@ -324,7 +325,6 @@ class SupplierInventoryController extends Controller
                 }
                 if (empty($isModelExist))
                 {
-
                     $newModels[$j]['model'] = $uploadFileContent['model'];
                     $newModels[$j]['sfx'] = $uploadFileContent['sfx'];
                     $newModels[$j]['model_year'] =  $uploadFileContent['model_year'];
