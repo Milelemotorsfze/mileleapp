@@ -347,10 +347,10 @@ class LetterOfIndentController extends Controller
     }
     public function approve(Request $request)
     {
-        info($request->all());
+       
         $letterOfIndent = LetterOfIndent::find($request->id);
         $letterOfIndent->status = $request->status;
-        info($request->review);
+
         if($request->status = LetterOfIndent::LOI_STATUS_REJECTED) {
             $letterOfIndent->review = $request->review;
         }

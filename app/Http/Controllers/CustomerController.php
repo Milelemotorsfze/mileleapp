@@ -164,7 +164,11 @@ class CustomerController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $customer = Customer::find($id);
+        $customer->delete();
+        
+        return response(true);
+
     }
     public function salescustomers(Request $request)
 {

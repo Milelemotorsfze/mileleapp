@@ -82,6 +82,17 @@
                                         </a>
                                         @endif
                                     @endcan
+                                    @can('delete-customer')
+                                        @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-customer');
+                                        @endphp
+                                        @if ($hasPermission)
+                                            @if($customer->is_deletable == true)
+                                                <button data-url="{{ route('dm-customers.destroy', $customer->id) }}" data-id="{{ $customer->id }}"
+                                                    class="btn btn-danger btn-sm btn-delete"><i class="fa fa-trash"></i></button>
+                                            @endif
+                                        @endif
+                                    @endcan
                                 </td>
 
                                 <div class="modal fade" id="view--docs-{{$customer->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -127,8 +138,34 @@
             </div>
         @endif
     @endcan
-@endsection
 
+@endsection
+@push('scripts')
+<script>
+ $('#PFI-table').on('click', '.btn-delete', function (e) {
+        var url = $(this).data('url');
+        var id = $(this).data('id');
+        var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+            if (e) {
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        _method: 'DELETE',
+                        id: id,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success:function (data) {
+                        location.reload();
+                        alertify.success('Customer Deleted successfully.');
+                    }
+                });
+            }
+        }).set({title:"Delete Item"})
+    });
+ </script>
+@endpush
 
 
 
