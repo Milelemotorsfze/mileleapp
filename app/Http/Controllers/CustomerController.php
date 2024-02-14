@@ -61,6 +61,7 @@ class CustomerController extends Controller
         $customer->country_id = $request->country_id;
         $customer->type = $request->type;
         $customer->address = $request->address;
+        $customer->created_by = Auth::id();
 
         if ($request->has('passport_file'))
         {

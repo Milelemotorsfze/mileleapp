@@ -48,9 +48,9 @@
                         <tr>
                             <th>S.No</th>
                             <th>Name</th>
-                            <th>Value</th>
+                            <th>(Month / Year) Value</th>
                             <th>Type</th>
-                            <th>Order</th>
+                            <th>Priority Number</th>
                             <th>Created At</th>
                             <th>Actions</th>
                         </tr>
@@ -65,21 +65,28 @@
                                     <td>{{ $loiMappingCriteria->value_type }}</td>
                                     <td>{{ $loiMappingCriteria->order }}</td>
                                     <td>{{ \Illuminate\Support\Carbon::parse($loiMappingCriteria->created_at)->format('d M Y') ?? '' }}</td>
-                                    @canany(['edit-loi-mapping-criterias','delete-loi-mapping-criterias'])
-                                        @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-loi-mapping-criterias','delete-loi-mapping-criterias']);
-                                        @endphp
-                                        @if ($hasPermission)
-                                            <td>
+                                    <td>
+                                        @can('edit-loi-mapping-criterias')
+                                            @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-loi-mapping-criterias');
+                                            @endphp
+                                            @if ($hasPermission)
                                                 <a data-placement="top" href="{{ route('loi-mapping-criterias.edit', $loiMappingCriteria->id) }}" class="btn btn-info btn-sm">
                                                     <i class="fa fa-edit"></i>
                                                 </a>
+                                            @endif
+                                        @endcan
+                                        @can('delete-loi-mapping-criterias')
+                                            @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-loi-mapping-criterias');
+                                            @endphp
+                                            @if ($hasPermission)
                                                 <a data-placement="top" href="#" data-id="{{ $loiMappingCriteria->id }}" data-url="{{ route('loi-mapping-criterias.destroy', $loiMappingCriteria->id) }}" class="btn btn-danger btn-delete btn-sm">
                                                     <i class="fa fa-trash"></i>
                                                 </a>
-                                            </td>
-                                        @endif
-                                    @endcan
+                                            @endif
+                                        @endcan
+                                    </td>                               
                                 </tr>
                         @endforeach
                         </tbody>

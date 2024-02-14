@@ -23,7 +23,10 @@ class Customer extends Model
     {
         return $this->belongsTo(Country::class);
     }
-
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class,'created_by','id');
+    }
     public function getIsDeletableAttribute() {
 
         $isExistinInventory = LetterOfIndent::where('customer_id', $this->id)->count();

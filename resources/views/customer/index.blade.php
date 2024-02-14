@@ -51,6 +51,7 @@
                             <th>Customer Type</th>
                             <th>Country </th>
                             <th>Address</th>
+                            <th>Created By</th>
                             <th>Created At</th>
                             <th>Action</th>
 
@@ -64,8 +65,9 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $customer->name }}</td>
                                 <td>{{ $customer->type }}</td>
-                                <td>{{ $customer->country->name }}</td>
+                                <td>{{ $customer->country->name ?? '' }}</td>
                                 <td>{{ $customer->address }}</td>
+                                <td> {{ $customer->createdBy->name ?? ''}} </td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($customer->created_at)->format('d M y') }}</td>
                                 <td>
                                     <button type="button" class="btn btn-primary btn-sm document-btn" title="To view Customer Documents" data-bs-toggle="modal" data-bs-target="#view--docs-{{$customer->id}}">
