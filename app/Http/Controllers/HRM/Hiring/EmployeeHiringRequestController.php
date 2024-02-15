@@ -415,9 +415,9 @@ class EmployeeHiringRequestController extends Controller
         $update = EmployeeHiringRequest::where('id',$request->id)->first();
         $update->final_status = $request->status;
         if($request->status == 'cancelled') {
-            $update->closed_by = Auth::id();
-            $update->closed_at = Carbon::now()->format('Y-m-d H:i:s');
-            $update->closed_comment = $request->comment;
+            $update->cancelled_by = Auth::id();
+            $update->cancelled_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->cancelled_comment = $request->comment;
         }
         else if($request->status == 'onhold') {
             $update->on_hold_by = Auth::id();
@@ -425,9 +425,9 @@ class EmployeeHiringRequestController extends Controller
             $update->on_hold_comment = $request->comment;
         }
         else if($request->status == 'closed') {
-            $update->cancelled_by = Auth::id();
-            $update->cancelled_at = Carbon::now()->format('Y-m-d H:i:s');
-            $update->cancelled_comment = $request->comment;
+            $update->closed_by = Auth::id();
+            $update->closed_at = Carbon::now()->format('Y-m-d H:i:s');
+            $update->closed_comment = $request->comment;
             if(count($request->selectedCandidates) > 0 ) {
                 foreach($request->selectedCandidates as $selectedCandidate) {
                     $candidate = InterviewSummaryReport::where('id',$selectedCandidate)->first();

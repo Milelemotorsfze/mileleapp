@@ -201,21 +201,21 @@ class JobDescriptionController extends Controller
             ['department_head_id',$authId],
             ])->latest()->get();
         if($HRManager) {
-            $HRManagerPendings = JobDescription::where([
-                ['action_by_department_head','approved'],
-                ['action_by_hr_manager','pending'],
-                ['hr_manager_id',$authId],
-                ])->latest()->get();
-            $HRManagerApproved = JobDescription::where([
-                ['action_by_department_head','approved'],
-                ['action_by_hr_manager','approved'],
-                ['hr_manager_id',$authId],
-                ])->latest()->get();
-            $HRManagerRejected = JobDescription::where([
-                ['action_by_department_head','approved'],                
-                ['action_by_hr_manager','rejected'],
-                ['hr_manager_id',$authId],
-                ])->latest()->get();
+        $HRManagerPendings = JobDescription::where([
+            ['action_by_department_head','approved'],
+            ['action_by_hr_manager','pending'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
+        $HRManagerApproved = JobDescription::where([
+            ['action_by_department_head','approved'],
+            ['action_by_hr_manager','approved'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
+        $HRManagerRejected = JobDescription::where([
+            ['action_by_department_head','approved'],                
+            ['action_by_hr_manager','rejected'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
         }
         return view('hrm.hiring.job_description.approvals',compact('page','deptHeadPendings',
         'deptHeadApproved','deptHeadRejected','HRManagerPendings','HRManagerApproved','HRManagerRejected',));
