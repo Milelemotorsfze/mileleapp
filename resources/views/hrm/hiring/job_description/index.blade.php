@@ -438,7 +438,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							</a>
 								@endif
 								@endcanany
-							
+								@canany(['edit-job-description'])
+									@php
+									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-job-description']);
+									@endphp
+									@if ($hasPermission) 
+											<a title="Edit" class="btn btn-sm btn-info" href="{{route('employee-hiring-job-description.create-or-edit',['id' => $data->id, 'hiring_id' => $data->hiring_request_id])}}">
+												<i class="fa fa-edit" aria-hidden="true"></i> 
+											</a>
+									@endif
+									@endcanany
 							</td>
 						</tr>
 						@endforeach

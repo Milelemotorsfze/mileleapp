@@ -132,6 +132,13 @@ class JobDescriptionController extends Controller
                         $update->skills_required = $request->skills_required;
                         $update->position_qualification = $request->position_qualification;
                         $update->updated_by = $authId;
+                        $update->status = 'pending';
+                        $update->action_by_department_head = 'pending';
+                        $update->department_head_id = $teamLeadOrReportingManager->team_lead_or_reporting_manager;
+                        $update->department_head_action_at = NULL;
+                        $update->action_by_hr_manager = 'pending';
+                        $update->hr_manager_id = $HRManager->handover_to_id;
+                        $update->hr_manager_action_at = NULL;
                         $update->update();
                         $history['hiring_request_id'] = $request->hiring_request_id;
                         $history['icon'] = 'icons8-edit-30.png';

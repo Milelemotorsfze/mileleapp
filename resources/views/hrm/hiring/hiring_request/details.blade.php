@@ -29,14 +29,43 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                         <label for="choices-single-default" class="form-label"> Current Status :</label>
                     </div>
                     <div class="col-lg-4 col-md-3 col-sm-6 col-12">
-                        @if($data->current_status == 'Rejected')
+                        @if($data->status == 'rejected')
                         <label class="badge badge-soft-danger">{{ $data->current_status ?? '' }}</label>
-                        @elseif($data->current_status == 'Approved')
+                        @elseif($data->status == 'approved')
                         <label class="badge badge-soft-success">{{ $data->current_status ?? '' }}</label>
                         @else
                         <label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label>
                         @endif
+                        
                     </div>
+                    <br>
+                            @if($data->status == 'approved' && $data->final_status == 'closed')
+                            <p>Closed At : @if($data->closed_comment != '')
+                                        {{ \Carbon\Carbon::parse($data->closed_comment)->format('d M Y, H:i:s') }}
+                                        @endif , 
+                            Closed By : {{$data->closedBy->name ?? ''}}</br>
+                            @if($data->closed_comment != '')
+                            Closed Comment : {{$data->closed_comment}}
+                            @endif
+                        </p>
+                            @elseif($data->status == 'approved' && $data->final_status == 'onhold')
+                            <p>On Hold At : @if($data->on_hold_at != '')
+                                        {{ \Carbon\Carbon::parse($data->on_hold_at)->format('d M Y, H:i:s') }}
+                                        @endif , 
+                            On Hold By : {{$data->onHoldBy->name ?? ''}}</br>
+                            @if($data->on_hold_comment != '')
+                            On Hold Comment : {{$data->on_hold_comment}}
+                        @endif</p>
+                            @elseif($data->status == 'approved' && $data->final_status == 'cancelled')
+                            <p>Cancelled At : @if($data->cancelled_at != '')
+                                        {{ \Carbon\Carbon::parse($data->cancelled_at)->format('d M Y, H:i:s') }}
+                                        @endif
+                                        , 
+                            Cancelled By : {{$data->cancelledBy->name ?? ''}}</br>
+                            @if($data->cancelled_comment != '')
+                            Cancelled Comment : {{$data->cancelled_comment}}
+                        @endif</p>
+                            @endif
                 </div>
             </div>
         </div>

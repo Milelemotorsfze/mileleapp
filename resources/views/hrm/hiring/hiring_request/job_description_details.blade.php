@@ -18,11 +18,13 @@
                                         data-bs-target="#approve-hiring-job-description-{{$data->jobDescription->id}}">
                                         <i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
                                     </button>
-                                    <a style="float:right;margin-right:5px;" title="Edit Job Description" class="btn btn-sm btn-info" href="{{route('employee-hiring-job-description.create-or-edit',[$data->jobDescription->id,$data->id])}}">
-                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                    </a>
                                 @endif
                             @endif
+                        @endif
+                        @if($data->jobDescription->status == 'pending' OR $data->jobDescription->status == 'rejected')
+                        <a style="float:right;margin-right:5px;" title="Edit Job Description" class="btn btn-sm btn-info" href="{{route('employee-hiring-job-description.create-or-edit',[$data->jobDescription->id,$data->id])}}">
+                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                    </a>
                         @endif
                         <div class="modal fade" id="approve-hiring-job-description-{{$data->jobDescription->id}}"
                             tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
