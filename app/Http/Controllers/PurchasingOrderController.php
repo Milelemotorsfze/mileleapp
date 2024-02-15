@@ -362,36 +362,36 @@ public function getBrandsAndModelLines(Request $request)
                     }
                     $masterModels = $request->master_model_id;
                     $dealer = $pfi->letterOfIndent->dealers ?? '';
-                    foreach($masterModels as $key => $masterModel) 
-                    {
-                        $model = MasterModel::find($masterModel);
-                        info($masterModel);
+                    // foreach($masterModels as $key => $masterModel) 
+                    // {
+                    //     $model = MasterModel::find($masterModel);
+                    //     info($masterModel);
 
-                        $possibleModelIds = MasterModel::where('model', $model->model)
-                                            ->where('sfx', $model->sfx)->pluck('id');
-                        info($possibleModelIds);
+                    //     $possibleModelIds = MasterModel::where('model', $model->model)
+                    //                         ->where('sfx', $model->sfx)->pluck('id');
+                    //     info($possibleModelIds);
 
-                        $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
-                            ->whereNull('purchase_order_id')
-                            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-                            ->where('supplier_id', $vendors_id)
-                            ->where('whole_sales', $dealer);
+                    //     $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
+                    //         ->whereNull('purchase_order_id')
+                    //         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                    //         ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                    //         ->where('supplier_id', $vendors_id)
+                    //         ->where('whole_sales', $dealer);
 
-                        if($vins[$key]) {
-                            $inventoryItem = $inventoryItem->where('chasis', $vins[$key]);
-                        }
+                    //     if($vins[$key]) {
+                    //         $inventoryItem = $inventoryItem->where('chasis', $vins[$key]);
+                    //     }
 
-                        info($inventoryItem->first());
+                    //     info($inventoryItem->first());
 
-                        if($inventoryItem) {
-                            $inventoryItem = $inventoryItem->first();
-                            info("INVENTORY ITEM FOUND");
-                            $inventoryItem->purchase_order_id = $purchasingOrder->id;    
-                            // $inventoryItem->save();
-                        }                            
+                    //     if($inventoryItem) {
+                    //         $inventoryItem = $inventoryItem->first();
+                    //         info("INVENTORY ITEM FOUND");
+                    //         $inventoryItem->purchase_order_id = $purchasingOrder->id;    
+                    //         // $inventoryItem->save();
+                    //     }                            
                                                 
-                    }    
+                    // }    
                     
                 }
         }
