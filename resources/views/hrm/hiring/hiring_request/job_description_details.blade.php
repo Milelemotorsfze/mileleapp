@@ -11,20 +11,20 @@
                             @if(isset($data->jobDescription->is_auth_user_can_approve['can_approve']))
                                 @if($data->jobDescription->is_auth_user_can_approve['can_approve'] == true)
                                     <button style="float:right;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#reject-employee-hiring-request-{{$data->jobDescription->id}}">
+                                        data-bs-target="#reject-hiring-job-description-{{$data->jobDescription->id}}">
                                         <i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
                                     </button>
                                     <button style="float:right;margin-right:5px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-                                        data-bs-target="#approve-employee-hiring-request-{{$data->jobDescription->id}}">
+                                        data-bs-target="#approve-hiring-job-description-{{$data->jobDescription->id}}">
                                         <i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
                                     </button>
-                                    <a style="float:right;margin-right:5px;" title="Edit Job Description" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$data->id)}}">
+                                    <a style="float:right;margin-right:5px;" title="Edit Job Description" class="btn btn-sm btn-info" href="{{route('employee-hiring-job-description.create-or-edit',[$data->jobDescription->id,$data->id])}}">
                                         <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                     </a>
                                 @endif
                             @endif
                         @endif
-                        <div class="modal fade" id="approve-employee-hiring-request-{{$data->jobDescription->id}}"
+                        <div class="modal fade" id="approve-hiring-job-description-{{$data->jobDescription->id}}"
                             tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog ">
                                 <div class="modal-content">
@@ -80,7 +80,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="modal fade" id="reject-employee-hiring-request-{{$data->jobDescription->id}}"
+                        <div class="modal fade" id="reject-hiring-job-description-{{$data->jobDescription->id}}"
                             tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog ">
                                 <div class="modal-content">
