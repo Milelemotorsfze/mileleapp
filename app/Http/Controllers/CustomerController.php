@@ -61,6 +61,7 @@ class CustomerController extends Controller
         $customer->country_id = $request->country_id;
         $customer->type = $request->type;
         $customer->address = $request->address;
+        $customer->created_by = Auth::id();
 
         if ($request->has('passport_file'))
         {
@@ -164,7 +165,11 @@ class CustomerController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $customer = Customer::find($id);
+        $customer->delete();
+        
+        return response(true);
+
     }
     public function salescustomers(Request $request)
 {

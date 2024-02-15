@@ -14,6 +14,7 @@ use App\Models\ModelYearCalculationCategory;
 use App\Models\Supplier;
 use App\Models\SupplierInventory;
 use App\Models\SupplierInventoryHistory;
+use App\Models\ApprovedLetterOfIndentItem;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -306,6 +307,7 @@ class SupplierInventoryController extends Controller
                                             ->where('sfx', $uploadFileContent['sfx'])
                                             ->where('model_year',  $uploadFileContent['model_year'])
                                             ->first();
+                                            
 
                 $isModelWithSteeringExist = MasterModel::where('model', $uploadFileContent['model'])
                     ->where('sfx', $uploadFileContent['sfx'])
@@ -324,7 +326,6 @@ class SupplierInventoryController extends Controller
                 }
                 if (empty($isModelExist))
                 {
-
                     $newModels[$j]['model'] = $uploadFileContent['model'];
                     $newModels[$j]['sfx'] = $uploadFileContent['sfx'];
                     $newModels[$j]['model_year'] =  $uploadFileContent['model_year'];
@@ -1100,7 +1101,8 @@ class SupplierInventoryController extends Controller
 
         $alreadyAddedIds = [];
         $QtyfullyAddedIds = [];
-        $pfiQtyAdded = [];
+        $pfiQtyAddedIds = [];
+        $PfiQtyfullyAddedIds = [];
         
         foreach ($inventoryItems as $inventoryItem) {
 
@@ -1136,7 +1138,7 @@ class SupplierInventoryController extends Controller
             }
 
             if($LOIItem) {
-                $pfiNumber = ApprovedLetterOfIndentItem::where('letter_of_indent_item_id', $LOIItem->id)->first();
+                
 
                 $remaingQuantity = $LOIItem->quantity - $LOIItem->utilized_quantity;
                 $assignedQuantity = 0;
@@ -1155,6 +1157,31 @@ class SupplierInventoryController extends Controller
                     $inventoryItem->letter_of_indent_item_id = $LOIItem->id;
                     $inventoryItem->save();
                 }
+
+                $approvedLOI = ApprovedLetterOfIndentItem::where('letter_of_indent_item_id', $LOIItem->id)
+                                                    ->where('is_pfi_created', true)
+                                                    ->whereNotIn('id', $PfiQtyfullyAddedIds)
+                                                    ->first();  
+                    if($approvedLOI) {
+                        $assignedPfiQuantity = 0;
+                        if(array_key_exists($approvedLOI->id, $pfiQtyAddedIds)) {
+                            $assignedPfiQuantity =  $pfiQtyAddedIds[$approvedLOI->id];
+                            $actualPfiQuantityRemaining = $approvedLOI->quantity - $assignedPfiQuantity;
+                        }else{
+                            $actualPfiQuantityRemaining = $approvedLOI->quantity;
+                        }
+    
+                        if($actualPfiQuantityRemaining <= $approvedLOI->quantity) {
+    
+                            if($actualPfiQuantityRemaining <= 1) {
+                                $PfiQtyfullyAddedIds[] = $approvedLOI->id;
+                            }
+                            $alreadyAddedIds[$LOIItem->id] = $assignedQuantity + 1;
+                            $inventoryItem->pfi_id = $approvedLOI->pfi_id;
+                            $inventoryItem->save();
+                        }    
+                    }
+                                       
             }
         }
     }

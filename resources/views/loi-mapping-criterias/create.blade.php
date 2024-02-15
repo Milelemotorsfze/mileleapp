@@ -45,7 +45,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label"> Type</label>
-                               <select name="value_type" class="form-select" >
+                               <select name="value_type" class="form-select"  id="value-type">
                                    <option value="{{ \App\Models\LOIMappingCriteria::TYPE_MONTH }}">
                                        {{ \App\Models\LOIMappingCriteria::TYPE_MONTH }}
                                    </option>
@@ -64,7 +64,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Priority Number</label>
-                                <input type="number" class="form-control" name="order" value="{{ old('order') }}" placeholder="Enter Priority">
+                                <input type="number" class="form-control" name="order" min="1"  oninput="validity.valid||(value='');" value="{{ old('order') }}" placeholder="Enter Priority">
                             </div>
                         </div>
                         <div class="col-12 text-center">
@@ -79,6 +79,7 @@
 @endsection
 @push('scripts')
     <script>
+
         $("#form-create").validate({
             ignore: [],
             rules: {
@@ -88,6 +89,7 @@
                 },
                 value: {
                     required: true,
+            
                 },
                 value_type: {
                     required: true,

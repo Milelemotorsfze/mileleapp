@@ -67,7 +67,7 @@
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Priority Number</label>
-                                    <input type="number" class="form-control" name="order" value="{{ old('order', $loiMappingCriteria->order) }}" placeholder="Enter Priority">
+                                    <input type="number" class="form-control"  oninput="validity.valid||(value='');" name="order" min="1" value="{{ old('order', $loiMappingCriteria->order) }}" placeholder="Enter Priority">
                                 </div>
                             </div>
                             <div class="col-12 text-center">

@@ -139,7 +139,6 @@
                     <th>Transmission</th>
                     <th>Fuel Type</th>
                     <th>Steering</th>
-                    <th>Seating Capacity</th>
                     <th>Upholstery</th>                    
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
@@ -151,22 +150,28 @@
                 </thead>
                 <tbody>
                 @foreach ($variants as $key => $variant)
-                    <tr data-id="1">
+                @if($variant->category != "Modified")
+                <tr data-id="1">
+                    @else
+                    <tr data-id="1"  >
+                    @endif
                         <td class="nowrap-td capitalize-first-letter">{{ $variant->brand->brand_name ?? 'null' }}</td>
                         <td class="nowrap-td capitalize-first-letter">{{ $variant->master_model_lines->model_line ?? 'null' }}</td>
                         <td class="nowrap-td capitalize-first-letter">{{ $variant->model_detail ?? 'null' }}</td>
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->my ?? 'null' )) }}</td>
                         <td class="nowrap-td capitalize-first-letter">
-    <a href="#" onclick="openModal('{{ $variant->id ?? '' }}')" style="text-decoration: underline;">
-        {{ $variant->name ?? 'null' }}
-    </a>
-</td>
-                        <td class="nowrap-td capitalize-first-letter">{{ $variant->detail ?? 'null' }}</td>
+                            <a href="#" onclick="openModal('{{ $variant->id ?? '' }}')" style="text-decoration: underline;">
+                                {{ $variant->name ?? 'null' }}
+                            </a>
+                        </td>
+                        <td class="nowrap-td capitalize-first-letter">
+                            <span class="truncate-text">{{ $variant->detail ?? 'null' }}</span>
+                            <a href="#" class="read-more">Read more</a>
+                        </td>
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->engine ?? 'null' )) }}</td>
                         <td class="nowrap-td capitalize-first-letter">{{ $variant->gearbox ?? 'null' }}</td>
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->fuel_type ?? 'null' )) }}</td>
                         <td class="nowrap-td capitalize-first-letter">{{ $variant->steering ?? 'null' }}</td>
-                        <td class="nowrap-td capitalize-first-letter">{{ $variant->seat ?? 'null' }}</td>
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->upholestry ?? 'null' )) }}</td>
                         @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
@@ -267,32 +272,95 @@ function openModal(id) {
         url: '/variants_details/' + id,
         type: 'GET',
         success: function(response) {
-            // Assuming response contains data returned from the server
-            // Update the modal with the received data
-            $('#variantview .modal-body').empty(); // Clear previous content
+            $('#variantview .modal-body').empty();
             var modalBody = $('#variantview .modal-body');
-            
-            // Create a table to display variant details
             var variantDetailsTable = $('<table class="table table-bordered"></table>');
             var variantDetailsBody = $('<tbody></tbody>');
-            variantDetailsBody.append('<tr><th>Attribute</th><th>Options</th><th>Modification Options</th></tr>');
+            if (response.modifiedVariants) {
+            variantDetailsBody.append('<tr><th>Attribute</th><th>Options</th><th>Modified Option</th></tr>');
+            if(response.variants.name != response.basevaraint.name)
+            {
+              variantDetailsBody.append('<tr><th>Name</th><td>' + response.basevaraint.name + '</td><td>' + response.variants.name + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Name</th><td>' + response.variants.name + '</td></tr>');
+            }
+            if(response.basevaraint.steering != response.variants.steering)
+            {
+            variantDetailsBody.append('<tr><th>Steering</th></td><td>'+ response.basevaraint.steering +'<td>' + response.variants.steering + '</td></tr>');
+            }
+            else {
+              variantDetailsBody.append('<tr><th>Steering</th></td><td>'+ response.basevaraint.steering +'<td></td></tr>');
+            }
+            if(response.basevaraint.engine != response.variants.engine)
+            {
+            variantDetailsBody.append('<tr><th>Engine</th></td><td>'+ response.basevaraint.engine +'<td>' + response.variants.engine + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Engine</th></td><td>'+ response.basevaraint.engine +'<td></td></tr>');
+            }
+            if(response.basevaraint.my != response.variants.my)
+            {
+            variantDetailsBody.append('<tr><th>Production Year</th></td><td>'+ response.basevaraint.my +'<td>' + response.variants.my + '</td></tr>');
+            }
+            else 
+            {
+            variantDetailsBody.append('<tr><th>Production Year</th></td><td>'+ response.basevaraint.my +'<td></td></tr>');
+            }
+            if(response.basevaraint.fuel_type != response.variants.fuel_type)
+            {
+            variantDetailsBody.append('<tr><th>Fuel Type</th></td><td>'+ response.basevaraint.fuel_type +'<td>' + response.variants.fuel_type + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Fuel Type</th></td><td>'+ response.basevaraint.fuel_type +'<td></td></tr>');
+            }
+            if(response.basevaraint.gearbox != response.variants.gearbox)
+            {
+            variantDetailsBody.append('<tr><th>Gear</th></td><td>'+ response.basevaraint.gearbox +'<td>' + response.variants.gearbox + '</td></tr>');
+            }
+            else 
+            {
+              variantDetailsBody.append('<tr><th>Gear</th></td><td>'+ response.basevaraint.gearbox +'<td></td></tr>');
+            }
+            if(response.basevaraint.drive_train != response.variants.drive_train)
+            {
+            variantDetailsBody.append('<tr><th>Drive Train</th></td><td>'+ response.basevaraint.drive_train +'<td>' + response.variants.drive_train + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Drive Train</th></td><td>'+ response.basevaraint.drive_train +'<td></td></tr>');
+            }
+            if(response.basevaraint.upholestry != response.variants.upholestry)
+            {
+            variantDetailsBody.append('<tr><th>Upholstery</th></td><td>'+ response.basevaraint.upholestry +'<td>' + response.variants.upholestry + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Upholstery</th></td><td>'+ response.basevaraint.upholestry +'<td></td></tr>'); 
+            }
+            }
+            else 
+            {
+            variantDetailsBody.append('<tr><th>Attribute</th><th>Options</th></tr>');
             variantDetailsBody.append('<tr><th>Name</th><td>' + response.variants.name + '</td></tr>');
-            variantDetailsBody.append('<tr><th>Steering</th><td>' + response.variants.steering + '</td><td></td></tr>');
-            variantDetailsBody.append('<tr><th>Engine</th><td>' + response.variants.engine + '</td><td></td></tr>');
-            variantDetailsBody.append('<tr><th>Production Year</th><td>' + response.variants.my + '</td><td></td></tr>');
-            variantDetailsBody.append('<tr><th>Fuel Type</th><td>' + response.variants.fuel_type + '</td><td></td></tr>');
-            variantDetailsBody.append('<tr><th>Gear</th><td>' + response.variants.gearbox + '</td><td></td></tr>');
-            variantDetailsBody.append('<tr><th>Drive Train</th><td>' + response.variants.drive_train + '</td><td></tr>');
-            variantDetailsBody.append('<tr><th>Upholstery</th><td>' + response.variants.upholestry + '</td><td></td></tr>');
+            variantDetailsBody.append('<tr><th>Steering</th><td>' + response.variants.steering + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Engine</th><td>' + response.variants.engine + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Production Year</th><td>' + response.variants.my + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Fuel Type</th><td>' + response.variants.fuel_type + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Gear</th><td>' + response.variants.gearbox + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Drive Train</th><td>' + response.variants.drive_train + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Upholstery</th><td>' + response.variants.upholestry + '</td></tr>');
+            }
             variantDetailsTable.append(variantDetailsBody);
             modalBody.append('<h5>Variant Details:</h5>');
             modalBody.append(variantDetailsTable);
-            
-            // Create a table to display variant items
               modalBody.append('<h5>Attributes Items:</h5>');
               var variantItemsTable = $('<table class="table table-bordered"></table>');
               if (response.modifiedVariants) {
-              var variantItemsHeader = $('<thead><tr><th>Attributes</th><th>Options</th><th>Modification Option</th></tr></thead>');
+              var variantItemsHeader = $('<thead><tr><th>Attributes</th><th>Options</th><th>Modified Option</th></tr></thead>');
               }
               else{
                 var variantItemsHeader = $('<thead><tr><th>Attributes</th><th>Options</th></tr></thead>');
@@ -303,7 +371,6 @@ function openModal(id) {
                   var specificationName = variantItem.model_specification ? variantItem.model_specification.name : 'N/A';
                   var optionName = variantItem.model_specification_option ? variantItem.model_specification_option.name : 'N/A';
                   var modificationOption = '';
-                  // Check if modifiedVariantItems match model_specification
                   if (response.modifiedVariants) {
                       response.modifiedVariants.forEach(function(modifiedVariant) {
                           if (modifiedVariant.modified_variant_items && modifiedVariant.modified_variant_items.name === specificationName) {
@@ -319,8 +386,6 @@ function openModal(id) {
               variantItemsTable.append(variantItemsHeader);
               variantItemsTable.append(variantItemsBody);
               modalBody.append(variantItemsTable);
-            
-            // Create a table to display modified variant items and addons
             if (response.modifiedVariants) {
                 modalBody.append('<h5>Modified Attributes Items:</h5>');
                 var modifiedVariantTable = $('<table class="table table-bordered"></table>');
@@ -340,10 +405,34 @@ function openModal(id) {
             $('#variantview').modal('show');
         },
         error: function(xhr, status, error) {
-            // Handle error
         }
     });
 }
+document.addEventListener('DOMContentLoaded', function() {
+    var truncateTexts = document.querySelectorAll('.truncate-text');
+    truncateTexts.forEach(function(truncateText) {
+        var fullText = truncateText.textContent;
+        var truncatedText = fullText.slice(0, 50);
+        var isTruncated = true;
+
+        truncateText.textContent = truncatedText;
+
+        var readMoreLink = truncateText.nextElementSibling;
+
+        readMoreLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            if (isTruncated) {
+                alert(fullText);
+                readMoreLink.textContent = 'Read more';
+                truncateText.textContent = truncatedText;
+            } else {
+                truncateText.textContent = truncatedText;
+                readMoreLink.textContent = 'Read more';
+            }
+            isTruncated = !isTruncated;
+        });
+    });
+});
 </script>
 @endsection
 

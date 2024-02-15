@@ -522,7 +522,6 @@
         }
 
         $('#pfi_reference_number').keyup(function(){
-
                 $.ajax({
                     type:"POST",
                     async: false,
@@ -578,7 +577,7 @@
             let supplier = $(this).val();
             let MMC = $(this).find('option:selected').attr("data-is-MMC");
             let letter_of_indent_id = $('#letter_of_indent_id').val();
-
+        
             if(MMC == 1) {
                 $('.mmc-items-div').attr('hidden', false);
             }else{

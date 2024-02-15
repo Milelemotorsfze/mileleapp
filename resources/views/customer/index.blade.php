@@ -51,6 +51,7 @@
                             <th>Customer Type</th>
                             <th>Country </th>
                             <th>Address</th>
+                            <th>Created By</th>
                             <th>Created At</th>
                             <th>Action</th>
 
@@ -64,8 +65,9 @@
                                 <td>{{ ++$i }}</td>
                                 <td>{{ $customer->name }}</td>
                                 <td>{{ $customer->type }}</td>
-                                <td>{{ $customer->country->name }}</td>
+                                <td>{{ $customer->country->name ?? '' }}</td>
                                 <td>{{ $customer->address }}</td>
+                                <td> {{ $customer->createdBy->name ?? ''}} </td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($customer->created_at)->format('d M y') }}</td>
                                 <td>
                                     <button type="button" class="btn btn-primary btn-sm document-btn" title="To view Customer Documents" data-bs-toggle="modal" data-bs-target="#view--docs-{{$customer->id}}">
@@ -80,6 +82,17 @@
                                         <a title="Edit Customer Details" class="btn btn-sm btn-info" href="{{ route('dm-customers.edit', $customer->id) }}">
                                             <i class="fa fa-edit" aria-hidden="true"></i>
                                         </a>
+                                        @endif
+                                    @endcan
+                                    @can('delete-customer')
+                                        @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-customer');
+                                        @endphp
+                                        @if ($hasPermission)
+                                            @if($customer->is_deletable == true)
+                                                <button data-url="{{ route('dm-customers.destroy', $customer->id) }}" data-id="{{ $customer->id }}"
+                                                    class="btn btn-danger btn-sm btn-delete"><i class="fa fa-trash"></i></button>
+                                            @endif
                                         @endif
                                     @endcan
                                 </td>
@@ -127,8 +140,34 @@
             </div>
         @endif
     @endcan
-@endsection
 
+@endsection
+@push('scripts')
+<script>
+ $('#PFI-table').on('click', '.btn-delete', function (e) {
+        var url = $(this).data('url');
+        var id = $(this).data('id');
+        var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+            if (e) {
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        _method: 'DELETE',
+                        id: id,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success:function (data) {
+                        location.reload();
+                        alertify.success('Customer Deleted successfully.');
+                    }
+                });
+            }
+        }).set({title:"Delete Item"})
+    });
+ </script>
+@endpush
 
 
 

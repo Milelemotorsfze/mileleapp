@@ -40,7 +40,17 @@ class LOIMappingCriteriaController extends Controller
             'value_type' => 'required',
             'value' => 'required',
             'order' => 'required|unique:loi_mapping_criterias,order',
+        ],
+        [
+        'order.unique' => 'Priority Number is already existing!'
         ]);
+        
+        $value = $request->value;
+        if($request->value_type == 'Month') {
+            if($value > 12) {
+                return redirect()->back()->with('error', "Please enter valid Month");
+            }
+        }
 
         $isExist = LOIMappingCriteria::where('value_type' , $request->value_type)
             ->where('value', $request->value)
@@ -53,6 +63,7 @@ class LOIMappingCriteriaController extends Controller
         $loiMappingCriteria = new LOIMappingCriteria();
         $loiMappingCriteria->name = $request->name;
         $loiMappingCriteria->value = $request->value;
+        $loiMappingCriteria->order = $request->order;
         $loiMappingCriteria->value_type = $request->value_type;
         $loiMappingCriteria->save();
 
@@ -95,8 +106,16 @@ class LOIMappingCriteriaController extends Controller
             'value_type' => 'required',
             'value' => 'required',
             'order' => 'required|unique:loi_mapping_criterias,order,'.$id,
+        ],
+        [
+        'order.unique' => 'Priority Number is already existing!'
         ]);
-
+        $value = $request->value;
+        if($request->value_type == 'Month') {
+            if($value > 12) {
+                return redirect()->back()->with('error', "Please enter valid Month");
+            }
+        }
         $isExist = LOIMappingCriteria::where('value_type' , $request->value_type)
             ->whereNot('id', $id)
             ->where('value', $request->value)
