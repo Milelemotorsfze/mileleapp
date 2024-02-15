@@ -49,12 +49,12 @@ class JobDescriptionController extends Controller
             else {
                 $currentHiringRequest ='';
             }    
-            $allHiringRequests = EmployeeHiringRequest::whereDoesntHave('jobDescription')->where('status','approved')->get();
+            $allHiringRequests = EmployeeHiringRequest::whereHas('questionnaire')->whereDoesntHave('jobDescription')->where('status','approved')->get();
         }
         else {
             $jobDescriptionId = $jobDescription->id;
             $currentHiringRequest = EmployeeHiringRequest::where('id',$jobDescription->hiring_request_id)->first();
-            $allHiringRequests1 = EmployeeHiringRequest::where('status','approved')->whereDoesntHave('jobDescription')->get();
+            $allHiringRequests1 = EmployeeHiringRequest::where('status','approved')->whereHas('questionnaire')->whereDoesntHave('jobDescription')->get();
             $allHiringRequests2 = EmployeeHiringRequest::where('status','approved')->where('id',$jobDescription->hiring_request_id)->get();
             $allHiringRequests = $allHiringRequests1->merge($allHiringRequests2);
         }
