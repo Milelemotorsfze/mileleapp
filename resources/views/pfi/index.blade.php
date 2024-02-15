@@ -22,9 +22,9 @@
                     <table id="PFI-table" class="table table-striped table-editable table-edits table table-condensed" style="">
                         <thead class="bg-soft-secondary">
                         <tr>
-                            <th>S.NO</th>
+                            <th>S.NO</th>                
                             <th>Created Date</th>
-                            <th>Reference Number</th>
+                            <th>PFI Number</th>
                             <th>Customer Name </th>
                             <th>Customer Country</th>
                             <th>Amount</th>

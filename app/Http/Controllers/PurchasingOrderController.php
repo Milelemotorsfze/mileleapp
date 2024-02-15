@@ -230,7 +230,8 @@ public function getBrandsAndModelLines(Request $request)
      */
     public function store(Request $request)
     {
-        
+        // dd($request->all());
+
         $this->validate($request, [
             'payment_term_id' => 'required',
             'po_type' => 'required',
@@ -316,6 +317,7 @@ public function getBrandsAndModelLines(Request $request)
                 $vehicle->status = "Not Approved";
                 // payment status need to update
                 if($request->input('master_model_id')) {
+                    info($request->input('master_model_id'));
                     $masterModelId = $request->input('master_model_id');
                     $vehicle->model_id = $masterModelId[$key];
                 }
@@ -358,6 +360,39 @@ public function getBrandsAndModelLines(Request $request)
                         $loiPurchaseOrder->save();
 
                     }
+                    $masterModels = $request->master_model_id;
+                    $dealer = $pfi->letterOfIndent->dealers ?? '';
+                    foreach($masterModels as $key => $masterModel) 
+                    {
+                        $model = MasterModel::find($masterModel);
+                        info($masterModel);
+
+                        $possibleModelIds = MasterModel::where('model', $model->model)
+                                            ->where('sfx', $model->sfx)->pluck('id');
+                        info($possibleModelIds);
+
+                        $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
+                            ->whereNull('purchase_order_id')
+                            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                            ->where('supplier_id', $vendors_id)
+                            ->where('whole_sales', $dealer);
+
+                        if($vins[$key]) {
+                            $inventoryItem = $inventoryItem->where('chasis', $vins[$key]);
+                        }
+
+                        info($inventoryItem->first());
+
+                        if($inventoryItem) {
+                            $inventoryItem = $inventoryItem->first();
+                            info("INVENTORY ITEM FOUND");
+                            $inventoryItem->purchase_order_id = $purchasingOrder->id;    
+                            // $inventoryItem->save();
+                        }                            
+                                                
+                    }    
+                    
                 }
         }
         DB::commit();
@@ -946,7 +981,7 @@ public function paymentreleasesconfirm($id)
                     ->where('sfx', $vehicle->masterModel->sfx)->pluck('id')->toArray();
                 foreach ($loiItemIds as $loiItemId) {
                     $item = LetterOfIndentItem::find($loiItemId);
-                    if(in_array($item->model_id, $possibleIds)) {
+                    if(in_array($item->master_model_id, $possibleIds)) {
                         if($item->utilized_quantity < $item->approved_quantity) {
                             $item->utilized_quantity = $item->utilized_quantity + 1;
                             $item->save();
@@ -1131,6 +1166,8 @@ public function purchasingallupdateStatus(Request $request)
 }
 public function purchasingallupdateStatusrel(Request $request)
 {
+    // dd($request->all());
+  
     $id = $request->input('orderId');
     $status = $request->input('status');
 
@@ -1163,21 +1200,22 @@ public function purchasingallupdateStatusrel(Request $request)
 
             if($vehicle->model_id) {
                 $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
-                    ->pluck('approved_loi_id');
-
+                    ->pluck('approved_loi_id');            
+                       
                 $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
                 $masterModel = MasterModel::find($vehicle->model_id);
                 $possibleIds = MasterModel::where('model', $masterModel->model)
                     ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
+                   
                 foreach ($loiItemIds as $loiItemId) {
                     $item = LetterOfIndentItem::find($loiItemId);
-                    if(in_array($item->model_id, $possibleIds)) {
+                   
+                    if(in_array($item->master_model_id, $possibleIds)) {
                         if($item->utilized_quantity < $item->approved_quantity) {
                             $item->utilized_quantity = $item->utilized_quantity + 1;
                             $item->save();
                             break;
                         }
-
                     }
                 }
             }

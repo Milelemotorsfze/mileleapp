@@ -1368,7 +1368,7 @@ function updateallStatus(status, orderId) {
     });
 }
 function updateallStatusrel(status, orderId) {
-      alert("ok");
+  
   let url = '{{ route('purchasing.updateallStatusrel') }}';
   let data = { status: status, orderId: orderId };
 
