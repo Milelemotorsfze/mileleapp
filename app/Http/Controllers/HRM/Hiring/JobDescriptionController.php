@@ -44,17 +44,39 @@ class JobDescriptionController extends Controller
             $jobDescription = new JobDescription();
             $jobDescriptionId = 'new';           
             if($hiring_id != 'new') {
-                $currentHiringRequest = EmployeeHiringRequest::whereDoesntHave('jobDescription')->where('id',$hiring_id)->where('status','approved')->first();
+                $currentHiringRequest = EmployeeHiringRequest::where('id',$hiring_id)->where('status','approved')
+                // ->where(function($query) {
+                //         $query->whereDoesntHave('jobDescription')
+                //         ->orWhereHas('jobDescription', function($q) {
+                //             $q = $q->whereIn('status',['pending','rejected']);
+                //         });
+                //     })
+                ->whereDoesntHave('jobDescription')->first();
             }
             else {
                 $currentHiringRequest ='';
             }    
-            $allHiringRequests = EmployeeHiringRequest::whereHas('questionnaire')->whereDoesntHave('jobDescription')->where('status','approved')->get();
+            $allHiringRequests = EmployeeHiringRequest::whereHas('questionnaire')
+            // ->where(function($query) {
+            //             $query->whereDoesntHave('jobDescription')
+            //             ->orWhereHas('jobDescription', function($q) {
+            //                 $q = $q->whereIn('status',['pending','rejected']);
+            //             });
+            //         })
+                    ->where('status','approved')
+                    ->whereDoesntHave('jobDescription')->get();
         }
         else {
             $jobDescriptionId = $jobDescription->id;
             $currentHiringRequest = EmployeeHiringRequest::where('id',$jobDescription->hiring_request_id)->first();
-            $allHiringRequests1 = EmployeeHiringRequest::where('status','approved')->whereHas('questionnaire')->whereDoesntHave('jobDescription')->get();
+            $allHiringRequests1 = EmployeeHiringRequest::where('status','approved')
+            // ->whereHas('questionnaire')->where(function($query) {
+            //             $query->whereDoesntHave('jobDescription')
+            //             ->orWhereHas('jobDescription', function($q) {
+            //                 $q = $q->whereIn('status',['pending','rejected']);
+            //             });
+            //         })
+            ->whereDoesntHave('jobDescription')->get();
             $allHiringRequests2 = EmployeeHiringRequest::where('status','approved')->where('id',$jobDescription->hiring_request_id)->get();
             $allHiringRequests = $allHiringRequests1->merge($allHiringRequests2);
         }
