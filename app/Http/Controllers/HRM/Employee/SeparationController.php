@@ -35,9 +35,9 @@ class SeparationController extends Controller
                 $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $createRequest = Separation::where('id',$id)->first();
-                if($createRequest != '') {
-                    $createRequest->employee_id = $request->id;
+                if($createRequest != '') {                  
                     $createRequest->status = 'pending';
+                    $createRequest->employee_id = $request->employee_id;
                     $createRequest->action_by_employee = 'pending';
                     $createRequest->employee_action_at = NULL;                       
                     $createRequest->comments_by_employee = NULL;
@@ -54,13 +54,29 @@ class SeparationController extends Controller
                     $createRequest->hr_manager_action_at = NULL;
                     $createRequest->comments_by_hr_manager = NULL;
                     $createRequest->updated_by = $authId;
+                    $createRequest->replacement = $request->replacement;
+                    $createRequest->separation_type = $request->separation_type;
+                    if($request->replacement == 4) {
+                        $createRequest->replacement_other = $request->replacement_other;
+                        $createRequest->employment_type = NULL;
+                    }
+                    else {
+                        $createRequest->replacement_other = NULL;
+                        $createRequest->employment_type = $request->employment_type;
+                    }
+                    if($request->separation_type == 4) {
+                        $createRequest->seperation_type_other = $request->seperation_type_other;
+                    }
+                    else {
+                        $createRequest->seperation_type_other = NULL;
+                    }
                     $createRequest->update();
                 }
-                $history['over_times_id'] = $createRequest->id;
+                $history['separations_id'] = $createRequest->id;
                 $history['icon'] = 'icons8-document-30.png';
                 $history['message'] = 'Separation Employee Handover request Updated by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
                 $createHistory = SeparationHistory::create($history);
-                $history2['over_times_id'] = $createRequest->id;
+                $history2['separations_id'] = $createRequest->id;
                 $history2['icon'] = 'icons8-send-30.png';
                 $history2['message'] = 'Separation Employee Handover request send to Employee ( '.$employee->first_name.' '.$employee->last_name.' - '.$employee->personal_email_address.' ) for approval';
                 $createHistory2 = SeparationHistory::create($history2);

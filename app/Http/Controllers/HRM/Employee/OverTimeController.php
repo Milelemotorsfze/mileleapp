@@ -215,7 +215,7 @@ class OverTimeController extends Controller
                     $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
                     $createRequest = OverTime::where('id',$id)->first();
                     if($createRequest != '') {
-                        $createRequest->employee_id = $request->id;
+                        $createRequest->employee_id = $request->employee_id;
                         $createRequest->status = 'pending';
                         $createRequest->action_by_employee = 'pending';
                         $createRequest->employee_action_at = NULL;                       

@@ -44,17 +44,39 @@ class JobDescriptionController extends Controller
             $jobDescription = new JobDescription();
             $jobDescriptionId = 'new';           
             if($hiring_id != 'new') {
-                $currentHiringRequest = EmployeeHiringRequest::whereDoesntHave('jobDescription')->where('id',$hiring_id)->where('status','approved')->first();
+                $currentHiringRequest = EmployeeHiringRequest::where('id',$hiring_id)->where('status','approved')
+                // ->where(function($query) {
+                //         $query->whereDoesntHave('jobDescription')
+                //         ->orWhereHas('jobDescription', function($q) {
+                //             $q = $q->whereIn('status',['pending','rejected']);
+                //         });
+                //     })
+                ->whereDoesntHave('jobDescription')->first();
             }
             else {
                 $currentHiringRequest ='';
             }    
-            $allHiringRequests = EmployeeHiringRequest::whereDoesntHave('jobDescription')->where('status','approved')->get();
+            $allHiringRequests = EmployeeHiringRequest::whereHas('questionnaire')
+            // ->where(function($query) {
+            //             $query->whereDoesntHave('jobDescription')
+            //             ->orWhereHas('jobDescription', function($q) {
+            //                 $q = $q->whereIn('status',['pending','rejected']);
+            //             });
+            //         })
+                    ->where('status','approved')
+                    ->whereDoesntHave('jobDescription')->get();
         }
         else {
             $jobDescriptionId = $jobDescription->id;
             $currentHiringRequest = EmployeeHiringRequest::where('id',$jobDescription->hiring_request_id)->first();
-            $allHiringRequests1 = EmployeeHiringRequest::where('status','approved')->whereDoesntHave('jobDescription')->get();
+            $allHiringRequests1 = EmployeeHiringRequest::where('status','approved')
+            // ->whereHas('questionnaire')->where(function($query) {
+            //             $query->whereDoesntHave('jobDescription')
+            //             ->orWhereHas('jobDescription', function($q) {
+            //                 $q = $q->whereIn('status',['pending','rejected']);
+            //             });
+            //         })
+            ->whereDoesntHave('jobDescription')->get();
             $allHiringRequests2 = EmployeeHiringRequest::where('status','approved')->where('id',$jobDescription->hiring_request_id)->get();
             $allHiringRequests = $allHiringRequests1->merge($allHiringRequests2);
         }
@@ -110,6 +132,13 @@ class JobDescriptionController extends Controller
                         $update->skills_required = $request->skills_required;
                         $update->position_qualification = $request->position_qualification;
                         $update->updated_by = $authId;
+                        $update->status = 'pending';
+                        $update->action_by_department_head = 'pending';
+                        $update->department_head_id = $teamLeadOrReportingManager->team_lead_or_reporting_manager;
+                        $update->department_head_action_at = NULL;
+                        $update->action_by_hr_manager = 'pending';
+                        $update->hr_manager_id = $HRManager->handover_to_id;
+                        $update->hr_manager_action_at = NULL;
                         $update->update();
                         $history['hiring_request_id'] = $request->hiring_request_id;
                         $history['icon'] = 'icons8-edit-30.png';
@@ -201,21 +230,21 @@ class JobDescriptionController extends Controller
             ['department_head_id',$authId],
             ])->latest()->get();
         if($HRManager) {
-            $HRManagerPendings = JobDescription::where([
-                ['action_by_department_head','approved'],
-                ['action_by_hr_manager','pending'],
-                ['hr_manager_id',$authId],
-                ])->latest()->get();
-            $HRManagerApproved = JobDescription::where([
-                ['action_by_department_head','approved'],
-                ['action_by_hr_manager','approved'],
-                ['hr_manager_id',$authId],
-                ])->latest()->get();
-            $HRManagerRejected = JobDescription::where([
-                ['action_by_department_head','approved'],                
-                ['action_by_hr_manager','rejected'],
-                ['hr_manager_id',$authId],
-                ])->latest()->get();
+        $HRManagerPendings = JobDescription::where([
+            ['action_by_department_head','approved'],
+            ['action_by_hr_manager','pending'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
+        $HRManagerApproved = JobDescription::where([
+            ['action_by_department_head','approved'],
+            ['action_by_hr_manager','approved'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
+        $HRManagerRejected = JobDescription::where([
+            ['action_by_department_head','approved'],                
+            ['action_by_hr_manager','rejected'],
+            ['hr_manager_id',$authId],
+            ])->latest()->get();
         }
         return view('hrm.hiring.job_description.approvals',compact('page','deptHeadPendings',
         'deptHeadApproved','deptHeadRejected','HRManagerPendings','HRManagerApproved','HRManagerRejected',));

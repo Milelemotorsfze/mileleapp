@@ -379,9 +379,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
 										@endphp
 										@if ($hasPermission)
+										@if($approvedOne->jobDescription->status == 'pending' OR $approvedOne->jobDescription->status == 'rejected')
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Job Description" class="btn btn-sm btn-secondary" href="{{ route('employee-hiring-job-description.create-or-edit', ['id' => $approvedOne->jobDescription->id, 'hiring_id' => $approvedOne->id]) }}">
 										<i class="fa fa-address-card" aria-hidden="true"></i> Edit Job Description
 										</a>
+										@endif
 										@endif
 										@endcanany
 										@else

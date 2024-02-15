@@ -25,6 +25,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-separation-em
 	@endif	
     <form id="separationEmployeeHandoverForm" name="separationEmployeeHandoverForm" enctype="multipart/form-data" method="POST" action="{{route('separation-handover.update',$data->id)}}">
         @csrf
+        @method('PUT')
 		<div class="row">
 			<div class="col-xxl-12 col-lg-6 col-md-6">
 				<p><span style="float:right;" class="error">* Required Field</span></p>
@@ -250,6 +251,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-separation-em
         // $("#designation_div").hide();
         // $("#department_div").hide();
         // $("#location_div").hide();
+       
+        if(oldData.user.emp_profile.employee_code != null) {
+            document.getElementById('employee_code').textContent=oldData.user.emp_profile.employee_code;
+        }
         if(oldData.user.emp_profile.passport_number != null) {
             document.getElementById('passport_number').textContent=oldData.user.emp_profile.passport_number;
         }
@@ -265,9 +270,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-separation-em
         if(oldData.user.emp_profile.location != null) {
             document.getElementById('location').textContent=oldData.user.emp_profile.location.name;
         }
-        $("#seperation_type_other").hide();
-        $("#replacement_other").hide();
-        $("#takeover_empdiv").hide();
+        if(oldData.replacement != 4) {
+            $("#replacement_other").hide();
+        }
+        if(oldData.replacement == 2 || oldData.replacement == 4) {
+            $("#takeover_empdiv").hide();
+        }
+        else {
+            $('#takeover_employee_id').select2({
+                allowClear: true,
+                maximumSelectionLength: 1,
+                placeholder:"Choose Takeover Employee Name",
+            });
+            if(oldData.takeover_employee_id != null) {
+                oldTakeoverEmp = oldDta.takeover_employee_id;
+                $('#emp_'+takeoverEmpId).prop('disabled', false);
+            }
+        }
+        if(oldData.separation_type != 4) {
+            $("#seperation_type_other").hide();
+        }
         $("#takeover_employee_code_div").hide();
         $("#takeover_passport_number_div").hide();
         $("#takeover_joining_date_div").hide();

@@ -292,8 +292,17 @@ class EmployeeHiringRequest extends Model
     }
     public function getCurrentStatusAttribute() {
         $currentStatus = '';
-        if($this->status == 'approved') {
-            $currentStatus = 'Approved';
+        if($this->status == 'approved' && $this->final_status == 'open') {
+            $currentStatus = 'Approved ( Open )';
+        }
+        else if($this->status == 'approved' && $this->final_status == 'closed') {
+            $currentStatus = 'Approved ( Closed )';
+        }
+        else if($this->status == 'approved' && $this->final_status == 'onhold') {
+            $currentStatus = 'Approved ( On Hold )';
+        }
+        else if($this->status == 'approved' && $this->final_status == 'cancelled') {
+            $currentStatus = 'Approved ( Cancelled )';
         }
         else if($this->status == 'rejected') {
             $currentStatus = 'Rejected';
@@ -461,5 +470,14 @@ class EmployeeHiringRequest extends Model
             ['date_of_telephonic_interview',NULL],
             ['status','pending'],
         ]);
+    }
+    public function cancelledBy() {
+        return $this->hasOne(User::class,'id','cancelled_by');
+    }
+    public function closedBy() {
+        return $this->hasOne(User::class,'id','closed_by');
+    }
+    public function onHoldBy() {
+        return $this->hasOne(User::class,'id','on_hold_by');
     }
 }

@@ -155,6 +155,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                                 @endif
                             @endif
                         @endif
+                        @if($data->status == 'pending')
                         @canany(['edit-employee-hiring-request'])
                         @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request']);
@@ -165,6 +166,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                             </a>
                         @endif
                         @endcanany
+                        @endif
                     </div>
                 </div>
             </div>

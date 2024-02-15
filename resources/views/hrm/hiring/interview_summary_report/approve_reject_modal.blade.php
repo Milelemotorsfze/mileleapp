@@ -94,7 +94,7 @@
 									<label class="form-label font-size-13">Comments</label>
 								</div>
 								<div class="col-lg-12 col-md-12 col-sm-12">
-									<textarea rows="5" id="comments{{$data->id}}" class="form-control" name="comment">
+									<textarea rows="5" id="reject-comments{{$data->id}}" class="form-control" name="comment">
 									</textarea>
 								</div>
 							</div>
@@ -112,18 +112,21 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function () {
+		var comments = '';
         $('.status-reject-button').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
-	        approveOrRejectHiringrequest(id, status)
+			comments = $("#reject-comments"+id).val();
+	        approveOrRejectHiringrequest(id, status,comments)
 	    })
 	    $('.status-approve-button').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
-	        approveOrRejectHiringrequest(id, status)
+			comments = $("#comments"+id).val();
+	        approveOrRejectHiringrequest(id, status,comments)
 	    })
-        function approveOrRejectHiringrequest(id, status) {
-			var comments = $("#comments"+id).val();
+        function approveOrRejectHiringrequest(id, status,comments) {
+			
 			var current_approve_position = $("#current_approve_position_"+id).val();
 	        let url = '{{ route('interview-summary-report.request-action') }}';
 	        if(status == 'rejected') {
