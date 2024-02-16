@@ -188,10 +188,10 @@ class HRMSPermissionSeeder extends Seeder
             $permission = new Permission();
 
             $permission->module_id = $value[6];
-            $permission->slug_name = $value[0];
-            $permission->name = $value[1];
+            $permission->slug_name = $value[1];
+            $permission->name = $value[0];
             $permission->guard_name =  'web';
-            $permission->description = $value[2];
+            $permission->description = $value[3];
             $permission->save();
 
             $data = [
