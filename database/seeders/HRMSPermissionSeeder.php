@@ -40,13 +40,13 @@ class HRMSPermissionSeeder extends Seeder
             // ['47', 'HRM - Overtime Application'],
             // ['48', 'HRM - Separation Employee Handover'],
         ];
-        foreach ($modules as $key => $value):
-            $module[] = [
-                'id'       => $value[0],
-                'name' => $value[1]
-            ];
-        endforeach;
-        DB::table('modules')->insert($module);
+        // foreach ($modules as $key => $value):
+        //     $module[] = [
+        //         'id'       => $value[0],
+        //         'name' => $value[1]
+        //     ];
+        // endforeach;
+        // DB::table('modules')->insert($module);
         $Permissions = [
             ['create-employee-hiring-request', 'Create Employee Hiring Request', 'web', 'To Create Employee Hiring Request', '2023-11-13 13:02:21', '2023-12-05 13:39:05', 28],
             ['edit-employee-hiring-request', 'Edit Employee Hiring Request', 'web', 'To Edit Employee Hiring Request', '2023-12-05 13:38:46', '2023-12-05 13:38:46', 28],
