@@ -696,9 +696,9 @@
                                     @endcanany
 
                                     @php
-                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action']);
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents','send-candidate-documents-request-form','verify-offer-letter-signature','verify-candidate-personal-information','send-personal-info-form-action']);
                                     @endphp
-                                    @if($hasPermission OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can']  == true OR (Auth::user()->interview_summary_report_approval == true && Auth::user()->can_show_summary == true) OR (Auth::user()->candidate_docs_varify > 0 && Auth::user()->can_show_docs == true) OR (Auth::user()->candidate_personal_information_varify > 0 && Auth::user()->can_show_info == true) OR Auth::user()->can_show_offer_letter == true)
+                                    @if(($hasPermission && (Auth::user()->can_show_offer_letter == true OR Auth::user()->can_show_info == true OR Auth::user()->can_show_docs == true OR Auth::user()->can_show_summary == true) )OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can']  == true OR (Auth::user()->interview_summary_report_approval == true && Auth::user()->can_show_summary == true) OR (Auth::user()->candidate_docs_varify > 0 && Auth::user()->can_show_docs == true) OR (Auth::user()->candidate_personal_information_varify > 0 && Auth::user()->can_show_info == true))
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                             <span data-key="t-utility"> Employee Hiring @if((Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->verify_offer_letters) > 0)
