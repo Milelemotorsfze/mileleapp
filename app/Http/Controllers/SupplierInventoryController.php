@@ -1684,8 +1684,13 @@ class SupplierInventoryController extends Controller
             ->where('whole_sales', $request->whole_sales)
             ->whereNotIn('id', $noChangeRowIds)
             ->whereNotIn('id', $updatedRowsIds)
+            ->where(function ($query) use($deliveryNote) {
+                $query->whereNull('delivery_note')
+                    ->orwhere('delivery_note', $deliveryNote);
+            })
 //            ->whereNotIn('id', $newlyAddedRowIds)
             ->get();
+            info($deletedRows->pluck('id'));
 
 //        return $deletedRows;
 
