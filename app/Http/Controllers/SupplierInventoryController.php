@@ -139,6 +139,7 @@ class SupplierInventoryController extends Controller
             $colourname = NULL;
 
             $date = Carbon::today()->format('Y-m-d');
+            // $date = '2024-02-11';
             $unavailableExtColours = [];
             $unavailableIntColours = [];
 
@@ -416,8 +417,8 @@ class SupplierInventoryController extends Controller
                         {
                             info("no row existing with model,sfx model year so => add new row");
                             $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])
-                                ->whereNotNull('chasis')
-                                ->first();
+                                                    ->whereNotNull('chasis')
+                                                    ->first();
                             if($isChasisExist) {
                                 info("case 1");
                                 return redirect()->back()->with('error', $uploadFileContent['chasis']." Chasis already existing");
@@ -963,6 +964,7 @@ class SupplierInventoryController extends Controller
                         if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
                             $supplierInventoryHistory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                         }
+                        
                         $supplierInventoryHistory->save();
                     }
                         // to find deleted rows
@@ -1070,7 +1072,7 @@ class SupplierInventoryController extends Controller
                             $supplierInventoryHistory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                             $supplierInventoryHistory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
                             if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
-                                $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                                $supplierInventoryHistory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                             }
                             $supplierInventoryHistory->save();
                         }
@@ -1335,13 +1337,13 @@ class SupplierInventoryController extends Controller
         $i = 0;
 
         $firstFileRowDetails = SupplierInventoryHistory::whereDate('date_of_entry', $request->first_file)
-//            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+           ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('supplier_id', $request->supplier_id)
             ->where('whole_sales', $request->whole_sales)
-            ->whereNull('chasis')
+            // ->whereNull('chasis')
             ->get();
         $secondFileRowDetails = SupplierInventoryHistory::whereDate('date_of_entry', $request->second_file)
-//            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+        //    ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
 //            ->whereNull('delivery_note')
             ->where('supplier_id', $request->supplier_id)
             ->where('whole_sales', $request->whole_sales)
@@ -1353,8 +1355,8 @@ class SupplierInventoryController extends Controller
         foreach ($firstFileRowDetails as $firstFileRowDetail) {
             $firstFileItems[] = $firstFileRowDetail->masterModel->model .'_'.$firstFileRowDetail->masterModel->sfx;
         }
-        $secondFileDetails = $secondFileRowDetails->whereNull('chasis');
-        foreach ($secondFileDetails as $secondFileDetail) {
+        // $secondFileDetails = $secondFileRowDetails->whereNull('chasis');
+        foreach ($secondFileRowDetails as $secondFileDetail) {
             $secondFileItems[] = $secondFileDetail->masterModel->model .'_'.$secondFileDetail->masterModel->sfx;
         }
 
@@ -1363,20 +1365,23 @@ class SupplierInventoryController extends Controller
 
         foreach ($secondFileRowDetails as $secondFileRowDetail)
         {
-            info($secondFileRowDetail['model']);
-            info($secondFileRowDetail['sfx']);
+          
             $model = $secondFileRowDetail->masterModel->model;
             $sfx = $secondFileRowDetail->masterModel->sfx;
-
+            info($model);
+            info($sfx);
             $modelIds = MasterModel::where('model', $model)
                 ->where('sfx', $sfx)
                 ->pluck('id')->toArray();
 
             $deliveryNote = $secondFileRowDetail['delivery_note'];
+            info("delivery note");
+            info($deliveryNote);
             // after having DN data their is no changes for data of thata ro.so consider the data without eta import for inventory
             $supplierInventories = SupplierInventoryHistory::whereIn('master_model_id', $modelIds)
                             ->whereDate('date_of_entry', $request->first_file)
-//                            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                            // ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                             ->where('supplier_id', $request->supplier_id)
                             ->where('whole_sales', $request->whole_sales)
                             ->where(function ($query) use($deliveryNote) {
@@ -1384,6 +1389,8 @@ class SupplierInventoryController extends Controller
                                     ->orwhere('delivery_note', $deliveryNote);
                             });
 
+                    info($supplierInventories->count());
+                      
             if ($supplierInventories->count() <= 0)
             {
                 info("no row existing with model,sfx model year so => add new row");
@@ -1417,6 +1424,8 @@ class SupplierInventoryController extends Controller
                         // Store the Count into Update the Row with data
                         $supplierInventory = SupplierInventoryHistory::whereIn('master_model_id', $modelIds)
                             ->whereDate('date_of_entry', $request->first_file)
+                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                            // ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
 //                            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                             ->where('supplier_id', $request->supplier_id)
                             ->where('whole_sales', $request->whole_sales)
@@ -1424,10 +1433,10 @@ class SupplierInventoryController extends Controller
                             ->whereNotIn('id', $updatedRowsIds)
                             ->where('chasis', $secondFileRowDetail['chasis'])
 //                                        ->whereNull('delivery_note') unable to find row when have delivery note
-                            ->where(function ($query) use($deliveryNote) {
-                                $query->whereNull('delivery_note')
-                                    ->orwhere('delivery_note', $deliveryNote);
-                            })
+                            // ->where(function ($query) use($deliveryNote) {
+                            //     $query->whereNull('delivery_note')
+                            //         ->orwhere('delivery_note', $deliveryNote);
+                            // })
                             ->first();
 
                         info($supplierInventory);
@@ -1437,16 +1446,17 @@ class SupplierInventoryController extends Controller
                             //adding new row simply
                             $isNullChaisis = SupplierInventoryHistory::whereIn('master_model_id', $modelIds)
                                 ->whereDate('date_of_entry', $request->first_file)
+                                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
 //                                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                 ->where('supplier_id', $request->supplier_id)
                                 ->where('whole_sales', $request->whole_sales)
                                 ->whereNotIn('id', $noChangeRowIds)
                                 ->whereNotIn('id', $updatedRowsIds)
-                                ->whereNull('chasis')
-                                ->where(function ($query) use($deliveryNote) {
-                                    $query->whereNull('delivery_note')
-                                        ->orwhere('delivery_note', $deliveryNote);
-                                });
+                                ->whereNull('chasis');
+                                // ->where(function ($query) use($deliveryNote) {
+                                //     $query->whereNull('delivery_note')
+                                //         ->orwhere('delivery_note', $deliveryNote);
+                                // });
                             $isNullChaisisIds = $isNullChaisis->pluck('id');
 
                             info($isNullChaisis->get());
@@ -1459,8 +1469,9 @@ class SupplierInventoryController extends Controller
                                     ->where('color_code', $secondFileRowDetail['color_code'])
                                     ->where('pord_month', $secondFileRowDetail['pord_month'])
                                     ->where('po_arm', $secondFileRowDetail['po_arm'])
-                                    ->where('eta_import', $secondFileRowDetail['eta_import'])
+                                    ->where('eta_import', $secondFileRowDetail['eta_import'])                               
                                     ->first();
+
                                 info($SimilarRowWithNullChaisis);
                                 if(!empty($SimilarRowWithNullChaisis)) {
                                     info("null chasis with smilar data exist");
@@ -1558,10 +1569,18 @@ class SupplierInventoryController extends Controller
                             $firstFilePairCount = 0;
 
                         }
+                        info("first pair count");
+                
+                        info($firstFilePairCount);
+                        info("second pair count");
+                    
+                        info($secondFilePairCount);
 
                         if($secondFilePairCount == $firstFilePairCount) {
                             $inventoryRow = SupplierInventoryHistory::whereIn('master_model_id', $modelIds)
                                 ->whereDate('date_of_entry', $request->first_file)
+                                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+
 //                                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                 ->where('supplier_id', $request->supplier_id)
                                 ->where('whole_sales', $request->whole_sales)
@@ -1590,6 +1609,8 @@ class SupplierInventoryController extends Controller
                             // check for engine number is changed or not
                             $nullChasisRow = SupplierInventoryHistory::whereIn('master_model_id', $modelIds)
                                 ->whereDate('date_of_entry', $request->first_file)
+                                 ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+
 //                                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                 ->where('supplier_id', $request->supplier_id)
                                 ->where('whole_sales', $request->whole_sales)
@@ -1625,6 +1646,8 @@ class SupplierInventoryController extends Controller
                         }else{
                             $nullChasisRow = SupplierInventoryHistory::whereIn('master_model_id', $modelIds)
                                 ->whereDate('date_of_entry', $request->first_file)
+                                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+
 //                                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                 ->where('supplier_id', $request->supplier_id)
                                 ->where('whole_sales', $request->whole_sales)
@@ -1656,6 +1679,7 @@ class SupplierInventoryController extends Controller
         }
 
         $deletedRows = SupplierInventoryHistory::whereDate('date_of_entry', $request->first_file)
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('supplier_id', $request->supplier_id)
             ->where('whole_sales', $request->whole_sales)
             ->whereNotIn('id', $noChangeRowIds)

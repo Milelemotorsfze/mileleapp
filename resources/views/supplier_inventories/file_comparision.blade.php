@@ -71,7 +71,7 @@
                                 <select class="form-control" autofocus name="supplier_id" id="supplier">
                                     <option value="" disabled>Select The Vendor</option>
                                     @foreach($suppliers as $supplier)
-                                        <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
+                                        <option value="{{ $supplier->id }}" {{ ( request()->supplier_id == $supplier->id ) ? 'selected' : '' }} >{{ $supplier->supplier }}</option>
                                     @endforeach
                                 </select>
                             </div>
