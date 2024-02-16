@@ -839,7 +839,7 @@ return view('calls.resultbrand', compact('data'));
                 $leadSource = LeadSource::where('source_name', $source_name)->first();
                 if ($leadSource) {
                     $lead_source_id = $leadSource->id;
-                } else {
+                } else { 
                     $lead_source_id = 1;
                 }
             } 

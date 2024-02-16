@@ -1227,11 +1227,11 @@
                                         <span data-key="t-extra-pages">Master Data</span>
                                         <div class="arrow-down"></div>
                                     </a>
+                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
                                     @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
                                 @endphp
                                 @if ($hasPermission)
-                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
                                     <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('paymentterms.index')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Payment Terms</span>
@@ -1354,7 +1354,7 @@
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('lead_source.index') }}" id="topnav-more" role="button">
                                         <i data-feather="server"></i>
-                                        <span data-key="t-extra-pages">Master </span>
+                                        <span data-key="t-extra-pages">Lead Sources</span>
                                     </a>
                                 </li>
                                 @endif
