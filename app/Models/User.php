@@ -55,6 +55,7 @@ class User extends Authenticatable
         'leave_request_approval',
         'advance_or_loan_balance',
         'overtime_request_approval',
+        'can_show_summary',
     ];
     public function getCanShowOfferLetterAttribute() {
         $canShowOfferLetter = false;
@@ -477,6 +478,41 @@ class User extends Authenticatable
             $overtimeRequestApproval['count'] = count($employeePendings) + count($reportingManagerPendings) + count($hrPendings) + count($divisionHeadPendings);
         }
         return $overtimeRequestApproval;
+    }
+    public function getCanShowSummaryAttribute() {
+        $canShowSummary = false;
+        $HRManagerPendings = InterviewSummaryReport::where([
+            ['action_by_hr_manager','pending'],
+            ['hr_manager_id',$this->id],
+            ])->latest()->get();
+        $HRManagerApproved = InterviewSummaryReport::where([
+            ['action_by_hr_manager','approved'],
+            ['hr_manager_id',$this->id],
+            ])->latest()->get();
+        $HRManagerRejected = InterviewSummaryReport::where([
+            ['action_by_hr_manager','rejected'],
+            ['hr_manager_id',$this->id],
+            ])->latest()->get();
+        $divisionHeadPendings = InterviewSummaryReport::where([
+            ['action_by_hr_manager','approved'],
+            ['action_by_division_head','pending'],
+            ['hr_manager_id',$this->id],
+            ])->latest()->get();
+        $divisionHeadApproved = InterviewSummaryReport::where([
+            ['action_by_hr_manager','approved'],
+            ['action_by_division_head','approved'],
+            ['hr_manager_id',$this->id],
+            ])->latest()->get();
+        $divisionHeadRejected = InterviewSummaryReport::where([
+            ['action_by_hr_manager','approved'],
+            ['action_by_division_head','rejected'],                
+            ['hr_manager_id',$this->id],
+            ])->latest()->get();
+        if(count($HRManagerPendings) > 0 OR count($HRManagerApproved) > 0 OR count($HRManagerRejected) > 0 OR count($divisionHeadPendings) > 0 OR 
+        count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0) {
+            $canShowSummary = true;
+        }
+        return $canShowSummary;
     }
     public function hasPermissionForSelectedRole($permissionName) {
         $selectedRole = $this->selected_role;
