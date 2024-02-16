@@ -94,7 +94,7 @@
                     Sub: <strong>Employment Offer</strong></br></br> 
                     <strong>Dear {{$data->candidate_name ?? ''}},</strong></br></br> 
                     We refer to your application submitted, and the subsequent Interview you had with us, we are pleased to offer you employment with our 
-                    Company, in the capacity of " <strong>{{$data->candidateDetails->designation->name}}</strong> ".</br></br> 
+                    Company, in the capacity of " <strong>{{$data->candidateDetails->designation->name ?? ''}}</strong> ".</br></br> 
                     This employment offer is subject to the condition that we are able to obtain from the Ministry of Labor and Social Affairs and the 
                     Naturalization and Immigration administration at the Ministry of Interior an entry permit for your employment under our Sponsorship.</br></br> 
                     Your employment with us shall be pursuant to the following terms and conditions.</br></br> 
@@ -102,15 +102,15 @@
                         <tbody>
                             <tr>
                                 <td class="bold"><strong>Basic Salary</strong></td>
-                                <td class="normal">AED {{$data->candidateDetails->basic_salary}}/- p.m. ( {{$inwords['basic_salary']}} Only )</td>
+                                <td class="normal">AED {{$data->candidateDetails->basic_salary}}/- p.m. ( {{$inwords['basic_salary'] ?? ''}} Only )</td>
                             </tr>
                             <tr>
                                 <td class="bold"><strong>Other Allowance</strong></td>
-                                <td class="normal">AED {{$data->candidateDetails->other_allowances}}/- p.m. ( {{$inwords['other_allowances']}} Only )</td>
+                                <td class="normal">AED {{$data->candidateDetails->other_allowances}}/- p.m. ( {{$inwords['other_allowances'] ?? ''}} Only )</td>
                             </tr>
                             <tr>
                                 <td class="bold"><strong>Total Salary</strong></td>
-                                <td class="normal">AED {{$data->candidateDetails->total_salary}}/- p.m. ( {{$inwords['total_salary']}} Only )</td>
+                                <td class="normal">AED {{$data->candidateDetails->total_salary}}/- p.m. ( {{$inwords['total_salary'] ?? ''}} Only )</td>
                             </tr>
                             <tr>
                                 <td class="bold"><strong>Place of Work</strong></td>
@@ -179,9 +179,9 @@
                         <tbody>
                             <tr>
                                 <td class="bold1">
-                                    <strong>{{$data->candidateDetails->offerLetterHr->name ?? $hr->handover_to_name}}</strong></br></br>
+                                    <strong>{{$data->candidateDetails->offerLetterHr->name ?? $hr->handover_to_name ?? ''}}</strong></br></br>
                                     HR Manager</br></br>
-                                    @if($data->offer_letter_send_at == NULL && $isAuth == 1)
+                                    @if($data->offer_letter_send_at == NULL && isset($isAuth) && $isAuth == 1)
                                         <button type="button" style="border-radius:5px; padding-bottom:5px; color: #fff; background-color: #034c84; border-color: #034c84; padding-top:5px;">
                                             <a href="{{route('candidate-offer-letter.send',$data->id)}}" style="color:white;">Send Offer Letter</a>
                                         </button>
@@ -190,7 +190,7 @@
                                 <td class="normal1">
                                     <strong>Read and accepted:</strong></br></br> 
                                     Name: <strong> @if($data->gender == 1) Mr. @elseif($data->gender == 2) Ms. @endif {{$data->candidate_name ?? ''}}</strong></br>
-                                    @if($data->offer_letter_send_at == NULL && $isAuth == 1)
+                                    @if($data->offer_letter_send_at == NULL && isset($isAuth) && $isAuth == 1)
                                     Date: ………………… </br> 
                                     Signature:…………………	                                     
                                     @endif
@@ -200,7 +200,7 @@
                                 <td class="bold1">
                                 </td>
                                 <td class="normal1">
-                                    @if($data->offer_letter_send_at != NULL && $isAuth == 0)
+                                    @if($data->offer_letter_send_at != NULL && isset($isAuth) && $isAuth == 0)
                                         <form class="w3-container" action="{{route('offerletter.signed')}}" method="POST" id="candidatepersonalInfoForm"
                                             name="DAFORM"  enctype="multipart/form-data" target="_self">
                                             @csrf
@@ -237,7 +237,7 @@
                                                 </div> -->
                                             </div> 
                                         </form>
-                                    @elseif($data->candidateDetails->offer_signed_at != NULL && $isAuth == 2)
+                                    @elseif($data->candidateDetails->offer_signed_at != NULL && isset($isAuth) && $isAuth == 2)
                                     Date: {{Carbon\Carbon::parse($data->candidateDetails->offer_signed_at)->format('F d,Y')}}</br>
                                     <table>
                                     <tbody>

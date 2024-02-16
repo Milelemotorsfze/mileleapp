@@ -10,6 +10,12 @@ use Validator;
 use DB;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserActivityController;
+use App\Models\HRM\Hiring\EmployeeHiringRequest;
+use App\Models\HRM\Hiring\EmployeeHiringRequestHistory;
+use App\Models\HRM\Hiring\JobDescription;
+use App\Models\HRM\Hiring\InterviewSummaryReport;
+use App\Models\HRM\Employee\PassportRequest;
+use App\Models\HRM\Employee\PassportRelease;
 
 class DivisionController extends Controller
 {
@@ -22,7 +28,7 @@ class DivisionController extends Controller
         $data = MasterDivisionWithHead::where('id',$id)->first();
         $previous = MasterDivisionWithHead::where('id', '<', $id)->max('id');
         $next = MasterDivisionWithHead::where('id', '>', $id)->min('id');
-        $divisionHeads = User::whereHas('empProfile')->with('empProfile.department','empProfile.designation','empProfile.location')->whereIn('id',[2,26,31,10,83])->get();
+        $divisionHeads = User::whereHas('empProfile')->with('empProfile.department','empProfile.designation','empProfile.location')->whereIn('id',[2,26,31,10,62])->get();
         return view('hrm.masters.division.edit',compact('data','previous','next','divisionHeads'));
     }
     public function update(Request $request, $id) {

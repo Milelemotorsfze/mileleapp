@@ -67,7 +67,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-list
 								@endif
 								@endcanany
 
-								@canany(['edit-division','edit-current-user-division'])
+								<!-- @canany(['edit-division','edit-current-user-division'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division','edit-current-user-division']);
 								@endphp
@@ -77,7 +77,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-list
 											<i class="fa fa-edit" aria-hidden="true"></i>
 										</a>
 								@endif
-								@endcanany
+								@endcanany -->
 							</td>
 						</tr>
 						@endforeach
