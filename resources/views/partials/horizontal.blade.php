@@ -718,7 +718,7 @@
                                             @if(Auth::user()->job_description_approval['count'] > 0) <span class="approval-count">{{Auth::user()->job_description_approval['count']}}<span> @endif
                                             </a>
                                             @endif
-                                            @if(Auth::user()->interview_summary_report_approval == true)
+                                            @if(Auth::user()->interview_summary_report_approval == true && Auth::user()->can_show_summary == true)
                                             <a href="{{ route('interview-summary-report.approval-awaiting') }}" class="dropdown-item" data-key="t-login">InterviewSummary @if(Auth::user()->interview_summary_report_approval['count'] > 0)<span class="approval-count">{{Auth::user()->interview_summary_report_approval['count']}}</span> @endif
                                             </a>
                                             @endif
@@ -734,7 +734,7 @@
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-offer-letter-signature']);
                                             @endphp
-                                            @if ($hasPermission)
+                                            @if ($hasPermission && Auth::user()->can_show_offer_letter == true)
                                             <a href="{{ route('candidate.listOfferLetter') }}" class="dropdown-item" data-key="t-login">Offer Letter @if(Auth::user()->verify_offer_letters > 0)<span class="approval-count">{{Auth::user()->verify_offer_letters}}</span> @endif</a>
                                             @endif
                                             @endcanany
@@ -742,7 +742,7 @@
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action']);
                                             @endphp
-                                            @if ($hasPermission)
+                                            @if ($hasPermission && Auth::user()->can_show_info == true)
                                             <a href="{{ route('candidate.listingInfo') }}" class="dropdown-item" data-key="t-login">Candidate Info @if(Auth::user()->candidate_personal_information_varify > 0)<span class="approval-count">{{Auth::user()->candidate_personal_information_varify}}</span> @endif</a>
                                             @endif
                                             @endcanany
