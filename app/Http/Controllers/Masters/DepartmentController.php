@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Masters;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Masters\MasterDepartment;
+use App\Models\User;
 
 class DepartmentController extends Controller
 {
