@@ -43,6 +43,7 @@ class User extends Authenticatable
         'job_description_approval',
         'interview_summary_report_approval',
         'candidate_docs_varify',
+        'can_show_docs',
         'verify_offer_letters',
         'candidate_personal_information_varify',
         'joining_report_approval',
@@ -144,13 +145,13 @@ class User extends Authenticatable
         $HRManagerApproved = InterviewSummaryReport::where([['action_by_hr_manager','approved'],['hr_manager_id',$this->id],])->latest()->get();
         $HRManagerRejected = InterviewSummaryReport::where([['action_by_hr_manager','rejected'],['hr_manager_id',$this->id],])->latest()->get();
         $divisionHeadPendings = InterviewSummaryReport::where([['action_by_hr_manager','approved'],['action_by_division_head','pending'],
-            ['hr_manager_id',$this->id],])->latest()->get();
+            ['division_head_id',$this->id],])->latest()->get();
         $divisionHeadApproved = InterviewSummaryReport::where([['action_by_hr_manager','approved'],['action_by_division_head','approved'],
-            ['hr_manager_id',$this->id],])->latest()->get();
+            ['division_head_id',$this->id],])->latest()->get();
         $divisionHeadRejected = InterviewSummaryReport::where([['action_by_hr_manager','approved'],['action_by_division_head','rejected'],
-            ['hr_manager_id',$this->id],])->latest()->get();
+            ['division_head_id',$this->id],])->latest()->get();
         if(count($HRManagerPendings) > 0 OR count($HRManagerApproved) > 0 OR count($HRManagerRejected) > 0 OR count($divisionHeadPendings) > 0 OR 
-        count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0 ) {
+        count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0 ) { 
             $interviewSummaryReportApproval['can'] = true;
             $interviewSummaryReportApproval['count'] = count($HRManagerPendings) + count($divisionHeadPendings);
         }
@@ -163,6 +164,21 @@ class User extends Authenticatable
             $q->where('documents_verified_at', NULL);
         })->latest()->count();
         return $pendingdocsUploaded;
+    }
+    public function getCanShowDocsAttribute() {
+        $canShowDocs = false;
+        $pending = EmployeeProfile::where([
+            ['type','candidate'],
+            ['documents_verified_at',NULL],
+        ])->get();
+        $verified = EmployeeProfile::where([
+            ['type','candidate'],
+            ['documents_verified_at','!=',NULL],
+        ])->get();
+        if(count($pending) > 0 OR count($verified) > 0) {
+            $canShowDocs = true;
+        }
+        return $canShowDocs;
     }
     public function getVerifyOfferLettersAttribute() {
         $verifyOffers = 0;

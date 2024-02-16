@@ -652,7 +652,7 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                     <i data-feather="grid"></i>
-                                    <span data-key="t-extra-pages">Approvals @if((Auth::user()->overtime_request_approval['count']+Auth::user()->liability_request_approval['count']+Auth::user()->leave_request_approval['count']+Auth::user()->passport_submit_request_approval['count']+Auth::user()->passport_release_request_approval['count']+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']) > 0)
+                                    <span data-key="t-extra-pages">Approvals @if((Auth::user()->overtime_request_approval['count']+Auth::user()->liability_request_approval['count']+Auth::user()->leave_request_approval['count']+Auth::user()->passport_submit_request_approval['count']+Auth::user()->passport_release_request_approval['count']+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->verify_offer_letters) > 0)
                                     <span class="approval-count">{{Auth::user()->overtime_request_approval['count']+Auth::user()->liability_request_approval['count']+Auth::user()->leave_request_approval['count']+Auth::user()->passport_submit_request_approval['count']+Auth::user()->passport_release_request_approval['count']+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->candidate_docs_varify+Auth::user()->candidate_personal_information_varify+Auth::user()->verify_offer_letters+Auth::user()->joining_report_approval['count']}}</span>
                                                 @endif
                                             </span>
@@ -701,7 +701,7 @@
                                     @if($hasPermission OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can']  == true OR Auth::user()->interview_summary_report_approval == true OR Auth::user()->candidate_docs_varify > 0 OR Auth::user()->candidate_personal_information_varify > 0)
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                            <span data-key="t-utility"> Employee Hiring @if((Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']) > 0)
+                                            <span data-key="t-utility"> Employee Hiring @if((Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->verify_offer_letters) > 0)
                                             <span class="approval-count">{{Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->candidate_docs_varify+Auth::user()->candidate_personal_information_varify+Auth::user()->verify_offer_letters}}</span>
                                                 @endif
                                             </span>
@@ -726,7 +726,7 @@
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents','send-candidate-documents-request-form']);
                                             @endphp
-                                            @if ($hasPermission)
+                                            @if ($hasPermission && Auth::user()->can_show_docs == true)
                                             <a href="{{ route('candidate.listDocs') }}" class="dropdown-item" data-key="t-login">Candidate Docs @if(Auth::user()->candidate_docs_varify > 0)<span class="approval-count">{{Auth::user()->candidate_docs_varify}}</span> @endif</a>
                                             @endif
                                             @endcanany
