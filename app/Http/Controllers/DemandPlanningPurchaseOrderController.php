@@ -7,6 +7,7 @@ use App\Models\ColorCode;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\MasterModel;
 use App\Models\PFI;
+use App\Models\SupplierInventory;
 use App\Models\Supplier;
 use App\Models\SupplierType;
 use App\Models\Varaint;
@@ -32,6 +33,7 @@ class DemandPlanningPurchaseOrderController extends Controller
         (new UserActivityController)->createActivity('Open Purchase Order create Section');
 
         $pfi = Pfi::find($request->id);
+        $dealer = $pfi->letterOfIndent->dealers ?? '';
 
         $pfiVehicleVariants = ApprovedLetterOfIndentItem::select('*', DB::raw('sum(quantity) as quantity'))
             ->where('pfi_id', $request->id)
@@ -46,6 +48,16 @@ class DemandPlanningPurchaseOrderController extends Controller
             $pfiVehicleVariant->masterModels = MasterModel::where('model', $masterModel->model)
                                             ->where('sfx', $masterModel->sfx)
                                             ->get();
+
+            $possibleModelIds = MasterModel::where('model', $masterModel->model)
+                                            ->where('sfx', $masterModel->sfx)->pluck('id');                             
+            $pfiVehicleVariant->inventoryQuantity = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
+                                                        ->whereNull('purchase_order_id')
+                                                        ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                                                        ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                                                        ->where('supplier_id', $pfi->supplier_id)
+                                                        ->where('whole_sales', $dealer)
+                                                        ->count();
         }
 
         $exColours = ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();

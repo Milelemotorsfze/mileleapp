@@ -59,7 +59,7 @@
                     <th>SFX</th>
                     <th>Model Year</th>
                     <th>Variant</th>
-                    <th>LOI</th>
+                   
                     <th>Chasis</th>
                     <th>Engine Number</th>
                     <th>Color Code</th>
@@ -68,6 +68,9 @@
                     <th>ETA Import Date</th>
                     <th>Production Month</th>
                     <th>DN Number</th>
+                    <th>LOI</th>
+                    <th>PFI Number </th>
+                    <th>PO Number</th>
                     <th>PO AMS</th>
                 </tr>
                 </thead>
@@ -115,7 +118,7 @@
                                 </select>
                             </td>
                             <td> {{ $supplierInventory->masterModel->variant->name ?? '' }}</td>
-                            <td>{{ $supplierInventory->letterOfIndentItem->uuid ?? '' }}</td>
+                           
                             <td data-field="chasis" id="chasis-editable-{{$supplierInventory->id}}" contenteditable="true" data-id="{{$supplierInventory->id}}" >
                                 {{ $supplierInventory->chasis }}
                             </td>
@@ -136,7 +139,9 @@
                             </td>
                             <td data-field="delivery_note"  id="delivery_note-editable-{{$supplierInventory->id}}"  contenteditable="true"
                                 data-id="{{$supplierInventory->id}}" >{{$supplierInventory->delivery_note}} </td>
-
+                            <td>{{ $supplierInventory->letterOfIndentItem->uuid ?? '' }}</td>
+                            <td> {{ $supplierInventory->pfi->pfi_reference_number ?? '' }} </td>
+                            <td> {{ $supplierInventory->purchaseOrder->po_number ?? ''}} </td>
                             <td data-field="po_arm" class="po_arm"  id="po_arm-editable-{{$supplierInventory->id}}"  contenteditable="true"
                                 data-id="{{$supplierInventory->id}}" >{{ $supplierInventory->po_arm }}</td>
 
