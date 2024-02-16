@@ -248,14 +248,14 @@
 
                                                 @endif
                                                 @endcanany
-                                                @canany(['view-asset-allocation-request-listing'])
+                                                <!-- @canany(['view-asset-allocation-request-listing'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-asset-allocation-request-listing']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('asset_allocation.index') }}" class="dropdown-item" data-key="t-login">Asset Allocation</a>
                                                 @endif
-                                                @endcanany
+                                                @endcanany -->
                                                 @canany([])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole([]);
@@ -427,7 +427,7 @@
                                             </a>
                                             @endif
                                             @endcanany
-                                        <div class="dropdown">
+                                        <!-- <div class="dropdown">
                                             @canany(['list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'])
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-increment','list-current-user-increment','view-all-list-insurance','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user']);
@@ -457,7 +457,7 @@
                                             </div>
                                             @endif
                                             @endcanany
-                                        </div>
+                                        </div> -->
                                             
                                         <div class="dropdown">
                                             <!-- @canany(['list-all-overtime','list-current-user-overtime','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'])
@@ -465,7 +465,7 @@
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-overtime','list-current-user-overtime','view-all-list-insurance','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user']);
                                             @endphp
                                             @if ($hasPermission) -->
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                            <!-- <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Reimbursement</span>
                                             </a>
                                            
@@ -475,7 +475,7 @@
 
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Payroll</span>
-                                            </a>
+                                            </a> -->
                                             <!-- @endif
                                             @endcanany -->
                                         </div>
@@ -1227,11 +1227,11 @@
                                         <span data-key="t-extra-pages">Master Data</span>
                                         <div class="arrow-down"></div>
                                     </a>
+                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
                                     @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
                                 @endphp
                                 @if ($hasPermission)
-                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
                                     <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('paymentterms.index')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Payment Terms</span>
@@ -1354,7 +1354,7 @@
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('lead_source.index') }}" id="topnav-more" role="button">
                                         <i data-feather="server"></i>
-                                        <span data-key="t-extra-pages">Master </span>
+                                        <span data-key="t-extra-pages">Lead Sources</span>
                                     </a>
                                 </li>
                                 @endif

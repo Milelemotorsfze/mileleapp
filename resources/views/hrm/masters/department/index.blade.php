@@ -83,7 +83,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-li
 								@endif
 								@endcanany
 
-								@canany(['edit-department','edit-current-user-department'])
+								<!-- @canany(['edit-department','edit-current-user-department'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-department','edit-current-user-department']);
 								@endphp
@@ -92,7 +92,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-li
 											<i class="fa fa-edit" aria-hidden="true"></i>
 										</a>
 								@endif
-								@endcanany
+								@endcanany -->
 							</td>
 						</tr>
 						@endforeach
