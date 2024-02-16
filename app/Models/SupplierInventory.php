@@ -63,6 +63,14 @@ class SupplierInventory extends Model
     {
         return $this->belongsTo(LetterOfIndentItem::class,'letter_of_indent_item_id','id');
     }
+    public function pfi()
+    {
+        return $this->belongsTo(Pfi::class,'pfi_id','id');
+    }
+    public function purchaseOrder()
+    {
+        return $this->belongsTo(purchasingOrder::class,'purchase_order_id','id');
+    }
     public function getTotalQuantityAttribute()
     {
         $masterModel = MasterModel::find($this->master_model_id);

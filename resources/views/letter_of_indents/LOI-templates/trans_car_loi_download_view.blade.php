@@ -133,7 +133,7 @@
                 <p class="fw-bold">VAT NOT APPLICABLE (EXPORT BILL) </p>
                 <p>NET TOTAL VALUE (USD) TOTAL </p>
                 <p>INVOICE VALUE (AED) </p>
-                <img src="{{ public_path('images/trans_car_seal.png') }}" class="overlay-image" style="height: 125px;width: 120px;">
+                <img src="{{ public_path('images/LOI/transcar_seal.png') }}" class="overlay-image" style="height: 125px;width: 120px;">
             </td>
             <td class="bg-light-grey text-dark fw-bold" > </td>
             <td class="bg-light-grey text-dark fw-bold" ></td>

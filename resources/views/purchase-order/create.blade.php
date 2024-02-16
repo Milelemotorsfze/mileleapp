@@ -177,6 +177,9 @@
                             <div class="col-lg-1 col-md-6">
                                 <label  class="form-label">QTY</label>
                             </div>
+                            <div class="col-lg-1 col-md-6">
+                                <label  class="form-label">Inventory QTY</label>
+                            </div>
                         </div>
                         @foreach($pfiVehicleVariants as $key => $pfiVehicleVariant)
                             <div class="row">
@@ -215,6 +218,11 @@
                                     <input type="number" id="quantity-{{$key}}" min="0"  oninput="checkQuantity({{$key}})" data-quantity="{{$pfiVehicleVariant->quantity}}"
                                       data-id="{{ $pfiVehicleVariant->id }}"  class="form-control qty-{{$pfiVehicleVariant->id}}" value="{{ $pfiVehicleVariant->quantity }}" placeholder="QTY">
                                     <span class="QuantityError-{{$key}} text-danger"></span>
+                                </div>
+                                <div class="col-lg-1 col-md-6">
+                                    <input type="number" id="inventory-qty-{{$key}}" min="0" data-inventory-qty="{{$pfiVehicleVariant->inventoryQuantity}}"
+                                      data-id="{{ $pfiVehicleVariant->id }}"  class="form-control inventory-qty-{{$pfiVehicleVariant->id}}" value="{{ $pfiVehicleVariant->inventoryQuantity }}" placeholder="QTY">
+                                    <span class="InventoryQuantityError-{{$key}} text-danger"></span>
                                 </div>
                             </div>
                         @endforeach
@@ -263,9 +271,10 @@
     function checkQuantity(key) {
         var selectedQuantity = $('#quantity-'+key).val();
         var variantQuantity = $('#quantity-'+key).attr('data-quantity');
-        if(parseInt(selectedQuantity) > parseInt(variantQuantity)) {
+        var inventoryQuantity = $('#inventory-qty-'+key).attr('data-inventory-qty');
+        if(parseInt(selectedQuantity) > parseInt(inventoryQuantity)) {
             formValid = false;
-            $('.QuantityError-'+key).text("Please Enter Quantity less than "+variantQuantity);
+            $('.QuantityError-'+key).text("Please Enter Quantity less than inventory Quantity "+inventoryQuantity);
             $('.add-row-btn').attr('disabled', true);
         }else{
             formValid = true;
@@ -325,7 +334,7 @@
         // }
 
     }
-    $('.add-row-btn').click(function() {
+    $('.add-row-btn').click(function(e) {
 
         // if(formValid == true) {
             $('.bar').show();
@@ -338,7 +347,8 @@
             var sum = $('#total-price').val();
             for (var i = 0; i < variantQuantity; i++) {
                 checkQuantity(i);
-                var qty = $('#quantity-'+i).val();
+                if(formValid == true) {
+                    var qty = $('#quantity-'+i).val();
                 var actualQuantity = $('#quantity-'+i).attr('data-quantity');
                 var remaingQuantity = parseInt(actualQuantity) - parseInt(qty);
                 $('#quantity-'+i).attr('data-quantity',remaingQuantity);
@@ -391,6 +401,8 @@
 
                     
                 }
+                }
+              
             }
 
             $('#variantRowsContainer').show();
