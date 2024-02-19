@@ -85,7 +85,6 @@ class HRMSPermissionSeeder extends Seeder
             ['view-rejected-job-description-list', 'View Rejected  Job Description List', 'web', 'To View Rejected  Job Description List', '2023-12-06 12:36:00', '2023-12-06 12:36:00', 30],
             ['view-job-description-details', 'View Job Description Details', 'web', 'To View Job Description Details', '2023-12-06 12:54:29', '2023-12-06 12:54:29', 30],
             ['view-job-description-approvals-details', 'View Job Description Approvals Details', 'web', 'To View Job Description Approvals Details', '2023-12-06 12:55:06', '2023-12-06 12:55:06', 30],
-            ['view-addon-supplier-info', 'View Addon Supplier Info', 'web', 'to view addon supplier info', '2023-12-14 08:56:45', '2023-12-14 08:56:45', 17],
             ['view-interview-summary-report-listing', 'View Interview Summary Report Listing', 'web', 'To View Interview Summary Report Listing', '2023-12-18 05:20:30', '2023-12-18 05:20:30', 31],
             ['create-interview-summary-report', 'Create Interview Summary Report', 'web', 'To Create Interview Summary Report', '2023-12-18 05:20:59', '2023-12-18 05:20:59', 31],
             ['edit-interview-summary-report', 'Edit Interview Summary Report', 'web', 'To Edit Interview Summary Report', '2023-12-18 05:21:24', '2023-12-18 05:21:24', 31],
