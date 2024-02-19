@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('loi_mapping_crtiterias');
+        Schema::dropIfExists('loi_mapping_criterias');
     }
 };

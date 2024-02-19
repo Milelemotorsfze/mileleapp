@@ -138,8 +138,8 @@ class SupplierInventoryController extends Controller
             $uploadFileContents = [];
             $colourname = NULL;
 
-            $date = Carbon::today()->format('Y-m-d');
-            // $date = '2024-02-11';
+            // $date = Carbon::today()->format('Y-m-d');
+            $date = '2024-02-10';
             $unavailableExtColours = [];
             $unavailableIntColours = [];
 
@@ -1365,7 +1365,9 @@ class SupplierInventoryController extends Controller
 
         foreach ($secondFileRowDetails as $secondFileRowDetail)
         {
-          
+            info("chasis");
+            info($secondFileDetail['chasis']);
+         
             $model = $secondFileRowDetail->masterModel->model;
             $sfx = $secondFileRowDetail->masterModel->sfx;
             info($model);
@@ -1677,7 +1679,8 @@ class SupplierInventoryController extends Controller
 
             }$i++;
         }
-
+        info("updated Rows");
+        info($updatedRowsIds);
         $deletedRows = SupplierInventoryHistory::whereDate('date_of_entry', $request->first_file)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('supplier_id', $request->supplier_id)
