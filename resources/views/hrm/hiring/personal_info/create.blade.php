@@ -411,8 +411,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <input type="file" class="form-control" multiple id="passport-file" name="passport[]"
-                                                            placeholder="Upload Passport (First & Second page)" accept="application/pdf, image/*">
+                                        <!-- <input type="file" class="form-control" multiple id="passport-file" name="passport[]"
+                                                            placeholder="Upload Passport (First & Second page)" accept="application/pdf, image/*"> -->
                                         <!-- <div class="card">
                                             <div class="card-header">
                                                 <h4 class="card-title">
