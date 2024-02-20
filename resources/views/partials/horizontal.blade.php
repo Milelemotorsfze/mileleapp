@@ -1145,10 +1145,10 @@
                                             @endif
                                         @endcan
 
-                                        @canany(['model-year-calculation-rules-list','model-year-calculation-categories-list','list-customer','list-master-models'])
+                                        @canany(['model-year-calculation-rules-list','model-year-calculation-categories-list','list-customer','list-master-models','list-color-code'])
                                             @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['model-year-calculation-rules-list',
-                                                'model-year-calculation-categories-list','list-customer','list-master-models']);
+                                                'model-year-calculation-categories-list','list-customer','list-master-models','list-color-code']);
                                             @endphp
                                             @if ($hasPermission)
                                                 <div class="dropdown">
@@ -1162,7 +1162,15 @@
                                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-customer');
                                                             @endphp
                                                             @if ($hasPermission)
-                                                                <a href="{{route('dm-customers.index')}}" class="dropdown-item" data-key="t-login">List Customers </a>
+                                                                <a href="{{route('dm-customers.index')}}" class="dropdown-item" data-key="t-login"> Customers </a>
+                                                            @endif
+                                                        @endcan
+                                                        @can('list-color-code')
+                                                            @php
+                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-color-code');
+                                                            @endphp
+                                                            @if ($hasPermission)
+                                                                <a href="{{route('colourcode.index')}}" class="dropdown-item" data-key="t-login"> Colours </a>
                                                             @endif
                                                         @endcan
                                                         @can('list-master-models')
@@ -1281,13 +1289,13 @@
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('colour-edit');
                                         @endphp
-                                        @if ($hasPermission)
-                                        <div class="dropdown">
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('colourcode.index')}}" id="topnav-utility" role="button">
-                                                <span data-key="t-utility">Colours </span>
-                                            </a>
-                                        </div>
-                                        @endif
+                                            @if ($hasPermission)
+                                            <div class="dropdown">
+                                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('colourcode.index')}}" id="topnav-utility" role="button">
+                                                    <span data-key="t-utility">Colours </span>
+                                                </a>
+                                            </div>
+                                            @endif
 
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
