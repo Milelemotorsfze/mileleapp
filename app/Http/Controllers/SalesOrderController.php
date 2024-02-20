@@ -192,5 +192,48 @@ class SalesOrderController extends Controller
                     }  
                 }
                 return redirect()->route('dailyleads.index')->with('success', 'Sales Order created successfully.'); 
-            }  
+            } 
+        public function updatesalesorder ($id) 
+        {
+            $quotation = Quotation::where('calls_id', $id)->first();
+            $calls = Calls::find($id);
+            $customerdetails = QuotationDetail::with('country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms')->where('quotation_id', $quotation->id)->first();
+            $vehicles = [];
+            if ($quotation) {
+                $quotationItems = QuotationItem::where('quotation_id', $quotation->id)
+                    ->whereIn('reference_type', [
+                        'App\Models\Varaint',
+                        'App\Models\MasterModelLines',
+                        'App\Models\Brand'
+                    ])->get();
+                foreach ($quotationItems as $item) {
+                    switch ($item->reference_type) {
+                        case 'App\Models\Varaint':
+                        $variantId = $item->reference_id;
+                        $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                        $vehicles[$item->id] = $variantVehicles;
+                        break;
+                    case 'App\Models\MasterModelLines':
+                        $variants = Variant::where('master_model_lines_id', $item->reference_id)->get();
+                        foreach ($variants as $variant) {
+                            $variantId = $variant->id;
+                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                            $vehicles[$item->id] = $variantVehicles;
+                        }
+                        break;
+                    case 'App\Models\Brand':
+                        $variants = Variant::where('brand_id', $item->reference_id)->get();
+                        foreach ($variants as $variant) {
+                            $variantId = $variant->id;
+                            $variantVehicles = DB::table('vehicles')->where('varaints_id', $variantId)->get()->toArray();
+                            $vehicles[$item->id] = $variantVehicles;
+                        }
+                        break;
+                    default:
+                        break;
+                    }
+                        }
+                        }  
+                        return view('salesorder.update', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails'));  
+        }
         }

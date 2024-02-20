@@ -2024,9 +2024,9 @@ class SupplierInventoryController extends Controller
 
     public function checkChasisUnique(Request $request) {
 
-        $isChasisExist = SupplierInventory::where('chasis',  $request->chasis)
-                                    ->first();
-
+        $isChasisExist = SupplierInventory::whereNot('id', $request->inventoryId)->where('chasis',  $request->chasis)
+                                ->whereNotNull('chasis')
+                                ->first();
         if($isChasisExist) {
             $data = 1;
         }else{

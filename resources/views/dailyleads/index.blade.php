@@ -875,6 +875,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Sales Values</th>
                   <th>Sales Notes</th>
                   <th>So Number</th>
+                  <th>SO Update</th>
                   <!-- <th>Booking Vehicles</th> -->
                 </tr>
               </thead>
@@ -2244,18 +2245,18 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
     }
 },
                 { data: 'so_number', name: 'so_number', searchable: false},
-//                 {
-//     data: 'id',
-//     name: 'id',
-//     searchable: false,
-//     render: function (data, type, row) {
-//         const bookingUrl = `{{ url('booking/create') }}/${data}`;
-//         return `
-//             <a class="btn btn-sm btn-info" href="${bookingUrl}" title="Booking">
-//                 <i class="fa fa-car" aria-hidden="true"></i>
-//             </a>`;
-//     }
-// },
+              {
+              data: 'id',
+              name: 'id',
+              searchable: false,
+              render: function (data, type, row) {
+              const updatesaleorder = `{{ url('salesorder/update') }}/${data}`;
+              return `
+              <a class="btn btn-sm btn-info" href="${updatesaleorder}" title="Update Sales Order">
+              <i class="fa fa-window-maximize" aria-hidden="true"></i>
+              </a>`;
+              }
+              },
             ]
         });
         dataTable7 =   $('#dtBasicExample7').DataTable({

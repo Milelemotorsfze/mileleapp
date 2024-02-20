@@ -171,14 +171,11 @@
                             <td> {{ $supplierInventory->masterModel->variant->name ?? '' }}</td>
                            
                             <td data-field="chasis" id="chasis-editable-{{$supplierInventory->id}}" contenteditable="true" data-id="{{$supplierInventory->id}}" >
-                                {{ $supplierInventory->chasis }}
-                            </td>
+                                {{ $supplierInventory->chasis }}</td>
                             <td  data-field="engine_number" id="engine_number-editable-{{$supplierInventory->id}}"
-                                 contenteditable="true" data-id="{{$supplierInventory->id}}" > {{ $supplierInventory->engine_number ?? '' }}
-                            </td>
+                                 contenteditable="true" data-id="{{$supplierInventory->id}}" > {{ $supplierInventory->engine_number ?? '' }}</td>
                             <td  data-field="color_code" id="color_code-editable-{{$supplierInventory->id}}"
-                                 contenteditable="true" data-id="{{$supplierInventory->id}}">{{ $supplierInventory->color_code }}
-                            </td>
+                                 contenteditable="true" data-id="{{$supplierInventory->id}}">{{ $supplierInventory->color_code }}</td>
                             <td>{{ $supplierInventory->interiorColor->name ?? '' }}</td>
                             <td>{{ $supplierInventory->exteriorColor->name ?? '' }}</td>
                             <td class="eta-import">
@@ -186,8 +183,7 @@
                                        data-id="{{$supplierInventory->id}}" value="{{ $supplierInventory->eta_import }}" >
                             </td>
                             <td data-field="pord_month" class="pord_month"  id="pord_month-editable-{{$supplierInventory->id}}"  contenteditable="true"
-                                data-id="{{$supplierInventory->id}}" >{{$supplierInventory->pord_month}}
-                            </td>
+                                data-id="{{$supplierInventory->id}}" >{{$supplierInventory->pord_month}}</td>
                             <td data-field="delivery_note"  id="delivery_note-editable-{{$supplierInventory->id}}"  contenteditable="true"
                                 data-id="{{$supplierInventory->id}}" >{{$supplierInventory->delivery_note}} </td>
                             <td>{{ $supplierInventory->letterOfIndentItem->uuid ?? '' }}</td>
@@ -267,7 +263,7 @@
                     if($.isNumeric(value) == true){
                         feildValidInput = true;
                         removeValidationError(InputId);
-
+                    
                         if(value.length != 6) {
                             $msg = "Characters length should be 6";
                             showValidationError(InputId,$msg);
@@ -304,11 +300,14 @@
 
                     let url = '{{ route('supplier-inventories.unique-chasis') }}';
                     let chasis = $('#'+InputId).text();
-
-                    $.ajax({
+                    let inventoryId = $('#'+InputId).attr('data-id');
+                    console.log(inventoryId);
+                    if(chasis.length > 0) {
+                        $.ajax({
                         type:"GET",
                         url: url,
                         data: {
+                            inventoryId: inventoryId,
                             chasis: chasis,
                         },
                         dataType : 'json',
@@ -321,7 +320,9 @@
                                 removeValidationError(InputId);
                             }
                         }
-                    });
+                        });
+                    }
+                 
                 }else if(field == 'color_code') {
 
                     let url = '{{ route('supplier-inventories.isExistColorCode') }}';
