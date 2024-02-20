@@ -68,44 +68,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					<div class="card">
 					<div class="card-header" style="background-color:#e8f3fd;">
 			<div class="row">
-				<!-- <div class="col-lg-10 col-md-3 col-sm-6 col-12">
-					<h4 class="card-title"><center>Hiring request Info</center></h4>
-				</div>
-				<div class="col-lg-2 col-md-3 col-sm-6 col-12">
-					@if(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
-						@if(isset($data->is_auth_user_can_approve['can_approve']))
-							@if($data->is_auth_user_can_approve['can_approve'] == true)
-								<button style="float:right;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-									data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
-									<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
-								</button>
-								<button style="float:right; margin-right:5px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-									data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
-									<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
-								</button>
-								@include('hrm.hiring.hiring_request.approve_reject_modal')
-							@endif
-						@endif
-					@endif
-					@canany(['edit-employee-hiring-request'])
-					@php
-					$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request']);
-					@endphp
-					@if ($hasPermission)
-						<a style="float:right; margin-right:5px;" title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$data->id)}}">
-							<i class="fa fa-edit" aria-hidden="true"></i> Edit
-						</a>
-					@endif
-					@endcanany
-				</div> -->
-				<!-- <div class="col-lg-2 col-md-2 col-sm-4 col-12">
-					<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-						<center><label for="choices-single-default" class="form-label"> <strong> Candidate Name</strong></label></center>
-					</div>
-					<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-					<center><span>{{ $data->candidate_name ?? '' }}</span></center>
-					</div>
-				</div> -->
 				<div class="col-lg-4 col-md-4 col-sm-4 col-12">
 					<div class="col-lg-6 col-md-6 col-sm-6 col-12">
 						<center><label for="choices-single-default" class="form-label"> <strong> Hiring Request UUID </strong></label></center>

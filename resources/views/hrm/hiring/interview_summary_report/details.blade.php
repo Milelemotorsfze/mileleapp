@@ -27,7 +27,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="pill" href="#documents"> Documents</a>
             </li>
-            @if($data->candidateDetails->offer_letter_send_at != '')
+            @if($data->offer_letter_send_at != '')
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="pill" href="#job-offer-letter"> Job Offer Letter</a>
             </li>
