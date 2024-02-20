@@ -1,11 +1,21 @@
 @extends('layouts.table')
 @section('content')
+@can('list-color-code')
+    @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-color-code');
+    @endphp
+    @if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">
             Master Colours Info
         </h4>
-        @can('colour-edit')
-            <a  class="btn btn-sm btn-info float-end" href="{{ route('colourcode.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+        @can('create-color-code')
+            @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-color-code');
+            @endphp
+            @if ($hasPermission)
+                <a  class="btn btn-sm btn-info float-end" href="{{ route('colourcode.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+            @endif
         @endcan
     </div>
     <div class="card-body">
@@ -80,6 +90,8 @@
             </table>
         </div>
     </div>
+    @endif
+        @endcan
     <script>
         $('.btn-delete').on('click',function(e){
             e.preventDefault();
