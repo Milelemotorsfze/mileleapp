@@ -1,5 +1,10 @@
 @extends('layouts.table')
 @section('content')
+<style>
+    .input-width{
+        min-height:34px;
+    }
+ </style>
     @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-view-all');
     @endphp
@@ -46,6 +51,54 @@
                     {{ Session::get('success') }}
                 </div>
             @endif
+            <form id="form-list" action="{{route('supplier-inventories.view-all')}}" >
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Vendor</label>
+                            <select class="form-control input-width" data-trigger name="supplier_id" id="supplier">
+                                <option value="" >Select The Vendor</option>
+                                @foreach($suppliers as $supplier)
+                                    <option value="{{ $supplier->id }}" {{ $supplier->id == request()->supplier_id ? 'selected'  : ''}}>
+                                        {{ $supplier->supplier }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Dealer</label>
+
+                                <select class="form-control input-width" data-trigger name="dealers" >
+                                    <option value="" >Select The Dealer</option>
+                                    <option value="{{ \App\Models\SupplierInventory::DEALER_TRANS_CARS }}"
+                                        {{  \App\Models\SupplierInventory::DEALER_TRANS_CARS == request()->dealers ? 'selected'  : ''}}>Trans Cars</option>
+                                    <option value="{{ \App\Models\SupplierInventory::DEALER_MILELE_MOTORS }}"
+                                     {{ \App\Models\SupplierInventory::DEALER_MILELE_MOTORS == request()->dealers ? 'selected'  : '' }}>Milele Motors</option>
+                                </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Country</label>
+                             <select class="form-control input-width" data-trigger name="country" >
+                                    <option value="" >Select The Country</option>
+                                    <option value="UAE"
+                                        {{  "UAE" == request()->country ? 'selected'  : ''}}> UAE </option>
+                                    <option value="Belgium"
+                                        {{ "Belgium" == request()->country ? 'selected'  : '' }}>Belgium</option>
+                                </select>
+                        </div>
+                    </div>
+                
+                    <div class="col-md-2">
+                        <button type="submit"  class="btn btn-primary mt-4 search">Search</button>
+                        <a href="{{route('supplier-inventories.view-all')}}">
+                            <button type="button"  class="btn btn-info mt-4 ">Refresh</button>
+                        </a>
+                    </div>
+                </div>
+            </form>
         </div>
         <div class="table-responsive p-2">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
@@ -89,12 +142,10 @@
                                 <select class="whole_sales" data-field="whole_sales" data-id="{{ $supplierInventory->id }}" id="whole_sales-editable-{{$supplierInventory->id}}">
                                     <option value="{{ \App\Models\SupplierInventory::DEALER_TRANS_CARS }}"
                                         {{ $supplierInventory->whole_sales == \App\Models\SupplierInventory::DEALER_TRANS_CARS ? 'selected' : ''}} >
-                                        Trans Cars
-                                    </option>
+                                        Trans Cars </option>
                                     <option value="{{\App\Models\SupplierInventory::DEALER_MILELE_MOTORS}}"
                                         {{ $supplierInventory->whole_sales == \App\Models\SupplierInventory::DEALER_MILELE_MOTORS ? 'selected' : ''}} >
-                                        Milele Motors
-                                    </option>
+                                        Milele Motors </option>
                                 </select>
                             </td>
                             <td>
@@ -201,6 +252,7 @@
             $('#dtBasicExample3 tbody td').on('change', '.whole_sales', function () {
                 var id = $(this).data('id');
                 var field = $(this).data('field');
+            
                 if(feildValidInput == true) {
                     addUpdatedData(id, field);
                 }
@@ -284,6 +336,7 @@
                         $msg = "Minimum length is 4";
                         showValidationError(InputId,$msg);
                     }else{
+                        console.log("lenght is ok");
                         removeValidationError(InputId);
                     }
 
@@ -300,13 +353,32 @@
                                     $msg = "This color code is not existing in our master Color Codes.";
                                     showValidationError(InputId, $msg);
                                 }else{
+                                    console.log("colour code existing");
                                     removeValidationError(InputId);
                                 }
                             }
                         });
                     }
-                }
+                }else if(field == 'delivery_note') {
+                    let InputId = 'delivery_note-editable-'+id;
+                    let deliveryNote = $('#'+InputId).text();
 
+                    if($.isNumeric(deliveryNote)) {
+                        if(deliveryNote.length < 5) {                        
+                            $msg = "Delivey Note minimum length should be 5";
+                            showValidationError(InputId,$msg);
+                        }else {
+                            removeValidationError(InputId);
+                        }
+                    }else{
+                        if(deliveryNote != 'waiting' && deliveryNote != 'WAITING'){
+                            $msg = "Only Waiting status is allowed or any DN Numer can update.";
+                            showValidationError(InputId,$msg);
+                        }else {
+                            removeValidationError(InputId);
+                        }
+                    }
+                }
             }
 
              $('.update-inventory-btn').on('click', function () {
@@ -316,12 +388,15 @@
                      $.each(updatedData,function(key,value) {
                          var splitValue = value.split('-');
                          var cellId = splitValue[1] +'-editable-' + splitValue[0];
-
-                         if(splitValue[1] == 'model_year' || splitValue[1] == 'supplier_id' ||  splitValue[1] == 'eta_import' ) {
+                         console.log(cellId);
+                        
+                         if(splitValue[1] == 'model_year' || splitValue[1] == 'supplier_id' ||  splitValue[1] == 'eta_import' 
+                         || splitValue[1] == 'country' || splitValue[1] == 'whole_sales' ) {
                              var cellValue = $('#'+ cellId).val();
                          }else{
                              var cellValue = $('#'+ cellId).text();
                          }
+                         console.log(cellValue);
                          selectedUpdatedDatas.push({id: splitValue[0],field: splitValue[1], value: cellValue});
 
                      });
@@ -336,7 +411,7 @@
                          },
                          dataType : 'json',
                          success: function(data) {
-                             console.log("success");
+                            //  console.log("success");
                              alertify.success('Inventory Updated Successfully.');
                              location.reload();
                          }
@@ -349,6 +424,7 @@
         });
         function addUpdatedData(id,field) {
             var arrayvalue = id + '-' + field;
+           
             if ($.inArray(arrayvalue, updatedData) == -1) {
                 updatedData.push(arrayvalue);
             }
