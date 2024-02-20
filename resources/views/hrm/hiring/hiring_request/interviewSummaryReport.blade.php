@@ -119,12 +119,12 @@
         <span> {{ $countTelephonicRoundCompleted ?? '' }}</span>
         </div>
         @endif
-        @if($countSelectedCandidates > 0)
+        @if($countSelectedForInterview > 0)
         <div class="col-lg-4 col-md-4 col-sm-4 col-12">
           <label for="choices-single-default" class="form-label">Resume Shortlisted :</label>
         </div>
         <div class="col-lg-2 col-md-2 col-sm-2 col-12">
-        <span> {{ $countSelectedCandidates ?? '' }}</span>
+        <span> {{ $countSelectedForInterview ?? '' }}</span>
         </div>
         @endif
       </div>
