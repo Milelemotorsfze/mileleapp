@@ -22,16 +22,27 @@ use App\Models\HRM\Employee\Leave;
 class JoiningReportController extends Controller
 {
     public function index($type) {
+        $authId = Auth::id();
         $pendings = JoiningReport::where(function ($query) {
+            $query = $query->where('action_by_prepared_by',NULL)->orWhere('action_by_prepared_by','pending')->orWhere('action_by_prepared_by','approved');
+        })
+        ->where(function ($query) {
+            $query = $query->where('action_by_employee',NULL)->orWhere('action_by_employee','pending')->orWhere('action_by_employee','approved');
+        })
+        ->where(function ($query) {
+            $query = $query->where('action_by_hr_manager',NULL)->orWhere('action_by_hr_manager','pending')->orWhere('action_by_hr_manager','approved');
+        })
+        ->where(function ($query) {
             $query = $query->where('action_by_department_head',NULL)->orWhere('action_by_department_head','pending');
-        });
+        })
+        ;
         if($type != NULL) {
             $pendings = $pendings->where('joining_type',$type);
         }
-        if(Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list'])) {
+        if(Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing'])) {
             $pendings = $pendings->latest();
         }
-        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-passport-request-list'])) {
+        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-joining-report-listing'])) {
             $pendings = $pendings->where('employee_id',$authId)->latest();
         }
         $pendings = $pendings->get();
@@ -39,10 +50,10 @@ class JoiningReportController extends Controller
         if($type != NULL) {
             $approved = $approved->where('joining_type',$type);
         }
-        if(Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list'])) {
+        if(Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing'])) {
             $approved = $approved->latest();
         }
-        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-passport-request-list'])) {
+        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-joining-report-listing'])) {
             $approved = $approved->where('employee_id',$authId)->latest();
         }
         $approved = $approved->get();
@@ -53,10 +64,10 @@ class JoiningReportController extends Controller
         if($type != NULL) {
             $rejected = $rejected->where('joining_type',$type);
         }
-        if(Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list'])) {
+        if(Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing'])) {
             $rejected = $rejected->latest();
         }
-        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-passport-request-list'])) {
+        else if(Auth::user()->hasPermissionForSelectedRole(['current-user-view-joining-report-listing'])) {
             $rejected = $rejected->where('employee_id',$authId)->latest();
         }
         $rejected = $rejected->get();
