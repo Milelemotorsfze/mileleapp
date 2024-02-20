@@ -181,7 +181,7 @@
                                 <td class="bold1">
                                     <strong>{{$data->candidateDetails->offerLetterHr->name ?? $hr->handover_to_name ?? ''}}</strong></br></br>
                                     HR Manager</br></br>
-                                    @if($data->offer_letter_send_at == NULL && isset($isAuth) && $isAuth == 1)
+                                    @if($data->offer_letter_send_at == NULL && isset($data->isAuth) && $data->isAuth == 1)
                                         <button type="button" style="border-radius:5px; padding-bottom:5px; color: #fff; background-color: #034c84; border-color: #034c84; padding-top:5px;">
                                             <a href="{{route('candidate-offer-letter.send',$data->id)}}" style="color:white;">Send Offer Letter</a>
                                         </button>
@@ -190,7 +190,7 @@
                                 <td class="normal1">
                                     <strong>Read and accepted:</strong></br></br> 
                                     Name: <strong> @if($data->gender == 1) Mr. @elseif($data->gender == 2) Ms. @endif {{$data->candidate_name ?? ''}}</strong></br>
-                                    @if($data->offer_letter_send_at == NULL && isset($isAuth) && $isAuth == 1)
+                                    @if($data->offer_letter_send_at == NULL && isset($data->isAuth) && $data->isAuth == 1)
                                     Date: ………………… </br> 
                                     Signature:…………………	                                     
                                     @endif
@@ -200,7 +200,7 @@
                                 <td class="bold1">
                                 </td>
                                 <td class="normal1">
-                                    @if($data->offer_letter_send_at != NULL && isset($isAuth) && $isAuth == 0)
+                                    @if($data->offer_letter_send_at != NULL && isset($data->isAuth) && $data->isAuth == 0)
                                         <form class="w3-container" action="{{route('offerletter.signed')}}" method="POST" id="candidatepersonalInfoForm"
                                             name="DAFORM"  enctype="multipart/form-data" target="_self">
                                             @csrf
@@ -237,7 +237,7 @@
                                                 </div> -->
                                             </div> 
                                         </form>
-                                    @elseif($data->candidateDetails->offer_signed_at != NULL && isset($isAuth) && $isAuth == 2)
+                                    @elseif($data->candidateDetails->offer_signed_at != NULL && isset($data->isAuth) && $data->isAuth == 2)
                                     Date: {{Carbon\Carbon::parse($data->candidateDetails->offer_signed_at)->format('F d,Y')}}</br>
                                     <table>
                                     <tbody>
@@ -253,7 +253,7 @@
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-offer-letter-signature']);
                                     @endphp                    
-                                    @if($hasPermission && isset($canVerifySign) && $canVerifySign == true && $data->offer_letter_verified_at == NULL && $data->offer_letter_verified_by == NULL)
+                                    @if($hasPermission && isset($data->canVerifySign) && $data->canVerifySign == true && $data->offer_letter_verified_at == NULL && $data->offer_letter_verified_by == NULL)
                                     <table>
                                     <tbody>
                                         <tr>

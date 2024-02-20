@@ -271,6 +271,18 @@ class EmployeeHiringRequestController extends Controller
                               ->merge($data->divisionHeadApprovalAwaitingCandidates)->merge($data->fifthRoundCompleted)->merge($data->forthRoundCompleted)
                               ->merge($data->thirdRoundCompleted)->merge($data->secondRoundCompleted)->merge($data->firstRoundCompleted)->merge($data->telephonicRoundCompleted)
                               ->merge($data->selectedForInterview);
+        foreach($data->allInterview as $oneCandidated) {
+            $oneCandidated->isAuth = '';  
+            $emp = '';
+            $emp = EmployeeProfile::where('interview_summary_id',$oneCandidated->id)->first();
+            if($emp->offer_sign != NULL && $emp->offer_signed_at != NULL && $emp->offer_letter_hr_id != NULL) {
+                $oneCandidated->isAuth = 2;
+            }
+            else if($oneCandidated->offer_letter_send_at != NULL && $emp->offer_sign == NULL && $emp->offer_signed_at == NULL && $emp->offer_letter_hr_id == NULL) {
+                $oneCandidated->isAuth = 0;
+            }
+            $oneCandidated->canVerifySign = true;
+        }
         $previous = EmployeeHiringRequest::where('status',$data->status)->where('id', '<', $id)->max('id');
         $next = EmployeeHiringRequest::where('status',$data->status)->where('id', '>', $id)->min('id');
         return view('hrm.hiring.hiring_request.show',compact('data','previous','next','countSelectedForInterview','countTelephonicRoundCompleted','countFirstRoundCompleted',

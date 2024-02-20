@@ -120,9 +120,9 @@ class CandidatePersonalInfoController extends Controller
                 $inwords['other_allowances'] = $this->decimalNumberInWords($request->other_allowances);
                 $inwords['total_salary'] = $this->decimalNumberInWords($request->total_salary);
                 $hr = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
-                $isAuth = 1;
+                $data->isAuth = 1;
                  DB::commit();
-                 return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr','isAuth'));
+                 return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr'));
             } 
             catch (\Exception $e) {
                 DB::rollback();
@@ -601,8 +601,8 @@ class CandidatePersonalInfoController extends Controller
                 $inwords['basic_salary'] = $this->decimalNumberInWords($emp->basic_salary);
                 $inwords['other_allowances'] = $this->decimalNumberInWords($emp->other_allowances);
                 $inwords['total_salary'] = $this->decimalNumberInWords($emp->total_salary);
-                $isAuth = 2;
-                $pdf = PDF::loadView('pdf.sample', compact('data','inwords','hr','isAuth'));               
+                $data->isAuth = 2;
+                $pdf = PDF::loadView('pdf.sample', compact('data','inwords','hr'));             
                 $data['name'] = 'Dear '.$data->candidate_name.' ,';
                 $template['from'] = 'no-reply@milele.com';
                 $template['from_name'] = 'Milele Matrix';
@@ -775,14 +775,14 @@ class CandidatePersonalInfoController extends Controller
                 $inwords['total_salary'] = $this->decimalNumberInWords($emp->total_salary);
                 $hr = ApprovalByPositions::where('approved_by_position','HR Manager')->first();               
                 if($emp->offer_sign != NULL && $emp->offer_signed_at != NULL && $emp->offer_letter_hr_id != NULL) {
-                    $isAuth = 2;
+                    $data->isAuth = 2;
                 }
                 else if($data->offer_letter_send_at != NULL && $emp->offer_sign == NULL && $emp->offer_signed_at == NULL && $emp->offer_letter_hr_id == NULL) {
-                    $isAuth = 0;
+                    $data->isAuth = 0;
                 }
-                $canVerifySign = true;
+                $data->canVerifySign = true;
                 DB::commit();
-                return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr','isAuth','canVerifySign'));
+                return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr'));
             } 
             catch (\Exception $e) {
                 DB::rollback();
@@ -815,7 +815,7 @@ class CandidatePersonalInfoController extends Controller
                 $inwords['basic_salary'] = $this->decimalNumberInWords($emp->basic_salary);
                 $inwords['other_allowances'] = $this->decimalNumberInWords($emp->other_allowances);
                 $inwords['total_salary'] = $this->decimalNumberInWords($emp->total_salary);
-                $isAuth = 2;
+                $data->isAuth = 2;
 
 
                 // // $pdf = Pdf::loadView('hrm.hiring.offer_letter.offerLetter', compact('data',
@@ -841,7 +841,7 @@ class CandidatePersonalInfoController extends Controller
                 //     return $pdf->save('/path-to/my_stored_file.pdf')->stream('invoice.pdf');
                 // // $pdf = Pdf::loadView('hrm.hiring.offer_letter.offerLetter',$data, $inwords, $hr, $isAuth); //load view page
                 // // return $pdf->download('test.pdf'); // download pdf file
-                return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr','isAuth'));
+                return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr'));
             } 
             catch (\Exception $e) {
                 DB::rollback();
