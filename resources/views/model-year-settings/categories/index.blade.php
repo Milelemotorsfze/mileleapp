@@ -43,6 +43,7 @@
                     <th>S.No</th>
                     <th>Name</th>
                     <th>Rule Name</th>
+                    <th>Value</th>
                     <th>Created At</th>
                     <th>Action</th>
                 </tr>
@@ -54,6 +55,7 @@
                             <td>{{ ++$i }}</td>
                             <td>{{ $modelYearCategory->name }}</td>
                             <td>{{ $modelYearCategory->modelYearRule->name }}</td>
+                            <td>{{ $modelYearCategory->modelYearRule->value }}</td>
                             <td>{{ \Carbon\Carbon::parse($modelYearCategory->created_at)->format('d M Y') }}</td>
 
                             <td>
