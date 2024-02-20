@@ -156,8 +156,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							$('#employee_code_div').show();
                             $('#designation_div').show();
                             $('#department_div').show();
-							document.getElementById('designation').textContent=candidates[i].designation.name;
-                            document.getElementById('department').textContent=candidates[i].department.name;
+							if(candidates[i].designation != null && candidates[i].designation.name != null) {
+								document.getElementById('designation').textContent=candidates[i].designation.name;
+							}
+							if(candidates[i].department != null && candidates[i].department.name != null) {
+								document.getElementById('department').textContent=candidates[i].department.name;
+							}
 						}
 					}
 				}               
