@@ -75,8 +75,21 @@ class SupplierInventoryController extends Controller
         $supplierInventories = SupplierInventory::with('masterModel')
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->orderBy('updated_at','DESC')
-            ->get();
+            ->orderBy('updated_at','DESC');
+
+            if($request->supplier_id){
+
+                $supplierInventories = $supplierInventories->where('supplier_id', $request->supplier_id);
+            }
+            if($request->dealers){
+                $supplierInventories = $supplierInventories->where('whole_sales', $request->dealers);
+            }
+            if($request->country){
+                $supplierInventories = $supplierInventories->where('country', $request->country);
+            }
+    
+            $supplierInventories = $supplierInventories->get();
+
         foreach ($supplierInventories as $supplierInventory) {
             $supplierInventory->modelYears = MasterModel::where('model', $supplierInventory->masterModel->model)
                 ->where('sfx', $supplierInventory->masterModel->sfx)
@@ -1189,8 +1202,11 @@ class SupplierInventoryController extends Controller
     }
     public function updateInventory(Request $request) {
         (new UserActivityController)->createActivity('Update the Supplier Inventories');
+        info($request->all());
 
         $updatedDatas = $request->selectedUpdatedDatas;
+       
+        DB::beginTransaction();
 
         foreach ($updatedDatas as $data) {
             $inventoryId = $data['id'];
@@ -1284,8 +1300,9 @@ class SupplierInventoryController extends Controller
                     $inventory->exterior_color_code_id = $exteriorColorId;
                 }
             }else if($fieldName == 'delivery_note' ) {
+
                 $inventory->$fieldName = $fieldValue;
-                if($fieldValue && $fieldValue !== SupplierInventory::DN_STATUS_WAITING) {
+                if ($fieldValue && is_numeric($fieldValue)) {
                     $inventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                 }
             }
@@ -1295,6 +1312,8 @@ class SupplierInventoryController extends Controller
 
             $inventory->save();
         }
+        DB::commit();
+
         return response(true);
     }
     public function FileComparision(Request $request) {
@@ -2005,10 +2024,8 @@ class SupplierInventoryController extends Controller
 
     public function checkChasisUnique(Request $request) {
 
-        $isChasisExist = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->where('chasis',  $request->chasis)
-            ->first();
+        $isChasisExist = SupplierInventory::where('chasis',  $request->chasis)
+                                    ->first();
 
         if($isChasisExist) {
             $data = 1;
@@ -2080,14 +2097,14 @@ class SupplierInventoryController extends Controller
             $extColour = substr($altercolourcode, 0, 3);
             $intColour = substr($altercolourcode, -2);
         }
-
+      
         $extColourRow = ColorCode::where('code', $extColour)
             ->where('belong_to', ColorCode::EXTERIOR)
             ->first();
         $intColourRow = ColorCode::where('code', $intColour)
             ->where('belong_to', ColorCode::INTERIOR)
             ->first();
-
+           
         $data = 0;
        if($intColourRow && $extColourRow) {
            $data = 1;

@@ -65,11 +65,11 @@ class SupplierInventory extends Model
     }
     public function pfi()
     {
-        return $this->belongsTo(Pfi::class,'pfi_id','id');
+        return $this->belongsTo(PFI::class,'pfi_id','id');
     }
     public function purchaseOrder()
     {
-        return $this->belongsTo(purchasingOrder::class,'purchase_order_id','id');
+        return $this->belongsTo(PurchasingOrder::class,'purchase_order_id','id');
     }
     public function getTotalQuantityAttribute()
     {
