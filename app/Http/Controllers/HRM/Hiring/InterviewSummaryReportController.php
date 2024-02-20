@@ -393,20 +393,20 @@ class InterviewSummaryReportController extends Controller
         $emp = EmployeeProfile::where('interview_summary_id',$id)->first();
         $hr = ApprovalByPositions::where('approved_by_position','HR Manager')->first(); 
         $inwords = [];  
-        $isAuth = '';            
+        $data->isAuth = '';            
         if($emp) {
             $inwords['basic_salary'] = (new CandidatePersonalInfoController)->decimalNumberInWords($emp->basic_salary);
             $inwords['other_allowances'] = (new CandidatePersonalInfoController)->decimalNumberInWords($emp->other_allowances);
             $inwords['total_salary'] = (new CandidatePersonalInfoController)->decimalNumberInWords($emp->total_salary);
             if($emp->offer_sign != NULL && $emp->offer_signed_at != NULL && $emp->offer_letter_hr_id != NULL) {
-                $isAuth = 2;
+                $data->isAuth = 2;
             }
             else if($data->offer_letter_send_at != NULL && $emp->offer_sign == NULL && $emp->offer_signed_at == NULL && $emp->offer_letter_hr_id == NULL) {
-                $isAuth = 0;
+                $data->isAuth = 0;
             }
         }
-        $canVerifySign = true;
-        return view('hrm.hiring.interview_summary_report.show',compact('data','previous','next','emp','inwords','hr','isAuth','canVerifySign')); 
+        $data->canVerifySign = true;
+        return view('hrm.hiring.interview_summary_report.show',compact('data','previous','next','emp','inwords','hr')); 
     }
     public function salary(Request $request) { 
         $validator = Validator::make($request->all(), [
