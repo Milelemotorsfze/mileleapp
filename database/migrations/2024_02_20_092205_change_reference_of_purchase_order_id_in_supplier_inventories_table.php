@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('supplier_inventories', function (Blueprint $table) {
-            $table->foreign('purchase_order_id')->references('id')->on('purchasing_order')->change();
+            $table->dropForeign(['purchase_order_id']);
+            $table->dropColumn('purchase_order_id');
         });
     }
 
@@ -22,7 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('supplier_inventories', function (Blueprint $table) {
-            $table->foreign('purchase_order_id')->references('id')->on('users')->change();
+            $table->bigInteger('purchase_order_id')->unsigned()->index()->nullable()->after('master_model_id');
+            $table->foreign('purchase_order_id')->references('id')->on('users');
         });
     }
 };
