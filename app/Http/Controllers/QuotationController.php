@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
 use App\Models\AgentCommission;
 use App\Models\Country;
 use App\Models\HRM\Employee\EmployeeProfile;
-use App\Models\MasterShippingPort;
+use App\Models\MasterShippingPorts;
 use App\Models\OtherLogisticsCharges;
 use App\Models\Quotation;
 use App\Models\Calls;
@@ -924,7 +924,7 @@ public function addqaddone(Request $request)
          }
     }
     public function getShippingPort(Request $request) {
-        $shippingPorts = MasterShippingPort::where('country_id', $request->country_id)
+        $shippingPorts = MasterShippingPorts::where('country_id', $request->country_id)
                          ->get();
 
         return $shippingPorts;
