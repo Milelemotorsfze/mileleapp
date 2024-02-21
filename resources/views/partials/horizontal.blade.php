@@ -106,11 +106,7 @@
                                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                         <i data-feather="file-text"></i>
                                         <span data-key="t-extra-pages">
-                                            @if(auth()->user()->selected_role == 20 OR auth()->user()->selected_role == 19 OR auth()->user()->selected_role == 1)
-                                            HR
-                                            @elseif(auth()->user()->selected_role == 30)
-                                            Employee
-                                            @endif
+                                           HR
                                         </span>
                                         <div class="arrow-down"></div>
                                     </a>

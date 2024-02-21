@@ -43,7 +43,7 @@ class JoiningReport extends Model
         'created_by',
         'updated_by',
         'deleted_by',
-        'joining_reports_id',
+        // 'joining_reports_id',
     ];
     protected $appends = [
         'is_auth_user_can_approve',

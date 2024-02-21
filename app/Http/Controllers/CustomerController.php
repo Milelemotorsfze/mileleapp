@@ -26,7 +26,6 @@ class CustomerController extends Controller
     public function index()
     {
         (new UserActivityController)->createActivity('Open Customer List Page');
-
         $customers = Customer::all();
         return view('customer.index', compact('customers'));
     }
@@ -176,9 +175,10 @@ class CustomerController extends Controller
     $useractivities = new UserActivities();
     $useractivities->activity = "Open The Customers Page";
     $useractivities->users_id = Auth::id();
+    $userid = Auth::id();
     $useractivities->save();
     if ($request->ajax()) {
-        $data = Clients::select([
+        $data = Clients::where('created_by' , $userid)->select([
             'id', // Include the Client ID
             'name',
             'phone',
@@ -192,11 +192,9 @@ class CustomerController extends Controller
             'tender',
             'passport',
         ]);
-
         return DataTables::of($data)
             ->addColumn('file_icons', function ($row) {
                 $icons = '';
-
                 $fileTypes = [
                     'tradelicense' => 'far fa-file-alt',
                     'tender' => 'fas fa-gavel',
@@ -208,7 +206,6 @@ class CustomerController extends Controller
 
                     if (!empty($fileLink)) {
                         $fileName = ucfirst($column);
-
                         $icons .= '<a href="#" class="file-icon" data-file="' . $fileLink . '" data-toggle="tooltip" title="' . $fileName . '"><i class="' . $iconClass . ' fa-lg"></i></a>';
                     }
                 }
@@ -244,6 +241,7 @@ public function createcustomers()
         $clients->lauguage = $request->input('language');
         $clients->destination = $request->input('location');
         $clients->company_name = $request->input('company_name');
+        $clients->created_by = Auth::id();
         $clients->customertype = $request->input('customertype');
         $customertype = $request->input('customertype');
         $filetrade = $request->file('tradelicense');
