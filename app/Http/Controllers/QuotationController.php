@@ -991,6 +991,11 @@ public function addqaddone(Request $request)
         $signatureData = $request->input('signature_data');
         $decodedImage = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $signatureData)); // Remove data URL prefix
         $pngImagePath = storage_path('app/public/signatures/') . uniqid() . '.png';
+        $pngImagePath = storage_path('app/public/signatures/') . uniqid() . '.png';
+        $directory = storage_path('app/public/signatures/');
+        if (!file_exists($directory)) {
+        mkdir($directory, 0777, true);
+        }
         file_put_contents($pngImagePath, $decodedImage);
         $pdf = new Fpdi();
         $pageCount = $pdf->setSourceFile(public_path('storage/quotation_files/' . basename($pdfPath)));
