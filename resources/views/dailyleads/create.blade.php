@@ -129,7 +129,7 @@ input[type=number]::-webkit-outer-spin-button {
                                             <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
                                         @endforeach
                                     </datalist>
-                                    <input type="text" name="model_line_ids" id="selectedBrandIds">
+                                    <input type="hidden" name="model_line_ids" id="selectedBrandIds">
                                 </div>
                             </div>
                         </div>
