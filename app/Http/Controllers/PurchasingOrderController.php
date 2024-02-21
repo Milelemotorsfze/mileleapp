@@ -365,12 +365,10 @@ public function getBrandsAndModelLines(Request $request)
                     foreach($masterModels as $key => $masterModel) 
                     {
                         $model = MasterModel::find($masterModel);
-                        info($masterModel);
-
+                        
                         $possibleModelIds = MasterModel::where('model', $model->model)
                                             ->where('sfx', $model->sfx)->pluck('id');
-                        info($possibleModelIds);
-
+                        
                         $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
                             ->whereNull('purchase_order_id')
                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
@@ -382,11 +380,9 @@ public function getBrandsAndModelLines(Request $request)
                             $inventoryItem = $inventoryItem->where('chasis', $vins[$key]);
                         }
 
-                        info($inventoryItem->first());
-
                         if($inventoryItem) {
                             $inventoryItem = $inventoryItem->first();
-                            info("INVENTORY ITEM FOUND");
+                          
                             $inventoryItem->purchase_order_id = $purchasingOrder->id;    
                             $inventoryItem->save();
                         }                                                                            
@@ -764,6 +760,7 @@ public function purchasingupdateStatus(Request $request)
     }
     public function cancel($id)
     {
+        return 1;
         $vehicle = Vehicles::findOrFail($id);
         if ($vehicle->status == 'Approved' || $vehicle->status == 'Request for Payment' || $vehicle->status == 'Payment In-Process') {
             $vehicle->status = 'Request for Cancel';
@@ -772,6 +769,10 @@ public function purchasingupdateStatus(Request $request)
         {
         $vehicle->status = 'cancel';
         }
+        // if($vehicle->model_id) {
+        //     $purchaseOrder = PurchaseOrder::findOrFail($vehicle->purchase_order_id);
+        //     $approvedLOI = 
+        // }
         $vehicle->save();
         return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
     }
