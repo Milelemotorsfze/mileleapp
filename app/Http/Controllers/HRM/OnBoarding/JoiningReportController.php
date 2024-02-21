@@ -130,25 +130,16 @@ class JoiningReportController extends Controller
                     $emp->update();
                 }
                 $input = $request->all(); 
-                // if($request->type == 'trial') {
-                //     $input['trial_period_joining_date'] = $request->joining_date;
-                // }
-                // else if($request->type == 'permanent') {
-                //     $input['permanent_joining_date'] = $request->joining_date;
-                // }
-                // $input['permanent_joining_location_id'] = $request->location;
                 $input['prepared_by_id'] = Auth::id();
                 $input['created_by'] = Auth::id();
                 if(isset($request->team_lead_or_reporting_manager)) {
                     $input['department_head_id'] = $request->team_lead_or_reporting_manager;
                 }
                 else {
-                    // dd($emp);
                     $input['department_head_id'] = $emp->team_lead_or_reporting_manager;
                 }
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $input['hr_manager_id'] = $HRManager->handover_to_id;
-                // dd($input);
                 $createJoinRep = JoiningReport::create($input);
                 if($request->joining_type == 'vacations_or_leave') {
                     if(count($request->choose_leaves) > 0) {
@@ -362,7 +353,6 @@ class JoiningReportController extends Controller
             return response()->json('success');
         } 
         catch (\Exception $e) {
-            // info($e);
             DB::rollback();
             dd($e);
         }
@@ -426,7 +416,6 @@ class JoiningReportController extends Controller
         $preparedByPendings = JoiningReport::where([
             ['action_by_prepared_by','pending'],
             ['prepared_by_id',$authId],
-            ['joining_type','internal_transfer']
             ])->latest()->get();
         $preparedByApproved = JoiningReport::where([
             ['action_by_prepared_by','approved'],
