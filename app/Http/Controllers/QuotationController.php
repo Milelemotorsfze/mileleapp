@@ -1040,6 +1040,7 @@ public function getVehiclesvins(Request $request)
 {
     $RowId = $request->input('RowId');
     $quotationItem = QuotationItem::where('uuid', $RowId)->first();
+    info($quotationItem);
     switch ($quotationItem->reference_type) {
         case 'App\Models\Varaint':
             $vehicles = Vehicles::where('varaints_id', $quotationItem->reference_id)
@@ -1124,5 +1125,17 @@ public function directquotationtocustomer($id)
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         return redirect()->route('qoutation.proforma_invoice', ['callId' => $calls->id]);
+}
+public function getVehiclesvinsfirst(Request $request)
+{
+    $modallineidad = $request->input('modallineidad');
+    $variants = Varaint::where('master_model_lines_id', $modallineidad)->get();
+    $vehicles = Vehicles::whereIn('varaints_id', $variants->pluck('id'))->where(function ($query) {
+        $query->whereNull('reservation_end_date')
+              ->orWhere('reservation_end_date', '<', Carbon::now());
+    })
+    ->whereNull('so_id')
+    ->get();
+    return response()->json(['vehicles' => $vehicles]);
 }
 }

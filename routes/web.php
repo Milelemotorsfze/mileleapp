@@ -775,6 +775,7 @@ Route::get('/d', function () {
     Route::post('/preorderstore/{QuotationId}', [PreOrderController::class, 'storepreorder'])->name('preorder.storespreorder');
     Route::get('/variants_details/{id}', [VariantController::class, 'getvariantsdetails'])->name('variants.getvariantsdetails');
     Route::post('/get-vehicles-vin', [QuotationController::class, 'getVehiclesvins']);
+    Route::post('/get-vehicles-vin-first', [QuotationController::class, 'getVehiclesvinsfirst']);
     Route::get('/salesorder/update/{id}', [SalesOrderController::class, 'updatesalesorder'])->name('salesorder.updatesalesorder');
     Route::get('/customer-quotation-direct/{id}', [QuotationController::class, 'directquotationtocustomer']);
 
