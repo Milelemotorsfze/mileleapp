@@ -109,7 +109,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 								@if($type == 'new_employee')
 								{{ $data->candidate->employee_code ?? '' }}
 								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
-								{{ $data->employee->employee_code ?? '' }}
+								{{ $data->user->empProfile->employee_code ?? '' }}
 								@endif
 							</td>
 							<td>
@@ -123,7 +123,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 								@if($type == 'new_employee')
 								{{ $data->candidate->department->name ?? '' }}
 								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
-								{{ $data->employee->department->name ?? '' }}
+								{{ $data->user->empProfile->department->name ?? '' }}
 								@endif
 								
 							</td>
@@ -261,7 +261,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 								@if($type == 'new_employee')
 								{{ $data->candidate->employee_code ?? '' }}
 								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
-								{{ $data->employee->employee_code ?? '' }}
+								{{ $data->user->empProfile->employee_code ?? '' }}
 								@endif								
 							</td>
 							<td>
@@ -275,7 +275,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							@if($type == 'new_employee')
 								{{ $data->candidate->department->name ?? '' }}
 								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
-								{{ $data->employee->department->name ?? '' }}
+								{{ $data->user->empProfile->department->name ?? '' }}
 								@endif	
 								
 							</td>
@@ -364,7 +364,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 								@if($type == 'new_employee')
 								{{ $data->candidate->employee_code ?? '' }}
 								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
-								{{ $data->employee->employee_code ?? '' }}
+								{{ $data->user->empProfile->employee_code ?? '' }}
 								@endif
 								
 							</td>
@@ -379,7 +379,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 								@if($type == 'new_employee')
 								{{ $data->candidate->department->name ?? '' }}
 								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
-								{{ $data->employee->department->name ?? '' }}
+								{{ $data->user->empProfile->department->name ?? '' }}
 								@endif
 								</td>
 							@if($type == 'new_employee')

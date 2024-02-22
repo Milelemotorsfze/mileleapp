@@ -89,7 +89,7 @@ class JoiningReportController extends Controller
         $masterlocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get(); 
         $reportingTo = User::where('status','active')->whereNotIn('id',[1,16])->get();
         $masterDepartments = MasterDepartment::get();
-        $employees = User::whereHas('empProfile');
+        $employees = User::whereNotIn('id',[1,16])->whereHas('empProfile');
         if($type == 'vacations_or_leave') {
             $employees = $employees->whereHas('approvedLeaves');
         }
@@ -451,20 +451,20 @@ class JoiningReportController extends Controller
         $employeePendings = JoiningReport::where([
             ['action_by_prepared_by','approved'],
             ['action_by_employee','pending'],
-            ])->whereHas('employee' , function($q) use($authId){
-                $q->where('user_id', $authId);
+            ])->whereHas('user' , function($q) use($authId){
+                $q->where('id', $authId);
             })->latest()->get();
         $employeeApproved = JoiningReport::where([
             ['action_by_prepared_by','approved'],
             ['action_by_employee','approved'],
-            ])->whereHas('employee' , function($q) use($authId){
-                $q->where('user_id', $authId);
+            ])->whereHas('user' , function($q) use($authId){
+                $q->where('id', $authId);
             })->latest()->get();
         $employeeRejected = JoiningReport::where([
             ['action_by_prepared_by','approved'],
             ['action_by_employee','rejected'],
-            ])->whereHas('employee' , function($q) use($authId){
-                $q->where('user_id', $authId);
+            ])->whereHas('user' , function($q) use($authId){
+                $q->where('id', $authId);
             })->latest()->get();
         if($HRManager) {
         $HRManagerPendings = JoiningReport::where([

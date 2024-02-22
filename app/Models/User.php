@@ -254,14 +254,14 @@ class User extends Authenticatable
         $preparedByPendings = JoiningReport::where([['action_by_prepared_by','pending'],['prepared_by_id',$this->id],])->latest()->get();
         $preparedByApproved = JoiningReport::where([['action_by_prepared_by','approved'],['prepared_by_id',$this->id],])->latest()->get();
         $preparedByRejected = JoiningReport::where([['action_by_prepared_by','rejected'],['prepared_by_id',$this->id],])->latest()->get();
-        $employeePendings = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','pending']])->whereHas('employee' , function($q) use($authId){
-            $q->where('user_id', $authId);
+        $employeePendings = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','pending']])->whereHas('user' , function($q) use($authId){
+            $q->where('id', $authId);
         })->latest()->get();
-        $employeeApproved = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','approved']])->whereHas('employee' , function($q) use($authId){
-            $q->where('user_id', $authId);
+        $employeeApproved = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','approved']])->whereHas('user' , function($q) use($authId){
+            $q->where('id', $authId);
         })->latest()->get();
-        $employeeRejected = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','rejected']])->whereHas('employee' , function($q) use($authId){
-            $q->where('user_id', $authId);
+        $employeeRejected = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','rejected']])->whereHas('user' , function($q) use($authId){
+            $q->where('id', $authId);
         })->latest()->get();
         $HRManagerPendings = JoiningReport::where([['action_by_prepared_by','approved'],['action_by_employee','approved'],['action_by_hr_manager','pending'],
             ['hr_manager_id',$this->id],])->latest()->get();
