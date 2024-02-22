@@ -111,7 +111,7 @@
                         </div>
                         <div class="col-lg-1 col-md-6 col-sm-12">
                             <div class="mb-3">
-                              
+
                                 <label for="choices-single-default" class="form-label font-size-13 "> Currency </label>
                                 <input type="text" class="form-control" name="currency" readonly value="{{ $pfi->currency ?? '' }}">
                             </div>
@@ -185,7 +185,7 @@
                             <div class="row">
                                 <input type="hidden" name="approved_loi_ids[]" value="{{$pfiVehicleVariant->id}}">
                                 <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiVehicleVariant->id}}" value="0">
-                                <input type="hidden" id="master-model-id-{{$key}}" value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->id ?? ''}}">
+                                <input type="hidden" id="master-model-id-{{$key}}" name="selected_model_ids[]"  value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->id ?? ''}}">
                                 <div class="col-lg-2 col-md-6">
                                     <select class="form-control mb-2 variants" id="variant-id-{{$key}}" data-key="{{$key}}" >
                                         @foreach($pfiVehicleVariant->masterModels as $masterModel)
@@ -237,7 +237,7 @@
                         <div class="col-lg-1 col-md-6">
                             <label for="Incoterm" class="form-label">Shipping Method:</label>
                             <select class="form-control" id="shippingmethod" name="shippingmethod">
-                                <option value="EXW">EXW</option>    
+                                <option value="EXW">EXW</option>
                                 <option value="CNF">CNF</option>
                                 <option value="CIF">CIF</option>
                                 <option value="FOB">FOB</option>
@@ -248,12 +248,12 @@
                             <label class="form-label">Shipping Cost:</label>
                             <input type="number" id="shippingcost" name="shippingcost" class="form-control" placeholder="Shipping Cost">
                         </div>
-                    
+
                         <div class="col-lg-3 col-md-6">
                             <label class="form-label">Prefered Destination:</label>
                             <input type="text" id="fd" name="fd" class="form-control" placeholder="Prefered Destination" >
                         </div>
-                
+
                     </div>
                     <br><br>
                       <div class="row">
@@ -399,24 +399,24 @@
                     newRow.append(masterModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol, removeBtn);
                     $('#variantRowsContainer').append(newRow);
 
-                    
+
                 }
                 }
-              
+
             }
 
             $('#variantRowsContainer').show();
         // }
 
     });
-    
+
     $(document).on('click', '.remove-row-btn', function() {
 
         $(this).closest('.row').remove();
 
         var Id = $(this).attr('data-approved-id');
         var selectedQuantity = $('.qty-'+Id).val();
-       
+
         var variantQuantity = $('.qty-'+Id).attr('data-quantity');
         var remainingQty = parseInt(variantQuantity) + 1;
         $('.qty-'+Id).attr('data-quantity',remainingQty);
@@ -436,7 +436,7 @@
         var totalPrice = $('#total-price').val();
         var remainingPrice = totalPrice - price;
         $('#total-price').val(remainingPrice);
-  
+
     });
     $('#po_number').on('change', function() {
         var poNumber = $('#po_number').val();

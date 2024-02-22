@@ -2116,7 +2116,7 @@ $(document).ready(function () {
                 var removeButtonHtml = '<button type="button" class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
                 if (row['button_type'] === 'Vehicle' || row['table_type'] === 'vehicle-table') {
                     var addonsButtonHtml = '<button type="button" class="btn btn-success btn-sm addons-button" style="margin-left: 5px; border-radius: 10px;" data-model-type="' + row.model_type + '" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '" data-row-id="' + row.id + '"><i class="fa fa-asterisk"></i></button>';
-                    var vinButtonHtml = '<button type="button" class="btn btn-primary btn-sm vin-button" style="margin-left: 5px; border-radius: 10px;" data-model-type="' + row.model_type + '" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '" data-row-id="' + row.id + '"><i class="fa fa-car"></i></button>';
+                    var vinButtonHtml = '<button type="button" class="btn btn-primary btn-sm vin-button" style="margin-left: 5px; border-radius: 10px;" data-model-type="' + row.model_type + '" data-model-line-id="' + row.modallineidad + '" data-number="' + row.number + '" data-index="' + index.row + '" data-row-id="' + row.id + '" " data-row-vins="' + row.model_line_id + '"><i class="fa fa-car"></i></button>';
                     return removeButtonHtml + addonsButtonHtml + vinButtonHtml;
                 } else {
                     return removeButtonHtml;
@@ -3502,25 +3502,28 @@ $(document).ready(function () {
             // Initialize VIN data from local storage
   var vinData = JSON.parse(localStorage.getItem('vinData')) || {};
   $('#dtBasicExample2').on('click', '.vin-button', function () {
-  var RowId = $(this).data('number');
+var modallineidad = $(this).data('row-vins'); // Corrected to 'model-line-id'
+if(modallineidad === null)
+{
+    var modallineidad = $(this).data('model-line-id');  
+}
+var RowId = $(this).data('number');
   $.ajax({
-    url: '/get-vehicles-vin',
+    url: '/get-vehicles-vin-first',
     type: 'POST',
     data: {
-      RowId: RowId,
+        modallineidad: modallineidad,
       _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
     },
     success: function(response) {
   // Clear existing options
   $('#vehicle-dropdown').empty();
-  
   // Add placeholder option
   $('#vehicle-dropdown').append($('<option>', {
     value: '',
     text: 'Please select Vin',
     selected: true
   }));
-
   // Populate dropdown with vehicles
   response.vehicles.forEach(function(vehicle) {
     $('#vehicle-dropdown').append($('<option>', {
