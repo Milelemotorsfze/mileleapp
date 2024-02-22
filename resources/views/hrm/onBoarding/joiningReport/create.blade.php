@@ -41,7 +41,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 			<div class="col-xxl-3 col-lg-4 col-md-4" id="employee_code_div">
 				<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
 				<input id="employee_code" type="text" class="form-control widthinput @error('employee_code') is-invalid @enderror" name="employee_code"
-                                placeholder="Employee Code" value="{{$candidate->employee_code}}" autocomplete="employee_code" autofocus>
+                                placeholder="Employee Code" value="" autocomplete="employee_code" autofocus>
 			</div>
 			<div class="col-xxl-3 col-lg-4 col-md-4" id="designation_div">
 				<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
@@ -151,11 +151,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 			var employeeId = $('#employee_id').val();
 			if(employeeId != '') {
 				if(candidates.length > 0) {
-					for(var i=0; i<candidates.length; i++) {						
+					for(var i=0; i<candidates.length; i++) {		
 						if(candidates[i].id == employeeId) {
 							$('#employee_code_div').show();
                             $('#designation_div').show();
                             $('#department_div').show();
+							if(candidates[i].employee_code != null) {
+								document.getElementById('employee_code').value=candidates[i].employee_code;
+							}
 							if(candidates[i].designation != null && candidates[i].designation.name != null) {
 								document.getElementById('designation').textContent=candidates[i].designation.name;
 							}
@@ -196,6 +199,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
             },
             employee_code: {
                 required: true,
+				minlength: 4,
+                maxlength: 4,
             },
             team_lead_or_reporting_manager: {
                 required: true,

@@ -7,7 +7,7 @@
 		@if ($hasPermission)
 				<div class="card-header">
 					<h4 class="card-title">
-						Candidate Documents Verification
+						Candidate Offer Letter Signature Verification
 					</h4>
 					@if (count($errors) > 0)
 					<div class="alert alert-danger">

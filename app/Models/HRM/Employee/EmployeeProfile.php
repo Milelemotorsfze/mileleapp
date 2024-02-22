@@ -191,4 +191,7 @@ class EmployeeProfile extends Model
     public function interviewSummary() {
         return $this->belongsTo(InterviewSummaryReport::class,'interview_summary_id','id'); 
     }
+    public function candidateJoiningReport() {
+        return $this->hasMany(JoiningReport::class,'candidate_id','id');
+    }
 }

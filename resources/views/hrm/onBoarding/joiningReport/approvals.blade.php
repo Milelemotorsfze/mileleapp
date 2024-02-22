@@ -71,26 +71,33 @@
                                             <td>{{ ++$i }}</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+													{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->name ?? ''}}
 												@endif
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->employee_code ?? '' }}
+													{{ $data->candidate->employee_code ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->employee_code ?? ''}}
 												@endif												
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->designation->name ?? '' }}
+													{{ $data->candidate->designation->name ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->designation->name ?? '' }}
 												@endif													
 											</td>
-                                            <td>{{ $data->employee->department->name ?? '' }}</td>
+                                            <td>
+												@if($data->joining_type == 'new_employee')
+												{{ $data->candidate->department->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+												{{ $data->employee->department->name ?? '' }}
+												@endif		
+												
+											</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
                                             <td>{{ $data->joiningLocation->name ?? '' }}</td>
@@ -160,26 +167,32 @@
                                             <td>{{ ++$i }}</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+													{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->name ?? ''}}
 												@endif
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->employee_code ?? '' }}
+													{{ $data->candidate->employee_code ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->employee_code ?? ''}}
 												@endif												
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->designation->name ?? '' }}
+													{{ $data->candidate->designation->name ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->designation->name ?? '' }}
 												@endif													
 											</td>
-                                            <td>{{ $data->employee->department->name ?? '' }}</td>
+                                            <td>
+											@if($data->joining_type == 'new_employee')
+											{{ $data->candidate->department->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+												{{ $data->employee->department->name ?? '' }}
+												@endif	
+												</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
                                             <td>{{ $data->joiningLocation->name ?? '' }}</td>
@@ -225,26 +238,31 @@
                                             <td>{{ ++$i }}</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+													{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->name ?? ''}}
 												@endif
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->employee_code ?? '' }}
+													{{ $data->candidate->employee_code ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->employee_code ?? ''}}
 												@endif												
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->designation->name ?? '' }}
+													{{ $data->candidate->designation->name ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->designation->name ?? '' }}
 												@endif													
 											</td>
-                                            <td>{{ $data->employee->department->name ?? '' }}</td>
+                                            <td>
+											@if($data->joining_type == 'new_employee')
+											{{ $data->candidate->department->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+												{{ $data->employee->department->name ?? '' }}
+												@endif</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
                                             <td>{{ $data->joiningLocation->name ?? '' }}</td>
@@ -314,26 +332,30 @@
                                             <td>{{ ++$i }}</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+													{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->name ?? ''}}
 												@endif
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->employee_code ?? '' }}
+													{{ $data->candidate->employee_code ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->employee_code ?? ''}}
 												@endif												
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->designation->name ?? '' }}
+													{{ $data->candidate->designation->name ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->designation->name ?? '' }}
 												@endif													
 											</td>
-                                            <td>{{ $data->employee->department->name ?? '' }}</td>
+                                            <td>@if($data->joining_type == 'new_employee')
+											{{ $data->candidate->department->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+												{{ $data->employee->department->name ?? '' }}
+												@endif</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
                                             <td>{{ $data->joiningLocation->name ?? '' }}</td>
@@ -403,26 +425,30 @@
                                             <td>{{ ++$i }}</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+													{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->name ?? ''}}
 												@endif
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->employee_code ?? '' }}
+													{{ $data->candidate->employee_code ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->employee_code ?? ''}}
 												@endif												
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->designation->name ?? '' }}
+													{{ $data->candidate->designation->name ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->designation->name ?? '' }}
 												@endif													
 											</td>
-                                            <td>{{ $data->employee->department->name ?? '' }}</td>
+                                            <td>@if($data->joining_type == 'new_employee')
+											{{ $data->candidate->department->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+												{{ $data->employee->department->name ?? '' }}
+												@endif</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
                                             <td>{{ $data->joiningLocation->name ?? '' }}</td>
@@ -468,26 +494,30 @@
                                             <td>{{ ++$i }}</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+													{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->name ?? ''}}
 												@endif
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->employee_code ?? '' }}
+													{{ $data->candidate->employee_code ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->employee_code ?? ''}}
 												@endif												
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->designation->name ?? '' }}
+													{{ $data->candidate->designation->name ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->designation->name ?? '' }}
 												@endif													
 											</td>
-                                            <td>{{ $data->employee->department->name ?? '' }}</td>
+                                            <td>@if($data->joining_type == 'new_employee')
+											{{ $data->candidate->department->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+												{{ $data->employee->department->name ?? '' }}
+												@endif</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
                                             <td>{{ $data->joiningLocation->name ?? '' }}</td>
@@ -556,26 +586,30 @@
 											<td>{{ ++$i }}</td>
 											<td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+													{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->name ?? ''}}
 												@endif
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->employee_code ?? '' }}
+													{{ $data->candidate->employee_code ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->employee_code ?? ''}}
 												@endif												
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->designation->name ?? '' }}
+													{{ $data->candidate->designation->name ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->designation->name ?? '' }}
 												@endif													
 											</td>
-                                            <td>{{ $data->employee->department->name ?? '' }}</td>
+                                            <td>@if($data->joining_type == 'new_employee')
+											{{ $data->candidate->department->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+												{{ $data->employee->department->name ?? '' }}
+												@endif</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
                                             <td>{{ $data->joiningLocation->name ?? '' }}</td>
@@ -645,26 +679,30 @@
                                             <td>{{ ++$i }}</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+													{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->name ?? ''}}
 												@endif
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->employee_code ?? '' }}
+													{{ $data->candidate->employee_code ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->employee_code ?? ''}}
 												@endif												
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->designation->name ?? '' }}
+													{{ $data->candidate->designation->name ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->designation->name ?? '' }}
 												@endif													
 											</td>
-                                            <td>{{ $data->employee->department->name ?? '' }}</td>
+                                            <td>@if($data->joining_type == 'new_employee')
+											{{ $data->candidate->department->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+												{{ $data->employee->department->name ?? '' }}
+												@endif</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
                                             <td>{{ $data->joiningLocation->name ?? '' }}</td>
@@ -710,26 +748,30 @@
                                             <td>{{ ++$i }}</td>
 											<td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+													{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->name ?? ''}}
 												@endif
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->employee_code ?? '' }}
+													{{ $data->candidate->employee_code ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->employee_code ?? ''}}
 												@endif												
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->designation->name ?? '' }}
+													{{ $data->candidate->designation->name ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->designation->name ?? '' }}
 												@endif													
 											</td>
-                                            <td>{{ $data->employee->department->name ?? '' }}</td>
+                                            <td>@if($data->joining_type == 'new_employee')
+											{{ $data->candidate->department->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+												{{ $data->employee->department->name ?? '' }}
+												@endif</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
                                             <td>{{ $data->joiningLocation->name ?? '' }}</td>
@@ -798,26 +840,30 @@
                                             <td>{{ ++$i }}</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+													{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->name ?? ''}}
 												@endif
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->employee_code ?? '' }}
+													{{ $data->candidate->employee_code ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->employee_code ?? ''}}
 												@endif												
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->designation->name ?? '' }}
+													{{ $data->candidate->designation->name ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->designation->name ?? '' }}
 												@endif													
 											</td>
-                                            <td>{{ $data->employee->department->name ?? '' }}</td>
+                                            <td>@if($data->joining_type == 'new_employee')
+											{{ $data->candidate->department->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+												{{ $data->employee->department->name ?? '' }}
+												@endif</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
                                             <td>{{ $data->joiningLocation->name ?? '' }}</td>
@@ -887,26 +933,30 @@
                                             <td>{{ ++$i }}</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+													{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->name ?? ''}}
 												@endif
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->employee_code ?? '' }}
+													{{ $data->candidate->employee_code ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->employee_code ?? ''}}
 												@endif												
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->designation->name ?? '' }}
+													{{ $data->candidate->designation->name ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->designation->name ?? '' }}
 												@endif													
 											</td>
-                                            <td>{{ $data->employee->department->name ?? '' }}</td>
+                                            <td>@if($data->joining_type == 'new_employee')
+											{{ $data->candidate->department->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+												{{ $data->employee->department->name ?? '' }}
+												@endif</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
                                             <td>{{ $data->joiningLocation->name ?? '' }}</td>
@@ -952,26 +1002,30 @@
                                             <td>{{ ++$i }}</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+													{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->name ?? ''}}
 												@endif
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->employee_code ?? '' }}
+													{{ $data->candidate->employee_code ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->employee_code ?? ''}}
 												@endif												
 											</td>
                                             <td>
 												@if($data->joining_type == 'new_employee')
-													{{ $data->employee->designation->name ?? '' }}
+													{{ $data->candidate->designation->name ?? '' }}
 												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
 													{{ $data->user->empProfile->designation->name ?? '' }}
 												@endif													
 											</td>
-                                            <td>{{ $data->employee->department->name ?? '' }}</td>
+                                            <td>@if($data->joining_type == 'new_employee')
+											{{ $data->candidate->department->name ?? '' }}
+												@elseif($data->joining_type == 'internal_transfer' OR $data->joining_type == 'vacations_or_leave')
+												{{ $data->employee->department->name ?? '' }}
+												@endif</td>
                                             <td>{{ $data->joining_type_name ?? ''}}</td>
                                             <td>{{ $data->joining_date ?? '' }}</td>
                                             <td>{{ $data->joiningLocation->name ?? '' }}</td>

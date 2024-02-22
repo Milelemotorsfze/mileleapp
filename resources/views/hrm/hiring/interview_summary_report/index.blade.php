@@ -1,4 +1,5 @@
 @extends('layouts.table')
+<meta name="csrf-token" content="{{ csrf_token() }}" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
@@ -2174,11 +2175,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										@endcanany
 
 										@if($data->candidate_expected_salary != 0.00 && $data->total_salary != 0.00)
-										<!-- <li>
-											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Add Personal Info" class="btn btn-sm btn-secondary" href="{{route('personal-info.create')}}">
-											<i class="fa fa-user-plus" aria-hidden="true"></i> Add Personal Info
-											</a>
-										</li> -->
 										@canany(['send-candidate-documents-request-form'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-candidate-documents-request-form']);
@@ -2191,12 +2187,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 												<i class="fa fa-paper-plane" aria-hidden="true"></i> Request Documents
 											</button>
 										</li>
-										<!-- <li>
-											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Send Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-												data-bs-target="#send-personal-info-form-{{$data->id}}">
-												<i class="fa fa-paper-plane" aria-hidden="true"></i> Send Form
-											</button>
-										</li> -->
 										@endif
 										@endcanany
 
@@ -2305,49 +2295,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</div>
 									</div>
 								</div>
-								<!-- <div class="modal fade" id="send-personal-info-form-{{$data->id}}"
-									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-									<div class="modal-dialog ">
-										<div class="modal-content">
-											<form method="POST" action="{{route('personal-info.send-email')}}" id="send_email_{{$data->id}}">
-												@csrf
-												<div class="modal-header">
-													<h1 class="modal-title fs-5" id="exampleModalLabel">Send Personal Information Form To candidates
-
-													</h1>
-													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-												</div>
-												<div class="modal-body p-3">
-													<div class="col-lg-12">
-														<div class="row">
-															<div class="col-12">
-																<div class="row">
-																	<div class="col-xxl-6 col-lg-6 col-md-6">
-																		<input type="text" name="id" value="{{$data->id}}" hidden>
-																	</div>
-																</div>
-																<div class="row">
-																	<div class="col-xxl-12 col-lg-12 col-md-12">
-																		<label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
-																	</div>
-																	<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
-																			<input name="email" id="email_{{$data->id}}" class="form-control" required
-																			placeholder="Enter Candidate Email" value="@if($data->email){{$data->email}}@endif">																		
-																	</div>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-												<div class="modal-footer">
-													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-													<button type="submit" class="btn btn-primary send-email"
-														data-id="{{ $data->id }}" data-status="final">Submit</button>
-												</div>
-											</form>
-										</div>
-									</div>
-								</div> -->
 							</td>
 						</tr>
 						@endforeach
@@ -2787,12 +2734,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																		</div>
 																	</div>
 																	<div class="row">
-																		<!-- <div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
-																		<label for="email" class="form-label font-size-13">{{ __('Date') }}</label>
-																				<input name="email" id="email_{{$data->id}}" class="form-control" required
-																				placeholder="Enter Candidate Name" value="@if($data->email){{$data->email}}@endif">																		
-																		</div> -->
-																		<input type="hidden" value="{{$data->id}}">
+																		<input type="hidden" id="candidateId" name="candidateId" value="{{$data->id}}">
 																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
 																		<label for="candidate_name" class="form-label font-size-13">{{ __('Candidate Name') }}</label>
 																				<input name="candidate_name" id="candidate_name_{{$data->id}}" class="form-control" required
@@ -2808,8 +2750,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																		<input id="contact_number_{{$i}}" type="tel" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
 																				name="contact_number[main]" placeholder="Mobile Number" value="@if($data->candidateDetails->contact_number){{$data->candidateDetails->contact_number}} @endif"
 																				autocomplete="contact_number[main]" autofocus oninput="validationOnKeyUp(this)">
-																				<!-- <input name="contact_number" id="contact_number_{{$data->id}}" class="form-control" required
-																				placeholder="Enter Mobile Phone" value="@if($data->contact_number){{$data->contact_number}}@endif">																		 -->
 																		</div>
 																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
 																			<label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
@@ -3122,6 +3062,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 @endsection
 @push('scripts')
 <script type="text/javascript">
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});
+</script>
+<script type="text/javascript">
 	var interviewersNames = {!! json_encode($interviewersNames) !!};
 	$(document).ready(function () {
 		if($("#count_docs").val() > 0) {
@@ -3160,6 +3107,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 			},
 			"value must be less than total salary"
 		);
+		jQuery.validator.addMethod("uniquePassport", 
+        function(value, element) {
+            var result = false;
+			var candidateId = $("#candidateId").val();
+            $.ajax({
+                type:"POST",
+                async: false,
+                url: "{{route('employee.uniquePassport')}}", // script to validate in server side
+                data: {passportNumber: value,candidateId:candidateId},
+                success: function(data) {
+                    result = (data == true) ? true : false;
+                }
+            });
+            // return true if username is exist in database
+            return result; 
+        }, 
+        "This Password is already taken! Try another."
+    );
+
 		$('.add-interview-summary').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
@@ -3252,6 +3218,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					passport_number: {
                         required: true,
                         validPassport:true,
+						uniquePassport: true,
                     },
 					"contact_number[main]": {
                         required: true,
@@ -3326,7 +3293,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					dataType: "json",
 					data: {
 						id: id,
-						_token: '{{ csrf_token() }}'
+						_token: '{{csrf_token()}}'
 					},
 					success: function (data) {							
 						if(data == 'success') {

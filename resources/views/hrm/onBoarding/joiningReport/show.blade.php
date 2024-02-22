@@ -75,31 +75,58 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                     <label for="choices-single-default" class="form-label"> Employee Name :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->employee->first_name ?? '' }} {{ $data->employee->last_name ?? '' }}</span>
+                                    <span>
+                                        @if($data->joining_type == 'new_employee')
+                                        {{ $data->candidate->first_name ?? '' }} {{ $data->candidate->last_name ?? '' }}
+                                        @else
+                                        {{ $data->employee->first_name ?? '' }} {{ $data->employee->last_name ?? '' }}
+                                        @endif
+                                    </span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Employee Code :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->employee->employee_code ?? '' }}</span>
+                                    <span>
+                                        @if($data->joining_type == 'new_employee')
+                                        {{ $data->candidate->employee_code ?? '' }}
+                                        @else
+                                        {{ $data->employee->employee_code ?? '' }}
+                                        @endif                                       
+                                    </span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Designation :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->employee->designation->name ?? '' }}</span>
+                                    <span>
+                                        @if($data->joining_type == 'new_employee')
+                                        {{ $data->candidate->employee_code ?? '' }}
+                                        @else
+                                        {{ $data->employee->designation->name ?? '' }}
+                                        @endif                                       
+                                    </span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Department :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->employee->department->name ?? '' }}</span>
+                                    <span>
+                                        @if($data->joining_type == 'new_employee')
+                                        {{ $data->candidate->department->name ?? '' }}
+                                        @else
+                                        {{ $data->employee->department->name ?? '' }}
+                                        @endif   
+                                        
+                                    </span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Reporting Manager :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->reportingManager->name ?? '' }}</span>
+                                    <span>
+                                        {{ $data->reportingManager->name ?? '' }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -114,14 +141,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                     <label for="choices-single-default" class="form-label"> Joining Type :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</span>
+                                    <span>{{ $data->joining_type_name ?? ''}}</span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Joining Date :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                     <span>
-                                        {{ $data->joining_type_name ?? ''}}</span>
+                                    @if($data->joining_date != NULL)
+								{{ \Carbon\Carbon::parse($data->joining_date)->format('d M Y') }}
+								@endif
+                                        </span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Location :</label>
@@ -229,7 +259,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                             Name :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
+                                        @if($data->joining_type == 'new_employee')
+                                        {{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
+                                        @else
                                         {{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+                                        @endif
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Status :
