@@ -276,7 +276,13 @@
             formValid = false;
             $('.QuantityError-'+key).text("Please Enter Quantity less than inventory Quantity "+inventoryQuantity);
             $('.add-row-btn').attr('disabled', true);
-        }else{
+        }
+        else if(parseInt(selectedQuantity) > parseInt(variantQuantity)){
+            formValid = false;
+            $('.QuantityError-'+key).text("Please Enter Quantity less than Maximum allocated Quantity "+variantQuantity);
+            $('.add-row-btn').attr('disabled', true);
+        }
+        else{
             formValid = true;
             $('.QuantityError-'+key).text("");
             $('.add-row-btn').attr('disabled', false);

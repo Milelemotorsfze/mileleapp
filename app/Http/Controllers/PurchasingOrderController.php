@@ -317,7 +317,6 @@ public function getBrandsAndModelLines(Request $request)
                 $vehicle->status = "Not Approved";
                 // payment status need to update
                 if($request->input('master_model_id')) {
-                    info($request->input('master_model_id'));
                     $masterModelId = $request->input('master_model_id');
                     $vehicle->model_id = $masterModelId[$key];
                 }
@@ -387,9 +386,7 @@ public function getBrandsAndModelLines(Request $request)
                         }
 
                         if($inventoryItem->count() > 0) {
-                            info("item present");
                             $inventoryItem = $inventoryItem->first();
-
                             $inventoryItem->purchase_order_id = $purchasingOrder->id;
                             $inventoryItem->save();
                         }
@@ -787,12 +784,16 @@ public function purchasingupdateStatus(Request $request)
              $inventoryItem->purchase_order_id = NULL;
              $inventoryItem->save();
 
-             $loiPurchaseOrder = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchase_order_id)
+             $loiPurchaseOrder = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
                                              ->where('master_model_id', $vehicle->model_id)
                                              ->first();
+             info($vehicle->purchasing_order_id);
+             info($vehicle->model_id);
+
              $loiPurchaseOrder->quantity = $loiPurchaseOrder->quantity - 1;
              $loiPurchaseOrder->save();
          }
+//         return 1;
         $vehicle->save();
         return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
     }
