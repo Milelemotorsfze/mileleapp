@@ -122,7 +122,7 @@
                                             @endphp
                                             @if ($hasPermission)
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility"> Masters</span>
+                                                <span data-key="t-utility"> Approvals</span>
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
@@ -131,7 +131,7 @@
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-listing','view-current-user-division']);
                                                 @endphp
                                                 @if ($hasPermission)
-                                                <a href="{{ route('division.index') }}" class="dropdown-item" data-key="t-login">Divisions</a>
+                                                <a href="{{ route('division.index') }}" class="dropdown-item" data-key="t-login">Division Approvals</a>
                                                 @endif
                                                 @endcanany
 
@@ -140,9 +140,10 @@
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-listing','view-current-user-department-lising']);
                                                 @endphp
                                                 @if ($hasPermission)
-                                                <a href="{{ route('department.index') }}" class="dropdown-item" data-key="t-login">Department</a>
+                                                <a href="{{ route('department.index') }}" class="dropdown-item" data-key="t-login">Department Approvals</a>
                                                 @endif
                                                 @endcanany
+                                                <a href="" class="dropdown-item" data-key="t-login">Designation Approvals</a>
                                             </div>
                                             @endif
                                             @endcanany

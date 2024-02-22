@@ -780,3 +780,4 @@ Route::get('/d', function () {
     Route::get('/customer-quotation-direct/{id}', [QuotationController::class, 'directquotationtocustomer']);
 
 
+

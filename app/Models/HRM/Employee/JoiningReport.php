@@ -99,9 +99,9 @@ class JoiningReport extends Model
         }
         return $joiningTypeName;
     } 
-    public function employee() {
-        return $this->belongsTo(EmployeeProfile::class,'employee_id');
-    }
+    // public function employee() {
+    //     return $this->belongsTo(EmployeeProfile::class,'employee_id');
+    // }
     public function candidate() {
         return $this->belongsTo(EmployeeProfile::class,'candidate_id');
     }

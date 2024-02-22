@@ -178,9 +178,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							$('#employee_code_div').show();
                             $('#designation_div').show();
                             $('#department_div').show();
-							document.getElementById('designation').textContent=employees[i].emp_profile.designation.name;
-                            document.getElementById('department').textContent=employees[i].emp_profile.department.name;  
-							document.getElementById('employee_code').value=employees[i].employee_code;                        
+							if(employees[i].emp_profile != null && employees[i].emp_profile.employee_code != null) {
+								document.getElementById('employee_code').value=employees[i].emp_profile.employee_code;                        
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.designation != null && employees[i].emp_profile.designation.name != null) {
+								document.getElementById('designation').textContent=employees[i].emp_profile.designation.name;
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.department != null && employees[i].emp_profile.department.name != null) {
+								document.getElementById('department').textContent=employees[i].emp_profile.department.name;  
+							}
 						}
 					}
 				}               

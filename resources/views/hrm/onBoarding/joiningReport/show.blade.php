@@ -79,7 +79,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                         @if($data->joining_type == 'new_employee')
                                         {{ $data->candidate->first_name ?? '' }} {{ $data->candidate->last_name ?? '' }}
                                         @else
-                                        {{ $data->employee->first_name ?? '' }} {{ $data->employee->last_name ?? '' }}
+                                        {{ $data->user->empProfile->first_name ?? '' }} {{ $data->user->empProfile->last_name ?? '' }}
                                         @endif
                                     </span>
                                 </div>
@@ -91,7 +91,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                         @if($data->joining_type == 'new_employee')
                                         {{ $data->candidate->employee_code ?? '' }}
                                         @else
-                                        {{ $data->employee->employee_code ?? '' }}
+                                        {{ $data->user->empProfile->employee_code ?? '' }}
                                         @endif                                       
                                     </span>
                                 </div>
@@ -103,7 +103,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                         @if($data->joining_type == 'new_employee')
                                         {{ $data->candidate->employee_code ?? '' }}
                                         @else
-                                        {{ $data->employee->designation->name ?? '' }}
+                                        {{ $data->user->empProfile->designation->name ?? '' }}
                                         @endif                                       
                                     </span>
                                 </div>
@@ -115,7 +115,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                         @if($data->joining_type == 'new_employee')
                                         {{ $data->candidate->department->name ?? '' }}
                                         @else
-                                        {{ $data->employee->department->name ?? '' }}
+                                        {{ $data->user->empProfile->department->name ?? '' }}
                                         @endif   
                                         
                                     </span>
@@ -262,7 +262,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                         @if($data->joining_type == 'new_employee')
                                         {{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
                                         @else
-                                        {{ $data->employee->first_name ?? ''}} {{$data->employee->last_name ?? ''}}
+                                        {{ $data->user->empProfile->first_name ?? ''}} {{$data->user->empProfile->last_name ?? ''}}
                                         @endif
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">

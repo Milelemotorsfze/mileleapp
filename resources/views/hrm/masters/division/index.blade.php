@@ -7,7 +7,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-list
 @if ($hasPermission)                                           
 <div class="card-header">
 	<h4 class="card-title">
-		Master Division Information
+		Division Approvals
 	</h4>	
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
@@ -41,9 +41,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-list
 					<thead>
 						<tr>
 							<th>Sl No</th>
-                            <th>Division name</th>
-							<th>Division Head Name</th>
-                            <th>Division Head Approval HandOver To Name</th>
+                            <th>Division</th>
+							<th>Division Head</th>
+                            <th>Approval HandOver To (Optional)</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -54,20 +54,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-list
 							<td>{{ ++$i }}</td>
 							<td>{{ $dataOne->name ?? ''}}</td>
 							<td>{{ $dataOne->divisionHead->name ?? '' }}</td>
-							<td>{{ $dataOne->approvalHandoverTo->name ?? '' }}</td>
+							<td>
+								@if($dataOne->division_head_id != $dataOne->approval_handover_to)
+								{{ $dataOne->approvalHandoverTo->name ?? '' }}
+								@endif
+							</td>
 							<td>
 								@canany(['view-division-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-details']);
 								@endphp
 								@if ($hasPermission)  
-                                    <!-- <a title="View Details" class="btn btn-sm btn-warning" href="{{route('division.show',$dataOne->id)}}">
+                                    <a title="View Details" class="btn btn-sm btn-warning" href="{{route('division.show',$dataOne->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i>
-										</a> -->
+										</a>
 								@endif
 								@endcanany
 
-								<!-- @canany(['edit-division','edit-current-user-division'])
+								@canany(['edit-division','edit-current-user-division'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division','edit-current-user-division']);
 								@endphp
@@ -77,7 +81,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-list
 											<i class="fa fa-edit" aria-hidden="true"></i>
 										</a>
 								@endif
-								@endcanany -->
+								@endcanany
 							</td>
 						</tr>
 						@endforeach
