@@ -8,4 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class PreOrder extends Model
 {
     use HasFactory;
+    public function quotation()
+{
+    return $this->belongsTo(Quotation::class);
+}
+
+public function preOrderItems()
+{
+    return $this->hasMany(PreOrdersItems::class, 'preorder_id');
+}
 }

@@ -191,6 +191,9 @@ input[type=number]::-webkit-outer-spin-button
         <a class="nav-link" data-bs-toggle="pill" href="#tab5">Negotiation</a>
       </li> -->
       <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab8">Pre-Orders</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab6">Sales Order</a>
       </li>
       <li class="nav-item">
@@ -877,6 +880,38 @@ input[type=number]::-webkit-outer-spin-button
                   <th>So Number</th>
                   <th>SO Update</th>
                   <!-- <th>Booking Vehicles</th> -->
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+      </div>
+    @endcan
+    @can('sales-view')
+      <div class="tab-pane fade show" id="tab8">
+      <br>
+      <!-- <div class="row">
+  <div class="col-lg-1">
+    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+  </div>
+</div> -->
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="dtBasicExample8" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <thead class="bg-soft-secondary">
+                <tr>
+                  <th>Qoutation ID</th>
+                  <th>Qoutation Date</th>
+                  <th>Qoutation Values</th>
+                  <th>Qoutation Notes</th>
+                  <th>Model Line</th>
+                  <th>Exterior Colour</th>
+                  <th>Interior Colour</th>
+                  <th>Model Year</th>
+                  <th>Qty</th>
+                  <th>Country</th>
+                  <th>Description</th>
+                  <th>Status</th>
                 </tr>
               </thead>
             </table>
@@ -2431,6 +2466,25 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
 },
             ]
         });
+    dataTable8 = $('#dtBasicExample8').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: "{{ route('dailyleads.index', ['status' => 'Preorder']) }}",
+    columns: [
+        { data: 'quotationsid', name: 'quotationsid' },
+        { data: 'date_formatted', name: 'date_formatted' },
+        { data: 'deal_value', name: 'quotations.deal_value' },
+        { data: 'sales_notes', name: 'quotations.sales_notes' },
+        { data: 'model_line', name: 'master_model_lines.model_line' },
+        { data: 'exterior', name: 'exterior' },
+        { data: 'interior', name: 'interior' },
+        { data: 'modelyear', name: 'pre_orders_items.modelyear' },
+        { data: 'qty', name: 'pre_orders_items.qty' },
+        { data: 'countryname', name: 'countryname' },
+        { data: 'description', name: 'pre_orders_items.description' },
+        { data: 'status', name: 'status' },
+    ]
+    });
     });
     function toggleRemarks(uniqueId) {
     const $truncatedText = $('#' + uniqueId + '_truncated');

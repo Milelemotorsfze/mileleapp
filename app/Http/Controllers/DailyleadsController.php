@@ -14,6 +14,7 @@ use App\Models\Rejection;
 use App\Models\Closed;
 use App\Models\LeadSource;
 use App\Models\Brand;
+use App\Models\PreOrder;
 use App\Models\So;
 use App\Models\Prospecting;
 use App\Models\Salesdemand;
@@ -47,6 +48,34 @@ class DailyleadsController extends Controller
     ->get();
         if ($request->ajax()) {
             $status = $request->input('status');
+            if($status === "Preorder")
+            {
+                $preorders = PreOrder::select([
+                    'pre_orders.status as status',
+                    'quotations.id as quotationsid',
+                    \DB::raw("DATE_FORMAT(quotations.date, '%d %b %Y') as date_formatted"),
+                    'quotations.deal_value as deal_value',
+                    'quotations.sales_notes as sales_notes',
+                    'master_model_lines.model_line as model_line',
+                    'pre_orders_items.qty',
+                    'pre_orders_items.description',
+                    'countries.name as countryname',
+                    'color_codes_exterior.name as exterior', // distinct alias for exterior color
+                    'color_codes_interior.name as interior', // distinct alias for interior color
+                    'pre_orders_items.modelyear'
+                ])
+                ->leftJoin('quotations', 'pre_orders.quotations_id', '=', 'quotations.id')
+                ->leftJoin('pre_orders_items', 'pre_orders.id', '=', 'pre_orders_items.preorder_id')
+                ->leftJoin('master_model_lines', 'pre_orders_items.master_model_lines_id', '=', 'master_model_lines.id')
+                ->leftJoin('countries', 'pre_orders_items.countries_id', '=', 'countries.id')
+                ->leftJoin('color_codes as color_codes_exterior', 'pre_orders_items.ex_colour', '=', 'color_codes_exterior.id') // distinct alias for exterior color
+                ->leftJoin('color_codes as color_codes_interior', 'pre_orders_items.int_colour', '=', 'color_codes_interior.id') // distinct alias for interior color
+                ->groupby('pre_orders.id')
+                ->get();
+                return DataTables::of($preorders)->toJson();  
+            }
+            else
+            {
             $searchValue = $request->input('search.value');
             $data = Calls::select(['calls.id', DB::raw("DATE_FORMAT(calls.created_at, '%d-%b-%Y') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")])
                 ->where('status', $status)->where('sales_person', $id)->orderBy('created_at', 'desc');
@@ -208,6 +237,7 @@ class DailyleadsController extends Controller
                 })
                 ->toJson();
         }
+    }
         return view('dailyleads.index', compact('pendingdata'));
     }
     public function create()
