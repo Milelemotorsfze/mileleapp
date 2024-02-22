@@ -230,8 +230,6 @@ public function getBrandsAndModelLines(Request $request)
      */
     public function store(Request $request)
     {
-         dd($request->all());
-
         $this->validate($request, [
             'payment_term_id' => 'required',
             'po_type' => 'required',
