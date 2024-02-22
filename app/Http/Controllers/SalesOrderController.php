@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\So;
 use App\Models\Quotation;
+use App\Models\Booking;
+use App\Models\BookingRequest;
 use App\Models\Closed;
 use App\Models\Calls;
 use App\Models\Vehicles;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\QuotationItem;
+use Carbon\Carbon;
 use App\Models\Brand;
 use App\Models\Varaint;
 use App\Models\PreOrder;
@@ -170,6 +173,46 @@ class SalesOrderController extends Controller
                         $soVinRelationship->quotation_items_id = $quotationItemId;
                         $soVinRelationship->vehicles_id = $vehicle->id;
                         $soVinRelationship->save();
+                        $existingbookingpending = BookingRequest::where('quotation_items_id', $quotationItemId)->where('status', "New")->first();
+                        $existingbookingapproved = BookingRequest::where('quotation_items_id', $quotationItemId)->where('status', "Approved")->first();
+                        if($existingbookingpending)
+                        {
+                            $existingbookingpending->days = "10";
+                            $existingbookingpending->save();
+                        }
+                        else if ($existingbookingapproved)
+                        {
+                            $existingbookingapproved->days = "10";
+                            $existingbookingapproved->save();
+                            $updatebooking = Booking::where('booking_requests_id',$existingbookingapproved->id)->whereDate('booking_end_date', '>', now())->first();
+                            if($updatebooking)
+                            {
+                            $updatebooking->booking_end_date  = Carbon::now()->addDays(10);
+                            $updatebooking->save();
+                            $vehicle->reservation_end_date = Carbon::now()->addDays(10);
+                            $vehicle->save();
+                            }
+                            else
+                            {
+                                $booking = New BookingRequest();
+                                $booking->vehicle_id = $vehicle->id;
+                                $booking->calls_id = $calls->id;
+                                $booking->created_by = Auth::id();
+                                $booking->status = "New";
+                                $booking->days = "10";
+                                $booking->save();   
+                            }
+                        }
+                        else
+                        {
+                        $booking = New BookingRequest();
+                        $booking->vehicle_id = $vehicle->id;
+                        $booking->calls_id = $calls->id;
+                        $booking->created_by = Auth::id();
+                        $booking->status = "New";
+                        $booking->days = "10";
+                        $booking->save();
+                        }
                     }
                 }
                 if($selectedVinsWithNull)

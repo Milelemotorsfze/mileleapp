@@ -1008,7 +1008,7 @@ public function addqaddone(Request $request)
             $x = 100;
             $pdf->Image($pngImagePath, $x, $signatureY, 50, 20);
         }
-        $outputPath = public_path('storage/quotation_files/' . basename($pdfPath)); // Use the same filename as the original PDF
+        $outputPath = public_path('storage/quotation_files/' . basename($pdfPath)); 
         $pdf->Output($outputPath, 'F');
         unlink($pngImagePath);
         $quotation = Quotation::find($quotationId);
