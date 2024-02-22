@@ -9,7 +9,6 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
-        <!-- <style>#signature_canvas { background-color: rgba(158, 167, 184, 0.2); }</style> -->
         <style type="text/css">
             canvas.style.background = "red"; 
             .m-signature-pad--body canvas {
@@ -85,25 +84,25 @@
                                                             <label for="choices-single-default" class="form-label"> Employee Name :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span>{{ $data->employee->first_name ?? '' }} {{ $data->employee->last_name ?? '' }}</span>
+                                                            <span>{{ $data->candidate->first_name ?? '' }} {{ $data->candidate->last_name ?? '' }}</span>
                                                         </div>
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                             <label for="choices-single-default" class="form-label"> Employee Code :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span>{{ $data->employee->employee_code ?? '' }}</span>
+                                                            <span>{{ $data->candidate->employee_code ?? '' }}</span>
                                                         </div>
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                             <label for="choices-single-default" class="form-label"> Designation :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span>{{ $data->employee->designation->name ?? '' }}</span>
+                                                            <span>{{ $data->candidate->designation->name ?? '' }}</span>
                                                         </div>
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                             <label for="choices-single-default" class="form-label"> Department :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span>{{ $data->employee->department->name ?? '' }}</span>
+                                                            <span>{{ $data->candidate->department->name ?? '' }}</span>
                                                         </div>
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                             <label for="choices-single-default" class="form-label"> Reporting Manager :</label>
@@ -126,24 +125,26 @@
                                                             <label for="choices-single-default" class="form-label"> Joining Type :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span>@if($data->trial_period_joining_date) Trial Period Joining @elseif($data->permanent_joining_date) Permanent Joining @endif</span>
+                                                            <span>
+                                                                {{$data->joining_type_name ?? ''}}
+                                                            </span>
                                                         </div>
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                             <label for="choices-single-default" class="form-label"> Joining Date :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                                             <span>
-                                                                @if($data->trial_period_joining_date)
-                                                                {{\Carbon\Carbon::parse($data->trial_period_joining_date)->format('d M Y')}}
-                                                            @elseif($data->permanent_joining_date)
-                                                            {{\Carbon\Carbon::parse($data->permanent_joining_date)->format('d M Y')}}
-                                                            @endif</span>
+                                                                @if($data->joining_date != '')
+                                                                {{\Carbon\Carbon::parse($data->joining_date)->format('d M Y')}}
+                                                           
+                                                            @endif
+                                                        </span>
                                                         </div>
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                             <label for="choices-single-default" class="form-label"> Location :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span>{{ $data->permanentJoiningLocation->name ?? '' }}</span>
+                                                            <span>{{ $data->joiningLocation->name ?? '' }}</span>
                                                         </div>
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                             <label for="choices-single-default" class="form-label"> Remarks :</label>

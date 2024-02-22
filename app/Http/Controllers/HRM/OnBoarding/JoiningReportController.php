@@ -26,14 +26,14 @@ class JoiningReportController extends Controller
         $pendings = JoiningReport::where(function ($query) {
             $query = $query->where('action_by_prepared_by',NULL)->orWhere('action_by_prepared_by','pending')->orWhere('action_by_prepared_by','approved');
         })
-        ->where(function ($query) {
-            $query = $query->where('action_by_employee',NULL)->orWhere('action_by_employee','pending')->orWhere('action_by_employee','approved');
+        ->where(function ($query1) {
+            $query1 = $query1->where('action_by_employee',NULL)->orWhere('action_by_employee','pending')->orWhere('action_by_employee','approved');
         })
-        ->where(function ($query) {
-            $query = $query->where('action_by_hr_manager',NULL)->orWhere('action_by_hr_manager','pending')->orWhere('action_by_hr_manager','approved');
+        ->where(function ($query2) {
+            $query2 = $query2->where('action_by_hr_manager',NULL)->orWhere('action_by_hr_manager','pending')->orWhere('action_by_hr_manager','approved');
         })
-        ->where(function ($query) {
-            $query = $query->where('action_by_department_head',NULL)->orWhere('action_by_department_head','pending');
+        ->where(function ($query3) {
+            $query3 = $query3->where('action_by_department_head',NULL)->orWhere('action_by_department_head','pending');
         })
         ;
         if($type != NULL) {
@@ -74,17 +74,20 @@ class JoiningReportController extends Controller
         return view('hrm.onBoarding.joiningReport.index',compact('pendings','approved','rejected','type'));
     }
     public function create($type) { 
+        $candidates = $masterlocations = $reportingTo = $masterDepartments = $employees = [];
         $candidates = EmployeeProfile::where([
             ['personal_information_verified_at','!=',NULL],
             ['type','candidate'],
         ])->whereHas('interviewSummary', function($q) {
             $q->where('offer_letter_verified_at','!=',NULL);
+        })->where(function ($query5) {
+            $query5->whereDoesntHave('candidateJoiningReport')
+            ->orWhereDoesntHave('candidateJoiningReport', function($query) {
+                $query->where('status','pending');
+        });
         })->with('designation','department')->get();
         $masterlocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get(); 
-        $reportingTo = User::where([
-            ['id','!=',16],
-            ['status','active']
-        ])->get();
+        $reportingTo = User::where('status','active')->whereNotIn('id',[1,16])->get();
         $masterDepartments = MasterDepartment::get();
         $employees = User::whereHas('empProfile');
         if($type == 'vacations_or_leave') {
@@ -140,6 +143,14 @@ class JoiningReportController extends Controller
                 }
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $input['hr_manager_id'] = $HRManager->handover_to_id;
+                if($request->joining_type == 'new_employee') {
+                    $input['candidate_id'] = $request->employee_id;
+                    $input['employee_id'] = NULL;
+                }
+                else if($request->joining_type == 'internal_transfer' OR $request->joining_type == 'vacations_or_leave') {
+                    $input['employee_id'] = $request->employee_id;
+                    $input['candidate_id'] = NULL;
+                }
                 $createJoinRep = JoiningReport::create($input);
                 if($request->joining_type == 'vacations_or_leave') {
                     if(count($request->choose_leaves) > 0) {
@@ -149,8 +160,7 @@ class JoiningReportController extends Controller
                             $leave->update();
                         }
                     }
-                }
-                
+                }              
                 $history['joining_report_id'] = $createJoinRep->id;
                 $history['icon'] = 'icons8-document-30.png';
                 $history['message'] = 'Employee joining report created by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
@@ -220,6 +230,7 @@ class JoiningReportController extends Controller
                     $createJoinRep->comments_by_department_head = NULL;                    
                     $createJoinRep->updated_by = Auth::id();
                     $createJoinRep->remarks = $request->remarks;
+                    $createJoinRep->status = 'pending';
                     $createJoinRep->update();
                     $history['joining_report_id'] = $createJoinRep->id;
                     $history['icon'] = 'icons8-document-30.png';
@@ -245,7 +256,9 @@ class JoiningReportController extends Controller
         $data = JoiningReport::where('id',$id)->first();
         $previous = JoiningReport::where('id', '<', $id)->max('id');
         $next = JoiningReport::where('id', '>', $id)->min('id');
-        if($data) {
+        if($data->joining_type == 'new_employee') {
+            $empJoinings = JoiningReport::where('candidate_id',$data->candidate_id)->get();
+        }else {
             $empJoinings = JoiningReport::where('employee_id',$data->employee_id)->get();
         }
         return view('hrm.onBoarding.joiningReport.show',compact('data','previous','next'));
@@ -288,11 +301,14 @@ class JoiningReportController extends Controller
                     $update->action_by_employee = 'pending';
                     $message = 'Interview Summary Report send to Employee ( '.$update->preparedBy->name.' - '.$update->preparedBy->email.' ) for approval';
                 }
-                if($update->employee->user_id == NULL) {
+                else {
+                    $update->status = 'rejected';
+                }
+                if($update->joining_type == 'new_employee' && $update->candidate->user_id == NULL && $request->status == 'approved') {
                     $data['id'] = Crypt::encrypt($update->id);
                     $data['send_by'] = Auth::user()->name;
-                    $data['email'] = $update->employee->personal_email_address;
-                    $data['name'] = 'Dear '.$update->employee->first_name.' '.$update->employee->last_name.' ,';
+                    $data['email'] = $update->candidate->personal_email_address;
+                    $data['name'] = 'Dear '.$update->candidate->first_name.' '.$update->candidate->last_name.' ,';
                     $template['from'] = 'no-reply@milele.com'; 
                     $template['from_name'] = 'Milele Matrix';
                     $subject = 'Milele - Employee Joining Report Verification';
@@ -314,6 +330,8 @@ class JoiningReportController extends Controller
                 if($request->status == 'approved') {
                     $update->action_by_hr_manager = 'pending';
                     $message = 'Interview Summary Report send to HR Manager ( '.$update->hr->name.' - '.$update->hr->email.' ) for approval';
+                }else {
+                    $update->status = 'rejected';
                 }
             }
             else if($request->current_approve_position == 'HR Manager') {        
@@ -323,6 +341,8 @@ class JoiningReportController extends Controller
                 if($request->status == 'approved') {
                     $update->action_by_department_head = 'pending';
                     $message = 'Interview Summary Report send to Reporting Manager ( '.$update->reportingManager->name.' - '.$update->reportingManager->email.' ) for approval';
+                }else {
+                    $update->status = 'rejected';
                 }
             }
             else if($request->current_approve_position == 'Reporting Manager') {
@@ -331,6 +351,9 @@ class JoiningReportController extends Controller
                 $update->action_by_department_head = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_hr_manager = 'approved';
+                    $update->status = 'approved';
+                }else {
+                    $update->status = 'rejected';
                 }
             }
             $update->update();
@@ -386,7 +409,7 @@ class JoiningReportController extends Controller
             $update->action_by_hr_manager = 'pending';
             $message = 'Interview Summary Report send to HR Manager ( '.$update->hr->name.' - '.$update->hr->email.' ) for approval';
             $update->update();
-            $history['message'] = 'Employee Joining Report verified by '.$update->employee->first_name.' '.$update->employee->last_name.' - '.$update->employee->personal_email_address.' )';
+            $history['message'] = 'Employee Joining Report verified by '.$update->candidate->first_name.' '.$update->candidate->last_name.' - '.$update->candidate->personal_email_address.' )';
             $createHistory = JoiningReportHistory::create($history);
             if($message != '') {
                 $history['icon'] = 'icons8-send-30.png';

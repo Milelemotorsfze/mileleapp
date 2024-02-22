@@ -15,6 +15,7 @@ class JoiningReport extends Model
     use HasFactory, SoftDeletes;
     protected $table = "joining_reports";
     protected $fillable = [
+        'status',
         'joining_type',
         'joining_date',
         'new_emp_joining_type',
@@ -29,6 +30,7 @@ class JoiningReport extends Model
         'prepared_by_action_at',
         'comments_by_prepared_by',
         'employee_id',
+        'candidate_id',
         'action_by_employee',
         'employee_action_at',
         'comments_by_employee',
@@ -43,7 +45,6 @@ class JoiningReport extends Model
         'created_by',
         'updated_by',
         'deleted_by',
-        // 'joining_reports_id',
     ];
     protected $appends = [
         'is_auth_user_can_approve',
@@ -100,6 +101,9 @@ class JoiningReport extends Model
     } 
     public function employee() {
         return $this->belongsTo(EmployeeProfile::class,'employee_id');
+    }
+    public function candidate() {
+        return $this->belongsTo(EmployeeProfile::class,'candidate_id');
     }
     public function user() {
         return $this->belongsTo(User::class,'employee_id');

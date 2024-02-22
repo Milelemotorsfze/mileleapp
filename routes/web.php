@@ -268,6 +268,11 @@ Route::get('/d', function () {
     Route::resource('master-job-position', MasterJobPositionController::class);
       // Master Specific Industry Experience
       Route::resource('industry-experience', MasterSpecificIndustryExperienceController::class);
+    // Employee
+    Route::resource('employee', EmployeeController::class);
+    Route::controller(EmployeeController::class)->group(function(){
+        Route::post('employee/passport-unique-check', 'uniquePassport')->name('employee.uniquePassport');
+    });
     // Employee Hiring Requset
     Route::resource('employee-hiring-request', EmployeeHiringRequestController::class);
     Route::controller(EmployeeHiringRequestController::class)->group(function(){
@@ -317,7 +322,6 @@ Route::get('/d', function () {
         Route::post('personal-info/verified', 'personalInfoVerified')->name('personal-info.verified');
         Route::post('docs/verified', 'docsVerified')->name('docs.verified');
         Route::post('offer-letter-sign/verified', 'offerLetterSignVerified')->name('offer_letter_sign.verified');
-        // Route::get('personal-info/listingInfo', 'getCandidatePersonalInfo')->name('personal-info.listingInfo');
     });
 
     // Joining Report
@@ -381,11 +385,6 @@ Route::get('/d', function () {
     });
      // Employee Overtime Application
      Route::resource('separation-handover', SeparationController::class);
-    //  Route::controller(OverTimeController::class)->group(function(){
-    //      Route::post('checkOvertimeAlreadyExist', 'checkOvertimeAlreadyExist')->name('overtime.checkOvertimeAlreadyExist');
-    //      Route::post('overtime_request_action', 'requestAction')->name('overtimeRequest.action');
-    //      Route::get('overtime_approval_awaiting', 'approvalAwaiting')->name('overtime.approvalAwaiting');
-    //  });
     // Demand & Planning Module
 
     // suppliers
@@ -536,7 +535,6 @@ Route::get('/d', function () {
 
     // HR
     Route::resource('hiring', HiringController::class);
-    Route::resource('employee', EmployeeController::class);
     // Route::POST('hiring', [HiringController::class, 'jobStore'])->name('jobStore');
     // Route::POST('hiring', [HiringController::class, 'jobUpdate'])->name('jobUpdate');
 

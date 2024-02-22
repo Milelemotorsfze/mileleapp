@@ -70,7 +70,7 @@
 										@foreach ($pending as $key => $data)
 										<tr data-id="1">
 											<td>{{ ++$i }}</td>
-											<td>{{ $data->first_name ?? '' }}</td>
+											<td>{{ $data->first_name ?? $data->interviewSummary->candidate_name ?? '' }}</td>
 											<td>{{ $data->last_name ?? '' }}</td>
 											<td>{{ $data->name_of_father ?? '' }}</td>
 											<td>{{ $data->name_of_mother ?? '' }}</td>
@@ -80,7 +80,7 @@
 											<td>{{ $data->educational_qualification ?? ''}}</td>
 											<td>{{ $data->year_of_completion ?? ''}}</td>
 											<td>{{ $data->religionName->name ?? ''}}</td>
-											<td>{{\Carbon\Carbon::parse($data->dob)->format('d M Y') ?? ''}}</td>
+											<td>@if($data->dob != ''){{\Carbon\Carbon::parse($data->dob)->format('d M Y') ?? ''}}@endif</td>
 											<td>{{ $data->replacement_for_employee_name ?? ''}}</td>
 											<td>{{ $data->explanation_of_new_hiring ?? ''}}</td>
 											<td>
@@ -122,7 +122,7 @@
 										@foreach ($verified as $key => $data)
 										<tr data-id="1">
 											<td>{{ ++$i }}</td>
-											<td>{{ $data->first_name ?? '' }}</td>
+											<td>{{ $data->first_name ?? $data->interviewSummary->candidate_name ?? '' }}</td>
 											<td>{{ $data->last_name ?? '' }}</td>
 											<td>{{ $data->name_of_father ?? '' }}</td>
 											<td>{{ $data->name_of_mother ?? '' }}</td>
@@ -132,7 +132,7 @@
 											<td>{{ $data->educational_qualification ?? ''}}</td>
 											<td>{{ $data->year_of_completion ?? ''}}</td>
 											<td>{{ $data->religionName->name ?? ''}}</td>
-											<td>{{\Carbon\Carbon::parse($data->dob)->format('d M Y') ?? ''}}</td>
+											<td>@if($data->dob != ''){{\Carbon\Carbon::parse($data->dob)->format('d M Y') ?? ''}}@endif</td>
 											<td>{{ $data->replacement_for_employee_name ?? ''}}</td>
 											<td>{{ $data->explanation_of_new_hiring ?? ''}}</td>																										
 										</tr>
