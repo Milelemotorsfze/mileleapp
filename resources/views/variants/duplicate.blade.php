@@ -170,6 +170,8 @@
                                             <option value="3.0" {{ isset($variant) && $variant->engine == '3.0' ? 'selected' : '' }}>3.0</option>
                                             <option value="3.3" {{ isset($variant) && $variant->engine == '3.3' ? 'selected' : '' }}>3.3</option>
                                             <option value="3.5" {{ isset($variant) && $variant->engine == '3.5' ? 'selected' : '' }}>3.5</option>
+                                            <option value="3.6" {{ isset($variant) && $variant->engine == '3.6' ? 'selected' : '' }}>3.6</option>
+                                            <option value="3.8" {{ isset($variant) && $variant->engine == '3.8' ? 'selected' : '' }}>3.8</option>
                                             <option value="4.0" {{ isset($variant) && $variant->engine == '4.0' ? 'selected' : '' }}>4.0</option>
                                             <option value="4.2" {{ isset($variant) && $variant->engine == '4.2' ? 'selected' : '' }}>4.2</option>
                                             <option value="4.4" {{ isset($variant) && $variant->engine == '4.4' ? 'selected' : '' }}>4.4</option>

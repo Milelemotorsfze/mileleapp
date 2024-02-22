@@ -3,6 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Addon;
+use App\Models\UserActivities;
+use App\Models\Clients;
+use App\Models\LeadSource;
+use App\Models\ClientLeads;
+use App\Models\CallsRequirement;
+use App\Models\Logs;
 use App\Models\AddonDetails;
 use setasign\Fpdi\Fpdi;
 use Smalot\PdfParser\Parser;
@@ -10,7 +16,7 @@ use Illuminate\Support\Str;
 use App\Models\AgentCommission;
 use App\Models\Country;
 use App\Models\HRM\Employee\EmployeeProfile;
-use App\Models\MasterShippingPort;
+use App\Models\MasterShippingPorts;
 use App\Models\OtherLogisticsCharges;
 use App\Models\Quotation;
 use App\Models\Calls;
@@ -141,7 +147,6 @@ class QuotationController extends Controller
                 $amount = $request->system_code_amount[$key];
             }
             $commissionAED = $commissionAED + $amount;
-
            $quotationItem = new QuotationItem();
            $quotationItem->unit_price = $price;
            $quotationItem->quantity = $request->quantities[$key];
@@ -254,7 +259,6 @@ class QuotationController extends Controller
         $quotationDetail->save();
         foreach ($quotationItemIds as $itemId) {
             $quotationItemRow = QuotationItem::find($itemId);
-
             $subItemIds = QuotationItem::where('uuid', $quotationItemRow->uuid)
                                     ->whereNot('id',$quotationItemRow->id)
                                     ->whereNotNull('uuid')
@@ -920,7 +924,7 @@ public function addqaddone(Request $request)
          }
     }
     public function getShippingPort(Request $request) {
-        $shippingPorts = MasterShippingPort::where('country_id', $request->country_id)
+        $shippingPorts = MasterShippingPorts::where('country_id', $request->country_id)
                          ->get();
 
         return $shippingPorts;
@@ -987,6 +991,11 @@ public function addqaddone(Request $request)
         $signatureData = $request->input('signature_data');
         $decodedImage = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $signatureData)); // Remove data URL prefix
         $pngImagePath = storage_path('app/public/signatures/') . uniqid() . '.png';
+        $pngImagePath = storage_path('app/public/signatures/') . uniqid() . '.png';
+        $directory = storage_path('app/public/signatures/');
+        if (!file_exists($directory)) {
+        mkdir($directory, 0777, true);
+        }
         file_put_contents($pngImagePath, $decodedImage);
         $pdf = new Fpdi();
         $pageCount = $pdf->setSourceFile(public_path('storage/quotation_files/' . basename($pdfPath)));
@@ -999,7 +1008,7 @@ public function addqaddone(Request $request)
             $x = 100;
             $pdf->Image($pngImagePath, $x, $signatureY, 50, 20);
         }
-        $outputPath = public_path('storage/quotation_files/' . basename($pdfPath)); // Use the same filename as the original PDF
+        $outputPath = public_path('storage/quotation_files/' . basename($pdfPath)); 
         $pdf->Output($outputPath, 'F');
         unlink($pngImagePath);
         $quotation = Quotation::find($quotationId);
@@ -1065,5 +1074,55 @@ public function getVehiclesvins(Request $request)
             break;
     }
     return response()->json(['vehicles' => $vehicles]);
+}
+public function directquotationtocustomer($id)
+{
+    $useractivities =  New UserActivities();
+    $useractivities->activity = "Store the New Direct Lead Automatic";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
+    $client = Clients::find($id);
+    $date = Carbon::now();
+    $date->setTimezone('Asia/Dubai');
+    $dataValue = LeadSource::where('source_name', $client->source)->value('id');
+    $formattedDate = $date->format('Y-m-d H:i:s');
+    $data = [
+            'name' => $client->name,
+            'source' => $dataValue,
+            'email' => $client->email,
+            'sales_person' => Auth::id(),
+            'location' => $client->destination,
+            'phone' => $client->phone,
+            'language' => $client->lauguage,
+            'created_at' => $formattedDate,
+            'created_by' => Auth::id(),
+            'status' => "New",
+            'priority' => "High",
+            'customer_coming_type' => "Direct From Sales",
+        ];
+        $calls = new Calls($data);
+        $calls->save();
+        $clientleads = New ClientLeads();
+        $clientleads->calls_id = $calls->id; 
+        $clientleads->clients_id = $client->id;
+        $clientleads->save();
+        $lastRecord = Calls::where('created_by', $data['created_by'])
+                   ->orderBy('id', 'desc')
+                   ->where('sales_person', Auth::id())
+                   ->first();
+        $table_id = $lastRecord->id;
+        $logdata = [
+            'table_name' => "calls",
+            'table_id' => $table_id,
+            'user_id' => Auth::id(),
+            'action' => "Create",
+        ];
+        $model = new Logs($logdata);
+        $model->save();
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Create Quotation";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        return redirect()->route('qoutation.proforma_invoice', ['callId' => $calls->id]);
 }
 }

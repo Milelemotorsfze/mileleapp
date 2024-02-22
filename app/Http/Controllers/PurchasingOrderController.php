@@ -230,8 +230,6 @@ public function getBrandsAndModelLines(Request $request)
      */
     public function store(Request $request)
     {
-        // dd($request->all());
-
         $this->validate($request, [
             'payment_term_id' => 'required',
             'po_type' => 'required',
@@ -362,13 +360,13 @@ public function getBrandsAndModelLines(Request $request)
                     }
                     $masterModels = $request->master_model_id;
                     $dealer = $pfi->letterOfIndent->dealers ?? '';
-                    foreach($masterModels as $key => $masterModel) 
+                    foreach($masterModels as $key => $masterModel)
                     {
                         $model = MasterModel::find($masterModel);
-                        
+
                         $possibleModelIds = MasterModel::where('model', $model->model)
                                             ->where('sfx', $model->sfx)->pluck('id');
-                        
+
                         $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
                             ->whereNull('purchase_order_id')
                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
@@ -380,13 +378,14 @@ public function getBrandsAndModelLines(Request $request)
                             $inventoryItem = $inventoryItem->where('chasis', $vins[$key]);
                         }
 
-                        if($inventoryItem) {
+                        if($inventoryItem->count() > 0) {
+                            info("item present");
                             $inventoryItem = $inventoryItem->first();
-                          
-                            $inventoryItem->purchase_order_id = $purchasingOrder->id;    
+
+                            $inventoryItem->purchase_order_id = $purchasingOrder->id;
                             $inventoryItem->save();
-                        }                                                                            
-                    }    
+                        }
+                    }
                 }
         }
         DB::commit();
@@ -760,7 +759,6 @@ public function purchasingupdateStatus(Request $request)
     }
     public function cancel($id)
     {
-        return 1;
         $vehicle = Vehicles::findOrFail($id);
         if ($vehicle->status == 'Approved' || $vehicle->status == 'Request for Payment' || $vehicle->status == 'Payment In-Process') {
             $vehicle->status = 'Request for Cancel';
@@ -769,10 +767,19 @@ public function purchasingupdateStatus(Request $request)
         {
         $vehicle->status = 'cancel';
         }
-        // if($vehicle->model_id) {
-        //     $purchaseOrder = PurchaseOrder::findOrFail($vehicle->purchase_order_id);
-        //     $approvedLOI = 
-        // }
+         if($vehicle->model_id) {
+             $masterModel = MasterModel::find($vehicle->model_id);
+             $possibleModelIds = MasterModel::where('model', $masterModel->model)
+                 ->where('sfx', $masterModel->sfx)->pluck('id');
+             info($possibleModelIds);
+             $inventoryItem = SupplierInventory::where('purchase_order_id', $vehicle->purchase_order_id)
+                 ->whereIn('master_model_id', $possibleModelIds)
+                 ->first();
+             info($inventoryItem);
+
+             $inventoryItem->purchase_order_id = null;
+             $inventoryItem->save();
+         }
         $vehicle->save();
         return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
     }
@@ -1166,7 +1173,7 @@ public function purchasingallupdateStatus(Request $request)
 public function purchasingallupdateStatusrel(Request $request)
 {
     // dd($request->all());
-  
+
     $id = $request->input('orderId');
     $status = $request->input('status');
 
@@ -1199,16 +1206,16 @@ public function purchasingallupdateStatusrel(Request $request)
 
             if($vehicle->model_id) {
                 $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
-                    ->pluck('approved_loi_id');            
-                       
+                    ->pluck('approved_loi_id');
+
                 $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
                 $masterModel = MasterModel::find($vehicle->model_id);
                 $possibleIds = MasterModel::where('model', $masterModel->model)
                     ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
-                   
+
                 foreach ($loiItemIds as $loiItemId) {
                     $item = LetterOfIndentItem::find($loiItemId);
-                   
+
                     if(in_array($item->master_model_id, $possibleIds)) {
                         if($item->utilized_quantity < $item->approved_quantity) {
                             $item->utilized_quantity = $item->utilized_quantity + 1;

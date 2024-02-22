@@ -40,17 +40,19 @@ class DemandPlanningPurchaseOrderController extends Controller
             ->groupBy('letter_of_indent_item_id')
             ->get();
         foreach ($pfiVehicleVariants as $pfiVehicleVariant) {
+
             $alreadyAddedQuantity = LOIItemPurchaseOrder::where('approved_loi_id', $pfiVehicleVariant->id)
                 ->sum('quantity');
 
             $pfiVehicleVariant->quantity = $pfiVehicleVariant->quantity - $alreadyAddedQuantity;
+
             $masterModel = MasterModel::find($pfiVehicleVariant->letterOfIndentItem->masterModel->id);
             $pfiVehicleVariant->masterModels = MasterModel::where('model', $masterModel->model)
                                             ->where('sfx', $masterModel->sfx)
                                             ->get();
 
             $possibleModelIds = MasterModel::where('model', $masterModel->model)
-                                            ->where('sfx', $masterModel->sfx)->pluck('id');                             
+                                            ->where('sfx', $masterModel->sfx)->pluck('id');
             $pfiVehicleVariant->inventoryQuantity = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
                                                         ->whereNull('purchase_order_id')
                                                         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)

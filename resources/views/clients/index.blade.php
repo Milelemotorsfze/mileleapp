@@ -78,6 +78,7 @@
                     <th>Destination</th>
                     <th>Company Name</th>
                     <th>Documents</th>
+                    <th>Actions</th>
                     <th>View Details</th>
                 </tr>
             </thead>
@@ -103,7 +104,13 @@ $(document).ready(function () {
             { data: 'destination', name: 'destination' },
             { data: 'company_name', name: 'company_name' },
             { data: 'file_icons', name: 'file_icons', orderable: false, searchable: false },
-            { data: 'view_history_icon', name: 'view_history_icon', orderable: false, searchable: false },
+            {
+            data: null,
+            render: function(data, type, row) {
+                return '<a href="/customer-quotation-direct/' + data.id + '" class="btn btn-sm btn-primary"><i class="fas fa-file-alt"></i> Create Quotation</a>';
+            }
+        },
+        { data: 'view_history_icon', name: 'view_history_icon', orderable: false, searchable: false },
         ],
     });
     $('[data-toggle="tooltip"]').tooltip();

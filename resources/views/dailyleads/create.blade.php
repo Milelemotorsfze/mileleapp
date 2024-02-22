@@ -259,7 +259,6 @@ $(document).ready(function() {
     if (selectedBrandIds.indexOf(selectedOptionId) === -1) {
       selectedBrandIds.push(selectedOptionId);
     }
-
     $('input[name="model_line_ids"]').val(JSON.stringify(selectedBrandIds));
     updateDropdownList();
   });
