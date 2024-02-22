@@ -51,11 +51,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-li
 					<thead>
 						<tr>
 							<th>Sl No</th>
-                            <th>Department name</th>
-							<th>Department Head Name</th>
-                            <th>Department Head Approval HandOver To Name</th>
-                            <th>Division Name</th>
-                            <th>Division Head Name</th>
+                            <th>Department</th>
+							<th>Department Head</th>
+                            <th>Approval HandOver To (Optional)</th>
+                            <th>Department Division</th>
+                            <th>Division Head</th>
                             <!-- <th>Division Head Approval HandOver To Name</th> -->
 							<th>Action</th>
 						</tr>
@@ -77,13 +77,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-li
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-details']);
 								@endphp
 								@if ($hasPermission)  
-                                    <!-- <a title="View Details" class="btn btn-sm btn-warning" href="{{route('department.show',$dataOne->id)}}">
+                                    <a title="View Details" class="btn btn-sm btn-warning" href="{{route('department.show',$dataOne->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i>
-										</a> -->
+										</a>
 								@endif
 								@endcanany
 
-								<!-- @canany(['edit-department','edit-current-user-department'])
+								@canany(['edit-department','edit-current-user-department'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-department','edit-current-user-department']);
 								@endphp
@@ -92,7 +92,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-li
 											<i class="fa fa-edit" aria-hidden="true"></i>
 										</a>
 								@endif
-								@endcanany -->
+								@endcanany
 							</td>
 						</tr>
 						@endforeach
