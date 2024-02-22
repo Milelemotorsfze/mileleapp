@@ -230,7 +230,7 @@ public function getBrandsAndModelLines(Request $request)
      */
     public function store(Request $request)
     {
-         dd($request->all());
+//         dd($request->all());
 
         $this->validate($request, [
             'payment_term_id' => 'required',
@@ -345,6 +345,8 @@ public function getBrandsAndModelLines(Request $request)
                 $purchasinglog->role = Auth::user()->selectedRole;
                 $purchasinglog->save();
             }
+                $masterModels = $request->master_model_id;
+
                 if($request->po_from == 'DEMAND_PLANNING') {
                     $loiItemsOfPurcahseOrders = $request->approved_loi_ids;
                     foreach($loiItemsOfPurcahseOrders as $key => $loiItemsOfPurchaseOrder) {
@@ -353,14 +355,18 @@ public function getBrandsAndModelLines(Request $request)
                         $pfi = PFI::find($approvedLoiItem->pfi_id);
                         $pfi->status = 'PO Initiated';
                         $pfi->save();
-                        $loiPurchaseOrder = new LOIItemPurchaseOrder();
-                        $loiPurchaseOrder->approved_loi_id = $loiItemsOfPurchaseOrder;
-                        $loiPurchaseOrder->purchase_order_id = $purchasingOrderId;
-                        $loiPurchaseOrder->quantity = $request->item_quantity_selected[$key] ?? '';
-                        $loiPurchaseOrder->save();
+
+                        if($request->item_quantity_selected[$key] > 0) {
+                            $loiPurchaseOrder = new LOIItemPurchaseOrder();
+                            $loiPurchaseOrder->approved_loi_id = $loiItemsOfPurchaseOrder;
+                            $loiPurchaseOrder->purchase_order_id = $purchasingOrderId;
+                            $loiPurchaseOrder->master_model_id = $request->selected_model_ids[$key];
+                            $loiPurchaseOrder->quantity = $request->item_quantity_selected[$key] ?? '';
+                            $loiPurchaseOrder->save();
+                        }
+
 
                     }
-                    $masterModels = $request->master_model_id;
                     $dealer = $pfi->letterOfIndent->dealers ?? '';
                     foreach($masterModels as $key => $masterModel)
                     {
@@ -778,9 +784,14 @@ public function purchasingupdateStatus(Request $request)
                  ->whereIn('master_model_id', $possibleModelIds)
                  ->first();
              info($inventoryItem);
-
-             $inventoryItem->purchase_order_id = null;
+             $inventoryItem->purchase_order_id = NULL;
              $inventoryItem->save();
+
+             $loiPurchaseOrder = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchase_order_id)
+                                             ->where('master_model_id', $vehicle->model_id)
+                                             ->first();
+             $loiPurchaseOrder->quantity = $loiPurchaseOrder->quantity - 1;
+             $loiPurchaseOrder->save();
          }
         $vehicle->save();
         return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
