@@ -140,10 +140,10 @@
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-listing','view-current-user-department-lising']);
                                                 @endphp
                                                 @if ($hasPermission)
-                                                <a href="{{ route('department.index') }}" class="dropdown-item" data-key="t-login">Department Approvals</a>
+                                                <a href="{{ route('department.index') }}" class="dropdown-item" data-key="t-login">Department Approval</a>
                                                 @endif
                                                 @endcanany
-                                                <a href="" class="dropdown-item" data-key="t-login">Designation Approvals</a>
+                                                <a href="" class="dropdown-item" data-key="t-login">Designation Approval</a>
                                             </div>
                                             @endif
                                             @endcanany
