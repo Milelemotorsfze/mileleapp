@@ -774,9 +774,16 @@
                 </div>
             @endif
 
-            @if($variantCount > 0)
-               @include('purchase-order.po_add_vehicles')
-            @endif
+            @can('edit-demand-planning-po')
+                @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                @endphp
+                @if ($hasPermission)
+                    @if($variantCount > 0)
+                       @include('purchase-order.po_add_vehicles')
+                    @endif
+                @endif
+            @endcan
 
             <div class="card">
                 <div class="card-header">
