@@ -44,7 +44,7 @@ class PurchasingOrderController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->get();
+        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->get();
         return view('warehouse.index', compact('data'));
     }
     public function filter($status)
@@ -55,7 +55,7 @@ class PurchasingOrderController extends Controller
     public function filterapprovedonly($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('vehicles')
@@ -78,7 +78,7 @@ class PurchasingOrderController extends Controller
     public function filterapproved($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('vehicles')
@@ -101,7 +101,7 @@ class PurchasingOrderController extends Controller
     public function filterincomings($status)
 {
     $userId = auth()->user()->id;
-    $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+    $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
     ->where('status', $status)
     ->whereNotExists(function ($query) {
         $query->select(DB::raw(1))
@@ -128,7 +128,7 @@ class PurchasingOrderController extends Controller
     public function filterpaymentrel($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where('vehicles.payment_status', 'Payment Initiated')
@@ -141,7 +141,7 @@ class PurchasingOrderController extends Controller
     public function filterintentreq($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where('vehicles.status', 'Request for Payment')
@@ -154,7 +154,7 @@ class PurchasingOrderController extends Controller
     public function filterpendingrelease($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where('vehicles.payment_status', 'Payment Initiate Request Approved')
@@ -167,7 +167,7 @@ class PurchasingOrderController extends Controller
     public function filterpendingdebits($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where('vehicles.payment_status', 'Payment Release Approved')
@@ -180,7 +180,7 @@ class PurchasingOrderController extends Controller
     public function filterpendingfellow($status)
     {
     $userId = auth()->user()->id;
-    $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+    $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
         ->where('status', $status)
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
