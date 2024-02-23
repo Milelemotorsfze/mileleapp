@@ -884,6 +884,43 @@ public function purchasingupdateStatus(Request $request)
         else
         {
             $vehicle->status = 'cancel';
+        $purchasinglog = new Purchasinglog();
+        $purchasinglog->time = now()->toTimeString();
+        $purchasinglog->date = now()->toDateString();
+        $purchasinglog->status = 'Vehicle Cancel';
+        $purchasinglog->role = Auth::user()->selectedRole;
+        $purchasinglog->purchasing_order_id = $vehicle->purchasing_order_id;
+        $purchasinglog->variant = $vehicle->varaints_id;
+        $purchasinglog->estimation_date = $vehicle->estimation_date;
+        $purchasinglog->territory = $vehicle->territory;
+        $purchasinglog->int_colour = $vehicle->int_colour;
+        $purchasinglog->ex_colour = $vehicle->ex_colour;
+        $purchasinglog->created_by = auth()->user()->id;
+        $purchasinglog->save();
+        $vehicleslog = new Vehicleslog();
+        $vehicleslog->time = now()->toTimeString();
+        $vehicleslog->date = now()->toDateString();
+        $vehicleslog->status = 'Vehicle Cancel';
+        $vehicleslog->vehicles_id = $id;
+        $vehicleslog->field = "Status";
+        $vehicleslog->old_value = $vehicle->status;
+        $vehicleslog->new_value = 'Vehicle Cancel';
+        $vehicleslog->created_by = auth()->user()->id;
+        $vehicleslog->role = Auth::user()->selectedRole;
+        $vehicleslog->save();
+        $updateqty = PurchasingOrderItems::where('variant_id', $vehicle->varaints_id)->where('purchasing_order_id', $vehicle->purchasing_order_id)->first();
+        if($updateqty)
+        {
+            $updateqty->qty = intval($updateqty->qty) - 1;
+            $updateqty->save();
+        }
+        $updateprice = VehiclePurchasingCost::where('vehicles_id', $id)->first();
+        if($updateprice)
+        {
+        $updatetotal = PurchasingOrder::find($vehicle->purchasing_order_id);
+        $updatetotal->totalcost = $updatetotal->totalcost - $updateprice->unit_price;
+        $updatetotal->save();
+        }
 
             if($vehicle->model_id) {
                 $masterModel = MasterModel::find($vehicle->model_id);

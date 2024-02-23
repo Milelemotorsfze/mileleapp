@@ -368,11 +368,11 @@
                     <h4 class="card-title">Vehicle's Details</h4>
                     <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                     @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                     @endphp
                     @if ($hasPermission)
-                        <a href="#" class="btn btn-sm btn-primary float-end edit-btn">Edit</a>
-                        <a href="#" class="btn btn-sm btn-success float-end update-btn" style="display: none;">Update</a>
+                    <a href="#" class="btn btn-sm btn-primary float-end edit-btn">Edit</a>
+                    <a href="#" class="btn btn-sm btn-success float-end update-btn" style="display: none;">Update</a>
                     @endif
                 </div>
                 <div class="card-body">
@@ -404,290 +404,292 @@
                             <tbody>
                             @foreach($vehicles as $vehicles)
                                 <tr>
-                                    {{--                                @php--}}
-                                    {{--                            $variant = DB::table('varaints')->where('id', $vehicles->varaints_id)->first();--}}
-                                    {{--                            $name = $variant->name;--}}
-                                    {{--                            $exColour = $vehicles->ex_colour ? DB::table('color_codes')->where('id', $vehicles->ex_colour)->first() : null;--}}
-                                    {{--                            $ex_colours = $exColour ? $exColour->name : null;--}}
-                                    {{--                            $intColour = $vehicles->int_colour ? DB::table('color_codes')->where('id', $vehicles->int_colour)->first() : null;--}}
-                                    {{--                            $int_colours = $intColour ? $intColour->name : null;--}}
-                                    {{--                            $detail = $variant->detail;--}}
-                                    {{--                            $brands_id = $variant->brands_id;--}}
-                                    {{--                            $master_model_lines_id = $variant->master_model_lines_id;--}}
-                                    {{--                            $brand = DB::table('brands')->where('id', $brands_id)->first();--}}
-                                    {{--                            $brand_names = $brand->brand_name;--}}
-                                    {{--                            $master_model_lines_ids = DB::table('master_model_lines')->where('id', $master_model_lines_id)->first();--}}
-                                    {{--                            $model_line = $master_model_lines_ids->model_line;--}}
-                                    {{--                            @endphp--}}
-                                    <td>{{ $vehicles->id }}</td>
-                                    <td>{{ ucfirst(strtolower($vehicles->variant->brand->brand_name)) }}</td>
-                                    <td>{{ ucfirst(strtolower($vehicles->variant->master_model_lines->model_line)) }}</td>
-                                    <td>{{ ucfirst($vehicles->variant->name) }}</td>
-                                    <td>
-                                        <span class="full-text">{{ ucfirst(strtolower($vehicles->variant->detail)) }}</span>
-                                        <span class="short-text"></span>
-                                        <a href="#" class="read-more">Read more</a>
-                                    </td>
-                                    <td>{{ ucfirst($vehicles->VehiclePurchasingCost->unit_price) }}</td>
-                                    @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-                                    @endphp
-                                    @if ($hasPermission)
-                                        @if ($vehicles->status != 'cancel')
-                                            <td class="editable-field ex_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
-                                                    <option value="">Exterior Color</option>
-                                                    @foreach ($exColours as $id => $exColour)
-                                                        @if ($id == $vehicles->ex_colour)
-                                                            <option value="{{ $id }}" selected>{{ $exColour }}</option>
-                                                        @else
-                                                            <option value="{{ $id }}">{{ $exColour }}</option>
-                                                        @endif
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                            <td class="editable-field int_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
-                                                    <option value="">Interior Color</option>
-                                                    @foreach ($intColours as $id => $intColour)
-                                                        @if ($id == $vehicles->int_colour)
-                                                            <option value="{{ $id }}" selected>{{ $intColour }}</option>
-                                                        @else
-                                                            <option value="{{ $id }}">{{ $intColour }}</option>
-                                                        @endif
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                            <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
-                                            <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
-                                            <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+{{--                                @php--}}
+{{--                            $variant = DB::table('varaints')->where('id', $vehicles->varaints_id)->first();--}}
+{{--                            $name = $variant->name;--}}
+{{--                            $exColour = $vehicles->ex_colour ? DB::table('color_codes')->where('id', $vehicles->ex_colour)->first() : null;--}}
+{{--                            $ex_colours = $exColour ? $exColour->name : null;--}}
+{{--                            $intColour = $vehicles->int_colour ? DB::table('color_codes')->where('id', $vehicles->int_colour)->first() : null;--}}
+{{--                            $int_colours = $intColour ? $intColour->name : null;--}}
+{{--                            $detail = $variant->detail;--}}
+{{--                            $brands_id = $variant->brands_id;--}}
+{{--                            $master_model_lines_id = $variant->master_model_lines_id;--}}
+{{--                            $brand = DB::table('brands')->where('id', $brands_id)->first();--}}
+{{--                            $brand_names = $brand->brand_name;--}}
+{{--                            $master_model_lines_ids = DB::table('master_model_lines')->where('id', $master_model_lines_id)->first();--}}
+{{--                            $model_line = $master_model_lines_ids->model_line;--}}
+{{--                            @endphp--}}
+                            <td>{{ $vehicles->id }}</td>
+                            <td>{{ ucfirst(strtolower($vehicles->variant->brand->brand_name)) }}</td>
+                            <td>{{ ucfirst(strtolower($vehicles->variant->master_model_lines->model_line)) }}</td>
+                            <td>{{ ucfirst($vehicles->variant->name) }}</td>
+                            <td>
+                            <span class="full-text">{{ ucfirst(strtolower($vehicles->variant->detail)) }}</span>
+                            <span class="short-text"></span>
+                            <a href="#" class="read-more">Read more</a>
+                          </td>
+                          <td>{{ ucfirst($vehicles->VehiclePurchasingCost->unit_price) }}</td>
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                            @endphp
+                            @if ($hasPermission)
+                            @if($vehicles->grn_id === null)
+							              @if ($vehicles->status != 'cancel')
+                            <td class="editable-field ex_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                    <option value="">Exterior Color</option>
+                                    @foreach ($exColours as $id => $exColour)
+                                        @if ($id == $vehicles->ex_colour)
+                                            <option value="{{ $id }}" selected>{{ $exColour }}</option>
                                         @else
-                                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
-                                                    <option value="">Exterior Color</option>
-                                                    @foreach ($exColours as $id => $exColour)
-                                                        @if ($id == $vehicles->ex_colour)
-                                                            <option value="{{ $id }}" selected>{{ $exColour }}</option>
-                                                        @else
-                                                            <option value="{{ $id }}">{{ $exColour }}</option>
-                                                        @endif
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
-                                                    <option value="">Interior Color</option>
-                                                    @foreach ($intColours as $id => $intColour)
-                                                        @if ($id == $vehicles->int_colour)
-                                                            <option value="{{ $id }}" selected>{{ $intColour }}</option>
-                                                        @else
-                                                            <option value="{{ $id }}">{{ $intColour }}</option>
-                                                        @endif
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
-                                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
-                                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+                                            <option value="{{ $id }}">{{ $exColour }}</option>
                                         @endif
-                                    @endif
-                                    @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
-                                    @endphp
-                                    @if ($hasPermission)
-                                        <td>
-                                            <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
-                                                <option value="">Exterior Color</option>
-                                                @foreach ($exColours as $id => $exColour)
-                                                    @if ($id == $vehicles->ex_colour)
-                                                        <option value="{{ $id }}" selected>{{ $exColour }}</option>
-                                                    @else
-                                                        <option value="{{ $id }}">{{ $exColour }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
-                                                <option value="">Interior Color</option>
-                                                @foreach ($intColours as $id => $intColour)
-                                                    @if ($id == $vehicles->int_colour)
-                                                        <option value="{{ $id }}" selected>{{ $intColour }}</option>
-                                                    @else
-                                                        <option value="{{ $id }}">{{ $intColour }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </td>
-                                        <td>{{ $vehicles->vin }}</td>
-                                        <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
-                                        <td>{{ $vehicles->estimation_date }}</td>
-                                    @endif
-                                    <td>
-                                        @if($vehicles->status ==="Approved")
-                                            {{ ucfirst(strtolower( $vehicles->status)) }}
-                                        @elseif($vehicles->status ==="New Changes")
-                                            {{ ucfirst(strtolower( $vehicles->status)) }}
-                                        @elseif($vehicles->status ==="New Vehicles")
-                                            {{ ucfirst(strtolower( $vehicles->status)) }}
-                                        @elseif($vehicles->status ==="Rejected")
-                                            {{ ucfirst(strtolower( $vehicles->status)) }}
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td class="editable-field int_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                    <option value="">Interior Color</option>
+                                    @foreach ($intColours as $id => $intColour)
+                                        @if ($id == $vehicles->int_colour)
+                                            <option value="{{ $id }}" selected>{{ $intColour }}</option>
                                         @else
-                                            {{ ucfirst(strtolower( $vehicles->status)) }}
+                                            <option value="{{ $id }}">{{ $intColour }}</option>
                                         @endif
-                                    </td>
-                                    @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit', 'edit-po-colour-details']);
-                                    @endphp
-                                    @if ($hasPermission)
-                                        <td>{{ ucfirst(strtolower($vehicles->payment_status)) }}</td>
-                                    @endif
-                                    <td style ="width:160px;">
-                                        <div class="row">
-                                            <div class="col-lg-12" style="display: inline-flex;">
-                                                <div class="col-lg-8">
-                                                    {{-- For Management  --}}
-                                                    @php
-                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
-                                                    @endphp
-                                                    @if ($hasPermission)
-                                                        @if ($vehicles->payment_status === '')
-                                                            @if ($vehicles->status != 'Rejected')
-                                                                <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.rejecteds', $vehicles->id) }}" onclick="return confirmRejected();"style="white-space: nowrap;">
-                                                                    Reject
-                                                                </a>
-                                                            @else
-                                                                <a title="UnReject" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.unrejecteds', $vehicles->id) }}" onclick="return confirmunRejected();" style="white-space: nowrap;">
-                                                                    Un-Reject
-                                                                </a>
-                                                            @endif
-                                                        @elseif ($vehicles->payment_status === 'Payment Initiated Request')
-                                                            <div style="display: flex; gap: 10px;">
-                                                                <a title="Payment Initiated Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleaseconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
-                                                                    Approved
-                                                                </a>
-                                                                <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.paymentreleaserejected', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
-                                                                    Reject
-                                                                </a>
-                                                                @elseif ($vehicles->payment_status === 'Payment Initiated')
-                                                                    <div style="display: flex; gap: 10px;">
-                                                                        <a title="Payment Release Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleasesconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
-                                                                            Approved
-                                                                        </a>
-                                                                        <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.paymentreleasesrejected', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
-                                                                            Reject
-                                                                        </a>
-                                                                    </div>
-                                                                @endif
-                                                                @endif
-                                                                {{-- For Incoming Confirm  --}}
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                    @if ($purchasingOrder->status === 'Approved')
-                                                                        @if ($vehicles->payment_status === 'Vendor Confirmed')
-                                                                            <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmincoming', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-                                                                                Incoming Confirmed
-                                                                            </a>
-                                                                        @endif
-                                                                    @endif
-                                                                @endif
-                                                                {{-- End For Vendor Confirm  --}}
-                                                                {{-- For Vendor Confirm  --}}
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                    @if ($purchasingOrder->status === 'Approved')
-                                                                        @if ($vehicles->payment_status === 'Payment Completed')
-                                                                            <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmvendors', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-                                                                                Vendor Confirmed
-                                                                            </a>
-                                                                        @endif
-                                                                    @endif
-                                                                @endif
-                                                                {{-- End For Vendor Confirm  --}}
-                                                                {{-- End For Management  --}}
-                                                                {{-- For Initiate Payment Procurement  --}}
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                    @if ($purchasingOrder->status === 'Approved')
-                                                                        @if ($vehicles->status === 'Approved' && $vehicles->payment_status === '')
-                                                                            <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-                                                                                Initiate Payment
-                                                                            </a>
-                                                                        @endif
-                                                                    @endif
-                                                                @endif
-                                                                {{-- End For Initiate Payment procurement  --}}
-                                                                {{-- For Initiate Payment Finance  --}}
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                    @if ($purchasingOrder->status === 'Approved')
-                                                                        @if ($vehicles->status === 'Request for Payment')
-                                                                            <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentintconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-                                                                                Initiate Payment Request
-                                                                            </a>
-                                                                        @endif
-                                                                    @endif
-                                                                @endif
-                                                                {{-- End For Initiate Payment Finance  --}}
-                                                                {{-- For Release Request  --}}
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                    @if ($purchasingOrder->status === 'Approved')
-                                                                        @if ($vehicles->payment_status === 'Payment Initiate Request Approved')
-                                                                            <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-                                                                                Payment Initiated
-                                                                            </a>
-                                                                        @endif
-                                                                    @endif
-                                                                @endif
-                                                                {{-- End For Release Request  --}}
-                                                                {{-- For Amount Debited  --}}
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                    @if ($purchasingOrder->status === 'Approved')
-                                                                        @if ($vehicles->payment_status === 'Payment Release Approved')
-                                                                            <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmdebited', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-                                                                                Payment Completed
-                                                                            </a>
-                                                                        @endif
-                                                                    @endif
-                                                                @endif
-                                                                {{-- End For Amount Debited  --}}
-                                                            </div>
-                                                            <div class="col-lg-4">
-                                                                {{-- Cancel & Delete for procurement  --}}
-                                                                @php
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-                                                                @endphp
-                                                                @if ($hasPermission)
-                                                                    @if ($purchasingOrder->status === 'Approved' && $vehicles->payment_status === '')
-                                                                        <a title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmCancel();" style="white-space: nowrap;">
-                                                                            Cancel
-                                                                        </a>
-                                                                    @elseif ($vehicles->status === 'Pending Approval')
-                                                                        <a title="Delete" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.deletevehicles', $vehicles->id) }}" onclick="return confirmDelete();" style="white-space: nowrap;">
-                                                                            Delete
-                                                                        </a>
-                                                                    @endif
-                                                                @endif
-                                                                {{-- End Cancel & Delete For Procurement  --}}
-                                                            </div>
-                                                </div>
-                                            </div>
-                                    </td>
-                                </tr>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
+                            <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+                            @else
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                    <option value="">Exterior Color</option>
+                                    @foreach ($exColours as $id => $exColour)
+                                        @if ($id == $vehicles->ex_colour)
+                                            <option value="{{ $id }}" selected>{{ $exColour }}</option>
+                                        @else
+                                            <option value="{{ $id }}">{{ $exColour }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                    <option value="">Interior Color</option>
+                                    @foreach ($intColours as $id => $intColour)
+                                        @if ($id == $vehicles->int_colour)
+                                            <option value="{{ $id }}" selected>{{ $intColour }}</option>
+                                        @else
+                                            <option value="{{ $id }}">{{ $intColour }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+                            @endif
+							              @endif
+                            @endif
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
+                            @endphp
+                            @if ($hasPermission)
+                            <td>
+                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                    <option value="">Exterior Color</option>
+                                    @foreach ($exColours as $id => $exColour)
+                                        @if ($id == $vehicles->ex_colour)
+                                            <option value="{{ $id }}" selected>{{ $exColour }}</option>
+                                        @else
+                                            <option value="{{ $id }}">{{ $exColour }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td>
+                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                    <option value="">Interior Color</option>
+                                    @foreach ($intColours as $id => $intColour)
+                                        @if ($id == $vehicles->int_colour)
+                                            <option value="{{ $id }}" selected>{{ $intColour }}</option>
+                                        @else
+                                            <option value="{{ $id }}">{{ $intColour }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td>{{ $vehicles->vin }}</td>
+                            <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
+                                <td>{{ $vehicles->estimation_date }}</td>
+                            @endif
+                            <td>
+                            @if($vehicles->status ==="Approved")
+                            {{ ucfirst(strtolower( $vehicles->status)) }}
+                            @elseif($vehicles->status ==="New Changes")
+                            {{ ucfirst(strtolower( $vehicles->status)) }}
+                            @elseif($vehicles->status ==="New Vehicles")
+                            {{ ucfirst(strtolower( $vehicles->status)) }}
+                            @elseif($vehicles->status ==="Rejected")
+                            {{ ucfirst(strtolower( $vehicles->status)) }}
+                            @else
+                            {{ ucfirst(strtolower( $vehicles->status)) }}
+                            @endif
+                            </td>
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit', 'edit-po-colour-details']);
+                            @endphp
+                            @if ($hasPermission)
+                            <td>{{ ucfirst(strtolower($vehicles->payment_status)) }}</td>
+                                @endif
+                                <td style ="width:160px;">
+                                <div class="row">
+        <div class="col-lg-12" style="display: inline-flex;">
+            <div class="col-lg-8">
+                        {{-- For Management  --}}
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
+                        @endphp
+                        @if ($hasPermission)
+                        @if ($vehicles->payment_status === '')
+                        @if ($vehicles->status != 'Rejected')
+                        <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.rejecteds', $vehicles->id) }}" onclick="return confirmRejected();"style="white-space: nowrap;">
+                            Reject
+                        </a>
+                        @else
+                        <a title="UnReject" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.unrejecteds', $vehicles->id) }}" onclick="return confirmunRejected();" style="white-space: nowrap;">
+                            Un-Reject
+                        </a>
+                        @endif
+                        @elseif ($vehicles->payment_status === 'Payment Initiated Request')
+                        <div style="display: flex; gap: 10px;">
+                        <a title="Payment Initiated Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleaseconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
+                        Approved
+                        </a>
+                        <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.paymentreleaserejected', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
+                        Reject
+                        </a>
+                        @elseif ($vehicles->payment_status === 'Payment Initiated')
+                        <div style="display: flex; gap: 10px;">
+                        <a title="Payment Release Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleasesconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
+                        Approved
+                        </a>
+                        <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.paymentreleasesrejected', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
+                        Reject
+                        </a>
+                        </div>
+                        @endif
+                        @endif
+                        {{-- For Incoming Confirm  --}}
+											@php
+											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+											@endphp
+											@if ($hasPermission)
+											@if ($purchasingOrder->status === 'Approved')
+											@if ($vehicles->payment_status === 'Vendor Confirmed')
+											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmincoming', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+											Incoming Confirmed
+											</a>
+                      @endif
+											@endif
+											@endif
+											{{-- End For Vendor Confirm  --}}
+                        {{-- For Vendor Confirm  --}}
+											@php
+											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+											@endphp
+											@if ($hasPermission)
+											@if ($purchasingOrder->status === 'Approved')
+											@if ($vehicles->payment_status === 'Payment Completed')
+											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmvendors', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+											Vendor Confirmed
+											</a>
+                                           @endif
+											@endif
+											@endif
+											{{-- End For Vendor Confirm  --}}
+						{{-- End For Management  --}}
+						{{-- For Initiate Payment Procurement  --}}
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+										@endphp
+										@if ($hasPermission)
+										@if ($purchasingOrder->status === 'Approved')
+										@if ($vehicles->status === 'Approved' && $vehicles->payment_status === '')
+										<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+											Initiate Payment
+										</a>
+										@endif
+										@endif
+										@endif
+							{{-- End For Initiate Payment procurement  --}}
+							{{-- For Initiate Payment Finance  --}}
+										@php
+											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+											@endphp
+											@if ($hasPermission)
+											@if ($purchasingOrder->status === 'Approved')
+											@if ($vehicles->status === 'Request for Payment')
+											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentintconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+											Initiate Payment Request
+											</a>
+											@endif
+											@endif
+											@endif
+								{{-- End For Initiate Payment Finance  --}}
+								{{-- For Release Request  --}}
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+								@endphp
+								@if ($hasPermission)
+								@if ($purchasingOrder->status === 'Approved')
+								@if ($vehicles->payment_status === 'Payment Initiate Request Approved')
+								<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+								Payment Initiated
+								</a>
+								@endif
+								@endif
+								@endif
+								{{-- End For Release Request  --}}
+								{{-- For Amount Debited  --}}
+									@php
+									$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+									@endphp
+									@if ($hasPermission)
+									@if ($purchasingOrder->status === 'Approved')
+									@if ($vehicles->payment_status === 'Payment Release Approved')
+									<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmdebited', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+									Payment Completed
+									</a>
+									@endif
+									@endif
+									@endif
+									{{-- End For Amount Debited  --}}
+									</div>
+                  <div class="col-lg-4">
+								{{-- Cancel & Delete for procurement  --}}
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+								@endphp
+								@if ($hasPermission)
+								@if ($purchasingOrder->status === 'Approved' && $vehicles->payment_status === '')
+								<a title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmCancel();" style="white-space: nowrap;">
+									Cancel
+								</a>
+								@elseif ($vehicles->status === 'Pending Approval')
+								<a title="Delete" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.deletevehicles', $vehicles->id) }}" onclick="return confirmDelete();" style="white-space: nowrap;">
+									Delete
+								</a>
+								@endif
+								@endif
+							{{-- End Cancel & Delete For Procurement  --}}
+              </div>
+              </div>
+							</div>
+                        </td>
+                        </tr>
                             @endforeach
                             </tbody>
                         </table>
