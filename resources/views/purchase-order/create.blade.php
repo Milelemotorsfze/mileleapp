@@ -220,7 +220,7 @@
                                     <span class="QuantityError-{{$key}} text-danger"></span>
                                 </div>
                                 <div class="col-lg-1 col-md-6">
-                                    <input type="number" id="inventory-qty-{{$key}}" min="0" data-inventory-qty="{{$pfiVehicleVariant->inventoryQuantity}}"
+                                    <input type="number" id="inventory-qty-{{$key}}" min="0" readonly data-inventory-qty="{{$pfiVehicleVariant->inventoryQuantity}}"
                                       data-id="{{ $pfiVehicleVariant->id }}"  class="form-control inventory-qty-{{$pfiVehicleVariant->id}}" value="{{ $pfiVehicleVariant->inventoryQuantity }}" placeholder="QTY">
                                     <span class="InventoryQuantityError-{{$key}} text-danger"></span>
                                 </div>
@@ -314,6 +314,7 @@
         } else {
             // if( formValid == true) {
                 var formData = $('#po-create-form').serialize();
+                console.log(formData);
                 $.ajax({
                     url: '{{ route('vehicles.check-create-vins') }}',
                     method: 'POST',
