@@ -71,7 +71,7 @@
 
             alertify.set('notifier','position', 'top-right','delay', 40);
 			// datatables
-
+            $('.my-datatable').DataTable();
             $('#teamlead-pending-hiring-requests-table').DataTable();
             $('#teamlead-approved-hiring-requests-table').DataTable();
             $('#teamlead-rejected-hiring-requests-table').DataTable();

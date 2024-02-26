@@ -76,6 +76,6 @@ class JobDescription extends Model
         return $this->hasOne(User::class,'id','department_head_id');
     }
     public function hrManagerName() {
-        return $this->hasOne(User::class,'id','department_head_id');
+        return $this->hasOne(User::class,'id','hr_manager_id');
     }
 }

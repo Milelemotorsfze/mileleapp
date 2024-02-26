@@ -1931,11 +1931,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											@if(isset($type))
 											@if($type == 'approve')
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-												data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#approve-interview-summary-{{$data->id}}">
 											<i class="fa fa-thumbs-up" aria-hidden="true"></i>  Approve 
 											</button>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-												data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#reject-interview-summary-{{$data->id}}">
 											<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 											</button>
 											@endif
@@ -1943,11 +1943,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											@if(isset($data->is_auth_user_can_approve['can_approve']))
 											@if($data->is_auth_user_can_approve['can_approve'] == true)
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-												data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#approve-interview-summary-{{$data->id}}">
 											<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 											</button>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-												data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#reject-interview-summary-{{$data->id}}">
 											<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 											</button>
 											@endif
