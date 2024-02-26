@@ -278,7 +278,7 @@ public function getBrandsAndModelLines(Request $request)
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
         $updateponum = PurchasingOrder::find($purchasingOrderId);
-        $updateponum->po_number = $request->input('po_number');;
+        $updateponum->po_number = $request->input('po_number');
         $updateponum->save();
         $variantNames = $request->input('variant_id');
         if($variantNames != null)
@@ -381,30 +381,51 @@ public function getBrandsAndModelLines(Request $request)
 
                     }
                     $dealer = $pfi->letterOfIndent->dealers ?? '';
+                    $alreadyAddedIds = [];
                     foreach($masterModels as $key => $masterModel)
                     {
                         $model = MasterModel::find($masterModel);
 
                         $possibleModelIds = MasterModel::where('model', $model->model)
                                             ->where('sfx', $model->sfx)->pluck('id');
-
+                        info($alreadyAddedIds);
                         $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
                             ->whereNull('purchase_order_id')
                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                             ->where('supplier_id', $vendors_id)
+                            ->whereNotIn('id', $alreadyAddedIds)
                             ->where('whole_sales', $dealer);
 
                         if($vins[$key]) {
-                            $inventoryItem = $inventoryItem->where('chasis', $vins[$key]);
+                            info("vin");
+                            info($vins[$key]);
+                             $inventoryItem = $inventoryItem->where('chasis', $vins[$key]);
                         }
 
                         if($inventoryItem->count() > 0) {
-                            $inventoryItem = $inventoryItem->first();
+                            $inventoryIds = $inventoryItem->pluck('id');
+
+
+                            $inventory = SupplierInventory::where('pfi_id', $pfi->id)
+                                                ->whereIn('id', $inventoryIds);
+                            if($inventory->count() > 0) {
+                                info("inventory item with pfi");
+                                info($inventory->first());
+                                $inventoryItem = $inventory->first();
+
+                            }else{
+                                info("inventory item");
+                                info($inventoryItem->first());
+                                $inventoryItem = $inventoryItem->first();
+                                $inventoryItem->pfi_id = $pfi->id;
+                            }
                             $inventoryItem->purchase_order_id = $purchasingOrder->id;
                             $inventoryItem->save();
+                            $alreadyAddedIds[] = $inventoryItem->id;
                         }
                     }
+//                    return 1;
                 }
         }
         DB::commit();
@@ -1066,6 +1087,7 @@ public function purchasingupdateStatus(Request $request)
                 info($possibleModelIds);
                 $purchasingOrder = PurchasingOrder::findOrFail($vehicle->purchasing_order_id);
                 $dealer = $purchasingOrder->LOIPurchasingOrder->approvedLOI->pfi->letterOfIndent->dealers ?? '';
+                $pfi_id = $purchasingOrder->LOIPurchasingOrder->approvedLOI->pfi->id ?? '';
                 $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
                     ->whereNull('purchase_order_id')
                     ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
@@ -1079,7 +1101,10 @@ public function purchasingupdateStatus(Request $request)
 
                 if($inventoryItem->count() > 0) {
                     $inventoryItem = $inventoryItem->first();
-                    info($inventoryItem);
+//                    $inventory = $inventoryItem->where('pfi_id', $pfi_id);
+//                    if($inventory->count() > 0) {
+//                        $inventoryItem = $inventory->first();
+//                    }
                     $inventoryItem->purchase_order_id = $purchasingOrder->id;
                     $inventoryItem->save();
                 }
