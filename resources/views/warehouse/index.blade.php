@@ -427,8 +427,9 @@ $pendingvendorfol = DB::table('purchasing_order')
                 {{ session('success') }}
             </div>
         @endif
+
         @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-po-details','demand-planning-po-list']);
                     @endphp
                     @if ($hasPermission)
 <h4 class="card-title">

@@ -44,7 +44,20 @@ class PurchasingOrderController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->get();
+
+        if(Auth::user()->hasPermissionForSelectedRole('demand-planning-po-list')){
+            $demandPlanningPoIds = LOIItemPurchaseOrder::groupBy('purchase_order_id')->pluck('purchase_order_id');
+//            return $demandPlanningPoIds;
+            // add migrated user Ids
+            $Ids = ['16'];
+            $Ids[] = $userId;
+            $data = PurchasingOrder::with('purchasing_order_items')->whereIn('created_by', $Ids)
+                                                ->whereIn('id', $demandPlanningPoIds)
+                                                ->get();
+        }else{
+            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->get();
+
+        }
         return view('warehouse.index', compact('data'));
     }
     public function filter($status)
@@ -261,6 +274,7 @@ public function getBrandsAndModelLines(Request $request)
         $purchasingOrder->fd = $request->input('fd');
         $purchasingOrder->status = "Pending Approval";
         $purchasingOrder->created_by = auth()->user()->id;
+        $purchasingOrder->is_demand_planning_po = $request->is_demand_planning_po ? true : false;
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
         $updateponum = PurchasingOrder::find($purchasingOrderId);
@@ -427,21 +441,22 @@ public function getBrandsAndModelLines(Request $request)
                 ->where('pfi_id', $pfi->id)
                 ->groupBy('letter_of_indent_item_id')
                 ->get();
-            $variantCount = $pfiVehicleVariants->count();
+
             foreach ($pfiVehicleVariants as $pfiVehicleVariant) {
 
                 $alreadyAddedQuantity = LOIItemPurchaseOrder::where('approved_loi_id', $pfiVehicleVariant->id)
-                    ->sum('quantity');
+                                            ->sum('quantity');
 
                 $pfiVehicleVariant->quantity = $pfiVehicleVariant->quantity - $alreadyAddedQuantity;
 
                 $masterModel = MasterModel::find($pfiVehicleVariant->letterOfIndentItem->masterModel->id);
                 $pfiVehicleVariant->masterModels = MasterModel::where('model', $masterModel->model)
-                    ->where('sfx', $masterModel->sfx)
-                    ->get();
+                                                ->where('sfx', $masterModel->sfx)
+                                                ->get();
 
                 $possibleModelIds = MasterModel::where('model', $masterModel->model)
-                    ->where('sfx', $masterModel->sfx)->pluck('id');
+                                                ->where('sfx', $masterModel->sfx)->pluck('id');
+
                 $pfiVehicleVariant->inventoryQuantity = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
                     ->whereNull('purchase_order_id')
                     ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
@@ -449,9 +464,11 @@ public function getBrandsAndModelLines(Request $request)
                     ->where('supplier_id', $pfi->supplier_id)
                     ->where('whole_sales', $dealer)
                     ->count();
+
+                $variantCount = $variantCount + $pfiVehicleVariant->quantity;
+
             }
         }
-
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
@@ -495,12 +512,12 @@ public function getBrandsAndModelLines(Request $request)
                 $variantQuantity = $variantsQuantity[$variant->name];
                 if($request->po_from == 'DEMAND_PLANNING') {
                     $IsExistpurchasingOrderItem = PurchasingOrderItems::where('purchasing_order_id', $purchasingOrderId)
-                        ->where('variant_id', $variantId)->first();
+                                                     ->where('variant_id', $variantId)->first();
                     if($IsExistpurchasingOrderItem) {
                         $purchasingOrderItem =  $IsExistpurchasingOrderItem;
-                      $variantQuantity = $IsExistpurchasingOrderItem->qty + $variantQuantity;
+                        $variantQuantity = $IsExistpurchasingOrderItem->qty + $variantQuantity;
                     }
-                    $purchasingOrderItem->qty = $variantQuantity ;
+                    $purchasingOrderItem->qty = $variantQuantity;
                 }
                 $purchasingOrderItem->variant_id = $variantId;
                 $purchasingOrderItem->purchasing_order_id = $purchasingOrderId;
@@ -814,7 +831,7 @@ public function purchasingupdateStatus(Request $request)
         $purchasingOrder->save();
         $vehicles = Vehicles::where('purchasing_order_id', $id)->where('status', '!=', 'Rejected')->get();
         foreach ($vehicles as $vehicle) {
-            if ($vehicle->status == 'New Changes' || $vehicle->status == 'Not Approved') {
+            if ($vehicle->status == 'New Changes' || $vehicle->status == 'Not Approved' || $vehicle->status == 'New Vehicles') {
             if($purchasingOrder->po_type === "Payment Adjustment")
             {
                 $vehicle->status = 'Payment Completed';
@@ -880,10 +897,10 @@ public function purchasingupdateStatus(Request $request)
         $vehicle = Vehicles::findOrFail($id);
         if ($vehicle->status == 'Approved' || $vehicle->status == 'Request for Payment' || $vehicle->status == 'Payment In-Process') {
             $vehicle->status = 'Request for Cancel';
+            $vehicle->save();
         }
         else
         {
-            $vehicle->status = 'cancel';
         $purchasinglog = new Purchasinglog();
         $purchasinglog->time = now()->toTimeString();
         $purchasinglog->date = now()->toDateString();
@@ -934,26 +951,26 @@ public function purchasingupdateStatus(Request $request)
                 $inventoryItem->purchase_order_id = NULL;
                 $inventoryItem->save();
 
-                $purchaseOrderItem = PurchasingOrderItems::where('purchasing_order_id', $vehicle->purchasing_order_id)
-                    ->where('variant_id', $vehicle->varaints_id)->first();
-                if($purchaseOrderItem) {
-                    $purchaseOrderItem->qty = $purchaseOrderItem->qty - 1;
-                    $purchaseOrderItem->save();
-                }
+//                $purchaseOrderItem = PurchasingOrderItems::where('purchasing_order_id', $vehicle->purchasing_order_id)
+//                    ->where('variant_id', $vehicle->varaints_id)->first();
+//                if($purchaseOrderItem) {
+//                    $purchaseOrderItem->qty = $purchaseOrderItem->qty - 1;
+//                    $purchaseOrderItem->save();
+//                }
 
                 $loiPurchaseOrder = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
                     ->where('master_model_id', $vehicle->model_id)
                     ->first();
                 info($vehicle->purchasing_order_id);
                 info($vehicle->model_id);
+                if($loiPurchaseOrder) {
+                    $loiPurchaseOrder->quantity = $loiPurchaseOrder->quantity - 1;
+                    $loiPurchaseOrder->save();
+                }
 
-                $loiPurchaseOrder->quantity = $loiPurchaseOrder->quantity - 1;
-                $loiPurchaseOrder->save();
             }
+        $vehicle->delete();
         }
-
-//         return 1;
-        $vehicle->save();
         return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
     }
     public function rejecteds($id)
@@ -1671,5 +1688,77 @@ public function allpaymentreqssfinpay(Request $request)
                    $vehicleslog->save();
                                  }
                                  return redirect()->back()->with('success', 'Payment Status Updated');
+                            }
+                            public function approvedcancel($id)
+                            {
+                                $vehicle = Vehicles::findOrFail($id);
+                                $purchasinglog = new Purchasinglog();
+                                $purchasinglog->time = now()->toTimeString();
+                                $purchasinglog->date = now()->toDateString();
+                                $purchasinglog->status = 'Vehicle Cancel';
+                                $purchasinglog->role = Auth::user()->selectedRole;
+                                $purchasinglog->purchasing_order_id = $vehicle->purchasing_order_id;
+                                $purchasinglog->variant = $vehicle->varaints_id;
+                                $purchasinglog->estimation_date = $vehicle->estimation_date;
+                                $purchasinglog->territory = $vehicle->territory;
+                                $purchasinglog->int_colour = $vehicle->int_colour;
+                                $purchasinglog->ex_colour = $vehicle->ex_colour;
+                                $purchasinglog->created_by = auth()->user()->id;
+                                $purchasinglog->save();
+                                $vehicleslog = new Vehicleslog();
+                                $vehicleslog->time = now()->toTimeString();
+                                $vehicleslog->date = now()->toDateString();
+                                $vehicleslog->status = 'Vehicle Cancel';
+                                $vehicleslog->vehicles_id = $id;
+                                $vehicleslog->field = "Status";
+                                $vehicleslog->old_value = $vehicle->status;
+                                $vehicleslog->new_value = 'Vehicle Cancel';
+                                $vehicleslog->created_by = auth()->user()->id;
+                                $vehicleslog->role = Auth::user()->selectedRole;
+                                $vehicleslog->save();
+                                $updateqty = PurchasingOrderItems::where('variant_id', $vehicle->varaints_id)->where('purchasing_order_id', $vehicle->purchasing_order_id)->first();
+                                if($updateqty)
+                                {
+                                    $updateqty->qty = intval($updateqty->qty) - 1;
+                                    $updateqty->save();
+                                }
+                                $updateprice = VehiclePurchasingCost::where('vehicles_id', $id)->first();
+                                if($updateprice)
+                                {
+                                $updatetotal = PurchasingOrder::find($vehicle->purchasing_order_id);
+                                $updatetotal->totalcost = $updatetotal->totalcost - $updateprice->unit_price;
+                                $updatetotal->save();
+                                }
+                        
+                                    if($vehicle->model_id) {
+                                        $masterModel = MasterModel::find($vehicle->model_id);
+                                        $possibleModelIds = MasterModel::where('model', $masterModel->model)
+                                            ->where('sfx', $masterModel->sfx)->pluck('id');
+                                        info($possibleModelIds);
+                                        $inventoryItem = SupplierInventory::where('purchase_order_id', $vehicle->purchasing_order_id)
+                                            ->whereIn('master_model_id', $possibleModelIds)
+                                            ->first();
+                                        info($inventoryItem);
+                                        $inventoryItem->purchase_order_id = NULL;
+                                        $inventoryItem->save();
+                        
+                                        $purchaseOrderItem = PurchasingOrderItems::where('purchasing_order_id', $vehicle->purchasing_order_id)
+                                            ->where('variant_id', $vehicle->varaints_id)->first();
+                                        if($purchaseOrderItem) {
+                                            $purchaseOrderItem->qty = $purchaseOrderItem->qty - 1;
+                                            $purchaseOrderItem->save();
+                                        }
+                        
+                                        $loiPurchaseOrder = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
+                                            ->where('master_model_id', $vehicle->model_id)
+                                            ->first();
+                                        info($vehicle->purchasing_order_id);
+                                        info($vehicle->model_id);
+                        
+                                        $loiPurchaseOrder->quantity = $loiPurchaseOrder->quantity - 1;
+                                        $loiPurchaseOrder->save();
+                                    }
+                                $vehicle->delete();
+                                return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
                             }
 }

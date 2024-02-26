@@ -554,7 +554,11 @@
                         @endphp
                         @if ($hasPermission)
                         @if ($vehicles->payment_status === '')
-                        @if ($vehicles->status != 'Rejected')
+                        @if($vehicles->status == 'Request for Cancel')
+                        <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.approvedcancel', $vehicles->id) }}" onclick="return confirmApprovedcancel();"style="white-space: nowrap;">
+                            Approved Cancel
+                        </a>
+                        @elseif ($vehicles->status != 'Rejected')
                         <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.rejecteds', $vehicles->id) }}" onclick="return confirmRejected();"style="white-space: nowrap;">
                             Reject
                         </a>
@@ -674,7 +678,7 @@
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
 								@endphp
 								@if ($hasPermission)
-								@if ($purchasingOrder->status === 'Approved' && $vehicles->payment_status === '')
+								@if ($purchasingOrder->status === 'Approved'  || $purchasingOrder->status === 'Pending Approval' && $vehicles->payment_status === '')
 								<a title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmCancel();" style="white-space: nowrap;">
 									Cancel
 								</a>
@@ -778,7 +782,7 @@
 
             @can('edit-demand-planning-po')
                 @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-demand-planning-po');
                 @endphp
                 @if ($hasPermission)
                     @if($variantCount > 0)
@@ -1478,6 +1482,16 @@
         <script>
             function confirmRejected() {
                 var confirmDialog = confirm("Are you sure you want to Reject this Vehicles?");
+                if (confirmDialog) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        </script>
+        <script>
+            function confirmApprovedcancel() {
+                var confirmDialog = confirm("Are you sure you want to Approved this Vehicles Cancel?");
                 if (confirmDialog) {
                     return true;
                 } else {

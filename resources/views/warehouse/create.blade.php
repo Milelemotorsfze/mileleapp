@@ -218,7 +218,7 @@ input[type=number]::-webkit-outer-spin-button {
             <div class="col-lg-1 col-md-6">
               <label for="Incoterm" class="form-label">Shipping Method:</label>
               <select class="form-control" id="shippingmethod" name="shippingmethod">
-              <option value="EXW">EXW</option>    
+              <option value="EXW">EXW</option>
               <option value="CNF">CNF</option>
               <option value="CIF">CIF</option>
               <option value="FOB">FOB</option>
@@ -241,6 +241,10 @@ input[type=number]::-webkit-outer-spin-button {
               <label for="Incoterm" class="form-label">Preferred Destination:</label>
               <input type="text" id="fd" name="fd" class="form-control" placeholder="Preferred Destination">
           </div>
+            <div class="col-lg-3 col-md-6 mt-3">
+                <input type="checkbox" id="is_demand_planning_po" name="is_demand_planning_po" class="form-check-inline mr-1" >
+                <label for="is_demand_planning_po" class="form-label fw-bold">Is Demand Planning PO ?</label>
+            </div>
             </div>
             <br>
             <br>
