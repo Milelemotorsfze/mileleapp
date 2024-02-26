@@ -194,4 +194,5 @@ class EmployeeProfile extends Model
     public function candidateJoiningReport() {
         return $this->hasMany(JoiningReport::class,'candidate_id','id');
     }
+    
 }

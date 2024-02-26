@@ -193,7 +193,7 @@ class EmployeeHiringRequestController extends Controller
                 }
                 else {
                     $update = EmployeeHiringRequest::find($id);
-                    if($update) {
+                    if($update && $update->status == 'pending') {
                         $update->request_date = $request->request_date;
                         $update->department_id = $request->department_id;
                         $update->location_id = $request->location_id;
@@ -238,6 +238,9 @@ class EmployeeHiringRequestController extends Controller
                         $createHistory2 = EmployeeHiringRequestHistory::create($history2);
                         (new UserActivityController)->createActivity('Employee Hiring Request Edited');
                         $successMessage = "Employee Hiring Request Updated Successfully";
+                    }
+                    else if(($update && $update->status == 'approved') OR ($update && $update->status == 'rejected')) {
+                        $successMessage = "can't update this employee hiring request ,because it is already ". $update->status;
                     }
                 }
                 DB::commit();
@@ -392,7 +395,7 @@ class EmployeeHiringRequestController extends Controller
         $message = '';
         $update = EmployeeHiringRequest::where('id',$request->id)->first();
         // Approvals =>  Team Lead/Manager -------> Recruitement(Hiring) manager -----------> Division head ---------> HR manager
-        
+        if($update && $update->status == 'pending') {
         if($request->current_approve_position == 'Team Lead / Reporting Manager') {
             $update->comments_by_department_head = $request->comment;
             $update->department_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
@@ -449,10 +452,16 @@ class EmployeeHiringRequestController extends Controller
         }
         (new UserActivityController)->createActivity($history['message']);
         return response()->json('success');
+    }
+    else {
+        return response()->json('error');
+    }
         // ,'New Employee Hiring Request '.$request->status.' Successfully'
     }
     public function updateFinalStatus(Request $request) {
         $update = EmployeeHiringRequest::where('id',$request->id)->first();
+        if($update && $update->status == 'pending') {
+          
         $update->final_status = $request->status;
         if($request->status == 'cancelled') {
             $update->cancelled_by = Auth::id();
@@ -494,12 +503,20 @@ class EmployeeHiringRequestController extends Controller
         $createHistory = EmployeeHiringRequestHistory::create($history);  
         (new UserActivityController)->createActivity($history['message']);
         return response()->json('success');
+          
+    }
+    return response()->json('error');
     }
     public function destroy($id) {
         $data = EmployeeHiringRequest::where('id',$id)->first();
-        $data->deleted_by = Auth::id();
-        $data->update();
-        $data->delete();
-        return response(true);
+        if($data && $data->status == 'pending') {
+            $data->deleted_by = Auth::id();
+            $data->update();
+            $data->delete();
+            return response(true);
+        }
+        else {
+            return response(false);
+        }
     }
 }

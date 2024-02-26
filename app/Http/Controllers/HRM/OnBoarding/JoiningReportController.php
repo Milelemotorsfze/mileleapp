@@ -93,6 +93,16 @@ class JoiningReportController extends Controller
         if($type == 'vacations_or_leave') {
             $employees = $employees->whereHas('approvedLeaves');
         }
+        if($type == 'internal_transfer') {
+            $employees = $employees->where(function ($query2) {
+                $query2->whereDoesntHave('joiningReport')->orWhereHas('joiningReport', function ($query1) {
+                    $query1->where([
+                        ['joining_type','==','internal_transfer'],
+                        ['status','==','pending'],
+                    ]);
+                });
+            });   
+        }
         $employees = $employees->with('empProfile.designation','empProfile.department','empProfile.location','approvedLeaves')->get();
         if($type == 'new_employee') {
             return view('hrm.onBoarding.joiningReport.create',compact('candidates','masterlocations','reportingTo','type','masterDepartments'));
@@ -201,7 +211,7 @@ class JoiningReportController extends Controller
                     $emp->update();
                 }
                 $createJoinRep = JoiningReport::where('id',$id)->first();
-                if($createJoinRep) {
+                if($createJoinRep && $createJoinRep->status == 'pending') {
                     $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                     if($request->joining_type == 'internal_transfer') {
                         $createJoinRep->transfer_from_department_id = $request->transfer_from_department_id;
@@ -241,7 +251,10 @@ class JoiningReportController extends Controller
                     $history2['message'] = 'Employee joining report send to Prepared by ( '.Auth::user()->name.' - '.Auth::user()->email.' ) for approval';
                     $createHistory2 = JoiningReportHistory::create($history2);
                     (new UserActivityController)->createActivity('New Employee joining report Updated');   
-                }              
+                }   
+                else {
+                    // "can't update this joining report ,because it is already ". $update->status;
+                }           
                 $successMessage = 'Employee Joining Report Form Editted Successfully.';
                 return redirect()->route('employee_joining_report.index', $request->joining_type);
             } 
@@ -293,6 +306,9 @@ class JoiningReportController extends Controller
         try {
             $message = '';
             $update = JoiningReport::where('id',$request->id)->first();
+            if($update && $update->sataus =='pending') {
+
+            
             if($request->current_approve_position == 'Prepared by') {
                 $update->comments_by_prepared_by = $request->comment;
                 $update->prepared_by_action_at = Carbon::now()->format('Y-m-d H:i:s');
@@ -374,6 +390,11 @@ class JoiningReportController extends Controller
             (new UserActivityController)->createActivity($history['message']);
             DB::commit();
             return response()->json('success');
+        }
+        else {
+            return response()->json('error');  
+        }
+
         } 
         catch (\Exception $e) {
             DB::rollback();
@@ -403,12 +424,17 @@ class JoiningReportController extends Controller
         try {
             $message = '';
             $update = JoiningReport::where('id',$request->id)->first();
+            if($update && $update->status == 'pending') {
+
+           
             $update->comments_by_employee = $request->comments_by_employee;
             $update->employee_action_at = Carbon::now()->format('Y-m-d H:i:s');
             $update->action_by_employee = 'approved';
             $update->action_by_hr_manager = 'pending';
             $message = 'Interview Summary Report send to HR Manager ( '.$update->hr->name.' - '.$update->hr->email.' ) for approval';
             $update->update();
+            $history['joining_report_id'] = $request->id;
+            $history['icon'] = 'icons8-thumb-up-30.png';
             $history['message'] = 'Employee Joining Report verified by '.$update->candidate->first_name.' '.$update->candidate->last_name.' - '.$update->candidate->personal_email_address.' )';
             $createHistory = JoiningReportHistory::create($history);
             if($message != '') {
@@ -417,8 +443,14 @@ class JoiningReportController extends Controller
                 $createHistory = JoiningReportHistory::create($history);
             }
             (new UserActivityController)->createActivity($history['message']);
-            DB::commit();
             $successMessage = 'Employee Joining Report Successfully Verified By Employee.';
+
+        }
+        else {
+            $successMessage = "can't update this candidatejoinig report ,because it is already ". $update->status;;
+
+        }
+            DB::commit();
             return view('hrm.hiring.documents.successPersonalinfo',compact('successMessage'));
         } 
         catch (\Exception $e) {

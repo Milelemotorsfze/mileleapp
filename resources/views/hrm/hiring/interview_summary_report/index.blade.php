@@ -3308,5 +3308,17 @@ $.ajaxSetup({
 			}	
 		}).set({title:"Confirmation"})
 	})
+	function inputNumberAbs(currentPriceInput) 
+	{
+	    var id = currentPriceInput.id;
+	    var input = document.getElementById(id);
+	    var val = input.value;
+	    val = val.replace(/^0+|[^\d.]/g, '');
+	    if(val.split('.').length>2) 
+	    {
+	        val =val.replace(/\.+$/,"");
+	    }
+	    input.value = val;
+	}
 </script>
 @endpush

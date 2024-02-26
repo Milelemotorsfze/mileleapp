@@ -153,7 +153,7 @@ class InterviewSummaryReportController extends Controller
             DB::beginTransaction();
             try {
                 $update = InterviewSummaryReport::where('id',$request->id)->first();
-                if($update) {
+                if($update && $update->status == 'pending') {
                     if($request->round == 'final') {
                         $update->candidate_selected = $request->candidate_selected;
                         $update->final_evaluation_of_candidate = $request->comment;
@@ -165,11 +165,15 @@ class InterviewSummaryReportController extends Controller
                         $hiringRequest = EmployeeHiringRequest::where('id',$update->hiring_request_id)->first();
                         $update->division_head_id = $hiringRequest->division_head_id;
                     }
+                    $msg = 'Final Evaluation Of Candidate Created Successfully';
+                }
+                else if(($update && $update->status == 'approved') OR ($update && $update->status == 'rejected')) {
+                    $msg = "can't update this interview summary report ,because it is already ". $update->status;
                 }
                 $update->update();
                 DB::commit();
                 return redirect()->route('interview-summary-report.index')
-                                    ->with('success','Final Evaluation Of Candidate Created Successfully');
+                                    ->with('success',$msg);
             } 
             catch (\Exception $e) {
                 DB::rollback();
@@ -195,7 +199,7 @@ class InterviewSummaryReportController extends Controller
             DB::beginTransaction();
             try {
                 $update = InterviewSummaryReport::where('id',$request->id)->first();
-                if($update) {
+                if($update && $update->status == 'pending') {
                     if($request->round == 'telephonic') {
                         $update->date_of_telephonic_interview = $request->date;
                         $update->telephonic_interview = $request->comment;
@@ -220,9 +224,13 @@ class InterviewSummaryReportController extends Controller
                         $update->date_of_fifth_round = $request->date;
                         $update->fifth_round = $request->comment;
                     }
+                    $msg = $request->round.' Round Interview Summary Report Created Successfully';
+                }
+                if(($update && $update->status == 'approved') OR ($update && $update->status == 'rejected')) {
+                    $msg = "can't update this interview summary report ,because it is already ". $update->status;
                 }
                 $update->update();
-                if(isset($request->interviewer_id)) {
+                if(isset($request->interviewer_id) && $update && $update->status == 'pending') {
                     if(count($request->interviewer_id) > 0) {
                         foreach($request->interviewer_id as $interviewer) {
                             $createInterviewer['interview_summary_report_id'] = $request->id;
@@ -235,7 +243,7 @@ class InterviewSummaryReportController extends Controller
                 DB::commit();
                 // return response()->json('success');
                 return redirect()->route('interview-summary-report.index',)
-                                    ->with('success',$request->round.' Round Interview Summary Report Created Successfully');
+                                    ->with('success',$msg);
             } 
             catch (\Exception $e) {
                 DB::rollback();
@@ -248,6 +256,9 @@ class InterviewSummaryReportController extends Controller
         try {
             $message = '';
             $update = InterviewSummaryReport::where('id',$request->id)->first();
+            if($update && $update->status == 'pending') {
+
+            
             if($request->current_approve_position == 'HR Manager') {
                 $update->comments_by_hr_manager = $request->comment;
                 $update->hr_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
@@ -286,6 +297,10 @@ class InterviewSummaryReportController extends Controller
             (new UserActivityController)->createActivity($history['message']);
             DB::commit();
             return response()->json('success');
+        }
+        else {
+            return response()->json('error'); 
+        }
         } 
         catch (\Exception $e) {
             // info($e);
@@ -317,6 +332,9 @@ class InterviewSummaryReportController extends Controller
                     $request->resume_file_name->move(public_path('resume'), $fileName);
                 }
                 if($update) {
+                    if($update->status == 'pending') {
+
+                    
                     $update->hiring_request_id  = $request->hiring_request_id ;
                     $update->candidate_name  = $request->candidate_name ;
                     $update->nationality  = $request->nationality ;
@@ -353,6 +371,10 @@ class InterviewSummaryReportController extends Controller
                     (new UserActivityController)->createActivity('Interview Summary updated');
                     $successMessage = "Interview Summary updated Successfully";
                 }
+                else {
+                    $successMessage = "can't update this interview summary report ,because it is already ". $update->status;
+                }
+                }
                 else {    
                     if($request->resume_file_name) {
                         $input['resume_file_name'] = $fileName;
@@ -378,7 +400,7 @@ class InterviewSummaryReportController extends Controller
                 }
                 DB::commit();
                 return redirect()->route('interview-summary-report.index')
-                                    ->with('success','Interview Summary Report Created Successfully');
+                                    ->with('success',$successMessage);
             } 
             catch (\Exception $e) {
                 DB::rollback();               
@@ -419,14 +441,18 @@ class InterviewSummaryReportController extends Controller
             DB::beginTransaction();
             try {
                 $update = InterviewSummaryReport::where('id',$request->id)->first();
-                if($update) {
+                if($update && $update->offer_letter_verified_at == NULL) {
                     $update->candidate_expected_salary = $request->candidate_expected_salary;
                     $update->total_salary = $request->total_salary;
+                    $msg = 'Salary Details Of Candidate Created Successfully';
+                }
+                else {
+                    $msg = "can't update this candidate salary details ,because this candidate's salary already verified ";
                 }
                 $update->update();
                 DB::commit();
                 return redirect()->route('interview-summary-report.index')
-                                    ->with('success','Salary Details Of Candidate Created Successfully');
+                                    ->with('success',$msg);
             } 
             catch (\Exception $e) {
                 DB::rollback();

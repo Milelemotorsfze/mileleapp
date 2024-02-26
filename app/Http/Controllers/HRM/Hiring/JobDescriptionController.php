@@ -131,7 +131,7 @@ class JobDescriptionController extends Controller
                 }
                 else {
                     $update = JobDescription::find($id);
-                    if($update) {
+                    if($update && ($update->status == 'pending' OR $update->status == 'rejected')) {
                         $update->hiring_request_id = $request->hiring_request_id;
                         $update->request_date = $request->request_date;
                         $update->location_id = $request->location_id;
@@ -155,6 +155,9 @@ class JobDescriptionController extends Controller
                         (new UserActivityController)->createActivity('Employee Hiring Job Description Edited');
                         $successMessage = "Employee Hiring Job Description Updated Successfully";
                     }
+                    else if(($update && $update->status == 'approved') OR ($update && $update->status == 'rejected')) {
+                        $successMessage = "can't update this employee hiring job description ,because it is already ". $update->status;
+                    }
                 }
                 DB::commit();
                 return redirect()->route('job_description.index')
@@ -171,6 +174,7 @@ class JobDescriptionController extends Controller
         try {
             $message = '';
             $update = JobDescription::where('id',$request->id)->first();
+            if($update && $update->status == 'pending') {
             if($request->current_approve_position == 'Team Lead / Reporting Manager') {
                 $update->comments_by_department_head = $request->comment;
                 $update->department_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
@@ -209,6 +213,10 @@ class JobDescriptionController extends Controller
             (new UserActivityController)->createActivity($history['message']);
             DB::commit();
             return response()->json('success');
+        }
+        else {
+            return response()->json('error');
+        }
         } 
         catch (\Exception $e) {
             // info($e);

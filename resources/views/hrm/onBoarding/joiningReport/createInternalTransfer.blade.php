@@ -65,11 +65,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="transfer_from_department_id" class="col-form-label text-md-end">{{ __('Transfer From Department') }}</label>
-							<select name="transfer_from_department_id" id="transfer_from_department_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
+							<!-- <select name="transfer_from_department_id" id="transfer_from_department_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
 								@foreach($masterDepartments as $department)
 									<option value="{{$department->id}}">{{$department->name}}</option>
 								@endforeach
-							</select>
+							</select> -->
+							<input type="hidden" name="transfer_from_department_id" id="transfer_from_department_id" value="" class="form-control widthinput @error('transfer_from_department_id') is-invalid @enderror">
+							<input type="text" readonly name="transfer_from_department_name" id="transfer_from_department_name" value="" class="form-control widthinput @error('transfer_from_department_name') is-invalid @enderror">
 						</div>
 					</div>
                     <div class="col-xxl-4 col-lg-6 col-md-6">
@@ -82,11 +84,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="transfer_from_location_id" class="col-form-label text-md-end">{{ __('Transfer From Location') }}</label>
-							<select name="transfer_from_location_id" id="transfer_from_location_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
+							<!-- <select name="transfer_from_location_id" id="transfer_from_location_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
 								@foreach($masterlocations as $location)
 									<option value="{{$location->id}}">{{$location->name}}</option>
 								@endforeach
-							</select>
+							</select> -->
+							<input type="hidden" name="transfer_from_location_id" id="transfer_from_location_id" value="" class="form-control widthinput @error('transfer_from_location_id') is-invalid @enderror">
+							<input type="text" readonly name="transfer_from_location_name" id="transfer_from_location_name" value="" class="form-control widthinput @error('transfer_from_location_name') is-invalid @enderror">
+						
 						</div>
 					</div>
                     <div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
@@ -154,16 +159,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 			maximumSelectionLength: 1,
             placeholder:"Choose Joining Location",
         });	
-        $('#transfer_from_location_id').select2({
-            allowClear: true,
-			maximumSelectionLength: 1,
-            placeholder:"Choose Transfer From Location",
-        });	
-        $('#transfer_from_department_id').select2({
-            allowClear: true,
-			maximumSelectionLength: 1,
-            placeholder:"Choose Transfer From Department",
-        });	
+        // $('#transfer_from_location_id').select2({
+        //     allowClear: true,
+		// 	maximumSelectionLength: 1,
+        //     placeholder:"Choose Transfer From Location",
+        // });	
+        // $('#transfer_from_department_id').select2({
+        //     allowClear: true,
+		// 	maximumSelectionLength: 1,
+        //     placeholder:"Choose Transfer From Department",
+        // });	
         $('#transfer_to_department_id').select2({
             allowClear: true,
 			maximumSelectionLength: 1,
@@ -186,6 +191,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							}
 							if(employees[i].emp_profile != null && employees[i].emp_profile.department != null && employees[i].emp_profile.department.name != null) {
 								document.getElementById('department').textContent=employees[i].emp_profile.department.name;  
+								document.getElementById('transfer_from_department_id').value=employees[i].emp_profile.department_id;  
+								document.getElementById('transfer_from_department_name').value=employees[i].emp_profile.department.name;  
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.work_location != null && employees[i].emp_profile.location.name != null) {
+								document.getElementById('transfer_from_location_id').value=employees[i].emp_profile.work_location;  
+								document.getElementById('transfer_from_location_name').value=employees[i].emp_profile.location.name;  
 							}
 						}
 					}

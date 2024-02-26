@@ -80,8 +80,6 @@ class InspectionController extends Controller
                 ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
                 ->whereNull('inspection.id')
                 ->whereNull('vehicles.inspection_date')
-                ->whereNull('vehicles.inspection_date')
-                ->whereNull('vehicles.so_id')
                 ->whereNull('vehicles.gdn_id')
                 ->whereNotNull('vehicles.grn_id');
                 $data = $data->groupBy('vehicles.id');

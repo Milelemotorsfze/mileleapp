@@ -50,6 +50,8 @@ class CandidatePersonalInfoController extends Controller
                     $update->email = $request->email;
                 }
                 $update->update();
+                if(($update && $update->email == '') OR ($update && $update->email != '' && isset($update->candidateDetails) 
+                && $update->candidateDetails->documents_verified_at != '')) {
                 $data['comment'] = '';
                 if($request->comment) {
                     $data['comment'] = $request->comment;
@@ -70,9 +72,14 @@ class CandidatePersonalInfoController extends Controller
                                 ->subject($subject);
                         }
                     );
+                    $msg = 'Documents Request Form Successfully Send To Candidate';
+                }
+                else {
+                    $msg = "can't send candidate documents upload form ,because this candidate's documents already verified ";
+                }
                 DB::commit();
                 return redirect()->back()
-                                    ->with('success','Documents Request Form Successfully Send To Candidate');
+                                    ->with('success',$msg);
             } 
             catch (\Exception $e) {
                 DB::rollback();
@@ -189,33 +196,39 @@ class CandidatePersonalInfoController extends Controller
                 }
                 $update->update();
                 $emp = EmployeeProfile::where('interview_summary_id',$request->id)->first();
-                if($emp) {
-                    $emp->personal_information_send_at = Carbon::now();
-                    $emp->update();
-                }               
-                $data['comment'] = '';
-                if($request->comment) {
-                    $data['comment'] = $request->comment;
+                if($emp && $emp->personal_information_verified_at == '' && $update->offer_letter_verified_at == '') {
+                    if($emp) {
+                        $emp->personal_information_send_at = Carbon::now();
+                        $emp->update();
+                    }               
+                    $data['comment'] = '';
+                    if($request->comment) {
+                        $data['comment'] = $request->comment;
+                    }
+                    $data['id'] = Crypt::encrypt($update->id);
+                    $data['email'] = $request->email;
+                    $data['send_by'] = Auth::user()->name;
+                    $data['name'] = 'Dear '.$update->candidate_name.' ,';
+                    $template['from'] = 'no-reply@milele.com';
+                    $template['from_name'] = 'Milele Matrix';
+                    $subject = 'Milele - Candidate Personal Information Form';
+                    Mail::send(
+                            "hrm.hiring.personal_info.email",
+                            ["data"=>$data] ,
+                            function($msg) use ($data,$template,$subject) {
+                                $msg->to($data['email'], $data['name'])
+                                    ->from($template['from'],$template['from_name'])
+                                    ->subject($subject);
+                            }
+                        );
+                $msg ='Offer Letter and Personal Information Form Successfully Send To Candidate';   
                 }
-                $data['id'] = Crypt::encrypt($update->id);
-                $data['email'] = $request->email;
-                $data['send_by'] = Auth::user()->name;
-                $data['name'] = 'Dear '.$update->candidate_name.' ,';
-                $template['from'] = 'no-reply@milele.com';
-                $template['from_name'] = 'Milele Matrix';
-                $subject = 'Milele - Candidate Personal Information Form';
-                Mail::send(
-                        "hrm.hiring.personal_info.email",
-                        ["data"=>$data] ,
-                        function($msg) use ($data,$template,$subject) {
-                            $msg->to($data['email'], $data['name'])
-                                ->from($template['from'],$template['from_name'])
-                                ->subject($subject);
-                        }
-                    );
-                DB::commit();
+                else {
+                    $msg ="can't send offer letter and personal information link ,because this candidate's offer letter or personal information already verified ";
+                }
+               DB::commit();
                 return redirect()->back()
-                                    ->with('success','Offer Letter and Personal Information Form Successfully Send To Candidate');
+                                    ->with('success',$msg);
             } 
             catch (\Exception $e) {
                 DB::rollback();
@@ -233,7 +246,13 @@ class CandidatePersonalInfoController extends Controller
         $masterLanguages = Language::select('id','name')->get();
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterRelations = MasterPersonRelation::select('id','name')->get();
-        return view('hrm.hiring.documents.create',compact('candidate','masterMaritalStatus','masterReligion','masterLanguages','masterNationality','masterRelations'));
+        if($candidate && isset($candidate->candidateDetails) && $candidate->candidateDetails->documents_verified_at == '') {
+            return view('hrm.hiring.documents.create',compact('candidate','masterMaritalStatus','masterReligion','masterLanguages','masterNationality','masterRelations'));
+        }
+        else {
+            $successMessage = 'Sorry ! This Link is expied.';
+            return view('hrm.hiring.documents.successPersonalinfo',compact('successMessage'));
+        }
     }
     public function sendPersonalForm($id) {
         $id = Crypt::decrypt($id);
@@ -245,7 +264,13 @@ class CandidatePersonalInfoController extends Controller
         $masterLanguages = Language::select('id','name')->get();
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterRelations = MasterPersonRelation::select('id','name')->get();
-        return view('hrm.hiring.personal_info.create',compact('candidate','masterMaritalStatus','masterReligion','masterLanguages','masterNationality','masterRelations'));
+        if($candidate && isset($candidate->candidateDetails) && $candidate->candidateDetails->personal_information_verified_at == '') {
+            return view('hrm.hiring.personal_info.create',compact('candidate','masterMaritalStatus','masterReligion','masterLanguages','masterNationality','masterRelations'));
+        }
+        else {
+            $successMessage = 'Sorry ! This Link is expied.';
+            return view('hrm.hiring.documents.successPersonalinfo',compact('successMessage'));
+        }
     }
     public function storeDocs(Request $request) {
         $validator = Validator::make($request->all(), [
@@ -258,7 +283,7 @@ class CandidatePersonalInfoController extends Controller
             DB::beginTransaction();
             try {
                 $candidate = InterviewSummaryReport::where('id',$request->id)->first();
-                if($candidate) {
+                if($candidate && isset($candidate->candidateDetails) && $candidate->candidateDetails->documents_verified_at == '') {
                     $createEmp = EmployeeProfile::where('interview_summary_id',$request->id)->first(); 
                     if($request->passport_size_photograph) {                       
                         $photoFileName = auth()->id() . '_' . time() . '.'. $request->passport_size_photograph->extension();
@@ -387,9 +412,13 @@ class CandidatePersonalInfoController extends Controller
                             $CandidateDocument->save();
                         }
                     }
-                }               
+                    $successMessage = 'Candidate Documents Request Form Submitted Successfully.';
+                }   
+                else  {
+                    $successMessage = "can't update this candidate documents ,because this candidate's documents already verified ";;
+                }            
            DB::commit();
-           $successMessage = 'Candidate Documents Request Form Submitted Successfully.';
+         
            return view('hrm.hiring.documents.successPersonalinfo',compact('candidate','successMessage'));
             } 
             catch (\Exception $e) {
@@ -431,7 +460,10 @@ class CandidatePersonalInfoController extends Controller
                 if($candidate && $request->signature) {
                     $candidate->pif_sign = $request->signature;
                     $candidate->update();
-                    $createEmp = EmployeeProfile::where('interview_summary_id',$request->id)->first();                   
+                    $createEmp = EmployeeProfile::where('interview_summary_id',$request->id)->first();    
+                    if(!$createEmp OR ($createEmp && $createEmp->personal_information_verified_at == '')) {
+
+                                
                     if(!$createEmp) {
                         $input = $request->all(); 
                         $input['residence_telephone_number'] = $request->residence_telephone_number['full'];
@@ -541,9 +573,15 @@ class CandidatePersonalInfoController extends Controller
                             }
                         }
                     }
+                    $successMessage = 'Candidate Personal Information Form Submitted Successfully.';
+
+                } 
+                else {
+                    $successMessage = "can't update this candidate personal information ,because it is already verified ";
+
+                }
                 }               
            DB::commit();
-           $successMessage = 'Candidate Personal Information Form Submitted Successfully.';
            return view('hrm.hiring.personal_info.successPersonalinfo',compact('candidate','successMessage'));
             } 
             catch (\Exception $e) {
@@ -564,7 +602,7 @@ class CandidatePersonalInfoController extends Controller
             try {
                 $authId = Auth::id();
                 $candidate = EmployeeProfile::where('interview_summary_id',$request->id)->first();
-                if($candidate) {
+                if($candidate && $candidate->documents_verified_at == '') {
                     $candidate->documents_verified_at = Carbon::now();
                     $candidate->documents_verified_by = $authId;
                     $candidate->update();
@@ -645,7 +683,7 @@ class CandidatePersonalInfoController extends Controller
             try {
                 $authId = Auth::id();
                 $candidate = EmployeeProfile::where('interview_summary_id',$request->id)->first();
-                if($candidate) {
+                if($candidate && $candidate->personal_information_verified_at == '') {
                     $candidate->personal_information_verified_at = Carbon::now();
                     $candidate->personal_information_verified_by = $authId;
                     $candidate->update();
