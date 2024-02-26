@@ -44,7 +44,20 @@ class PurchasingOrderController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->get();
+
+        if(Auth::user()->hasPermissionForSelectedRole('demand-planning-po-list')){
+            $demandPlanningPoIds = LOIItemPurchaseOrder::groupBy('purchase_order_id')->pluck('purchase_order_id');
+//            return $demandPlanningPoIds;
+            // add migrated user Ids
+            $Ids = ['16'];
+            $Ids[] = $userId;
+            $data = PurchasingOrder::with('purchasing_order_items')->whereIn('created_by', $Ids)
+                                                ->whereIn('id', $demandPlanningPoIds)
+                                                ->get();
+        }else{
+            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->get();
+
+        }
         return view('warehouse.index', compact('data'));
     }
     public function filter($status)
@@ -261,6 +274,7 @@ public function getBrandsAndModelLines(Request $request)
         $purchasingOrder->fd = $request->input('fd');
         $purchasingOrder->status = "Pending Approval";
         $purchasingOrder->created_by = auth()->user()->id;
+        $purchasingOrder->is_demand_planning_po = $request->is_demand_planning_po ? true : false;
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
         $updateponum = PurchasingOrder::find($purchasingOrderId);
@@ -450,11 +464,11 @@ public function getBrandsAndModelLines(Request $request)
                     ->where('supplier_id', $pfi->supplier_id)
                     ->where('whole_sales', $dealer)
                     ->count();
+
                 $variantCount = $variantCount + $pfiVehicleVariant->quantity;
 
             }
         }
-//      return $variantCount;
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
