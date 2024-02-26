@@ -47,11 +47,12 @@ class JobDescriptionController extends Controller
                 $currentHiringRequest = EmployeeHiringRequest::where('id',$hiring_id)->where('status','approved')
                 // ->where(function($query) {
                 //         $query->whereDoesntHave('jobDescription')
-                //         ->orWhereHas('jobDescription', function($q) {
-                //             $q = $q->whereIn('status',['pending','rejected']);
+                //         ->orWhereDoesntHave('jobDescription', function($q) {
+                //             $q = $q->whereIn('status',['pending','approved']);
                 //         });
                 //     })
-                ->whereDoesntHave('jobDescription')->first();
+                ->whereDoesntHave('jobDescription')
+                ->first();
             }
             else {
                 $currentHiringRequest ='';
@@ -64,7 +65,14 @@ class JobDescriptionController extends Controller
             //             });
             //         })
                     ->where('status','approved')
-                    ->whereDoesntHave('jobDescription')->get();
+                    // ->where(function($query) {
+                    //     $query->whereDoesntHave('jobDescription')
+                    //     ->orWhereDoesntHave('jobDescription', function($q) {
+                    //         $q = $q->whereIn('status',['pending','approved']);
+                    //     });
+                    // })
+                    ->whereDoesntHave('jobDescription')
+                    ->get();
         }
         else {
             $jobDescriptionId = $jobDescription->id;

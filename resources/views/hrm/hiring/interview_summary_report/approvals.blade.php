@@ -4,29 +4,29 @@
 @if(count($HRManagerPendings) > 0 OR count($HRManagerApproved) > 0 OR count($HRManagerRejected) > 0)
 <div class="card-header">
 	<h4 class="card-title">
-    Interview Summary Report Approvals By HR Manager
+		Interview Summary Report Approvals By HR Manager
 	</h4>
 </div>
 <div class="portfolio">
 	<ul class="nav nav-pills nav-fill" id="my-tab">
 		<li class="nav-item">
-			<a class="nav-link active" data-bs-toggle="pill" href="#hr-pending-hiring-requests">Pending </a>
+			<a class="nav-link active" data-bs-toggle="pill" href="#hr-pending-interview-summary">Pending </a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#hr-approved-hiring-requests">Approved </a>
+			<a class="nav-link" data-bs-toggle="pill" href="#hr-approved-interview-summary">Approved </a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#hr-rejected-hiring-requests">Rejected </a>
+			<a class="nav-link" data-bs-toggle="pill" href="#hr-rejected-interview-summary">Rejected </a>
 		</li>
 	</ul>
 </div>
 <div class="tab-content" id="selling-price-histories" >
-	<div class="tab-pane fade show active" id="hr-pending-hiring-requests">
+	<div class="tab-pane fade show active" id="hr-pending-interview-summary">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="hr-pending-hiring-requests-table" class="table table-striped table-editable table-edits table data-table-class">
+				<table id="hr-pending-interview-summary-table" class="table table-striped table-editable table-edits table data-table-class">
 					<thead>
-                    <tr>
+						<tr>
 							<th rowspan="2" class="light">Sl No</th>
 							<th colspan="2" class="dark">
 								<center>Hiring Request</center>
@@ -56,7 +56,7 @@
 								<center>Fifth Round</center>
 							</th>
 							<th rowspan="2" class="light">Final Evaluation Of Candidate</th>
-							<th colspan="4" class="dark">
+							<th colspan="2" class="dark">
 								<center>HR Manager Approvals</center>
 							</th>
 							<th rowspan="2" class="light">
@@ -95,8 +95,8 @@
 							<td class="dark">Summary</td>
 							<td class="dark">Name</td>
 							<td class="dark">Action</td>
-							<td class="dark">Action At</td>
-							<td class="dark">Comments</td>
+							<!-- <td class="dark">Action At</td>
+								<td class="dark">Comments</td> -->
 						</tr>
 					</thead>
 					<tbody>
@@ -180,8 +180,8 @@
 							<td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
 							<td>{{$data->hrManager->name ?? ''}}</td>
 							<td>{{$data->action_by_hr_manager ?? ''}}</td>
-							<td>{{$data->hr_manager_action_at ?? ''}}</td>
-							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
+							<!-- <td>{{$data->hr_manager_action_at ?? ''}}</td>
+								<td>{{$data->comments_by_hr_manager ?? ''}}</td> -->
 							<td>{{$data->divisionHeadName->name ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>{{ $data->created_at ?? ''}}</td>
@@ -192,16 +192,16 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')										
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')										
 										<li>
 											@if(isset($type))
 											@if($type == 'approve')
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-												data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#approve-interview-summary-approvals-{{$data->id}}">
 											<i class="fa fa-thumbs-up" aria-hidden="true"></i>  Approve 
 											</button>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-												data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#reject-interview-summary-approvals-{{$data->id}}">
 											<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 											</button>
 											@endif
@@ -209,11 +209,11 @@
 											@if(isset($data->is_auth_user_can_approve['can_approve']))
 											@if($data->is_auth_user_can_approve['can_approve'] == true)
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-												data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#approve-interview-summary-approvals-{{$data->id}}">
 											<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 											</button>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-												data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#reject-interview-summary-approvals-{{$data->id}}">
 											<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 											</button>
 											@endif
@@ -223,7 +223,118 @@
 									</ul>
 								</div>
 							</td>
-							@include('hrm.hiring.interview_summary_report.approve_reject_modal')					
+							<div class="modal fade" id="approve-interview-summary-approvals-{{$data->id}}"
+								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div class="modal-dialog ">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h1 class="modal-title fs-5" id="exampleModalLabel">Interview Summary Report Approval</h1>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body p-3">
+											<div class="col-lg-12">
+												<div class="row">
+													<div class="col-12">
+														<div class="row mt-2">
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																<label class="form-label font-size-13">Approval By Position</label>
+															</div>
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																{{$data->is_auth_user_can_approve['current_approve_position']}}
+																@endif
+															</div>
+														</div>
+														<div class="row mt-2">
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																<label class="form-label font-size-13">Approval By Name</label>
+															</div>
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																@if(isset($data->is_auth_user_can_approve['current_approve_person']))
+																{{$data->is_auth_user_can_approve['current_approve_person']}}
+																@endif
+															</div>
+														</div>
+														@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+														<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
+														@endif
+														<div class="row mt-2">
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<label class="form-label font-size-13">Comments</label>
+															</div>
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<textarea rows="5" id="comments{{$data->id}}" class="form-control" name="comment">
+																</textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+											<button type="button" class="btn btn-success status-approve-button"
+												data-id="{{ $data->id }}" data-status="approved">Approve</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="modal fade" id="reject-interview-summary-approvals-{{$data->id}}"
+								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div class="modal-dialog ">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Hiring Request Rejection</h1>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body p-3">
+											<div class="col-lg-12">
+												<div class="row">
+													<div class="col-12">
+														<div class="row mt-2">
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																<label class="form-label font-size-13">Rejection By Position</label>
+															</div>
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																{{$data->is_auth_user_can_approve['current_approve_position']}}
+																@endif
+															</div>
+														</div>
+														<div class="row mt-2">
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																<label class="form-label font-size-13">Rejection By Name</label>
+															</div>
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																@if(isset($data->is_auth_user_can_approve['current_approve_person']))
+																{{$data->is_auth_user_can_approve['current_approve_person']}}
+																@endif
+															</div>
+														</div>
+														@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+														<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
+														@endif
+														<div class="row mt-2">
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<label class="form-label font-size-13">Comments</label>
+															</div>
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<textarea rows="5" id="reject-comments{{$data->id}}" class="form-control" name="comment">
+																</textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+											<button type="button" class="btn btn-danger  status-reject-button" data-id="{{ $data->id }}"
+												data-status="rejected">Reject</button>
+										</div>
+									</div>
+								</div>
+							</div>
 						</tr>
 						@endforeach
 					</tbody>
@@ -231,12 +342,12 @@
 			</div>
 		</div>
 	</div>
-    <div class="tab-pane fade show" id="hr-approved-hiring-requests">
+	<div class="tab-pane fade show" id="hr-approved-interview-summary">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="hr-approved-hiring-requests-table" class="table table-striped table-editable table-edits table data-table-class">
+				<table id="hr-approved-interview-summary-table" class="table table-striped table-editable table-edits table data-table-class">
 					<thead>
-                        <tr>
+						<tr>
 							<th rowspan="2" class="light">Sl No</th>
 							<th colspan="2" class="dark">
 								<center>Hiring Request</center>
@@ -400,7 +511,7 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')									
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')									
 									</ul>
 								</div>
 							</td>
@@ -411,12 +522,12 @@
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade show" id="hr-rejected-hiring-requests">
+	<div class="tab-pane fade show" id="hr-rejected-interview-summary">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="hr-rejected-hiring-requests-table" class="table table-striped table-editable table-edits table data-table-class">
+				<table id="hr-rejected-interview-summary-table" class="table table-striped table-editable table-edits table data-table-class">
 					<thead>
-                    <tr>
+						<tr>
 							<th rowspan="2" class="light">Sl No</th>
 							<th colspan="2" class="dark">
 								<center>Hiring Request</center>
@@ -580,7 +691,7 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')									
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')									
 									</ul>
 								</div>
 							</td>
@@ -597,29 +708,29 @@
 @if(count($divisionHeadPendings) > 0 || count($divisionHeadApproved) > 0 || count($divisionHeadRejected) > 0)
 <div class="card-header">
 	<h4 class="card-title">
-    Interview Summary Report Approvals By Department Head
+		Interview Summary Report Approvals By Department Head
 	</h4>
 </div>
 <div class="portfolio">
 	<ul class="nav nav-pills nav-fill" id="my-tab">
 		<li class="nav-item">
-			<a class="nav-link active" data-bs-toggle="pill" href="#teamlead-pending-hiring-requests">Pending </a>
+			<a class="nav-link active" data-bs-toggle="pill" href="#teamlead-pending-interview-summary">Pending </a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#teamlead-approved-hiring-requests">Approved </a>
+			<a class="nav-link" data-bs-toggle="pill" href="#teamlead-approved-interview-summary">Approved </a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#teamlead-rejected-hiring-requests">Rejected </a>
+			<a class="nav-link" data-bs-toggle="pill" href="#teamlead-rejected-interview-summary">Rejected </a>
 		</li>
 	</ul>
 </div>
 <div class="tab-content" id="selling-price-histories" >
-	<div class="tab-pane fade show active" id="teamlead-pending-hiring-requests">
+	<div class="tab-pane fade show active" id="teamlead-pending-interview-summary">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="teamlead-pending-hiring-requests-table" class="table table-striped table-editable table-edits table data-table-class">
+				<table id="teamlead-pending-interview-summary-table" class="table table-striped table-editable table-edits table data-table-class">
 					<thead>
-                        <tr>
+						<tr>
 							<th rowspan="2" class="light">Sl No</th>
 							<th colspan="2" class="dark">
 								<center>Hiring Request</center>
@@ -657,7 +768,6 @@
 							</th>
 							<th rowspan="2" class="dark">Created By</th>
 							<th rowspan="2" class="light">Created At</th>
-							<th rowspan="2" class="light">Action</th>
 						</tr>
 						<tr>
 							<td class="dark">UUID</td>
@@ -775,9 +885,9 @@
 							<td>{{$data->hr_manager_action_at ?? ''}}</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>{{$data->divisionHeadName->name ?? ''}}</td>
-							<td>{{$data->action_by_division_head ?? ''}}</td>
-							<td>{{$data->division_head_action_at ?? ''}}</td>
-							<td>{{$data->comments_by_division_head ?? ''}}</td>
+							<!-- <td>{{$data->action_by_division_head ?? ''}}</td> -->
+							<!-- <td>{{$data->division_head_action_at ?? ''}}</td> -->
+							<!-- <td>{{$data->comments_by_division_head ?? ''}}</td> -->
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>{{ $data->created_at ?? ''}}</td>
 							<td>
@@ -786,16 +896,16 @@
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
-									<li>
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
+										<li>
 											@if(isset($type))
 											@if($type == 'approve')
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-												data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#approve-interview-summary-approvals-{{$data->id}}">
 											<i class="fa fa-thumbs-up" aria-hidden="true"></i>  Approve 
 											</button>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-												data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#reject-interview-summary-approvals-{{$data->id}}">
 											<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 											</button>
 											@endif
@@ -803,11 +913,11 @@
 											@if(isset($data->is_auth_user_can_approve['can_approve']))
 											@if($data->is_auth_user_can_approve['can_approve'] == true)
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-												data-bs-target="#approve-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#approve-interview-summary-approvals-{{$data->id}}">
 											<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 											</button>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-												data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#reject-interview-summary-approvals-{{$data->id}}">
 											<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 											</button>
 											@endif
@@ -815,8 +925,120 @@
 											@endif
 										</li>
 									</ul>
-								</div> 
+								</div>
 							</td>
+							<div class="modal fade" id="approve-interview-summary-approvals-{{$data->id}}"
+								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div class="modal-dialog ">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h1 class="modal-title fs-5" id="exampleModalLabel">Interview Summary Report Approval</h1>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body p-3">
+											<div class="col-lg-12">
+												<div class="row">
+													<div class="col-12">
+														<div class="row mt-2">
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																<label class="form-label font-size-13">Approval By Position</label>
+															</div>
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																{{$data->is_auth_user_can_approve['current_approve_position']}}
+																@endif
+															</div>
+														</div>
+														<div class="row mt-2">
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																<label class="form-label font-size-13">Approval By Name</label>
+															</div>
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																@if(isset($data->is_auth_user_can_approve['current_approve_person']))
+																{{$data->is_auth_user_can_approve['current_approve_person']}}
+																@endif
+															</div>
+														</div>
+														@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+														<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
+														@endif
+														<div class="row mt-2">
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<label class="form-label font-size-13">Comments</label>
+															</div>
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<textarea rows="5" id="comments{{$data->id}}" class="form-control" name="comment">
+																</textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+											<button type="button" class="btn btn-success status-approve-button"
+												data-id="{{ $data->id }}" data-status="approved">Approve</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="modal fade" id="reject-interview-summary-approvals-{{$data->id}}"
+								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div class="modal-dialog ">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h1 class="modal-title fs-5" id="exampleModalLabel">Employee Hiring Request Rejection</h1>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body p-3">
+											<div class="col-lg-12">
+												<div class="row">
+													<div class="col-12">
+														<div class="row mt-2">
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																<label class="form-label font-size-13">Rejection By Position</label>
+															</div>
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																{{$data->is_auth_user_can_approve['current_approve_position']}}
+																@endif
+															</div>
+														</div>
+														<div class="row mt-2">
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																<label class="form-label font-size-13">Rejection By Name</label>
+															</div>
+															<div class="col-lg-6 col-md-6 col-sm-6">
+																@if(isset($data->is_auth_user_can_approve['current_approve_person']))
+																{{$data->is_auth_user_can_approve['current_approve_person']}}
+																@endif
+															</div>
+														</div>
+														@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+														<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
+														@endif
+														<div class="row mt-2">
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<label class="form-label font-size-13">Comments</label>
+															</div>
+															<div class="col-lg-12 col-md-12 col-sm-12">
+																<textarea rows="5" id="reject-comments{{$data->id}}" class="form-control" name="comment">
+																</textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+											<button type="button" class="btn btn-danger  status-reject-button" data-id="{{ $data->id }}"
+												data-status="rejected">Reject</button>
+										</div>
+									</div>
+								</div>
+							</div>
 						</tr>
 						@endforeach
 					</tbody>
@@ -824,12 +1046,12 @@
 			</div>
 		</div>
 	</div>
-    <div class="tab-pane fade show" id="teamlead-approved-hiring-requests">
+	<div class="tab-pane fade show" id="teamlead-approved-interview-summary">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="teamlead-approved-hiring-requests-table" class="table table-striped table-editable table-edits table data-table-class">
+				<table id="teamlead-approved-interview-summary-table" class="table table-striped table-editable table-edits table data-table-class">
 					<thead>
-                        <tr>
+						<tr>
 							<th rowspan="2" class="light">Sl No</th>
 							<th colspan="2" class="dark">
 								<center>Hiring Request</center>
@@ -899,7 +1121,7 @@
 							<td class="dark">Action</td>
 							<td class="dark">Action At</td>
 							<td class="dark">Comments</td>
-                            <td class="light">Name</td>
+							<td class="light">Name</td>
 							<td class="light">Action</td>
 							<td class="light">Action At</td>
 							<td class="light">Comments</td>
@@ -995,7 +1217,15 @@
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>{{ $data->created_at ?? ''}}</td>
 							<td>
-							@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
+							<div class="dropdown">
+									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+									<i class="fa fa-bars" aria-hidden="true"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')									
+									</ul>
+								</div>
+								
 							</td>
 						</tr>
 						@endforeach
@@ -1004,12 +1234,12 @@
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade show" id="teamlead-rejected-hiring-requests">
+	<div class="tab-pane fade show" id="teamlead-rejected-interview-summary">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="teamlead-rejected-hiring-requests-table" class="table table-striped table-editable table-edits table data-table-class">
+				<table id="teamlead-rejected-interview-summary-table" class="table table-striped table-editable table-edits table data-table-class">
 					<thead>
-                    	<tr>
+						<tr>
 							<th rowspan="2" class="light">Sl No</th>
 							<th colspan="2" class="dark">
 								<center>Hiring Request</center>
@@ -1079,7 +1309,7 @@
 							<td class="dark">Action</td>
 							<td class="dark">Action At</td>
 							<td class="dark">Comments</td>
-                            <td class="light">Name</td>
+							<td class="light">Name</td>
 							<td class="light">Action</td>
 							<td class="light">Action At</td>
 							<td class="light">Comments</td>
@@ -1175,7 +1405,14 @@
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>{{ $data->created_at ?? ''}}</td>
 							<td>
-							@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
+							<div class="dropdown">
+									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+									<i class="fa fa-bars" aria-hidden="true"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')									
+									</ul>
+								</div>
 							</td>
 						</tr>
 						@endforeach
@@ -1192,26 +1429,28 @@
 @push('scripts')
 <script type="text/javascript">
 	$(document).ready(function () {
-	    $('.status-reject-button').click(function (e) {
+		$('.status-reject-button').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
-	        approveOrRejectHiringrequest(id, status)
+			comments = $("#reject-comments"+id).val();
+	        approveOrRejectHiringrequest(id, status,comments)
 	    })
 	    $('.status-approve-button').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
-	        approveOrRejectHiringrequest(id, status)
+			comments = $("#comments"+id).val();
+	        approveOrRejectHiringrequest(id, status,comments)
 	    })
-	    function approveOrRejectHiringrequest(id, status) {
-			var comment = $("#comment-"+id).val();
+        function approveOrRejectHiringrequest(id, status,comments) {
+			
 			var current_approve_position = $("#current_approve_position_"+id).val();
-	        let url = '{{ route('employee-hiring-request.request-action') }}';
+	        let url = '{{ route('interview-summary-report.request-action') }}';
 	        if(status == 'rejected') {
 	            var message = 'Reject';
 	        }else{
 	            var message = 'Approve';
 	        }
-	        var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee hiring request ?',function (e) {
+	        var confirm = alertify.confirm('Are you sure you want to '+ message +' this interview summary report ?',function (e) {
 	            if (e) {
 	                $.ajax({
 	                    type: "POST",
@@ -1220,11 +1459,11 @@
 	                    data: {
 	                        id: id,
 	                        status: status,
-	                        comment: comment,
+	                        comment: comments,
 							current_approve_position: current_approve_position,
 	                        _token: '{{ csrf_token() }}'
 	                    },
-	                    success: function (data) {
+	                    success: function (data) {console.log(data);
 							if(data == 'success') {
 								window.location.reload();
 								alertify.success(status + " Successfully")
@@ -1239,17 +1478,5 @@
 	        }).set({title:"Confirmation"})
 	    }
 	})
-	function inputNumberAbs(currentPriceInput) 
-	{
-	    var id = currentPriceInput.id;
-	    var input = document.getElementById(id);
-	    var val = input.value;
-	    val = val.replace(/^0+|[^\d.]/g, '');
-	    if(val.split('.').length>2) 
-	    {
-	        val =val.replace(/\.+$/,"");
-	    }
-	    input.value = val;
-	}
 </script>
 @endpush

@@ -1,4 +1,4 @@
-<div class="modal fade" id="approve-employee-hiring-request-{{$data->id}}"
+<div class="modal fade" id="approve-interview-summary-{{$data->id}}"
 	tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog ">
 		<div class="modal-content">
@@ -54,7 +54,7 @@
 		</div>
 	</div>
 </div>
-<div class="modal fade" id="reject-employee-hiring-request-{{$data->id}}"
+<div class="modal fade" id="reject-interview-summary-{{$data->id}}"
 	tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog ">
 		<div class="modal-content">
