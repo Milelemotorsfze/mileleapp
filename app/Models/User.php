@@ -557,4 +557,7 @@ class User extends Authenticatable
             ['joining_reports_id',NULL],
         ]);
     }
+    public function joiningReport() {
+        return $this->hasMany(JoiningReport::class,'employee_id','id');
+    }
 }

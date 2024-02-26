@@ -265,11 +265,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="transfer_from_department_id" class="col-form-label text-md-end">{{ __('Transfer From Department') }}</label>
-							<select name="transfer_from_department_id" id="transfer_from_department_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
+							<!-- <select name="transfer_from_department_id" id="transfer_from_department_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
 								@foreach($masterDepartments as $department)
 									<option value="{{$department->id}}" @if($data->transfer_from_department_id == $department->id) selected @endif>{{$department->name}}</option>
 								@endforeach
-							</select>
+							</select> -->
+							<input type="hidden" name="transfer_from_department_id" id="transfer_from_department_id" value="{{$data->transfer_from_department_id ?? ''}}" class="form-control widthinput @error('transfer_from_department_id') is-invalid @enderror">
+							<input type="text" readonly name="transfer_from_department_name" id="transfer_from_department_name" value="{{$data->transferFromDepartment->name ?? ''}}" class="form-control widthinput @error('transfer_from_department_name') is-invalid @enderror">
 						</div>
 					</div>
                     <div class="col-xxl-4 col-lg-6 col-md-6">
@@ -282,11 +284,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="transfer_from_location_id" class="col-form-label text-md-end">{{ __('Transfer From Location') }}</label>
-							<select name="transfer_from_location_id" id="transfer_from_location_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
+							<!-- <select name="transfer_from_location_id" id="transfer_from_location_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
 								@foreach($masterlocations as $location)
 									<option value="{{$location->id}}" @if($data->transfer_from_location_id == $location->id) selected @endif>{{$location->name}}</option>
 								@endforeach
-							</select>
+							</select> -->
+							<input type="hidden" name="transfer_from_location_id" id="transfer_from_location_id" value="{{$data->transfer_from_location_id ?? ''}}" class="form-control widthinput @error('transfer_from_location_id') is-invalid @enderror">
+							<input type="text" readonly name="transfer_from_location_name" id="transfer_from_location_name" value="{{$data->transferFromLocation->name ?? ''}}" class="form-control widthinput @error('transfer_from_location_name') is-invalid @enderror">
 						</div>
 					</div>
                     <div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
@@ -351,16 +355,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 			maximumSelectionLength: 1,
             placeholder:"Choose Employee Hiring Request UUID",
         });	
-        $('#transfer_from_location_id').select2({
-            allowClear: true,
-			maximumSelectionLength: 1,
-            placeholder:"Choose Transfer From Location",
-        });	
-        $('#transfer_from_department_id').select2({
-            allowClear: true,
-			maximumSelectionLength: 1,
-            placeholder:"Choose Transfer From Department",
-        });	
+        // $('#transfer_from_location_id').select2({
+        //     allowClear: true,
+		// 	maximumSelectionLength: 1,
+        //     placeholder:"Choose Transfer From Location",
+        // });	
+        // $('#transfer_from_department_id').select2({
+        //     allowClear: true,
+		// 	maximumSelectionLength: 1,
+        //     placeholder:"Choose Transfer From Department",
+        // });	
         $('#transfer_to_department_id').select2({
             allowClear: true,
 			maximumSelectionLength: 1,
@@ -376,9 +380,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 							$('#employee_code_div').show();
                             $('#designation_div').show();
                             $('#department_div').show();
-							document.getElementById('designation').textContent=employees[i].designation.name;
-                            document.getElementById('department').textContent=employees[i].department.name;
-                            document.getElementById('employee_code').textContent=employees[i].employee_code;
+							// document.getElementById('designation').textContent=employees[i].designation.name;
+                            // document.getElementById('department').textContent=employees[i].department.name;
+                            // document.getElementById('employee_code').textContent=employees[i].employee_code;
+							if(employees[i].emp_profile != null && employees[i].emp_profile.employee_code != null) {
+								document.getElementById('employee_code').value=employees[i].emp_profile.employee_code;                        
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.designation != null && employees[i].emp_profile.designation.name != null) {
+								document.getElementById('designation').textContent=employees[i].emp_profile.designation.name;
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.department != null && employees[i].emp_profile.department.name != null) {
+								document.getElementById('department').textContent=employees[i].emp_profile.department.name;  
+								document.getElementById('transfer_from_department_id').value=employees[i].emp_profile.department_id;  
+								document.getElementById('transfer_from_department_name').value=employees[i].emp_profile.department.name;  
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.work_location != null && employees[i].emp_profile.location.name != null) {
+								document.getElementById('transfer_from_location_id').value=employees[i].emp_profile.work_location;  
+								document.getElementById('transfer_from_location_name').value=employees[i].emp_profile.location.name;  
+							}
 						}
 					}
 				}               
@@ -387,6 +406,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 				$('#employee_code_div').hide();
 				$('#designation_div').hide();
                 $('#department_div').hide();
+				document.getElementById('transfer_from_department_id').value='';  
+				document.getElementById('transfer_from_department_name').value='';
+				document.getElementById('transfer_from_location_id').value='';  
+				document.getElementById('transfer_from_location_name').value='';
 			}			
 		});
 	});
