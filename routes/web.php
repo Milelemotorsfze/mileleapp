@@ -576,6 +576,7 @@ Route::get('/d', function () {
     Route::get('vehicles/payment-confirm/{id}', [PurchasingOrderController::class, 'confirmPayment'])->name('vehicles.paymentconfirm');
     Route::get('/vehicles/cancel/{id}', [PurchasingOrderController::class, 'cancel'])->name('vehicles.cancel');
     Route::get('/vehicles/rejecteds/{id}', [PurchasingOrderController::class, 'rejecteds'])->name('vehicles.rejecteds');
+    Route::get('/vehicles/approvedcancel/{id}', [PurchasingOrderController::class, 'approvedcancel'])->name('vehicles.approvedcancel');
     Route::get('/vehicles/unrejecteds/{id}', [PurchasingOrderController::class, 'unrejecteds'])->name('vehicles.unrejecteds');
     Route::get('/vehicles/deletevehicles/{id}', [PurchasingOrderController::class, 'deletevehicles'])->name('vehicles.deletevehicles');
     Route::get('vehicles/paymentintconfirm/{id}', [PurchasingOrderController::class, 'paymentintconfirm'])->name('vehicles.paymentintconfirm');
