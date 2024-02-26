@@ -697,7 +697,7 @@
                 </div>
             </div>
             @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('add-more-vehicles-po');
             @endphp
             @if ($hasPermission)
                 <div class="card">
