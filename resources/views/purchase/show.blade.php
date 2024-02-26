@@ -778,7 +778,7 @@
 
             @can('edit-demand-planning-po')
                 @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-demand-planning-po');
                 @endphp
                 @if ($hasPermission)
                     @if($variantCount > 0)

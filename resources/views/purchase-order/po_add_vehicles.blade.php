@@ -7,6 +7,7 @@
             @csrf
             @method('PUT')
             <input type="hidden" name="po_from" value="DEMAND_PLANNING">
+            <input type="hidden" id="currency" name="currency" class="form-control" readonly value="{{$purchasingOrder->currency}}">
 
             <div id="VehiclevariantRowsContainer" style="display: none;">
                 <div class="bar">Stock Vehicles</div>

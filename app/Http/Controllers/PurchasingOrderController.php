@@ -427,21 +427,22 @@ public function getBrandsAndModelLines(Request $request)
                 ->where('pfi_id', $pfi->id)
                 ->groupBy('letter_of_indent_item_id')
                 ->get();
-            $variantCount = $pfiVehicleVariants->count();
+
             foreach ($pfiVehicleVariants as $pfiVehicleVariant) {
 
                 $alreadyAddedQuantity = LOIItemPurchaseOrder::where('approved_loi_id', $pfiVehicleVariant->id)
-                    ->sum('quantity');
+                                            ->sum('quantity');
 
                 $pfiVehicleVariant->quantity = $pfiVehicleVariant->quantity - $alreadyAddedQuantity;
 
                 $masterModel = MasterModel::find($pfiVehicleVariant->letterOfIndentItem->masterModel->id);
                 $pfiVehicleVariant->masterModels = MasterModel::where('model', $masterModel->model)
-                    ->where('sfx', $masterModel->sfx)
-                    ->get();
+                                                ->where('sfx', $masterModel->sfx)
+                                                ->get();
 
                 $possibleModelIds = MasterModel::where('model', $masterModel->model)
-                    ->where('sfx', $masterModel->sfx)->pluck('id');
+                                                ->where('sfx', $masterModel->sfx)->pluck('id');
+
                 $pfiVehicleVariant->inventoryQuantity = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
                     ->whereNull('purchase_order_id')
                     ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
@@ -449,9 +450,11 @@ public function getBrandsAndModelLines(Request $request)
                     ->where('supplier_id', $pfi->supplier_id)
                     ->where('whole_sales', $dealer)
                     ->count();
+                $variantCount = $variantCount + $pfiVehicleVariant->quantity;
+
             }
         }
-
+//      return $variantCount;
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
@@ -495,12 +498,12 @@ public function getBrandsAndModelLines(Request $request)
                 $variantQuantity = $variantsQuantity[$variant->name];
                 if($request->po_from == 'DEMAND_PLANNING') {
                     $IsExistpurchasingOrderItem = PurchasingOrderItems::where('purchasing_order_id', $purchasingOrderId)
-                        ->where('variant_id', $variantId)->first();
+                                                     ->where('variant_id', $variantId)->first();
                     if($IsExistpurchasingOrderItem) {
                         $purchasingOrderItem =  $IsExistpurchasingOrderItem;
-                      $variantQuantity = $IsExistpurchasingOrderItem->qty + $variantQuantity;
+                        $variantQuantity = $IsExistpurchasingOrderItem->qty + $variantQuantity;
                     }
-                    $purchasingOrderItem->qty = $variantQuantity ;
+                    $purchasingOrderItem->qty = $variantQuantity;
                 }
                 $purchasingOrderItem->variant_id = $variantId;
                 $purchasingOrderItem->purchasing_order_id = $purchasingOrderId;
@@ -934,21 +937,23 @@ public function purchasingupdateStatus(Request $request)
                 $inventoryItem->purchase_order_id = NULL;
                 $inventoryItem->save();
 
-                $purchaseOrderItem = PurchasingOrderItems::where('purchasing_order_id', $vehicle->purchasing_order_id)
-                    ->where('variant_id', $vehicle->varaints_id)->first();
-                if($purchaseOrderItem) {
-                    $purchaseOrderItem->qty = $purchaseOrderItem->qty - 1;
-                    $purchaseOrderItem->save();
-                }
+//                $purchaseOrderItem = PurchasingOrderItems::where('purchasing_order_id', $vehicle->purchasing_order_id)
+//                    ->where('variant_id', $vehicle->varaints_id)->first();
+//                if($purchaseOrderItem) {
+//                    $purchaseOrderItem->qty = $purchaseOrderItem->qty - 1;
+//                    $purchaseOrderItem->save();
+//                }
 
                 $loiPurchaseOrder = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
                     ->where('master_model_id', $vehicle->model_id)
                     ->first();
                 info($vehicle->purchasing_order_id);
                 info($vehicle->model_id);
+                if($loiPurchaseOrder) {
+                    $loiPurchaseOrder->quantity = $loiPurchaseOrder->quantity - 1;
+                    $loiPurchaseOrder->save();
+                }
 
-                $loiPurchaseOrder->quantity = $loiPurchaseOrder->quantity - 1;
-                $loiPurchaseOrder->save();
             }
         }
 
