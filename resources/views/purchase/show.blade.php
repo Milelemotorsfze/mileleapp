@@ -559,8 +559,8 @@
                             Approved Cancel
                         </a>
                         @elseif ($vehicles->status != 'Rejected')
-                        <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.rejecteds', $vehicles->id) }}" onclick="return confirmRejected();"style="white-space: nowrap;">
-                            Reject
+                        <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmRejected();"style="white-space: nowrap;">
+                            Reject / Cancel
                         </a>
                         @else
                         <a title="UnReject" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.unrejecteds', $vehicles->id) }}" onclick="return confirmunRejected();" style="white-space: nowrap;">
@@ -679,9 +679,11 @@
 								@endphp
 								@if ($hasPermission)
 								@if ($purchasingOrder->status === 'Approved'  || $purchasingOrder->status === 'Pending Approval' && $vehicles->payment_status === '')
+                                @if($vehicles->status !== "Request for Cancel")
 								<a title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmCancel();" style="white-space: nowrap;">
 									Cancel
 								</a>
+                                @endif
 								@elseif ($vehicles->status === 'Pending Approval')
 								<a title="Delete" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.deletevehicles', $vehicles->id) }}" onclick="return confirmDelete();" style="white-space: nowrap;">
 									Delete

@@ -84,7 +84,8 @@ class DocumentController extends Controller
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->whereNotNull('vehicles.grn_id')
                 ->whereNotNull('vehicles.documents_id')
-                ->whereNull('vehicles.so_id');
+                ->whereNull('vehicles.so_id')
+                ->whereNull('vehicles.gdn_id');
                 $data = $data->groupBy('vehicles.id');
             } 
             if($status === "PendingBL")
