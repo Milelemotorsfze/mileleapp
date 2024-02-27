@@ -87,7 +87,7 @@ class SupplierInventoryController extends Controller
             if($request->country){
                 $supplierInventories = $supplierInventories->where('country', $request->country);
             }
-    
+
             $supplierInventories = $supplierInventories->get();
 
         foreach ($supplierInventories as $supplierInventory) {
@@ -151,8 +151,8 @@ class SupplierInventoryController extends Controller
             $uploadFileContents = [];
             $colourname = NULL;
 
-            // $date = Carbon::today()->format('Y-m-d');
-            $date = '2024-02-10';
+             $date = Carbon::today()->format('Y-m-d');
+//            $date = '2024-02-15';
             $unavailableExtColours = [];
             $unavailableIntColours = [];
 
@@ -210,7 +210,7 @@ class SupplierInventoryController extends Controller
                             }
                         }
                     }
-                    
+
                     $uploadFileContents[$i]['steering'] = $filedata[0];
                     $uploadFileContents[$i]['model'] = $filedata[1];
                     $uploadFileContents[$i]['sfx'] = $filedata[2];
@@ -321,7 +321,7 @@ class SupplierInventoryController extends Controller
                                             ->where('sfx', $uploadFileContent['sfx'])
                                             ->where('model_year',  $uploadFileContent['model_year'])
                                             ->first();
-                                            
+
 
                 $isModelWithSteeringExist = MasterModel::where('model', $uploadFileContent['model'])
                     ->where('sfx', $uploadFileContent['sfx'])
@@ -402,7 +402,7 @@ class SupplierInventoryController extends Controller
                             ->where('steering', $uploadFileContent['steering'])
                             ->first();
 
-                    
+
                         $modelId = $model->id;
                         info($uploadFileContent['model']);
                         info($uploadFileContent['sfx']);
@@ -582,17 +582,17 @@ class SupplierInventoryController extends Controller
                                                 info($newlyAddedRowIds);
                                                 info($updatedRowsIds);
                                                 $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])
-                                                    ->whereNotNull('chasis')
-                                                    ->first();
+                                                                                    ->whereNotNull('chasis')
+                                                                                    ->first();
                                                 if($isChasisExist) {
                                                     info("case 3");
                                                     return redirect()->back()->with('error', $uploadFileContent['chasis']." Chasis already existing");
 
                                                 }else{
                                                     $rowWithoutUpdate = SupplierInventory::whereIn('id', $isNullChaisisIds)->whereNotIn('id', $newlyAddedRowIds)
-                                                        ->whereNotIn('id', $updatedRowsIds)
-                                                        ->whereNotIn('id', $noChangeRowIds)
-                                                        ->first();
+                                                                                        ->whereNotIn('id', $updatedRowsIds)
+                                                                                        ->whereNotIn('id', $noChangeRowIds)
+                                                                                        ->first();
 
                                                     info($rowWithoutUpdate);
 
@@ -977,7 +977,7 @@ class SupplierInventoryController extends Controller
                         if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
                             $supplierInventoryHistory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                         }
-                        
+
                         $supplierInventoryHistory->save();
                     }
                         // to find deleted rows
@@ -1107,6 +1107,7 @@ class SupplierInventoryController extends Controller
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('supplier_id', $request->supplier_id)
             ->where('whole_sales', $request->whole_sales)
+            ->whereNull('purchase_order_id')
             ->where(function ($query)  {
                 $query->whereNull('delivery_note')
                     ->orwhere('delivery_note', SupplierInventory::DN_STATUS_WAITING)
@@ -1118,7 +1119,7 @@ class SupplierInventoryController extends Controller
         $QtyfullyAddedIds = [];
         $pfiQtyAddedIds = [];
         $PfiQtyfullyAddedIds = [];
-        
+
         foreach ($inventoryItems as $inventoryItem) {
 
             $modelIds = MasterModel::where('model', $inventoryItem->masterModel->model)
@@ -1153,7 +1154,7 @@ class SupplierInventoryController extends Controller
             }
 
             if($LOIItem) {
-                
+
 
                 $remaingQuantity = $LOIItem->quantity - $LOIItem->utilized_quantity;
                 $assignedQuantity = 0;
@@ -1176,7 +1177,7 @@ class SupplierInventoryController extends Controller
                 $approvedLOI = ApprovedLetterOfIndentItem::where('letter_of_indent_item_id', $LOIItem->id)
                                                     ->where('is_pfi_created', true)
                                                     ->whereNotIn('id', $PfiQtyfullyAddedIds)
-                                                    ->first();  
+                                                    ->first();
                     if($approvedLOI) {
                         $assignedPfiQuantity = 0;
                         if(array_key_exists($approvedLOI->id, $pfiQtyAddedIds)) {
@@ -1185,18 +1186,18 @@ class SupplierInventoryController extends Controller
                         }else{
                             $actualPfiQuantityRemaining = $approvedLOI->quantity;
                         }
-    
+
                         if($actualPfiQuantityRemaining <= $approvedLOI->quantity) {
-    
+
                             if($actualPfiQuantityRemaining <= 1) {
                                 $PfiQtyfullyAddedIds[] = $approvedLOI->id;
                             }
                             $alreadyAddedIds[$LOIItem->id] = $assignedQuantity + 1;
                             $inventoryItem->pfi_id = $approvedLOI->pfi_id;
                             $inventoryItem->save();
-                        }    
+                        }
                     }
-                                       
+
             }
         }
     }
@@ -1205,7 +1206,7 @@ class SupplierInventoryController extends Controller
         info($request->all());
 
         $updatedDatas = $request->selectedUpdatedDatas;
-       
+
         DB::beginTransaction();
 
         foreach ($updatedDatas as $data) {
@@ -1386,7 +1387,7 @@ class SupplierInventoryController extends Controller
         {
             info("chasis");
             info($secondFileDetail['chasis']);
-         
+
             $model = $secondFileRowDetail->masterModel->model;
             $sfx = $secondFileRowDetail->masterModel->sfx;
             info($model);
@@ -1411,7 +1412,7 @@ class SupplierInventoryController extends Controller
                             });
 
                     info($supplierInventories->count());
-                      
+
             if ($supplierInventories->count() <= 0)
             {
                 info("no row existing with model,sfx model year so => add new row");
@@ -1490,7 +1491,7 @@ class SupplierInventoryController extends Controller
                                     ->where('color_code', $secondFileRowDetail['color_code'])
                                     ->where('pord_month', $secondFileRowDetail['pord_month'])
                                     ->where('po_arm', $secondFileRowDetail['po_arm'])
-                                    ->where('eta_import', $secondFileRowDetail['eta_import'])                               
+                                    ->where('eta_import', $secondFileRowDetail['eta_import'])
                                     ->first();
 
                                 info($SimilarRowWithNullChaisis);
@@ -1591,10 +1592,10 @@ class SupplierInventoryController extends Controller
 
                         }
                         info("first pair count");
-                
+
                         info($firstFilePairCount);
                         info("second pair count");
-                    
+
                         info($secondFilePairCount);
 
                         if($secondFilePairCount == $firstFilePairCount) {
@@ -2097,14 +2098,14 @@ class SupplierInventoryController extends Controller
             $extColour = substr($altercolourcode, 0, 3);
             $intColour = substr($altercolourcode, -2);
         }
-      
+
         $extColourRow = ColorCode::where('code', $extColour)
             ->where('belong_to', ColorCode::EXTERIOR)
             ->first();
         $intColourRow = ColorCode::where('code', $intColour)
             ->where('belong_to', ColorCode::INTERIOR)
             ->first();
-           
+
         $data = 0;
        if($intColourRow && $extColourRow) {
            $data = 1;

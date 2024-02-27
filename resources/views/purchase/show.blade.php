@@ -428,7 +428,7 @@
                             <span class="short-text"></span>
                             <a href="#" class="read-more">Read more</a>
                           </td>
-                          <td>{{ ucfirst($vehicles->VehiclePurchasingCost->unit_price) }}</td>
+                          <td>{{ ucfirst($vehicles->VehiclePurchasingCost->unit_price ?? '') }}</td>
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                             @endphp
@@ -787,9 +787,9 @@
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-demand-planning-po');
                 @endphp
                 @if ($hasPermission)
-                    @if($variantCount > 0)
+{{--                    @if($variantCount > 0)--}}
                        @include('purchase-order.po_add_vehicles')
-                    @endif
+{{--                    @endif--}}
                 @endif
             @endcan
 
