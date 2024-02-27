@@ -72,6 +72,7 @@
             <div class="row">
                 @foreach($pfiVehicleVariants as $key => $pfiVehicleVariant)
                     <div class="row">
+                        <input type="hidden" id="loi-item-id-{{$key}}" value="{{$pfiVehicleVariant->letterOfIndentItem->id ?? ''}}">
                         <input type="hidden" name="approved_loi_ids[]" value="{{$pfiVehicleVariant->id}}">
                         <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiVehicleVariant->id}}" value="0">
                         <input type="hidden" id="master-model-id-{{$key}}" name="selected_model_ids[]"  value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->id ?? ''}}">
@@ -223,6 +224,7 @@
                     var masterModelLine = $('#master-model-line-' + i).val();
                     var detail = $('#variant-detail-' + i).val();
                     var masterModelId = $('#master-model-id-' + i).val();
+                    var loiItemId = $('#loi-item-id-'+i).val();
                     var dataid = $('#quantity-' + i).attr('data-id');
                     var price = $('#unit-price-' + i).val();
                     var existingQuantity = $('#item-quantity-selected-' + dataid).val();
@@ -234,6 +236,7 @@
 
                     for (var j = 0; j < qty; j++) {
                         var newRow = $('<div class="row row-space"></div>');
+                        var LoiItemCol  = $('<input type="hidden" name="loi_item_Ids[]" value="' + loiItemId + '" >');
                         var masterModelCol = $('<input type="hidden" id="model-id" name="master_model_id[]" value="' + masterModelId + '" >');
                         var variantCol = $('<div class="col-lg-1 col-md-6"><input type="text" id="variant-id"  name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
                         var brandCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="brand[]" value="' + brand + '" class="form-control" readonly></div>');
@@ -260,7 +263,7 @@
                                 intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
                             }
                         }
-                        newRow.append(masterModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol, removeBtn);
+                        newRow.append(LoiItemCol, masterModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol, removeBtn);
                         $('#VehiclevariantRowsContainer').append(newRow);
 
 
