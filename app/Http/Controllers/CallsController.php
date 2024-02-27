@@ -1450,11 +1450,8 @@ foreach ($modelLineIds as $modelLineId) {
         $useractivities->activity = "Export the Leads Data";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-    
         $fromDate = $request->input('fromDate');
-        $toDate = $request->input('toDate');
-    
-        // Define column headings
+        $toDate = date('Y-m-d', strtotime($request->input('toDate') . ' +1 day'));
         $headings = [
             'Name',
             'Phone',
@@ -1471,8 +1468,6 @@ foreach ($modelLineIds as $modelLineId) {
             'Strategies',
             'Model Line',
         ];
-    
-        // Select specific columns for export
         $data = \DB::table('calls as c')
             ->join('users as u', 'c.sales_person', '=', 'u.id')
             ->join('lead_source as ls', 'c.source', '=', 'ls.id')
@@ -1482,7 +1477,7 @@ foreach ($modelLineIds as $modelLineId) {
             ->whereBetween('c.created_at', [$fromDate, $toDate])
             ->select(
                 'c.name',
-                \DB::raw('CAST(c.phone AS UNSIGNED) as phone'), // Cast phone as unsigned to treat it as a number
+                \DB::raw('CAST(c.phone AS UNSIGNED) as phone'),
                 'c.email',
                 'c.remarks',
                 'c.location',
@@ -1497,9 +1492,7 @@ foreach ($modelLineIds as $modelLineId) {
                 'mml.model_line as model_line'
             )
             ->get()
-            ->toArray(); // Convert the collection to array
-    
-        // Create and download the Excel file with headings and data
+            ->toArray();
         return Excel::download(new LeadsExport($data, $headings), 'leads_export.xlsx');
     }
 }
