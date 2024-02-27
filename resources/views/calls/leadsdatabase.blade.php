@@ -46,12 +46,9 @@
         var table = $('#dtBasicExample2').DataTable({
             "processing": true,
             "serverSide": true,
-            "ajax": "{{ route('calls.datacenter') }}", // Change this to your actual route
-            // Disable sorting for all columns
-            "ordering": false,
-            // Define column-specific filters
+            "ajax": "{{ route('calls.datacenter') }}", 
             "columns": [
-                { data: 'date', name: 'date' },
+                { data: 'created_at', name: 'created_at' },
                 { data: 'status', name: 'status' },
                 { data: 'priority', name: 'priority' },
                 { data: 'type', name: 'type' },
@@ -69,21 +66,19 @@
                 { data: 'sales_remarks_coming', name: 'sales_remarks_coming' },
             ]
         });
-        // Add individual column filters
-        $('#dtBasicExample2 thead tr').clone(true).appendTo('#dtBasicExample2 thead');
-        $('#dtBasicExample2 thead tr:eq(1) th').each(function(i) {
-            var title = $(this).text();
-            $(this).html('<input type="text" placeholder="Search ' + title + '" />');
-            $('input', this).on('keyup change', function() {
-                if (table.column(i).search() !== this.value) {
-                    table
-                        .column(i)
-                        .search(this.value)
-                        .draw();
-                }
-            });
+        $('#dtBasicExample2 thead tr:eq(0) th').each(function(i) {
+        var title = $(this).text();
+        $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+        $('input', this).on('keyup change', function() {
+            if (table.column(i).search() !== this.value) {
+                table
+                    .column(i)
+                    .search(this.value)
+                    .draw();
+            }
         });
     });
+});
 </script>
             </div>
             @else
