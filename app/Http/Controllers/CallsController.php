@@ -1467,6 +1467,7 @@ foreach ($modelLineIds as $modelLineId) {
             'Lead Source Name',
             'Strategies',
             'Model Line',
+            'Status',
         ];
         $data = \DB::table('calls as c')
             ->join('users as u', 'c.sales_person', '=', 'u.id')
@@ -1489,7 +1490,8 @@ foreach ($modelLineIds as $modelLineId) {
                 'u.name as sales_person_name',
                 'ls.source_name as lead_source_name',
                 \DB::raw('IFNULL(st.name, "No Strategy") as strategies'),
-                'mml.model_line as model_line'
+                'mml.model_line as model_line',
+                'c.status'
             )
             ->get()
             ->toArray();
