@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Calls;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 use App\Models\UserActivities;
 use App\Models\User;
+use App\Exports\LeadsExport;
 use Yajra\DataTables\DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -1433,5 +1435,71 @@ foreach ($modelLineIds as $modelLineId) {
         $model = new Logs($logdata);
         $model->save();
         return redirect()->route('home')->with('success', 'Lead Record created successfully');
+    }
+    public function leadsexport(Request $request)
+    {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Leads Export Page";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        return view('calls.leadsexport');
+    }
+    public function exportsleadsform(Request $request)
+    {
+        $useractivities = new UserActivities();
+        $useractivities->activity = "Export the Leads Data";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+    
+        $fromDate = $request->input('fromDate');
+        $toDate = $request->input('toDate');
+    
+        // Define column headings
+        $headings = [
+            'Name',
+            'Phone',
+            'Email',
+            'Remarks',
+            'Location',
+            'Language',
+            'Created At',
+            'Type',
+            'Priority',
+            'Custom Brand Model',
+            'Sales Person Name',
+            'Lead Source Name',
+            'Strategies',
+            'Model Line',
+        ];
+    
+        // Select specific columns for export
+        $data = \DB::table('calls as c')
+            ->join('users as u', 'c.sales_person', '=', 'u.id')
+            ->join('lead_source as ls', 'c.source', '=', 'ls.id')
+            ->leftJoin('strategies as st', 'c.strategies_id', '=', 'st.id')
+            ->leftJoin('calls_requirement as cr', 'c.id', '=', 'cr.lead_id')
+            ->leftJoin('master_model_lines as mml', 'cr.model_line_id', '=', 'mml.id')
+            ->whereBetween('c.created_at', [$fromDate, $toDate])
+            ->select(
+                'c.name',
+                \DB::raw('CAST(c.phone AS UNSIGNED) as phone'), // Cast phone as unsigned to treat it as a number
+                'c.email',
+                'c.remarks',
+                'c.location',
+                'c.language',
+                'c.created_at',
+                'c.type',
+                'c.priority',
+                'c.custom_brand_model',
+                'u.name as sales_person_name',
+                'ls.source_name as lead_source_name',
+                \DB::raw('IFNULL(st.name, "No Strategy") as strategies'),
+                'mml.model_line as model_line'
+            )
+            ->get()
+            ->toArray(); // Convert the collection to array
+    
+        // Create and download the Excel file with headings and data
+        return Excel::download(new LeadsExport($data, $headings), 'leads_export.xlsx');
     }
 }

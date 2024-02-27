@@ -887,6 +887,11 @@
                                             </a>
                                         </div>
                                         <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.leadsexport') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Leads Export</span>
+                                            </a>
+                                        </div>
+                                        <div class="dropdown">
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.datacenter') }}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Google Review</span>
                                             </a>
