@@ -55,8 +55,7 @@ class PurchasingOrderController extends Controller
                                                 ->whereIn('id', $demandPlanningPoIds)
                                                 ->get();
         }else{
-            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->get();
-
+            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->orderBy('po_number', 'desc')->get();
         }
         return view('warehouse.index', compact('data'));
     }
@@ -244,7 +243,6 @@ public function getBrandsAndModelLines(Request $request)
     public function store(Request $request)
     {
 //         dd($request->all());
-
         $this->validate($request, [
             'payment_term_id' => 'required',
             'po_type' => 'required',
@@ -252,7 +250,6 @@ public function getBrandsAndModelLines(Request $request)
         ]);
 
         DB::beginTransaction();
-
         $useractivities =  New UserActivities();
         $useractivities->activity = "Store the Purchasing Order";
         $useractivities->users_id = Auth::id();
@@ -570,16 +567,16 @@ public function getBrandsAndModelLines(Request $request)
                 $vehicle->purchasing_order_id = $purchasingOrderId;
                 $vehicle->status = "New Vehicles";
                 $vehicle->save();
-
+                $purchasingOrdertotal = PurchasingOrder::find($purchasingOrderId);
+                $purchasingOrdertotal->totalcost = $purchasingOrdertotal->totalcost + $unit_price;
+                $purchasingOrdertotal->save();
                 $vehiclecost = New VehiclePurchasingCost();
                 $vehiclecost->currency = $request->input('currency');
                 $vehiclecost->unit_price = $unit_price;
                 $vehiclecost->vehicles_id = $vehicle->id;
                 $vehiclecost->save();
-
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                 $currentDateTime = Carbon::now($dubaiTimeZone);
-
                 $purchasinglog = new Purchasinglog();
                 $purchasinglog->time = now()->toTimeString();
                 $purchasinglog->date = now()->toDateString();
