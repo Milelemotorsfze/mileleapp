@@ -233,7 +233,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
+                                        @if($data->department_head_action_at != '')
                                             {{$data->comments_by_department_head ?? ''}}
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -272,7 +274,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
+                                        @if($data->hiring_manager_action_at != '')
                                             {{$data->comments_by_hiring_manager ?? ''}}
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -312,7 +316,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
+                                        @if($data->division_head_action_at != '')
                                             {{$data->comments_by_division_head ?? ''}}
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -351,7 +357,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                                             Comments :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
+                                        @if($data->hr_manager_action_at != '')
                                             {{$data->comments_by_hr_manager ?? ''}}
+                                            @endif
                                         </div>
                                     </div>
                                 </div>

@@ -146,7 +146,7 @@
 		@endif
         @endcanany  
 @endsection
-@push('scripts')
+<!-- @push('scripts')
 <script type="text/javascript">
 	$(document).ready(function () {
 	    $('.status-reject-button').click(function (e) {
@@ -209,4 +209,4 @@
 	    input.value = val;
 	}
 </script>
-@endpush
+@endpush -->

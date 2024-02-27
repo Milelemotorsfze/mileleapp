@@ -152,7 +152,8 @@ data-status="rejected">Reject</button>
 								alertify.success(status + " Successfully")
 							}
 							else if(data == 'error') {
-
+								window.location.reload();
+								alertify.error("Can't Update the status, because it is already updated")
 							}
 	                    }
 	                });

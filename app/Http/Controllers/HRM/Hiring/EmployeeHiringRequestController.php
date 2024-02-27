@@ -126,6 +126,7 @@ class EmployeeHiringRequestController extends Controller
             'requestedByUsers','reportingToUsers','replacementForEmployees'));
     }
     public function storeOrUpdate(Request $request, $id) { 
+        $status = '';
         // public function store(Request $request){
 // $prefix = 'A';
 //             $uuid = IdGenerator::generate(['table' => 'employee_hiring_requests', 'length' => 7, 'prefix' => $prefix]);
@@ -238,14 +239,16 @@ class EmployeeHiringRequestController extends Controller
                         $createHistory2 = EmployeeHiringRequestHistory::create($history2);
                         (new UserActivityController)->createActivity('Employee Hiring Request Edited');
                         $successMessage = "Employee Hiring Request Updated Successfully";
+                        $status ='success';
                     }
                     else if(($update && $update->status == 'approved') OR ($update && $update->status == 'rejected')) {
                         $successMessage = "can't update this employee hiring request ,because it is already ". $update->status;
+                        $status ='error';
                     }
                 }
                 DB::commit();
                 return redirect()->route('employee-hiring-request.index')
-                                    ->with('success',$successMessage);
+                                    ->with($status,$successMessage);
             } 
             catch (\Exception $e) {
                 DB::rollback();
@@ -395,117 +398,120 @@ class EmployeeHiringRequestController extends Controller
         $message = '';
         $update = EmployeeHiringRequest::where('id',$request->id)->first();
         // Approvals =>  Team Lead/Manager -------> Recruitement(Hiring) manager -----------> Division head ---------> HR manager
-        if($update && $update->status == 'pending') {
-        if($request->current_approve_position == 'Team Lead / Reporting Manager') {
-            $update->comments_by_department_head = $request->comment;
-            $update->department_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
-            $update->action_by_department_head = $request->status;
-            if($request->status == 'approved') {
-                $update->action_by_hiring_manager = 'pending';
-                $message = 'Employee hiring request send to Recruiting Manager ( '.$update->hr_manager_name.' - '.$update->hr_manager_email.' ) for approval';
+        if($update && $update->status == 'pending' && (
+            ($request->current_approve_position == 'Team Lead / Reporting Manager' && $update->action_by_department_head == 'pending') 
+            OR ($request->current_approve_position == 'Recruiting Manager' && $update->action_by_hiring_manager == 'pending') 
+            OR ($request->current_approve_position == 'Division Head' && $update->action_by_division_head == 'pending') 
+            OR ($request->current_approve_position == 'HR Manager' && $update->action_by_hr_manager == 'pending'))) {
+            if($request->current_approve_position == 'Team Lead / Reporting Manager') {
+                $update->comments_by_department_head = $request->comment;
+                $update->department_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->action_by_department_head = $request->status;
+                if($request->status == 'approved') {
+                    $update->action_by_hiring_manager = 'pending';
+                    $message = 'Employee hiring request send to Recruiting Manager ( '.$update->hr_manager_name.' - '.$update->hr_manager_email.' ) for approval';
+                }
             }
-        }
-        else if($request->current_approve_position == 'Recruiting Manager') {
-            $update->comments_by_hiring_manager = $request->comment;
-            $update->hiring_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
-            $update->action_by_hiring_manager = $request->status;
-            if($request->status == 'approved') {
-                $update->action_by_division_head = 'pending';
-                $message = 'Employee hiring request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';
+            else if($request->current_approve_position == 'Recruiting Manager') {
+                $update->comments_by_hiring_manager = $request->comment;
+                $update->hiring_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->action_by_hiring_manager = $request->status;
+                if($request->status == 'approved') {
+                    $update->action_by_division_head = 'pending';
+                    $message = 'Employee hiring request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';
+                }
             }
-        }
-        else if($request->current_approve_position == 'Division Head') {
-            $update->comments_by_division_head = $request->comment;
-            $update->division_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
-            $update->action_by_division_head = $request->status;
-            if($request->status == 'approved') {
-                $update->action_by_hr_manager = 'pending';
-                $message = 'Employee hiring request send to HR Manager ( '.$update->hr_manager_name.' - '.$update->hr_manager_email.' ) for approval';
+            else if($request->current_approve_position == 'Division Head') {
+                $update->comments_by_division_head = $request->comment;
+                $update->division_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->action_by_division_head = $request->status;
+                if($request->status == 'approved') {
+                    $update->action_by_hr_manager = 'pending';
+                    $message = 'Employee hiring request send to HR Manager ( '.$update->hr_manager_name.' - '.$update->hr_manager_email.' ) for approval';
+                }
             }
-        }
-        else if($request->current_approve_position == 'HR Manager') {
-            $update->comments_by_hr_manager = $request->comment;
-            $update->hr_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
-            $update->action_by_hr_manager = $request->status;
-            if($request->status == 'approved') {
-                $update->status = 'approved';
-                $update->final_status = 'open';
+            else if($request->current_approve_position == 'HR Manager') {
+                $update->comments_by_hr_manager = $request->comment;
+                $update->hr_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->action_by_hr_manager = $request->status;
+                if($request->status == 'approved') {
+                    $update->status = 'approved';
+                    $update->final_status = 'open';
+                }
             }
+            if($request->status == 'rejected') {
+                $update->status = 'rejected';
+            }
+            $update->update();
+            $history['hiring_request_id'] = $request->id;
+            if($request->status == 'approved') {
+                $history['icon'] = 'icons8-thumb-up-30.png';
+            }
+            else if($request->status == 'rejected') {
+                $history['icon'] = 'icons8-thumb-down-30.png';
+            }
+            $history['message'] = 'Employee hiring request '.$request->status.' by '.$request->current_approve_position.' ( '.Auth::user()->name.' - '.Auth::user()->email.' )';
+            $createHistory = EmployeeHiringRequestHistory::create($history);  
+            if($request->status == 'approved' && $message != '') {
+                $history['icon'] = 'icons8-send-30.png';
+                $history['message'] = $message;
+                $createHistory = EmployeeHiringRequestHistory::create($history);
+            }
+            (new UserActivityController)->createActivity($history['message']);
+            return response()->json('success');
         }
-        if($request->status == 'rejected') {
-            $update->status = 'rejected';
+        else {
+            return response()->json('error');
         }
-        $update->update();
-        $history['hiring_request_id'] = $request->id;
-        if($request->status == 'approved') {
-            $history['icon'] = 'icons8-thumb-up-30.png';
-        }
-        else if($request->status == 'rejected') {
-            $history['icon'] = 'icons8-thumb-down-30.png';
-        }
-        $history['message'] = 'Employee hiring request '.$request->status.' by '.$request->current_approve_position.' ( '.Auth::user()->name.' - '.Auth::user()->email.' )';
-        $createHistory = EmployeeHiringRequestHistory::create($history);  
-        if($request->status == 'approved' && $message != '') {
-            $history['icon'] = 'icons8-send-30.png';
-            $history['message'] = $message;
-            $createHistory = EmployeeHiringRequestHistory::create($history);
-        }
-        (new UserActivityController)->createActivity($history['message']);
-        return response()->json('success');
-    }
-    else {
-        return response()->json('error');
-    }
-        // ,'New Employee Hiring Request '.$request->status.' Successfully'
     }
     public function updateFinalStatus(Request $request) {
         $update = EmployeeHiringRequest::where('id',$request->id)->first();
-        if($update && $update->status == 'pending') {
-          
-        $update->final_status = $request->status;
-        if($request->status == 'cancelled') {
-            $update->cancelled_by = Auth::id();
-            $update->cancelled_at = Carbon::now()->format('Y-m-d H:i:s');
-            $update->cancelled_comment = $request->comment;
-        }
-        else if($request->status == 'onhold') {
-            $update->on_hold_by = Auth::id();
-            $update->on_hold_at = Carbon::now()->format('Y-m-d H:i:s');
-            $update->on_hold_comment = $request->comment;
-        }
-        else if($request->status == 'closed') {
-            $update->closed_by = Auth::id();
-            $update->closed_at = Carbon::now()->format('Y-m-d H:i:s');
-            $update->closed_comment = $request->comment;
-            if(count($request->selectedCandidates) > 0 ) {
-                foreach($request->selectedCandidates as $selectedCandidate) {
-                    $candidate = InterviewSummaryReport::where('id',$selectedCandidate)->first();
-                    $candidate->seleced_status = 'selected';
-                    $candidate->selected_status_by = Auth::id();
-                    $candidate->selected_status_at = Carbon::now()->format('Y-m-d H:i:s');
-                    $candidate->selected_hiring_request_id = $request->id;
-                    $candidate->update();
+        if($update && $update->status == 'approved' && $update->final_status == 'open') {         
+            $update->final_status = $request->status;
+            if($request->status == 'cancelled') {
+                $update->cancelled_by = Auth::id();
+                $update->cancelled_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->cancelled_comment = $request->comment;
+            }
+            else if($request->status == 'onhold') {
+                $update->on_hold_by = Auth::id();
+                $update->on_hold_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->on_hold_comment = $request->comment;
+            }
+            else if($request->status == 'closed') {
+                $update->closed_by = Auth::id();
+                $update->closed_at = Carbon::now()->format('Y-m-d H:i:s');
+                $update->closed_comment = $request->comment;
+                if(count($request->selectedCandidates) > 0 ) {
+                    foreach($request->selectedCandidates as $selectedCandidate) {
+                        $candidate = InterviewSummaryReport::where('id',$selectedCandidate)->first();
+                        $candidate->seleced_status = 'selected';
+                        $candidate->selected_status_by = Auth::id();
+                        $candidate->selected_status_at = Carbon::now()->format('Y-m-d H:i:s');
+                        $candidate->selected_hiring_request_id = $request->id;
+                        $candidate->update();
+                    }
                 }
             }
+            $update->update();
+            $history['hiring_request_id'] = $request->id;
+            if($request->status == 'cancelled') {
+                $history['icon'] = 'icons8-cancel-30.png';
+            }
+            else if($request->status == 'onhold') {
+                $history['icon'] = 'icons8-hand-30.png';
+            }
+            else if($request->status == 'closed') {
+                $history['icon'] = 'icons8-check-30.png';
+            }
+            $history['message'] = 'Employee hiring request '.$request->status.' by ( '.Auth::user()->name.' - '.Auth::user()->email.' )';
+            $createHistory = EmployeeHiringRequestHistory::create($history);  
+            (new UserActivityController)->createActivity($history['message']);
+            return response()->json('success');          
         }
-        $update->update();
-        $history['hiring_request_id'] = $request->id;
-        if($request->status == 'cancelled') {
-            $history['icon'] = 'icons8-cancel-30.png';
+        else {
+            return response()->json('error');
         }
-        else if($request->status == 'onhold') {
-            $history['icon'] = 'icons8-hand-30.png';
-        }
-        else if($request->status == 'closed') {
-            $history['icon'] = 'icons8-check-30.png';
-        }
-        $history['message'] = 'Employee hiring request '.$request->status.' by ( '.Auth::user()->name.' - '.Auth::user()->email.' )';
-        $createHistory = EmployeeHiringRequestHistory::create($history);  
-        (new UserActivityController)->createActivity($history['message']);
-        return response()->json('success');
-          
-    }
-    return response()->json('error');
     }
     public function destroy($id) {
         $data = EmployeeHiringRequest::where('id',$id)->first();
@@ -513,10 +519,10 @@ class EmployeeHiringRequestController extends Controller
             $data->deleted_by = Auth::id();
             $data->update();
             $data->delete();
-            return response(true);
+            return response()->json('success');  
         }
         else {
-            return response(false);
+            return response()->json('error');
         }
     }
 }

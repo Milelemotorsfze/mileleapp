@@ -484,7 +484,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="comment-{{$approvedOne->id}}" class="form-control" name="comment">
+																<textarea rows="5" id="cancelled-comment-{{$approvedOne->id}}" class="form-control" name="comment">
 																</textarea>
 															</div>
 														</div>
@@ -517,7 +517,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="comment-{{$approvedOne->id}}" class="form-control" name="comment">
+																<textarea rows="5" id="on-hold-comment-{{$approvedOne->id}}" class="form-control" name="comment">
 																</textarea>
 															</div>
 														</div>
@@ -565,7 +565,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="comment-{{$approvedOne->id}}" class="form-control" name="comment">
+																<textarea rows="5" id="closed-comment-{{$approvedOne->id}}" class="form-control" name="comment">
 																</textarea>
 															</div>
 														</div>
@@ -991,23 +991,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 				});
 			}
 		}
+		var comment = '';
 		$('.status-closed-button').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
-	        updateFinalStatusHiringrequest(id, status)
+			var comment = $("#closed-comment-"+id).val();
+	        updateFinalStatusHiringrequest(id, status,comment)
 	    })
 		$('.status-onhold-button').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
-	        updateFinalStatusHiringrequest(id, status)
+			var comment = $("#on-hold-comment-"+id).val();
+	        updateFinalStatusHiringrequest(id, status,comment)
 	    })
 		$('.status-cancelled-button').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
-	        updateFinalStatusHiringrequest(id, status)
+			var comment = $("#cancelled-comment-"+id).val();
+	        updateFinalStatusHiringrequest(id, status,comment)
 	    })
-		function updateFinalStatusHiringrequest(id, status) {
-			var comment = $("#comment-"+id).val();
+		function updateFinalStatusHiringrequest(id, status,comment) {
 	        let url = '{{ route('employee-hiring-request.final-status') }}';
 	        if(status == 'closed') {
 	            var message = 'Closed';
@@ -1040,7 +1043,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								alertify.success(status + " Successfully")
 							}
 							else if(data == 'error') {
-
+								window.location.reload();
+								alertify.error("Can't Update the status, because it is already updated")
 							}
 	                    }
 	                });
@@ -1076,8 +1080,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
                         _token: '{{ csrf_token() }}'
                     },
                     success:function (data) {
-                        location.reload();
-                        alertify.success('Employee Hiring Request Deleted successfully.');
+						if(data == 'success') {
+								window.location.reload();
+								alertify.success(status + " Successfully")
+							}
+							else if(data == 'error') {
+								window.location.reload();
+								alertify.error("Can't delete, because it is already approved or rejected")
+							}
                     }
                 });
             }
