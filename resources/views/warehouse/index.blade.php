@@ -461,7 +461,7 @@ $pendingvendorfol = DB::table('purchasing_order')
                         </td>
                         <td style="vertical-align: middle; text-align: center;">
                         @php
-                        $vehicleCount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->count();
+                        $vehicleCount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->wherenull('deleted_at')->count();
                         @endphp
                         {{ $vehicleCount }}
                     </td>
