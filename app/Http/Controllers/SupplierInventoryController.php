@@ -151,8 +151,8 @@ class SupplierInventoryController extends Controller
             $uploadFileContents = [];
             $colourname = NULL;
 
-             $date = Carbon::today()->format('Y-m-d');
-//            $date = '2024-02-15';
+//             $date = Carbon::today()->format('Y-m-d');
+            $date = '2024-02-19';
             $unavailableExtColours = [];
             $unavailableIntColours = [];
 
@@ -331,7 +331,6 @@ class SupplierInventoryController extends Controller
 
                 if(empty($isModelWithSteeringExist))
                 {
-
                     $newModelsWithSteerings[$j]['steering'] = $uploadFileContent['steering'];
                     $newModelsWithSteerings[$j]['model'] = $uploadFileContent['model'];
                     $newModelsWithSteerings[$j]['sfx'] = $uploadFileContent['sfx'];
@@ -343,6 +342,11 @@ class SupplierInventoryController extends Controller
                     $newModels[$j]['model'] = $uploadFileContent['model'];
                     $newModels[$j]['sfx'] = $uploadFileContent['sfx'];
                     $newModels[$j]['model_year'] =  $uploadFileContent['model_year'];
+                }
+                if(!empty($uploadFileContent['delivery_note']) && !is_numeric($uploadFileContent['delivery_note'])) {
+                    if (strcasecmp($uploadFileContent['delivery_note'], 'Waiting') !== 0) {
+                        return redirect()->back()->with('error', $uploadFileContent['delivery_note']." Delivery note should be a number or status should be Waiting");
+                    }
                 }
                 $j++;
             }
@@ -396,6 +400,7 @@ class SupplierInventoryController extends Controller
                     $dealer = $request->whole_sales;
                     foreach ($uploadFileContents as $uploadFileContent)
                     {
+
                         $model = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->where('model_year', $uploadFileContent['model_year'])
@@ -509,11 +514,12 @@ class SupplierInventoryController extends Controller
                                         ->whereNotIn('id', $updatedRowsIds)
                                         ->where('chasis', $uploadFileContent['chasis'])
 //                                        ->whereNull('delivery_note') unable to find row when have delivery note
-                                        // ->where(function ($query) use($deliveryNote) {
-                                        //     $query->whereNull('delivery_note')
-                                        //         ->orwhere('delivery_note', $deliveryNote);
-                                        // })
+//                                         ->where(function ($query) use($deliveryNote) {
+//                                             $query->whereNull('delivery_note')
+//                                                 ->orwhere('delivery_note', $deliveryNote);
+//                                         })
                                         // DN WHERE condition removed bcz when DN have updation it does't identify the row with chasis
+
                                        ->first();
 
                                     info($supplierInventory);
@@ -530,10 +536,10 @@ class SupplierInventoryController extends Controller
                                             ->whereNotIn('id', $newlyAddedRowIds)
                                             ->whereNotIn('id', $updatedRowsIds)
                                             ->whereNull('chasis');
-                                            // ->where(function ($query) use($deliveryNote) {
-                                            //     $query->whereNull('delivery_note')
-                                            //         ->orwhere('delivery_note', $deliveryNote);
-                                            // });
+//                                             ->where(function ($query) use($deliveryNote) {
+//                                                 $query->whereNull('delivery_note')
+//                                                     ->orwhere('delivery_note', $deliveryNote);
+//                                             });
 
                                         $isNullChaisisIds = $isNullChaisis->pluck('id');
 
@@ -722,22 +728,22 @@ class SupplierInventoryController extends Controller
                                     }
                                     else
                                     {
+                                        // item existing with chasis, also not existing with similar row data so it is a case of update
                                         info("inventory with chasis existing.");
-                                        // inventory with chasis existing...
 
-                                        if(!empty($uploadFileContent['delivery_note'])) {
-                                            $supplierInventories = $supplierInventories->where('delivery_note', $uploadFileContent['delivery_note']);
-                                        }
+//                                        info($supplierInventories->get());
+//                                        $supplierInventories = $supplierInventories->where('engine_number', $uploadFileContent['engine_number'])
+//                                            ->where('color_code', $uploadFileContent['color_code'])
+//                                            ->where('pord_month', $uploadFileContent['pord_month'])
+//                                            ->where('po_arm', $uploadFileContent['po_arm'])
+//                                            ->where('eta_import', $uploadFileContent['eta_import'])
+//                                            ->where('delivery_note', $deliveryNote)
+//                                            ->first();
+//
+//                                        if (!$supplierInventories)
+//                                        {
+//                                            info($supplierInventories->pluck('id'));
 
-                                        $supplierInventories = $supplierInventories->where('engine_number', $uploadFileContent['engine_number'])
-                                            ->where('color_code', $uploadFileContent['color_code'])
-                                            ->where('pord_month', $uploadFileContent['pord_month'])
-                                            ->where('po_arm', $uploadFileContent['po_arm'])
-                                            ->where('eta_import', $uploadFileContent['eta_import'])
-                                            ->first();
-
-                                        if (!$supplierInventories)
-                                        {
                                             info("chasis with detail row not exist update row");
                                             // chasis existing our system so get corresponding inventory when engine number is not matching
                                             $updatedRowsIds[]                   = $supplierInventory->id;
@@ -761,7 +767,7 @@ class SupplierInventoryController extends Controller
                                                 $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                             }
                                             $supplierInventory->save();
-                                        }
+//                                        }
                                     }
                                 }
                                 else {
@@ -1715,276 +1721,6 @@ class SupplierInventoryController extends Controller
             ->get();
             info($deletedRows->pluck('id'));
 
-//        return $deletedRows;
-
-//        foreach ($secondFileRowDetails as $secondFileRowDetail)
-//        {
-//            $masterModel = MasterModel::find($secondFileRowDetail['master_model_id']);
-//            $masterModelIds = MasterModel::where('model', $masterModel->model)
-//                ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
-//
-//            $supplierInventories = SupplierInventory::whereDate('date_of_entry', $request->first_file)
-//                ->whereIn('master_model_id', $masterModelIds)
-//                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-//                ->where('supplier_id', $request->supplier_id)
-//                ->where('whole_sales', $request->whole_sales)
-//                ->whereNull('delivery_note');
-//
-//            if ($supplierInventories->count() <= 0) {
-//                // model and sfx not existing in Suplr Invtry => new row
-//                $newlyAddedRows[$i]['model'] = $masterModel->model;
-//                $newlyAddedRows[$i]['sfx'] = $masterModel->sfx;
-//                $newlyAddedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
-//                $newlyAddedRows[$i]['engine_number'] = $secondFileRowDetail['engine_number'];
-//                $newlyAddedRows[$i]['color_code'] = $secondFileRowDetail['color_code'];
-//                $newlyAddedRows[$i]['pord_month'] = $secondFileRowDetail['pord_month'];
-//                $newlyAddedRows[$i]['po_arm'] = $secondFileRowDetail['po_arm'];
-//                $newlyAddedRows[$i]['eta_import'] = $secondFileRowDetail['eta_import'];
-//
-//            } else {
-//                if (!empty($secondFileRowDetail['chasis'])) {
-//                    // Store the Count into Update the Row with data
-//                    $supplierInventory = $supplierInventories->where('chasis', $secondFileRowDetail['chasis'])
-//                        ->first();
-//                    $isNullChaisis = SupplierInventory::whereDate('date_of_entry', $request->first_file)
-//                        ->whereIn('master_model_id', $masterModelIds)
-//                        ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-//                        ->whereNull('delivery_note')
-//                        ->where('supplier_id', $request->supplier_id)
-//                        ->where('whole_sales', $request->whole_sales)
-//                        ->whereNull('chasis');
-//
-//                    if (!$supplierInventory) {
-//                        //adding new row simply
-//                        if (!empty($isNullChaisis->first())) {
-//                            // null chaisis existing => updating row
-//                            $chasisUpdatedRow = $isNullChaisis->whereNotIn('id',$chasisUpdatedRowIds)->first();
-//                            $chasisUpdatedRowIds[] = $chasisUpdatedRow->id;
-//                            $isNullChaisis = $isNullChaisis->first();
-//
-//                            $updatedRowsIds[] = $isNullChaisis->id;
-//                            $updatedRows[$i]['model'] = $masterModel->model;
-//                            $updatedRows[$i]['sfx'] = $masterModel->sfx;
-//                            $updatedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
-//                            $updatedRows[$i]['engine_number'] = $secondFileRowDetail['engine_number'];
-//                            $updatedRows[$i]['color_code'] = $secondFileRowDetail['color_code'];
-//                            $updatedRows[$i]['pord_month'] = $secondFileRowDetail['pord_month'];
-//                            $updatedRows[$i]['po_arm'] = $secondFileRowDetail['po_arm'];
-//                            $updatedRows[$i]['eta_import'] = $secondFileRowDetail['eta_import'];
-//                        } else {
-//                            // new chaisis with existing model and sfx => add row ,
-//                            $newlyAddedRows[$i]['model'] = $masterModel->model;
-//                            $newlyAddedRows[$i]['sfx'] = $masterModel->sfx;
-//                            $newlyAddedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
-//                            $newlyAddedRows[$i]['engine_number'] = $secondFileRowDetail['engine_number'];
-//                            $newlyAddedRows[$i]['color_code'] = $secondFileRowDetail['color_code'];
-//                        }
-//                    } else
-//                    {
-//
-//
-//                    }
-//                } else
-//                {
-//                    $nullChaisisCount = SupplierInventory::whereDate('date_of_entry', $request->first_file)
-//                        ->whereIn('master_model_id',$masterModelIds)
-//                        ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-//                        ->where('supplier_id', $request->supplier_id)
-//                        ->where('whole_sales', $request->whole_sales)
-//                        ->whereNotIn('id', $chasisUpdatedRowIds)
-//                        ->whereNull('chasis')
-//                         ->whereNull('delivery_note')
-//                        ->count();
-//                    $modelSfxValuePair = $masterModel->model."_".$masterModel->sfx;
-//                    $countblankchasis[] = $modelSfxValuePair;
-//                    $groupedCountValue =  array_count_values($countblankchasis);
-//                    if ($groupedCountValue[$modelSfxValuePair] > $nullChaisisCount)
-//                    {
-//                        $newlyAddedRows[$i]['model'] = $masterModel->model;
-//                        $newlyAddedRows[$i]['sfx'] = $masterModel->sfx;
-//                        $newlyAddedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
-//                        $newlyAddedRows[$i]['engine_number'] = $secondFileRowDetail['engine_number'];
-//                        $newlyAddedRows[$i]['color_code'] = $secondFileRowDetail['color_code'];
-//
-//                    }else
-//                    {
-//                        $supplierInventory = $supplierInventories->whereNull('chasis')->first();
-//                        $supplierInventory1 = $supplierInventories->whereNull('chasis')
-//                            ->where('engine_number', $secondFileRowDetail['engine_number'])
-//                            ->first();
-//                        if (!$supplierInventory1)
-//                        {
-//                            $updatedRowsIds[] = $supplierInventory->id;
-//                            $updatedRows[$i]['model'] = $masterModel->model;
-//                            $updatedRows[$i]['sfx'] = $masterModel->sfx;
-//                            $updatedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
-//                            $updatedRows[$i]['engine_number'] = $secondFileRowDetail['engine_number'];
-//                            $updatedRows[$i]['color_code'] = $secondFileRowDetail['color_code'];
-//                            $updatedRows[$i]['pord_month'] = $secondFileRowDetail['pord_month'];
-//                            $updatedRows[$i]['po_arm'] = $secondFileRowDetail['po_arm'];
-//                            $updatedRows[$i]['eta_import'] = $secondFileRowDetail['eta_import'];
-//
-//                        }else
-//                        {
-//                            $supplierInventory2 = $supplierInventories->whereNull('chasis')
-//                                ->where('color_code', $secondFileRowDetail['color_code'])
-//                                ->first();
-//                            if (!$supplierInventory2)
-//                            {
-//                                $updatedRowsIds[] = $supplierInventory1->id;
-//                                $updatedRows[$i]['model'] = $masterModel->model;
-//                                $updatedRows[$i]['sfx'] = $masterModel->sfx;
-//                                $updatedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
-//                                $updatedRows[$i]['engine_number'] = $secondFileRowDetail['engine_number'];
-//                                $updatedRows[$i]['color_code'] = $secondFileRowDetail['color_code'];
-//                                $updatedRows[$i]['pord_month'] = $secondFileRowDetail['pord_month'];
-//                                $updatedRows[$i]['po_arm'] = $secondFileRowDetail['po_arm'];
-//                                $updatedRows[$i]['eta_import'] = $secondFileRowDetail['eta_import'];
-//
-//                            } else {
-//                                $supplierInventory3 = $supplierInventories->whereNull('chasis')
-//                                    ->where('pord_month', $secondFileRowDetail['pord_month'])
-//                                    ->first();
-//                                if (!$supplierInventory3)
-//                                {
-//                                    $updatedRowsIds[] = $supplierInventory2->id;
-//                                    $updatedRows[$i]['model'] = $masterModel->model;
-//                                    $updatedRows[$i]['sfx'] = $masterModel->sfx;
-//                                    $updatedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
-//                                    $updatedRows[$i]['engine_number'] = $secondFileRowDetail['engine_number'];
-//                                    $updatedRows[$i]['color_code'] = $secondFileRowDetail['color_code'];
-//                                    $updatedRows[$i]['pord_month'] = $secondFileRowDetail['pord_month'];
-//                                    $updatedRows[$i]['po_arm'] = $secondFileRowDetail['po_arm'];
-//                                    $updatedRows[$i]['eta_import'] = $secondFileRowDetail['eta_import'];
-//
-//                                }else{
-//                                    $supplierInventory4 = $supplierInventories->whereNull('chasis')
-//                                        ->where('po_arm', $secondFileRowDetail['po_arm'])
-//                                        ->first();
-//                                    if (!$supplierInventory4)
-//                                    {
-//                                        $updatedRowsIds[] = $supplierInventory3->id;
-//                                        $updatedRows[$i]['model'] = $masterModel->model;
-//                                        $updatedRows[$i]['sfx'] = $masterModel->sfx;
-//                                        $updatedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
-//                                        $updatedRows[$i]['engine_number'] = $secondFileRowDetail['engine_number'];
-//                                        $updatedRows[$i]['color_code'] = $secondFileRowDetail['color_code'];
-//                                        $updatedRows[$i]['pord_month'] = $secondFileRowDetail['pord_month'];
-//                                        $updatedRows[$i]['po_arm'] = $secondFileRowDetail['po_arm'];
-//                                        $updatedRows[$i]['eta_import'] = $secondFileRowDetail['eta_import'];
-//
-//                                    }else{
-//                                        if (!empty($secondFileRowDetail['eta_import'])) {
-//                                            $supplierInventory5 = $supplierInventories->whereNull('chasis')
-//                                                ->whereDate('eta_import', $secondFileRowDetail['eta_import'])
-//                                                ->first();
-//                                            if (!$supplierInventory5)
-//                                            {
-//                                                $updatedRowsIds[] = $supplierInventory4->id;
-//                                                $updatedRows[$i]['model'] = $masterModel->model;
-//                                                $updatedRows[$i]['sfx'] = $masterModel->sfx;
-//                                                $updatedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
-//                                                $updatedRows[$i]['engine_number'] = $secondFileRowDetail['engine_number'];
-//                                                $updatedRows[$i]['color_code'] = $secondFileRowDetail['color_code'];
-//                                                $updatedRows[$i]['pord_month'] = $secondFileRowDetail['pord_month'];
-//                                                $updatedRows[$i]['po_arm'] = $secondFileRowDetail['po_arm'];
-//                                                $updatedRows[$i]['eta_import'] = $secondFileRowDetail['eta_import'];
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }$i++;
-//        }
-//
-//        foreach ($firstFileRowDetails as $firstFileRowDetail)
-//        {
-//            $masterModel = MasterModel::find($firstFileRowDetail['master_model_id']);
-//            $firstFileValuePairs[] =  $masterModel->model."_".$masterModel->sfx."_".$firstFileRowDetail['chasis']."_".
-//                $firstFileRowDetail['engine_number']."_".$firstFileRowDetail['color_code']."_".$firstFileRowDetail['pord_month']."_".
-//                $firstFileRowDetail['po_arm'];
-//        }
-//        // to find deleted rows
-//        // group the value pair to get count of duplicate data
-//        $groupedFirstFileCount =  array_count_values($firstFileValuePairs);
-//        $j=0;
-//        $updatedDetails = [];
-//        foreach ($updatedRowsIds as $updatedRowsId) {
-//            $supplierInventory = SupplierInventory::find($updatedRowsId);
-//            $updatedDetails[] =  $supplierInventory->masterModel->model."_".$supplierInventory->masterModel->sfx."_".$supplierInventory->chasis."_".
-//                $supplierInventory->engine_number."_".$supplierInventory->color_code."_".$supplierInventory->pord_month."_".
-//                $supplierInventory->po_arm;
-//        }
-//        $chasisUpdatedRows = [];
-//        if(!empty($chasisUpdatedRowIds)) {
-//            foreach ($chasisUpdatedRowIds as $chasisUpdatedRowId) {
-//                $supplierInventory = SupplierInventory::find($chasisUpdatedRowId);
-//                $chasisUpdatedRows[] =  $supplierInventory->masterModel->model."_".$supplierInventory->masterModel->sfx."_".$supplierInventory->chasis."_".
-//                    $supplierInventory->engine_number."_".$supplierInventory->color_code."_".$supplierInventory->pord_month."_".
-//                    $supplierInventory->po_arm;
-//            }
-//            $updatedChasisGroupedCount =  array_count_values($chasisUpdatedRows);
-//        }
-//
-//        foreach ($firstFileRowDetails as $firstFileRowDetail)
-//        {
-//            $date =  Carbon::parse($request->second_file)->format('Y-m-d');
-//            $masterModel = MasterModel::find($firstFileRowDetail['master_model_id']);
-//            $isExistSupplier = SupplierInventory::whereDate('date_of_entry', $date)
-//                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-//                ->where('supplier_id', $request->supplier_id)
-//                ->where('whole_sales', $request->whole_sales)
-//                ->where('master_model_id', $firstFileRowDetail['master_model_id'])
-//                ->where('chasis', $firstFileRowDetail['chasis'])
-//                ->where('engine_number', $firstFileRowDetail['engine_number'])
-//                ->where('color_code', $firstFileRowDetail['color_code'])
-//                ->where('pord_month', $firstFileRowDetail['pord_month'])
-//                ->where('po_arm', $firstFileRowDetail['po_arm']);
-////                ->whereNull('delivery_note');
-//                $firstFileRow = $masterModel->model."_".$masterModel->sfx."_".$firstFileRowDetail['chasis']."_".
-//                                $firstFileRowDetail['engine_number']."_".$firstFileRowDetail['color_code']."_".
-//                                $firstFileRowDetail['pord_month']."_". $firstFileRowDetail['po_arm'];
-////                                ->whereNull('delivery_note')
-//            if ($isExistSupplier->count() > 0)
-//            {
-//                if ($isExistSupplier->count() != $groupedFirstFileCount[$firstFileRow])
-//                {
-//                    $secondFileRowCount = $isExistSupplier->count();
-//                    if (!empty($chasisUpdatedRows))
-//                    {
-//                        if (in_array($firstFileRow,$chasisUpdatedRows))
-//                        {
-//                            $groupedFirstFileCount[$firstFileRow] = $groupedFirstFileCount[$firstFileRow] - $updatedChasisGroupedCount[$firstFileRow];
-//                        }
-//                    }
-//                    if ($secondFileRowCount < $groupedFirstFileCount[$firstFileRow])
-//                    {
-//                         $deletedRowCount = $groupedFirstFileCount[$firstFileRow] - $secondFileRowCount;
-//                         $row = $isExistSupplier->first();
-//                         for($i=0;$i<$deletedRowCount;$i++) {
-//                             $deletedRows[$i]['model'] = $masterModel->model;
-//                             $deletedRows[$i]['sfx'] = $masterModel->sfx;
-//                             $deletedRows[$i]['chasis'] = $row->chasis;
-//                             $deletedRows[$i]['engine_number'] = $row->engine_number;
-//                             $deletedRows[$i]['color_code'] = $row->color_code;
-//                         }
-//                    }
-//                }
-//            }else{
-//                if (!in_array($firstFileRow, $updatedDetails ))
-//                {
-//                    $deletedRows[$j]['model'] = $masterModel->model;
-//                    $deletedRows[$j]['sfx'] = $masterModel->sfx;
-//                    $deletedRows[$j]['chasis'] = $firstFileRowDetail['chasis'];
-//                    $deletedRows[$j]['engine_number'] = $firstFileRowDetail['engine_number'];
-//                    $deletedRows[$j]['color_code'] = $firstFileRowDetail['color_code'];
-//                }
-//            }
-//            $j++;
-//        }
         return view('supplier_inventories.file_comparision',compact('newlyAddedRows',
             'deletedRows','updatedRows','suppliers'));
     }
