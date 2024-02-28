@@ -156,9 +156,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                             @endif
                         @endif
                         @if($data->status == 'pending')
-                        @canany(['edit-employee-hiring-request'])
+                        @canany(['edit-employee-hiring-request','edit-current-user-hiring-request'])
                         @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request']);
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request','edit-current-user-hiring-request']);
                         @endphp
                         @if ($hasPermission)
                             <a style="float:right; margin-right:5px;" title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create-or-edit',$data->id)}}">

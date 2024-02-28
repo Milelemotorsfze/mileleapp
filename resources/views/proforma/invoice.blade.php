@@ -2112,6 +2112,7 @@ $(document).ready(function () {
     targets: -1,
     data: null,
             render: function (data, type, row, index) {
+                console.log(row);
                 var directAdd = 'Direct-Add';
                 var removeButtonHtml = '<button type="button" class="circle-buttonr remove-button" data-button-type="' + directAdd + '">Remove</button>';
                 if (row['button_type'] === 'Vehicle' || row['table_type'] === 'vehicle-table') {
@@ -2668,8 +2669,8 @@ $(document).ready(function () {
             var table = $('#dtBasicExample1').DataTable();
             var id = $(this).data('variant-id');
             var modallineidad = $(this).data('modellineidad');
-            // rowData['brand_id'] = $(this).data('brand-id');
-            // rowData['model_line_id'] = modallineidad;
+            rowData['brand_id'] = $(this).data('brand-id');
+            rowData['model_line_id'] = modallineidad;
 
         }
         else if(buttonType == 'Accessory') {

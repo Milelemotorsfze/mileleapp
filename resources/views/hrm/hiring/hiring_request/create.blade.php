@@ -1,9 +1,9 @@
 @extends('layouts.main')
 @include('layouts.formstyle')
 @section('content')
-@canany(['create-employee-hiring-request','edit-employee-hiring-request'])
+@canany(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">

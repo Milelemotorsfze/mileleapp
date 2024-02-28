@@ -10,7 +10,7 @@
   }
 	</style>
 @section('content')
-@canany(['create-employee-hiring-request','edit-employee-hiring-request','view-all-pending-hiring-request-listing',
+@canany(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request','view-all-pending-hiring-request-listing',
 	'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
 	'view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing','view-pending-hiring-request-listing-of-current-user',
 	'view-approved-hiring-request-listing-of-current-user','view-closed-hiring-request-listing-of-current-user','view-on-hold-hiring-request-listing-of-current-user',
@@ -19,7 +19,7 @@
 	,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
 	,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','create-job-description'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','view-all-pending-hiring-request-listing',
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request','view-all-pending-hiring-request-listing',
 	'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
 	'view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing','view-pending-hiring-request-listing-of-current-user',
 	'view-approved-hiring-request-listing-of-current-user','view-closed-hiring-request-listing-of-current-user','view-on-hold-hiring-request-listing-of-current-user',
@@ -43,9 +43,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 	<a style="float: right;" class="btn btn-sm btn-success" href="{{ route('employee-hiring-request.create-or-edit','new') }}">
       <i class="fa fa-plus" aria-hidden="true"></i> New Hiring Request
     </a>
-	<!-- <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('employee-passport_request.create-or-edit','new') }}">
-      <i class="fa fa-plus" aria-hidden="true"></i> New Passport Request
-    </a> -->
+
+	
 	@endif
 	@endcanany
 	@endif
@@ -187,11 +186,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->uuid ?? ''}}</td>
 							<td>
-								<!-- {{ $data->request_date ?? '' }} -->
-								{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
-								<!-- @if($data->request_date) -->
-                                    <!-- {{ \Carbon\Carbon::parse($data->request_date)->format('d M y') }} -->
-                                <!-- @endif -->
+
+							{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								
+							
 							</td>
 							<td>{{ $data->department_name ?? '' }}</td>
 							<td>{{ $data->department_location ?? '' }}</td>
@@ -225,9 +223,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 									</li>
 									@endif
 									@endcanany
-									@canany(['edit-employee-hiring-request'])
+									@canany(['edit-employee-hiring-request','edit-current-user-hiring-request'])
 									@php
-									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request']);
+									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request','edit-current-user-hiring-request']);
 									@endphp
 									@if ($hasPermission)
                                     <li>
@@ -307,7 +305,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<!-- <th>Reporting To With Position</th> -->
+
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -317,7 +315,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<th>Detailed Explanation Of New Hiring</th>
 							<th>Created By</th>
 							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
+
 							<th>Action</th>
 							
 						</tr>
@@ -333,7 +331,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<td>{{ $approvedOne->department_location ?? '' }}</td>
 							<td>{{ $approvedOne->requested_by_name ?? '' }}</td>
 							<td>{{ $approvedOne->requested_job_name ?? '' }}</td>
-							<!-- <td>{{ $approvedOne->reporting_to_name ?? '' }}</td>							 -->
+
 							<td>{{ $approvedOne->experience_level_name ?? ''}}</td>
 							<td>{{ $approvedOne->salary_range_start_in_aed ?? ''}} - {{$approvedOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $approvedOne->work_time_start ?? ''}} - {{$approvedOne->work_time_end ?? ''}}</td>
@@ -363,9 +361,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 									@endcanany
                                     <li>
 										@if(isset($approvedOne->questionnaire))
-										@canany(['edit-questionnaire'])
+										@canany(['edit-questionnaire','edit-current-user-questionnaire'])
 										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-questionnaire']);
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-questionnaire','edit-current-user-questionnaire']);
 										@endphp
 										@if ($hasPermission)
 										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
@@ -400,9 +398,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 										@endif
 
 										
-										<!-- <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Interview Summary Report" class="btn btn-sm btn-warning" href="{{route('interview-summary-report.create-or-edit',$approvedOne->id)}}">
-										<i class="fa fa-plus" aria-hidden="true"></i> Interview Summary
-										</a> -->
+										
+										
 										@else
 										@canany(['create-questionnaire'])
 										@php
@@ -462,9 +459,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
                                 </ul>
                             </div>
 								
-								<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$approvedOne->id)}}">
-									<i class="fa fa-edit" aria-hidden="true"></i>
-								</a> -->
+								
+							
 								
 							</td>
 							<div class="modal fade" id="cancelled-hiring-request-{{$approvedOne->id}}"
@@ -608,7 +604,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<!-- <th>Reporting To With Position</th> -->
+
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -618,7 +614,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<th>Detailed Explanation Of New Hiring</th>
 							<th>Created By</th>
 							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
+
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -633,7 +629,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<td>{{ $closedOne->department_location ?? '' }}</td>
 							<td>{{ $closedOne->requested_by_name ?? '' }}</td>
 							<td>{{ $closedOne->requested_job_name ?? '' }}</td>
-							<!-- <td>{{ $closedOne->reporting_to_name ?? '' }}</td>							 -->
+
 							<td>{{ $closedOne->experience_level_name ?? ''}}</td>
 							<td>{{ $closedOne->salary_range_start_in_aed ?? ''}} - {{$closedOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $closedOne->work_time_start ?? ''}} - {{$closedOne->work_time_end ?? ''}}</td>
@@ -655,9 +651,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								@endif
 								@endcanany
 							
-							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$closedOne->id)}}">
-								<i class="fa fa-edit" aria-hidden="true"></i>
-							</a> -->
+							
 							</td>
 						</tr>
 						@endforeach
@@ -686,7 +680,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<!-- <th>Reporting To With Position</th> -->
+
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -696,7 +690,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<th>Detailed Explanation Of New Hiring</th>
 							<th>Created By</th>
 							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
+
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -711,7 +705,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<td>{{ $onHoldOne->department_location ?? '' }}</td>
 							<td>{{ $onHoldOne->requested_by_name ?? '' }}</td>
 							<td>{{ $onHoldOne->requested_job_name ?? '' }}</td>
-							<!-- <td>{{ $onHoldOne->reporting_to_name ?? '' }}</td>							 -->
+
 							<td>{{ $onHoldOne->experience_level_name ?? ''}}</td>
 							<td>{{ $onHoldOne->salary_range_start_in_aed ?? ''}} - {{$onHoldOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $onHoldOne->work_time_start ?? ''}} - {{$onHoldOne->work_time_end ?? ''}}</td>
@@ -733,9 +727,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								@endif
 								@endcanany
 							
-							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$onHoldOne->id)}}">
-								<i class="fa fa-edit" aria-hidden="true"></i>
-							</a> -->
+							
+								
 							</td>
 						</tr>
 						@endforeach
@@ -764,7 +757,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<!-- <th>Reporting To With Position</th> -->
+
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -774,7 +767,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<th>Detailed Explanation Of New Hiring</th>
 							<th>Created By</th>
 							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
+
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -789,7 +782,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<td>{{ $cancelledOne->department_location ?? '' }}</td>
 							<td>{{ $cancelledOne->requested_by_name ?? '' }}</td>
 							<td>{{ $cancelledOne->requested_job_name ?? '' }}</td>
-							<!-- <td>{{ $cancelledOne->reporting_to_name ?? '' }}</td>							 -->
+
 							<td>{{ $cancelledOne->experience_level_name ?? ''}}</td>
 							<td>{{ $cancelledOne->salary_range_start_in_aed ?? ''}} - {{$cancelledOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $cancelledOne->work_time_start ?? ''}} - {{$cancelledOne->work_time_end ?? ''}}</td>
@@ -811,9 +804,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								@endif
 								@endcanany
 							
-							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$cancelledOne->id)}}">
-								<i class="fa fa-edit" aria-hidden="true"></i>
-							</a> -->
+							
+								
 							</td>
 						</tr>
 						@endforeach
@@ -842,7 +834,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<!-- <th>Reporting To With Position</th> -->
+
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -852,7 +844,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<th>Detailed Explanation Of New Hiring</th>
 							<th>Created By</th>
 							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
+
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -867,7 +859,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<td>{{ $rejectedOne->department_location ?? '' }}</td>
 							<td>{{ $rejectedOne->requested_by_name ?? '' }}</td>
 							<td>{{ $rejectedOne->requested_job_name ?? '' }}</td>
-							<!-- <td>{{ $rejectedOne->reporting_to_name ?? '' }}</td>							 -->
+
 							<td>{{ $rejectedOne->experience_level_name ?? ''}}</td>
 							<td>{{ $rejectedOne->salary_range_start_in_aed ?? ''}} - {{$rejectedOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $rejectedOne->work_time_start ?? ''}} - {{$rejectedOne->work_time_end ?? ''}}</td>
@@ -889,9 +881,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								@endif
 								@endcanany
 							
-							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$rejectedOne->id)}}">
-								<i class="fa fa-edit" aria-hidden="true"></i>
-							</a> -->
+							
+								
 							</td>
 						</tr>
 						@endforeach
@@ -920,7 +911,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<th>Department Location</th>
 							<th>Requested By</th>
 							<th>Requested Job Title</th>
-							<!-- <th>Reporting To With Position</th> -->
+
 							<th>Experience Level</th>
 							<th>Salary Range(AED)</th>
 							<th>Work Time</th>
@@ -930,8 +921,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<th>Detailed Explanation Of New Hiring</th>
 							<th>Created By</th>
 							<th>Created At</th>
-							<!-- <th>Current Status</th> -->
-							<!-- <th>Action</th> -->
+							
+							
 						</tr>
 					</thead>
 					<tbody>
@@ -945,7 +936,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<td>{{ $deletedOne->department_location ?? '' }}</td>
 							<td>{{ $deletedOne->requested_by_name ?? '' }}</td>
 							<td>{{ $deletedOne->requested_job_name ?? '' }}</td>
-							<!-- <td>{{ $deletedOne->reporting_to_name ?? '' }}</td>							 -->
+
 							<td>{{ $deletedOne->experience_level_name ?? ''}}</td>
 							<td>{{ $deletedOne->salary_range_start_in_aed ?? ''}} - {{$deletedOne->salary_range_end_in_aed ?? ''}}</td>
 							<td>{{ $deletedOne->work_time_start ?? ''}} - {{$deletedOne->work_time_end ?? ''}}</td>
@@ -955,14 +946,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<td>{{$deletedOne->explanation_of_new_hiring}}</td>
 							<td>{{$deletedOne->created_by_name}}</td>
 							<td>{{$deletedOne->created_at}}</td>
-							<td>
-							<!-- <a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$deletedOne->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
-							</a> -->
-							<!-- <a title="Edit Hiring Request" class="btn btn-sm btn-info" href="{{route('employee-hiring-request.create',$deletedOne->id)}}">
-								<i class="fa fa-edit" aria-hidden="true"></i>
-							</a> -->
-							</td>
+							
 						</tr>
 						@endforeach
 					</tbody>

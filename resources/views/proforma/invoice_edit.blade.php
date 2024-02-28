@@ -3897,6 +3897,7 @@ function updateSecondTable(RowId, savedVins) {
     var existingItemsJson = <?php echo $existingItemsJson; ?>;
     var secondTable = $('#dtBasicExample2').DataTable();
     existingItemsJson.forEach(function(existings) {
+        console.log(existings);
     var description =  existings.description; 
     var uniqueNumber = existings.uuid;
     var row = [];

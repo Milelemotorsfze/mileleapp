@@ -200,7 +200,7 @@
                                 <td class="bold1">
                                 </td>
                                 <td class="normal1">
-                                    @if($data->offer_letter_send_at != NULL && isset($data->isAuth) && $data->isAuth == 0)
+                                    @if($data->offer_letter_send_at != NULL && isset($data->isAuth) && $data->isAuth == 0 && $data->pif_sign == '')
                                         <form class="w3-container" action="{{route('offerletter.signed')}}" method="POST" id="candidatepersonalInfoForm"
                                             name="DAFORM"  enctype="multipart/form-data" target="_self">
                                             @csrf

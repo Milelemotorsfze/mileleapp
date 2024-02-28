@@ -21,7 +21,6 @@ use DB;
 use Exception;
 use Carbon\Carbon;
 use App\Http\Controllers\UserActivityController;
-// use Haruncpi\LaravelIdGenerator\IdGenerator;
 
 class EmployeeHiringRequestController extends Controller
 {
@@ -106,14 +105,38 @@ class EmployeeHiringRequestController extends Controller
         return view('hrm.hiring.hiring_request.index',compact('pendings','approved','closed','onHold','cancelled','rejected','deleted','page'));
     }
     public function createOrEdit($id) {
+        $authId = Auth::id();
+        $data = $previous = $next = '';
         if($id == 'new') {
-            $data = new EmployeeHiringRequest();
-            $previous = $next = '';
+            $data = new EmployeeHiringRequest();         
         }
         else {
-            $data = EmployeeHiringRequest::find($id);
-            $previous = EmployeeHiringRequest::where('status',$data->status)->where('id', '<', $id)->max('id');
-            $next = EmployeeHiringRequest::where('status',$data->status)->where('id', '>', $id)->min('id');
+            $data = EmployeeHiringRequest::where('id',$id);
+            if(Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request'])) {
+                $data = $data->latest();
+            }
+            else if(Auth::user()->hasPermissionForSelectedRole(['edit-current-user-hiring-request'])) {
+                $data = $data->where('requested_by',$authId)->latest();
+            }
+            $data =$data->first();
+            if($data) {
+                $previous = EmployeeHiringRequest::where('status',$data->status)->where('id', '<', $id);
+                if(Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request'])) {
+                    $previous = $previous->latest();
+                }
+                else if(Auth::user()->hasPermissionForSelectedRole(['edit-current-user-hiring-request'])) {
+                    $previous = $previous->where('requested_by',$authId)->latest();
+                }
+                $previous = $previous->max('id');
+                $next = EmployeeHiringRequest::where('status',$data->status)->where('id', '>', $id);
+                if(Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request'])) {
+                    $next = $next->latest();
+                }
+                else if(Auth::user()->hasPermissionForSelectedRole(['edit-current-user-hiring-request'])) {
+                    $next = $next->where('requested_by',$authId)->latest();
+                }
+                $next =$next->min('id');
+            }
         }
         $masterdepartments = MasterDepartment::where('status','active')->select('id','name')->get();
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
@@ -122,36 +145,26 @@ class EmployeeHiringRequestController extends Controller
         $requestedByUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
         $reportingToUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
         $replacementForEmployees = User::whereNotIn('id',['1','16'])->select('id','name')->get();
-        return view('hrm.hiring.hiring_request.create',compact('id','data','previous','next','masterdepartments','masterExperienceLevels','masterJobPositions','masterOfficeLocations',
+        if($data) {
+            return view('hrm.hiring.hiring_request.create',compact('id','data','previous','next','masterdepartments','masterExperienceLevels','masterJobPositions','masterOfficeLocations',
             'requestedByUsers','reportingToUsers','replacementForEmployees'));
+        }
+        else {
+            return view('hrm.notaccess');
+        }
     }
     public function storeOrUpdate(Request $request, $id) { 
         $status = '';
-        // public function store(Request $request){
-// $prefix = 'A';
-//             $uuid = IdGenerator::generate(['table' => 'employee_hiring_requests', 'length' => 7, 'prefix' => $prefix]);
-//         dd($uuid);
-        //     $todo = new Todo();
-        //     $todo->id = $id;
-        //     $todo->title = $request->get('title');
-        //     $todo->save();
-        
-        // }
-        // $uuid = IdGenerator::generate(['table' => 'employee_hiring_requests', 'length' => 10, 'prefix' =>'INV-']);
-        // dd($uuid);
-//output: INV-000001
         $validator = Validator::make($request->all(), [
             'request_date' => 'required',
             'department_id' => 'required',
             'location_id' => 'required',
             'requested_by' => 'required',
             'requested_job_title' => 'required',
-            // 'reporting_to' => 'required',
             'experience_level' => 'required',
             'salary_range_start_in_aed' => 'required',
             'salary_range_end_in_aed' => 'required',
             'work_time_start' => 'required',
-            // 'reporting_to' => 'required',
             'work_time_end' => 'required',
             'number_of_openings' => 'required',
             'type_of_role' => 'required',
@@ -172,7 +185,6 @@ class EmployeeHiringRequestController extends Controller
                 if($id == 'new') {
                     // Approvals =>  Team Lead/Manager -------> Recruitement(Hiring) manager -----------> Division head ---------> HR manager
                     $input['created_by'] = $authId;
-                    // $input['department_head_id'] = $department->approval_by_id;
                     $input['department_head_id'] = $teamLeadOrReportingManager->team_lead_or_reporting_manager;
                     $input['action_by_department_head'] = 'pending';
                     $input['hiring_manager_id'] = $hiringManager->handover_to_id;
@@ -186,8 +198,6 @@ class EmployeeHiringRequestController extends Controller
                     $history2['hiring_request_id'] = $createRequest->id;
                     $history2['icon'] = 'icons8-send-30.png';
                     $history2['message'] = 'Employee hiring request send to Team Lead / Reporting Manager ( '.$teamLeadOrReportingManager->teamLeadOrReportingManager->name.' - '.$teamLeadOrReportingManager->teamLeadOrReportingManager->email.' ) for approval';
-                    // $history2['message'] = 'Employee hiring request send to Team Lead / Reporting Manager ( '.$department->approval_by_name.' - '.$department->approval_by_email.' ) for approval';
-                    // $history2['message'] = 'Employee hiring request send to '.$hiringManager->approved_by_position_name.' ( '.$hiringManager->handover_to_name.' - '.$hiringManager->handover_to_email.' ) for approval';
                     $createHistory2 = EmployeeHiringRequestHistory::create($history2);
                     (new UserActivityController)->createActivity('New Employee Hiring Request Created');
                     $successMessage = "New Employee Hiring Request Created Successfully";
@@ -200,7 +210,6 @@ class EmployeeHiringRequestController extends Controller
                         $update->location_id = $request->location_id;
                         $update->requested_by = $request->requested_by;
                         $update->requested_job_title = $request->requested_job_title;
-                        // $update->reporting_to = $request->reporting_to;
                         $update->experience_level = $request->experience_level;
                         $update->salary_range_start_in_aed = $request->salary_range_start_in_aed;
                         $update->salary_range_end_in_aed = $request->salary_range_end_in_aed;
@@ -218,16 +227,12 @@ class EmployeeHiringRequestController extends Controller
                         $update->updated_by = $authId;
                         $update->action_by_department_head = 'pending';
                         $update->department_head_action_at = NULL;
-                        // $update->comments_by_department_head = NULL;
                         $update->action_by_hiring_manager = NULL;
                         $update->hiring_manager_action_at =  NULL;
-                        // $update->comments_by_hiring_manager = NULL;
                         $update->action_by_division_head = NULL;
                         $update->division_head_action_at = NULL;
-                        // $update->comments_by_division_head = NULL;
                         $update->action_by_hr_manager = NULL;
                         $update->hr_manager_action_at = NULL;
-                        // $update->comments_by_hr_manager = NULL;                     
                         $update->update();
                         $history['hiring_request_id'] = $id;
                         $history['icon'] = 'icons8-edit-30.png';
@@ -257,43 +262,72 @@ class EmployeeHiringRequestController extends Controller
         }
     }
     public function show($id) {
-        $data = EmployeeHiringRequest::where('id',$id)->first();
-
-        $countSelectedForInterview = count($data->selectedForInterview);
-        $countTelephonicRoundCompleted = count($data->telephonicRoundCompleted);
-        $countFirstRoundCompleted = count($data->firstRoundCompleted);
-        $countSecondRoundCompleted = count($data->secondRoundCompleted);
-        $countThirdRoundCompleted = count($data->thirdRoundCompleted);
-        $countForthRoundCompleted = count($data->forthRoundCompleted);
-        $countFifthRoundCompleted = count($data->fifthRoundCompleted);
-        $countDivisionHeadApprovalAwaitingCandidates = count($data->divisionHeadApprovalAwaitingCandidates);
-        $countHrApprovalAwaitingCandidates = count($data->hrApprovalAwaitingCandidates);
-        $countRejectedCandidates = count($data->rejectedCandidates);
-        $countApprovedSelectedCandidates = count($data->approvedSelectedCandidates);
-        $countSelectedCandidates = count($data->selectedCandidates);
-        
-        $data->allInterview = [];
-        $data->allInterview = $data->selectedCandidates->merge($data->approvedSelectedCandidates)->merge($data->rejectedCandidates)->merge($data->hrApprovalAwaitingCandidates)
-                              ->merge($data->divisionHeadApprovalAwaitingCandidates)->merge($data->fifthRoundCompleted)->merge($data->forthRoundCompleted)
-                              ->merge($data->thirdRoundCompleted)->merge($data->secondRoundCompleted)->merge($data->firstRoundCompleted)->merge($data->telephonicRoundCompleted)
-                              ->merge($data->selectedForInterview);
-        foreach($data->allInterview as $oneCandidated) {
-            $oneCandidated->isAuth = '';  
-            $emp = '';
-            $emp = EmployeeProfile::where('interview_summary_id',$oneCandidated->id)->first();
-            if($emp && $emp->offer_sign != NULL && $emp->offer_signed_at != NULL && $emp->offer_letter_hr_id != NULL) {
-                $oneCandidated->isAuth = 2;
-            }
-            else if($oneCandidated->offer_letter_send_at != NULL && $emp->offer_sign == NULL && $emp->offer_signed_at == NULL && $emp->offer_letter_hr_id == NULL) {
-                $oneCandidated->isAuth = 0;
-            }
-            $oneCandidated->canVerifySign = true;
+        $countSelectedForInterview = $countTelephonicRoundCompleted = $countFirstRoundCompleted = $countSecondRoundCompleted = $countThirdRoundCompleted =
+        $countForthRoundCompleted = $countFifthRoundCompleted = $countDivisionHeadApprovalAwaitingCandidates = $countHrApprovalAwaitingCandidates =
+        $countRejectedCandidates = $countApprovedSelectedCandidates = $countSelectedCandidates = 0;
+        $authId = Auth::id();
+        $data = EmployeeHiringRequest::where('id',$id);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details'])) {
+            $data = $data->latest();
         }
-        $previous = EmployeeHiringRequest::where('status',$data->status)->where('id', '<', $id)->max('id');
-        $next = EmployeeHiringRequest::where('status',$data->status)->where('id', '>', $id)->min('id');
-        return view('hrm.hiring.hiring_request.show',compact('data','previous','next','countSelectedForInterview','countTelephonicRoundCompleted','countFirstRoundCompleted',
-        'countSecondRoundCompleted','countThirdRoundCompleted','countForthRoundCompleted','countFifthRoundCompleted','countDivisionHeadApprovalAwaitingCandidates',
-        'countHrApprovalAwaitingCandidates','countRejectedCandidates','countApprovedSelectedCandidates','countSelectedCandidates'));
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-hiring-request-details-of-current-user'])) {
+            $data = $data->where('requested_by',$authId)->latest();
+        }
+        $data =$data->first();
+        if($data) {
+            $countSelectedForInterview = count($data->selectedForInterview);
+            $countTelephonicRoundCompleted = count($data->telephonicRoundCompleted);
+            $countFirstRoundCompleted = count($data->firstRoundCompleted);
+            $countSecondRoundCompleted = count($data->secondRoundCompleted);
+            $countThirdRoundCompleted = count($data->thirdRoundCompleted);
+            $countForthRoundCompleted = count($data->forthRoundCompleted);
+            $countFifthRoundCompleted = count($data->fifthRoundCompleted);
+            $countDivisionHeadApprovalAwaitingCandidates = count($data->divisionHeadApprovalAwaitingCandidates);
+            $countHrApprovalAwaitingCandidates = count($data->hrApprovalAwaitingCandidates);
+            $countRejectedCandidates = count($data->rejectedCandidates);
+            $countApprovedSelectedCandidates = count($data->approvedSelectedCandidates);
+            $countSelectedCandidates = count($data->selectedCandidates);
+            
+            $data->allInterview = [];
+            $data->allInterview = $data->selectedCandidates->merge($data->approvedSelectedCandidates)->merge($data->rejectedCandidates)->merge($data->hrApprovalAwaitingCandidates)
+                                  ->merge($data->divisionHeadApprovalAwaitingCandidates)->merge($data->fifthRoundCompleted)->merge($data->forthRoundCompleted)
+                                  ->merge($data->thirdRoundCompleted)->merge($data->secondRoundCompleted)->merge($data->firstRoundCompleted)->merge($data->telephonicRoundCompleted)
+                                  ->merge($data->selectedForInterview);
+            foreach($data->allInterview as $oneCandidated) {
+                $oneCandidated->isAuth = '';  
+                $emp = '';
+                $emp = EmployeeProfile::where('interview_summary_id',$oneCandidated->id)->first();
+                if($emp && $emp->offer_sign != NULL && $emp->offer_signed_at != NULL && $emp->offer_letter_hr_id != NULL) {
+                    $oneCandidated->isAuth = 2;
+                }
+                else if($oneCandidated->offer_letter_send_at != NULL && $emp->offer_sign == NULL && $emp->offer_signed_at == NULL && $emp->offer_letter_hr_id == NULL) {
+                    $oneCandidated->isAuth = 0;
+                }
+                $oneCandidated->canVerifySign = true;
+            }
+            $previous = EmployeeHiringRequest::where('status',$data->status)->where('id', '<', $id);
+            if(Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details'])) {
+                $previous = $previous->latest();
+            }
+            else if(Auth::user()->hasPermissionForSelectedRole(['view-hiring-request-details-of-current-user'])) {
+                $previous = $previous->where('requested_by',$authId)->latest();
+            }
+            $previous = $previous->max('id');
+            $next = EmployeeHiringRequest::where('status',$data->status)->where('id', '>', $id);
+            if(Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details'])) {
+                $next = $next->latest();
+            }
+            else if(Auth::user()->hasPermissionForSelectedRole(['view-hiring-request-details-of-current-user'])) {
+                $next = $next->where('requested_by',$authId)->latest();
+            }
+            $next = $next->min('id');
+            return view('hrm.hiring.hiring_request.show',compact('data','previous','next','countSelectedForInterview','countTelephonicRoundCompleted','countFirstRoundCompleted',
+            'countSecondRoundCompleted','countThirdRoundCompleted','countForthRoundCompleted','countFifthRoundCompleted','countDivisionHeadApprovalAwaitingCandidates',
+            'countHrApprovalAwaitingCandidates','countRejectedCandidates','countApprovedSelectedCandidates','countSelectedCandidates'));
+        }
+        else {
+            return view('hrm.notaccess');
+        }
     }
     public function approvalAwaiting(Request $request) {
         $authId = Auth::id();
@@ -309,9 +343,6 @@ class EmployeeHiringRequestController extends Controller
             ['handover_to_id',$authId]
         ])->first();
         // Approvals =>  Team Lead/Manager -------> Recruitement(Hiring) manager -----------> Division head ---------> HR manager
-        // $deptHead = DepartmentHeadApprovals::where([
-        //     ['approval_by_id',$authId],
-        // ])->pluck('department_id');
         $deptHeadPendings = EmployeeHiringRequest::where([
             ['action_by_department_head','pending'],
             ['department_head_id',$authId],
@@ -341,10 +372,6 @@ class EmployeeHiringRequestController extends Controller
                 ['hiring_manager_id',$authId],
                 ])->latest()->get();
         }
-        // if(count($deptHead) > 0) {
-           
-        // }
-        
         $divisionHeadPendings = EmployeeHiringRequest::where([            
             ['action_by_department_head','approved'],
             ['action_by_hiring_manager','approved'],
@@ -363,7 +390,6 @@ class EmployeeHiringRequestController extends Controller
             ['action_by_division_head','rejected'],
             ['division_head_id',$authId],
             ])->latest()->get();
-
         $HRManager = ApprovalByPositions::where([
             ['approved_by_position','HR Manager'],
             ['handover_to_id',$authId]

@@ -24,11 +24,10 @@ use Exception;
 use App\Http\Controllers\UserActivityController;
 class EmployeeHiringQuestionnaireController extends Controller
 {
-    public function index() {
-        return view('hrm.hiring.questionnaire.index');
-    }
     public function createOrEdit($id) {
-        $currentQuestionnaire = EmployeeHiringQuestionnaire::where('hiring_request_id',$id)->first();
+        $authId = Auth::id();
+        $currentQuestionnaire = EmployeeHiringQuestionnaire::where('hiring_request_id',$id);
+        $currentQuestionnaire = $currentQuestionnaire->first();
         if(!$currentQuestionnaire) {
             $currentQuestionnaire = new EmployeeHiringQuestionnaire();
             $questionnaireId = 'new';
@@ -36,7 +35,14 @@ class EmployeeHiringQuestionnaireController extends Controller
         else {
             $questionnaireId = $currentQuestionnaire->id;
         }
-        $data = EmployeeHiringRequest::where('id',$id)->first();
+        $data = EmployeeHiringRequest::where('id',$id);
+        if(Auth::user()->hasPermissionForSelectedRole(['edit-questionnaire'])) {
+            $data = $data->where('status','approved')->where('final_status','open')->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['edit-current-user-questionnaire'])) {
+            $data = $data->where('requested_by',$authId)->where('status','approved')->where('final_status','open')->latest();
+        }
+        $data = $data->first();
         $masterDesignations = MasterJobPosition::select('id','name')->get();
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
         $masterVisaTypes = MasterVisaType::where('status','active')->select('id','name')->get();
@@ -47,11 +53,15 @@ class EmployeeHiringQuestionnaireController extends Controller
         $masterDepartments = MasterDepartment::select('id','name')->get();
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
         $masterSpecificIndustryExperiences = MasterSpecificIndustryExperience::select('id','name')->get();
-        return view('hrm.hiring.questionnaire.create',compact('data','questionnaireId','currentQuestionnaire','masterDesignations','masterVisaTypes','masterNationality','masterLanguages',
-        'interviewdByUsers','masterRecuritmentSources','masterDepartments','masterExperienceLevels','masterSpecificIndustryExperiences','masterOfficeLocations'));
+        if($data) {
+            return view('hrm.hiring.questionnaire.create',compact('data','questionnaireId','currentQuestionnaire','masterDesignations','masterVisaTypes','masterNationality','masterLanguages',
+            'interviewdByUsers','masterRecuritmentSources','masterDepartments','masterExperienceLevels','masterSpecificIndustryExperiences','masterOfficeLocations'));
+        }
+        else {
+            return view('hrm.notaccess');
+        }
     }
     public function storeOrUpdate(Request $request, $id) {
-        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'designation_type' => 'required',
             'designation_id' => 'required',
@@ -63,7 +73,6 @@ class EmployeeHiringQuestionnaireController extends Controller
             'work_time_start' => 'required',
             'work_time_end' => 'required',
             'education' => 'required',
-            // 'education_certificates' => 'required',
             'certification' => 'required',
             'industry_experience_id' => 'required',
             'specific_company_experience' => 'required',
@@ -77,22 +86,14 @@ class EmployeeHiringQuestionnaireController extends Controller
             'requires_multiple_industry_experience' => 'required',
             'team_handling_experience_required' => 'required',
             'driving_licence' => 'required',
-            // 'own_car' => 'required',
-            // 'fuel_expenses_by' => 'required',
             'required_to_work_on_trial' => 'required',
-            // 'number_of_trial_days' => 'required',
             'commission_involved_in_salary' => 'required',
-            // 'commission_type' => 'required',
-            // 'commission_amount' => 'required',
-            // 'commission_percentage' => 'required',
             'mandatory_skills' => 'required',
             'interviewd_by' => 'required',
             'job_opening_purpose_objective' => 'required',
             'screening_questions' => 'required',
             'technical_test' => 'required',
             'trial_work_job_description' => 'required',
-            // 'internal_department_evaluation' => 'required',
-            // 'external_vendor_evaluation' => 'required',
             'recruitment_source_id' => 'required',
             'experience' => 'required',
             'travel_experience' => 'required',
@@ -120,11 +121,10 @@ class EmployeeHiringQuestionnaireController extends Controller
         else {
             DB::beginTransaction();
             try {
-                // dd('let me know when reach here......');
                 $authId = Auth::id();
                 $input = $request->all();
                 $update = EmployeeHiringQuestionnaire::where('hiring_request_id',$id)->first();
-                if($update) {
+                if($update && $update->hiringRequest->status == 'approved' && $update->hiringRequest->final_status == 'open') {
                     $update->designation_type  = $request->designation_type ;
                     $update->designation_id  = $request->designation_id ;
                     $update->no_of_years_of_experience_in_specific_job_role  = $request->no_of_years_of_experience_in_specific_job_role ;
@@ -242,8 +242,9 @@ class EmployeeHiringQuestionnaireController extends Controller
                     $createHistory = EmployeeHiringRequestHistory::create($history);
                     (new UserActivityController)->createActivity('Employee Hiring Questionnaire Edited');
                     $successMessage = "Employee Hiring Questionnaire Updated Successfully";
+                    $status = 'success';
                 }
-                else {
+                else if(!$update) {
                     if(isset($request->internal_department_evaluation)) {
                         $input['internal_department_evaluation'] = 'yes';
                     }
@@ -282,19 +283,21 @@ class EmployeeHiringQuestionnaireController extends Controller
                     $createHistory = EmployeeHiringRequestHistory::create($history);
                     (new UserActivityController)->createActivity($createHistory->message);
                     $successMessage = "New Employee Hiring Questionnaire Created Successfully";
+                    $status = 'success';
+                }
+                else {
+                    $successMessage = "Can't update the data because it is already".$update->hiringRequest->final_status;
+                    $status = 'error';
                 }
                 DB::commit();
                 return redirect()->route('employee-hiring-request.index')
-                                    ->with('success','New Employee Hiring Request Questionnaire Created Successfully');
+                                    ->with($status,$successMessage);
             } 
             catch (\Exception $e) {
                 DB::rollback();               
                 dd($e);
             }
         }
-    }
-    public function edit() {
-        return view('hrm.hiring.questionnaire.edit');
     }
 }
  
