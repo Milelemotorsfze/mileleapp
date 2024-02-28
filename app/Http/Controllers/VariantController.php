@@ -51,7 +51,6 @@ public function store(Request $request)
 {
     $selectedSpecifications = json_decode(request('selected_specifications'), true);
     ksort($selectedSpecifications);
-    
     $totalSpecifications = count($selectedSpecifications);
     $existingVariantop = Varaint::where('brands_id', $request->input('brands_id'))
         ->where('master_model_lines_id', $request->input('master_model_lines_id'))
@@ -398,6 +397,7 @@ $existingspecifications = Varaint::with('VariantItems')
     }
     $variant = new Varaint();
     $variant->brands_id = $request->input('brands_id');
+    $variant->netsuite_name = $request->input('netsuite_name');
     $variant->master_model_lines_id = $request->input('master_model_lines_id');
     $variant->steering = $request->input('steering');
     $variant->fuel_type = $request->input('fuel_type');
@@ -703,6 +703,7 @@ public function savespecification(Request $request)
     $newvariant->name = $oldname . $nextVariantName;
     $newvariant->engine = $request->input('engine');
     $newvariant->fuel_type = $request->input('fuel_type');
+    $newvariant->netsuite_name = $request->input('netsuite_name');
     $newvariant->gearbox = $request->input('gearbox');
     $newvariant->master_model_lines_id = $variantfull->master_model_lines_id;
     $newvariant->brands_id = $variantfull->brands_id;

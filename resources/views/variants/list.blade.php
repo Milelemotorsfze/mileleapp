@@ -133,6 +133,7 @@
                     <th>Model Line</th>
                     <th>Model Description</th>
                     <th>Model Year</th>
+                    <th>Netsuite Name</th>
                     <th>Variant</th>
                     <th>Variant Detail</th>
                     <th>Engine Capacity</th>
@@ -159,6 +160,7 @@
                         <td class="nowrap-td capitalize-first-letter">{{ $variant->master_model_lines->model_line ?? 'null' }}</td>
                         <td class="nowrap-td capitalize-first-letter">{{ $variant->model_detail ?? 'null' }}</td>
                         <td class="nowrap-td">{{ ucfirst(strtolower($variant->my ?? 'null' )) }}</td>
+                        <td class="nowrap-td">{{ $variant->netsuite_name}}</td>
                         <td class="nowrap-td capitalize-first-letter">
                             <a href="#" onclick="openModal('{{ $variant->id ?? '' }}')" style="text-decoration: underline;">
                                 {{ $variant->name ?? 'null' }}
