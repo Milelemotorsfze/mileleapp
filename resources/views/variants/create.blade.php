@@ -69,6 +69,12 @@
                 <form id="form-create" action="{{ route('variants.store') }}" method="POST">
                     @csrf
                         <div class="row">
+                        <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Netsuite Variant Name</label>
+                                   <input type = "text" name="netsuite_name" class="form-control"/>
+                                </div>
+                            </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Brand</label>
