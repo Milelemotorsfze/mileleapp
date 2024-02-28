@@ -35,6 +35,7 @@ class CandidatePersonalInfoController extends Controller
         return view('hrm.hiring.documents.create');
     }
     public function sendDocsEmail(Request $request) {
+        $status = $message = '';
         $validator = Validator::make($request->all(), [
             'id' => 'required',
             'email' => 'required',
@@ -71,14 +72,16 @@ class CandidatePersonalInfoController extends Controller
                                 ->subject($subject);
                         }
                     );
-                    $msg = 'Documents Request Form Successfully Send To Candidate';
+                    $status = 'success';
+                    $message = 'Documents Request Form Successfully Send To Candidate';
                 }
                 else {
-                    $msg = "can't send candidate documents upload form ,because this candidate's documents already verified ";
+                    $status = 'error';
+                    $message = "can't send candidate documents upload form ,because this candidate's documents already verified ";
                 }
                 DB::commit();
                 return redirect()->back()
-                                    ->with('success',$msg);
+                                    ->with($status,$message);
             } 
             catch (\Exception $e) {
                 DB::rollback();
@@ -245,7 +248,7 @@ class CandidatePersonalInfoController extends Controller
         $masterLanguages = Language::select('id','name')->get();
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterRelations = MasterPersonRelation::select('id','name')->get();
-        if($candidate && isset($candidate->candidateDetails) && $candidate->candidateDetails->documents_verified_at == '') {
+        if(($candidate && !isset($candidate->candidateDetails)) OR ($candidate && isset($candidate->candidateDetails) && $candidate->candidateDetails->documents_verified_at == '')) {
             return view('hrm.hiring.documents.create',compact('candidate','masterMaritalStatus','masterReligion','masterLanguages','masterNationality','masterRelations'));
         }
         else {
