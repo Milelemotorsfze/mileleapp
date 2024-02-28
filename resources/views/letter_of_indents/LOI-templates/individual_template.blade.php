@@ -65,9 +65,11 @@
                     @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
                         <li>{{$key + 1}}.&nbsp;
                             <span class="fw-bold">Model Name:</span>
-                            {{ $letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}},
-                            {{ $letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? '' }}
-                            {{ $letterOfIndentItem->masterModel->variant->my ?? ''}}
+                            @if($letterOfIndentItem->LOI->dealers == 'Trans Cars')
+                                {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
+                            @else
+                                {{ $letterOfIndentItem->masterModel->milele_loi_description ?? '' }}
+                            @endif
                         </li>
                         <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Type: </span> Brand New</li>
                         <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Drive: </span>

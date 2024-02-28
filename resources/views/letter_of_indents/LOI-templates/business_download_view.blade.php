@@ -55,12 +55,13 @@
                       @endif
                     </td>
                     <td>
-                        @if($letterOfIndentItem->masterModel->variant()->exists())
-                            {{ strtoupper($letterOfIndentItem->masterModel->variant->master_model_lines->model_line) ?? ''}}
+                        @if($letterOfIndentItem->LOI->dealers == 'Trans Cars')
+                            {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
+                        @else
+                            {{ $letterOfIndentItem->masterModel->milele_loi_description ?? '' }}
                         @endif
                       </td>
                     <td>{{ $letterOfIndentItem->quantity }}</td>
-
                 </tr>
             @endforeach
         </table>

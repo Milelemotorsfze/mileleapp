@@ -106,9 +106,9 @@
             <tr>
                 <td>{{ $key + 1 }}</td>
                 <td>
-                    <p style="font-weight: bold"> {{ $letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? '' }} {{ $letterOfIndentItem->masterModel->variant->engine_type ?? ''}}
-                        {{ $letterOfIndentItem->masterModel->variant->fuel_type ?? ''}} {{ $letterOfIndentItem->masterModel->steering }}</p>
-                    <p>Make: {{$letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}}</p>
+                    <p style="font-weight: bold">
+                        {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
+                    </p>
                     <p>Model: {{$letterOfIndentItem->masterModel->model_year}}  Brand New Zero km</p>
                 </td>
                 <td>{{$letterOfIndentItem->quantity}}</td>
