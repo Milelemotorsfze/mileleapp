@@ -118,7 +118,7 @@
                         </div>
                         <div class="col-lg-1 col-md-6">
                             <label class="form-label">Total Unit Prices:</label>
-                            <input type="text" name="total_cost" class="form-control" readonly id="total-price" value="0" placeholder="Total Unit Price">
+                            <input type="text" name="totalcost" class="form-control" readonly id="total-price" value="0" placeholder="Total Unit Price">
                         </div>
                     </div>
                     <div id="variantRowsContainer" style="display: none;">

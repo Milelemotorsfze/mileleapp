@@ -104,6 +104,14 @@ class CallsController extends Controller
         $useractivities->save();
         if ($request->ajax()) {
             $callsQuery = Calls::query();
+            if ($request->has('order')) {
+                $order = $request->input('order')[0];
+                $columnIndex = $order['column'];
+                $columnName = $request->input('columns')[$columnIndex]['name'];
+                $direction = $order['dir'];
+    
+                $callsQuery->orderBy($columnName, $direction);
+            }
             foreach ($request->input('columns') as $column) {
                 $searchValue = $column['search']['value'];
                 $columnName = $column['name'];
@@ -182,7 +190,7 @@ class CallsController extends Controller
             }
             }
             return DataTables::of($callsQuery)
-                ->addColumn('date', function ($call) {
+                ->addColumn('created_at', function ($call) {
                     return date('d-M-Y', strtotime($call->created_at));
                 })
                 ->addColumn('status', function ($call) {
