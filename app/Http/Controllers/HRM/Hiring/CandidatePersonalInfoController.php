@@ -285,7 +285,7 @@ class CandidatePersonalInfoController extends Controller
             DB::beginTransaction();
             try {
                 $candidate = InterviewSummaryReport::where('id',$request->id)->first();
-                if($candidate && isset($candidate->candidateDetails) && $candidate->candidateDetails->documents_verified_at == '') {
+                if(($candidate && !isset($candidate->candidateDetails)) OR ($candidate && isset($candidate->candidateDetails) && $candidate->candidateDetails->documents_verified_at == '')) {
                     $createEmp = EmployeeProfile::where('interview_summary_id',$request->id)->first(); 
                     if($request->passport_size_photograph) {                       
                         $photoFileName = auth()->id() . '_' . time() . '.'. $request->passport_size_photograph->extension();
