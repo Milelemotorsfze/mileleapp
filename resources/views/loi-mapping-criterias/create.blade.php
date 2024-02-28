@@ -64,7 +64,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Priority Number</label>
-                                <input type="number" class="form-control" name="order" min="1"  oninput="validity.valid||(value='');" value="{{ old('order') }}" placeholder="Enter Priority">
+                                <input type="number" class="form-control" name="order" min="1" required  oninput="validity.valid||(value='');" value="{{ old('order') }}" placeholder="Enter Priority">
                             </div>
                         </div>
                         <div class="col-12 text-center">
@@ -89,7 +89,6 @@
                 },
                 value: {
                     required: true,
-            
                 },
                 value_type: {
                     required: true,

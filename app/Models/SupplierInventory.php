@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class SupplierInventory extends Model
 {
     use HasFactory;
-    
+
     public const VEH_STATUS_SUPPLIER_INVENTORY = "supplier inventory";
     public const VEH_STATUS_VENDOR_CONFIRMED = "Vendor Confirmed";
     public const VEH_STATUS_LOI_APPROVED = "LOI Approved";
@@ -77,8 +77,7 @@ class SupplierInventory extends Model
         $masterModelIds = MasterModel:: where('model', $masterModel->model)
             ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
 
-        $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
-            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
+        $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds);
 
         if(request()->supplier_id){
             $supplierInventories = $supplierInventories->where('supplier_id', request()->supplier_id);
