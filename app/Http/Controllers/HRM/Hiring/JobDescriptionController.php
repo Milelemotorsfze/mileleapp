@@ -24,68 +24,70 @@ use App\Models\HRM\Employee\EmployeeProfile;
 class JobDescriptionController extends Controller
 {
     public function index() {
-        $pendings = JobDescription::where('status','pending')->latest()->get();
-        $approved = JobDescription::where('status','approved')->latest()->get();
-        $rejected = JobDescription::where('status','rejected')->latest()->get();
+        $authId = Auth::id();
+        $pendings = JobDescription::where('status','pending');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-pending-job-description-list'])) {
+            $pendings = $pendings->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-current-user-pending-job-description-list'])) {
+            $pendings = $pendings->whereHas('employeeHiringRequest',function($query) use($authId) {
+                $query->where('requested_by',$authId);
+            })->latest();
+        }
+        $pendings = $pendings->get();
+        $approved = JobDescription::where('status','approved');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-approved-job-description-list'])) {
+            $approved = $approved->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-current-user-approved-job-description-list'])) {
+            $approved = $approved->whereHas('employeeHiringRequest',function($query) use($authId) {
+                $query->where('requested_by',$authId);
+            })->latest();
+        }
+        $approved =$approved->get();
+        $rejected = JobDescription::where('status','rejected');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-rejected-job-description-list'])) {
+            $rejected = $rejected->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['view-current-user-rejected-job-description-list'])) {
+            $rejected = $rejected->whereHas('employeeHiringRequest',function($query) use($authId) {
+                $query->where('requested_by',$authId);
+            })->latest();
+        }
+        $rejected=$rejected->get();
         return view('hrm.hiring.job_description.index',compact('pendings','approved','rejected'));
     }
-    public function create() {
-        return view('hrm.hiring.job_description.create');
-    }
-    public function edit() {
-        return view('hrm.hiring.job_description.edit');
-    }
-    public function show(string $id) {
-        return view('hrm.hiring.job_description.show');
-    }
     public function createOrEdit($id, $hiring_id) {
-        $jobDescription = JobDescription::where('id',$id)->first();
+        $authId = Auth::id();
+        $jobDescription = JobDescription::where('id',$id);
+
+        $jobDescription =$jobDescription->first();
         if(!$jobDescription) {
             $jobDescription = new JobDescription();
             $jobDescriptionId = 'new';           
             if($hiring_id != 'new') {
-                $currentHiringRequest = EmployeeHiringRequest::where('id',$hiring_id)->where('status','approved')
-                // ->where(function($query) {
-                //         $query->whereDoesntHave('jobDescription')
-                //         ->orWhereDoesntHave('jobDescription', function($q) {
-                //             $q = $q->whereIn('status',['pending','approved']);
-                //         });
-                //     })
-                ->whereDoesntHave('jobDescription')
-                ->first();
+                $currentHiringRequest = EmployeeHiringRequest::where('id',$hiring_id)->where('status','approved')->where('final_status','open')
+                ->whereDoesntHave('jobDescription');
+                // if(Auth::user()->hasPermissionForSelectedRole(['view-rejected-job-description-list'])) {
+                //     // $rejected = $rejected->latest();
+                // }
+                // else if(Auth::user()->hasPermissionForSelectedRole(['view-current-user-rejected-job-description-list'])) {
+                //     // $rejected = $rejected->whereHas('employeeHiringRequest',function($query) use($authId) {
+                //     //     $query->where('requested_by',$authId);
+                //     // })->latest();
+                // }
+                $currentHiringRequest =$currentHiringRequest->first();
             }
             else {
                 $currentHiringRequest ='';
             }    
-            $allHiringRequests = EmployeeHiringRequest::whereHas('questionnaire')
-            // ->where(function($query) {
-            //             $query->whereDoesntHave('jobDescription')
-            //             ->orWhereHas('jobDescription', function($q) {
-            //                 $q = $q->whereIn('status',['pending','rejected']);
-            //             });
-            //         })
-                    ->where('status','approved')
-                    // ->where(function($query) {
-                    //     $query->whereDoesntHave('jobDescription')
-                    //     ->orWhereDoesntHave('jobDescription', function($q) {
-                    //         $q = $q->whereIn('status',['pending','approved']);
-                    //     });
-                    // })
-                    ->whereDoesntHave('jobDescription')
-                    ->get();
+            $allHiringRequests = EmployeeHiringRequest::whereHas('questionnaire')->where('status','approved')->where('final_status','open')->whereDoesntHave('jobDescription')->get();
         }
         else {
             $jobDescriptionId = $jobDescription->id;
             $currentHiringRequest = EmployeeHiringRequest::where('id',$jobDescription->hiring_request_id)->first();
-            $allHiringRequests1 = EmployeeHiringRequest::where('status','approved')
-            // ->whereHas('questionnaire')->where(function($query) {
-            //             $query->whereDoesntHave('jobDescription')
-            //             ->orWhereHas('jobDescription', function($q) {
-            //                 $q = $q->whereIn('status',['pending','rejected']);
-            //             });
-            //         })
-            ->whereDoesntHave('jobDescription')->get();
-            $allHiringRequests2 = EmployeeHiringRequest::where('status','approved')->where('id',$jobDescription->hiring_request_id)->get();
+            $allHiringRequests1 = EmployeeHiringRequest::where('status','approved')->where('final_status','open')->whereDoesntHave('jobDescription')->get();
+            $allHiringRequests2 = EmployeeHiringRequest::where('status','approved')->where('final_status','open')->where('id',$jobDescription->hiring_request_id)->get();
             $allHiringRequests = $allHiringRequests1->merge($allHiringRequests2);
         }
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
@@ -112,7 +114,7 @@ class JobDescriptionController extends Controller
                 $teamLeadOrReportingManager = EmployeeProfile::where('user_id',$hiringRequest->requested_by)->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $input = $request->all();
-                if($id == 'new') {
+                if($id == 'new' && isset($hiringRequest->questionnaire) && !isset($hiringRequest->jobDescription)) {
                     $input['created_by'] = $authId;
                     $input['department_head_id'] = $teamLeadOrReportingManager->team_lead_or_reporting_manager;
                     $input['action_by_department_head'] = 'pending';
@@ -129,8 +131,12 @@ class JobDescriptionController extends Controller
                     (new UserActivityController)->createActivity('New Employee Hiring Job Description Created');
                     $successMessage = "New Employee Hiring Job Description Created Successfully";
                 }
-                else {
-                    $update = JobDescription::find($id);
+                else if(($id == 'new' OR $id != 'new') && isset($hiringRequest->questionnaire) && isset($hiringRequest->jobDescription)) {
+                    $update = JobDescription::where('hiring_request_id',$request->hiring_request_id);
+                    if($id != 'new') {
+                        $update =$update->where('id',$id);
+                    }
+                    $update =$update->first();
                     if($update && ($update->status == 'pending' OR $update->status == 'rejected')) {
                         $update->hiring_request_id = $request->hiring_request_id;
                         $update->request_date = $request->request_date;

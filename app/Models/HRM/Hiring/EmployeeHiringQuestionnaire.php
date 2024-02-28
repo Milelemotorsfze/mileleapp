@@ -195,4 +195,7 @@ class EmployeeHiringQuestionnaire extends Model
     public function additionalLanguages() {
         return $this->hasMany(QuestionnaireLanguagePreference::class,'questionnaire_id','id');
     }
+    public function hiringRequest() {
+        return $this->belongsTo(EmployeeHiringRequest::class,'hiring_request_id','id');
+    }
 }
