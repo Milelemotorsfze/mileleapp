@@ -424,7 +424,7 @@ class InterviewSummaryReportController extends Controller
                 $data->isAuth = 2;
             }
             else if($data->offer_letter_send_at != NULL && $emp->offer_sign == NULL && $emp->offer_signed_at == NULL && $emp->offer_letter_hr_id == NULL) {
-                $data->isAuth = 0;
+                $data->isAuth = 1;
             }
         }
         $data->canVerifySign = true;

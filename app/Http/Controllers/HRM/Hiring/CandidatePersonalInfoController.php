@@ -729,6 +729,7 @@ class CandidatePersonalInfoController extends Controller
             $q->where([
                 ['offer_letter_send_at','!=',NULL],
                 ['offer_letter_verified_at',NULL],
+                ['pif_sign','==',NULL],
             ]);
         })->get();
         $verified = EmployeeProfile::where([
@@ -738,6 +739,7 @@ class CandidatePersonalInfoController extends Controller
             $q->where([
                 ['offer_letter_send_at','!=',NULL],
                 ['offer_letter_verified_at','!=',NULL],
+                ['pif_sign','!=',NULL],
             ]);
         })->get();
         return view('hrm.hiring.offer_letter.verifyOrResend',compact('pending','verified'));
