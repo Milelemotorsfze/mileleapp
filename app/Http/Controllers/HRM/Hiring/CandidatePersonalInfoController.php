@@ -45,13 +45,12 @@ class CandidatePersonalInfoController extends Controller
         else {
             DB::beginTransaction();
             try {
-                $update = InterviewSummaryReport::where('id',$request->id)->first();
+                $update = InterviewSummaryReport::with('candidateDetails')->where('id',$request->id)->first();
                 if($update) {
                     $update->email = $request->email;
                 }
                 $update->update();
-                if(($update && $update->email == '') OR ($update && $update->email != '' && isset($update->candidateDetails) 
-                && $update->candidateDetails->documents_verified_at != '')) {
+                if(($update && $update->email == '') OR ($update && $update->email != '' && !isset($update->candidateDetails)) OR ($update && $update->email != '' && isset($update->candidateDetails) && $update->candidateDetails->documents_verified_at != '')) {
                 $data['comment'] = '';
                 if($request->comment) {
                     $data['comment'] = $request->comment;
