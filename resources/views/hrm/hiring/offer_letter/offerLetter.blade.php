@@ -253,7 +253,7 @@
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-offer-letter-signature']);
                                     @endphp                    
-                                    @if($hasPermission && isset($data->canVerifySign) && $data->canVerifySign == true && $data->offer_letter_verified_at == NULL && $data->offer_letter_verified_by == NULL)
+                                    @if($hasPermission && isset($data->canVerifySign) && $data->canVerifySign == true && $data->offer_letter_verified_at == NULL && $data->offer_letter_verified_by == NULL && $data->pif_sign != NULL)
                                     <table>
                                     <tbody>
                                         <tr>

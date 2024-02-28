@@ -301,7 +301,7 @@ class EmployeeHiringRequestController extends Controller
                     $oneCandidated->isAuth = 2;
                 }
                 else if($oneCandidated->offer_letter_send_at != NULL && $emp->offer_sign == NULL && $emp->offer_signed_at == NULL && $emp->offer_letter_hr_id == NULL) {
-                    $oneCandidated->isAuth = 0;
+                    $oneCandidated->isAuth = 1;
                 }
                 $oneCandidated->canVerifySign = true;
             }
