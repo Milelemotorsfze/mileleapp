@@ -227,6 +227,7 @@ class User extends Authenticatable
             ['seleced_status','pending'],
             ['offer_letter_send_at','!=',NULL],
             ['offer_letter_verified_at',NULL],
+            ['pif_sign','!=',NULL],
         ])
             // where('status','approved')->where('seleced_status','pending')->where('offer_letter_send_at','!=',NULL)
         ->whereHas('candidateDetails', function($q){
