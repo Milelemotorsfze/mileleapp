@@ -176,10 +176,10 @@ class QuotationController extends Controller
                    $item = Varaint::find($request->reference_ids[$key]);
                    
                }
-
                $isVehicle = 1;
                $quotationItem->brand_id = $request->brand_ids[$key];
                $quotationItem->model_line_id = $request->model_line_ids[$key];
+               info($quotationItem->brand_id);
            }else if($request->types[$key] == 'Other') {
                $item = OtherLogisticsCharges::find($request->reference_ids[$key]);
 

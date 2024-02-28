@@ -782,5 +782,8 @@ Route::get('/d', function () {
     Route::get('/salesorder/update/{id}', [SalesOrderController::class, 'updatesalesorder'])->name('salesorder.updatesalesorder');
     Route::get('/customer-quotation-direct/{id}', [QuotationController::class, 'directquotationtocustomer']);
 
+    //Pre Order
+    Route::resource('preorder', PreOrderController::class);
+
 
 

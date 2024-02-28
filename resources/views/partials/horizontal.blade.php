@@ -930,9 +930,14 @@
                                         <span data-key="t-extra-pages">Purchase Order</span>
                                     </a>
                                 </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('preorder.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="award"></i>
+                                        <span data-key="t-extra-pages">Pre Order</span>
+                                    </a>
+                                </li>
                                 @endif
                                 @endcan
-
                                 @can('variants-view')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-view');
