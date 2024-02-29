@@ -85,7 +85,7 @@ class OverTimeController extends Controller
                     $authId = Auth::id();
                     $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                     $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
-                    $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
+                    $divisionHead = MasterDivisionWithHead::where('id',$employee->department->division_id)->first();
                     $input = $request->all();
                     $input['created_by'] = $authId; 
                     $input['hr_manager_id'] = $HRManager->handover_to_id;                
