@@ -21,6 +21,7 @@ use DB;
 use Exception;
 use Carbon\Carbon;
 use App\Http\Controllers\UserActivityController;
+use App\Http\Controllers\HRM\Hiring\CandidatePersonalInfoController;
 
 class EmployeeHiringRequestController extends Controller
 {
@@ -294,10 +295,14 @@ class EmployeeHiringRequestController extends Controller
                                   ->merge($data->thirdRoundCompleted)->merge($data->secondRoundCompleted)->merge($data->firstRoundCompleted)->merge($data->telephonicRoundCompleted)
                                   ->merge($data->selectedForInterview);
             foreach($data->allInterview as $oneCandidated) { 
-                // dd($oneCandidated->candidateDetails->offer_sign);
-                $oneCandidated->isAuth = '';  
+                $oneCandidated->isAuth = $oneCandidated->inwords_basic_salary =$oneCandidated->inwords_other_allowances =$oneCandidated->inwords_total_salary ='';  
                 $emp = '';
                 $emp = EmployeeProfile::where('interview_summary_id',$oneCandidated->id)->first();
+                if($emp) {
+                    $oneCandidated->inwords_basic_salary = (new CandidatePersonalInfoController)->decimalNumberInWords($emp->basic_salary);
+                    $oneCandidated->inwords_other_allowances = (new CandidatePersonalInfoController)->decimalNumberInWords($emp->other_allowances);
+                    $oneCandidated->inwords_total_salary = (new CandidatePersonalInfoController)->decimalNumberInWords($emp->total_salary);
+                }
                 if($emp && $emp->offer_sign != NULL && $emp->offer_signed_at != NULL && $emp->offer_letter_hr_id != NULL) {
                     $oneCandidated->isAuth = 2;
                 }

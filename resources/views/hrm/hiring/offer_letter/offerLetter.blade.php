@@ -102,15 +102,15 @@
                         <tbody>
                             <tr>
                                 <td class="bold"><strong>Basic Salary</strong></td>
-                                <td class="normal">AED {{$data->candidateDetails->basic_salary}}/- p.m. ( {{$inwords['basic_salary'] ?? ''}} Only )</td>
+                                <td class="normal">AED {{$data->candidateDetails->basic_salary}}/- p.m. ( {{$inwords['basic_salary'] ?? $data->inwords_basic_salary ?? ''}} Only )</td>
                             </tr>
                             <tr>
                                 <td class="bold"><strong>Other Allowance</strong></td>
-                                <td class="normal">AED {{$data->candidateDetails->other_allowances}}/- p.m. ( {{$inwords['other_allowances'] ?? ''}} Only )</td>
+                                <td class="normal">AED {{$data->candidateDetails->other_allowances}}/- p.m. ( {{$inwords['other_allowances'] ?? $data->inwords_other_allowances ?? ''}} Only )</td>
                             </tr>
                             <tr>
                                 <td class="bold"><strong>Total Salary</strong></td>
-                                <td class="normal">AED {{$data->candidateDetails->total_salary}}/- p.m. ( {{$inwords['total_salary'] ?? ''}} Only )</td>
+                                <td class="normal">AED {{$data->candidateDetails->total_salary}}/- p.m. ( {{$inwords['total_salary'] ?? $data->inwords_total_salary ?? ''}} Only )</td>
                             </tr>
                             <tr>
                                 <td class="bold"><strong>Place of Work</strong></td>
