@@ -293,7 +293,8 @@ class EmployeeHiringRequestController extends Controller
                                   ->merge($data->divisionHeadApprovalAwaitingCandidates)->merge($data->fifthRoundCompleted)->merge($data->forthRoundCompleted)
                                   ->merge($data->thirdRoundCompleted)->merge($data->secondRoundCompleted)->merge($data->firstRoundCompleted)->merge($data->telephonicRoundCompleted)
                                   ->merge($data->selectedForInterview);
-            foreach($data->allInterview as $oneCandidated) {
+            foreach($data->allInterview as $oneCandidated) { 
+                // dd($oneCandidated->candidateDetails->offer_sign);
                 $oneCandidated->isAuth = '';  
                 $emp = '';
                 $emp = EmployeeProfile::where('interview_summary_id',$oneCandidated->id)->first();

@@ -200,7 +200,7 @@
                                 <td class="bold1">
                                 </td>
                                 <td class="normal1">
-                                    @if($data->offer_letter_send_at != NULL && isset($data->isAuth) && $data->isAuth == 0 && $data->pif_sign == '')
+                                    @if($data->offer_letter_send_at != NULL && isset($data->isAuth) && $data->isAuth == 0 && $data->candidateDetails->offer_sign == '')
                                         <form class="w3-container" action="{{route('offerletter.signed')}}" method="POST" id="candidatepersonalInfoForm"
                                             name="DAFORM"  enctype="multipart/form-data" target="_self">
                                             @csrf
@@ -253,12 +253,12 @@
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-offer-letter-signature']);
                                     @endphp                    
-                                    @if($hasPermission && isset($data->canVerifySign) && $data->canVerifySign == true && $data->offer_letter_verified_at == NULL && $data->offer_letter_verified_by == NULL && $data->pif_sign != NULL)
+                                    @if($hasPermission && isset($data->canVerifySign) && $data->canVerifySign == true && $data->offer_letter_verified_at == NULL && $data->offer_letter_verified_by == NULL && $data->candidateDetails->offer_sign != NULL)
                                     <table>
                                     <tbody>
                                         <tr>
                                         <button type="button" class="btn btn-success btn-verify-offer-letter-sign"
-												data-id="{{ $data->id }}" data-status="approved"><i class="fa fa-check" aria-hidden="true"></i> Signature Verified</button>
+												data-id="{{ $data->id }}" data-status="approved"><i class="fa fa-check" aria-hidden="true"></i> Verify Signature</button>
                                         </tr>
                                     </tbody>
                                     </table>
