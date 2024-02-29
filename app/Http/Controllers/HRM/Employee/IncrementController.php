@@ -26,7 +26,7 @@ class IncrementController extends Controller
         return view('hrm.increment.index',compact('datas'));
     }
     public function create() {
-        $employees = User::whereHas('empProfile', function($q) {
+        $employees = User::whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         return view('hrm.increment.create',compact('employees'));
@@ -88,7 +88,7 @@ class IncrementController extends Controller
         }       
     }
     public function edit($id) {
-        $employees = User::whereHas('empProfile', function($q) {
+        $employees = User::whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         $data = Increment::where('id',$id)->with('user.empProfile.department','user.empProfile.designation','user.empProfile.location')->first();

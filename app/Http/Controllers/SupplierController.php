@@ -81,7 +81,7 @@ class SupplierController extends Controller
 //            return view('demand_planning_suppliers.create');
 //        }
         $categories = MasterVendorCategory::all();
-        $users = User::where('id','!=','16')->select('id','name')->get();
+        $users = User::whereNotIn('id',[1,16])->select('id','name')->get();
         return view('suppliers.create',compact('paymentMethods','addons','users','categories'));
     }
 
@@ -329,7 +329,7 @@ class SupplierController extends Controller
 
         $addons = AddonDetails::whereIn('addon_type_name',$supTyp)->whereNotIn('id',$supplierAddons)
             ->select('id','addon_code','addon_id')->with('AddonName')->get();
-        $users = User::select('id','name')->get();
+        $users = User::whereNotIn('id',[1,16])->select('id','name')->get();
 
         return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods',
             'addons','paymentMethods','array','supplierTypes','supAddTypesName','supplierAddons','vendorCategories','masterSubCategories',

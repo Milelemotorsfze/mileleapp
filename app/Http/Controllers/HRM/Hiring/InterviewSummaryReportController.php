@@ -135,7 +135,7 @@ class InterviewSummaryReportController extends Controller
         $data = EmployeeHiringRequest::where('id',$id)->first();
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterGender = MasterGender::whereIn('id',[1,2])->get();
-        $interviewersNames = User::whereHas('empProfile')->select('id','name')->get();
+        $interviewersNames = User::whereNotIn('id',[1,16])->whereHas('empProfile')->select('id','name')->get();
         return view('hrm.hiring.interview_summary_report.createOrEdit',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
         'masterGender','interviewersNames','hiringrequests'));
     }

@@ -134,9 +134,9 @@ class PassportRequestController extends Controller
     // }
     public function edit($id) {
         $data = PassportRequest::where('id',$id)->first();
-        $Users = User::whereHas('empProfile')->get();
+        $Users = User::whereNotIn('id',[1,16])->whereHas('empProfile')->get();
         $masterEmployees = [];
-        $currentUser = User::where('id',$data->employee_id)->first();        
+        $currentUser = User::whereNotIn('id',[1,16])->where('id',$data->employee_id)->first();        
         if($currentUser) {
             array_push($masterEmployees,$currentUser);  
         }
@@ -165,7 +165,7 @@ class PassportRequestController extends Controller
             $previous = PassportRequest::where('id', '<', $id)->max('id');
             $next = PassportRequest::where('id', '>', $id)->min('id');
         }
-        $Users = User::whereHas('empProfile')->get();
+        $Users = User::whereNotIn('id',[1,16])->whereHas('empProfile')->get();
         $masterEmployees = [];
         foreach($Users as $User) {
             if($User->can_submit_or_release_passport == true) {

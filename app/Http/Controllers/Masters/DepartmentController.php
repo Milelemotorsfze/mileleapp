@@ -18,7 +18,7 @@ class DepartmentController extends Controller
         $data = MasterDepartment::where('id',$id)->first();
         $previous = MasterDepartment::where('id', '<', $id)->max('id');
         $next = MasterDepartment::where('id', '>', $id)->min('id');
-        $divisionHeads = User::whereHas('empProfile')->with('empProfile.department','empProfile.designation','empProfile.location')->whereIn('id',[2,26,31,10])->get();
+        $divisionHeads = User::whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.department','empProfile.designation','empProfile.location')->whereIn('id',[2,26,31,10])->get();
         return view('hrm.masters.department.edit',compact('data','previous','next','divisionHeads'));
     }
 }

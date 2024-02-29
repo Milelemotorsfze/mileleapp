@@ -186,7 +186,7 @@ class EmployeeLeaveController extends Controller
             $rejected = $rejected->where('employee_id',$authId)->latest();
         }
         $rejected =$rejected->get();
-        $leavePersonReplacedBy = User::whereHas('empProfile')->get();
+        $leavePersonReplacedBy = User::whereNotIn('id',[1,16])->whereHas('empProfile')->get();
         return view('hrm.leave.index',compact('pendings','approved','rejected','page','leavePersonReplacedBy'));
     }
     public function create() {
@@ -211,7 +211,7 @@ class EmployeeLeaveController extends Controller
             $previous = Leave::where('status',$data->status)->where('id', '<', $id)->max('id');
             $next = Leave::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
-        $masterEmployees = User::whereHas('empProfile')->with('empProfile.department','empProfile.designation','empProfile.location')->select('id','name')->get();
+        $masterEmployees = User::whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.department','empProfile.designation','empProfile.location')->select('id','name')->get();
         return view('hrm.leave.create',compact('id','data','previous','next','masterEmployees'));
     }
     public function storeOrUpdate(Request $request, $id) { 

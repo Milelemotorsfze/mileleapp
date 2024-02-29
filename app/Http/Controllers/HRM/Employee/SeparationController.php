@@ -93,7 +93,7 @@ class SeparationController extends Controller
     }
     public function edit($id) {
         $data = Separation::where('id',$id)->with('user.empProfile.department','user.empProfile.designation','user.empProfile.location')->first();
-        $employees = User::whereHas('empProfile', function($q) {
+        $employees = User::whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         $separationTypes = SeparationTypes::all();
@@ -141,7 +141,7 @@ class SeparationController extends Controller
         }     
     }
     public function create() {
-        $employees = User::whereHas('empProfile', function($q) {
+        $employees = User::whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         $separationTypes = SeparationTypes::all();
