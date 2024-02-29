@@ -38,18 +38,18 @@
 }
 </style>
 @section('content')
-@canany(['view-all-insurance-details','view-current-user-insurance-details'])
+@canany(['all-increment-details','current-user-increment-details'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-insurance-details','view-current-user-insurance-details']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['all-increment-details','current-user-increment-details']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Employee Insurance Details</h4>
+	<h4 class="card-title"> Employee Increment Details</h4>
 	@if($previous != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('insurance.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('increment.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
 	@endif
 	@if($next != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('insurance.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+	<a  class="btn btn-sm btn-info float-first" href="{{ route('increment.show',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
 	@endif
 	<a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 	@if (count($errors) > 0)
@@ -138,47 +138,63 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-insurance
             <div class="col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Insurance Details</h4>
+                        <h4 class="card-title">Increment Details</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Insurance Policy Number :</label>
+                                <label for="choices-single-default" class="form-label"> Basic Salary (AED) :</label>
                             </div>
                             <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{$data->insurance_policy_number ?? ''}}</span>
+                                <span>{{ $data->basic_salary ?? ''}}</span>
                             </div>
                             <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Insurance Card Number :</label>
+                                <label for="choices-single-default" class="form-label"> Other Allowances (AED) :</label>
                             </div>
                             <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{ $data->insurance_card_number ?? '' }}</span>
+                                <span>{{ $data->other_allowances ?? ''}}</span>
                             </div>
                             <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Insurance Policy Start Date :</label>
+                                <label for="choices-single-default" class="form-label"> Total Salary (AED) :</label>
                             </div>
                             <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                 <span>
-                                    @if($data->insurance_policy_start_date != NULL)
-                                        {{\Carbon\Carbon::parse($data->insurance_policy_start_date)->format('d M Y') ?? ''}}
+                                {{ $data->total_salary ?? ''}}
+                                </span>
+                            </div>
+                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                <label for="choices-single-default" class="form-label"> Increment Effective Date :</label>
+                            </div>
+                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                <span>
+                                    @if($data->increament_effective_date != NULL)
+                                        {{\Carbon\Carbon::parse($data->increament_effective_date)->format('d M Y') ?? ''}}
                                     @endif
                                 </span>
                             </div>
                             <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Insurance Policy End Date :</label>
+                                <label for="choices-single-default" class="form-label"> Increment Amount (AED) :</label>
                             </div>
                             <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>
-                                    @if($data->insurance_policy_end_date != NULL)
-                                        {{\Carbon\Carbon::parse($data->insurance_policy_end_date)->format('d M Y') ?? ''}}
-                                    @endif
-                                </span>
+                                <span>{{ $data->increment_amount ?? ''}}</span>
                             </div>
                             <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Insurance Cancellation Done :</label>
+                                <label for="choices-single-default" class="form-label"> Revised Basic Salary (AED) :</label>
                             </div>
                             <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{ $data->insurance_cancellation_done ?? '' }}</span>
+                                <span>{{ $data->revised_basic_salary ?? ''}}</span>
+                            </div>
+                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                <label for="choices-single-default" class="form-label"> Revised Other Allowance (AED) :</label>
+                            </div>
+                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                <span>{{ $data->revised_other_allowance ?? ''}}</span>
+                            </div>
+                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                <label for="choices-single-default" class="form-label"> Revised Total Salary (AED) :</label>
+                            </div>
+                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                <span>{{ $data->revised_total_salary ?? ''}}</span>
                             </div>
                             <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                 <label for="choices-single-default" class="form-label"> Date :</label>
@@ -203,38 +219,38 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-insurance
         </div>
         <div class="row">
             <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+            @if(isset($data->increment_image))
                 <div class="card preview-div">
                     <div class="card-body">
                         <div class="row">			
                             <div class="col-lg-12 col-md-12 col-sm-12 mt-12">
-                                <span class="fw-bold col-form-label text-md-end" id="insurance-label"></span>
-                                <div id="insurance-preview">
-                                @if(isset($data->insurance_image))
-                                <div id="insurance-preview1">
+                                <span class="fw-bold col-form-label text-md-end" id="increment-label"></span>
+                                <div id="increment-preview">
+                                <div id="increment-preview1">
                                     <div class="row">
                                         <div class="col-lg-6 col-md-12 col-sm-12 mt-1">
-                                            <h6 class="fw-bold text-center mb-1" style="float:left;">insurance</h6>
+                                            <h6 class="fw-bold text-center mb-1" style="float:left;">increment</h6>
                                         </div>
                                         <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
                                             <button  type="button" class="btn btn-sm btn-info mb-1 " style="float:right;">
-                                            <a href="{{ url('hrm/employee/insurance/' . $data->insurance_image) }}" download class="text-white">
+                                            <a href="{{ url('hrm/employee/increment/' . $data->increment_image) }}" download class="text-white">
                                             Download
                                             </a>
                                             </button>                                           
                                         </div>
                                     </div>
-                                    <iframe src="{{ url('hrm/employee/insurance/' . $data->insurance_image) }}" height="500" alt="insurance"></iframe>                                                                           
+                                    <iframe src="{{ url('hrm/employee/increment/' . $data->increment_image) }}" height="500" alt="increment"></iframe>                                                                           
                                 </div>
-                                @endif										
                                 </div>
                             </div>
-                            <input type="hidden" id="insurance-file-delete" name="is_insurance_delete" value="">   									
+                            <input type="hidden" id="increment-file-delete" name="is_increment_delete" value="">   									
                         </div>
                     </div>
                 </div>
+                @endif	
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">All Ticket Allowance PO Details</h4>
+                        <h4 class="card-title">All Increment Details</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -242,11 +258,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-insurance
                                 <thead>
                                     <tr>
                                         <th>Sl No</th>
-                                        <th>Insurance Policy Number</th>
-                                        <th>Insurance Card Number</th>
-                                        <th>Insurance Policy Start Date</th>
-                                        <th>Insurance Policy End Date</th>
-                                        <th>Insurance Cancellation Done</th>
+                                        <th>Basic Salary (AED)</th>
+                                        <th>Other Allowances (AED)</th>
+                                        <th>Total Salary (AED)</th>
+                                        <th>Increment Effective Date</th>
+                                        <th>Increment Amount (AED)</th>
+                                        <th>Revised Basic Salary (AED)</th>
+                                        <th>Revised Other Allowance (AED)</th>
+                                        <th>Revised Total Salary (AED)</th>
                                         <th>Created At</th>
                                         <th>Created By</th>
                                         <th>Updated At</th>
@@ -258,19 +277,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-insurance
                                     @foreach($all as $one)
                                     <tr>
                                         <td>{{ ++$i }}</td>
-                                        <td>{{ $one->insurance_policy_number ?? ''}}</td>
-                                        <td>{{ $one->insurance_card_number ?? ''}}</td>
-                                        <td>
-                                            @if($data->insurance_policy_start_date != NULL)
-                                                {{\Carbon\Carbon::parse($data->insurance_policy_start_date)->format('d M Y') ?? ''}}
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($data->insurance_policy_end_date != NULL)
-                                                {{\Carbon\Carbon::parse($data->insurance_policy_end_date)->format('d M Y') ?? ''}}
-                                            @endif
-                                        </td>
-                                        <td>{{ $one->insurance_cancellation_done ?? ''}}</td>
+                                        <td>{{ $data->basic_salary ?? ''}}</td>
+                                        <td>{{ $data->other_allowances ?? ''}}</td>
+                                        <td>{{ $data->total_salary ?? ''}}</td>
+                                        <td>{{ $data->increament_effective_date ?? ''}}</td>
+                                        <td>{{ $data->increment_amount ?? ''}}</td>
+                                        <td>{{ $data->revised_basic_salary ?? ''}}</td>
+                                        <td>{{ $data->revised_other_allowance ?? ''}}</td>
+                                        <td>{{ $data->revised_total_salary ?? ''}}</td>
                                         <td>
                                             @if($data->created_at != NULL)
                                                 {{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
