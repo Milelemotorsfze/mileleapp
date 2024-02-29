@@ -130,16 +130,7 @@
                                 <tr>
                                     <td>{{$letterOfIndentItem->quantity}}</td>
                                     <td>
-                                        {{ strtoupper($letterOfIndentItem->masterModel->steering) }}, BRAND NEW,
-                                        @if($letterOfIndentItem->masterModel->variant()->exists())
-                                            {{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}},
-                                            {{ strtoupper($letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? '') }},
-                                            {{ strtoupper($letterOfIndentItem->masterModel->variant->fuel_type) ?? ''}}
-                                            @if($letterOfIndentItem->masterModel->variant->engine != '')
-                                                , ENGINE {{ strtoupper($letterOfIndentItem->masterModel->variant->engine) ?? ''}}
-                                            @endif
-                                        @endif
-                                            - SPECIFICATION ATTACHED IN APPENDIX
+                                        {{ $letterOfIndentItem->masterModel->milele_loi_description ?? ''}}
                                     </td>
                                     <td style="background-color: black;color: black" >0</td>
                                     <td style="background-color: black;color: black" >0</td>

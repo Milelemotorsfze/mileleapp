@@ -15,7 +15,7 @@
         table ,td,th{
             font-family: arial, sans-serif;
             border-collapse: collapse;
-            width: 100%;
+            /*width: 100%;*/
             padding:10px;
             border: 1px solid #1c1b1b;
             /*background-color: #0a58ca;*/
@@ -58,7 +58,7 @@
 
             <p>I am writing on behalf of {{ $letterOfIndent->customer->company_name ?? '' }}  to formally convey our intent to procure automobile(s) from Milele Motors.
                 Please find our company's automotive requirements listed with specifications below.</p>
-            <table class="table-responsive">
+            <table class="table table-responsive">
                 <tr>
                     <th >Brand</th>
                     <th>Model Type</th>
@@ -72,8 +72,10 @@
                             @endif
                         </td>
                         <td>
-                            @if($letterOfIndentItem->masterModel->variant()->exists())
-                                {{ strtoupper($letterOfIndentItem->masterModel->variant->master_model_lines->model_line) ?? ''}}
+                            @if($letterOfIndentItem->LOI->dealers == 'Trans Cars')
+                                {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
+                            @else
+                                {{ $letterOfIndentItem->masterModel->milele_loi_description ?? '' }}
                             @endif
                         </td>
                         <td>{{ $letterOfIndentItem->quantity }}</td>
