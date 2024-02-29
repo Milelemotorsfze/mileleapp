@@ -116,7 +116,7 @@ class InterviewSummaryReportController extends Controller
         $selectedForJob = InterviewSummaryReport::where('status','approved')->where('seleced_status','selected')->latest()->get(); 
         $docsUploaded = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')->whereHas('candidateDetails')->latest()->get();
         // dd($docsUploaded);
-        $interviewersNames = User::whereHas('empProfile')->select('id','name')->get();
+        $interviewersNames = User::whereHas('empProfile')->whereNotIn('id',[1,16])->select('id','name')->get();
         return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','notSelected',
         'pendings','approved','selectedForJob','docsUploaded','rejected','interviewersNames'));
     }

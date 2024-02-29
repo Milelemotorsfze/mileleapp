@@ -101,7 +101,7 @@
                         <tbody>
                             <tr>
                                 <td class="bold"><strong>Basic Salary</strong></td>
-                                <td class="normal">AED {{$data->candidateDetails->basic_salary}}/- p.m. ( {{$inwords['basic_salary']}} Only )</td>
+                                <td class="normal">AED {{$data->candidateDetails->basic_salary}}/- p.m. ( {{$inwords['basic_salary'] ?? }} Only )</td>
                             </tr>
                             <tr>
                                 <td class="bold"><strong>Other Allowance</strong></td>

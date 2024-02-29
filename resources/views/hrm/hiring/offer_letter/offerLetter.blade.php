@@ -102,15 +102,15 @@
                         <tbody>
                             <tr>
                                 <td class="bold"><strong>Basic Salary</strong></td>
-                                <td class="normal">AED {{$data->candidateDetails->basic_salary}}/- p.m. ( {{$inwords['basic_salary'] ?? ''}} Only )</td>
+                                <td class="normal">AED {{$data->candidateDetails->basic_salary}}/- p.m. ( {{$inwords['basic_salary'] ?? $data->inwords_basic_salary ?? ''}} Only )</td>
                             </tr>
                             <tr>
                                 <td class="bold"><strong>Other Allowance</strong></td>
-                                <td class="normal">AED {{$data->candidateDetails->other_allowances}}/- p.m. ( {{$inwords['other_allowances'] ?? ''}} Only )</td>
+                                <td class="normal">AED {{$data->candidateDetails->other_allowances}}/- p.m. ( {{$inwords['other_allowances'] ?? $data->inwords_other_allowances ?? ''}} Only )</td>
                             </tr>
                             <tr>
                                 <td class="bold"><strong>Total Salary</strong></td>
-                                <td class="normal">AED {{$data->candidateDetails->total_salary}}/- p.m. ( {{$inwords['total_salary'] ?? ''}} Only )</td>
+                                <td class="normal">AED {{$data->candidateDetails->total_salary}}/- p.m. ( {{$inwords['total_salary'] ?? $data->inwords_total_salary ?? ''}} Only )</td>
                             </tr>
                             <tr>
                                 <td class="bold"><strong>Place of Work</strong></td>
@@ -200,7 +200,7 @@
                                 <td class="bold1">
                                 </td>
                                 <td class="normal1">
-                                    @if($data->offer_letter_send_at != NULL && isset($data->isAuth) && $data->isAuth == 0 && $data->pif_sign == '')
+                                    @if($data->offer_letter_send_at != NULL && isset($data->isAuth) && $data->isAuth == 0 && $data->candidateDetails->offer_sign == '')
                                         <form class="w3-container" action="{{route('offerletter.signed')}}" method="POST" id="candidatepersonalInfoForm"
                                             name="DAFORM"  enctype="multipart/form-data" target="_self">
                                             @csrf
@@ -253,12 +253,12 @@
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-offer-letter-signature']);
                                     @endphp                    
-                                    @if($hasPermission && isset($data->canVerifySign) && $data->canVerifySign == true && $data->offer_letter_verified_at == NULL && $data->offer_letter_verified_by == NULL && $data->pif_sign != NULL)
+                                    @if($hasPermission && isset($data->canVerifySign) && $data->canVerifySign == true && $data->offer_letter_verified_at == NULL && $data->offer_letter_verified_by == NULL && $data->candidateDetails->offer_sign != NULL)
                                     <table>
                                     <tbody>
                                         <tr>
                                         <button type="button" class="btn btn-success btn-verify-offer-letter-sign"
-												data-id="{{ $data->id }}" data-status="approved"><i class="fa fa-check" aria-hidden="true"></i> Signature Verified</button>
+												data-id="{{ $data->id }}" data-status="approved"><i class="fa fa-check" aria-hidden="true"></i> Verify Signature</button>
                                         </tr>
                                     </tbody>
                                     </table>

@@ -1450,59 +1450,91 @@ foreach ($modelLineIds as $modelLineId) {
         $useractivities->activity = "Open Leads Export Page";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return view('calls.leadsexport');
+        $countries = CountryListFacade::getList('en');
+        $strategies = Strategy::get();
+        $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
+        $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
+        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+        return view('calls.leadsexport', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'strategies'));
     }
     public function exportsleadsform(Request $request)
-    {
-        $useractivities = new UserActivities();
-        $useractivities->activity = "Export the Leads Data";
-        $useractivities->users_id = Auth::id();
-        $useractivities->save();
-        $fromDate = $request->input('fromDate');
-        $toDate = date('Y-m-d', strtotime($request->input('toDate') . ' +1 day'));
-        $headings = [
-            'Name',
-            'Phone',
-            'Email',
-            'Remarks',
-            'Location',
-            'Language',
-            'Created At',
-            'Type',
-            'Priority',
-            'Custom Brand Model',
-            'Sales Person Name',
-            'Lead Source Name',
-            'Strategies',
-            'Model Line',
-            'Status',
-        ];
-        $data = \DB::table('calls as c')
-            ->join('users as u', 'c.sales_person', '=', 'u.id')
-            ->join('lead_source as ls', 'c.source', '=', 'ls.id')
-            ->leftJoin('strategies as st', 'c.strategies_id', '=', 'st.id')
-            ->leftJoin('calls_requirement as cr', 'c.id', '=', 'cr.lead_id')
-            ->leftJoin('master_model_lines as mml', 'cr.model_line_id', '=', 'mml.id')
-            ->whereBetween('c.created_at', [$fromDate, $toDate])
-            ->select(
-                'c.name',
-                \DB::raw('CAST(c.phone AS UNSIGNED) as phone'),
-                'c.email',
-                'c.remarks',
-                'c.location',
-                'c.language',
-                'c.created_at',
-                'c.type',
-                'c.priority',
-                'c.custom_brand_model',
-                'u.name as sales_person_name',
-                'ls.source_name as lead_source_name',
-                \DB::raw('IFNULL(st.name, "No Strategy") as strategies'),
-                'mml.model_line as model_line',
-                'c.status'
-            )
-            ->get()
-            ->toArray();
-        return Excel::download(new LeadsExport($data, $headings), 'leads_export.xlsx');
+{
+    $useractivities = new UserActivities();
+    $useractivities->activity = "Export the Leads Data";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
+    $fromDate = $request->input('fromDate');
+    $source = $request->input('source');
+    $strategy = $request->input('strategy');
+    $salesperson = $request->input('salesperson');
+    $modelline = $request->input('modelline');
+    $priority = $request->input('priority');
+    $location = $request->input('location');
+    $language = $request->input('language');
+    $toDate = date('Y-m-d', strtotime($request->input('toDate') . ' +1 day'));
+    $headings = [
+        'Name',
+        'Phone',
+        'Email',
+        'Remarks',
+        'Location',
+        'Language',
+        'Created At',
+        'Type',
+        'Priority',
+        'Custom Brand Model',
+        'Sales Person Name',
+        'Lead Source Name',
+        'Strategies',
+        'Model Line',
+        'Status',
+    ];
+    $data = \DB::table('calls as c')
+        ->join('users as u', 'c.sales_person', '=', 'u.id')
+        ->join('lead_source as ls', 'c.source', '=', 'ls.id')
+        ->leftJoin('strategies as st', 'c.strategies_id', '=', 'st.id')
+        ->leftJoin('calls_requirement as cr', 'c.id', '=', 'cr.lead_id')
+        ->leftJoin('master_model_lines as mml', 'cr.model_line_id', '=', 'mml.id')
+        ->whereBetween('c.created_at', [$fromDate, $toDate]);
+    if ($source !== null) {
+        $data->where('c.source', $source);
     }
+    if ($strategy !== null) {
+        $data->where('c.strategies_id', $strategy);
+    }
+    if ($salesperson !== null) {
+        $data->where('c.sales_person', $salesperson);
+    }
+    if ($modelline !== null) {
+        $data->where('cr.model_line_id', $modelline);
+    }
+    if ($priority !== null) {
+        $data->where('c.priority', $priority);
+    }
+    if ($location !== null) {
+        $data->where('c.location', $location);
+    }
+    if ($language !== null) {
+        $data->where('c.language', $language);
+    }
+    $data->select(
+        'c.name',
+        \DB::raw('CAST(c.phone AS UNSIGNED) as phone'),
+        'c.email',
+        'c.remarks',
+        'c.location',
+        'c.language',
+        'c.created_at',
+        'c.type',
+        'c.priority',
+        'c.custom_brand_model',
+        'u.name as sales_person_name',
+        'ls.source_name as lead_source_name',
+        \DB::raw('IFNULL(st.name, "No Strategy") as strategies'),
+        'mml.model_line as model_line',
+        'c.status'
+    );
+    $results = $data->get()->toArray();
+    return Excel::download(new LeadsExport($results, $headings), 'leads_export.xlsx');
+}
 }
