@@ -19,6 +19,8 @@ use Carbon\Carbon;
 class EmployeeLeaveController extends Controller
 {
     public function approvalAwaiting(Request $request) {
+        $leavePersonReplacedBy = '';
+        $leavePersonReplacedBy = User::whereNotIn('id',[1,16])->whereHas('empProfile')->get();
         $authId = Auth::id();
         $page = 'approval';
         $HRManager = '';
@@ -94,7 +96,7 @@ class EmployeeLeaveController extends Controller
             ['action_by_division_head','rejected'],
             ['division_head_id',$authId],
             ])->latest()->get();
-        return view('hrm.leave.approvals',compact('page','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','employeePendings',
+        return view('hrm.leave.approvals',compact('leavePersonReplacedBy','page','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','employeePendings',
         'employeeApproved','employeeRejected','HRManagerPendings','HRManagerApproved','HRManagerRejected','ReportingManagerPendings','ReportingManagerApproved','ReportingManagerRejected'));
     }
     public function requestAction(Request $request) {
@@ -186,6 +188,7 @@ class EmployeeLeaveController extends Controller
             $rejected = $rejected->where('employee_id',$authId)->latest();
         }
         $rejected =$rejected->get();
+        $leavePersonReplacedBy = '';
         $leavePersonReplacedBy = User::whereNotIn('id',[1,16])->whereHas('empProfile')->get();
         return view('hrm.leave.index',compact('pendings','approved','rejected','page','leavePersonReplacedBy'));
     }
