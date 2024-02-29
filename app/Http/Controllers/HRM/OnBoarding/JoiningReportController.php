@@ -287,11 +287,8 @@ class JoiningReportController extends Controller
             $q->where('offer_letter_verified_at','!=',NULL);
         })->with('designation','department')->get();
         $masterlocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get(); 
-        $reportingTo = User::where([
-            ['id','!=',16],
-            ['status','active']
-        ])->get();
-        $employees = User::whereHas('empProfile')->with('empProfile.designation','empProfile.department','empProfile.location')->get();
+        $reportingTo = User::whereNotIn('id',[1,16])->where('status','active')->get();
+        $employees = User::whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.designation','empProfile.department','empProfile.location')->get();
         $masterDepartments = MasterDepartment::get();
         if($data->joining_type == 'new_employee') {
             return view('hrm.onBoarding.joiningReport.edit',compact('data','candidates','masterlocations','reportingTo'));
@@ -308,9 +305,11 @@ class JoiningReportController extends Controller
         try {
             $message = '';
             $update = JoiningReport::where('id',$request->id)->first();
-            if($update && $update->sataus =='pending') {
-
-            
+            if($update && $update->status == 'pending' && (
+                ($request->current_approve_position == 'Prepared by' && $update->action_by_prepared_by == 'pending') 
+                OR ($request->current_approve_position == 'Employee' && $update->action_by_employee == 'pending') 
+                OR ($request->current_approve_position == 'HR Manager' && $update->action_by_hr_manager == 'pending') 
+                OR ($request->current_approve_position == 'Reporting Manager' && $update->action_by_department_head == 'pending'))) {
             if($request->current_approve_position == 'Prepared by') {
                 $update->comments_by_prepared_by = $request->comment;
                 $update->prepared_by_action_at = Carbon::now()->format('Y-m-d H:i:s');

@@ -3,9 +3,6 @@
   .texttransform {
     text-transform: capitalize;
   }
-  
-/* element.style {
-} */
 .nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
     width: 99%;
     border: 1px solid #4ba6ef !important;
@@ -246,9 +243,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-requ
                                             Status :
                                         </div>
                                         <div class="col-lg-10 col-md-12 col-sm-12">
-                                            <label class="badge texttransform @if($data->submit_action_by_department_head =='pending') badge-soft-info 
-                                        @elseif($data->submit_action_by_department_head =='approved') badge-soft-success 
-                                        @else badge-soft-danger @endif">{{$data->submit_action_by_department_head ?? ''}}</label>
+                                            <label class="badge texttransform @if($data->submit_action_by_division_head =='pending') badge-soft-info 
+                                        @elseif($data->submit_action_by_division_head =='approved') badge-soft-success 
+                                        @else badge-soft-danger @endif">{{$data->submit_action_by_division_head ?? ''}}</label>
                                         </div>
                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                             Date & Time :

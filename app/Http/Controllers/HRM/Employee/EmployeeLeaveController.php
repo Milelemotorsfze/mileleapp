@@ -19,6 +19,8 @@ use Carbon\Carbon;
 class EmployeeLeaveController extends Controller
 {
     public function approvalAwaiting(Request $request) {
+        $leavePersonReplacedBy = '';
+        $leavePersonReplacedBy = User::whereNotIn('id',[1,16])->whereHas('empProfile')->get();
         $authId = Auth::id();
         $page = 'approval';
         $HRManager = '';
@@ -94,7 +96,7 @@ class EmployeeLeaveController extends Controller
             ['action_by_division_head','rejected'],
             ['division_head_id',$authId],
             ])->latest()->get();
-        return view('hrm.leave.approvals',compact('page','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','employeePendings',
+        return view('hrm.leave.approvals',compact('leavePersonReplacedBy','page','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','employeePendings',
         'employeeApproved','employeeRejected','HRManagerPendings','HRManagerApproved','HRManagerRejected','ReportingManagerPendings','ReportingManagerApproved','ReportingManagerRejected'));
     }
     public function requestAction(Request $request) {
@@ -186,7 +188,8 @@ class EmployeeLeaveController extends Controller
             $rejected = $rejected->where('employee_id',$authId)->latest();
         }
         $rejected =$rejected->get();
-        $leavePersonReplacedBy = User::whereHas('empProfile')->get();
+        $leavePersonReplacedBy = '';
+        $leavePersonReplacedBy = User::whereNotIn('id',[1,16])->whereHas('empProfile')->get();
         return view('hrm.leave.index',compact('pendings','approved','rejected','page','leavePersonReplacedBy'));
     }
     public function create() {
@@ -211,7 +214,7 @@ class EmployeeLeaveController extends Controller
             $previous = Leave::where('status',$data->status)->where('id', '<', $id)->max('id');
             $next = Leave::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
-        $masterEmployees = User::whereHas('empProfile')->with('empProfile.department','empProfile.designation','empProfile.location')->select('id','name')->get();
+        $masterEmployees = User::whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.department','empProfile.designation','empProfile.location')->select('id','name')->get();
         return view('hrm.leave.create',compact('id','data','previous','next','masterEmployees'));
     }
     public function storeOrUpdate(Request $request, $id) { 
@@ -237,7 +240,7 @@ class EmployeeLeaveController extends Controller
                 $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 // $departmentHead = DepartmentHeadApprovals::where('department_id',$employee->department_id)->first();
-                $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
+                $divisionHead = MasterDivisionWithHead::where('id',$employee->department->division_id)->first();
                 $input = $request->all();
                 if($id == 'new') {
                     $input['created_by'] = $authId;   

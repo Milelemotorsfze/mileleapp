@@ -256,7 +256,7 @@ class EmployeeLiabilityController extends Controller
             $previous = Liability::where('status',$data->status)->where('id', '<', $id)->max('id');
             $next = Liability::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
-        $masterEmployees = User::whereHas('empProfile')->with('empProfile.designation','empProfile.department','empProfile.location')->select('id','name')->get();
+        $masterEmployees = User::whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.designation','empProfile.department','empProfile.location')->select('id','name')->get();
         return view('hrm.liability.create',compact('id','data','previous','next','masterEmployees'));
     }
     public function storeOrUpdate(Request $request, $id) { 
@@ -279,7 +279,7 @@ class EmployeeLiabilityController extends Controller
                 $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 $financeManager = ApprovalByPositions::where('approved_by_position','Finance Manager')->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
-                $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
+                $divisionHead = MasterDivisionWithHead::where('id',$employee->department->division_id)->first();
                 $input = $request->all();
                 if($id == 'new') {
                     $input['created_by'] = $authId;                   

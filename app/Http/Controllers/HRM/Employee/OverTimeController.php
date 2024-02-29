@@ -47,7 +47,7 @@ class OverTimeController extends Controller
         return view('hrm.overtime.index',compact('pendings','approved','rejected'));
     }
     public function create() {
-        $employees = User::whereHas('empProfile', function($q) {
+        $employees = User::whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         return view('hrm.overtime.create',compact('employees'));
@@ -85,7 +85,7 @@ class OverTimeController extends Controller
                     $authId = Auth::id();
                     $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                     $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
-                    $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
+                    $divisionHead = MasterDivisionWithHead::where('id',$employee->department->division_id)->first();
                     $input = $request->all();
                     $input['created_by'] = $authId; 
                     $input['hr_manager_id'] = $HRManager->handover_to_id;                
@@ -166,7 +166,7 @@ class OverTimeController extends Controller
     }   
     public function edit($id) {
         $data = OverTime::where('id', $id)->with('times','user.empProfile.department','user.empProfile.designation','user.empProfile.location')->first();
-        $employees = User::whereHas('empProfile', function($q) {
+        $employees = User::whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         return view('hrm.overtime.edit',compact('data','employees'));

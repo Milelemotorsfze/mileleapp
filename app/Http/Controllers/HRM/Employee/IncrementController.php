@@ -26,7 +26,7 @@ class IncrementController extends Controller
         return view('hrm.increment.index',compact('datas'));
     }
     public function create() {
-        $employees = User::whereHas('empProfile', function($q) {
+        $employees = User::whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         return view('hrm.increment.create',compact('employees'));
@@ -88,7 +88,7 @@ class IncrementController extends Controller
         }       
     }
     public function edit($id) {
-        $employees = User::whereHas('empProfile', function($q) {
+        $employees = User::whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         $data = Increment::where('id',$id)->with('user.empProfile.department','user.empProfile.designation','user.empProfile.location')->first();
@@ -97,11 +97,11 @@ class IncrementController extends Controller
     public function update(Request $request, $id) {
         $validator = Validator::make($request->all(), [
             'employee_id' => 'required',
-            'increment_policy_number' => 'required',
-            'increment_card_number' => 'required',
-            'increment_policy_start_date' => 'required',
-            'increment_policy_end_date' => 'required',
-            'increment_image' => 'required',
+            'increament_effective_date' => 'required',
+            'increment_amount' => 'required',
+            'revised_basic_salary' => 'required',
+            'revised_other_allowance' => 'required',
+            'revised_total_salary' => 'required',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withInput()->withErrors($validator);
@@ -126,7 +126,7 @@ class IncrementController extends Controller
                     $update->increment_policy_number = $request->increment_policy_number;
                     $update->increment_card_number = $request->increment_card_number;
                     $update->increment_policy_start_date = $request->increment_policy_start_date;
-                    $update->increment_policy_end_date = $request->increment_policy_end_date;
+                    $update->increament_effective_date = $request->increament_effective_date;
                     $update->updated_by = $authId;
                     $update->update();
                 }
@@ -145,7 +145,7 @@ class IncrementController extends Controller
         $data = Increment::where('id',$id)->first();
         $previous = Increment::where('id', '<', $id)->max('id');
         $next = Increment::where('id', '>', $id)->min('id');
-        $all = Increment::where('employee_id',$data->employee_id)->latest('increment_policy_end_date')->get();
+        $all = Increment::where('employee_id',$data->employee_id)->latest('increament_effective_date')->get();
         return view('hrm.increment.show',compact('data','previous','next','all'));
     }
 }

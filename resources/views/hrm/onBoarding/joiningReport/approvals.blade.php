@@ -119,7 +119,7 @@
 																data-bs-target="#reject-joining-report-{{$data->id}}">
 																<i class="fa fa-thumbs-down" aria-hidden="true"></i>
 															</button>
-														@elseif($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] == 'Employee' && $data->employee->user_id != NULL)	
+														@elseif($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] == 'Employee' && $data->employee_id != NULL)	
 															<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 																data-bs-target="#approve-joining-report-{{$data->id}}">
 																<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
@@ -377,7 +377,7 @@
 																data-bs-target="#reject-joining-report-{{$data->id}}">
 																<i class="fa fa-thumbs-down" aria-hidden="true"></i>
 															</button>
-														@elseif($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] == 'Employee' && $data->employee->user_id != NULL)	
+														@elseif($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] == 'Employee' && $data->employee_id != NULL)	
 															<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 																data-bs-target="#approve-joining-report-{{$data->id}}">
 																<i class="fa fa-thumbs-up" aria-hidden="true"></i> 
@@ -631,7 +631,7 @@
 																data-bs-target="#reject-joining-report-{{$data->id}}">
 																<i class="fa fa-thumbs-down" aria-hidden="true"></i>
 															</button>
-														@elseif($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] == 'Employee' && $data->employee->user_id != NULL)	
+														@elseif($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] == 'Employee' && $data->employee_id != NULL)	
 															<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 																data-bs-target="#approve-joining-report-{{$data->id}}">
 																<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
@@ -885,7 +885,7 @@
 																data-bs-target="#reject-joining-report-{{$data->id}}">
 																<i class="fa fa-thumbs-down" aria-hidden="true"></i>
 															</button>
-														@elseif($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] == 'Employee' && $data->employee->user_id != NULL)	
+														@elseif($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] == 'Employee' && $data->employee_id != NULL)	
 															<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 																data-bs-target="#approve-joining-report-{{$data->id}}">
 																<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
