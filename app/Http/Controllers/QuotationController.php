@@ -990,11 +990,10 @@ public function addqaddone(Request $request)
         $quotationId = $request->input('qoutation_id');
         $signatureData = $request->input('signature_data');
         $decodedImage = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $signatureData)); // Remove data URL prefix
-        $pngImagePath = storage_path('app/public/signatures/') . uniqid() . '.png';
-        $pngImagePath = storage_path('app/public/signatures/') . uniqid() . '.png';
-        $directory = storage_path('app/public/signatures/');
+        $pngImagePath = public_path('storage/quotation_files/signatures/') . uniqid() . '.png';
+        $directory = public_path('storage/quotation_files/signatures/');
         if (!file_exists($directory)) {
-        mkdir($directory, 0777, true);
+            mkdir($directory, 0777, true);
         }
         file_put_contents($pngImagePath, $decodedImage);
         $pdf = new Fpdi();
