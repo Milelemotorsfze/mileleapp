@@ -185,10 +185,6 @@
                     <div id="file-preview">
                     </div>
                 </div>
-{{--                <div class="col-lg-4 col-md-12 col-sm-12">--}}
-{{--                    <div id="image-preview">--}}
-{{--                    </div>--}}
-{{--                </div>--}}
                 <div class="col-lg-4 col-md-12 col-sm-12">
                     <div id="signature-preview">
                     </div>
@@ -245,8 +241,8 @@
                                 </div>
                                 <div class="col-lg-1 col-md-6 col-sm-12">
                                     <label class="form-label">Quantity</label>
-                                    <input type="number" name="quantity[]" placeholder="Quantity"  maxlength="5" value="1" data-index="1" class="form-control widthinput quantities text-dark"
-                                           step="1" oninput="validity.valid||(value='');" min="0" id="quantity-1">
+                                    <input type="number" name="quantity[]" placeholder="Quantity"  maxlength="5" data-index="1" class="form-control widthinput quantities text-dark"
+                                           step="1" oninput="validity.valid||(value='');" min="1" id="quantity-1">
                                 </div>
                                 <div class="col-lg-1 col-md-6 col-sm-12">
                                     <label class="form-label">Inventory Qty</label>
@@ -287,9 +283,6 @@
             while (previewFile.firstChild) {
                 previewFile.removeChild(previewFile.firstChild);
             }
-            // while (previewImage.firstChild) {
-            //     previewImage.removeChild(previewImage.firstChild);
-            // }
             for (let i = 0; i < files.length; i++)
             {
                 const file = files[i];
@@ -300,13 +293,6 @@
                     iframe.src = objectUrl;
                     previewFile.appendChild(iframe);
                 }
-                // else if (file.type.match("image/*"))
-                // {
-                //     const objectUrl = URL.createObjectURL(file);
-                //     const image = new Image();
-                //     image.src = objectUrl;
-                //     previewImage.appendChild(image);
-                // }
             }
         });
         const signatureFileInput = document.querySelector("#signature-upload");
@@ -330,14 +316,14 @@
         });
         getCustomers();
 
-        // jQuery.validator.addMethod('required_check', function(value, element) {
-        //     let dealer = $('#dealer').val();
-        //     if(dealer == 'Milele Motors') {
-        //         return true;
-        //     }else{
-        //         return false;
-        //     }
-        // },'This feild is required');
+        jQuery.validator.addMethod('signature', function(value, element) {
+            let dealer = $('#dealer').val();
+            if(dealer == 'Milele Motors') {
+                return true;
+            }else{
+                return false;
+            }
+        },'This feild is required');
 
         $("#form-create").validate({
             ignore: [],
@@ -374,6 +360,7 @@
                     extension: "pdf"
                 },
                 loi_signature: {
+                    signature: true,
                     extension: "png|jpeg|jpg|svg"
                 },
                 messages: {
@@ -573,8 +560,8 @@
                                    class="form-control widthinput text-dark loi-descriptions" data-index="${index}" id="loi-description-${index}" >
                    </div>
                     <div class="col-lg-1 col-md-6 col-sm-12">
-                        <input type="number" name="quantity[]" placeholder="Quantity" maxlength="5" value="1" class="form-control widthinput text-dark quantities"
-                               step="1" oninput="validity.valid||(value='');" min="0" data-index="${index}" id="quantity-${index}">
+                        <input type="number" name="quantity[]" placeholder="Quantity" maxlength="5" class="form-control widthinput text-dark quantities"
+                               step="1" oninput="validity.valid||(value='');" min="1" data-index="${index}" id="quantity-${index}">
                     </div>
                     <div class="col-lg-1 col-md-6 col-sm-12">
                         <input type="number" readonly id="inventory-quantity-${index}" data-index="${index}" value="" class="form-control widthinput inventory-qty" >
@@ -709,6 +696,7 @@
 
         });
         $(document.body).on('select2:unselect', ".models", function (e) {
+            console.log("unselected");
             let index = $(this).attr('data-index');
 
             var modelYear =  $('#model-year-'+index).val();
@@ -723,22 +711,24 @@
 
             $('#sfx-'+index).empty();
             $('#model-year-'+index).empty();
+
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
             $('#inventory-quantity-'+index).val("");
-
+            $('#quantity-'+index).val("");
         });
         $(document.body).on('select2:unselect', ".model-years", function (e) {
             let index = $(this).attr('data-index');
             $('#loi-description-'+index).val("");
             $('#master-model-id-'+index).val("");
             $('#inventory-quantity-'+index).val("");
+            $('#quantity-'+index).val("");
 
             var modelYear = e.params.data.id;
             var model = $('#model-'+index).val();
             var sfx = $('#sfx-'+index).val();
             appendModelYear(index, model[0],sfx[0],modelYear);
-            // get the unseleted index and match with each row  item if model and sfx is matching append that row
+            // get the unseleted index and match with each row item if model and sfx is matching append that row
         });
 
        function getSfx(index) {
@@ -804,7 +794,6 @@
                    selectedModelIds:selectedModelIds,
                },
                success:function (data) {
-
                    $('#model-year-'+index).empty();
                    $('#model-year-'+index).html('<option value=""> Select Model Year </option>');
                    $('#loi-description-'+index).html('<option value=""> Select LOI Description </option>');
@@ -937,15 +926,15 @@
        function enableDealer() {
             // check any model year is selected or not
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;
-            var selectedModelYears = [];
+            var selectedModels = [];
             for(let i=1; i<=totalIndex; i++)
             {
-                var modelYear = $('#model-year-'+i).val();
-                if(modelYear[0]) {
-                    selectedModelYears.push(modelYear[0])
+                var model = $('#model'+i).val();
+                if(model) {
+                    selectedModels.push(model)
                 }
             }
-            if(selectedModelYears.length <= 0) {
+            if(selectedModels.length <= 0) {
                 $('#dealer').attr("disabled", false);
             }
        }
