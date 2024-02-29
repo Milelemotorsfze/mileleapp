@@ -237,7 +237,7 @@ class EmployeeLeaveController extends Controller
                 $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 // $departmentHead = DepartmentHeadApprovals::where('department_id',$employee->department_id)->first();
-                $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
+                $divisionHead = MasterDivisionWithHead::where('id',$employee->department->division_id)->first();
                 $input = $request->all();
                 if($id == 'new') {
                     $input['created_by'] = $authId;   
