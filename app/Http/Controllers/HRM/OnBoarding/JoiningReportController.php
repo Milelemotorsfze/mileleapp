@@ -305,9 +305,11 @@ class JoiningReportController extends Controller
         try {
             $message = '';
             $update = JoiningReport::where('id',$request->id)->first();
-            if($update && $update->sataus =='pending') {
-
-            
+            if($update && $update->status == 'pending' && (
+                ($request->current_approve_position == 'Prepared by' && $update->action_by_prepared_by == 'pending') 
+                OR ($request->current_approve_position == 'Employee' && $update->action_by_employee == 'pending') 
+                OR ($request->current_approve_position == 'HR Manager' && $update->action_by_hr_manager == 'pending') 
+                OR ($request->current_approve_position == 'Reporting Manager' && $update->action_by_department_head == 'pending'))) {
             if($request->current_approve_position == 'Prepared by') {
                 $update->comments_by_prepared_by = $request->comment;
                 $update->prepared_by_action_at = Carbon::now()->format('Y-m-d H:i:s');
