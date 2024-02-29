@@ -279,7 +279,7 @@ class EmployeeLiabilityController extends Controller
                 $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 $financeManager = ApprovalByPositions::where('approved_by_position','Finance Manager')->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
-                $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
+                $divisionHead = MasterDivisionWithHead::where('id',$employee->department->division_id)->first();
                 $input = $request->all();
                 if($id == 'new') {
                     $input['created_by'] = $authId;                   
