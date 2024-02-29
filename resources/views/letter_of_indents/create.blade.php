@@ -370,6 +370,7 @@
                     required: true
                 },
                 "files[]": {
+                    required:true,
                     extension: "pdf"
                 },
                 loi_signature: {
