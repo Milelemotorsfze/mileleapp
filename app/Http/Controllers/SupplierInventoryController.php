@@ -84,9 +84,6 @@ class SupplierInventoryController extends Controller
             if($request->dealers){
                 $supplierInventories = $supplierInventories->where('whole_sales', $request->dealers);
             }
-            if($request->country){
-                $supplierInventories = $supplierInventories->where('country', $request->country);
-            }
 
             $supplierInventories = $supplierInventories->get();
 
@@ -1209,7 +1206,6 @@ class SupplierInventoryController extends Controller
     }
     public function updateInventory(Request $request) {
         (new UserActivityController)->createActivity('Update the Supplier Inventories');
-        info($request->all());
 
         $updatedDatas = $request->selectedUpdatedDatas;
 

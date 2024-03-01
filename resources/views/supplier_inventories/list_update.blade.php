@@ -79,19 +79,6 @@
                         </div>
                     </div>
                     <div class="col-md-2">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Country</label>
-                             <select class="form-control input-width" data-trigger name="country" >
-                                    <option value="" >Select The Country</option>
-                                    <option value="UAE"
-                                        {{  "UAE" == request()->country ? 'selected'  : ''}}> UAE </option>
-                                    <option value="Belgium"
-                                        {{ "Belgium" == request()->country ? 'selected'  : '' }}>Belgium</option>
-                                </select>
-                        </div>
-                    </div>
-                
-                    <div class="col-md-2">
                         <button type="submit"  class="btn btn-primary mt-4 search">Search</button>
                         <a href="{{route('supplier-inventories.view-all')}}">
                             <button type="button"  class="btn btn-info mt-4 ">Refresh</button>
@@ -112,7 +99,7 @@
                     <th>SFX</th>
                     <th>Model Year</th>
                     <th>Variant</th>
-                   
+
                     <th>Chasis</th>
                     <th>Engine Number</th>
                     <th>Color Code</th>
@@ -169,7 +156,7 @@
                                 </select>
                             </td>
                             <td> {{ $supplierInventory->masterModel->variant->name ?? '' }}</td>
-                           
+
                             <td data-field="chasis" id="chasis-editable-{{$supplierInventory->id}}" contenteditable="true" data-id="{{$supplierInventory->id}}" >
                                 {{ $supplierInventory->chasis }}</td>
                             <td  data-field="engine_number" id="engine_number-editable-{{$supplierInventory->id}}"
@@ -248,7 +235,7 @@
             $('#dtBasicExample3 tbody td').on('change', '.whole_sales', function () {
                 var id = $(this).data('id');
                 var field = $(this).data('field');
-            
+
                 if(feildValidInput == true) {
                     addUpdatedData(id, field);
                 }
@@ -263,7 +250,7 @@
                     if($.isNumeric(value) == true){
                         feildValidInput = true;
                         removeValidationError(InputId);
-                    
+
                         if(value.length != 6) {
                             $msg = "Characters length should be 6";
                             showValidationError(InputId,$msg);
@@ -322,7 +309,7 @@
                         }
                         });
                     }
-                 
+
                 }else if(field == 'color_code') {
 
                     let url = '{{ route('supplier-inventories.isExistColorCode') }}';
@@ -365,7 +352,7 @@
                     let deliveryNote = $('#'+InputId).text();
 
                     if($.isNumeric(deliveryNote)) {
-                        if(deliveryNote.length < 5) {                        
+                        if(deliveryNote.length < 5) {
                             $msg = "Delivey Note minimum length should be 5";
                             showValidationError(InputId,$msg);
                         }else {
@@ -390,8 +377,8 @@
                          var splitValue = value.split('-');
                          var cellId = splitValue[1] +'-editable-' + splitValue[0];
                          console.log(cellId);
-                        
-                         if(splitValue[1] == 'model_year' || splitValue[1] == 'supplier_id' ||  splitValue[1] == 'eta_import' 
+
+                         if(splitValue[1] == 'model_year' || splitValue[1] == 'supplier_id' ||  splitValue[1] == 'eta_import'
                          || splitValue[1] == 'country' || splitValue[1] == 'whole_sales' ) {
                              var cellValue = $('#'+ cellId).val();
                          }else{
@@ -425,7 +412,7 @@
         });
         function addUpdatedData(id,field) {
             var arrayvalue = id + '-' + field;
-           
+
             if ($.inArray(arrayvalue, updatedData) == -1) {
                 updatedData.push(arrayvalue);
             }
