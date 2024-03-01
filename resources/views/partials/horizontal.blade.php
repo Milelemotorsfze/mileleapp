@@ -116,9 +116,9 @@
                                             <span data-key="t-utility">Employee Relation</span>
                                         </a> -->
                                         <div class="dropdown">
-                                            @canany(['view-division-listing','view-department-listing','view-current-user-department-lising','view-current-user-division'])
+                                            @canany(['view-division-listing','view-department-listing','division-approval-listing','view-current-user-department-lising','view-current-user-division'])
                                             @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-listing','view-current-user-division','view-department-listing','view-current-user-department-lising']);
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-listing','view-current-user-division','division-approval-listing','view-department-listing','view-current-user-department-lising']);
                                             @endphp
                                             @if ($hasPermission)
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
@@ -143,7 +143,14 @@
                                                 <a href="{{ route('department.index') }}" class="dropdown-item" data-key="t-login">Department Approvals</a>
                                                 @endif
                                                 @endcanany
-                                                <a href="" class="dropdown-item" data-key="t-login">Designation Approvals</a>
+                                                @canany(['division-approval-listing'])
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['division-approval-listing']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('designation-approvals.index') }}" class="dropdown-item" data-key="t-login">Designation Approvals</a>
+                                                @endif
+                                                @endcanany
                                             </div>
                                             @endif
                                             @endcanany

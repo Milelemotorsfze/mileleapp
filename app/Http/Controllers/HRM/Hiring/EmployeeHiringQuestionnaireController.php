@@ -58,7 +58,8 @@ class EmployeeHiringQuestionnaireController extends Controller
             'interviewdByUsers','masterRecuritmentSources','masterDepartments','masterExperienceLevels','masterSpecificIndustryExperiences','masterOfficeLocations'));
         }
         else {
-            return view('hrm.notaccess');
+            $errorMsg ="Sorry ! You don't have permission to access this page";
+            return view('hrm.notaccess',compact('errorMsg'));
         }
     }
     public function storeOrUpdate(Request $request, $id) {

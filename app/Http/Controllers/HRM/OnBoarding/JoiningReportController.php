@@ -96,10 +96,10 @@ class JoiningReportController extends Controller
         if($type == 'internal_transfer') {
             $employees = $employees->where(function ($query2) {
                 $query2->whereDoesntHave('joiningReport')
-                ->orWhereHas('joiningReport', function ($query1) {
+                ->orWhereDoesntHave('joiningReport', function ($query1) {
                     $query1->where([
                         ['joining_type','==','internal_transfer'],
-                        ['status','!=','pending'],
+                        ['status','==','pending'],
                     ]);
                 })
                 ;

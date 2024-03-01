@@ -39,4 +39,7 @@ class ApprovalByPositions extends Model
         $handoverToEmailName = $handoverToEmail->email;
         return $handoverToEmailName;
     }
+    public function designationPerson() {
+        return $this->hasOne(User::class,'id','approved_by_id');
+    }
 }
