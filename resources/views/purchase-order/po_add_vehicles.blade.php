@@ -13,7 +13,10 @@
                 <div class="bar">Stock Vehicles</div>
                 <div class="row">
                     <div class="col-lg-1 col-md-6">
-                        <label for="brandInput" class="form-label">Variants:</label>
+                        <label class="form-label">Model-SFX</label>
+                    </div>
+                    <div class="col-lg-1 col-md-6">
+                        <label for="brandInput" class="form-label">Variant:</label>
                     </div>
                     <div class="col-lg-1 col-md-6">
                         <label for="QTY" class="form-label">Brand:</label>
@@ -21,8 +24,8 @@
                     <div class="col-lg-1 col-md-6">
                         <label for="QTY" class="form-label">Model Line:</label>
                     </div>
-                    <div class="col-lg-2 col-md-6">
-                        <label for="QTY" class="form-label">Variants Detail:</label>
+                    <div class="col-lg-1 col-md-6">
+                        <label for="QTY" class="form-label">Variant Detail:</label>
                     </div>
                     <div class="col-lg-1 col-md-6">
                         <label for="exColour" class="form-label">Exterior Color:</label>
@@ -48,12 +51,15 @@
             <div class="bar">Add New Vehicles Into PO</div>
             <div class="row">
                 <div class="col-lg-2 col-md-6">
+                    <label class="form-label">Model-SFX</label>
+                </div>
+                <div class="col-lg-2 col-md-6">
                     <label class="form-label">Variant</label>
                 </div>
-                <div class="col-lg-2 col-md-6">
+                <div class="col-lg-1 col-md-6">
                     <label  class="form-label">Brand</label>
                 </div>
-                <div class="col-lg-2 col-md-6">
+                <div class="col-lg-1 col-md-6">
                     <label  class="form-label">Model Line</label>
                 </div>
                 <div class="col-lg-2 col-md-6">
@@ -76,6 +82,10 @@
                         <input type="hidden" name="approved_loi_ids[]" value="{{$pfiVehicleVariant->id}}">
                         <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiVehicleVariant->id}}" value="0">
                         <input type="hidden" id="master-model-id-{{$key}}" name="selected_model_ids[]"  value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->id ?? ''}}">
+                        <div class="col-lg-2 col-md-6 mt-md-2">
+                            <input type="text"  class="form-control" placeholder="Model" id="model-{{$key}}"
+                                   value="{{ $pfiVehicleVariant->letterOfIndentItem->masterModel->model ."-". $pfiVehicleVariant->letterOfIndentItem->masterModel->sfx}}" readonly>
+                        </div>
                         <div class="col-lg-2 col-md-6">
                             <select class="form-control mb-2 variants" id="variant-id-{{$key}}" data-key="{{$key}}" >
                                 @foreach($pfiVehicleVariant->masterModels as $masterModel)
@@ -86,11 +96,11 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-lg-2 col-md-6">
-                            <input type="text"   class="form-control" placeholder="Brand" id="brand-{{$key}}"
+                        <div class="col-lg-1 col-md-6">
+                            <input type="text" class="form-control" placeholder="Brand" id="brand-{{$key}}"
                                    value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}}" readonly>
                         </div>
-                        <div class="col-lg-2 col-md-6">
+                        <div class="col-lg-1 col-md-6">
                             <input type="text"  class="form-control" id="master-model-line-{{$key}}"
                                    value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? ''}}"
                                    placeholder="Model Line" readonly>
@@ -221,6 +231,7 @@
                     var selectedVariant = $('#variant-id-' + i).find(":selected").text();
 
                     var brand = $('#brand-' + i).val();
+                    var model = $('#model-'+i).val();
                     var masterModelLine = $('#master-model-line-' + i).val();
                     var detail = $('#variant-detail-' + i).val();
                     var masterModelId = $('#master-model-id-' + i).val();
@@ -238,17 +249,18 @@
                         var newRow = $('<div class="row row-space"></div>');
                         var LoiItemCol  = $('<input type="hidden" name="loi_item_Ids[]" value="' + loiItemId + '" >');
                         var masterModelCol = $('<input type="hidden" id="model-id" name="master_model_id[]" value="' + masterModelId + '" >');
-                        var variantCol = $('<div class="col-lg-1 col-md-6"><input type="text" id="variant-id"  name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
-                        var brandCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="brand[]" value="' + brand + '" class="form-control" readonly></div>');
-                        var masterModelLineCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
-                        var detailCol = $('<div class="col-lg-2 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
-                        var exColourCol = $('<div class="col-lg-1 col-md-6"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
-                        var intColourCol = $('<div class="col-lg-1 col-md-6"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
-                        var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
-                        var estimatedCol = $('<div class="col-lg-1 col-md-6"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
-                        var engineNumber = $('<div class="col-lg-1 col-md-6"><input type="text" name="engine_number[]" class="form-control"></div>');
-                        var unitPrice = $('<div class="col-lg-1 col-md-6"><input type="text" value="' + price + '" name="unit_prices[]" readonly class="form-control"></div>');
-                        var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" data-unit-price="' + price + '" data-approved-id="' + dataid + '" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
+                        var ModelCol = $('<div class="col-lg-1 col-md-6 mt-md-1"><input type="text" title="'+ model +'"  value="' + model + '" class="form-control" readonly></div>');
+                        var variantCol = $('<div class="col-lg-1 col-md-6 mt-md-1"><input type="text" id="variant-id" title="'+ selectedVariant +'"   name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
+                        var brandCol = $('<div class="col-lg-1 col-md-6 mt-md-1"><input type="text" name="brand[]" title="'+ brand +'"  value="' + brand + '" class="form-control" readonly></div>');
+                        var masterModelLineCol = $('<div class="col-lg-1 col-md-6 mt-md-1"><input type="text" title="'+ masterModelLine +'"  name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
+                        var detailCol = $('<div class="col-lg-1 col-md-6 mt-md-1"><input type="text" title="'+ detail +'"  name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
+                        var exColourCol = $('<div class="col-lg-1 col-md-6 mt-md-1"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
+                        var intColourCol = $('<div class="col-lg-1 col-md-6 mt-md-1"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
+                        var vinCol = $('<div class="col-lg-1 col-md-6 mt-md-1"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
+                        var estimatedCol = $('<div class="col-lg-1 col-md-6 mt-md-1"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
+                        var engineNumber = $('<div class="col-lg-1 col-md-6 mt-md-1"><input type="text" name="engine_number[]" class="form-control"></div>');
+                        var unitPrice = $('<div class="col-lg-1 col-md-6 mt-md-1"><input type="text" title="'+ price +'"  value="' + price + '" name="unit_prices[]" readonly class="form-control"></div>');
+                        var removeBtn = $('<div class="col-lg-1 col-md-6 mt-md-1"><button type="button" data-unit-price="' + price + '" data-approved-id="' + dataid + '" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
                         // Populate Exterior Colors dropdown
                         var exColourDropdown = exColourCol.find('select');
                         for (var id in exColours) {
@@ -263,10 +275,8 @@
                                 intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
                             }
                         }
-                        newRow.append(LoiItemCol, masterModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol, removeBtn);
+                        newRow.append(LoiItemCol, masterModelCol, ModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol, removeBtn);
                         $('#VehiclevariantRowsContainer').append(newRow);
-
-
                     }
                 }
 

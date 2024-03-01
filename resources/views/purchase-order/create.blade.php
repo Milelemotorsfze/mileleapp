@@ -116,8 +116,8 @@
                                 <input type="text" class="form-control" name="currency" readonly value="{{ $pfi->currency ?? '' }}">
                             </div>
                         </div>
-                        <div class="col-lg-1 col-md-6">
-                            <label class="form-label">Total Unit Prices:</label>
+                        <div class="col-lg-2 col-md-6">
+                            <label class="form-label">Total Unit Price:</label>
                             <input type="text" name="totalcost" class="form-control" readonly id="total-price" value="0" placeholder="Total Unit Price">
                         </div>
                     </div>
@@ -125,7 +125,10 @@
                         <div class="bar">Stock Vehicles</div>
                         <div class="row">
                             <div class="col-lg-1 col-md-6">
-                                <label for="brandInput" class="form-label">Variants:</label>
+                                <label for="brandInput" class="form-label">Model-SFX:</label>
+                            </div>
+                            <div class="col-lg-1 col-md-6">
+                                <label for="brandInput" class="form-label">Variant:</label>
                             </div>
                             <div class="col-lg-1 col-md-6">
                                 <label for="QTY" class="form-label">Brand:</label>
@@ -133,7 +136,7 @@
                             <div class="col-lg-1 col-md-6">
                                 <label for="QTY" class="form-label">Model Line:</label>
                             </div>
-                            <div class="col-lg-2 col-md-6">
+                            <div class="col-lg-1 col-md-6">
                                 <label for="QTY" class="form-label">Variants Detail:</label>
                             </div>
                             <div class="col-lg-1 col-md-6">
@@ -160,12 +163,15 @@
                     <div class="row">
                         <div class="row">
                             <div class="col-lg-2 col-md-6">
+                                <label class="form-label">Model-SFX</label>
+                            </div>
+                            <div class="col-lg-2 col-md-6">
                                 <label class="form-label">Variant</label>
                             </div>
-                            <div class="col-lg-2 col-md-6">
+                            <div class="col-lg-1 col-md-6">
                                 <label  class="form-label">Brand</label>
                             </div>
-                            <div class="col-lg-2 col-md-6">
+                            <div class="col-lg-1 col-md-6">
                                 <label  class="form-label">Model Line</label>
                             </div>
                             <div class="col-lg-2 col-md-6">
@@ -187,7 +193,11 @@
                                 <input type="hidden" name="approved_loi_ids[]" value="{{$pfiVehicleVariant->id}}">
                                 <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiVehicleVariant->id}}" value="0">
                                 <input type="hidden" id="master-model-id-{{$key}}" name="selected_model_ids[]"  value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->id ?? ''}}">
-                                <div class="col-lg-2 col-md-6">
+                                <div class="col-lg-2 col-md-6 mt-md-2">
+                                    <input type="text"  class="form-control" placeholder="Model" id="model-{{$key}}"
+                                           value="{{ $pfiVehicleVariant->letterOfIndentItem->masterModel->model ."-". $pfiVehicleVariant->letterOfIndentItem->masterModel->sfx}}" readonly>
+                                </div>
+                                <div class="col-lg-2 col-md-6 mt-md-2">
                                     <select class="form-control mb-2 variants" id="variant-id-{{$key}}" data-key="{{$key}}" >
                                         @foreach($pfiVehicleVariant->masterModels as $masterModel)
                                             <option value="{{ $masterModel->variant_id }}" data-model-id="{{$masterModel->id}}"
@@ -197,30 +207,30 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-lg-2 col-md-6">
+                                <div class="col-lg-1 col-md-6 mt-md-2">
                                     <input type="text"   class="form-control" placeholder="Brand" id="brand-{{$key}}"
                                            value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}}" readonly>
                                 </div>
-                                <div class="col-lg-2 col-md-6">
+                                <div class="col-lg-1 col-md-6 mt-md-2">
                                     <input type="text"  class="form-control" id="master-model-line-{{$key}}"
                                            value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? ''}}"
                                            placeholder="Model Line" readonly>
                                 </div>
-                                <div class="col-lg-2 col-md-6">
+                                <div class="col-lg-2 col-md-6 mt-md-2">
                                     <input type="text" id="variant-detail-{{$key}}" class="form-control"  placeholder="Variants Detail" readonly
                                            value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->detail ?? ''}}">
                                 </div>
-                                <div class="col-lg-2 col-md-6">
+                                <div class="col-lg-2 col-md-6 mt-md-2">
                                     <input type="text"  class="form-control" id="unit-price-{{$key}}"
                                            value="{{ $pfiVehicleVariant->unit_price }}"
                                            placeholder="Unit Price" readonly>
                                 </div>
-                                <div class="col-lg-1 col-md-6">
+                                <div class="col-lg-1 col-md-6 mt-md-2">
                                     <input type="number" id="quantity-{{$key}}" min="0"  oninput="checkQuantity({{$key}})" data-quantity="{{$pfiVehicleVariant->quantity}}"
                                       data-id="{{ $pfiVehicleVariant->id }}"  class="form-control qty-{{$pfiVehicleVariant->id}}" value="{{ $pfiVehicleVariant->quantity }}" placeholder="QTY">
                                     <span class="QuantityError-{{$key}} text-danger"></span>
                                 </div>
-                                <div class="col-lg-1 col-md-6">
+                                <div class="col-lg-1 col-md-6 mt-md-2">
                                     <input type="number" id="inventory-qty-{{$key}}" min="0" readonly data-inventory-qty="{{$pfiVehicleVariant->inventoryQuantity}}"
                                       data-id="{{ $pfiVehicleVariant->id }}"  class="form-control inventory-qty-{{$pfiVehicleVariant->id}}" value="{{ $pfiVehicleVariant->inventoryQuantity }}" placeholder="QTY">
                                     <span class="InventoryQuantityError-{{$key}} text-danger"></span>
@@ -235,7 +245,7 @@
                     </div>
                     <div class="bar">Shipping</div>
                     <div class="row">
-                        <div class="col-lg-1 col-md-6">
+                        <div class="col-lg-2 col-md-6 col-sm-12">
                             <label for="Incoterm" class="form-label">Shipping Method:</label>
                             <select class="form-control" id="shippingmethod" name="shippingmethod">
                                 <option value="EXW">EXW</option>
@@ -358,6 +368,7 @@
                 var selectedVariant = $('#variant-id-'+i).find(":selected").text();
 
                 var brand = $('#brand-'+i).val();
+                var model = $('#model-'+i).val();
                 var masterModelLine = $('#master-model-line-'+i).val();
                 var detail = $('#variant-detail-'+i).val();
                 var masterModelId = $('#master-model-id-'+i).val();
@@ -375,17 +386,18 @@
                     var newRow = $('<div class="row row-space"></div>');
                     var LoiItemCol  = $('<input type="hidden" name="loi_item_Ids[]" value="' + loiItemId + '" >');
                     var masterModelCol  = $('<input type="hidden" id="model-id" name="master_model_id[]" value="' + masterModelId + '" >');
-                    var variantCol = $('<div class="col-lg-1 col-md-6"><input type="text" id="variant-id"  name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
-                    var brandCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="brand[]" value="' + brand + '" class="form-control" readonly></div>');
-                    var masterModelLineCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
-                    var detailCol = $('<div class="col-lg-2 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
-                    var exColourCol = $('<div class="col-lg-1 col-md-6"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
-                    var intColourCol = $('<div class="col-lg-1 col-md-6"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
-                    var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
-                    var estimatedCol = $('<div class="col-lg-1 col-md-6"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
-                    var engineNumber = $('<div class="col-lg-1 col-md-6"><input type="text" name="engine_number[]" class="form-control"></div>');
-                    var unitPrice = $('<div class="col-lg-1 col-md-6"><input type="text" value="' + price + '" name="unit_prices[]" readonly class="form-control"></div>');
-                    var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" data-unit-price="'+ price +'" data-approved-id="' + dataid + '" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
+                    var ModelCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" title="'+ model +'"  value="' + model + '" class="form-control" readonly></div>');
+                    var variantCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" id="variant-id" title="'+ selectedVariant +'"   title="'+ model +'"  name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
+                    var brandCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="brand[]" title="'+ brand +'"  value="' + brand + '" class="form-control" readonly></div>');
+                    var masterModelLineCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" title="'+ masterModelLine +'" name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
+                    var detailCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="detail[]" value="' + detail + '"  title="'+ detail +'"  class="form-control" readonly></div>');
+                    var exColourCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
+                    var intColourCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
+                    var vinCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
+                    var estimatedCol = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
+                    var engineNumber = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" name="engine_number[]" class="form-control"></div>');
+                    var unitPrice = $('<div class="col-lg-1 col-md-6 mt-md-2"><input type="text" value="' + price + '"  title="'+ price +'" name="unit_prices[]" readonly class="form-control"></div>');
+                    var removeBtn = $('<div class="col-lg-1 col-md-6 mt-md-2"><button type="button" data-unit-price="'+ price +'" data-approved-id="' + dataid + '" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
                     // Populate Exterior Colors dropdown
                     var exColourDropdown = exColourCol.find('select');
                     for (var id in exColours) {
@@ -400,7 +412,7 @@
                             intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
                         }
                     }
-                    newRow.append(LoiItemCol,masterModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol, removeBtn);
+                    newRow.append(LoiItemCol,masterModelCol, ModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol, removeBtn);
                     $('#variantRowsContainer').append(newRow);
 
 
