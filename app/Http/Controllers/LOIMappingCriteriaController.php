@@ -44,7 +44,7 @@ class LOIMappingCriteriaController extends Controller
         [
         'order.unique' => 'Priority Number is already existing!'
         ]);
-        
+
         $value = $request->value;
         if($request->value_type == 'Month') {
             if($value > 12) {
@@ -65,6 +65,7 @@ class LOIMappingCriteriaController extends Controller
         $loiMappingCriteria->value = $request->value;
         $loiMappingCriteria->order = $request->order;
         $loiMappingCriteria->value_type = $request->value_type;
+        $loiMappingCriteria->country = $request->country;
         $loiMappingCriteria->save();
 
         return redirect()->route('loi-mapping-criterias.index')->with('success',"LOI Mapping Criteria added successfully.");
@@ -129,6 +130,7 @@ class LOIMappingCriteriaController extends Controller
         $loiMappingCriteria->value = $request->value;
         $loiMappingCriteria->order = $request->order;
         $loiMappingCriteria->value_type = $request->value_type;
+        $loiMappingCriteria->country = $request->country;
         $loiMappingCriteria->save();
 
         return redirect()->route('loi-mapping-criterias.index')->with('success',"LOI Mapping Criteria updated successfully.");

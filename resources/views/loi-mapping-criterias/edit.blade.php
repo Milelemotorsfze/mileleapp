@@ -70,6 +70,15 @@
                                     <input type="number" class="form-control" required oninput="validity.valid||(value='');" name="order" min="1" value="{{ old('order', $loiMappingCriteria->order) }}" placeholder="Enter Priority">
                                 </div>
                             </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label text-muted"> Country</label>
+                                    <select class="form-control" data-trigger name="country" id="choices-single-default">
+                                        <option value='UAE' {{ $loiMappingCriteria->country == 'UAE' ? 'selected' : '' }} >UAE</option>
+                                        <option value='Belgium' {{ $loiMappingCriteria->country == 'UAE' ? 'selected' : '' }} >Belgium</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-12 text-center">
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </div>

@@ -52,7 +52,7 @@
                                 <label for="choices-single-default" class="form-label text-muted"> Country</label>
                                 <select class="form-control" data-trigger name="country" id="choices-single-default">
                                     <option value='UAE'>UAE</option>
-                                    <option value='Belguim'>Belguim</option>
+                                    <option value='Belgium'>Belgium</option>
                                 </select>
                             </div>
                         </div>

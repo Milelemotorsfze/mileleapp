@@ -206,7 +206,7 @@
             </div>
             <div class="card mt-2" >
                     <div class="card-header">
-                        <h4 class="card-title ">LOI Items</h4>
+                        <h4 class="card-title">LOI Items</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -307,6 +307,7 @@
                 </div>
             <select name="deletedIds[]" id="deleted-docs" hidden="hidden" multiple>
             </select>
+            <input type="hidden" id="remaining-document-count" value="{{ $letterOfIndent->LOIDocuments->count() }}" >
             <div class="col-12 text-center">
                 <button type="submit" class="btn btn-primary float-end">Update</button>
             </div>
@@ -349,22 +350,41 @@
 
         const signatureFileInput = document.querySelector("#signature");
         const signaturePreviewFile = document.querySelector("#signature-preview");
+
         signatureFileInput.addEventListener("change", function(event) {
             const files = event.target.files;
             while (signaturePreviewFile.firstChild) {
                 signaturePreviewFile.removeChild(signaturePreviewFile.firstChild);
             }
-
-            const file = files[0];
-            if (file.type.match("application/pdf"))
+            for (let i = 0; i < files.length; i++)
             {
-                const objectUrl = URL.createObjectURL(file);
-                const iframe = document.createElement("iframe");
-                iframe.src = objectUrl;
-                signaturePreviewFile.closest('.row').appendChild(iframe);
+                const file = files[i];
+                if (file.type.match("application/pdf"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const iframe = document.createElement("iframe");
+                    iframe.src = objectUrl;
+                    signaturePreviewFile.appendChild(iframe);
+                }
             }
-
         });
+
+        // signatureFileInput.addEventListener("change", function(event) {
+        //     const files = event.target.files;
+        //     // while (signaturePreviewFile.firstChild) {
+        //     //     signaturePreviewFile.removeChild(signaturePreviewFile.firstChild);
+        //     // }
+        //
+        //     const file = files[0];
+        //     if (file.type.match("application/pdf"))
+        //     {
+        //         const objectUrl = URL.createObjectURL(file);
+        //         const iframe = document.createElement("iframe");
+        //         iframe.src = objectUrl;
+        //         signaturePreviewFile.closest('.row').appendChild(iframe);
+        //     }
+        //
+        // });
 
             getCustomers();
 
@@ -394,10 +414,15 @@
                 $('#deleted-docs').empty();
 
                 jQuery.each(deletedDocumetIds, function (key, value) {
-                    console.log(value);
+
                     $('#deleted-docs').append('<option value="' + value + '" >' + value+ '</option>');
                     $("#deleted-docs option").attr("selected", "selected");
                 });
+                let count = $('#remaining-document-count').val();
+                console.log("count");
+                console.log(count);
+                let remainingCount = count - 1;
+                $('#remaining-document-count').val(remainingCount);
             });
             var LOICount = '{{ $letterOfIndentItems->count() }}';
 
@@ -447,37 +472,49 @@
                     }
                 });
             }
-            $('.loi-doc-button-delete').on('click',function(){
-            let id = $(this).attr('data-id');
-            let url =  $(this).attr('data-url');
-            var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
-                if (e) {
-                    $.ajax({
-                        type: "POST",
-                        url: url,
-                        dataType: "json",
-                        data: {
-                            _method: 'DELETE',
-                            id: 'id',
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success:function (data) {
-                            location.reload();
-                            alertify.success('Item Deleted successfully.');
-                        }
-                    });
-                }
-            }).set({title:"Delete Item"})
-        });
-        //
-        // jQuery.validator.addMethod('required_check', function(value, element) {
-        //     let dealer = $('#dealer').val();
-        //     if(dealer == 'Milele Motors') {
-        //         return false;
-        //     }else{
-        //         return true;
-        //     }
-        // },'This feild is required');
+        {{--    $('.loi-doc-button-delete').on('click',function(){--}}
+        {{--        alert("ok");--}}
+        {{--    let id = $(this).attr('data-id');--}}
+        {{--    let url =  $(this).attr('data-url');--}}
+        {{--    var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {--}}
+        {{--        if (e) {--}}
+        {{--            $.ajax({--}}
+        {{--                type: "POST",--}}
+        {{--                url: url,--}}
+        {{--                dataType: "json",--}}
+        {{--                data: {--}}
+        {{--                    _method: 'DELETE',--}}
+        {{--                    id: 'id',--}}
+        {{--                    _token: '{{ csrf_token() }}'--}}
+        {{--                },--}}
+        {{--                success:function (data) {--}}
+        {{--                    location.reload();--}}
+
+        {{--                    alertify.success('Item Deleted successfully.');--}}
+        {{--                }--}}
+        {{--            });--}}
+        {{--        }--}}
+        {{--    }).set({title:"Delete Item"})--}}
+        {{--});--}}
+
+         jQuery.validator.addMethod('signature', function(value, element) {
+             let dealer = $('#dealer').val();
+             if(dealer == 'Milele Motors') {
+                 return true;
+             }else{
+                 return false;
+             }
+         },'This feild is required');
+
+
+        jQuery.validator.addMethod('file', function(value, element) {
+            let remainingCount = $('#remaining-document-count').val();
+            if(remainingCount != 0) {
+                return true;
+            }else{
+                return false;
+            }
+        },'This feild is required');
 
         $("#form-doc-upload").validate({
             ignore: [],
@@ -510,9 +547,11 @@
                     required: true
                 },
                 "files[]": {
+                    file:true,
                     extension: "pdf"
                 },
                 loi_signature: {
+                    signature: true,
                     extension: "png|jpeg|jpg|svg"
                 },
                 messages: {
@@ -973,7 +1012,6 @@
                                 return false;
                             }
                         });
-                        console.log(isOptionExist);
                         if(isOptionExist == 'no'){
                             $('#sfx-'+i).append($('<option>', {value: sfx, text : sfx}))
 
@@ -1000,7 +1038,6 @@
                             return false;
                         }
                     });
-                    console.log(isOptionExist);
                     if(isOptionExist == 'no'){
                         $('#model-'+i).append($('<option>', {value: unSelectedmodel, text : unSelectedmodel}))
 

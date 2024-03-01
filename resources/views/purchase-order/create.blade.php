@@ -245,14 +245,10 @@
                                 <option value="Local">Local</option>
                             </select>
                         </div>
-                        <div class="col-lg-2 col-md-6">
-                            <label class="form-label">Shipping Cost:</label>
-                            <input type="number" id="shippingcost" name="shippingcost" class="form-control" placeholder="Shipping Cost">
-                        </div>
 
                         <div class="col-lg-3 col-md-6">
                             <label class="form-label">Prefered Destination:</label>
-                            <input type="text" id="fd" name="fd" class="form-control" placeholder="Prefered Destination" >
+                            <input type="text" id="fd" name="fd" class="form-control" readonly value="{{ $pfi->letterOfIndent->prefered_location ?? '' }}" placeholder="Prefered Destination" >
                         </div>
 
                     </div>

@@ -264,7 +264,9 @@ public function getBrandsAndModelLines(Request $request)
         $purchasingOrder->payment_term_id = $request->input('payment_term_id');
         $purchasingOrder->currency = $request->input('currency');
         $purchasingOrder->shippingmethod = $request->input('shippingmethod');
-        $purchasingOrder->shippingcost = $request->input('shippingcost');
+        if($request->po_from != 'DEMAND_PLANNING') {
+            $purchasingOrder->shippingcost = $request->input('shippingcost');
+        }
         $purchasingOrder->totalcost = $request->input('totalcost');
         $purchasingOrder->pol = $request->input('pol');
         $purchasingOrder->pod = $request->input('pod');
@@ -955,7 +957,7 @@ public function purchasingupdateStatus(Request $request)
                 $updatetotal = PurchasingOrder::find($vehicle->purchasing_order_id);
                 $updatetotal->totalcost = $updatetotal->totalcost - $updateprice->unit_price;
                 $updatetotal->save();
-                } 
+                }
                 if($vehicle->model_id) {
                     $masterModel = MasterModel::find($vehicle->model_id);
                     $possibleModelIds = MasterModel::where('model', $masterModel->model)
@@ -967,7 +969,7 @@ public function purchasingupdateStatus(Request $request)
                     $inventoryItem->pfi_id = NULL;
                     $inventoryItem->letter_of_indent_item_id  = NULL;
                     $inventoryItem->save();
-    
+
                     $loiPurchaseOrder = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
                                                                 ->where('master_model_id', $vehicle->model_id)
                                                                 ->first();
@@ -975,11 +977,11 @@ public function purchasingupdateStatus(Request $request)
                         $loiPurchaseOrder->quantity = $loiPurchaseOrder->quantity - 1;
                         $loiPurchaseOrder->save();
                     }
-    
+
                 }
-            $vehicle->delete(); 
+            $vehicle->delete();
             }
-            else 
+            else
             {
             $vehicle->status = 'Request for Cancel';
             $vehicle->save();

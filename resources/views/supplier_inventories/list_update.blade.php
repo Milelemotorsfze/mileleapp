@@ -122,7 +122,7 @@
                             <td>
                                 <select class="country" data-field="country" data-id="{{ $supplierInventory->id }}" id="country-editable-{{$supplierInventory->id}}">
                                     <option value="UAE" {{ $supplierInventory->country == 'UAE' ? 'selected' : '' }} >UAE</option>
-                                    <option value="Belguim" {{ $supplierInventory->country == 'Belguim' ? 'selected' : '' }}>Belguim</option>
+                                    <option value="Belgium" {{ $supplierInventory->country == 'Belguim' ? 'selected' : '' }}>Belgium</option>
                                 </select>
                             </td>
                             <td>
