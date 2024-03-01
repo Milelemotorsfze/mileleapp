@@ -158,8 +158,7 @@
 							}
 	                    }
 	                });
-	            }
-	
+	            }	
 	        }).set({title:"Confirmation"})
 	    }
     });

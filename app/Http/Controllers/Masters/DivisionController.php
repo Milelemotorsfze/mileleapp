@@ -240,8 +240,13 @@ class DivisionController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                $errorMsg ="Comong Soon ! This function is under testing now.. You can access later !";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
+    }
+    public function show($id) {
+        $errorMsg ="Comong Soon ! This page is under testing now.. You can access later !";
+        return view('hrm.notaccess',compact('errorMsg'));
     }
 }

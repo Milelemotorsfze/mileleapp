@@ -3,6 +3,7 @@
 use App\Http\Controllers\LOIMappingCriteriaController;
 use App\Http\Controllers\Masters\MasterJobPositionController;
 use App\Http\Controllers\Masters\MasterSpecificIndustryExperienceController;
+use App\Http\Controllers\Masters\DesignationApprovalsController;
 use App\Http\Controllers\Masters\DivisionController;
 use App\Http\Controllers\Masters\DepartmentController;
 use App\Http\Controllers\HRM\Hiring\EmployeeHiringRequestController;
@@ -264,6 +265,9 @@ Route::get('/d', function () {
     Route::resource('division', DivisionController::class);
     // Master Department and head
     Route::resource('department', DepartmentController::class);
+    // Designation Approvals
+    Route::resource('designation-approvals', DesignationApprovalsController::class);
+    
     // Master Job Position
     Route::resource('master-job-position', MasterJobPositionController::class);
       // Master Specific Industry Experience
