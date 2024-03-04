@@ -3422,7 +3422,7 @@ $(document).ready(function () {
                         $('#addonDataTable').DataTable({
                             data: data,
                             columns: [
-                                { title: 'S.No: ' },
+                                { title: 'S.No:' },
                                 { title: 'Spare Part Code' },
                                 { title: 'Spare Part Name' },
                                 { title: 'Brand/Model Lines/Model Description' },

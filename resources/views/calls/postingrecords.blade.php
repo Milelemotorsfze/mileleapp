@@ -50,7 +50,7 @@
   </style>
 @section('content')
 @php
-  $hasPermission = Auth::user()->hasPermissionForSelectedRole('pre-order-processing');
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('posting-records');
   @endphp
   @if ($hasPermission)
   <div class="card-header">
@@ -63,73 +63,34 @@
      Pre Order Info
     </h4>
     <br>
-    @can('pre-order-processing')
+    @can('posting-records')
     <ul class="nav nav-pills nav-fill">
     <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Pending Requests
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Videos
+        <span class="badge badge-danger row-badge2 badge-notification"></span>
+        </a>
+      </li>
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Pictures
         <span class="badge badge-danger row-badge2 badge-notification"></span>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Under Process 
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Reels 
         <span class="badge badge-danger row-badge1 badge-notification"></span>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Completed
-        <span class="badge badge-danger row-badge3 badge-notification"></span>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Ads 
+        <span class="badge badge-danger row-badge1 badge-notification"></span>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Rejected
-        <span class="badge badge-danger row-badge4 badge-notification"></span>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Stories 
+        <span class="badge badge-danger row-badge1 badge-notification"></span>
         </a>
       </li>
     </ul>      
-  </div>
-  <div class="modal fade" id="processingmodel" tabindex="-1" aria-labelledby="processingmodelLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="processingmodelLabel">Processing</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-        <input type="text" id="Preorder_id_input" name="pre_orders_items" class="form-control">
-        <table class="table">
-            <thead>
-              <tr>
-                <th>PO Number</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="vinTableBody">
-            </tbody>
-          </table>
-          <div class="mb-3">
-            <label for="poInput" class="form-label">Po Numbers</label>
-            <select id="po-dropdown" class="form-control">
-                </select>
-                </div>
-          <button type="button" class="btn btn-primary btn-sm" onclick="addpoRow()">Add</button>
-          </br>
-          </br>
-          
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="sales-notes" class="form-label">Notes:</label>
-            </div>
-            <div class="col-md-8">
-              <textarea class="form-control" id="notes"></textarea>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="savepolist()">Save Changes</button>
-        </div>
-      </div>
-    </div>
   </div>
   <div class="tab-content">
       <div class="tab-pane fade show active" id="tab1"> 
@@ -138,21 +99,12 @@
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
             <thead class="bg-soft-secondary">
                 <tr>
-                <th>Pre Order Number</th>
-                <th>Booking Date</th>
-                  <th>SO Number</th>
-                  <th>Sales Person</th>
-                  <th>Brand</th>
+                <th>Estimated Arrival</th>
+                <th>Brand</th>
                   <th>Model Line</th>
-                  <th>Model Year</th>
-                  <th>Selling Price</th>
+                  <th>Variant</th>
                   <th>Interior Colour</th>
                   <th>Exterior Colour</th>
-                  <th>Qty</th>
-                  <th>Teritory</th>
-                  <th>Final Dest</th>
-                  <th>Details</th>
-                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -161,6 +113,25 @@
           </div>  
         </div>  
       </div>  
+      <div class="tab-pane fade show" id="tab2"> 
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table-bordered">
+            <thead class="bg-soft-secondary">
+                <tr>
+                <th>Brand</th>
+                  <th>Model Line</th>
+                  <th>Variant</th>
+                  <th>Interior Colour</th>
+                  <th>Exterior Colour</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>  
+        </div>  
+      </div>
       @endcan
       </div>
     </div>

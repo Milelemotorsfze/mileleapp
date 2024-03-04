@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\PreOrder;
+use App\Models\PreOrderPos;
 use App\Models\UserActivities;
 use App\Models\Brand;
 use App\Models\ColorCode;
 use App\Models\Quotation;
 use Illuminate\Support\Facades\Auth;
 use App\Models\QuotationItem;
+use App\Models\PurchasingOrder;
 use App\Models\QuotationDetail;
 use App\Models\MasterModelLines;
 use App\Models\Varaint;
+use Yajra\DataTables\DataTables;
 use App\Models\PreOrdersItems;
 use Illuminate\Http\Request;
 
@@ -31,45 +34,34 @@ class PreOrderController extends Controller
             $searchValue = $request->input('search.value');
             if($status === "Pending")
             {
-            $data = PreOrder::select( [
-                    'vehicles.id',
-                    'warehouse.name as location',
-                     DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
-                    'vehicles.ppmmyyy',
-                    'vehicles.vin',
+                $preorders = PreOrdersItems::select([
+                    'pre_orders.id as pre_order_number',
+                    'pre_orders.status',
+                    'pre_orders_items.id',
+                    'so.so_number',
+                    'so.notes',
+                    'master_model_lines.model_line as model_line',
+                    'pre_orders_items.qty',
+                    'pre_orders_items.description',
+                    'countries.name as countryname',
+                    'color_codes_exterior.name as exterior', 
+                    'color_codes_interior.name as interior', 
+                    'pre_orders_items.modelyear',
                     'brands.brand_name',
-                    'varaints.name as variant',
-                    'varaints.model_detail',
-                    'varaints.detail',
-                    'varaints.seat',
-                    'varaints.upholestry',
-                    'varaints.steering',
-                    'varaints.my',
-                    'varaints.fuel_type',
-                    'varaints.gearbox',
-                    'master_model_lines.model_line',
-                    'int_color.name as interior_color',
-                    'ex_color.name as exterior_color',
-                    'purchasing_order.po_number',
-                    'grn.grn_number',
-                    DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
+                    'users.name as salesperson'
                 ])
-                ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-                ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
-                ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
-                ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
-                ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
-                ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
-                ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-                ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
-                ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
-                ->whereNull('inspection.id')
-                ->whereNull('vehicles.inspection_date')
-                ->whereNull('vehicles.gdn_id')
-                ->whereNotNull('vehicles.grn_id');
-                $data = $data->groupBy('vehicles.id');
+                ->leftJoin('pre_orders', 'pre_orders_items.preorder_id', '=', 'pre_orders.id')
+                ->leftJoin('so', 'pre_orders.quotations_id', '=', 'so.quotation_id')
+                ->leftJoin('users', 'pre_orders.requested_by', '=', 'users.id')
+                ->leftJoin('master_model_lines', 'pre_orders_items.master_model_lines_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                ->leftJoin('countries', 'pre_orders_items.countries_id', '=', 'countries.id')
+                ->leftJoin('color_codes as color_codes_exterior', 'pre_orders_items.ex_colour', '=', 'color_codes_exterior.id') // distinct alias for exterior color
+                ->leftJoin('color_codes as color_codes_interior', 'pre_orders_items.int_colour', '=', 'color_codes_interior.id') // distinct alias for interior color
+                ->where('pre_orders_items.status', 'Approved')
+                ->groupby('pre_orders_items.id');
             }
-                return DataTables::of($data)
+                return DataTables::of($preorders)
                 ->toJson();
         }
         return view('preorder.index');
@@ -187,4 +179,34 @@ class PreOrderController extends Controller
                 }
             return redirect()->route('dailyleads.index')->with('success', 'Pre Order created successfully.');
             }
-}
+            public function getpoforpreorder()
+            {
+                $poNumbers = PurchasingOrder::pluck('po_number')->toArray();
+                return response()->json($poNumbers);
+        }
+        public function savepolistpreorder(Request $request)
+        {
+            $polist = $request->input('po_numbers');
+            $pre_orders_items = $request->input('Preorder_id_input');
+            $notes = $request->input('notes');
+            foreach ($polist as $po_number) {
+                info($po_number);
+                $poNumbers = PurchasingOrder::where('po_number', $po_number)->first();
+                if ($poNumbers) {
+                    $poid = $poNumbers->id; 
+                    info($poid);
+                    $preOrderPos = new PreOrderPos();
+                    $preOrderPos->purchasing_order_id = $poid;
+                    $preOrderPos->pre_orders_items_id = $pre_orders_items;
+                    $preOrderPos->save();
+                } else {
+                    info("PurchasingOrder not found for po_number: " . $po_number);
+                }
+            }
+            $PreOrdersItems = PreOrdersItems::where('id', $pre_orders_items)->first();
+            $PreOrdersItems->status = "Under-Processing";
+            $PreOrdersItems->notes = $notes;
+            $PreOrdersItems->save();
+            return response()->json(['message' => 'PO list saved successfully'], 200);
+        }
+        }
