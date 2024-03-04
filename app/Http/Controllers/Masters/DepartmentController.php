@@ -31,4 +31,8 @@ class DepartmentController extends Controller
         $errorMsg ="Comong Soon ! This page is under testing now.. You can access later !";
         return view('hrm.notaccess',compact('errorMsg'));
     }
+    public function create() {
+        $errorMsg ="Comong Soon ! This page is under testing now.. You can access later !";
+        return view('hrm.notaccess',compact('errorMsg'));
+    }
 }

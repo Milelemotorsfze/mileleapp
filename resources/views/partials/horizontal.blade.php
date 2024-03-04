@@ -42,6 +42,13 @@
         }
 
     }
+    @media (min-width: 992px) {
+.topnav .dropdown .dropdown-menu {
+    margin-top: 0;
+    border-radius: 0 0 .25rem .25rem;
+    right: auto!important;
+}
+    }
 </style>
 
 <div class="container">
@@ -341,8 +348,8 @@
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('employee_joining_report.index','new_employee') }}" class="dropdown-item" data-key="t-login">New Employee</a>
-                                                <a href="{{ route('employee_joining_report.index','temporary_internal_transfer') }}" class="dropdown-item" data-key="t-login">Temporary Internal Transfer</a>
-                                                <a href="{{ route('employee_joining_report.index','permanent_internal_transfer') }}" class="dropdown-item" data-key="t-login">Permanent Internal Transfer</a>                                    
+                                                <a href="{{ route('employee_joining_report.index','temporary') }}" class="dropdown-item" data-key="t-login">Temporary Internal Transfer</a>
+                                                <a href="{{ route('employee_joining_report.index','permanent') }}" class="dropdown-item" data-key="t-login">Permanent Internal Transfer</a>                                    
                                                 <a href="{{ route('employee_joining_report.index','vacations_or_leave') }}" class="dropdown-item" data-key="t-login">Vacations Or Leave</a>
                                                 @endif
                                                 @endcanany

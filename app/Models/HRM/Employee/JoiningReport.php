@@ -45,6 +45,8 @@ class JoiningReport extends Model
         'created_by',
         'updated_by',
         'deleted_by',
+        'old_reporting_manager',
+        'new_reporting_manager',
     ];
     protected $appends = [
         'is_auth_user_can_approve',
@@ -88,8 +90,11 @@ class JoiningReport extends Model
         if($this->joining_type == 'vacations_or_leave') {
             $joiningTypeName = 'Vacations Or Leave';
         }
-        else if($this->joining_type == 'internal_transfer') {
-            $joiningTypeName = 'Internal Transfer';
+        else if($this->joining_type == 'internal_transfer' && $this->internal_transfer_type == 'temporary') {
+            $joiningTypeName = 'Internal Transfer - Temporary';
+        }
+        else if($this->joining_type == 'internal_transfer' && $this->internal_transfer_type == 'permanent') {
+            $joiningTypeName = 'Internal Transfer - Permanent';
         }
         else if($this->joining_type == 'new_employee' && $this->new_emp_joining_type =='trial_period') {
             $joiningTypeName = 'New Employee - Trial Period';

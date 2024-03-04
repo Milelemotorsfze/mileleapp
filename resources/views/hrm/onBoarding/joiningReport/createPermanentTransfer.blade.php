@@ -7,7 +7,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Create Temporary Internal Transfer Joining Report</h4>
+	<h4 class="card-title"> Create Permanent Internal Transfer Joining Report</h4>
 	
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee-hiring-request.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
@@ -22,7 +22,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 		</ul>
 	</div>
 	@endif
-	<form id="joiningReportForm" name="joiningReportForm" enctype="multipart/form-data" method="POST" action="{{route('joining_report.store')}}">
+	<form id="perIntTransjoiningReportForm" name="perIntTransjoiningReportForm" enctype="multipart/form-data" method="POST" action="{{route('joining_report.store')}}">
 		@csrf
 		<div class="card">
 		<div class="card-body">
@@ -40,8 +40,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 			</div>
 			<div class="col-xxl-3 col-lg-4 col-md-4" id="employee_code_div">
 				<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
-				
-								<center><span id="employee_code_name"></span></center>
+				<!-- <input id="employee_code" type="text" class="form-control widthinput @error('employee_code') is-invalid @enderror" name="employee_code"
+                                placeholder="Employee Code" value="{{$employee->employee_code}}" autocomplete="employee_code" autofocus> -->
+                                <center><span id="employee_code"></span></center>
 			</div>
 			<div class="col-xxl-3 col-lg-4 col-md-4" id="designation_div">
 				<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
@@ -56,47 +57,49 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 		</div>
 		<div class="card">
 			<div class="card-header">
-				<h4 class="card-title">Temporary Internal Transfer Information</h4>
+				<h4 class="card-title">Permanent Internal Transfer Information</h4>
 			</div>
 			<div class="card-body">
 				<div class="row">
                     <input type="hidden" name="joining_type" value="internal_transfer">
-					<input type="hidden" name="internal_transfer_type" value="temporary">
-					<input type="hidden" name="transfer_from_department_id" id="transfer_from_department_id" value="">
-					<input type="hidden" name="transfer_from_location_id" id="transfer_from_location_id" value="">
-					<input type="hidden" name="employee_code" id="employee_code" value="">
-                    <div class="col-xxl-6 col-lg-6 col-md-6" id="transfer_from_department_name_div">
-						<div >
-							<center><label for="transfer_from_department_id" class="col-form-label text-md-end">{{ __('Transfer From Department') }}</label></center>
-							
-							
-						</div>
-						<div><center><span id="transfer_from_department_name"></span></center></div>
-					</div>
-                   
-					<div class="col-xxl-6 col-lg-6 col-md-6" id="transfer_from_location_name_div">
-						<div>
-							<center><label for="transfer_from_location_id" class="col-form-label text-md-end">{{ __('Transfer From Location') }}</label></center>
-							
-						</div>
-						<div><center><span id="transfer_from_location_name"></span></center></div>
-					</div>
+                    <input type="hidden" name="internal_transfer_type" value="permanent">
+                    <input type="hidden" name="transfer_from_department_id" id="transfer_from_department_id" value="">
+                    <input type="hidden" name="transfer_from_location_id" id="transfer_from_location_id" value="">
+                    <div class="col-xxl-4 col-lg-4 col-md-4" id="transfer_from_department_name_div">
+                        <div><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Transfer From Department') }}</strong></label></div>                     
+                            <div><span id="transfer_from_department_name"></span></div>
+
+                    </div>
+                    <div class="col-xxl-4 col-lg-4 col-md-4" id="transfer_from_location_name_div">
+                        <div><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Transfer From Location') }}</strong></label></div> 
+                    <div><span id="transfer_from_location_name" value=""></span></div>
 </div>
-</br>
+                    
+                    <div class="col-xxl-4 col-lg-4 col-md-4 radio-main-div" id="change_reporting_manager_div">
+						<span class="error">* </span>
+						<label for="type" class="col-form-label text-md-end">{{ __('Change Reporting Manager') }}</label>
+						<fieldset style="margin-top:5px;" class="radio-div-container">
+                            <div class="row some-class">
+                                
+                                <div class="col-xxl-6 col-lg-6 col-md-6">
+                                    <input type="radio" class="type" name="team_lead_or_reporting_manager" value="" id="department_head" />
+                                    <label for="department_head" id="department_head_label"></label>
+                                </div>
+                                <div class="col-xxl-6 col-lg-6 col-md-6">
+                                    <input type="radio" class="type" name="team_lead_or_reporting_manager" value="" id="division_head" />
+                                    <label for="division_head" id="division_head_label"></label>
+                                </div>
+                            </div>
+                        </fieldset>
+					</div>
+                    <!-- <div class="col-xxl-4 col-lg-4 col-md-4" id="change_reporting_manager_div">
+                        <div><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Change Reporting Manager') }}</strong></label></div> 
+                        <div><span id="change_reporting_manager" value=""></span></div>
+                    </div> -->
+</div>
+                        </br>
 <div class="row">
-<div class="col-xxl-3 col-lg-6 col-md-6">
-                        <span class="error">* </span>
-                        <label for="transfer_from_date" class="col-form-label text-md-end">{{ __('Transfer From Date') }}</label>
-                        <input id="transfer_from_date" type="date" class="form-control widthinput @error('transfer_from_date') is-invalid @enderror" name="transfer_from_date"
-                                placeholder="Transfer From Date" value="" autocomplete="transfer_from_date" autofocus>
-                    </div>
-					<div class="col-xxl-3 col-lg-6 col-md-6">
-                        <span class="error">* </span>
-                        <label for="joining_date" class="col-form-label text-md-end">{{ __('Transfer To Date') }}</label>
-                        <input id="joining_date" type="date" class="form-control widthinput @error('joining_date') is-invalid @enderror" name="joining_date"
-                                placeholder="Transfer From Date" value="" autocomplete="joining_date" autofocus>
-                    </div>
-                    <div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+                    <div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="transfer_to_department_id" class="col-form-label text-md-end">{{ __('Transfer To Department') }}</label>
@@ -107,8 +110,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							</select>
 						</div>
 					</div>
-                   
-					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+                    
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="joining_location" class="col-form-label text-md-end">{{ __('Transfer To Location') }}</label>
@@ -119,7 +122,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							</select>
 						</div>
 					</div>
-					
+                    <div class="col-xxl-4 col-lg-6 col-md-6">
+                        <span class="error">* </span>
+                        <label for="joining_date" class="col-form-label text-md-end">{{ __('Joining Date') }}</label>
+                        <input id="joining_date" type="date" class="form-control widthinput @error('joining_date') is-invalid @enderror" name="joining_date"
+                                placeholder="Joining Date" value="" autocomplete="joining_date" autofocus>
+                    </div>
 				</div>
                 <div class="row">
                     <div class="col-xxl-12 col-lg-12 col-md-12">
@@ -148,8 +156,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
         $('#employee_code_div').hide();
 		$('#designation_div').hide();
 		$('#department_div').hide();
-		$('#transfer_from_department_name_div').hide();
+        $('#transfer_from_department_name_div').hide();
 		$('#transfer_from_location_name_div').hide();
+        $('#change_reporting_manager_div').hide();
         $('#employee_id').select2({
             allowClear: true,
             maximumSelectionLength: 1,
@@ -159,7 +168,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
             allowClear: true,
 			maximumSelectionLength: 1,
             placeholder:"Choose Joining Location",
-        });
+        });	
+        // $('#transfer_from_location_id').select2({
+        //     allowClear: true,
+		// 	maximumSelectionLength: 1,
+        //     placeholder:"Choose Transfer From Location",
+        // });	
+        // $('#transfer_from_department_id').select2({
+        //     allowClear: true,
+		// 	maximumSelectionLength: 1,
+        //     placeholder:"Choose Transfer From Department",
+        // });	
         $('#transfer_to_department_id').select2({
             allowClear: true,
 			maximumSelectionLength: 1,
@@ -174,11 +193,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							$('#employee_code_div').show();
                             $('#designation_div').show();
                             $('#department_div').show();
-							$('#transfer_from_department_name_div').show();
-							$('#transfer_from_location_name_div').show();
+                            $('#transfer_from_department_name_div').show();
+		                    $('#transfer_from_location_name_div').show();
+                            $('#change_reporting_manager_div').show();
+                            // console.log(employees[i].emp_profile.department.division);
+                            if(employees[i].emp_profile != null && employees[i].emp_profile.department != null && employees[i].emp_profile.department.department_head_id != null
+                            && employees[i].emp_profile.department.department_head.name != null) {
+                                document.getElementById('department_head').value=employees[i].emp_profile.department.department_head_id;  
+                                document.getElementById('department_head_label').textContent=employees[i].emp_profile.department.department_head.name;  
+                                 
+                            }
+                            if(employees[i].emp_profile != null && employees[i].emp_profile.department != null 
+                            && employees[i].emp_profile.department.division_id != null && employees[i].emp_profile.department.division.division_head_id != null &&
+                            employees[i].emp_profile.department.division.division_head != null && employees[i].emp_profile.department.division.division_head.name != null) {
+                                document.getElementById('division_head').value=employees[i].emp_profile.department.division.division_head_id;  
+                                document.getElementById('division_head_label').textContent=employees[i].emp_profile.department.division.division_head.name;  
+}
 							if(employees[i].emp_profile != null && employees[i].emp_profile.employee_code != null) {
-								document.getElementById('employee_code_name').textContent=employees[i].emp_profile.employee_code;     
-								document.getElementById('employee_code').value=employees[i].emp_profile.employee_code;                        
+								document.getElementById('employee_code').textContent=employees[i].emp_profile.employee_code;                        
 							}
 							if(employees[i].emp_profile != null && employees[i].emp_profile.designation != null && employees[i].emp_profile.designation.name != null) {
 								document.getElementById('designation').textContent=employees[i].emp_profile.designation.name;
@@ -188,6 +220,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 								document.getElementById('transfer_from_department_id').value=employees[i].emp_profile.department_id;  
 								document.getElementById('transfer_from_department_name').textContent=employees[i].emp_profile.department.name; 
 								oldEmpId = employees[i].emp_profile.department_id;
+								$('#tranfer_to_'+oldEmpId).prop('disabled', true);
 							}
 							if(employees[i].emp_profile != null && employees[i].emp_profile.work_location != null && employees[i].emp_profile.location.name != null) {
 								document.getElementById('transfer_from_location_id').value=employees[i].emp_profile.work_location;  
@@ -201,16 +234,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 				$('#employee_code_div').hide();
 				$('#designation_div').hide();
                 $('#department_div').hide();
-				$('#transfer_from_department_name_div').hide();
-				$('#transfer_from_location_name_div').hide();
-				document.getElementById('employee_code_name').textContent=''; 
+                $('#transfer_from_department_name_div').hide();
+		        $('#transfer_from_location_name_div').hide();
+                $('#change_reporting_manager_div').hide();
 				document.getElementById('employee_code').textContent=''; 
 				document.getElementById('designation').textContent=''; 
 				document.getElementById('department').textContent='';   
 				document.getElementById('transfer_from_department_id').value='';  
-				document.getElementById('transfer_from_department_name').textContent=''; 
+				document.getElementById('transfer_from_department_name').value=''; 
 				document.getElementById('transfer_from_location_id').value=''; 
-				document.getElementById('transfer_from_location_name').textContent='';   
+				document.getElementById('transfer_from_location_name').value='';   
+				$('#tranfer_to_'+oldEmpId).prop('disabled', false);
 			}			
 		});
 	});
@@ -228,7 +262,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
             return true;
         }
     },'Must be greater than start date.');
-	$('#joiningReportForm').validate({ 
+	$('#perIntTransjoiningReportForm').validate({ 
         rules: {
             employee_id: {
 				required: true,
@@ -240,7 +274,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
             joining_location: {
                 required: true,
             },
-            transfer_from_date: {
+            transfer_from_department_id: {
+                required: true,
+            },
+            team_lead_or_reporting_manager: {
+                required: true,
+            },
+            transfer_from_location_id: {
                 required: true,
             },
             transfer_to_department_id: {
@@ -250,7 +290,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 		errorPlacement: function ( error, element ) {
             error.addClass( "invalid-feedback font-size-13" );
 			
-			 if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+            if (element.is(':radio') && element.closest('.radio-main-div').length > 0) {
+                error.addClass('radio-error');
+                error.insertAfter(element.closest('.radio-main-div').find('fieldset.radio-div-container').last());
+            }
+			else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
                 if (!element.val() || element.val().length === 0) {
                     console.log("Error is here with length", element.val().length);
                     error.addClass('select-error');
