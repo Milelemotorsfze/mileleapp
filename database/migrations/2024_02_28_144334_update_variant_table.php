@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('varaints', function (Blueprint $table) {
-            $table->string('netsuite _name')->nullable();
+            $table->string('netsuite_name')->nullable();
         });
     }
 

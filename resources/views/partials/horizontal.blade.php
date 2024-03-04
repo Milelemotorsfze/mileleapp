@@ -898,6 +898,18 @@
                                         <span data-key="t-extra-pages">Sales Persons</span>
                                     </a>
                                 </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('postingrecords.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="upload-cloud"></i>
+                                        <span data-key="t-extra-pages">Posting Records</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('marketingpurchasingpayments.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="shopping-bag"></i>
+                                        <span data-key="t-extra-pages">Purchashing & Payments</span>
+                                    </a>
+                                </li>
                                 @endif
                                 @endcan
                                 @can('View-daily-movemnets')

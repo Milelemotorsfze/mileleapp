@@ -90,7 +90,7 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="col-lg-1 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">Netsuit PO: </label>
-            <input type="text" id="po_number" name="po_number" class="form-control" placeholder="PO Date" required>
+            <input type="text" id="po_number" name="po_number" class="form-control" placeholder="PO Number" required>
         </div>
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>

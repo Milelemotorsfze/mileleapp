@@ -102,6 +102,9 @@ use App\Http\Controllers\SalesTargetsController;
 use App\Http\Controllers\ClientAccountTransitionController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\PreOrderController;
+use App\Http\Controllers\PostingRecordsController;
+use App\Http\Controllers\MarketingPurchasingPaymentsController;
+
 
 
 /*
@@ -487,6 +490,9 @@ Route::get('/d', function () {
     Route::post('new-leads/storeleads', [CallsController::class, 'storeleads'])->name('calls.storeleads');
     Route::post('new-variants/storenewvarinats', [CallsController::class, 'storenewvarinats'])->name('calls.storenewvarinats');
     Route::resource('sale_person_status', SalesPersonStatusController::class);
+    Route::resource('postingrecords', PostingRecordsController::class);
+    Route::resource('marketingpurchasingpayments', MarketingPurchasingPaymentsController::class);
+    
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
     Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');
@@ -791,7 +797,8 @@ Route::get('/d', function () {
     //Pre Order
     Route::resource('preorder', PreOrderController::class);
     Route::get('/get-po-for-presale', [PreOrderController::class, 'getpoforpreorder']);
-    Route::post('/save-po-list-preorder', [PreOrderController::class, 'savepolistpreorder']);
+
+     
 
 
 
