@@ -790,6 +790,8 @@ Route::get('/d', function () {
 
     //Pre Order
     Route::resource('preorder', PreOrderController::class);
+    Route::get('/get-po-for-presale', [PreOrderController::class, 'getpoforpreorder']);
+    Route::post('/save-po-list-preorder', [PreOrderController::class, 'savepolistpreorder']);
 
 
 

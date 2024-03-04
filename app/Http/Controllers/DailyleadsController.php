@@ -60,16 +60,16 @@ class DailyleadsController extends Controller
                     'pre_orders_items.qty',
                     'pre_orders_items.description',
                     'countries.name as countryname',
-                    'color_codes_exterior.name as exterior', // distinct alias for exterior color
-                    'color_codes_interior.name as interior', // distinct alias for interior color
+                    'color_codes_exterior.name as exterior',
+                    'color_codes_interior.name as interior',
                     'pre_orders_items.modelyear'
                 ])
                 ->leftJoin('quotations', 'pre_orders.quotations_id', '=', 'quotations.id')
                 ->leftJoin('pre_orders_items', 'pre_orders.id', '=', 'pre_orders_items.preorder_id')
                 ->leftJoin('master_model_lines', 'pre_orders_items.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('countries', 'pre_orders_items.countries_id', '=', 'countries.id')
-                ->leftJoin('color_codes as color_codes_exterior', 'pre_orders_items.ex_colour', '=', 'color_codes_exterior.id') // distinct alias for exterior color
-                ->leftJoin('color_codes as color_codes_interior', 'pre_orders_items.int_colour', '=', 'color_codes_interior.id') // distinct alias for interior color
+                ->leftJoin('color_codes as color_codes_exterior', 'pre_orders_items.ex_colour', '=', 'color_codes_exterior.id')
+                ->leftJoin('color_codes as color_codes_interior', 'pre_orders_items.int_colour', '=', 'color_codes_interior.id')
                 ->groupby('pre_orders.id')
                 ->get();
                 return DataTables::of($preorders)->toJson();  
@@ -77,8 +77,15 @@ class DailyleadsController extends Controller
             else
             {
             $searchValue = $request->input('search.value');
-            $data = Calls::select(['calls.id', DB::raw("DATE_FORMAT(calls.created_at, '%d-%b-%Y') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")])
-                ->where('status', $status)->where('sales_person', $id)->orderBy('created_at', 'desc');
+            $data = Calls::select(['calls.id', DB::raw("DATE_FORMAT(calls.created_at, '%d-%b-%Y') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")]);
+            if($status === "Prospecting")
+            {
+            $data->whereIn('status', ['Prospecting', 'New Demand'])->where('sales_person', $id)->orderBy('created_at', 'desc');  
+            }
+            else
+            {
+            $data->where('status', $status)->where('sales_person', $id)->orderBy('created_at', 'desc');
+            }
             $data->addSelect(DB::raw('(SELECT GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ") FROM calls_requirement
                 JOIN master_model_lines ON calls_requirement.model_line_id = master_model_lines.id
                 JOIN brands ON master_model_lines.brand_id = brands.id
@@ -105,23 +112,24 @@ class DailyleadsController extends Controller
                             });
                     });
                 }
-            if ($status === 'Prospecting') {
-                $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
-                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
-                $data->addSelect(
-                    DB::raw("IFNULL(DATE_FORMAT(demand.date, '%d-%b-%Y'), '') as ddate"),
-                    DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes")
-                );
-                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
-            } elseif ($status === 'New Demand') {
-                $data->addSelect(
-                    DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%d-%b-%Y'), '') as date"),
-                    DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes")
-                );
-                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
-                $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%d-%b-%Y') as ddate"), 'demand.salesnotes as dsalesnotes');
-                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
-            } elseif ($status === 'Quoted') {
+                if ($status === 'Prospecting') {
+                    $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
+                    $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
+                    $data->addSelect(
+                        DB::raw("IFNULL(DATE_FORMAT(demand.date, '%d-%b-%Y'), '') as ddate"),
+                        DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes"),
+                        DB::raw("IFNULL(demand.purchaserremarks, '') as purchaserremarks"),
+                    );
+                    $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
+                } elseif ($status === 'New Demand') {
+                    $data->addSelect(
+                        DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%d-%b-%Y'), '') as date"),
+                        DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes")
+                    );
+                    $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
+                    $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%d-%b-%Y') as ddate"), 'demand.salesnotes as dsalesnotes');
+                    $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
+                } elseif ($status === 'Quoted') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%d-%b-%Y'), '') as date"),
                     DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes")
