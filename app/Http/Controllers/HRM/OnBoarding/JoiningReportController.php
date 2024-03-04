@@ -83,8 +83,24 @@ class JoiningReportController extends Controller
         })->where(function ($query5) {
             $query5->whereDoesntHave('candidateJoiningReport')
             ->orWhereDoesntHave('candidateJoiningReport', function($query) {
-                $query->where('status','pending');
-        });
+                $query->where('status','pending')->orWhere(function($query6) {
+                        $query6->where('joining_type','new_employee')->where('new_emp_joining_type','permanent')->whereIn('status',['pending','approved']);
+                    })->orWhere(function($query7) {
+                            $query7->where(function($query8){
+                            $query8->where('joining_type','new_employee')->where('new_emp_joining_type','permanent')->whereIn('status',['pending','approved']);
+                            })->where(function($query9){
+                                $query9->where('joining_type','new_employee')->where('new_emp_joining_type','trial_period')->where('status','approved');
+                            });        
+            // ->orWhereDoesntHave('candidateJoiningReport', function($query6) {
+            //     $query6->where('joining_type','new_employee')->where('new_emp_joining_type','permanent')->whereIn('status',['pending','approved']);
+            // })->orWhereDoesntHave('candidateJoiningReport', function($query7) {
+            //     $query7->where(function($query8){
+            //     $query8->where('joining_type','new_employee')->where('new_emp_joining_type','permanent')->whereIn('status',['pending','approved']);
+            //     })->where(function($query9){
+            //         $query9->where('joining_type','new_employee')->where('new_emp_joining_type','trial_period')->where('status','approved');
+                });        
+            })
+            ;
         })->with('designation','department')->get();
         $masterlocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get(); 
         $reportingTo = User::where('status','active')->whereNotIn('id',[1,16])->get();
@@ -141,6 +157,9 @@ class JoiningReportController extends Controller
                     $emp->employee_code = $request->employee_code;
                     if(isset($request->team_lead_or_reporting_manager)) {
                         $emp->team_lead_or_reporting_manager = $request->team_lead_or_reporting_manager;
+                    }
+                    if(isset($request->joining_location)) {
+                        $emp->work_location = $request->joining_location;
                     }
                     $emp->update();
                 }

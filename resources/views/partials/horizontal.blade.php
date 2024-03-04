@@ -341,21 +341,8 @@
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('employee_joining_report.index','new_employee') }}" class="dropdown-item" data-key="t-login">New Employee</a>
-                                                @endif
-                                                @endcanany
-                                                @canany(['view-joining-report-listing','current-user-view-joining-report-listing'])
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <a href="{{ route('employee_joining_report.index','internal_transfer') }}" class="dropdown-item" data-key="t-login">Internal Transfer</a>
-                                                @endif
-                                                @endcanany
-                                                @canany(['view-joining-report-listing','current-user-view-joining-report-listing'])
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
-                                                @endphp
-                                                @if ($hasPermission)
+                                                <a href="{{ route('employee_joining_report.index','temporary_internal_transfer') }}" class="dropdown-item" data-key="t-login">Temporary Internal Transfer</a>
+                                                <a href="{{ route('employee_joining_report.index','permanent_internal_transfer') }}" class="dropdown-item" data-key="t-login">Permanent Internal Transfer</a>                                    
                                                 <a href="{{ route('employee_joining_report.index','vacations_or_leave') }}" class="dropdown-item" data-key="t-login">Vacations Or Leave</a>
                                                 @endif
                                                 @endcanany

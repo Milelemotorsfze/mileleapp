@@ -16,6 +16,7 @@ use App\Models\HRM\Employee\EmployeeSpokenLanguage;
 use App\Models\Country;
 use App\Models\EmpDoc;
 use App\Models\HRM\Hiring\InterviewSummaryReport;
+use App\Models\HRM\Employee\JoiningReport;
 class EmployeeProfile extends Model
 {
     use HasFactory, SoftDeletes;
@@ -137,6 +138,34 @@ class EmployeeProfile extends Model
         'offer_letter_fileName',
         
     ];
+    protected $appends = [
+        'candidate_joining_type',
+        'candidate_trial_joining_date',
+    ];
+    public function getCandidateJoiningTypeAttribute() {
+        $candidateJoiningType = 'any';
+        $joiningReport = JoiningReport::where([
+            ['joining_type','new_employee'],
+            ['new_emp_joining_type','trial_period'],
+            ['status','approved'],
+        ])->first();
+        if($joiningReport) {
+            $candidateJoiningType = 'permanent';
+        }
+        return $candidateJoiningType;
+    }
+    public function getCandidateTrialJoiningDateAttribute() {
+        $candidateJoiningType = '';
+        $joiningReport = JoiningReport::where([
+            ['joining_type','new_employee'],
+            ['new_emp_joining_type','trial_period'],
+            ['status','approved'],
+        ])->first();
+        if($joiningReport) {
+            $candidateJoiningType = $joiningReport->joining_date;
+        }
+        return $candidateJoiningType;
+    }
     public function teamLeadOrReportingManager() {
         return $this->hasOne(User::class,'id','team_lead_or_reporting_manager');
     }
