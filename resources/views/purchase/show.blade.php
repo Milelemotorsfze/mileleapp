@@ -381,6 +381,15 @@
                             <thead class="bg-soft-secondary">
                             <tr >
                                 <th id="serno" style="vertical-align: middle;">Ref No:</th>
+                                @can('view-vehicle-model-sfx')
+                                    @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-vehicle-model-sfx');
+                                    @endphp
+                                    @if ($hasPermission)
+                                        <th>Model - SFX</th>
+                                   @endif
+                                @endcan
+
                                 <th>Brand</th>
                                 <th>Model Line</th>
                                 <th>Variant</th>
@@ -420,6 +429,18 @@
 {{--                            $model_line = $master_model_lines_ids->model_line;--}}
 {{--                            @endphp--}}
                             <td>{{ $vehicles->id }}</td>
+                            @can('view-vehicle-model-sfx')
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-vehicle-model-sfx');
+                                @endphp
+                                @if ($hasPermission)
+                                    <td>
+                                        @if($vehicles->model_id)
+                                            {{ $vehicles->masterModel->model ?? ''  }} - {{ $vehicles->masterModel->sfx ?? '' }}
+                                        @endif
+                                    </td>
+                                @endif
+                            @endcan
                             <td>{{ ucfirst(strtolower($vehicles->variant->brand->brand_name)) }}</td>
                             <td>{{ ucfirst(strtolower($vehicles->variant->master_model_lines->model_line)) }}</td>
                             <td>{{ ucfirst($vehicles->variant->name) }}</td>

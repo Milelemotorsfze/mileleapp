@@ -15,7 +15,15 @@
                 <h4 class="card-title">
                     LOI Lists
                 </h4>
-                <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+                @can('LOI-create')
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-create');
+                    @endphp
+                    @if ($hasPermission)
+                        <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+                    @endif
+                @endcan
+
                 @if (count($errors) > 0)
                     <div class="alert alert-danger">
                         <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -282,7 +290,7 @@
                                         <td>{{ $letterOfIndent->destination }}</td>
                                         <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
-                                       
+
                                         @can('LOI-approve')
                                             @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
@@ -299,7 +307,7 @@
                                                  @endif
                                             @endif
                                         @endcan
-                                      
+
 {{--                                        <td>--}}
 {{--                                            <select class="form-control" onchange="location = this.value;">--}}
 {{--                                                <option value="">Select Template</option>--}}
@@ -471,7 +479,7 @@
                                         <td>{{ $letterOfIndent->destination }}</td>
                                         <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
-                                      
+
                                         @can('LOI-approve')
                                             @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
@@ -488,7 +496,7 @@
                                             </td>
                                             @endif
                                         @endcan
-                                    
+
                                         <td> {{ $letterOfIndent->total_quantity }} </td>
                                         <td> {{ $letterOfIndent->utilized_quantity }} </td>
                                         <td>

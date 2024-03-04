@@ -51,6 +51,7 @@
                             <th>(Month / Year) Value</th>
                             <th>Type</th>
                             <th>Priority Number</th>
+                            <th>Country</th>
                             <th>Created At</th>
                             <th>Actions</th>
                         </tr>
@@ -64,6 +65,7 @@
                                     <td>{{ $loiMappingCriteria->value }}</td>
                                     <td>{{ $loiMappingCriteria->value_type }}</td>
                                     <td>{{ $loiMappingCriteria->order }}</td>
+                                    <td>{{ $loiMappingCriteria->country }}</td>
                                     <td>{{ \Illuminate\Support\Carbon::parse($loiMappingCriteria->created_at)->format('d M Y') ?? '' }}</td>
                                     <td>
                                         @can('edit-loi-mapping-criterias')
@@ -86,7 +88,7 @@
                                                 </a>
                                             @endif
                                         @endcan
-                                    </td>                               
+                                    </td>
                                 </tr>
                         @endforeach
                         </tbody>

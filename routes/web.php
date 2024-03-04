@@ -267,7 +267,7 @@ Route::get('/d', function () {
     Route::resource('department', DepartmentController::class);
     // Designation Approvals
     Route::resource('designation-approvals', DesignationApprovalsController::class);
-    
+
     // Master Job Position
     Route::resource('master-job-position', MasterJobPositionController::class);
       // Master Specific Industry Experience
@@ -392,7 +392,7 @@ Route::get('/d', function () {
     // Demand & Planning Module
 
     // suppliers
-    
+
     //    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
 
     // Demands
@@ -425,6 +425,8 @@ Route::get('/d', function () {
 
     // Supplier Inventories
     Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');
+    Route::get('supplier-inventories/createNew', [SupplierInventoryController::class,'createNew'])->name('supplier-inventories.createNew');
+    Route::post('supplier-inventories/excel-update', [SupplierInventoryController::class,'ExcelUpdate'])->name('supplier-inventories.excel-update');
     Route::get('supplier-inventories/lists', [SupplierInventoryController::class,'lists'])->name('supplier-inventories.lists');
     Route::get('supplier-inventories/file-comparision', [SupplierInventoryController::class,'FileComparision'])->name('supplier-inventories.file-comparision');
     Route::get('supplier-inventories/file-comparision-report', [SupplierInventoryController::class,'FileComparisionReport'])

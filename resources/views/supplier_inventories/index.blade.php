@@ -9,8 +9,15 @@
         <h4 class="card-title">
             Inventory Lists
         </h4>
-
             <div class="ml-auto float-end">
+                @can('supplier-inventory-create')
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-create');
+                    @endphp
+                    @if ($hasPermission)
+                        <a  class="btn btn-sm btn-info float-end" href="{{ route('supplier-inventories.createNew') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+                    @endif
+                @endcan
                 @can('supplier-inventory-list-view-all')
                     @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-view-all');
@@ -46,7 +53,6 @@
                     <div class="col-md-2">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label text-muted">Dealer</label>
-
                                 <select class="form-control" data-trigger name="dealers" >
                                     <option value="" >Select The Dealer</option>
                                     <option value="Trans Cars" {{ 'Trans Cars' == request()->dealers ? 'selected'  : ''}}>Trans Cars</option>
@@ -87,7 +93,6 @@
                         data-id="{{$supplierInventory->master_model_id}}" data-model="{{$supplierInventory->masterModel->model ?? ''}}"
                         data-sfx="{{ $supplierInventory->masterModel->sfx ?? ''}}" >
                         <td>{{ ++$i }}</td>
-
                         <td>{{ $supplierInventory->supplier->supplier ?? ''}}</td>
                         <td>{{ $supplierInventory->whole_sales ?? ''}}</td>
                         <td>{{ $supplierInventory->masterModel->model ?? '' }}</td>

@@ -6,7 +6,7 @@
         @endphp
         @if ($hasPermission)
             <div class="card-header">
-                <h4 class="card-title">Add / Update Supplier Inventory Record</h4>
+                <h4 class="card-title"> Update Supplier Inventory Record</h4>
                 <a  class="btn btn-sm btn-info float-end " href="{{ route('supplier-inventories.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
                 <a href="{{ url('inventory/sample_supplier_inventory.csv') }}" class="btn btn-primary btn-sm  float-end" style="margin-right: 5px" target="_blank">
                     <i class="fa fa-download" ></i> Sample Template</a>
@@ -24,8 +24,9 @@
                             {{ Session::get('message') }}
                         </div>
                     @endif
-                <form id="form-update" action="{{ route('supplier-inventories.store') }}" method="POST" enctype="multipart/form-data">
+                <form id="form-update" action="{{ route('supplier-inventories.excel-update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+
                     <div class="row">
                         <div class="col-lg-4 col-md-4">
                             <div class="mb-3">
@@ -52,7 +53,7 @@
                                 <label for="choices-single-default" class="form-label text-muted"> Country</label>
                                 <select class="form-control" data-trigger name="country" id="choices-single-default">
                                     <option value='UAE'>UAE</option>
-                                    <option value='Belguim'>Belguim</option>
+                                    <option value='Belgium'>Belgium</option>
                                 </select>
                             </div>
                         </div>
