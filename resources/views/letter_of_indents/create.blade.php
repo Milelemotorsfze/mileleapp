@@ -382,6 +382,7 @@
                     file: {
                         extension: "Please upload pdf file"
                     },
+
                     loi_signature:{
                         extension: "Please upload Image file format (png,jpeg,jpg,svg)"
                     }

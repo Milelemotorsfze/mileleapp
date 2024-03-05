@@ -379,7 +379,7 @@
                     <div class="table-responsive" >
                         <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
                             <thead class="bg-soft-secondary">
-                            <tr >
+                            <tr>
                                 <th id="serno" style="vertical-align: middle;">Ref No:</th>
                                 @can('view-vehicle-model-sfx')
                                     @php
@@ -395,7 +395,7 @@
                                 <th>Variant</th>
                                 <th>Variants Detail</th>
                                 <th>Price</th>
-                                <th  style="vertical-align: middle;" id="int_color">Exterior Color</th>
+                                <th style="vertical-align: middle;" id="int_color">Exterior Color</th>
                                 <th  style="vertical-align: middle;" id="ex_color">Interior Color</th>
                                 <th>VIN Number</th>
                                 <th>Territory</th>
