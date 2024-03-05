@@ -551,7 +551,6 @@
                     extension: "pdf"
                 },
                 loi_signature: {
-                    signature: true,
                     extension: "png|jpeg|jpg|svg"
                 },
                 messages: {

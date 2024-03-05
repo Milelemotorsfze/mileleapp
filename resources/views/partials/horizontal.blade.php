@@ -1348,7 +1348,7 @@
                                         </div>
                                         @endif
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicle-selling-price');
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">

@@ -44,7 +44,22 @@ class PurchasingOrderController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $userId = auth()->user()->id;
-
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+        if ($hasPermission){
+        if(Auth::user()->hasPermissionForSelectedRole('demand-planning-po-list')){
+            $demandPlanningPoIds = LOIItemPurchaseOrder::groupBy('purchase_order_id')->pluck('purchase_order_id');
+//            return $demandPlanningPoIds;
+            // add migrated user Ids
+            $Ids = ['16'];
+            $Ids[] = $userId;
+            $data = PurchasingOrder::with('purchasing_order_items')->whereIn('id', $demandPlanningPoIds)
+                                                ->get();
+        }else{
+            $data = PurchasingOrder::with('purchasing_order_items')->orderBy('po_number', 'desc')->get();
+        }
+    }
+    else
+    {
         if(Auth::user()->hasPermissionForSelectedRole('demand-planning-po-list')){
             $demandPlanningPoIds = LOIItemPurchaseOrder::groupBy('purchase_order_id')->pluck('purchase_order_id');
 //            return $demandPlanningPoIds;
@@ -56,7 +71,8 @@ class PurchasingOrderController extends Controller
                                                 ->get();
         }else{
             $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->orderBy('po_number', 'desc')->get();
-        }
+        }  
+    }
         return view('warehouse.index', compact('data'));
     }
     public function filter($status)
@@ -382,9 +398,14 @@ public function getBrandsAndModelLines(Request $request)
                     foreach($masterModels as $key => $masterModel)
                     {
                         $model = MasterModel::find($masterModel);
+                        $vehicle = Vehicles::where('model_id', $masterModel)->where('purchasing_order_id', $purchasingOrderId)
+                                                    ->where('vin', $vins[$key])
+                                                    ->whereNull('supplier_inventory_id')
+                                                    ->first();
 
                         $possibleModelIds = MasterModel::where('model', $model->model)
                                             ->where('sfx', $model->sfx)->pluck('id');
+
                         $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
                             ->whereNull('purchase_order_id')
                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
@@ -401,16 +422,23 @@ public function getBrandsAndModelLines(Request $request)
                             $inventoryIds = $inventoryItem->pluck('id');
                             $inventory = SupplierInventory::where('pfi_id', $pfi->id)
                                                 ->whereIn('id', $inventoryIds);
+
                             if($inventory->count() > 0) {
                                 $inventoryItem = $inventory->first();
-
                             }else{
                                 $inventoryItem = $inventoryItem->first();
                                 $inventoryItem->pfi_id = $pfi->id;
                             }
+
                             $inventoryItem->letter_of_indent_item_id = $request->loi_item_Ids[$key];
                             $inventoryItem->purchase_order_id = $purchasingOrder->id;
                             $inventoryItem->save();
+
+                            // add entry to inventory log table
+
+                            $vehicle->supplier_inventory_id = $inventoryItem->id;
+                            $vehicle->save();
+
                             $alreadyAddedIds[] = $inventoryItem->id;
                         }
                     }
@@ -630,6 +658,13 @@ public function getBrandsAndModelLines(Request $request)
                         $model = MasterModel::find($masterModel);
                         $possibleModelIds = MasterModel::where('model', $model->model)
                                             ->where('sfx', $model->sfx)->pluck('id');
+                        $vehicle = Vehicles::where('model_id', $masterModel)
+                                                    ->where('purchasing_order_id', $purchasingOrderId)
+                                                    ->where('vin', $vins[$key])
+                                                    ->whereNull('supplier_inventory_id')
+                                                    ->first();
+
+
                         $inventoryItem = SupplierInventory::whereIn('master_model_id', $possibleModelIds)
                             ->whereNull('purchase_order_id')
                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
@@ -656,6 +691,10 @@ public function getBrandsAndModelLines(Request $request)
                             $inventoryItem->letter_of_indent_item_id = $request->loi_item_Ids[$key];
                             $inventoryItem->purchase_order_id = $purchasingOrder->id;
                             $inventoryItem->save();
+
+                            $vehicle->supplier_inventory_id = $inventoryItem->id;
+                            $vehicle->save();
+
                             $alreadyAddedIds[] = $inventoryItem->id;
                         }
                     }
@@ -784,7 +823,6 @@ public function checkcreatevins(Request $request)
 {
 
     $updatedData = $request->json()->all();
-
     foreach ($updatedData as $data) {
         $vehicleId = $data['id'];
         $fieldName = $data['name'];
@@ -828,9 +866,31 @@ public function checkcreatevins(Request $request)
                 $purchasingOrderId = $vehicle->purchasing_order_id;
                 $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
                 if ($purchasingOrder) {
+//                    check the po is under demand planning
+
+                    $loiPurchasingOrder = LOIItemPurchaseOrder::where('purchase_order_id', $purchasingOrderId)->first();
+                       if($loiPurchasingOrder) {
+                           $supplierInventory = SupplierInventory::find($vehicle->supplier_inventory_id);
+                           if($supplierInventory) {
+                               if($fieldName == 'vin') {
+                                   $supplierInventory->chasis = $fieldValue;
+                               }
+                               if($fieldName == 'estimation_date') {
+                                   $supplierInventory->eta_import =  \Illuminate\Support\Carbon::parse($fieldValue)->format('Y-m-d');
+                               }
+                               if($fieldName == 'int_colour') {
+                                   $supplierInventory->interior_color_code_id = $fieldValue ?? '';
+                               }
+                               if($fieldName == 'ex_colour') {
+                                   $supplierInventory->exterior_color_code_id = $fieldValue ?? '';
+                               }
+                               $supplierInventory->save();
+                           }
+                       }
+
                     $purchasingOrder->status = 'Pending Approval';
                     $purchasingOrder->save();
-                     }
+                }
 
             }
         }

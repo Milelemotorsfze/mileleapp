@@ -379,7 +379,7 @@
                     <div class="table-responsive" >
                         <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
                             <thead class="bg-soft-secondary">
-                            <tr >
+                            <tr>
                                 <th id="serno" style="vertical-align: middle;">Ref No:</th>
                                 @can('view-vehicle-model-sfx')
                                     @php
@@ -395,8 +395,9 @@
                                 <th>Variant</th>
                                 <th>Variants Detail</th>
                                 <th>Price</th>
-                                <th  style="vertical-align: middle;" id="int_color">Exterior Color</th>
+                                <th style="vertical-align: middle;" id="int_color">Exterior Color</th>
                                 <th  style="vertical-align: middle;" id="ex_color">Interior Color</th>
+                                <th>Engine Number</th>
                                 <th>VIN Number</th>
                                 <th>Territory</th>
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
@@ -480,6 +481,7 @@
                                     @endforeach
                                 </select>
                             </td>
+                            <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
                             <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
@@ -508,6 +510,7 @@
                                     @endforeach
                                 </select>
                             </td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
@@ -542,6 +545,7 @@
                                     @endforeach
                                 </select>
                             </td>
+                            <td>{{ $vehicles->engine }}</td>
                             <td>{{ $vehicles->vin }}</td>
                             <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                                 <td>{{ $vehicles->estimation_date }}</td>
