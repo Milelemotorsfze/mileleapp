@@ -45,15 +45,15 @@ class PostingRecordsController extends Controller
                 ->leftJoin('master_model_lines', 'pre_orders_items.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
                 ->leftJoin('countries', 'pre_orders_items.countries_id', '=', 'countries.id')
-                ->leftJoin('color_codes as color_codes_exterior', 'pre_orders_items.ex_colour', '=', 'color_codes_exterior.id') // distinct alias for exterior color
-                ->leftJoin('color_codes as color_codes_interior', 'pre_orders_items.int_colour', '=', 'color_codes_interior.id') // distinct alias for interior color
+                ->leftJoin('color_codes as color_codes_exterior', 'pre_orders_items.ex_colour', '=', 'color_codes_exterior.id')
+                ->leftJoin('color_codes as color_codes_interior', 'pre_orders_items.int_colour', '=', 'color_codes_interior.id')
                 ->where('pre_orders_items.status', 'Approved')
                 ->groupby('pre_orders_items.id');
             }
                 return DataTables::of($preorders)
                 ->toJson();
         }
-        return view('preorder.index');
+        return view('calls.postingrecords');
     }
 
     /**

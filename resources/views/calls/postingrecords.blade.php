@@ -60,7 +60,7 @@
     </div>
 @endif
     <h4 class="card-title">
-     Pre Order Info
+     Posting Records
     </h4>
     <br>
     @can('posting-records')
@@ -71,7 +71,7 @@
         </a>
       </li>
     <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Pictures
+        <a class="nav-link" data-bs-toggle="pill" href="#tab1">Pictures
         <span class="badge badge-danger row-badge2 badge-notification"></span>
         </a>
       </li>
@@ -99,12 +99,11 @@
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
             <thead class="bg-soft-secondary">
                 <tr>
-                <th>Estimated Arrival</th>
                 <th>Brand</th>
-                  <th>Model Line</th>
-                  <th>Variant</th>
-                  <th>Interior Colour</th>
-                  <th>Exterior Colour</th>
+                <th>Model</th>
+                <th>Varaints</th>
+                <th>Interior Colour</th>
+                <th>Exterior Colour</th>
                 </tr>
               </thead>
               <tbody>
@@ -119,7 +118,7 @@
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table-bordered">
             <thead class="bg-soft-secondary">
                 <tr>
-                <th>Brand</th>
+                  <th>Brand</th>
                   <th>Model Line</th>
                   <th>Variant</th>
                   <th>Interior Colour</th>
