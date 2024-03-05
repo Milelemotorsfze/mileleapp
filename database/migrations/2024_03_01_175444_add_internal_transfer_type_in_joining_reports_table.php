@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('varaints', function (Blueprint $table) {
-            $table->string('netsuite_name')->nullable();
+        Schema::table('joining_reports', function (Blueprint $table) {
+            $table->enum('internal_transfer_type', ['temporary', 'permanent'])->nullable();
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('varaints', function (Blueprint $table) {
-            $table->dropColumn('netsuite_name');
+        Schema::table('joining_reports', function (Blueprint $table) {
+            $table->dropColumn('internal_transfer_type');
         });
     }
 };

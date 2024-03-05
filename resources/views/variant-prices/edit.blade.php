@@ -1,5 +1,9 @@
 @extends('layouts.table')
 @section('content')
+@php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicle-selling-price');
+                                        @endphp
+                                        @if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">Edit Price</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ route('variant-prices.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -242,6 +246,7 @@
             </div>
             </div>
     </div>
+    @endif
 @endsection
 @push('scripts')
     <script>

@@ -316,15 +316,15 @@
             <h6>SO Details</h6>
         <div class="col-md-2 mb-3">
             <label for="today_date">SO Date</label>
-            <input type="date" class="form-control" id="so_date" name="so_date" value="<?php echo date("Y-m-d"); ?>">
+            <input type="date" class="form-control" id="so_date" name="so_date" value="{{$sodetails->so_date}}">
         </div>
         <div class="col-md-2 mb-3">
             <label for="text_input">Netsuit SO Number</label>
-            <input type="text" class="form-control" id="so_number" name="so_number">
+            <input type="text" class="form-control" id="so_number" name="so_number" value="{{$sodetails->so_number}}">
         </div>
         <div class="col-md-8 mb-3">
             <label for="text_area">Sales Notes</label>
-            <textarea class="form-control" id="notes" name="notes"></textarea>
+            <textarea class="form-control" id="notes" name="notes" value="{{$sodetails->notes}}"></textarea>
         </div>
     </div>
         <hr>

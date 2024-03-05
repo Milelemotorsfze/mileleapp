@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('varaints', function (Blueprint $table) {
-            $table->string('netsuite_name')->nullable();
+        Schema::table('pre_orders_items', function (Blueprint $table) {
+            $table->text('notes')->nullable();
+            $table->string('status')->nullable();
         });
     }
 
@@ -21,8 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('varaints', function (Blueprint $table) {
-            $table->dropColumn('netsuite_name');
+        Schema::table('pre_orders_items', function (Blueprint $table) {
+            $table->dropColumn('notes');
+            $table->dropColumn('status');
         });
     }
 };

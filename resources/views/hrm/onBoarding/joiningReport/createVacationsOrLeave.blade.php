@@ -22,7 +22,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 		</ul>
 	</div>
 	@endif
-	<form id="joiningReportForm" name="joiningReportForm" enctype="multipart/form-data" method="POST" action="{{route('joining_report.store')}}">
+	<form id="vacOrlejoiningReportForm" name="vacOrlejoiningReportForm" enctype="multipart/form-data" method="POST" action="{{route('joining_report.store')}}">
 		@csrf
 		<div class="card">
 		<div class="card-body">
@@ -163,7 +163,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
         errorClass: "is-invalid",
         errorElement: "p",     
     });
-	$('#joiningReportForm').validate({ 
+	$('#vacOrlejoiningReportForm').validate({ 
         rules: {
             employee_id: {
 				required: true,

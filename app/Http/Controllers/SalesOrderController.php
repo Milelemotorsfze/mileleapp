@@ -240,6 +240,8 @@ class SalesOrderController extends Controller
         {
             $quotation = Quotation::where('calls_id', $id)->first();
             $calls = Calls::find($id);
+            $sodetails = So::where('quotation_id', $quotation->id)->first();
+            $soitems = Soitems::where('so_id', $sodetails->id)->get();
             $customerdetails = QuotationDetail::with('country', 'shippingPort', 'shippingPortOfLoad', 'paymentterms')->where('quotation_id', $quotation->id)->first();
             $vehicles = [];
             if ($quotation) {
@@ -277,6 +279,6 @@ class SalesOrderController extends Controller
                     }
                         }
                         }  
-                        return view('salesorder.update', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails'));  
+                        return view('salesorder.update', compact('vehicles', 'quotationItems', 'quotation', 'calls', 'customerdetails','sodetails', 'soitems'));  
         }
         }

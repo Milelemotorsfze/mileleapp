@@ -42,6 +42,13 @@
         }
 
     }
+    @media (min-width: 992px) {
+.topnav .dropdown .dropdown-menu {
+    margin-top: 0;
+    border-radius: 0 0 .25rem .25rem;
+    right: auto!important;
+}
+    }
 </style>
 
 <div class="container">
@@ -341,21 +348,8 @@
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('employee_joining_report.index','new_employee') }}" class="dropdown-item" data-key="t-login">New Employee</a>
-                                                @endif
-                                                @endcanany
-                                                @canany(['view-joining-report-listing','current-user-view-joining-report-listing'])
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <a href="{{ route('employee_joining_report.index','internal_transfer') }}" class="dropdown-item" data-key="t-login">Internal Transfer</a>
-                                                @endif
-                                                @endcanany
-                                                @canany(['view-joining-report-listing','current-user-view-joining-report-listing'])
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
-                                                @endphp
-                                                @if ($hasPermission)
+                                                <a href="{{ route('employee_joining_report.index','temporary') }}" class="dropdown-item" data-key="t-login">Temporary Internal Transfer</a>
+                                                <a href="{{ route('employee_joining_report.index','permanent') }}" class="dropdown-item" data-key="t-login">Permanent Internal Transfer</a>                                    
                                                 <a href="{{ route('employee_joining_report.index','vacations_or_leave') }}" class="dropdown-item" data-key="t-login">Vacations Or Leave</a>
                                                 @endif
                                                 @endcanany
@@ -911,6 +905,18 @@
                                         <span data-key="t-extra-pages">Sales Persons</span>
                                     </a>
                                 </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('postingrecords.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="upload-cloud"></i>
+                                        <span data-key="t-extra-pages">Posting Records</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('marketingpurchasingpayments.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="shopping-bag"></i>
+                                        <span data-key="t-extra-pages">Purchashing & Payments</span>
+                                    </a>
+                                </li>
                                 @endif
                                 @endcan
                                 @can('View-daily-movemnets')
@@ -1342,7 +1348,7 @@
                                         </div>
                                         @endif
                                         @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicle-selling-price');
                                         @endphp
                                         @if ($hasPermission)
                                         <div class="dropdown">

@@ -44,7 +44,22 @@ class PurchasingOrderController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $userId = auth()->user()->id;
-
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+        if ($hasPermission){
+        if(Auth::user()->hasPermissionForSelectedRole('demand-planning-po-list')){
+            $demandPlanningPoIds = LOIItemPurchaseOrder::groupBy('purchase_order_id')->pluck('purchase_order_id');
+//            return $demandPlanningPoIds;
+            // add migrated user Ids
+            $Ids = ['16'];
+            $Ids[] = $userId;
+            $data = PurchasingOrder::with('purchasing_order_items')->whereIn('id', $demandPlanningPoIds)
+                                                ->get();
+        }else{
+            $data = PurchasingOrder::with('purchasing_order_items')->orderBy('po_number', 'desc')->get();
+        }
+    }
+    else
+    {
         if(Auth::user()->hasPermissionForSelectedRole('demand-planning-po-list')){
             $demandPlanningPoIds = LOIItemPurchaseOrder::groupBy('purchase_order_id')->pluck('purchase_order_id');
 //            return $demandPlanningPoIds;
@@ -56,7 +71,8 @@ class PurchasingOrderController extends Controller
                                                 ->get();
         }else{
             $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->orderBy('po_number', 'desc')->get();
-        }
+        }  
+    }
         return view('warehouse.index', compact('data'));
     }
     public function filter($status)

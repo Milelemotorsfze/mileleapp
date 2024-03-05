@@ -7,7 +7,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 @if ($hasPermission)                                           
 <div class="card-header">
 	<h4 class="card-title">
-		@if($type == 'new_employee') New Employee @elseif($type == 'internal_transfer') Internal Transfer @elseif($type == 'vacations_or_leave') Vacations Or Leave @endif Joining Report Info
+		@if($type == 'new_employee') New Employee @elseif($type == 'temporary') Temporary Internal Transfer @elseif($type == 'permanent') Permanent Internal Transfer @elseif($type == 'vacations_or_leave') Vacations Or Leave @endif Joining Report Info
 	</h4>	
 	@canany(['create-joining-report','current-user-create-joining-report'])
 	@php
@@ -15,7 +15,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 	@endphp
 	@if ($hasPermission)
 	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('create_joining_report.create',$type) }}">
-      <i class="fa fa-plus" aria-hidden="true"></i> New Joining Report
+      <i class="fa fa-plus" aria-hidden="true"></i> New Joining Report 
     </a>
 	@endif
 	@endcanany
@@ -79,7 +79,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							@if($type == 'new_employee')
 							<th>Joining Type</th>
 							@endif
-							@if($type == 'internal_transfer')
+							@if($type == 'permanent' OR $type == 'temporary')
 							<th>Transfer From Department</th>
 							<th>Transfer From Date</th>
 							<th>Transfer From Location</th>
@@ -101,28 +101,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<td>
 								@if($type == 'new_employee')
 								{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
-								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
+								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->name ?? ''}}
 								@endif
 							</td>
 							<td>
 								@if($type == 'new_employee')
 								{{ $data->candidate->employee_code ?? '' }}
-								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
+								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->employee_code ?? '' }}
 								@endif
 							</td>
 							<td>
 								@if($type == 'new_employee')
 								{{ $data->candidate->designation->name ?? '' }}
-								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
+								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->designation->name ?? '' }}
 								@endif								
 							</td>
 							<td>
 								@if($type == 'new_employee')
 								{{ $data->candidate->department->name ?? '' }}
-								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
+								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->department->name ?? '' }}
 								@endif
 								
@@ -130,7 +130,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							@if($type == 'new_employee')
 							<td>{{ $data->joining_type_name ?? ''}}</td>
 							@endif
-							@if($type == 'internal_transfer')
+							@if($type == 'permanent' OR $type == 'temporary')
 							<td>{{ $data->transferFromDepartment->name ?? ''}}</td>
 							<td>
 								@if($data->transfer_from_date != NULL)
@@ -233,7 +233,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							@if($type == 'new_employee')
 							<th>Joining Type</th>
 							@endif
-							@if($type == 'internal_transfer')
+							@if($type == 'permanent' OR $type == 'temporary')
 							<th>Transfer From Department</th>
 							<th>Transfer From Date</th>
 							<th>Transfer From Location</th>
@@ -254,27 +254,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 						<td>{{ ++$i }}</td>
 							<td>@if($type == 'new_employee')
 								{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
-								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
+								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->name ?? ''}}
 								@endif</td>
 							<td>
 								@if($type == 'new_employee')
 								{{ $data->candidate->employee_code ?? '' }}
-								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
+								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->employee_code ?? '' }}
 								@endif								
 							</td>
 							<td>
 								@if($type == 'new_employee')
 								{{ $data->candidate->designation->name ?? '' }}
-								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
+								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->designation->name ?? '' }}
 								@endif								
 							</td>
 							<td>
 							@if($type == 'new_employee')
 								{{ $data->candidate->department->name ?? '' }}
-								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
+								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->department->name ?? '' }}
 								@endif	
 								
@@ -282,7 +282,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							@if($type == 'new_employee')
 							<td>{{ $data->joining_type_name ?? ''}}</td>
 							@endif
-							@if($type == 'internal_transfer')
+							@if($type == 'permanent' OR $type == 'temporary')
 							<td>{{ $data->transferFromDepartment->name ?? ''}}</td>
 							<td>
 								@if($data->transfer_from_date != NULL)
@@ -336,7 +336,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							@if($type == 'new_employee')
 							<th>Joining Type</th>
 							@endif
-							@if($type == 'internal_transfer')
+							@if($type == 'permanent' OR $type == 'temporary')
 							<th>Transfer From Department</th>
 							<th>Transfer From Date</th>
 							<th>Transfer From Location</th>
@@ -357,13 +357,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 						<td>{{ ++$i }}</td>
 							<td>@if($type == 'new_employee')
 								{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
-								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
+								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->name ?? ''}}
 								@endif</td>
 							<td>
 								@if($type == 'new_employee')
 								{{ $data->candidate->employee_code ?? '' }}
-								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
+								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->employee_code ?? '' }}
 								@endif
 								
@@ -371,21 +371,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<td>
 								@if($type == 'new_employee')
 								{{ $data->candidate->designation->name ?? '' }}
-								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
+								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->designation->name ?? '' }}
 								@endif								
 							</td>
 							<td>
 								@if($type == 'new_employee')
 								{{ $data->candidate->department->name ?? '' }}
-								@elseif($type == 'internal_transfer' OR $type == 'vacations_or_leave')
+								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->department->name ?? '' }}
 								@endif
 								</td>
 							@if($type == 'new_employee')
 							<td>{{ $data->joining_type_name ?? ''}}</td>
 							@endif
-							@if($type == 'internal_transfer')
+							@if($type == 'permanent' OR $type == 'temporary')
 							<td>{{ $data->transferFromDepartment->name ?? ''}}</td>
 							<td>
 								@if($data->transfer_from_date != NULL)

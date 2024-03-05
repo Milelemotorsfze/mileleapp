@@ -301,7 +301,7 @@ input[type=number]::-webkit-outer-spin-button
     <ul class="dropdown-menu dropdown-menu-end">
     @can('sales-view')
       <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li>
-      <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Demand</a></li>
+      <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Unique Inquiry / Demand</a></li>
       <!-- <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li> -->
       <li><a class="dropdown-item"href="{{route('qoutation.proforma_invoice',['callId'=> $calls->id]) }}">Quotation</a></li>
       <!-- <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Negotiation</a></li> -->
@@ -383,7 +383,7 @@ input[type=number]::-webkit-outer-spin-button
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="demandmodelLabel">Demand</h5>
+          <h5 class="modal-title" id="demandmodelLabel">Unique Inquiry / Demand</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -711,8 +711,9 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Remarks & Messages</th>
                   <th>Prospectings Date</th>
                   <th>Prospectings Notes</th>
-                  <th>Demand Date</th>
-                  <th>Demand Notes</th>
+                  <th>Inquiry Date</th>
+                  <th>Inquiry Notes</th>
+                  <th>Purchaser Remarks</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -1657,6 +1658,30 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
         }
     }
 },
+{
+    data: 'purchaserremarks',
+    name: 'purchaserremarks',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'purchaserremarks_' + row.id;
+
+        if (row.ddate && row.ddate !== '') {
+            if (data && data.length > maxLength) {
+                const truncatedText = data.substring(0, maxLength);
+                return `
+                    <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                    <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                    <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+                `;
+            } else {
+                return `<span class="remarks-text">${data}</span>`;
+            }
+        } else {
+            return '';
+        }
+    }
+},
                 {
                     data: 'id',
                     name: 'id',
@@ -1664,18 +1689,33 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                     render: function (data, type, row) {
                       const bookingUrl = `{{ url('booking/create') }}/${data}`;
                       const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
+                      if (row.ddate && row.ddate !== '') {
                         return `
                             <div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Demand</a></li>
                                     <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
                             </div>`;
                     }
+                    else
+                  {
+                    return `
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
+                                    <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                                </ul>
+                            </div>`;
+                  }
+                  }
                 },
             ]
         });

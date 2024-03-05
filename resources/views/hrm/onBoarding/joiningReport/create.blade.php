@@ -22,7 +22,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 		</ul>
 	</div>
 	@endif
-	<form id="joiningReportForm" name="joiningReportForm" enctype="multipart/form-data" method="POST" action="{{route('joining_report.store')}}">
+	<form id="newjoiningReportForm" name="newjoiningReportForm" enctype="multipart/form-data" method="POST" action="{{route('joining_report.store')}}">
 		@csrf
 		<div class="card">
 		<div class="card-body">
@@ -165,6 +165,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							if(candidates[i].department != null && candidates[i].department.name != null) {
 								document.getElementById('department').textContent=candidates[i].department.name;
 							}
+							if(candidates[i].candidate_joining_type == 'permanent') {
+								$('#permanent').prop('checked',true);
+								$('#trial_period').attr("disabled",true);
+								if(candidates[i].candidate_trial_joining_date != null) {
+									document.getElementById("joining_date").min = candidates[i].candidate_trial_joining_date;
+									var alreadySelectedDate = $("#joining_date").val();
+								}
+							}
+							console.log(candidates[i].team_lead_or_reporting_manager);
+							if(candidates[i].team_lead_or_reporting_manager != null) {
+								$("#team_lead_or_reporting_manager").select2().val(candidates[i].team_lead_or_reporting_manager).trigger("change");
+							}
+							if(candidates[i].work_location != null) {
+								$("#joining_location").select2().val(candidates[i].team_lead_or_reporting_manager).trigger("change");
+								$("#joining_location").val(candidates[i].work_location);
+							}
+							console.log(candidates[i].candidate_joining_type);
 						}
 					}
 				}               
@@ -173,6 +190,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 				$('#employee_code_div').hide();
 				$('#designation_div').hide();
                 $('#department_div').hide();
+				$('#permanent').prop('checked',false);
+				$('#trial_period').prop('checked',false);
+				$('#trial_period').attr("disabled",false);
 			}			
 		});
 	});
@@ -180,7 +200,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
         errorClass: "is-invalid",
         errorElement: "p",     
     });
-	$('#joiningReportForm').validate({ 
+	$('#newjoiningReportForm').validate({ 
         rules: {
             employee_id: {
 				required: true,
