@@ -36,11 +36,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 		@method("PUT")
 
 		<div class="row">
-			<!-- <div class="col-xxl-2 col-lg-6 col-md-6">
-				<span class="error">* </span>
-				<label for="request_date" class="col-form-label text-md-end">{{ __('Choose Date') }}</label>
-				<input type="date" name="request_date" id="request_date" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
-			</div> -->
 			<div class="col-xxl-12 col-lg-6 col-md-6">
 				<p><span style="float:right;" class="error">* Required Field</span></p>
 			</div>			
@@ -59,7 +54,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 								class="form-control widthinput" placeholder="Enter Leave Type If Others"
 								 aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->name ?? ''}}">
 					</div>
-                    <div class="col-xxl-4 col-lg-4 col-md-4">
+                    <div class="col-xxl-4 col-lg-4 col-md-4 select-button-main-div">
+					<div class="dropdown-option-div">
 						<span class="error">* </span>
 						<label for="division_head_id" class="col-form-label text-md-end">{{ __('Division Head Name') }}</label>
                         <select name="division_head_id" id="division_head_id" multiple="true" class="division_head_id form-control widthinput" onchange="" autofocus>
@@ -67,8 +63,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
                                 <option value="{{$divisionHead->id}}" @if($data->division_head_id == $divisionHead->id) selected @endif>{{$divisionHead->name}}</option>
                             @endforeach
                         </select>
+					</div>
 					</div>	 
-					<div class="col-xxl-4 col-lg-4 col-md-4">
+					<div class="col-xxl-4 col-lg-4 col-md-4 select-button-main-div">
+					<div class="dropdown-option-div">
 						<span class="error">* </span>
 						<label for="approval_handover_to" class="col-form-label text-md-end">{{ __('Division Head Approval Hand Over To') }}</label>
                         <select name="approval_handover_to" id="approval_handover_to" multiple="true" class="approval_handover_to form-control widthinput" onchange="" autofocus>
@@ -76,6 +74,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
                                 <option value="{{$approvalBy->id}}" @if($data->approval_handover_to == $approvalBy->id) selected @endif>{{$approvalBy->name}}</option>
                             @endforeach
                         </select>
+					</div>
 					</div>	           
 				</div>
 			</div>
@@ -110,15 +109,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
         errorElement: "p",
         errorPlacement: function ( error, element ) {
             error.addClass( "invalid-feedback font-size-13" );
-            if ( element.prop( "type" ) === "checkbox" ) {
-                error.insertAfter( element.parent( "label" ) );
-            }
-            else if (element.hasClass("select2-hidden-accessible")) {
-                element = $("#select2-" + element.attr("id") + "-container").parent();
-                error.insertAfter(element);
-            }
-			else if (element.parent().hasClass('input-group')) {
-                error.insertAfter(element.parent());
+			if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+                if (!element.val() || element.val().length === 0) {
+                    console.log("Error is here with length", element.val().length);
+                    error.addClass('select-error');
+                    error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+                } else {
+                    console.log("No error");
+                }
             }
             else {
                 error.insertAfter( element );

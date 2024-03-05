@@ -81,7 +81,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
         @endphp
         @if ($hasPermission)
 		<li class="nav-item">
-			<a class="nav-link active" data-bs-toggle="pill" href="#pending-hiring-requests">Pending</a>
+			<a class="nav-link active" data-bs-toggle="pill" href="#pending-hiring-requests">Pending Approvals</a>
 		</li>
         @endif
         @endcanany
@@ -91,7 +91,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
         @endphp
         @if ($hasPermission)
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#approved-hiring-requests">Approved(Open)</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#approved-hiring-requests">Open Requests</a>
 		</li>
         @endif
         @endcanany

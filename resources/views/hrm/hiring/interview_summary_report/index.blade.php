@@ -410,13 +410,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																	<div class="col-lg-12 col-md-12 col-sm-12">
 																		<label class="form-label font-size-13">Choose First Round Interviewers Names</label>
 																	</div>
-																	<div class="col-lg-12 col-md-12 col-sm-12">
+																	<div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
+																	<div class="dropdown-option-div">
 																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
 																			class="interviewer_id form-control widthinput">
 																			@foreach($interviewersNames as $interviewer)
 																			<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
 																			@endforeach
 																		</select>
+																	</div>
 																	</div>
 																	@endif
 																	@endif
@@ -598,13 +600,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																	<div class="col-lg-12 col-md-12 col-sm-12">
 																		<label class="form-label font-size-13">Choose Second Round Interviewers Names</label>
 																	</div>
-																	<div class="col-lg-12 col-md-12 col-sm-12">
+																	<div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
+																		<div class="dropdown-option-div">
 																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
 																			class="interviewer_id form-control widthinput" autofocus>
 																			@foreach($interviewersNames as $interviewer)
 																			<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
 																			@endforeach
 																		</select>
+																	</div>
 																	</div>
 																	@endif
 																	@endif
@@ -802,13 +806,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                                                     <div class="col-lg-12 col-md-12 col-sm-12">
                                                                         <label class="form-label font-size-13">Choose Third Round Interviewers Names</label>
                                                                     </div>
-                                                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
+																		<div class="dropdown-option-div">
                                                                         <select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
                                                                             class="interviewer_id form-control widthinput" autofocus>
                                                                             @foreach($interviewersNames as $interviewer)
                                                                             <option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
                                                                             @endforeach
                                                                         </select>
+																	</div>
                                                                     </div>
                                                                     @endif
                                                                     @endif
@@ -1024,13 +1030,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																	<div class="col-lg-12 col-md-12 col-sm-12">
 																		<label class="form-label font-size-13">Choose Forth Round Interviewers Names</label>
 																	</div>
-																	<div class="col-lg-12 col-md-12 col-sm-12">
+																	<div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
+																		<div class="dropdown-option-div">
 																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
 																			class="interviewer_id form-control widthinput" autofocus>
 																			@foreach($interviewersNames as $interviewer)
 																			<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
 																			@endforeach
 																		</select>
+																	</div>
 																	</div>
 																	@endif
 																	@endif
@@ -1263,13 +1271,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																	<div class="col-lg-12 col-md-12 col-sm-12">
 																		<label class="form-label font-size-13">Choose Fifth Round Interviewers Names</label>
 																	</div>
-																	<div class="col-lg-12 col-md-12 col-sm-12">
+																	<div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
+																		<div class="dropdown-option-div">
 																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
 																			class="interviewer_id form-control widthinput" autofocus>
 																			@foreach($interviewersNames as $interviewer)
 																			<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
 																			@endforeach
 																		</select>
+																	</div>
 																	</div>
 																	@endif
 																	@endif
@@ -3125,7 +3135,32 @@ $.ajaxSetup({
         }, 
         "This Password is already taken! Try another."
     );
-
+	jQuery.validator.setDefaults({
+        errorClass: "is-invalid",
+        errorElement: "p",
+        errorPlacement: function ( error, element ) {
+            error.addClass( "invalid-feedback font-size-13" );
+            // if ( element.prop( "type" ) === "checkbox" ) {
+            //     error.insertAfter( element.parent( "label" ) );
+            // }
+            // else
+			 if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+                if (!element.val() || element.val().length === 0) {
+                    console.log("Error is here with length", element.val().length);
+                    error.addClass('select-error');
+                    error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+                } else {
+                    console.log("No error");
+                }
+            }
+			// else if (element.parent().hasClass('input-group')) {
+            //     error.insertAfter(element.parent());
+            // }
+            else {
+                error.insertAfter( element );
+            }
+        }
+    });
 		$('.add-interview-summary').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
@@ -3308,8 +3343,7 @@ $.ajaxSetup({
 			}	
 		}).set({title:"Confirmation"})
 	})
-	function inputNumberAbs(currentPriceInput) 
-	{
+	function inputNumberAbs(currentPriceInput) {
 	    var id = currentPriceInput.id;
 	    var input = document.getElementById(id);
 	    var val = input.value;

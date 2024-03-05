@@ -52,7 +52,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 			</div>
 			<div class="card-body">
 				<div class="row">
-					<div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+					<div class="dropdown-option-div">
 						<span class="error">* </span>
 						<label for="department_id" class="col-form-label text-md-end">{{ __('Choose Department Name') }}</label>
 						<select name="department_id" id="department_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
@@ -61,7 +62,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							@endforeach
 						</select>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6">
+					</div>
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+					<div class="dropdown-option-div">
 						<span class="error">* </span>
 						<label for="location_id" class="col-form-label text-md-end">{{ __('Choose Department Location') }}</label>
 						<select name="location_id" id="location_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
@@ -70,7 +73,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							@endforeach
 						</select>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6">
+					</div>
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+					<div class="dropdown-option-div">
 						<span class="error">* </span>
 						<label for="requested_by" class="col-form-label text-md-end">{{ __('Choose Requested By') }}</label>
 						<select name="requested_by" id="requested_by" multiple="true" class="form-control widthinput" onchange="" autofocus>						
@@ -79,7 +84,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							@endforeach
 						</select>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6">
+					</div>
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+					<div class="dropdown-option-div">
 						<span class="error">* </span>
 						<label for="requested_job_title" class="col-form-label text-md-end">{{ __('Choose Requested Job Title') }}</label>
 						<select name="requested_job_title" id="requested_job_title" multiple="true" class="form-control widthinput" onchange="" autofocus>						
@@ -87,6 +94,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								<option value="{{$masterJobPosition->id}}">{{$masterJobPosition->name}}</option>
 							@endforeach
 						</select>
+					</div>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<a id="createNewJobTitleButton" data-toggle="popover" data-trigger="hover" title="Create New Job Title" data-placement="top" style="margin-top:38px;"
@@ -101,7 +109,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 			</div>
 			<div class="card-body">
 				<div class="row">
-					<div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+					<div class="dropdown-option-div">
 						<span class="error">* </span>
 						<label for="experience_level" class="col-form-label text-md-end">Choose Experience Level</label>
 						<select name="experience_level" id="experience_level" class="form-control widthinput"  multiple="true" autofocus onchange="">
@@ -109,6 +118,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<option value="{{$masterExperienceLevel->id}}">{{$masterExperienceLevel->name}} ( {{$masterExperienceLevel->number_of_year_of_experience}} )</option>
 							@endforeach
 						</select>
+					</div>
 					</div>
 					<div class="col-xxl-2 col-lg-6 col-md-6">
 						<span class="error">* </span>
@@ -172,7 +182,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
                             </div>
                         </fieldset>
 					</div>
-					<div id="replacement_for_employee_div" class="col-xxl-4 col-lg-6 col-md-6">
+					<div id="replacement_for_employee_div" class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+					<div class="dropdown-option-div">
 						<span class="error">* </span>
 						<label for="replacement_for_employee" class="col-form-label text-md-end">Choose Replacement For Employee</label>
 						<select name="replacement_for_employee" id="replacement_for_employee" class="form-control widthinput"  multiple="true" autofocus onchange="">
@@ -180,6 +191,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<option value="{{$replacementForEmployee->id}}">{{$replacementForEmployee->name}}</option>
 							@endforeach
 						</select>
+					</div>
 					</div>
 				</div>
 			</div>
@@ -279,6 +291,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 		}
 		else {
 			$("#replacement_for_employee_div").show();
+			$('#replacement_for_employee').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder:"Choose Replacement For Employee",
+        });
 		}
 	});
 	
@@ -290,9 +307,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
             if ( element.prop( "type" ) === "checkbox" ) {
                 error.insertAfter( element.parent( "label" ) );
             }
-            else if (element.hasClass("select2-hidden-accessible")) {
-                element = $("#select2-" + element.attr("id") + "-container").parent();
-                error.insertAfter(element);
+            else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+                if (!element.val() || element.val().length === 0) {
+                    console.log("Error is here with length", element.val().length);
+                    error.addClass('select-error');
+                    error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+                } else {
+                    console.log("No error");
+                }
             }
 			else if (element.parent().hasClass('input-group')) {
                 error.insertAfter(element.parent());
@@ -310,6 +332,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 		},
 		"Please enter a valid amount "
 	);
+	jQuery.validator.addMethod(
+        "greaterThanFirstValueValidate",
+        function(value, element, param) {
+            var startValue = $(param).val();
+            var isValid = parseFloat(value) > parseFloat(startValue);
+            return this.optional(element) || isValid;
+        },
+        "End value must be greater than start value"
+    );
+	jQuery.validator.addMethod(
+        "timeDifferenceValidate",
+        function(value, element, params) {
+            var startTime = $(params[0]).val();
+            var endTime = value;
+
+            var timeDifference = calculateTimeDifference(startTime, endTime);
+            return timeDifference >= 9;
+        },
+        "The time difference must be greater than or equal to 9 hours"
+    );
+	function calculateTimeDifference(startTime, endTime) {
+        var start = new Date("01/01/2023 " + startTime);
+        var end = new Date("01/01/2023 " + endTime);
+        var timeDifference = Math.abs(end - start) / 36e5;
+        return timeDifference;
+    }
 	$('#employeeHiringRequestForm').validate({ // initialize the plugin
         rules: {
 			request_date: {
@@ -340,6 +388,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 			salary_range_end_in_aed: {
                 required: true,				
 				money: true,
+				greaterThanFirstValueValidate: "#salary_range_start_in_aed",
             },
             experience_level: {
                 required: true,
@@ -349,6 +398,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 			},
             work_time_end: {
                 required: true,
+				timeDifferenceValidate: ["#work_time_start"],
             },
 			explanation_of_new_hiring: {
                 required: true,
