@@ -109,7 +109,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
                         <input type="date" name="date_of_telephonic_interview" id="date_of_telephonic_interview" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6 select-button-main-div">
-					<div class="dropdown-option-div">
+				<div class="dropdown-option-div">
 						<!-- <span class="error">* </span> -->
 						<label for="interviewer_id" class="col-form-label text-md-end">{{ __('Choose Name Of Interviewers') }}</label>
                         <select name="interviewer_id[]" id="interviewer_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
@@ -117,7 +117,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 								<option value="{{$interviewers->id}}">{{$interviewers->name}}</option>
 							@endforeach
 						</select>
-					</div>
+</div>
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
                         <label for="interviewer_id" class="col-form-label text-md-end">{{ __('Telephonic Interview Summary') }}</label>
@@ -128,7 +128,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 				</div>
 			</div>
 		</div>
-		@if($currentInterviewReport != '' && $currentInterviewReport->date_of_first_round != '')
+
+		@if($data != '' && $data->date_of_first_round != '')
 		<div class="card">
 			<div class="card-header">
 				<h4 class="card-title">First Round Interview</h4>
@@ -141,7 +142,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
                         <input type="date" name="date_of_first_round" id="date_of_first_round" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6 select-button-main-div">
-					<div class="dropdown-option-div">
+				<div class="dropdown-option-div">
 						<!-- <span class="error">* </span> -->
 						<label for="first_interviewer_id" class="col-form-label text-md-end">{{ __('Choose Name Of First Round Interviewers') }}</label>
                         <select name="first_interviewer_id[]" id="first_interviewer_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
@@ -149,7 +150,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 								<option value="{{$interviewers->id}}">{{$interviewers->name}}</option>
 							@endforeach
 						</select>
-					</div>
+</div>
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
                         <label for="first_round" class="col-form-label text-md-end">{{ __('First Round Interview Summary') }}</label>
@@ -162,7 +163,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 		</div>
 		@endif
 
-		@if($currentInterviewReport != '' && $currentInterviewReport->date_of_second_round != '')
+		@if($data != '' && $data->date_of_second_round != '')
 		<div class="card">
 			<div class="card-header">
 				<h4 class="card-title">second Round Interview</h4>
@@ -175,7 +176,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
                         <input type="date" name="date_of_second_round" id="date_of_second_round" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6 select-button-main-div">
-					<div class="dropdown-option-div">
+				<div class="dropdown-option-div">
 						<!-- <span class="error">* </span> -->
 						<label for="second_interviewer_id" class="col-form-label text-md-end">{{ __('Choose Name Of Second Round Interviewers') }}</label>
                         <select name="second_interviewer_id[]" id="second_interviewer_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
@@ -183,7 +184,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 								<option value="{{$interviewers->id}}">{{$interviewers->name}}</option>
 							@endforeach
 						</select>
-					</div>
+</div>
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
                         <label for="second_round" class="col-form-label text-md-end">{{ __('Second Round Interview Summary') }}</label>
@@ -196,7 +197,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 		</div>
 		@endif
 
-		@if($currentInterviewReport != '' && $currentInterviewReport->date_of_third_round != '')
+		@if($data != '' && $data->date_of_third_round != '')
 		<div class="card">
 			<div class="card-header">
 				<h4 class="card-title">third Round Interview</h4>
@@ -209,7 +210,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
                         <input type="date" name="date_of_third_round" id="date_of_third_round" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6 select-button-main-div">
-					<div class="dropdown-option-div">
+				<div class="dropdown-option-div">
 						<!-- <span class="error">* </span> -->
 						<label for="third_interviewer_id" class="col-form-label text-md-end">{{ __('Choose Name Of Third Round Interviewers') }}</label>
                         <select name="third_interviewer_id[]" id="third_interviewer_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
@@ -217,7 +218,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 								<option value="{{$interviewers->id}}">{{$interviewers->name}}</option>
 							@endforeach
 						</select>
-					</div>
+</div>
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
                         <label for="third_round" class="col-form-label text-md-end">{{ __('Third Round Interview Summary') }}</label>
@@ -230,7 +231,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 		</div>
 		@endif
 
-		@if($currentInterviewReport != '' && $currentInterviewReport->date_of_forth_round != '')
+		@if($data != '' && $data->date_of_forth_round != '')
 		<div class="card">
 			<div class="card-header">
 				<h4 class="card-title">forth Round Interview</h4>
@@ -243,7 +244,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
                         <input type="date" name="date_of_forth_round" id="date_of_forth_round" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6 select-button-main-div">
-					<div class="dropdown-option-div">
+				<div class="dropdown-option-div">
 						<!-- <span class="error">* </span> -->
 						<label for="forth_interviewer_id" class="col-form-label text-md-end">{{ __('Choose Name Of Forth Round Interviewers') }}</label>
                         <select name="forth_interviewer_id[]" id="forth_interviewer_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
@@ -251,7 +252,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 								<option value="{{$interviewers->id}}">{{$interviewers->name}}</option>
 							@endforeach
 						</select>
-					</div>
+</div>
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
                         <label for="forth_round" class="col-form-label text-md-end">{{ __('Forth Round Interview Summary') }}</label>
@@ -264,7 +265,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 		</div>
 		@endif
 
-		@if($currentInterviewReport != '' && $currentInterviewReport->date_of_fifth_round != '')
+		@if($data != '' && $data->date_of_fifth_round != '')
 		<div class="card">
 			<div class="card-header">
 				<h4 class="card-title">Fifth Round Interview</h4>
@@ -277,7 +278,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
                         <input type="date" name="date_of_fifth_round" id="date_of_fifth_round" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6 select-button-main-div">
-					<div class="dropdown-option-div">
+				<div class="dropdown-option-div">
 						<!-- <span class="error">* </span> -->
 						<label for="fifth_interviewer_id" class="col-form-label text-md-end">{{ __('Choose Name Of Fifth Round Interviewers') }}</label>
                         <select name="fifth_interviewer_id[]" id="fifth_interviewer_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
@@ -285,7 +286,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 								<option value="{{$interviewers->id}}">{{$interviewers->name}}</option>
 							@endforeach
 						</select>
-					</div>
+</div>
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
                         <label for="fifth_round" class="col-form-label text-md-end">{{ __('Fifth Round Interview Summary') }}</label>
@@ -410,11 +411,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 	var currentInterviewReport = {!! json_encode($currentInterviewReport) !!};
 	console.log(currentInterviewReport);
 	var telephonicInterviewersArr = [];
-	var firstRoundInterviewersArr = [];
-	var secondRoundInterviewersArr = [];
-	var thirdRoundInterviewersArr = [];
-	var forthRoundInterviewersArr = [];
-	var fifthRoundInterviewersArr = [];
 	$(document).ready(function () {
 		if(currentInterviewReport.resume_file_name != undefined) {
 			$('.preview-div').attr('hidden', false);
@@ -423,14 +419,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 		$("#candidate_name").val(currentInterviewReport.candidate_name);
 		$("#nationality").val(currentInterviewReport.nationality);
 		$('#' + currentInterviewReport.gender).prop('checked',true);
-		// $("#resume_file_name").val(currentInterviewReport.resume_file_name);
 		$("#date_of_telephonic_interview").val(currentInterviewReport.date_of_telephonic_interview);
-		$("#date_of_first_round").val(currentInterviewReport.date_of_first_round);
-		$("#date_of_second_round").val(currentInterviewReport.date_of_second_round);
-		$("#date_of_third_round").val(currentInterviewReport.date_of_third_round);
-		$("#date_of_forth_round").val(currentInterviewReport.date_of_forth_round);
-		$("#date_of_fifth_round").val(currentInterviewReport.date_of_fifth_round);
-		
 		if(currentInterviewReport.telephonic_interviewers != undefined) {
 			if(currentInterviewReport.telephonic_interviewers.length > 0) {
 				for(var i=0; i<currentInterviewReport.telephonic_interviewers.length; i++) {
@@ -438,55 +427,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 				}
 			}
 		}
-		if(currentInterviewReport.first_round_interviewers != undefined) {
-			if(currentInterviewReport.first_round_interviewers.length > 0) {
-				for(var i=0; i<currentInterviewReport.first_round_interviewers.length; i++) {
-					firstRoundInterviewersArr.push(currentInterviewReport.first_round_interviewers[i].interviewer_id);
-				}
-			}
-		}
-		if(currentInterviewReport.second_round_interviewers != undefined) {
-			if(currentInterviewReport.second_round_interviewers.length > 0) {
-				for(var i=0; i<currentInterviewReport.second_round_interviewers.length; i++) {
-					secondRoundInterviewersArr.push(currentInterviewReport.second_round_interviewers[i].interviewer_id);
-				}
-			}
-		}
-		if(currentInterviewReport.third_round_interviewers != undefined) {
-			if(currentInterviewReport.third_round_interviewers.length > 0) {
-				for(var i=0; i<currentInterviewReport.third_round_interviewers.length; i++) {
-					thirdRoundInterviewersArr.push(currentInterviewReport.third_round_interviewers[i].interviewer_id);
-				}
-			}
-		}
-		if(currentInterviewReport.forth_round_interviewers != undefined) {
-			if(currentInterviewReport.forth_round_interviewers.length > 0) {
-				for(var i=0; i<currentInterviewReport.forth_round_interviewers.length; i++) {
-					forthRoundInterviewersArr.push(currentInterviewReport.forth_round_interviewers[i].interviewer_id);
-				}
-			}
-		}
-		if(currentInterviewReport.fifth_round_interviewers != undefined) {
-			if(currentInterviewReport.fifth_round_interviewers.length > 0) {
-				for(var i=0; i<currentInterviewReport.fifth_round_interviewers.length; i++) {
-					fifthRoundInterviewersArr.push(currentInterviewReport.fifth_round_interviewers[i].interviewer_id);
-				}
-			}
-		}
 		$("#interviewer_id").val(telephonicInterviewersArr);
-		$("#first_interviewer_id").val(firstRoundInterviewersArr);
-		$("#second_interviewer_id").val(secondRoundInterviewersArr);
-		$("#third_interviewer_id").val(thirdRoundInterviewersArr);
-		$("#forth_interviewer_id").val(forthRoundInterviewersArr);
-		$("#fifth_interviewer_id").val(fifthRoundInterviewersArr);
-
 		$("#telephonic_interview").val(currentInterviewReport.telephonic_interview);
-		$("#first_round").val(currentInterviewReport.first_round);
-		$("#second_round").val(currentInterviewReport.second_round);
-		$("#third_round").val(currentInterviewReport.third_round);
-		$("#forth_round").val(currentInterviewReport.forth_round);
-		$("#fifth_round").val(currentInterviewReport.fifth_round);
-
 		$('#dress_' + currentInterviewReport.rate_dress_appearance).prop('checked',true);
 		$('#body_language_' + currentInterviewReport.rate_body_language_appearance).prop('checked',true);
 
@@ -498,26 +440,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
             placeholder:"Choose Nationality",
         });
 		$('#interviewer_id').select2({
-            allowClear: true,
-            placeholder:"Choose Name Of Interviewers",
-        });
-		$('#first_interviewer_id').select2({
-            allowClear: true,
-            placeholder:"Choose Name Of Interviewers",
-        });
-		$('#second_interviewer_id').select2({
-            allowClear: true,
-            placeholder:"Choose Name Of Interviewers",
-        });
-		$('#third_interviewer_id').select2({
-            allowClear: true,
-            placeholder:"Choose Name Of Interviewers",
-        });
-		$('#forth_interviewer_id').select2({
-            allowClear: true,
-            placeholder:"Choose Name Of Interviewers",
-        });
-		$('#fifth_interviewer_id').select2({
             allowClear: true,
             placeholder:"Choose Name Of Interviewers",
         });
@@ -545,8 +467,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 				$('#department_div').hide();
 			}			
 		});
-		// console.log($("#interviewer_id").val());
-
 	});
 	file4InputLicense.addEventListener("change", function(event) {
             $('.preview-div').attr('hidden', false);
@@ -569,7 +489,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
         
     });
 	$('#interviewSummaryReportForm').validate({ // initialize the plugin
-		// alert($('#resume_file_name').val());
         rules: {
 			candidate_name: {
 				required: true,
@@ -580,290 +499,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
             gender: {
                 required: true,
             },
-			// resume_file_name: {
-            //     required: true,
-            // },
 			hiring_request_id: {
 				required: true,
-			},
-			date_of_telephonic_interview: {
-				required: function(element){
-					if($("#telephonic_interview").val().length > 0) {                                
-						return true;
-					}
-					else if($("#interviewer_id").val().length > 0) {
-						return true;
-					}					
-					else if($("#date_of_first_interview").val().length > 0) {
-						return true;
-					}
-					else if($("#date_of_second_interview").val().length > 0) {
-						return true;
-					}
-					else if($("#date_of_third_interview").val().length > 0) {
-						return true;
-					}
-					else if($("#date_of_forth_interview").val().length > 0) {
-						return true;
-					}
-					else if($("#date_of_fifth_interview").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},	
-			date_of_first_interview: {
-				required: function(element){
-					if($("#first_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#first_interviewer_id").val().length > 0) {
-						return true;
-					}
-					else if($("#date_of_second_interview").val().length > 0) {
-						return true;
-					}
-					else if($("#date_of_third_interview").val().length > 0) {
-						return true;
-					}
-					else if($("#date_of_forth_interview").val().length > 0) {
-						return true;
-					}
-					else if($("#date_of_fifth_interview").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},		
-			date_of_second_interview: {
-				required: function(element){
-					if($("#second_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#second_interviewer_id").val().length > 0) {
-						return true;
-					}
-					else if($("#date_of_third_interview").val().length > 0) {
-						return true;
-					}
-					else if($("#date_of_forth_interview").val().length > 0) {
-						return true;
-					}
-					else if($("#date_of_fifth_interview").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},		
-			date_of_third_interview: {
-				required: function(element){
-					if($("#third_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#third_interviewer_id").val().length > 0) {
-						return true;
-					}
-					else if($("#date_of_forth_interview").val().length > 0) {
-						return true;
-					}
-					else if($("#date_of_fifth_interview").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},		
-			date_of_forth_interview: {
-				required: function(element){
-					if($("#forth_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#forth_interviewer_id").val().length > 0) {
-						return true;
-					}	
-					else if($("#date_of_fifth_interview").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},		
-			date_of_fifth_interview: {
-				required: function(element){
-					if($("#fifth_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#fifth_interviewer_id").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},	
-			telephonic_interview: {
-				required: function(element){
-					if($("#date_of_telephonic_interview").val().length > 0) {                                
-						return true;
-					}
-					else if($("#interviewer_id").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},		
-			first_round: {
-				required: function(element){
-					if($("#date_of_first_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#first_interviewer_id").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},	
-			second_round: {
-				required: function(element){
-					if($("#date_of_second_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#second_interviewer_id").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},	
-			third_round: {
-				required: function(element){
-					if($("#date_of_third_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#third_interviewer_id").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},	
-			forth_round: {
-				required: function(element){
-					if($("#date_of_forth_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#forth_interviewer_id").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},	
-			fifth_round: {
-				required: function(element){
-					if($("#date_of_fifth_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#fifth_interviewer_id").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},	
-			"interviewer_id[]": {
-				required: function(element){
-					if($("#date_of_telephonic_interview").val().length > 0) {                                
-						return true;
-					}
-					else if($("#telephonic_interview").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},		
-			"first_interviewer_id[]": {
-				required: function(element){
-					if($("#date_of_first_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#first_round").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},	
-			"second_interviewer_id[]": {
-				required: function(element){
-					if($("#date_of_second_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#second_round").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},	
-			"third_interviewer_id[]": {
-				required: function(element){
-					if($("#date_of_third_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#third_round").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},	
-			"forth_interviewer_id[]": {
-				required: function(element){
-					if($("#date_of_forth_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#forth_round").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
-			},	
-			"fifth_interviewer_id[]": {
-				required: function(element){
-					if($("#date_of_fifth_round").val().length > 0) {                                
-						return true;
-					}
-					else if($("#fifth_round").val().length > 0) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				},
 			},				
         },
 		errorPlacement: function ( error, element ) {

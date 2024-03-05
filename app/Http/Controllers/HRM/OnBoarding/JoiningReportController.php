@@ -140,7 +140,7 @@ class JoiningReportController extends Controller
             return view('hrm.onBoarding.joiningReport.createVacationsOrLeave',compact('employees','masterlocations','reportingTo','type','masterDepartments'));
         }
     }
-    public function store(Request $request) {
+    public function store(Request $request) { 
         $oldRepMangr = '';
         $validator = Validator::make($request->all(), [
             'employee_id' => 'required|integer',

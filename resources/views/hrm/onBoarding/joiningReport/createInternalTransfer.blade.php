@@ -228,6 +228,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
             return true;
         }
     },'Must be greater than start date.');
+	jQuery.validator.addMethod("deptLoc", function (value, element, params) {
+		var fromDept = '';
+        var fromLoc = '';
+		var toDept = '';
+        var toLoc = '';
+        fromDept = $('#transfer_from_department_id').val();
+        fromLoc = $('#transfer_from_location_id').val();
+		toDept = $('#transfer_to_department_id').val();
+        toLoc = $('#joining_location').val();
+        if(fromDept == toDept && fromLoc == toLoc) {
+            return false;
+        }else{
+            return true;
+        }
+    },"can't transfer to the same departmenta and location");
 	$('#joiningReportForm').validate({ 
         rules: {
             employee_id: {
@@ -239,6 +254,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 			},
             joining_location: {
                 required: true,
+				deptLoc: true,
             },
             transfer_from_date: {
                 required: true,

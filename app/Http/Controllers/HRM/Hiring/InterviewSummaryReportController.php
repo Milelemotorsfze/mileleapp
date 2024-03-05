@@ -121,7 +121,8 @@ class InterviewSummaryReportController extends Controller
         'pendings','approved','selectedForJob','docsUploaded','rejected','interviewersNames'));
     }
     public function createOrEdit($id) {
-        $currentInterviewReport = InterviewSummaryReport::with('telephonicInterviewers')->where('id',$id)->first();
+        $currentInterviewReport = InterviewSummaryReport::with('telephonicInterviewers','firstRoundInterviewers','secondRoundInterviewers',
+        'thirdRoundInterviewers','forthRoundInterviewers','fifthRoundInterviewers')->where('id',$id)->first();
         if(!$currentInterviewReport) {
             $currentInterviewReport = new InterviewSummaryReport();
             $interviewSummaryId = 'new';
@@ -136,8 +137,14 @@ class InterviewSummaryReportController extends Controller
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterGender = MasterGender::whereIn('id',[1,2])->get();
         $interviewersNames = User::whereNotIn('id',[1,16])->whereHas('empProfile')->select('id','name')->get();
-        return view('hrm.hiring.interview_summary_report.createOrEdit',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
-        'masterGender','interviewersNames','hiringrequests'));
+        if($id != 'new') {
+            return view('hrm.hiring.interview_summary_report.createOrEdit',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
+            'masterGender','interviewersNames','hiringrequests'));
+        }
+        else {
+            return view('hrm.hiring.interview_summary_report.create',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
+            'masterGender','interviewersNames','hiringrequests'));
+        }
     }
     public function finalEvaluation(Request $request) {
         $validator = Validator::make($request->all(), [
@@ -326,21 +333,29 @@ class InterviewSummaryReportController extends Controller
                 $input = $request->all();
                 $update = InterviewSummaryReport::where('id',$id)->first();
                 if($request->resume_file_name) {
-                $fileName = $authId . '_' . time() . '.'. $request->resume_file_name->extension();
+                    $fileName = $authId . '_' . time() . '.'. $request->resume_file_name->extension();
                     $type = $request->resume_file_name->getClientMimeType();
                     $size = $request->resume_file_name->getSize();
                     $request->resume_file_name->move(public_path('resume'), $fileName);
                 }
                 if($update) {
                     if($update->status == 'pending') {
-
-                    
                     $update->hiring_request_id  = $request->hiring_request_id ;
                     $update->candidate_name  = $request->candidate_name ;
                     $update->nationality  = $request->nationality ;
                     $update->gender  = $request->gender ;
                     $update->telephonic_interview = $request->telephonic_interview;
                     $update->date_of_telephonic_interview  = $request->date_of_telephonic_interview ;
+                    $update->first_round = $request->first_round;
+                    $update->date_of_first_round  = $request->date_of_first_round ;
+                    $update->second_round = $request->second_round;
+                    $update->date_of_second_round  = $request->date_of_second_round ;
+                    $update->third_round = $request->third_round;
+                    $update->date_of_third_round  = $request->date_of_third_round ;
+                    $update->forth_round = $request->forth_round;
+                    $update->date_of_forth_round  = $request->date_of_forth_round ;
+                    $update->fifth_round = $request->fifth_round;
+                    $update->date_of_fifth_round  = $request->date_of_fifth_round ;
                     $update->rate_dress_appearance  = $request->rate_dress_appearance ;
                     $update->rate_body_language_appearance  = $request->rate_body_language_appearance ;
                     if($request->resume_file_name) {
@@ -354,12 +369,103 @@ class InterviewSummaryReportController extends Controller
                             $previousInterviewer->delete();
                         }
                     }
-                    $createInterviewer['interview_summary_report_id'] = $update->id;
-                    $createInterviewer['round'] = $request->round;
                     if(isset($request->interviewer_id)) {
-                        if(count($request->interviewer_id) > 0) {
+                        if($request->interviewer_id != '' && count($request->interviewer_id) > 0) {
                             foreach($request->interviewer_id as $interviewer_id) {
+                                $createInterviewer = [];
+                                $createInterviewer['interview_summary_report_id'] = $update->id;
+                                $createInterviewer['round'] = $request->round;
                                 $createInterviewer['interviewer_id'] = $interviewer_id;
+                                $intervierCreated = Interviewers::create($createInterviewer);
+                            }
+                        }
+                    }
+                    $previousInterviewers = [];
+                    $previousInterviewers = Interviewers::where('interview_summary_report_id',$update->id)->where('round','first')->get();
+                    if(count($previousInterviewers) > 0) {
+                        foreach($previousInterviewers as $previousInterviewer) {
+                            $previousInterviewer->delete();
+                        }
+                    }
+                    if(isset($request->first_interviewer_id)) {
+                        if($request->first_interviewer_id != '' && count($request->first_interviewer_id) > 0) {
+                            foreach($request->first_interviewer_id as $first_interviewer_id) {
+                                $createInterviewer = [];
+                                $createInterviewer['interview_summary_report_id'] = $update->id;
+                                $createInterviewer['round'] = 'first';
+                                $createInterviewer['interviewer_id'] = $first_interviewer_id;
+                                $intervierCreated = Interviewers::create($createInterviewer);
+                            }
+                        }
+                    }
+                    $previousInterviewers = [];
+                    $previousInterviewers = Interviewers::where('interview_summary_report_id',$update->id)->where('round','second')->get();
+                    if(count($previousInterviewers) > 0) {
+                        foreach($previousInterviewers as $previousInterviewer) {
+                            $previousInterviewer->delete();
+                        }
+                    }
+                    if(isset($request->first_interviewer_id)) {
+                        if($request->second_interviewer_id != '' && count($request->second_interviewer_id) > 0) {
+                            foreach($request->second_interviewer_id as $second_interviewer_id) {
+                                $createInterviewer = [];
+                                $createInterviewer['interview_summary_report_id'] = $update->id;
+                                $createInterviewer['round'] = 'second';
+                                $createInterviewer['interviewer_id'] = $second_interviewer_id;
+                                $intervierCreated = Interviewers::create($createInterviewer);
+                            }
+                        }
+                    }
+                    $previousInterviewers = [];
+                    $previousInterviewers = Interviewers::where('interview_summary_report_id',$update->id)->where('round','third')->get();
+                    if(count($previousInterviewers) > 0) {
+                        foreach($previousInterviewers as $previousInterviewer) {
+                            $previousInterviewer->delete();
+                        }
+                    }
+                    if(isset($request->third_interviewer_id)) {
+                        if($request->third_interviewer_id != '' && count($request->third_interviewer_id) > 0) {
+                            foreach($request->third_interviewer_id as $third_interviewer_id) {
+                                $createInterviewer = [];
+                                $createInterviewer['interview_summary_report_id'] = $update->id;
+                                $createInterviewer['round'] = 'third';
+                                $createInterviewer['interviewer_id'] = $third_interviewer_id;
+                                $intervierCreated = Interviewers::create($createInterviewer);
+                            }
+                        }
+                    }                   
+                    $previousInterviewers = [];
+                    $previousInterviewers = Interviewers::where('interview_summary_report_id',$update->id)->where('round','forth')->get();
+                    if(count($previousInterviewers) > 0) {
+                        foreach($previousInterviewers as $previousInterviewer) {
+                            $previousInterviewer->delete();
+                        }
+                    }
+                    if(isset($request->forth_interviewer_id)) {
+                        if($request->forth_interviewer_id != '' && count($request->forth_interviewer_id) > 0) {
+                            foreach($request->forth_interviewer_id as $forth_interviewer_id) {
+                                $createInterviewer = [];
+                                $createInterviewer['interview_summary_report_id'] = $update->id;
+                                $createInterviewer['round'] = 'forth';
+                                $createInterviewer['interviewer_id'] = $forth_interviewer_id;
+                                $intervierCreated = Interviewers::create($createInterviewer);
+                            }
+                        }
+                    }
+                    $previousInterviewers = [];
+                    $previousInterviewers = Interviewers::where('interview_summary_report_id',$update->id)->where('round','fifth')->get();
+                    if(count($previousInterviewers) > 0) {
+                        foreach($previousInterviewers as $previousInterviewer) {
+                            $previousInterviewer->delete();
+                        }
+                    }
+                    if(isset($request->fifth_interviewer_id)) {
+                        if($request->fifth_interviewer_id != '' && count($request->fifth_interviewer_id) > 0) {
+                            foreach($request->fifth_interviewer_id as $fifth_interviewer_id) {
+                                $createInterviewer = [];
+                                $createInterviewer['interview_summary_report_id'] = $update->id;
+                                $createInterviewer['round'] = 'fifth';
+                                $createInterviewer['interviewer_id'] = $fifth_interviewer_id;
                                 $intervierCreated = Interviewers::create($createInterviewer);
                             }
                         }
