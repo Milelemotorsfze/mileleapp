@@ -784,7 +784,6 @@ public function checkcreatevins(Request $request)
 {
 
     $updatedData = $request->json()->all();
-
     foreach ($updatedData as $data) {
         $vehicleId = $data['id'];
         $fieldName = $data['name'];
