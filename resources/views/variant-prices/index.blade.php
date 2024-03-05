@@ -10,7 +10,10 @@
             Price List
         </h4>
     </div>
-{{--    @can('PFI-list')--}}
+    @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicle-selling-price');
+                                        @endphp
+                                        @if ($hasPermission)
         <div class="portfolio">
             <ul class="nav nav-pills nav-fill" id="my-tab">
                 <li class="nav-item">
@@ -114,9 +117,7 @@
             </div>
         </div>
 
-{{--    @endcan--}}
-    <!-- Modal -->
-
+@endif
 @endsection
 
 
