@@ -55,7 +55,7 @@ class PurchasingOrderController extends Controller
             $data = PurchasingOrder::with('purchasing_order_items')->whereIn('id', $demandPlanningPoIds)
                                                 ->get();
         }else{
-            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orderBy('po_number', 'desc')->get();
+            $data = PurchasingOrder::with('purchasing_order_items')->orderBy('po_number', 'desc')->get();
         }
     }
     else
