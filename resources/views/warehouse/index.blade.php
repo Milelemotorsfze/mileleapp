@@ -85,11 +85,14 @@ th.nowrap-td {
         <tr>
         <td onclick="window.location='{{ route('purchasing.filter', ['status' => 'Pending Approval']) }}';">
         @php
+        $pendongpoapproval = 0;
         $userId = auth()->user()->id;
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
         @endphp
         @if ($hasPermission)
+        @php
         $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->count();
+        @endphp
         @else
         @php
         $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->where('created_by', $userId)->orWhere('created_by', 16)->count();
