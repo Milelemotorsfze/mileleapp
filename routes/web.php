@@ -440,6 +440,7 @@ Route::get('/d', function () {
     Route::get('/check-unique-chasis', [SupplierInventoryController::class,'checkChasisUnique'])->name('supplier-inventories.unique-chasis');
     Route::get('/check-production-month', [SupplierInventoryController::class,'checkProductionMonth'])->name('supplier-inventories.checkProductionMonth');
     Route::get('/isExistColorCode', [SupplierInventoryController::class,'isExistColorCode'])->name('supplier-inventories.isExistColorCode');
+    Route::get('/unique-production-month', [SupplierInventoryController::class,'uniqueProductionMonth'])->name('supplier-inventories.uniqueProductionMonth');
 
 
     //BL Module
@@ -492,7 +493,7 @@ Route::get('/d', function () {
     Route::resource('sale_person_status', SalesPersonStatusController::class);
     Route::resource('postingrecords', PostingRecordsController::class);
     Route::resource('marketingpurchasingpayments', MarketingPurchasingPaymentsController::class);
-    
+
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
     Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');
@@ -798,7 +799,7 @@ Route::get('/d', function () {
     Route::resource('preorder', PreOrderController::class);
     Route::get('/get-po-for-presale', [PreOrderController::class, 'getpoforpreorder']);
 
-     
+
 
 
 

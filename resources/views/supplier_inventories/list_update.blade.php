@@ -288,7 +288,7 @@
                     let url = '{{ route('supplier-inventories.unique-chasis') }}';
                     let chasis = $('#'+InputId).text();
                     let inventoryId = $('#'+InputId).attr('data-id');
-                    console.log(inventoryId);
+
                     if(chasis.length > 0) {
                         $.ajax({
                         type:"GET",
@@ -299,7 +299,6 @@
                         },
                         dataType : 'json',
                         success: function(data) {
-
                             if(data == 1) {
                                 $msg = "This chasis is already existing";
                                 showValidationError(InputId, $msg);
@@ -360,7 +359,7 @@
                         }
                     }else{
                         if(deliveryNote != 'waiting' && deliveryNote != 'WAITING'){
-                            $msg = "Only Waiting status is allowed or any DN Numer can update.";
+                            $msg = "Only Waiting status is allowed or any DN Number can update.";
                             showValidationError(InputId,$msg);
                         }else {
                             removeValidationError(InputId);

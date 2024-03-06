@@ -5,6 +5,9 @@
         {
             height:32px!important;
         }
+        .error{
+            color: #f12323;
+        }
     </style>
     @can('supplier-inventory-create')
         @php
@@ -89,7 +92,9 @@
                         <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted"> Chasis</label>
-                                <input type="text" name="chasis" placeholder="Enter Chasis" class="form-control widthinput">
+                                <input type="text" name="chasis" id="chasis" placeholder="Enter Chasis" onkeyup="CheckUniqueChasis()" class="form-control widthinput">
+                                <span id="chasis_error" class="error"></span>
+
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-4">
@@ -106,7 +111,8 @@
                         </div>  <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted"> Production Month</label>
-                                <input type="text" name="pord_month" placeholder="Enter Production Month" class="form-control widthinput">
+                                <input type="text" name="pord_month" placeholder="Enter Production Month" onkeyup="CheckProductionMonth()" id="pord_month" class="form-control widthinput">
+                                <span id="pord_month_error" class="error"></span>
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-4">
@@ -115,14 +121,12 @@
                                 <input type="text" name="po_arm" placeholder="Enter PO Arm" class="form-control widthinput">
                             </div>
                         </div>
-
                         <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted"> Delivery Note </label>
                                 <input type="text" name="delivery_note" placeholder="Enter Delivery Note" class="form-control widthinput">
                             </div>
                         </div>
-
                     </div>
                     <div class="col-12 text-center">
                         <button type="submit" class="btn btn-primary"> Submit </button>
@@ -134,11 +138,33 @@
 @endsection
 @push('scripts')
     <script>
+        var feildValidInput = true;
+
         $("#form-update").validate({
             ignore: [],
             rules: {
                 model: {
                     required: true,
+                },
+                sfx: {
+                    required: true,
+                },
+                supplier_id: {
+                    required: true,
+                },
+                whole_sales: {
+                    required: true,
+                },
+                country:{
+                    required: true,
+                },
+                pord_month: {
+                    maxlength: 6,
+                    minlength:6,
+                },
+                color_code:{
+                    minlength:4,
+                    maxlength:6
                 }
             },
         });
@@ -149,12 +175,15 @@
             maximumSelectionLength: 1
         }).on('change', function() {
             getSfx();
+            CheckProductionMonth();
         });
 
         $('#sfx').select2({
             placeholder: 'Select SFX',
             allowClear: true,
             maximumSelectionLength: 1
+        }).on('change', function() {
+            CheckProductionMonth();
         });
 
         function getSfx() {
@@ -170,7 +199,6 @@
                     module: 'LOI',
                 },
                 success:function (data) {
-                    console.log(data);
                     $('#sfx').empty();
                     $('#sfx').html('<option value=""> Select SFX </option>');
                     jQuery.each(data, function(key,value){
@@ -178,6 +206,69 @@
                     });
                 }
             });
+        }
+        function CheckProductionMonth() {
+               let productionMonth =  $('#pord_month').val();
+               let model =  $('#model').val();
+               let sfx =  $('#sfx').val();
+               let url = '{{ route('supplier-inventories.uniqueProductionMonth') }}';
+
+              if(productionMonth.length == 6  && model.length > 0 && sfx.length > 0) {
+
+                  $.ajax({
+                      type:"GET",
+                      url: url,
+                      data: {
+                          prod_month: productionMonth,
+                          model: model,
+                          sfx: sfx,
+                      },
+                      dataType : 'json',
+                      success: function(data) {
+                          var InputId = 'pord_month_error';
+                          if(data !== 1) {
+                              feildValidInput = true;
+                              $msg = 'The model,sfx and the requested model year ('+ data +') combination not existing in the system.';
+
+                              showValidationError(InputId,$msg);
+                          }else{
+                              feildValidInput = false;
+                              removeValidationError(InputId);
+                          }
+                      }
+                  });
+              }
+            }
+        function CheckUniqueChasis() {
+            let url = '{{ route('supplier-inventories.unique-chasis') }}';
+            let chasis = $('#chasis').val();
+
+            if(chasis.length > 0) {
+                $.ajax({
+                    type:"GET",
+                    url: url,
+                    data: {
+                        chasis: chasis,
+                    },
+                    dataType : 'json',
+                    success: function(data) {
+                        var InputId = 'chasis_error';
+                        if(data == 1) {
+                            $msg = "This chasis is already existing";
+                            showValidationError(InputId, $msg);
+                        }else{
+                            removeValidationError(InputId);
+                        }
+                    }
+                });
+            }
+        }
+
+        function showValidationError(InputId,$msg){
+          $('#'+InputId).html($msg);
+        }
+        function removeValidationError(InputId,$msg){
+            $('#'+InputId).html("");
         }
     </script>
 @endpush

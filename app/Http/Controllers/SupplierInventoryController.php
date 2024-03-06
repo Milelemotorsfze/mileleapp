@@ -132,9 +132,70 @@ class SupplierInventoryController extends Controller
     }
     public function store(Request $request)
     {
+//        dd($request->all());
 
-        dd($request->all());
+        $request->validate([
+            'whole_sales' => 'required',
+            'supplier_id' =>' required',
+            'country' => 'required',
+            'model' => 'required',
+            'sfx' => 'required',
+        ]);
+
+        if(!empty($request->prod_month)) {
+            $productionMonth = substr($request->prod_month,  -2);
+            if($productionMonth < 0 || $productionMonth > 12) {
+                return redirect()->back()->with('error', 'Invalid Production Month '.$productionMonth.', Last 2 digit indicating Invalid month!');
+            }
+        }
+
+        $colourcode = $request->color_code;
+
+        $interiorColorId = NULL;
+        $exteriorColorId = NUll;
+
+        if($colourcode) {
+            $colourcodecount = strlen($colourcode);
+
+            if ($colourcodecount == 5) {
+                $extColour = substr($colourcode, 0, 3);
+                $intColour = substr($colourcode,  -2);
+
+            }
+            if ($colourcodecount == 4) {
+
+                $altercolourcode = "0" . $colourcode;
+                $extColour = substr($altercolourcode, 0, 3);
+                $intColour = substr($altercolourcode, -2);
+                $colourcode = $extColour.''.$intColour;
+
+            }
+            if($extColour) {
+                $extColourRow = ColorCode::where('code', $extColour)
+                                        ->where('belong_to', ColorCode::EXTERIOR)
+                                        ->first();
+
+                if ($extColourRow)
+                {
+                    $exteriorColor = $extColourRow->name;
+                    $exteriorColorId = $extColourRow->id;
+                }
+            }
+            if($intColour) {
+                $intColourRow = ColorCode::where('code', $intColour)
+                                    ->where('belong_to', ColorCode::INTERIOR)
+                                    ->first();
+
+                if ($intColourRow)
+                {
+                    $interiorColor = $intColourRow->name;
+                    $interiorColorId = $intColourRow->id;
+                }
+            }
+        }
+
         $supplierInventory = new SupplierInventory();
+
         $supplierInventory->supplier_id = $request->supplier_id;
         $supplierInventory->whole_sales = $request->whole_sales;
         $supplierInventory->country = $request->country;
@@ -142,7 +203,17 @@ class SupplierInventoryController extends Controller
         $supplierInventory->chasis = $request->chasis;
         $supplierInventory->engine_number = $request->engine_number;
         $supplierInventory->color_code = $request->color_code;
+        $supplierInventory->po_arm = $request->po_arm;
+        $supplierInventory->delivery_note = $request->delivery_note;
+        $supplierInventory->interior_color_code_id  = $interiorColorId;
+        $supplierInventory->exterior_color_code_id  = $exteriorColorId;
+        $supplierInventory->veh_status = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
+        $supplierInventory->upload_status = SupplierInventory::UPLOAD_STATUS_ACTIVE;
+        $supplierInventory->date_of_entry = Carbon::now()->format('Y-m-d');
+
         $supplierInventory->save();
+
+        return  redirect()->back()->with('success', 'Inventory added successfully.');
 
     }
 
@@ -1786,10 +1857,13 @@ class SupplierInventoryController extends Controller
 
     public function checkChasisUnique(Request $request) {
 
-        $isChasisExist = SupplierInventory::whereNot('id', $request->inventoryId)->where('chasis',  $request->chasis)
-                                ->whereNotNull('chasis')
-                                ->first();
-        if($isChasisExist) {
+        $isChasisExist = SupplierInventory::where('chasis',  $request->chasis)
+                                      ->whereNotNull('chasis');
+
+        if($request->inventoryId) {
+            $isChasisExist = $isChasisExist->whereNot('id', $request->inventoryId);
+        }
+        if($isChasisExist->count() > 0) {
             $data = 1;
         }else{
             $data = 0;
@@ -1818,11 +1892,8 @@ class SupplierInventoryController extends Controller
                 });
 
             if ($isItemExistCategory->count() > 0) {
-
                 $correspondingCategoryRuleValue = $modelYearCalculationCategory->modelYearRule->value ?? 0;
-
                 if ($productionMonth > $correspondingCategoryRuleValue) {
-
                     if ($production_month){
                         $modelYear = substr($production_month, 0, -2) + 1;
                     }
@@ -1874,4 +1945,48 @@ class SupplierInventoryController extends Controller
 
        return response($data);
     }
+    public function uniqueProductionMonth(Request $request) {
+
+        $production_month = $request->prod_month;
+        $modelYear = substr($production_month, 0, -2);
+        $productionMonth = substr($production_month, -2);
+
+        $modelYearCalculationCategories = ModelYearCalculationCategory::all();
+
+        foreach ($modelYearCalculationCategories as $modelYearCalculationCategory) {
+
+            $isItemExistCategory = MasterModel::select(['id', 'model', 'sfx', 'variant_id'])
+                ->where('model', $request->model)
+                ->where('sfx', $request->sfx)
+                ->with('variant.master_model_lines')
+                ->whereHas('variant.master_model_lines', function ($query) use ($modelYearCalculationCategory) {
+                    $query->where('model_line', 'LIKE', '%' . $modelYearCalculationCategory->name . '%');
+                });
+
+            if ($isItemExistCategory->count() > 0) {
+                $correspondingCategoryRuleValue = $modelYearCalculationCategory->modelYearRule->value ?? 0;
+                if ($productionMonth > $correspondingCategoryRuleValue) {
+                    if ($production_month){
+                        $modelYear = substr($production_month, 0, -2) + 1;
+                    }
+                    break;
+                }
+            }
+        }
+
+        $isExistModelCombination =  MasterModel::where('model', $request->model)
+            ->where('sfx', $request->sfx)
+            ->where('model_year', $modelYear)
+            ->first();
+
+        if($isExistModelCombination) {
+            $data = 1;
+        }else{
+            $data = $modelYear;
+        }
+
+        return response($data);
+
+    }
+
 }
