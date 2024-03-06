@@ -85,9 +85,19 @@ th.nowrap-td {
         <tr>
         <td onclick="window.location='{{ route('purchasing.filter', ['status' => 'Pending Approval']) }}';">
         @php
+        $pendongpoapproval = 0;
         $userId = auth()->user()->id;
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+        @endphp
+        @if ($hasPermission)
+        @php
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->count();
+        @endphp
+        @else
+        @php
         $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->where('created_by', $userId)->orWhere('created_by', 16)->count();
         @endphp
+        @endif
         @if ($pendongpoapproval > 0)
             {{ $pendongpoapproval }}
         @else
@@ -95,6 +105,23 @@ th.nowrap-td {
         @endif
     </td>
     <td onclick="window.location='{{ route('purchasing.filterapprovedonly', ['status' => 'Approved']) }}';">
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+        @endphp
+        @if ($hasPermission)
+        @php
+        $userId = auth()->user()->id;
+        $alreadyapproved = DB::table('purchasing_order')
+        ->where('purchasing_order.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('vehicles.status', 'Approved');
+            })
+            ->count();
+        @endphp
+        @else
         @php
         $userId = auth()->user()->id;
         $alreadyapproved = DB::table('purchasing_order')
@@ -109,6 +136,7 @@ th.nowrap-td {
             })
             ->count();
         @endphp
+        @endif
         @if ($alreadyapproved > 0)
             {{ $alreadyapproved }}
         @else
@@ -147,9 +175,11 @@ th.nowrap-td {
 <td onclick="window.location='{{ route('purchasing.filterincomings', ['status' => 'Approved']) }}';">
     @php
     $userId = auth()->user()->id;
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+        @endphp
+        @if ($hasPermission)
+        @php
     $completedPos = DB::table('purchasing_order')
-    ->where('created_by', $userId)
-    ->orWhere('created_by', 16)
         ->whereNotExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('vehicles')
@@ -159,6 +189,21 @@ th.nowrap-td {
         ->where('status', 'Approved')
         ->count();
     @endphp
+        @else
+        @php
+    $completedPos = DB::table('purchasing_order')
+    ->where('created_by', $userId)
+    ->orWhere('created_by', 16)
+        ->whereNotExists(function ($query) { 
+            $query->select(DB::raw(1))
+                ->from('vehicles')
+                ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                ->whereNotIn('payment_status', ['Payment Rejected', 'Payment Release Rejected', 'Payment Initiate Request Rejected', 'Incoming Stock']);
+        })
+        ->where('status', 'Approved')
+        ->count();
+    @endphp
+    @endif
     @if ($completedPos > 0)
         {{ $completedPos }}
     @else
@@ -204,8 +249,17 @@ th.nowrap-td {
     <td style="font-size: 12px;">
         @php
         $userId = auth()->user()->id;
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+        @endphp
+        @if ($hasPermission)
+        @php
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->count();
+        @endphp
+        @else
+        @php
         $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->where('created_by', $userId)->orWhere('created_by', 16)->count();
         @endphp
+        @endif
         @if ($pendongpoapproval > 0)
             {{ $pendongpoapproval }}
         @else
@@ -382,6 +436,25 @@ th.nowrap-td {
     <td style="font-size: 12px;">
     @php
     $userId = auth()->user()->id;
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+        @endphp
+        @if ($hasPermission)
+        @php
+$pendingvendorfol = DB::table('purchasing_order')
+    ->where('status', 'Approved')
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('vehicles')
+            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where(function ($query) {
+                $query->where('payment_status', 'Payment Completed')
+                      ->orWhere('payment_status', 'Vendor Confirmed');
+            });
+    })
+    ->count();
+@endphp
+@else
+@php
 $pendingvendorfol = DB::table('purchasing_order')
     ->where('created_by', $userId)
     ->orWhere('created_by', 16)
@@ -397,6 +470,7 @@ $pendingvendorfol = DB::table('purchasing_order')
     })
     ->count();
 @endphp
+@endif
         @if ($pendingvendorfol > 0)
             {{ $pendingvendorfol }}
         @else

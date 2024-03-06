@@ -579,6 +579,7 @@ Route::get('/d', function () {
     Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
     Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost');
     Route::post('/check-create-vins', [PurchasingOrderController::class, 'checkcreatevins'])->name('vehicles.check-create-vins');
+    Route::post('/check-create-vins-inside', [PurchasingOrderController::class, 'checkcreatevinsinside'])->name('vehicles.check-create-vins-inside');
     Route::patch('/check-edit-vins', [PurchasingOrderController::class, 'checkeditvins'])->name('vehicles.check-edit-vins');
     Route::patch('/check-edit-create-vins', [PurchasingOrderController::class, 'checkeditcreate'])->name('vehicles.check-edit-create');
     Route::get('users/update-role/{roleId}', [UserController::class, 'updateRole'])->name('users.updateRole');

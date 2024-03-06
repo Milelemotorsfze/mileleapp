@@ -786,6 +786,23 @@ public function checkcreatevins(Request $request)
         }
         return response()->json('unique');
     }
+    public function checkcreatevinsinside(Request $request)
+    {
+        $vinValues = $request->input('vins');
+        $po = $request->input('po');
+        $vinValues = array_filter($vinValues, function ($value) {
+            return trim($value) !== '';
+        });
+        $duplicates = array_unique(array_diff_assoc($vinValues, array_unique($vinValues)));
+        if (!empty($duplicates)) {
+            return response()->json('duplicate');
+        }
+        $existingVins = Vehicles::whereIn('vin', $vinValues)->whereNot('purchasing_order_id', $po)->pluck('vin')->toArray();
+        if (!empty($existingVins)) {
+            return response()->json('duplicate');
+        }
+        return response()->json('unique');
+    }
     public function checkeditcreate(Request $request)
     {
         $vinValues = $request->input('vin');
