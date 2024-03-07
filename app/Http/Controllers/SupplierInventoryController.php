@@ -132,8 +132,6 @@ class SupplierInventoryController extends Controller
     }
     public function store(Request $request)
     {
-//        dd($request->all());
-
         $request->validate([
             'whole_sales' => 'required',
             'supplier_id' =>' required',
@@ -213,8 +211,7 @@ class SupplierInventoryController extends Controller
 
         $supplierInventory->save();
 
-        return  redirect()->back()->with('success', 'Inventory added successfully.');
-
+        return  redirect()->route('supplier-inventories.index')->with('success', 'Inventory added successfully.');
     }
 
     public function ExcelUpdate(Request $request)

@@ -25,6 +25,12 @@
                         {{ Session::get('error') }}
                     </div>
                 @endif
+                    @if (Session::has('success'))
+                        <div class="alert alert-success" >
+                            <button type="button" class="btn-close p-0 close" data-dismiss="alert"></button>
+                            {{ Session::get('success') }}
+                        </div>
+                    @endif
                 @if (Session::has('message'))
                     <div class="alert alert-success" id="success-alert">
                         <button type="button" class="btn-close p-0 close" data-dismiss="alert"> </button>
