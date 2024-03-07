@@ -1227,64 +1227,72 @@
                 });
             });
             updateBtn.addEventListener('click', () => {
-                updateBtn.style.display = 'none';
-                editBtn.style.display = 'block';
-                editableFields.forEach(field => {
-                    field.contentEditable = false;
-                    field.classList.remove('editing');
-                    const selectElement = field.querySelector('select');
-                    if (selectElement) {
-                        selectElement.setAttribute('disabled', 'disabled');
-                    }
-                    const inputField = field.querySelector('input[type="date"]');
-                    if (inputField) {
-                        const fieldValue = inputField.value;
-                        field.innerHTML = fieldValue;
-                    }
-                });
-                const updatedData = [];
-                editableFields.forEach(field => {
-                    const fieldName = field.classList[1];
-                    const fieldValue = field.innerText.trim();
-                    const selectElement = field.querySelector('select');
-                    if (selectElement) {
-                        const selectedOption = selectElement.options[selectElement.selectedIndex];
-                        const selectedValue = selectedOption.value;
-                        const selectedText = selectedOption.text;
-                        updatedData.push({ id: field.getAttribute('data-vehicle-id'), name: fieldName, value: selectedValue });
-                    } else {
-                        updatedData.push({ id: field.getAttribute('data-vehicle-id'), name: fieldName, value: fieldValue });
-                    }
-                });
-                console.log(updatedData);
-                fetch('{{ route('purchasing.updateData') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify(updatedData)
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Handle the response from the controller if needed
-                        console.log(data);
-
-                        // Display the flash message on the page
-                        const flashMessage = document.getElementById('flash-message');
-                        flashMessage.textContent = 'Data updated successfully';
-                        flashMessage.style.display = 'block';
-
-                        // Hide the flash message after 5 seconds
-                        setTimeout(() => {
-                            flashMessage.style.display = 'none';
-                        }, 2000);
-                    })
-                    .catch(error => {
-                        // Handle any errors that occur during the request
-                        console.error(error);
-                    });
+    checkDuplicateVIN(function(vinCheckResult) {
+        console.log(vinCheckResult);
+        if (vinCheckResult === false) {
+            return; // Do nothing if VIN check fails
+        } else {
+            // Proceed with update logic
+            updateBtn.style.display = 'none';
+            editBtn.style.display = 'block';
+            editableFields.forEach(field => {
+                field.contentEditable = false;
+                field.classList.remove('editing');
+                const selectElement = field.querySelector('select');
+                if (selectElement) {
+                    selectElement.setAttribute('disabled', 'disabled');
+                }
+                const inputField = field.querySelector('input[type="date"]');
+                if (inputField) {
+                    const fieldValue = inputField.value;
+                    field.innerHTML = fieldValue;
+                }
             });
+            const updatedData = [];
+            editableFields.forEach(field => {
+                const fieldName = field.classList[1];
+                const fieldValue = field.innerText.trim();
+                const selectElement = field.querySelector('select');
+                if (selectElement) {
+                    const selectedOption = selectElement.options[selectElement.selectedIndex];
+                    const selectedValue = selectedOption.value;
+                    const selectedText = selectedOption.text;
+                    updatedData.push({ id: field.getAttribute('data-vehicle-id'), name: fieldName, value: selectedValue });
+                } else {
+                    updatedData.push({ id: field.getAttribute('data-vehicle-id'), name: fieldName, value: fieldValue });
+                }
+            });
+            console.log(updatedData);
+            fetch('{{ route('purchasing.updateData') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(updatedData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response from the controller if needed
+                console.log(data);
+
+                // Display the flash message on the page
+                const flashMessage = document.getElementById('flash-message');
+                flashMessage.textContent = 'Data updated successfully';
+                flashMessage.style.display = 'block';
+
+                // Hide the flash message after 5 seconds
+                setTimeout(() => {
+                    flashMessage.style.display = 'none';
+                }, 2000);
+            })
+            .catch(error => {
+                // Handle any errors that occur during the request
+                console.error(error);
+            });
+        }
+    });
+});
         </script>
         <script>
             $(document).ready(function() {
@@ -1685,4 +1693,42 @@
                 });
             });
         </script>
+        <script>
+    function checkDuplicateVIN(callback) {
+        var vinValues = Array.from(document.querySelectorAll('.editable-field.vin')).map(function(field) {
+            return field.innerText.trim();
+        });
+        var allBlank = vinValues.every(function(value) {
+            return value.trim() === '';
+        });
+        if (allBlank) {
+            console.log("All VIN values are blank");
+            callback(1); // Indicate all values are blank
+        } else {
+            var Po = "{{$purchasingOrder->id}}";
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                url: '{{ route('vehicles.check-create-vins-inside') }}',
+                method: 'POST',
+                data: { vins: vinValues, po: Po },
+                success: function(response) {
+                    if (response === 'duplicate') {
+                        alert('Duplicate VIN values found in the database. Please ensure all VIN values are unique.');
+                        callback(false); // Indicate duplicate values found
+                    } else {
+                        callback(1); // Indicate all values are unique
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while checking for VIN duplication. Please try again.');
+                    callback(false); // Indicate error occurred
+                }
+            });
+        }
+    }
+</script>
 @endsection
