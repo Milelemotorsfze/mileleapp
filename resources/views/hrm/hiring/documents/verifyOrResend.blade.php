@@ -76,7 +76,7 @@
 											<td>{{ $data->name_of_mother ?? '' }}</td>
 											<td>{{ $data->maritalStatus->name ?? '' }}</td>
 											<td>{{ $data->passport_number ?? '' }}</td>							
-											<td>@if($data->passport_expiry_date != ''){{\Carbon\Carbon::parse($data->passport_expiry_date)->format('d M Y')}} @endif</td>
+											<td>@if(isset($data)&& $data->passport_expiry_date != ''){{\Carbon\Carbon::parse($data->passport_expiry_date)->format('d M Y')}} @endif</td>
 											<td>{{ $data->educational_qualification ?? ''}}</td>
 											<td>{{ $data->year_of_completion ?? ''}}</td>
 											<td>{{ $data->religionName->name ?? ''}}</td>
@@ -128,7 +128,7 @@
 											<td>{{ $data->name_of_mother ?? '' }}</td>
 											<td>{{ $data->maritalStatus->name ?? '' }}</td>
 											<td>{{ $data->passport_number ?? '' }}</td>							
-											<td>@if($data->passport_expiry_date != ''){{\Carbon\Carbon::parse($data->passport_expiry_date)->format('d M Y')}} @endif</td>
+											<td>@if(isset($data) && $data->passport_expiry_date != ''){{\Carbon\Carbon::parse($data->passport_expiry_date)->format('d M Y')}} @endif</td>
 											<td>{{ $data->educational_qualification ?? ''}}</td>
 											<td>{{ $data->year_of_completion ?? ''}}</td>
 											<td>{{ $data->religionName->name ?? ''}}</td>
@@ -146,67 +146,3 @@
 		@endif
         @endcanany  
 @endsection
-<!-- @push('scripts')
-<script type="text/javascript">
-	$(document).ready(function () {
-	    $('.status-reject-button').click(function (e) {
-	        var id = $(this).attr('data-id');
-	        var status = $(this).attr('data-status');
-	        approveOrRejectHiringrequest(id, status)
-	    })
-	    $('.status-approve-button').click(function (e) {
-	        var id = $(this).attr('data-id');
-	        var status = $(this).attr('data-status');
-	        approveOrRejectHiringrequest(id, status)
-	    })
-	    function approveOrRejectHiringrequest(id, status) {
-			var comment = $("#comment-"+id).val();
-			var current_approve_position = $("#current_approve_position_"+id).val();
-	        let url = '{{ route('employee-hiring-request.request-action') }}';
-	        if(status == 'rejected') {
-	            var message = 'Reject';
-	        }else{
-	            var message = 'Approve';
-	        }
-	        var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee hiring request ?',function (e) {
-	            if (e) {
-	                $.ajax({
-	                    type: "POST",
-	                    url: url,
-	                    dataType: "json",
-	                    data: {
-	                        id: id,
-	                        status: status,
-	                        comment: comment,
-							current_approve_position: current_approve_position,
-	                        _token: '{{ csrf_token() }}'
-	                    },
-	                    success: function (data) {
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-
-							}
-	                    }
-	                });
-	            }
-	
-	        }).set({title:"Confirmation"})
-	    }
-	})
-	function inputNumberAbs(currentPriceInput) 
-	{
-	    var id = currentPriceInput.id;
-	    var input = document.getElementById(id);
-	    var val = input.value;
-	    val = val.replace(/^0+|[^\d.]/g, '');
-	    if(val.split('.').length>2) 
-	    {
-	        val =val.replace(/\.+$/,"");
-	    }
-	    input.value = val;
-	}
-</script>
-@endpush -->

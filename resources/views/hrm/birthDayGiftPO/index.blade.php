@@ -80,7 +80,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-birthday-po
 						@foreach ($datas as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
-							<td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+							<td>
+								@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->user->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>

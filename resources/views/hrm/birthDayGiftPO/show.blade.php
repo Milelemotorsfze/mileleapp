@@ -126,7 +126,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-d
                             </div>
                             <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                 <span>
-                                    @if($data->user->empProfile->company_joining_date != NULL)
+                                    @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != NULL)
                                         {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
                                     @endif
                                 </span>

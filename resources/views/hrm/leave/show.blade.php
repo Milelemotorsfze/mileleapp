@@ -153,7 +153,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
                                     <label for="choices-single-default" class="form-label"> Request Date :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</span>
+                                    <span>
+                                        @if($data->created_at != '')
+                                        {{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+                                        @endif
+                                    </span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Leave Type :</label>
@@ -171,13 +175,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
                                     <label for="choices-single-default" class="form-label"> Leave Start Date :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</span>
+                                    <span>
+                                        @if($data->leave_start_date != '')
+                                        {{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+                                        @endif
+                                    </span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Leave End Date :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</span>
+                                <span>
+                                    @if($data->leave_end_date != '')
+                                    {{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+                                    @endif
+                                </span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Total Number Of Days :</label>

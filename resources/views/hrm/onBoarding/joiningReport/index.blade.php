@@ -99,28 +99,28 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>
-								@if($type == 'new_employee')
+								@if($type == 'new_employee' && isset($data) && isset($data->candidate))
 								{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->name ?? ''}}
 								@endif
 							</td>
 							<td>
-								@if($type == 'new_employee')
+								@if($type == 'new_employee' && isset($data) && isset($data->candidate))
 								{{ $data->candidate->employee_code ?? '' }}
 								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->employee_code ?? '' }}
 								@endif
 							</td>
 							<td>
-								@if($type == 'new_employee')
+								@if($type == 'new_employee' && isset($data) && isset($data->candidate) && isset($data->candidate->designation))
 								{{ $data->candidate->designation->name ?? '' }}
 								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->designation->name ?? '' }}
 								@endif								
 							</td>
 							<td>
-								@if($type == 'new_employee')
+								@if($type == 'new_employee' && isset($data) && isset($data->candidate) && isset($data->candidate->department))
 								{{ $data->candidate->department->name ?? '' }}
 								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->department->name ?? '' }}
@@ -131,24 +131,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<td>{{ $data->joining_type_name ?? ''}}</td>
 							@endif
 							@if($type == 'permanent' OR $type == 'temporary')
-							<td>{{ $data->transferFromDepartment->name ?? ''}}</td>
+							<td>@if(isset($data) && isset($data->transferFromDepartment)){{ $data->transferFromDepartment->name ?? ''}} @endif</td>
 							<td>
 								@if($data->transfer_from_date != NULL)
 								{{ \Carbon\Carbon::parse($data->transfer_from_date)->format('d M Y') }}
 								@endif
 							</td>
-							<td>{{ $data->transferFromLocation->name ?? ''}}</td>
-							<td>{{ $data->transferToDepartment->name ?? ''}}</td>
+							<td>@if(isset($data) && isset($data->transferFromLocation)) {{ $data->transferFromLocation->name ?? ''}} @endif</td>
+							<td>@if(isset($data) && isset($data->transferToDepartment)) {{ $data->transferToDepartment->name ?? ''}} @endif</td>
 							@endif
 							<td>
 								@if($data->joining_date != NULL)
 								{{ \Carbon\Carbon::parse($data->joining_date)->format('d M Y') }}
 								@endif
 							</td>
-							<td>{{ $data->joiningLocation->name ?? '' }} </td>
-							<td>{{ $data->reportingManager->name ?? '' }}</td>
+							<td>@if(isset($data) && isset($data->joiningLocation)) {{ $data->joiningLocation->name ?? '' }} @endif</td>
+							<td>@if(isset($data) && isset($data->reportingManager)) {{ $data->reportingManager->name ?? '' }} @endif</td>
 							<td>{{ $data->remarks ?? '' }}</td>
-							<td>{{ $data->preparedBy->name ?? '' }}</td>
+							<td>@if(isset($data) && isset($data->preparedBy)) {{ $data->preparedBy->name ?? '' }} @endif</td>
 							<td>
 							<div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -252,27 +252,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 						@foreach ($approved as $key => $data)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
-							<td>@if($type == 'new_employee')
+							<td>@if($type == 'new_employee' && isset($data) && isset($data->candidate))
 								{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->name ?? ''}}
 								@endif</td>
 							<td>
-								@if($type == 'new_employee')
+								@if($type == 'new_employee' && isset($data) && isset($data->candidate))
 								{{ $data->candidate->employee_code ?? '' }}
 								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->employee_code ?? '' }}
 								@endif								
 							</td>
 							<td>
-								@if($type == 'new_employee')
+								@if($type == 'new_employee'  && isset($data) && isset($data->candidate) && isset($data->candidate->designation))
 								{{ $data->candidate->designation->name ?? '' }}
 								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->designation->name ?? '' }}
 								@endif								
 							</td>
 							<td>
-							@if($type == 'new_employee')
+							@if($type == 'new_employee'  && isset($data) && isset($data->candidate) && isset($data->candidate->department))
 								{{ $data->candidate->department->name ?? '' }}
 								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->department->name ?? '' }}
@@ -283,7 +283,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<td>{{ $data->joining_type_name ?? ''}}</td>
 							@endif
 							@if($type == 'permanent' OR $type == 'temporary')
-							<td>{{ $data->transferFromDepartment->name ?? ''}}</td>
+							<td>@if(isset($data) && isset($data->transferFromDepartment)) {{ $data->transferFromDepartment->name ?? ''}} @endif</td>
 							<td>
 								@if($data->transfer_from_date != NULL)
 								{{ \Carbon\Carbon::parse($data->transfer_from_date)->format('d M Y') }}
@@ -355,13 +355,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 						@foreach ($rejected as $key => $data)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
-							<td>@if($type == 'new_employee')
+							<td>@if($type == 'new_employee' && isset($data) && isset($data->candidate))
 								{{ $data->candidate->first_name ?? ''}} {{$data->candidate->last_name ?? ''}}
 								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->name ?? ''}}
 								@endif</td>
 							<td>
-								@if($type == 'new_employee')
+								@if($type == 'new_employee' && isset($data) && isset($data->candidate))
 								{{ $data->candidate->employee_code ?? '' }}
 								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->employee_code ?? '' }}
@@ -369,14 +369,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 								
 							</td>
 							<td>
-								@if($type == 'new_employee')
+								@if($type == 'new_employee' && isset($data) && isset($data->candidate) && isset($data->candidate->designation))
 								{{ $data->candidate->designation->name ?? '' }}
 								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->designation->name ?? '' }}
 								@endif								
 							</td>
 							<td>
-								@if($type == 'new_employee')
+								@if($type == 'new_employee' && isset($data) && isset($data->candidate) && isset($data->candidate->department))
 								{{ $data->candidate->department->name ?? '' }}
 								@elseif($type == 'permanent' OR $type == 'temporary' OR $type == 'vacations_or_leave')
 								{{ $data->user->empProfile->department->name ?? '' }}
@@ -386,24 +386,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<td>{{ $data->joining_type_name ?? ''}}</td>
 							@endif
 							@if($type == 'permanent' OR $type == 'temporary')
-							<td>{{ $data->transferFromDepartment->name ?? ''}}</td>
+							<td>@if(isset($data) && isset($data->transferFromDepartment)) {{ $data->transferFromDepartment->name ?? ''}} @endif</td>
 							<td>
 								@if($data->transfer_from_date != NULL)
 								{{ \Carbon\Carbon::parse($data->transfer_from_date)->format('d M Y') }}
 								@endif
 							</td>
-							<td>{{ $data->transferFromLocation->name ?? ''}}</td>
-							<td>{{ $data->transferToDepartment->name ?? ''}}</td>
+							<td>@if(isset($data) && isset($data->transferFromLocation)) {{ $data->transferFromLocation->name ?? ''}} @endif</td>
+							<td>@if(isset($data) && isset($data->transferToDepartment)) {{ $data->transferToDepartment->name ?? ''}} @endif</td>
 							@endif
 							<td>
 								@if($data->joining_date != NULL)
 								{{ \Carbon\Carbon::parse($data->joining_date)->format('d M Y') }}
 								@endif
 							</td>
-							<td>{{ $data->joiningLocation->name ?? '' }}</td>
-							<td>{{ $data->reportingManager->name ?? '' }}</td>
+							<td>@if(isset($data) && isset($data->joiningLocation)) {{ $data->joiningLocation->name ?? '' }} @endif</td>
+							<td>@if(isset($data) && isset($data->reportingManager)) {{ $data->reportingManager->name ?? '' }} @endif</td>
 							<td>{{ $data->remarks ?? '' }}</td>
-							<td>{{ $data->preparedBy->name ?? '' }}</td>
+							<td>@if(isset($data) && isset($data->preparedBy)) {{ $data->preparedBy->name ?? '' }} @endif</td>
 							<td>
 							@canany(['view-joining-report-details','current-user-view-joining-report-details'])
 								@php

@@ -17,7 +17,7 @@
 
 
 
-<h4>{{ $data["name"] }}</h4>
+<h4>{{ $data["name"] ?? '' }}</h4>
 </br>
 <p>Greetings from Milele!</p>
 </br>
@@ -46,10 +46,10 @@
 <p>link is - <a href="{{env('BASE_URL')}}/candidate/documents/{{ $data["id"] }}">Candidate Documents Request Form</a>
 </p>
 </br>
-@if($data["comment"])
-<p>{{$data["comment"]}}</p>
+@if($data["comment"] ?? '')
+<p>{{$data["comment"] ?? ''}}</p>
 @endif
 <p>Looking forward to hearing from you.</p>
 </br>
 <p>Regards,</p>
-<p>{{$data['send_by']}}</p>
+<p>{{$data['send_by'] ?? ''}}</p>

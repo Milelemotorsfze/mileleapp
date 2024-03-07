@@ -144,7 +144,7 @@ class JoiningReportController extends Controller
         $oldRepMangr = '';
         $validator = Validator::make($request->all(), [
             'employee_id' => 'required|integer',
-            'employee_code' => 'required',
+            // 'employee_code' => 'required',
             'joining_type' => 'required',
             'joining_date' => 'required',
             'joining_location' => 'required',
@@ -156,6 +156,8 @@ class JoiningReportController extends Controller
             DB::beginTransaction();
             try {
                 DB::commit();
+                $type = '';
+                $type = $request->joining_type;
                 if($request->joining_type == 'new_employee') {
                     $emp = EmployeeProfile::where('id',$request->employee_id)->first();
                 }
@@ -173,6 +175,10 @@ class JoiningReportController extends Controller
                     if($request->joining_type == 'internal_transfer' && $request->internal_transfer_type == 'permanent') {
                         $oldRepMangr = $emp->team_lead_or_reporting_manager;
                         $emp->team_lead_or_reporting_manager = $request->team_lead_or_reporting_manager;
+                        $type = $request->internal_transfer_type;
+                    }
+                    else if($request->joining_type == 'internal_transfer' && $request->internal_transfer_type == 'temporary') {
+                        $type = $request->internal_transfer_type;
                     }
                     $emp->update();
                 }
@@ -222,7 +228,7 @@ class JoiningReportController extends Controller
                 $createHistory2 = JoiningReportHistory::create($history2);
                 (new UserActivityController)->createActivity('New Employee joining report Created');               
                 $successMessage = 'Employee Joining Report Created Successfully.';
-                return redirect()->route('employee_joining_report.index', $request->joining_type);
+                return redirect()->route('employee_joining_report.index', $type);
             } 
             catch (\Exception $e) {
                 DB::rollback();

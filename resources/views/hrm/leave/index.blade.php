@@ -104,17 +104,33 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 						@foreach ($pendings as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
-							<td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+							<td>
+							@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->user->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-							<td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+							<td>
+							@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+								{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->leave_type ?? ''}}</td>
 							<td>{{ $data->type_of_leave_description ?? ''}}</td>
-							<td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-							<td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+							<td>
+								@if($data->leave_start_date != '')
+								{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+								@endif
+							</td>
+							<td>
+								@if($data->leave_end_date != '')
+								{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->total_no_of_days ?? ''}}</td>	
 							<td>{{ $data->no_of_paid_days ?? ''}}</td>		
 							<td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
@@ -123,6 +139,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 							<td>{{ $data->alternative_personal_email ?? ''}}</td>								
 							<td>
 							<div class="dropdown">
+
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
@@ -224,17 +241,34 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 						@foreach ($approved as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
-                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+                            <td>
+								@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->user->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-							<td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+							<td>
+							@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+
+								{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->leave_type ?? ''}}</td>
 							<td>{{ $data->type_of_leave_description ?? ''}}</td>
-							<td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-							<td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+							<td>
+								@if($data->leave_start_date != '')
+								{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+								@endif
+							</td>
+							<td>
+								@if($data->leave_end_date != '')
+								{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->total_no_of_days ?? ''}}</td>	
 							<td>{{ $data->no_of_paid_days ?? ''}}</td>		
 							<td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
@@ -293,17 +327,31 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 						@foreach ($rejected as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
-							<td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+							<td>
+							@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+							@endif</td>
 							<td>{{ $data->user->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-							<td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+							<td>							@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+
+								{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+							@endif</td>
 							<td>{{ $data->leave_type ?? ''}}</td>
 							<td>{{ $data->type_of_leave_description ?? ''}}</td>
-							<td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-							<td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+							<td>
+								@if($data->leave_start_date != '')
+								{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+								@endif
+							</td>
+							<td>
+								@if($data->leave_end_date != '')
+								{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->total_no_of_days ?? ''}}</td>	
 							<td>{{ $data->no_of_paid_days ?? ''}}</td>		
 							<td>{{ $data->no_of_unpaid_days ?? ''}}</td>		

@@ -125,7 +125,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         <label for="choices-single-default" class="form-label"> Date  :</label>
                                     </div>
                                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                        <span class="texttransform">{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}</span>
+                                        <span class="texttransform">
+                                            @if($data->date_of_telephonic_interview != '')
+                                            {{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+                                            @endif
+                                        </span>
                                     </div>
                                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                         <label for="choices-single-default" class="form-label"> Name Of Interviewers  :</label>
@@ -164,7 +168,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         <label for="choices-single-default" class="form-label"> Date  :</label>
                                     </div>
                                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                        <span class="texttransform">{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}</span>
+                                        <span class="texttransform">
+                                            @if($data->date_of_first_round != '')
+                                            {{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+                                            @endif
+                                        </span>
                                     </div>
                                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                         <label for="choices-single-default" class="form-label"> Name Of Interviewers  :</label>
@@ -203,7 +211,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         <label for="choices-single-default" class="form-label"> Date  :</label>
                                     </div>
                                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                        <span class="texttransform">{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}</span>
+                                        <span class="texttransform">
+                                            @if($data->date_of_second_round != '')
+                                            {{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+                                            @endif
+                                        </span>
                                     </div>
                                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                         <label for="choices-single-default" class="form-label"> Name Of Interviewers  :</label>
@@ -242,7 +254,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         <label for="choices-single-default" class="form-label"> Date  :</label>
                                     </div>
                                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                        <span class="texttransform">{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}</span>
+                                        <span class="texttransform">
+                                            @if($data->date_of_third_round != '')
+                                            {{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+                                            @endif
+                                        </span>
                                     </div>
                                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                         <label for="choices-single-default" class="form-label"> Name Of Interviewers  :</label>
@@ -281,7 +297,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         <label for="choices-single-default" class="form-label"> Date  :</label>
                                     </div>
                                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                        <span class="texttransform">{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}</span>
+                                        <span class="texttransform">
+                                            @if($data->date_of_forth_round != '')
+                                            {{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+                                            @endif
+                                        </span>
                                     </div>
                                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                         <label for="choices-single-default" class="form-label"> Name Of Interviewers  :</label>
@@ -320,7 +340,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         <label for="choices-single-default" class="form-label"> Date  :</label>
                                     </div>
                                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                        <span class="texttransform">{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}</span>
+                                        <span class="texttransform">
+                                            @if($data->date_of_fifth_round != '')
+                                            {{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+                                            @endif
+                                        </span>
                                     </div>
                                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                         <label for="choices-single-default" class="form-label"> Name Of Interviewers  :</label>
@@ -883,7 +907,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         <label for="choices-single-default" class="form-label"> Passport Expiry Date  :</label>
                                     </div>
                                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                        <span>@if($data->candidateDetails->passport_expiry_date != ''){{\Carbon\Carbon::parse($data->candidateDetails->passport_expiry_date)->format('d M Y')}} @endif</span>
+                                        <span>@if(isset($data) && isset($data->candidateDetails) && $data->candidateDetails->passport_expiry_date != ''){{\Carbon\Carbon::parse($data->candidateDetails->passport_expiry_date)->format('d M Y')}} @endif</span>
                                     </div>
                                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                         <label for="choices-single-default" class="form-label"> Educational Qualification  :</label>
@@ -907,7 +931,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         <label for="choices-single-default" class="form-label"> Date Of Birth  :</label>
                                     </div>
                                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                        <span>{{\Carbon\Carbon::parse($data->candidateDetails->dob)->format('d M Y') ?? ''}}</span>
+                                        <span>
+                                            @if(isset($data) && isset($data->candidateDetails) && $data->candidateDetails->dob != '')
+                                            {{\Carbon\Carbon::parse($data->candidateDetails->dob)->format('d M Y') ?? ''}}
+                                            @endif
+                                        </span>
                                     </div>
                                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                         <label for="choices-single-default" class="form-label"> Spoken Languages  :</label>
@@ -948,13 +976,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         <label for="choices-single-default" class="form-label"> Spouse Passport Expiry Date  :</label>
                                     </div>
                                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                        <span>{{\Carbon\Carbon::parse($data->candidateDetails->spouse_passport_expiry_date)->format('d M Y') ?? ''}}</span>
+                                        <span>
+                                            @if(isset($data) && isset($data->candidateDetails) && $data->candidateDetails->spouse_passport_expiry_date != '')
+                                            {{\Carbon\Carbon::parse($data->candidateDetails->spouse_passport_expiry_date)->format('d M Y') ?? ''}}
+                                            @endif
+                                        </span>
                                     </div>
                                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                         <label for="choices-single-default" class="form-label"> Spouse Date Of Birth  :</label>
                                     </div>
                                     <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                        <span>{{\Carbon\Carbon::parse($data->candidateDetails->spouse_dob)->format('d M Y') ?? ''}}</span>
+                                        <span>
+                                            @if(isset($data) && isset($data->candidateDetails) && $data->candidateDetails->spouse_dob != '')
+                                            {{\Carbon\Carbon::parse($data->candidateDetails->spouse_dob)->format('d M Y') ?? ''}}
+                                            @endif
+                                        </span>
                                     </div>
                                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                         <label for="choices-single-default" class="form-label"> Spouse Nationality  :</label>

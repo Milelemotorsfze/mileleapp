@@ -89,15 +89,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po',
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->location->name ?? '' }}</td>
 							<td>{{ $data->eligibility_year ?? ''}}</td>
-							<td>{{ $data->eligibility_date ?? ''}}</td>
+							<td>
+								@if($data->eligibility_date != '')
+								{{ \Carbon\Carbon::parse($data->eligibility_date)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->po_year ?? ''}}</td>
 							<td>{{ $data->po_number ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>{{ $data->updatedBy->name ?? ''}}</td>
 							<td>
                                 @if($data->updated_by != NULL)
-                                {{ \Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}</td>	
-                                @endif							
+                                {{ \Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}	
+                                @endif	
+								</td>						
 							<td>							
 								@canany(['view-ticket-details','view-ticket-details-of-current-user'])
 								@php

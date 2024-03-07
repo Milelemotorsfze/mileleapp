@@ -169,7 +169,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -329,7 +331,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							
+							<td>
+								@if($data->date_of_telephonic_interview != '')
+									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
 								@if(count($data->telephonicInterviewers) > 0)
@@ -341,7 +348,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -506,7 +515,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if($data->date_of_telephonic_interview != '')
+									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
 								@if(count($data->telephonicInterviewers) > 0)
@@ -517,7 +530,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
-							<td>{{ $data->date_of_first_round ?? ''}}</td>
+							
+							<td>
+								@if($data->date_of_first_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->firstRoundInterviewers))
 								@if(count($data->firstRoundInterviewers) > 0)
@@ -529,7 +547,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							</td>
 							<td>{{ $data->first_round ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -701,7 +721,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                             <td>{{ $data->genderName->name ?? '' }}</td>
                             <td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
                             <td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-                            <td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+                            <td>
+								@if($data->date_of_telephonic_interview != '')
+									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								@endif
+							</td>
                             <td>
                                 @if(isset($data->telephonicInterviewers))
                                 @if(count($data->telephonicInterviewers) > 0)
@@ -712,7 +736,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                 @endif
                             </td>
                             <td>{{ $data->telephonic_interview ?? ''}}</td>
-                            <td>{{$data->date_of_first_round ?? ''}}</td>
+                            <td>
+								@if($data->date_of_first_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								@endif
+							</td>
                             <td>
                                 @if(isset($data->firstRoundInterviewers))
                                 @if(count($data->firstRoundInterviewers) > 0)
@@ -723,7 +751,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                 @endif
                             </td>
                             <td>{{$data->first_round ?? ''}}</td>
-                            <td>{{$data->date_of_second_round ?? ''}}</td>
+                            <td>
+								@if($data->date_of_second_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								@endif
+							</td>
                             <td>
                                 @if(isset($data->secondRoundInterviewers))
                                 @if(count($data->secondRoundInterviewers) > 0)
@@ -735,7 +767,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                             </td>
                             <td>{{$data->second_round ?? ''}}</td>
                             <td>{{ $data->createdBy->name ?? ''}}</td>
-                            <td>{{ $data->created_at ?? ''}}</td>
+                            <td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	</td>
                             <td>
                                 <div class="dropdown">
                                     <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -914,7 +948,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if($data->date_of_telephonic_interview != '')
+									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
 								@if(count($data->telephonicInterviewers) > 0)
@@ -925,7 +963,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
-							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_first_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->firstRoundInterviewers))
 								@if(count($data->firstRoundInterviewers) > 0)
@@ -936,7 +978,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->first_round ?? ''}}</td>
-							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_second_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->secondRoundInterviewers))
 								@if(count($data->secondRoundInterviewers) > 0)
@@ -947,7 +993,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->second_round ?? ''}}</td>
-							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_third_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->thirdRoundInterviewers))
 								@if(count($data->thirdRoundInterviewers) > 0)
@@ -959,7 +1009,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							</td>
 							<td>{{$data->third_round ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -1144,7 +1196,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if($data->date_of_telephonic_interview != '')
+									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
 								@if(count($data->telephonicInterviewers) > 0)
@@ -1155,7 +1211,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
-							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_first_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->firstRoundInterviewers))
 								@if(count($data->firstRoundInterviewers) > 0)
@@ -1166,7 +1226,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->first_round ?? ''}}</td>
-							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_second_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->secondRoundInterviewers))
 								@if(count($data->secondRoundInterviewers) > 0)
@@ -1177,7 +1241,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->second_round ?? ''}}</td>
-							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_third_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->thirdRoundInterviewers))
 								@if(count($data->thirdRoundInterviewers) > 0)
@@ -1188,7 +1256,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->third_round ?? ''}}</td>
-							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_forth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->forthRoundInterviewers))
 								@if(count($data->forthRoundInterviewers) > 0)
@@ -1200,7 +1272,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							</td>
 							<td>{{$data->forth_round ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -1391,7 +1465,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if($data->date_of_telephonic_interview != '')
+									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
 								@if(count($data->telephonicInterviewers) > 0)
@@ -1402,7 +1480,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
-							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_first_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->firstRoundInterviewers))
 								@if(count($data->firstRoundInterviewers) > 0)
@@ -1413,7 +1495,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->first_round ?? ''}}</td>
-							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_second_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->secondRoundInterviewers))
 								@if(count($data->secondRoundInterviewers) > 0)
@@ -1424,7 +1510,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->second_round ?? ''}}</td>
-							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_third_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->thirdRoundInterviewers))
 								@if(count($data->thirdRoundInterviewers) > 0)
@@ -1435,7 +1525,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->third_round ?? ''}}</td>
-							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_forth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->forthRoundInterviewers))
 								@if(count($data->forthRoundInterviewers) > 0)
@@ -1446,7 +1540,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->forth_round ?? ''}}</td>
-							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_fifth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->fifthRoundInterviewers))
 								@if(count($data->fifthRoundInterviewers) > 0)
@@ -1458,7 +1556,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							</td>
 							<td>{{$data->fifth_round ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -1646,7 +1746,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if($data->date_of_telephonic_interview != '')
+									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
 								@if(count($data->telephonicInterviewers) > 0)
@@ -1657,7 +1761,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
-							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_first_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->firstRoundInterviewers))
 								@if(count($data->firstRoundInterviewers) > 0)
@@ -1668,7 +1776,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->first_round ?? ''}}</td>
-							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_second_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->secondRoundInterviewers))
 								@if(count($data->secondRoundInterviewers) > 0)
@@ -1679,7 +1791,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->second_round ?? ''}}</td>
-							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_third_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->thirdRoundInterviewers))
 								@if(count($data->thirdRoundInterviewers) > 0)
@@ -1690,7 +1806,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->third_round ?? ''}}</td>
-							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_forth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->forthRoundInterviewers))
 								@if(count($data->forthRoundInterviewers) > 0)
@@ -1701,7 +1821,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->forth_round ?? ''}}</td>
-							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_fifth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->fifthRoundInterviewers))
 								@if(count($data->fifthRoundInterviewers) > 0)
@@ -1714,7 +1838,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->fifth_round ?? ''}}</td>
 							<td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -1839,7 +1965,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if($data->date_of_telephonic_interview != '')
+									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
 								@if(count($data->telephonicInterviewers) > 0)
@@ -1850,7 +1980,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
-							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_first_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->firstRoundInterviewers))
 								@if(count($data->firstRoundInterviewers) > 0)
@@ -1861,7 +1995,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->first_round ?? ''}}</td>
-							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_second_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->secondRoundInterviewers))
 								@if(count($data->secondRoundInterviewers) > 0)
@@ -1872,7 +2010,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->second_round ?? ''}}</td>
-							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_third_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->thirdRoundInterviewers))
 								@if(count($data->thirdRoundInterviewers) > 0)
@@ -1883,7 +2025,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->third_round ?? ''}}</td>
-							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_forth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->forthRoundInterviewers))
 								@if(count($data->forthRoundInterviewers) > 0)
@@ -1894,7 +2040,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->forth_round ?? ''}}</td>
-							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_fifth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->fifthRoundInterviewers))
 								@if(count($data->fifthRoundInterviewers) > 0)
@@ -1908,11 +2058,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
 							<td>{{$data->hrManager->name ?? ''}}</td>
 							<td>{{$data->action_by_hr_manager ?? ''}}</td>
-							<td>{{$data->hr_manager_action_at ?? ''}}</td>
+							<td>
+							@if($data->hr_manager_action_at != '')
+									{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>{{$data->divisionHeadName->name ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	</td>
 							<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
 							<td>
 								<div class="dropdown">
@@ -2069,7 +2225,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if($data->date_of_telephonic_interview != '')
+									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
 								@if(count($data->telephonicInterviewers) > 0)
@@ -2080,7 +2240,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
-							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_first_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->firstRoundInterviewers))
 								@if(count($data->firstRoundInterviewers) > 0)
@@ -2091,7 +2255,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->first_round ?? ''}}</td>
-							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_second_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->secondRoundInterviewers))
 								@if(count($data->secondRoundInterviewers) > 0)
@@ -2102,7 +2270,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->second_round ?? ''}}</td>
-							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_third_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->thirdRoundInterviewers))
 								@if(count($data->thirdRoundInterviewers) > 0)
@@ -2113,7 +2285,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->third_round ?? ''}}</td>
-							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_forth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->forthRoundInterviewers))
 								@if(count($data->forthRoundInterviewers) > 0)
@@ -2124,7 +2300,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->forth_round ?? ''}}</td>
-							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							
+							<td>
+								@if($data->date_of_fifth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->fifthRoundInterviewers))
 								@if(count($data->fifthRoundInterviewers) > 0)
@@ -2138,14 +2319,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
 							<td>{{$data->hrManager->name ?? ''}}</td>
 							<td>{{$data->action_by_hr_manager ?? ''}}</td>
-							<td>{{$data->hr_manager_action_at ?? ''}}</td>
+							<td>
+							@if($data->hr_manager_action_at != '')
+									{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>{{$data->divisionHeadName->name ?? ''}}</td>
 							<td>{{$data->action_by_division_head ?? ''}}</td>
-							<td>{{$data->division_head_action_at ?? ''}}</td>
+							
+							<td>
+							@if($data->division_head_action_at != '')
+									{{\Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_division_head ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -2406,7 +2598,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if($data->date_of_telephonic_interview != '')
+									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
 								@if(count($data->telephonicInterviewers) > 0)
@@ -2417,7 +2613,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
-							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_first_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->firstRoundInterviewers))
 								@if(count($data->firstRoundInterviewers) > 0)
@@ -2428,7 +2628,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->first_round ?? ''}}</td>
-							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_second_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->secondRoundInterviewers))
 								@if(count($data->secondRoundInterviewers) > 0)
@@ -2439,7 +2643,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->second_round ?? ''}}</td>
-							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_third_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->thirdRoundInterviewers))
 								@if(count($data->thirdRoundInterviewers) > 0)
@@ -2450,7 +2658,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->third_round ?? ''}}</td>
-							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_forth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->forthRoundInterviewers))
 								@if(count($data->forthRoundInterviewers) > 0)
@@ -2461,7 +2673,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->forth_round ?? ''}}</td>
-							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_fifth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->fifthRoundInterviewers))
 								@if(count($data->fifthRoundInterviewers) > 0)
@@ -2475,14 +2691,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
 							<td>{{$data->hrManager->name ?? ''}}</td>
 							<td>{{$data->action_by_hr_manager ?? ''}}</td>
-							<td>{{$data->hr_manager_action_at ?? ''}}</td>
+							<td>
+							@if($data->hr_manager_action_at != '')
+									{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>{{$data->divisionHeadName->name ?? ''}}</td>
 							<td>{{$data->action_by_division_head ?? ''}}</td>
-							<td>{{$data->division_head_action_at ?? ''}}</td>
+							<td>
+							@if($data->division_head_action_at != '')
+									{{\Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_division_head ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -2595,7 +2821,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if($data->date_of_telephonic_interview != '')
+									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
 								@if(count($data->telephonicInterviewers) > 0)
@@ -2606,7 +2836,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
-							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_first_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->firstRoundInterviewers))
 								@if(count($data->firstRoundInterviewers) > 0)
@@ -2617,7 +2851,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->first_round ?? ''}}</td>
-							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_second_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->secondRoundInterviewers))
 								@if(count($data->secondRoundInterviewers) > 0)
@@ -2628,7 +2866,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->second_round ?? ''}}</td>
-							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_third_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->thirdRoundInterviewers))
 								@if(count($data->thirdRoundInterviewers) > 0)
@@ -2639,7 +2881,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->third_round ?? ''}}</td>
-							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_forth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->forthRoundInterviewers))
 								@if(count($data->forthRoundInterviewers) > 0)
@@ -2650,7 +2896,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->forth_round ?? ''}}</td>
-							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_fifth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->fifthRoundInterviewers))
 								@if(count($data->fifthRoundInterviewers) > 0)
@@ -2664,14 +2914,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
 							<td>{{$data->hrManager->name ?? ''}}</td>
 							<td>{{$data->action_by_hr_manager ?? ''}}</td>
-							<td>{{$data->hr_manager_action_at ?? ''}}</td>
+							<td>
+							@if($data->hr_manager_action_at != '')
+									{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>{{$data->divisionHeadName->name ?? ''}}</td>
 							<td>{{$data->action_by_division_head ?? ''}}</td>
-							<td>{{$data->division_head_action_at ?? ''}}</td>
+							<td>
+							@if($data->division_head_action_at != '')
+									{{\Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_division_head ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -2979,7 +3239,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-							<td>{{ $data->date_of_telephonic_interview ?? ''}}</td>
+							<td>
+								@if($data->date_of_telephonic_interview != '')
+									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->telephonicInterviewers))
 								@if(count($data->telephonicInterviewers) > 0)
@@ -2990,7 +3254,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
-							<td>{{$data->date_of_first_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_first_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->firstRoundInterviewers))
 								@if(count($data->firstRoundInterviewers) > 0)
@@ -3001,7 +3269,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->first_round ?? ''}}</td>
-							<td>{{$data->date_of_second_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_second_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->secondRoundInterviewers))
 								@if(count($data->secondRoundInterviewers) > 0)
@@ -3012,7 +3284,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->second_round ?? ''}}</td>
-							<td>{{$data->date_of_third_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_third_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->thirdRoundInterviewers))
 								@if(count($data->thirdRoundInterviewers) > 0)
@@ -3023,7 +3299,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->third_round ?? ''}}</td>
-							<td>{{$data->date_of_forth_round ?? ''}}</td>
+							
+							<td>
+								@if($data->date_of_forth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->forthRoundInterviewers))
 								@if(count($data->forthRoundInterviewers) > 0)
@@ -3034,7 +3315,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->forth_round ?? ''}}</td>
-							<td>{{$data->date_of_fifth_round ?? ''}}</td>
+							<td>
+								@if($data->date_of_fifth_round != '')
+									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								@endif
+							</td>
 							<td>
 								@if(isset($data->fifthRoundInterviewers))
 								@if(count($data->fifthRoundInterviewers) > 0)
@@ -3048,14 +3333,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
 							<td>{{$data->hrManager->name ?? ''}}</td>
 							<td>{{$data->action_by_hr_manager ?? ''}}</td>
-							<td>{{$data->hr_manager_action_at ?? ''}}</td>
+							<td>
+							@if($data->hr_manager_action_at != '')
+									{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>{{$data->divisionHeadName->name ?? ''}}</td>
 							<td>{{$data->action_by_division_head ?? ''}}</td>
-							<td>{{$data->division_head_action_at ?? ''}}</td>
+							<td>
+							@if($data->division_head_action_at != '')
+									{{\Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_division_head ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	</td>
 							<td>
 							@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 							</td>

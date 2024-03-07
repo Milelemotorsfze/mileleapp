@@ -186,10 +186,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->uuid ?? ''}}</td>
 							<td>
-
-							{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
-								
-							
+								@if($data->request_date != '')
+									{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								@endif										
 							</td>
 							<td>{{ $data->department_name ?? '' }}</td>
 							<td>{{ $data->department_location ?? '' }}</td>
@@ -203,7 +202,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							<td>{{ $data->replacement_for_employee_name ?? ''}}</td>
 							<td>{{ $data->explanation_of_new_hiring ?? ''}}</td>
 							<td>{{ $data->created_by_name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif</td>
 							<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
 							<td>
 							<div class="dropdown">
@@ -322,25 +323,31 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($approved as $key => $approvedOne)
+						@foreach ($approved as $key => $data)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
-							<td>{{ $approvedOne->uuid ?? ''}}</td>
-							<td>{{ $approvedOne->request_date ?? '' }}</td>
-							<td>{{ $approvedOne->department_name ?? '' }}</td>
-							<td>{{ $approvedOne->department_location ?? '' }}</td>
-							<td>{{ $approvedOne->requested_by_name ?? '' }}</td>
-							<td>{{ $approvedOne->requested_job_name ?? '' }}</td>
+							<td>{{ $data->uuid ?? ''}}</td>
+							<td>
+								@if($data->request_date != '')
+									{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								@endif	
+							</td>
+							<td>{{ $data->department_name ?? '' }}</td>
+							<td>{{ $data->department_location ?? '' }}</td>
+							<td>{{ $data->requested_by_name ?? '' }}</td>
+							<td>{{ $data->requested_job_name ?? '' }}</td>
 
-							<td>{{ $approvedOne->experience_level_name ?? ''}}</td>
-							<td>{{ $approvedOne->salary_range_start_in_aed ?? ''}} - {{$approvedOne->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $approvedOne->work_time_start ?? ''}} - {{$approvedOne->work_time_end ?? ''}}</td>
-							<td>{{ $approvedOne->number_of_openings ?? ''}}</td>
-							<td>{{$approvedOne->type_of_role_name}}</td>
-							<td>{{$approvedOne->replacement_for_employee_name}}</td>
-							<td>{{$approvedOne->explanation_of_new_hiring}}</td>
-							<td>{{$approvedOne->created_by_name}}</td>
-							<td>{{$approvedOne->created_at}}</td>
+							<td>{{ $data->experience_level_name ?? ''}}</td>
+							<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+							<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+							<td>{{ $data->number_of_openings ?? ''}}</td>
+							<td>{{$data->type_of_role_name}}</td>
+							<td>{{$data->replacement_for_employee_name}}</td>
+							<td>{{$data->explanation_of_new_hiring}}</td>
+							<td>{{$data->created_by_name}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif</td>
 							<td>
 							<div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -353,32 +360,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 									@endphp
 									@if ($hasPermission)
                                     <li>
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$approvedOne->id)}}">
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i> View Details
 										</a>
 									</li>
 									@endif
 									@endcanany
                                     <li>
-										@if(isset($approvedOne->questionnaire))
+										@if(isset($data->questionnaire))
 										@canany(['edit-questionnaire','edit-current-user-questionnaire'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-questionnaire','edit-current-user-questionnaire']);
 										@endphp
 										@if ($hasPermission)
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit Questionnaire Checklist" class="btn btn-sm btn-primary" href="{{route('employee-hiring-questionnaire.create-or-edit',$data->id)}}">
 										<i class="fa fa-list" aria-hidden="true"></i> Edit Questionnaire
 										</a>
 										@endif
 										@endcanany
-										@if(isset($approvedOne->jobDescription))
+										@if(isset($data->jobDescription))
 										@canany(['create-job-description'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
 										@endphp
 										@if ($hasPermission)
-										@if($approvedOne->jobDescription->status == 'pending' OR $approvedOne->jobDescription->status == 'rejected')
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Job Description" class="btn btn-sm btn-secondary" href="{{ route('employee-hiring-job-description.create-or-edit', ['id' => $approvedOne->jobDescription->id, 'hiring_id' => $approvedOne->id]) }}">
+										@if($data->jobDescription->status == 'pending' OR $data->jobDescription->status == 'rejected')
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Job Description" class="btn btn-sm btn-secondary" href="{{ route('employee-hiring-job-description.create-or-edit', ['id' => $data->jobDescription->id, 'hiring_id' => $data->id]) }}">
 										<i class="fa fa-address-card" aria-hidden="true"></i> Edit Job Description
 										</a>
 										@endif
@@ -390,7 +397,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
 										@endphp
 										@if ($hasPermission)
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Job Description" class="btn btn-sm btn-secondary" href="{{ route('employee-hiring-job-description.create-or-edit', ['id' => 'new', 'hiring_id' => $approvedOne->id]) }}">
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Job Description" class="btn btn-sm btn-secondary" href="{{ route('employee-hiring-job-description.create-or-edit', ['id' => 'new', 'hiring_id' => $data->id]) }}">
 										<i class="fa fa-address-card" aria-hidden="true"></i> Add Job Description
 										</a>
 										@endif
@@ -406,7 +413,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-questionnaire']);
 										@endphp
 										@if ($hasPermission)
-										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.create-or-edit',$approvedOne->id)}}">
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Create Questionnaire Checklist" class="btn btn-sm btn-info" href="{{route('employee-hiring-questionnaire.create-or-edit',$data->id)}}">
 										<i class="fa fa-list" aria-hidden="true"></i> Create Questionnaire
 										</a>
 										@endif
@@ -418,11 +425,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['hiring-request-close-action']);
 									@endphp
 									@if ($hasPermission)
-									@if(isset($approvedOne->shortlistedCandidates))
-									@if(count($approvedOne->shortlistedCandidates) > 0)
+									@if(isset($data->shortlistedCandidates))
+									@if(count($data->shortlistedCandidates) > 0)
 									<li>
 										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-											data-bs-target="#closed-hiring-request-{{$approvedOne->id}}">
+											data-bs-target="#closed-hiring-request-{{$data->id}}">
 											<i class="fa fa-check" aria-hidden="true"></i> Closed
 										</button>
 									</li>
@@ -437,7 +444,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 									@if ($hasPermission)
                                     <li>
 										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="On Hold" type="button" class="btn btn-primary btn-sm"  data-bs-toggle="modal"
-											data-bs-target="#on-hold-hiring-request-{{$approvedOne->id}}">
+											data-bs-target="#on-hold-hiring-request-{{$data->id}}">
 											<i class="fa fa-hand-rock" aria-hidden="true"></i> On Hold
 										</button>
 									</li>
@@ -450,7 +457,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 									@if ($hasPermission)
                                     <li>
 										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Cancelled" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-											data-bs-target="#cancelled-hiring-request-{{$approvedOne->id}}">
+											data-bs-target="#cancelled-hiring-request-{{$data->id}}">
 											<i class="fa fa-ban" aria-hidden="true"></i> Cancelled
 										</button>
 									</li>
@@ -463,7 +470,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 							
 								
 							</td>
-							<div class="modal fade" id="cancelled-hiring-request-{{$approvedOne->id}}"
+							<div class="modal fade" id="cancelled-hiring-request-{{$data->id}}"
 								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 								<div class="modal-dialog ">
 									<div class="modal-content">
@@ -480,7 +487,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="cancelled-comment-{{$approvedOne->id}}" class="form-control" name="comment">
+																<textarea rows="5" id="cancelled-comment-{{$data->id}}" class="form-control" name="comment">
 																</textarea>
 															</div>
 														</div>
@@ -491,12 +498,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 										<div class="modal-footer">
 											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 											<button type="button" class="btn btn-danger status-cancelled-button"
-												data-id="{{ $approvedOne->id }}" data-status="cancelled">Submit</button>
+												data-id="{{ $data->id }}" data-status="cancelled">Submit</button>
 										</div>
 									</div>
 								</div>
 							</div>
-							<div class="modal fade" id="on-hold-hiring-request-{{$approvedOne->id}}"
+							<div class="modal fade" id="on-hold-hiring-request-{{$data->id}}"
 								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 								<div class="modal-dialog ">
 									<div class="modal-content">
@@ -513,7 +520,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="on-hold-comment-{{$approvedOne->id}}" class="form-control" name="comment">
+																<textarea rows="5" id="on-hold-comment-{{$data->id}}" class="form-control" name="comment">
 																</textarea>
 															</div>
 														</div>
@@ -524,12 +531,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 										<div class="modal-footer">
 											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 											<button type="button" class="btn btn-primary status-onhold-button"
-												data-id="{{ $approvedOne->id }}" data-status="onhold">Submit</button>
+												data-id="{{ $data->id }}" data-status="onhold">Submit</button>
 										</div>
 									</div>
 								</div>
 							</div>
-							<div class="modal fade" id="closed-hiring-request-{{$approvedOne->id}}"
+							<div class="modal fade" id="closed-hiring-request-{{$data->id}}"
 								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 								<div class="modal-dialog ">
 									<div class="modal-content">
@@ -542,15 +549,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 												<div class="row">
 													<div class="col-12">
 														<div class="row mt-2">
-															@if(isset($approvedOne->shortlistedCandidates))
-																@if(count($approvedOne->shortlistedCandidates) > 0)
+															@if(isset($data->shortlistedCandidates))
+																@if(count($data->shortlistedCandidates) > 0)
 																	<div class="col-lg-12 col-md-12 col-sm-12">
 																		<label class="form-label font-size-13">Selected Candidates</label>
 																	</div>
 																	<div class="col-lg-12 col-md-12 col-sm-12">
-																		<select name="candidate_id[]" id="candidate_id_{{$approvedOne->id}}" multiple="true" style="width:100%;"
+																		<select name="candidate_id[]" id="candidate_id_{{$data->id}}" multiple="true" style="width:100%;"
 																		class="candidate_id form-control widthinput" autofocus>
-																			@foreach($approvedOne->shortlistedCandidates as $shortlistedCandidate)
+																			@foreach($data->shortlistedCandidates as $shortlistedCandidate)
 																				<option value="{{$shortlistedCandidate->id}}" selected>{{$shortlistedCandidate->candidate_name}}</option>
 																			@endforeach
 																		</select>
@@ -561,7 +568,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="closed-comment-{{$approvedOne->id}}" class="form-control" name="comment">
+																<textarea rows="5" id="closed-comment-{{$data->id}}" class="form-control" name="comment">
 																</textarea>
 															</div>
 														</div>
@@ -572,7 +579,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 										<div class="modal-footer">
 											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 											<button type="button" class="btn btn-primary status-closed-button"
-												data-id="{{ $approvedOne->id }}" data-status="closed">Submit</button>
+												data-id="{{ $data->id }}" data-status="closed">Submit</button>
 										</div>
 									</div>
 								</div>
@@ -620,32 +627,38 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($closed as $key => $closedOne)
+						@foreach ($closed as $key => $data)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
-							<td>{{ $closedOne->uuid ?? ''}}</td>
-							<td>{{ $closedOne->request_date ?? '' }}</td>
-							<td>{{ $closedOne->department_name ?? '' }}</td>
-							<td>{{ $closedOne->department_location ?? '' }}</td>
-							<td>{{ $closedOne->requested_by_name ?? '' }}</td>
-							<td>{{ $closedOne->requested_job_name ?? '' }}</td>
+							<td>{{ $data->uuid ?? ''}}</td>
+							<td>
+								@if($data->request_date != '')
+									{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								@endif	
+							</td>
+							<td>{{ $data->department_name ?? '' }}</td>
+							<td>{{ $data->department_location ?? '' }}</td>
+							<td>{{ $data->requested_by_name ?? '' }}</td>
+							<td>{{ $data->requested_job_name ?? '' }}</td>
 
-							<td>{{ $closedOne->experience_level_name ?? ''}}</td>
-							<td>{{ $closedOne->salary_range_start_in_aed ?? ''}} - {{$closedOne->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $closedOne->work_time_start ?? ''}} - {{$closedOne->work_time_end ?? ''}}</td>
-							<td>{{ $closedOne->number_of_openings ?? ''}}</td>
-							<td>{{$closedOne->type_of_role_name}}</td>
-							<td>{{$closedOne->replacement_for_employee_name}}</td>
-							<td>{{$closedOne->explanation_of_new_hiring}}</td>
-							<td>{{$closedOne->created_by_name}}</td>
-							<td>{{$closedOne->created_at}}</td>
+							<td>{{ $data->experience_level_name ?? ''}}</td>
+							<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+							<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+							<td>{{ $data->number_of_openings ?? ''}}</td>
+							<td>{{$data->type_of_role_name}}</td>
+							<td>{{$data->replacement_for_employee_name}}</td>
+							<td>{{$data->explanation_of_new_hiring}}</td>
+							<td>{{$data->created_by_name}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif</td>
 							<td>
 								@canany(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details']);
 								@endphp
 								@if ($hasPermission)
-								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$closedOne->id)}}">
+								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 									<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
 								@endif
@@ -696,32 +709,36 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($onHold as $key => $onHoldOne)
+						@foreach ($onHold as $key => $data)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
-						<td>{{$onHoldOne->uuid ?? ''}}</td>
-							<td>{{ $onHoldOne->request_date ?? '' }}</td>
-							<td>{{ $onHoldOne->department_name ?? '' }}</td>
-							<td>{{ $onHoldOne->department_location ?? '' }}</td>
-							<td>{{ $onHoldOne->requested_by_name ?? '' }}</td>
-							<td>{{ $onHoldOne->requested_job_name ?? '' }}</td>
+						<td>{{$data->uuid ?? ''}}</td>
+							<td>@if($data->request_date != '')
+									{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								@endif	</td>
+							<td>{{ $data->department_name ?? '' }}</td>
+							<td>{{ $data->department_location ?? '' }}</td>
+							<td>{{ $data->requested_by_name ?? '' }}</td>
+							<td>{{ $data->requested_job_name ?? '' }}</td>
 
-							<td>{{ $onHoldOne->experience_level_name ?? ''}}</td>
-							<td>{{ $onHoldOne->salary_range_start_in_aed ?? ''}} - {{$onHoldOne->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $onHoldOne->work_time_start ?? ''}} - {{$onHoldOne->work_time_end ?? ''}}</td>
-							<td>{{ $onHoldOne->number_of_openings ?? ''}}</td>
-							<td>{{$onHoldOne->type_of_role_name}}</td>
-							<td>{{$onHoldOne->replacement_for_employee_name}}</td>
-							<td>{{$onHoldOne->explanation_of_new_hiring}}</td>
-							<td>{{$onHoldOne->created_by_name}}</td>
-							<td>{{$onHoldOne->created_at}}</td>
+							<td>{{ $data->experience_level_name ?? ''}}</td>
+							<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+							<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+							<td>{{ $data->number_of_openings ?? ''}}</td>
+							<td>{{$data->type_of_role_name}}</td>
+							<td>{{$data->replacement_for_employee_name}}</td>
+							<td>{{$data->explanation_of_new_hiring}}</td>
+							<td>{{$data->created_by_name}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif</td>
 							<td>
 								@canany(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details']);
 								@endphp
 								@if ($hasPermission)
-								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$onHoldOne->id)}}">
+								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 									<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
 								@endif
@@ -773,32 +790,36 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($cancelled as $key => $cancelledOne)
+						@foreach ($cancelled as $key => $data)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
-						<td>{{ $cancelledOne->uuid ?? ''}}</td>
-							<td>{{ $cancelledOne->request_date ?? '' }}</td>
-							<td>{{ $cancelledOne->department_name ?? '' }}</td>
-							<td>{{ $cancelledOne->department_location ?? '' }}</td>
-							<td>{{ $cancelledOne->requested_by_name ?? '' }}</td>
-							<td>{{ $cancelledOne->requested_job_name ?? '' }}</td>
+						<td>{{ $data->uuid ?? ''}}</td>
+							<td>@if($data->request_date != '')
+									{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								@endif	</td>
+							<td>{{ $data->department_name ?? '' }}</td>
+							<td>{{ $data->department_location ?? '' }}</td>
+							<td>{{ $data->requested_by_name ?? '' }}</td>
+							<td>{{ $data->requested_job_name ?? '' }}</td>
 
-							<td>{{ $cancelledOne->experience_level_name ?? ''}}</td>
-							<td>{{ $cancelledOne->salary_range_start_in_aed ?? ''}} - {{$cancelledOne->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $cancelledOne->work_time_start ?? ''}} - {{$cancelledOne->work_time_end ?? ''}}</td>
-							<td>{{ $cancelledOne->number_of_openings ?? ''}}</td>
-							<td>{{$cancelledOne->type_of_role_name}}</td>
-							<td>{{$cancelledOne->replacement_for_employee_name}}</td>
-							<td>{{$cancelledOne->explanation_of_new_hiring}}</td>
-							<td>{{$cancelledOne->created_by_name}}</td>
-							<td>{{$cancelledOne->created_at}}</td>
+							<td>{{ $data->experience_level_name ?? ''}}</td>
+							<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+							<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+							<td>{{ $data->number_of_openings ?? ''}}</td>
+							<td>{{$data->type_of_role_name}}</td>
+							<td>{{$data->replacement_for_employee_name}}</td>
+							<td>{{$data->explanation_of_new_hiring}}</td>
+							<td>{{$data->created_by_name}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif</td>
 							<td>
 								@canany(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details']);
 								@endphp
 								@if ($hasPermission)
-								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$cancelledOne->id)}}">
+								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 									<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
 								@endif
@@ -850,32 +871,38 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($rejected as $key => $rejectedOne)
+						@foreach ($rejected as $key => $data)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
-						<td>{{ $rejectedOne->uuid ?? ''}}</td>
-							<td>{{ $rejectedOne->request_date ?? '' }}</td>
-							<td>{{ $rejectedOne->department_name ?? '' }}</td>
-							<td>{{ $rejectedOne->department_location ?? '' }}</td>
-							<td>{{ $rejectedOne->requested_by_name ?? '' }}</td>
-							<td>{{ $rejectedOne->requested_job_name ?? '' }}</td>
+						<td>{{ $data->uuid ?? ''}}</td>
+							<td>@if($data->request_date != '')
+									{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								@endif	</td>
+							<td>{{ $data->department_name ?? '' }}</td>
+							<td>{{ $data->department_location ?? '' }}</td>
+							<td>{{ $data->requested_by_name ?? '' }}</td>
+							<td>{{ $data->requested_job_name ?? '' }}</td>
 
-							<td>{{ $rejectedOne->experience_level_name ?? ''}}</td>
-							<td>{{ $rejectedOne->salary_range_start_in_aed ?? ''}} - {{$rejectedOne->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $rejectedOne->work_time_start ?? ''}} - {{$rejectedOne->work_time_end ?? ''}}</td>
-							<td>{{ $rejectedOne->number_of_openings ?? ''}}</td>
-							<td>{{$rejectedOne->type_of_role_name}}</td>
-							<td>{{$rejectedOne->replacement_for_employee_name}}</td>
-							<td>{{$rejectedOne->explanation_of_new_hiring}}</td>
-							<td>{{$rejectedOne->created_by_name}}</td>
-							<td>{{$rejectedOne->created_at}}</td>
+							<td>{{ $data->experience_level_name ?? ''}}</td>
+							<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+							<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+							<td>{{ $data->number_of_openings ?? ''}}</td>
+							<td>{{$data->type_of_role_name}}</td>
+							<td>{{$data->replacement_for_employee_name}}</td>
+							<td>{{$data->explanation_of_new_hiring}}</td>
+							<td>{{$data->created_by_name}}</td>
+							<td>
+							@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif
+								</td>
 							<td>
 								@canany(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details']);
 								@endphp
 								@if ($hasPermission)
-								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$rejectedOne->id)}}">
+								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 									<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
 								@endif
@@ -927,25 +954,29 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($deleted as $key => $deletedOne)
+						@foreach ($deleted as $key => $data)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
-						<td>{{ $deletedOne->uuid ?? ''}}</td>
-							<td>{{ $deletedOne->request_date ?? '' }}</td>
-							<td>{{ $deletedOne->department_name ?? '' }}</td>
-							<td>{{ $deletedOne->department_location ?? '' }}</td>
-							<td>{{ $deletedOne->requested_by_name ?? '' }}</td>
-							<td>{{ $deletedOne->requested_job_name ?? '' }}</td>
+						<td>{{ $data->uuid ?? ''}}</td>
+							<td>@if($data->request_date != '')
+									{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								@endif	</td>
+							<td>{{ $data->department_name ?? '' }}</td>
+							<td>{{ $data->department_location ?? '' }}</td>
+							<td>{{ $data->requested_by_name ?? '' }}</td>
+							<td>{{ $data->requested_job_name ?? '' }}</td>
 
-							<td>{{ $deletedOne->experience_level_name ?? ''}}</td>
-							<td>{{ $deletedOne->salary_range_start_in_aed ?? ''}} - {{$deletedOne->salary_range_end_in_aed ?? ''}}</td>
-							<td>{{ $deletedOne->work_time_start ?? ''}} - {{$deletedOne->work_time_end ?? ''}}</td>
-							<td>{{ $deletedOne->number_of_openings ?? ''}}</td>
-							<td>{{$deletedOne->type_of_role_name}}</td>
-							<td>{{$deletedOne->replacement_for_employee_name}}</td>
-							<td>{{$deletedOne->explanation_of_new_hiring}}</td>
-							<td>{{$deletedOne->created_by_name}}</td>
-							<td>{{$deletedOne->created_at}}</td>
+							<td>{{ $data->experience_level_name ?? ''}}</td>
+							<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+							<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+							<td>{{ $data->number_of_openings ?? ''}}</td>
+							<td>{{$data->type_of_role_name}}</td>
+							<td>{{$data->replacement_for_employee_name}}</td>
+							<td>{{$data->explanation_of_new_hiring}}</td>
+							<td>{{$data->created_by_name}}</td>
+							<td>@if($data->created_at != '')
+									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif</td>
 							
 						</tr>
 						@endforeach

@@ -51,56 +51,65 @@
 									</thead>
 									<tbody>
 										<div hidden>{{$i=0;}}</div>
-										@foreach ($deptHeadPendings as $key => $pending)
+										@foreach ($deptHeadPendings as $key => $data)
 										<tr data-id="1">
 											<td>{{ ++$i }}</td>
-											<td>{{$pending->uuid ?? ''}}</td><td>{{ $pending->request_date ?? '' }}</td>
-											<td>{{ $pending->department_name ?? '' }}</td>
-											<td>{{ $pending->department_location ?? '' }}</td>
-											<td>{{ $pending->requested_by_name ?? '' }}</td>
-											<td>{{ $pending->requested_job_name ?? '' }}</td>
-											<td>{{ $pending->divisionHead->name ?? '' }}</td>							
-											<td>{{ $pending->experience_level_name ?? ''}}</td>
-											<td>{{ $pending->salary_range_start_in_aed ?? ''}} - {{$pending->salary_range_end_in_aed ?? ''}}</td>
-											<td>{{ $pending->work_time_start ?? ''}} - {{$pending->work_time_end ?? ''}}</td>
-											<td>{{ $pending->number_of_openings ?? ''}}</td>
-											<td>{{$pending->type_of_role_name ?? ''}}</td>
-											<td>{{$pending->replacement_for_employee_name ?? ''}}</td>
-											<td>{{$pending->explanation_of_new_hiring ?? ''}}</td>
-											<td>{{$pending->created_by_name ?? ''}}</td>
-											<td>{{$pending->created_at ?? ''}}</td>
-											<td><label class="badge badge-soft-info">{{ $pending->current_status ?? '' }}</label></td>
+											<td>{{$data->uuid ?? ''}}</td>
 											<td>
-												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$pending->id)}}">
+												@if($data->request_date != '')
+												{{\Carbon\Carbon::parse($data->request_date)->format('d M Y') ?? ''}}											
+												@endif
+											</td>
+											<td>{{ $data->department_name ?? '' }}</td>
+											<td>{{ $data->department_location ?? '' }}</td>
+											<td>{{ $data->requested_by_name ?? '' }}</td>
+											<td>{{ $data->requested_job_name ?? '' }}</td>
+											<td>{{ $data->divisionHead->name ?? '' }}</td>							
+											<td>{{ $data->experience_level_name ?? ''}}</td>
+											<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+											<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+											<td>{{ $data->number_of_openings ?? ''}}</td>
+											<td>{{$data->type_of_role_name ?? ''}}</td>
+											<td>{{$data->replacement_for_employee_name ?? ''}}</td>
+											<td>{{$data->explanation_of_new_hiring ?? ''}}</td>
+											<td>{{$data->created_by_name ?? ''}}</td>
+											<td>
+												@if($data->created_at != '')
+												{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+												@endif
+											</td>
+											<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
+											<td>
+												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 													<i class="fa fa-eye" aria-hidden="true"></i> View Details
 												</a>												
 												@if(isset($type))
 													@if($type == 'approve')
 														<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-															data-bs-target="#approve-hiring-request-approvals-{{$pending->id}}">
+															data-bs-target="#approve-hiring-request-approvals-{{$data->id}}">
 															<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 														</button>
 														<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-															data-bs-target="#reject-hiring-request-approvals-{{$pending->id}}">
+															data-bs-target="#reject-hiring-request-approvals-{{$data->id}}">
 															<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 														</button>
 													@endif
-												@elseif(isset($pending->is_auth_user_can_approve) && $pending->is_auth_user_can_approve != '')
-													@if(isset($pending->is_auth_user_can_approve['can_approve']))
-														@if($pending->is_auth_user_can_approve['can_approve'] == true)
+												@elseif(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
+													@if(isset($data->is_auth_user_can_approve['can_approve']))
+														@if($data->is_auth_user_can_approve['can_approve'] == true)
 															<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-																data-bs-target="#approve-hiring-request-approvals-{{$pending->id}}">
+																data-bs-target="#approve-hiring-request-approvals-{{$data->id}}">
 																<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 															</button>
 															<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-																data-bs-target="#reject-hiring-request-approvals-{{$pending->id}}">
+																data-bs-target="#reject-hiring-request-approvals-{{$data->id}}">
 																<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 															</button>
 														@endif
 													@endif
 												@endif
 											</td>
-											<div class="modal fade" id="approve-hiring-request-approvals-{{$pending->id}}"
+											<div class="modal fade" id="approve-hiring-request-approvals-{{$data->id}}"
 												tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 												<div class="modal-dialog ">
 													<div class="modal-content">
@@ -117,8 +126,8 @@
 																				<label class="form-label font-size-13">Approval By Position</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																					{{$pending->is_auth_user_can_approve['current_approve_position']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																					{{$data->is_auth_user_can_approve['current_approve_position']}}
 																				@endif
 																			</div>
 																		</div>
@@ -127,20 +136,20 @@
 																				<label class="form-label font-size-13">Approval By Name</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_person']))
-																					{{$pending->is_auth_user_can_approve['current_approve_person']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_person']))
+																					{{$data->is_auth_user_can_approve['current_approve_person']}}
 																				@endif
 																			</div>
 																		</div>
-																		@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																			<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
+																		@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																			<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
 																		@endif
 																		<div class="row mt-2">
 																			<div class="col-lg-12 col-md-12 col-sm-12">
 																				<label class="form-label font-size-13">Comments</label>
 																			</div>
 																			<div class="col-lg-12 col-md-12 col-sm-12">
-																				<textarea rows="5" id="comment-{{$pending->id}}" class="form-control" name="comment">
+																				<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment">
 																				</textarea>
 																			</div>
 																		</div>
@@ -151,14 +160,14 @@
 														<div class="modal-footer">
 															<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 															<button type="button" class="btn btn-success status-approve-button"
-																data-id="{{ $pending->id }}" data-status="approved">Approve</button>
+																data-id="{{ $data->id }}" data-status="approved">Approve</button>
 														</div>
 													</div>
 												</div>
 											</div>
 
 
-											<div class="modal fade" id="reject-hiring-request-approvals-{{$pending->id}}"
+											<div class="modal fade" id="reject-hiring-request-approvals-{{$data->id}}"
 												tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 												<div class="modal-dialog ">
 													<div class="modal-content">
@@ -175,8 +184,8 @@
 																				<label class="form-label font-size-13">Rejection By Position</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																					{{$pending->is_auth_user_can_approve['current_approve_position']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																					{{$data->is_auth_user_can_approve['current_approve_position']}}
 																				@endif
 																			</div>
 																		</div>
@@ -185,20 +194,20 @@
 																				<label class="form-label font-size-13">Rejection By Name</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_person']))
-																					{{$pending->is_auth_user_can_approve['current_approve_person']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_person']))
+																					{{$data->is_auth_user_can_approve['current_approve_person']}}
 																				@endif
 																			</div>
 																		</div>
-																		@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																			<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
+																		@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																			<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
 																		@endif
 																		<div class="row mt-2">
 																			<div class="col-lg-12 col-md-12 col-sm-12">
 																				<label class="form-label font-size-13">Comments</label>
 																			</div>
 																			<div class="col-lg-12 col-md-12 col-sm-12">
-																				<textarea rows="5" id="reject-comment-{{$pending->id}}" class="form-control" name="comment">
+																				<textarea rows="5" id="reject-comment-{{$data->id}}" class="form-control" name="comment">
 																				</textarea>
 																			</div>
 																		</div>
@@ -208,7 +217,7 @@
 														</div>
 														<div class="modal-footer">
 															<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-															<button type="button" class="btn btn-danger  status-reject-button" data-id="{{ $pending->id }}"
+															<button type="button" class="btn btn-danger  status-reject-button" data-id="{{ $data->id }}"
 																data-status="rejected">Reject</button>
 														</div>
 													</div>
@@ -248,26 +257,35 @@
 									</thead>
 									<tbody>
 										<div hidden>{{$i=0;}}</div>
-										@foreach ($deptHeadApproved as $key => $approvedOne)
+										@foreach ($deptHeadApproved as $key => $data)
 										<tr data-id="1">
 										<td>{{ ++$i }}</td>
-											<td>{{$approvedOne->uuid ?? ''}}</td><td>{{ $approvedOne->request_date ?? '' }}</td>
-											<td>{{ $approvedOne->department_name ?? '' }}</td>
-											<td>{{ $approvedOne->department_location ?? '' }}</td>
-											<td>{{ $approvedOne->requested_by_name ?? '' }}</td>
-											<td>{{ $approvedOne->requested_job_name ?? '' }}</td>
-											<td>{{ $approvedOne->divisionHead->name ?? '' }}</td>							
-											<td>{{ $approvedOne->experience_level_name ?? ''}}</td>
-											<td>{{ $approvedOne->salary_range_start_in_aed ?? ''}} - {{$approvedOne->salary_range_end_in_aed ?? ''}}</td>
-											<td>{{ $approvedOne->work_time_start ?? ''}} - {{$approvedOne->work_time_end ?? ''}}</td>
-											<td>{{ $approvedOne->number_of_openings ?? ''}}</td>
-											<td>{{$approvedOne->type_of_role_name}}</td>
-											<td>{{$approvedOne->replacement_for_employee_name}}</td>
-											<td>{{$approvedOne->explanation_of_new_hiring}}</td>
-											<td>{{$approvedOne->created_by_name}}</td>
-											<td>{{$approvedOne->created_at}}</td>
+											<td>{{$data->uuid ?? ''}}</td>
 											<td>
-												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$approvedOne->id)}}">
+											@if($data->request_date != '')
+												{{\Carbon\Carbon::parse($data->request_date)->format('d M Y') ?? ''}}
+												@endif
+											</td>
+											<td>{{ $data->department_name ?? '' }}</td>
+											<td>{{ $data->department_location ?? '' }}</td>
+											<td>{{ $data->requested_by_name ?? '' }}</td>
+											<td>{{ $data->requested_job_name ?? '' }}</td>
+											<td>{{ $data->divisionHead->name ?? '' }}</td>							
+											<td>{{ $data->experience_level_name ?? ''}}</td>
+											<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+											<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+											<td>{{ $data->number_of_openings ?? ''}}</td>
+											<td>{{$data->type_of_role_name}}</td>
+											<td>{{$data->replacement_for_employee_name}}</td>
+											<td>{{$data->explanation_of_new_hiring}}</td>
+											<td>{{$data->created_by_name}}</td>
+											<td>
+											@if($data->created_at != '')
+												{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+												@endif
+											</td>
+											<td>
+												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 													<i class="fa fa-eye" aria-hidden="true"></i> View Details
 												</a>
 											</td>
@@ -305,26 +323,33 @@
 									</thead>
 									<tbody>
 										<div hidden>{{$i=0;}}</div>
-										@foreach ($deptHeadRejected as $key => $rejectedOne)
+										@foreach ($deptHeadRejected as $key => $data)
 										<tr data-id="1">
 										<td>{{ ++$i }}</td>
-											<td>{{$rejectedOne->uuid ?? ''}}</td><td>{{ $rejectedOne->request_date ?? '' }}</td>
-											<td>{{ $rejectedOne->department_name ?? '' }}</td>
-											<td>{{ $rejectedOne->department_location ?? '' }}</td>
-											<td>{{ $rejectedOne->requested_by_name ?? '' }}</td>
-											<td>{{ $rejectedOne->requested_job_name ?? '' }}</td>
-											<td>{{ $rejectedOne->divisionHead->name ?? '' }}</td>							
-											<td>{{ $rejectedOne->experience_level_name ?? ''}}</td>
-											<td>{{ $rejectedOne->salary_range_start_in_aed ?? ''}} - {{$rejectedOne->salary_range_end_in_aed ?? ''}}</td>
-											<td>{{ $rejectedOne->work_time_start ?? ''}} - {{$rejectedOne->work_time_end ?? ''}}</td>
-											<td>{{ $rejectedOne->number_of_openings ?? ''}}</td>
-											<td>{{$rejectedOne->type_of_role_name}}</td>
-											<td>{{$rejectedOne->replacement_for_employee_name}}</td>
-											<td>{{$rejectedOne->explanation_of_new_hiring}}</td>
-											<td>{{$rejectedOne->created_by_name}}</td>
-											<td>{{$rejectedOne->created_at}}</td>
+											<td>{{$data->uuid ?? ''}}</td>
 											<td>
-											<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$rejectedOne->id)}}">
+											@if($data->request_date != '')
+												{{\Carbon\Carbon::parse($data->request_date)->format('d M Y') ?? ''}}											
+												@endif
+											</td>
+											<td>{{ $data->department_name ?? '' }}</td>
+											<td>{{ $data->department_location ?? '' }}</td>
+											<td>{{ $data->requested_by_name ?? '' }}</td>
+											<td>{{ $data->requested_job_name ?? '' }}</td>
+											<td>{{ $data->divisionHead->name ?? '' }}</td>							
+											<td>{{ $data->experience_level_name ?? ''}}</td>
+											<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+											<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+											<td>{{ $data->number_of_openings ?? ''}}</td>
+											<td>{{$data->type_of_role_name}}</td>
+											<td>{{$data->replacement_for_employee_name}}</td>
+											<td>{{$data->explanation_of_new_hiring}}</td>
+											<td>{{$data->created_by_name}}</td>
+											<td>@if($data->created_at != '')
+												{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+												@endif</td>
+											<td>
+											<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 												<i class="fa fa-eye" aria-hidden="true"></i> View Details
 											</a>
 											</td>
@@ -409,57 +434,66 @@
 									</thead>
 									<tbody>
 										<div hidden>{{$i=0;}}</div>
-										@foreach ($hiringManagerPendings as $key => $pending)
+										@foreach ($hiringManagerPendings as $key => $data)
 										<tr data-id="1">
 											<td>{{ ++$i }}</td>
-											<td>{{$pending->uuid ?? ''}}</td><td>{{ $pending->request_date ?? '' }}</td>
-											<td>{{ $pending->department_name ?? '' }}</td>
-											<td>{{ $pending->department_location ?? '' }}</td>
-											<td>{{ $pending->requested_by_name ?? '' }}</td>
-											<td>{{ $pending->requested_job_name ?? '' }}</td>
-											<td>{{ $pending->divisionHead->name ?? '' }}</td>							
-											<td>{{ $pending->experience_level_name ?? ''}}</td>
-											<td>{{ $pending->salary_range_start_in_aed ?? ''}} - {{$pending->salary_range_end_in_aed ?? ''}}</td>
-											<td>{{ $pending->work_time_start ?? ''}} - {{$pending->work_time_end ?? ''}}</td>
-											<td>{{ $pending->number_of_openings ?? ''}}</td>
-											<td>{{$pending->type_of_role_name ?? ''}}</td>
-											<td>{{$pending->replacement_for_employee_name ?? ''}}</td>
-											<td>{{$pending->explanation_of_new_hiring ?? ''}}</td>
-											<td>{{$pending->created_by_name ?? ''}}</td>
-											<td>{{$pending->created_at ?? ''}}</td>
-											<td><label class="badge badge-soft-info">{{ $pending->current_status ?? '' }}</label></td>
+											<td>{{$data->uuid ?? ''}}</td>
 											<td>
-												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$pending->id)}}">
+											@if($data->request_date != '')
+												{{\Carbon\Carbon::parse($data->request_date)->format('d M Y') ?? ''}}											
+												@endif
+											</td>
+											<td>{{ $data->department_name ?? '' }}</td>
+											<td>{{ $data->department_location ?? '' }}</td>
+											<td>{{ $data->requested_by_name ?? '' }}</td>
+											<td>{{ $data->requested_job_name ?? '' }}</td>
+											<td>{{ $data->divisionHead->name ?? '' }}</td>							
+											<td>{{ $data->experience_level_name ?? ''}}</td>
+											<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+											<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+											<td>{{ $data->number_of_openings ?? ''}}</td>
+											<td>{{$data->type_of_role_name ?? ''}}</td>
+											<td>{{$data->replacement_for_employee_name ?? ''}}</td>
+											<td>{{$data->explanation_of_new_hiring ?? ''}}</td>
+											<td>{{$data->created_by_name ?? ''}}</td>
+											<td>
+												@if($data->created_at != '')
+											{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+											@endif
+												</td>
+											<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
+											<td>
+												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 													<i class="fa fa-eye" aria-hidden="true"></i> View Details
 												</a>
 												
 												@if(isset($type))
 													@if($type == 'approve')
 														<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-															data-bs-target="#approve-hiring-request-approvals-{{$pending->id}}">
+															data-bs-target="#approve-hiring-request-approvals-{{$data->id}}">
 															<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 														</button>
 														<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-															data-bs-target="#reject-hiring-request-approvals-{{$pending->id}}">
+															data-bs-target="#reject-hiring-request-approvals-{{$data->id}}">
 															<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 														</button>
 													@endif
-												@elseif(isset($pending->is_auth_user_can_approve) && $pending->is_auth_user_can_approve != '')
-													@if(isset($pending->is_auth_user_can_approve['can_approve']))
-														@if($pending->is_auth_user_can_approve['can_approve'] == true)
+												@elseif(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
+													@if(isset($data->is_auth_user_can_approve['can_approve']))
+														@if($data->is_auth_user_can_approve['can_approve'] == true)
 															<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-																data-bs-target="#approve-hiring-request-approvals-{{$pending->id}}">
+																data-bs-target="#approve-hiring-request-approvals-{{$data->id}}">
 																<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 															</button>
 															<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-																data-bs-target="#reject-hiring-request-approvals-{{$pending->id}}">
+																data-bs-target="#reject-hiring-request-approvals-{{$data->id}}">
 																<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 															</button>
 														@endif
 													@endif
 												@endif
 											</td>
-											<div class="modal fade" id="approve-hiring-request-approvals-{{$pending->id}}"
+											<div class="modal fade" id="approve-hiring-request-approvals-{{$data->id}}"
 												tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 												<div class="modal-dialog ">
 													<div class="modal-content">
@@ -476,8 +510,8 @@
 																				<label class="form-label font-size-13">Approval By Position</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																					{{$pending->is_auth_user_can_approve['current_approve_position']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																					{{$data->is_auth_user_can_approve['current_approve_position']}}
 																				@endif
 																			</div>
 																		</div>
@@ -486,20 +520,20 @@
 																				<label class="form-label font-size-13">Approval By Name</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_person']))
-																					{{$pending->is_auth_user_can_approve['current_approve_person']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_person']))
+																					{{$data->is_auth_user_can_approve['current_approve_person']}}
 																				@endif
 																			</div>
 																		</div>
-																		@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																			<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
+																		@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																			<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
 																		@endif
 																		<div class="row mt-2">
 																			<div class="col-lg-12 col-md-12 col-sm-12">
 																				<label class="form-label font-size-13">Comments</label>
 																			</div>
 																			<div class="col-lg-12 col-md-12 col-sm-12">
-																				<textarea rows="5" id="comment-{{$pending->id}}" class="form-control" name="comment">
+																				<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment">
 																				</textarea>
 																			</div>
 																		</div>
@@ -510,14 +544,14 @@
 														<div class="modal-footer">
 															<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 															<button type="button" class="btn btn-success status-approve-button"
-																data-id="{{ $pending->id }}" data-status="approved">Approve</button>
+																data-id="{{ $data->id }}" data-status="approved">Approve</button>
 														</div>
 													</div>
 												</div>
 											</div>
 
 
-											<div class="modal fade" id="reject-hiring-request-approvals-{{$pending->id}}"
+											<div class="modal fade" id="reject-hiring-request-approvals-{{$data->id}}"
 												tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 												<div class="modal-dialog ">
 													<div class="modal-content">
@@ -534,8 +568,8 @@
 																				<label class="form-label font-size-13">Rejection By Position</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																					{{$pending->is_auth_user_can_approve['current_approve_position']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																					{{$data->is_auth_user_can_approve['current_approve_position']}}
 																				@endif
 																			</div>
 																		</div>
@@ -544,20 +578,20 @@
 																				<label class="form-label font-size-13">Rejection By Name</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_person']))
-																					{{$pending->is_auth_user_can_approve['current_approve_person']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_person']))
+																					{{$data->is_auth_user_can_approve['current_approve_person']}}
 																				@endif
 																			</div>
 																		</div>
-																		@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																			<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
+																		@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																			<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
 																		@endif
 																		<div class="row mt-2">
 																			<div class="col-lg-12 col-md-12 col-sm-12">
 																				<label class="form-label font-size-13">Comments</label>
 																			</div>
 																			<div class="col-lg-12 col-md-12 col-sm-12">
-																				<textarea rows="5" id="reject-comment-{{$pending->id}}" class="form-control" name="comment">
+																				<textarea rows="5" id="reject-comment-{{$data->id}}" class="form-control" name="comment">
 																				</textarea>
 																			</div>
 																		</div>
@@ -567,7 +601,7 @@
 														</div>
 														<div class="modal-footer">
 															<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-															<button type="button" class="btn btn-danger  status-reject-button" data-id="{{ $pending->id }}"
+															<button type="button" class="btn btn-danger  status-reject-button" data-id="{{ $data->id }}"
 																data-status="rejected">Reject</button>
 														</div>
 													</div>
@@ -607,26 +641,33 @@
 									</thead>
 									<tbody>
 										<div hidden>{{$i=0;}}</div>
-										@foreach ($hiringManagerApproved as $key => $approvedOne)
+										@foreach ($hiringManagerApproved as $key => $data)
 										<tr data-id="1">
 										<td>{{ ++$i }}</td>
-											<td>{{$approvedOne->uuid ?? ''}}</td><td>{{ $approvedOne->request_date ?? '' }}</td>
-											<td>{{ $approvedOne->department_name ?? '' }}</td>
-											<td>{{ $approvedOne->department_location ?? '' }}</td>
-											<td>{{ $approvedOne->requested_by_name ?? '' }}</td>
-											<td>{{ $approvedOne->requested_job_name ?? '' }}</td>
-											<td>{{ $approvedOne->divisionHead->name ?? '' }}</td>							
-											<td>{{ $approvedOne->experience_level_name ?? ''}}</td>
-											<td>{{ $approvedOne->salary_range_start_in_aed ?? ''}} - {{$approvedOne->salary_range_end_in_aed ?? ''}}</td>
-											<td>{{ $approvedOne->work_time_start ?? ''}} - {{$approvedOne->work_time_end ?? ''}}</td>
-											<td>{{ $approvedOne->number_of_openings ?? ''}}</td>
-											<td>{{$approvedOne->type_of_role_name}}</td>
-											<td>{{$approvedOne->replacement_for_employee_name}}</td>
-											<td>{{$approvedOne->explanation_of_new_hiring}}</td>
-											<td>{{$approvedOne->created_by_name}}</td>
-											<td>{{$approvedOne->created_at}}</td>
+											<td>{{$data->uuid ?? ''}}</td>
 											<td>
-												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$approvedOne->id)}}">
+											@if($data->request_date != '')
+												{{\Carbon\Carbon::parse($data->request_date)->format('d M Y') ?? ''}}											
+												@endif
+											</td>
+											<td>{{ $data->department_name ?? '' }}</td>
+											<td>{{ $data->department_location ?? '' }}</td>
+											<td>{{ $data->requested_by_name ?? '' }}</td>
+											<td>{{ $data->requested_job_name ?? '' }}</td>
+											<td>{{ $data->divisionHead->name ?? '' }}</td>							
+											<td>{{ $data->experience_level_name ?? ''}}</td>
+											<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+											<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+											<td>{{ $data->number_of_openings ?? ''}}</td>
+											<td>{{$data->type_of_role_name}}</td>
+											<td>{{$data->replacement_for_employee_name}}</td>
+											<td>{{$data->explanation_of_new_hiring}}</td>
+											<td>{{$data->created_by_name}}</td>
+											<td>@if($data->created_at != '')
+												{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+												@endif</td>
+											<td>
+												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 													<i class="fa fa-eye" aria-hidden="true"></i> View Details
 												</a>
 											</td>
@@ -664,26 +705,30 @@
 									</thead>
 									<tbody>
 										<div hidden>{{$i=0;}}</div>
-										@foreach ($hiringManagerRejected as $key => $rejectedOne)
+										@foreach ($hiringManagerRejected as $key => $data)
 										<tr data-id="1">
 										<td>{{ ++$i }}</td>
-											<td>{{$rejectedOne->uuid ?? ''}}</td><td>{{ $rejectedOne->request_date ?? '' }}</td>
-											<td>{{ $rejectedOne->department_name ?? '' }}</td>
-											<td>{{ $rejectedOne->department_location ?? '' }}</td>
-											<td>{{ $rejectedOne->requested_by_name ?? '' }}</td>
-											<td>{{ $rejectedOne->requested_job_name ?? '' }}</td>
-											<td>{{ $rejectedOne->divisionHead->name ?? '' }}</td>							
-											<td>{{ $rejectedOne->experience_level_name ?? ''}}</td>
-											<td>{{ $rejectedOne->salary_range_start_in_aed ?? ''}} - {{$rejectedOne->salary_range_end_in_aed ?? ''}}</td>
-											<td>{{ $rejectedOne->work_time_start ?? ''}} - {{$rejectedOne->work_time_end ?? ''}}</td>
-											<td>{{ $rejectedOne->number_of_openings ?? ''}}</td>
-											<td>{{$rejectedOne->type_of_role_name}}</td>
-											<td>{{$rejectedOne->replacement_for_employee_name}}</td>
-											<td>{{$rejectedOne->explanation_of_new_hiring}}</td>
-											<td>{{$rejectedOne->created_by_name}}</td>
-											<td>{{$rejectedOne->created_at}}</td>
+											<td>{{$data->uuid ?? ''}}</td><td>@if($data->request_date != '')
+												{{\Carbon\Carbon::parse($data->request_date)->format('d M Y') ?? ''}}											
+												@endif</td>
+											<td>{{ $data->department_name ?? '' }}</td>
+											<td>{{ $data->department_location ?? '' }}</td>
+											<td>{{ $data->requested_by_name ?? '' }}</td>
+											<td>{{ $data->requested_job_name ?? '' }}</td>
+											<td>{{ $data->divisionHead->name ?? '' }}</td>							
+											<td>{{ $data->experience_level_name ?? ''}}</td>
+											<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+											<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+											<td>{{ $data->number_of_openings ?? ''}}</td>
+											<td>{{$data->type_of_role_name}}</td>
+											<td>{{$data->replacement_for_employee_name}}</td>
+											<td>{{$data->explanation_of_new_hiring}}</td>
+											<td>{{$data->created_by_name}}</td>
+											<td>@if($data->created_at != '')
+												{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+												@endif</td>
 											<td>
-											<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$rejectedOne->id)}}">
+											<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 												<i class="fa fa-eye" aria-hidden="true"></i> View Details
 											</a>
 											</td>
@@ -768,57 +813,64 @@
 									</thead>
 									<tbody>
 										<div hidden>{{$i=0;}}</div>
-										@foreach ($divisionHeadPendings as $key => $pending)
+										@foreach ($divisionHeadPendings as $key => $data)
 										<tr data-id="1">
 											<td>{{ ++$i }}</td>
-											<td>{{$pending->uuid ?? ''}}</td><td>{{ $pending->request_date ?? '' }}</td>
-											<td>{{ $pending->department_name ?? '' }}</td>
-											<td>{{ $pending->department_location ?? '' }}</td>
-											<td>{{ $pending->requested_by_name ?? '' }}</td>
-											<td>{{ $pending->requested_job_name ?? '' }}</td>
-											<td>{{ $pending->divisionHead->name ?? '' }}</td>							
-											<td>{{ $pending->experience_level_name ?? ''}}</td>
-											<td>{{ $pending->salary_range_start_in_aed ?? ''}} - {{$pending->salary_range_end_in_aed ?? ''}}</td>
-											<td>{{ $pending->work_time_start ?? ''}} - {{$pending->work_time_end ?? ''}}</td>
-											<td>{{ $pending->number_of_openings ?? ''}}</td>
-											<td>{{$pending->type_of_role_name ?? ''}}</td>
-											<td>{{$pending->replacement_for_employee_name ?? ''}}</td>
-											<td>{{$pending->explanation_of_new_hiring ?? ''}}</td>
-											<td>{{$pending->created_by_name ?? ''}}</td>
-											<td>{{$pending->created_at ?? ''}}</td>
-											<td><label class="badge badge-soft-info">{{ $pending->current_status ?? '' }}</label></td>
+											<td>{{$data->uuid ?? ''}}</td>
 											<td>
-												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$pending->id)}}">
+											@if($data->request_date != '')
+												{{\Carbon\Carbon::parse($data->request_date)->format('d M Y') ?? ''}}
+												@endif
+											</td>
+											<td>{{ $data->department_name ?? '' }}</td>
+											<td>{{ $data->department_location ?? '' }}</td>
+											<td>{{ $data->requested_by_name ?? '' }}</td>
+											<td>{{ $data->requested_job_name ?? '' }}</td>
+											<td>{{ $data->divisionHead->name ?? '' }}</td>							
+											<td>{{ $data->experience_level_name ?? ''}}</td>
+											<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+											<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+											<td>{{ $data->number_of_openings ?? ''}}</td>
+											<td>{{$data->type_of_role_name ?? ''}}</td>
+											<td>{{$data->replacement_for_employee_name ?? ''}}</td>
+											<td>{{$data->explanation_of_new_hiring ?? ''}}</td>
+											<td>{{$data->created_by_name ?? ''}}</td>
+											<td>@if($data->created_at != '')
+												{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+												@endif</td>
+											<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
+											<td>
+												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 													<i class="fa fa-eye" aria-hidden="true"></i> View Details
 												</a>
 												
 												@if(isset($type))
 													@if($type == 'approve')
 														<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-															data-bs-target="#approve-hiring-request-approvals-{{$pending->id}}">
+															data-bs-target="#approve-hiring-request-approvals-{{$data->id}}">
 															<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 														</button>
 														<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-															data-bs-target="#reject-hiring-request-approvals-{{$pending->id}}">
+															data-bs-target="#reject-hiring-request-approvals-{{$data->id}}">
 															<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 														</button>
 													@endif
-												@elseif(isset($pending->is_auth_user_can_approve) && $pending->is_auth_user_can_approve != '')
-													@if(isset($pending->is_auth_user_can_approve['can_approve']))
-														@if($pending->is_auth_user_can_approve['can_approve'] == true)
+												@elseif(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
+													@if(isset($data->is_auth_user_can_approve['can_approve']))
+														@if($data->is_auth_user_can_approve['can_approve'] == true)
 															<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-																data-bs-target="#approve-hiring-request-approvals-{{$pending->id}}">
+																data-bs-target="#approve-hiring-request-approvals-{{$data->id}}">
 																<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 															</button>
 															<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-																data-bs-target="#reject-hiring-request-approvals-{{$pending->id}}">
+																data-bs-target="#reject-hiring-request-approvals-{{$data->id}}">
 																<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 															</button>
 														@endif
 													@endif
 												@endif
 											</td>
-											<div class="modal fade" id="approve-hiring-request-approvals-{{$pending->id}}"
+											<div class="modal fade" id="approve-hiring-request-approvals-{{$data->id}}"
 												tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 												<div class="modal-dialog ">
 													<div class="modal-content">
@@ -835,8 +887,8 @@
 																				<label class="form-label font-size-13">Approval By Position</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																					{{$pending->is_auth_user_can_approve['current_approve_position']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																					{{$data->is_auth_user_can_approve['current_approve_position']}}
 																				@endif
 																			</div>
 																		</div>
@@ -845,20 +897,20 @@
 																				<label class="form-label font-size-13">Approval By Name</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_person']))
-																					{{$pending->is_auth_user_can_approve['current_approve_person']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_person']))
+																					{{$data->is_auth_user_can_approve['current_approve_person']}}
 																				@endif
 																			</div>
 																		</div>
-																		@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																			<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
+																		@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																			<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
 																		@endif
 																		<div class="row mt-2">
 																			<div class="col-lg-12 col-md-12 col-sm-12">
 																				<label class="form-label font-size-13">Comments</label>
 																			</div>
 																			<div class="col-lg-12 col-md-12 col-sm-12">
-																				<textarea rows="5" id="comment-{{$pending->id}}" class="form-control" name="comment">
+																				<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment">
 																				</textarea>
 																			</div>
 																		</div>
@@ -869,14 +921,14 @@
 														<div class="modal-footer">
 															<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 															<button type="button" class="btn btn-success status-approve-button"
-																data-id="{{ $pending->id }}" data-status="approved">Approve</button>
+																data-id="{{ $data->id }}" data-status="approved">Approve</button>
 														</div>
 													</div>
 												</div>
 											</div>
 
 
-											<div class="modal fade" id="reject-hiring-request-approvals-{{$pending->id}}"
+											<div class="modal fade" id="reject-hiring-request-approvals-{{$data->id}}"
 												tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 												<div class="modal-dialog ">
 													<div class="modal-content">
@@ -893,8 +945,8 @@
 																				<label class="form-label font-size-13">Rejection By Position</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																					{{$pending->is_auth_user_can_approve['current_approve_position']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																					{{$data->is_auth_user_can_approve['current_approve_position']}}
 																				@endif
 																			</div>
 																		</div>
@@ -903,20 +955,20 @@
 																				<label class="form-label font-size-13">Rejection By Name</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_person']))
-																					{{$pending->is_auth_user_can_approve['current_approve_person']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_person']))
+																					{{$data->is_auth_user_can_approve['current_approve_person']}}
 																				@endif
 																			</div>
 																		</div>
-																		@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																			<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
+																		@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																			<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
 																		@endif
 																		<div class="row mt-2">
 																			<div class="col-lg-12 col-md-12 col-sm-12">
 																				<label class="form-label font-size-13">Comments</label>
 																			</div>
 																			<div class="col-lg-12 col-md-12 col-sm-12">
-																				<textarea rows="5" id="reject-comment-{{$pending->id}}" class="form-control" name="comment">
+																				<textarea rows="5" id="reject-comment-{{$data->id}}" class="form-control" name="comment">
 																				</textarea>
 																			</div>
 																		</div>
@@ -926,7 +978,7 @@
 														</div>
 														<div class="modal-footer">
 															<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-															<button type="button" class="btn btn-danger  status-reject-button" data-id="{{ $pending->id }}"
+															<button type="button" class="btn btn-danger  status-reject-button" data-id="{{ $data->id }}"
 																data-status="rejected">Reject</button>
 														</div>
 													</div>
@@ -966,26 +1018,31 @@
 									</thead>
 									<tbody>
 										<div hidden>{{$i=0;}}</div>
-										@foreach ($divisionHeadApproved as $key => $approvedOne)
+										@foreach ($divisionHeadApproved as $key => $data)
 										<tr data-id="1">
 										<td>{{ ++$i }}</td>
-											<td>{{$approvedOne->uuid ?? ''}}</td><td>{{ $approvedOne->request_date ?? '' }}</td>
-											<td>{{ $approvedOne->department_name ?? '' }}</td>
-											<td>{{ $approvedOne->department_location ?? '' }}</td>
-											<td>{{ $approvedOne->requested_by_name ?? '' }}</td>
-											<td>{{ $approvedOne->requested_job_name ?? '' }}</td>
-											<td>{{ $approvedOne->divisionHead->name ?? '' }}</td>							
-											<td>{{ $approvedOne->experience_level_name ?? ''}}</td>
-											<td>{{ $approvedOne->salary_range_start_in_aed ?? ''}} - {{$approvedOne->salary_range_end_in_aed ?? ''}}</td>
-											<td>{{ $approvedOne->work_time_start ?? ''}} - {{$approvedOne->work_time_end ?? ''}}</td>
-											<td>{{ $approvedOne->number_of_openings ?? ''}}</td>
-											<td>{{$approvedOne->type_of_role_name}}</td>
-											<td>{{$approvedOne->replacement_for_employee_name}}</td>
-											<td>{{$approvedOne->explanation_of_new_hiring}}</td>
-											<td>{{$approvedOne->created_by_name}}</td>
-											<td>{{$approvedOne->created_at}}</td>
+											<td>{{$data->uuid ?? ''}}</td>
+											<td>@if($data->request_date != '')
+												{{\Carbon\Carbon::parse($data->request_date)->format('d M Y') ?? ''}}											
+												@endif</td>
+											<td>{{ $data->department_name ?? '' }}</td>
+											<td>{{ $data->department_location ?? '' }}</td>
+											<td>{{ $data->requested_by_name ?? '' }}</td>
+											<td>{{ $data->requested_job_name ?? '' }}</td>
+											<td>{{ $data->divisionHead->name ?? '' }}</td>							
+											<td>{{ $data->experience_level_name ?? ''}}</td>
+											<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+											<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+											<td>{{ $data->number_of_openings ?? ''}}</td>
+											<td>{{$data->type_of_role_name}}</td>
+											<td>{{$data->replacement_for_employee_name}}</td>
+											<td>{{$data->explanation_of_new_hiring}}</td>
+											<td>{{$data->created_by_name}}</td>
+											<td>@if($data->created_at != '')
+												{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+												@endif</td>
 											<td>
-												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$approvedOne->id)}}">
+												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 													<i class="fa fa-eye" aria-hidden="true"></i> View Details
 												</a>
 											</td>
@@ -1023,26 +1080,30 @@
 									</thead>
 									<tbody>
 										<div hidden>{{$i=0;}}</div>
-										@foreach ($divisionHeadRejected as $key => $rejectedOne)
+										@foreach ($divisionHeadRejected as $key => $data)
 										<tr data-id="1">
 										<td>{{ ++$i }}</td>
-											<td>{{$rejectedOne->uuid ?? ''}}</td><td>{{ $rejectedOne->request_date ?? '' }}</td>
-											<td>{{ $rejectedOne->department_name ?? '' }}</td>
-											<td>{{ $rejectedOne->department_location ?? '' }}</td>
-											<td>{{ $rejectedOne->requested_by_name ?? '' }}</td>
-											<td>{{ $rejectedOne->requested_job_name ?? '' }}</td>
-											<td>{{ $rejectedOne->divisionHead->name ?? '' }}</td>							
-											<td>{{ $rejectedOne->experience_level_name ?? ''}}</td>
-											<td>{{ $rejectedOne->salary_range_start_in_aed ?? ''}} - {{$rejectedOne->salary_range_end_in_aed ?? ''}}</td>
-											<td>{{ $rejectedOne->work_time_start ?? ''}} - {{$rejectedOne->work_time_end ?? ''}}</td>
-											<td>{{ $rejectedOne->number_of_openings ?? ''}}</td>
-											<td>{{$rejectedOne->type_of_role_name}}</td>
-											<td>{{$rejectedOne->replacement_for_employee_name}}</td>
-											<td>{{$rejectedOne->explanation_of_new_hiring}}</td>
-											<td>{{$rejectedOne->created_by_name}}</td>
-											<td>{{$rejectedOne->created_at}}</td>
+											<td>{{$data->uuid ?? ''}}</td><td>@if($data->request_date != '')
+												{{\Carbon\Carbon::parse($data->request_date)->format('d M Y') ?? ''}}											
+												@endif</td>
+											<td>{{ $data->department_name ?? '' }}</td>
+											<td>{{ $data->department_location ?? '' }}</td>
+											<td>{{ $data->requested_by_name ?? '' }}</td>
+											<td>{{ $data->requested_job_name ?? '' }}</td>
+											<td>{{ $data->divisionHead->name ?? '' }}</td>							
+											<td>{{ $data->experience_level_name ?? ''}}</td>
+											<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+											<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+											<td>{{ $data->number_of_openings ?? ''}}</td>
+											<td>{{$data->type_of_role_name}}</td>
+											<td>{{$data->replacement_for_employee_name}}</td>
+											<td>{{$data->explanation_of_new_hiring}}</td>
+											<td>{{$data->created_by_name}}</td>
+											<td>@if($data->created_at != '')
+												{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+												@endif</td>
 											<td>
-											<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$rejectedOne->id)}}">
+											<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 												<i class="fa fa-eye" aria-hidden="true"></i> View Details
 											</a>
 											</td>
@@ -1104,56 +1165,62 @@
 									</thead>
 									<tbody>
 										<div hidden>{{$i=0;}}</div>
-										@foreach ($HRManagerPendings as $key => $pending)
+										@foreach ($HRManagerPendings as $key => $data)
 										<tr data-id="1">
 											<td>{{ ++$i }}</td>
-											<td>{{$pending->uuid ?? ''}}</td><td>{{ $pending->request_date ?? '' }}</td>
-											<td>{{ $pending->department_name ?? '' }}</td>
-											<td>{{ $pending->department_location ?? '' }}</td>
-											<td>{{ $pending->requested_by_name ?? '' }}</td>
-											<td>{{ $pending->requested_job_name ?? '' }}</td>
-											<td>{{ $pending->divisionHead->name ?? '' }}</td>							
-											<td>{{ $pending->experience_level_name ?? ''}}</td>
-											<td>{{ $pending->salary_range_start_in_aed ?? ''}} - {{$pending->salary_range_end_in_aed ?? ''}}</td>
-											<td>{{ $pending->work_time_start ?? ''}} - {{$pending->work_time_end ?? ''}}</td>
-											<td>{{ $pending->number_of_openings ?? ''}}</td>
-											<td>{{$pending->type_of_role_name ?? ''}}</td>
-											<td>{{$pending->replacement_for_employee_name ?? ''}}</td>
-											<td>{{$pending->explanation_of_new_hiring ?? ''}}</td>
-											<td>{{$pending->created_by_name ?? ''}}</td>
-											<td>{{$pending->created_at ?? ''}}</td>
-											<td><label class="badge badge-soft-info">{{ $pending->current_status ?? '' }}</label></td>
+											<td>{{$data->uuid ?? ''}}</td><td>@if($data->request_date != '')
+												{{\Carbon\Carbon::parse($data->request_date)->format('d M Y') ?? ''}}											
+												@endif</td>
+											<td>{{ $data->department_name ?? '' }}</td>
+											<td>{{ $data->department_location ?? '' }}</td>
+											<td>{{ $data->requested_by_name ?? '' }}</td>
+											<td>{{ $data->requested_job_name ?? '' }}</td>
+											<td>{{ $data->divisionHead->name ?? '' }}</td>							
+											<td>{{ $data->experience_level_name ?? ''}}</td>
+											<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+											<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+											<td>{{ $data->number_of_openings ?? ''}}</td>
+											<td>{{$data->type_of_role_name ?? ''}}</td>
+											<td>{{$data->replacement_for_employee_name ?? ''}}</td>
+											<td>{{$data->explanation_of_new_hiring ?? ''}}</td>
+											<td>{{$data->created_by_name ?? ''}}</td>
+											<td>@if($data->created_at != '')
+												{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+												@endif</td>
+											<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
 											<td>
-												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$pending->id)}}">
+												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 													<i class="fa fa-eye" aria-hidden="true"></i> View Details
 												</a>
 												@if(isset($type))
 													@if($type == 'approve')
 														<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-															data-bs-target="#approve-hiring-request-approvals-{{$pending->id}}">
+															data-bs-target="#approve-hiring-request-approvals-{{$data->id}}">
 															<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 														</button>
 														<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-															data-bs-target="#reject-hiring-request-approvals-{{$pending->id}}">
+															data-bs-target="#reject-hiring-request-approvals-{{$data->id}}">
 															<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 														</button>
 													@endif
-												@elseif(isset($pending->is_auth_user_can_approve) && $pending->is_auth_user_can_approve != '')
-													@if(isset($pending->is_auth_user_can_approve['can_approve']))
-														@if($pending->is_auth_user_can_approve['can_approve'] == true)
+												@elseif(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
+													@if(isset($data->is_auth_user_can_approve['can_approve']))
+														@if($data->is_auth_user_can_approve['can_approve'] == true)
 															<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-																data-bs-target="#approve-hiring-request-approvals-{{$pending->id}}">
+																data-bs-target="#approve-hiring-request-approvals-{{$data->id}}">
 																<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 															</button>
 															<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-																data-bs-target="#reject-hiring-request-approvals-{{$pending->id}}">
+																data-bs-target="#reject-hiring-request-approvals-{{$data->id}}">
 																<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 															</button>
 														@endif
+
+
 													@endif
 												@endif
 											</td>
-											<div class="modal fade" id="approve-hiring-request-approvals-{{$pending->id}}"
+											<div class="modal fade" id="approve-hiring-request-approvals-{{$data->id}}"
 												tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 												<div class="modal-dialog ">
 													<div class="modal-content">
@@ -1170,8 +1237,8 @@
 																				<label class="form-label font-size-13">Approval By Position</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																					{{$pending->is_auth_user_can_approve['current_approve_position']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																					{{$data->is_auth_user_can_approve['current_approve_position']}}
 																				@endif
 																			</div>
 																		</div>
@@ -1180,20 +1247,20 @@
 																				<label class="form-label font-size-13">Approval By Name</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_person']))
-																					{{$pending->is_auth_user_can_approve['current_approve_person']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_person']))
+																					{{$data->is_auth_user_can_approve['current_approve_person']}}
 																				@endif
 																			</div>
 																		</div>
-																		@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																			<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
+																		@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																			<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
 																		@endif
 																		<div class="row mt-2">
 																			<div class="col-lg-12 col-md-12 col-sm-12">
 																				<label class="form-label font-size-13">Comments</label>
 																			</div>
 																			<div class="col-lg-12 col-md-12 col-sm-12">
-																				<textarea rows="5" id="comment-{{$pending->id}}" class="form-control" name="comment">
+																				<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment">
 																				</textarea>
 																			</div>
 																		</div>
@@ -1204,14 +1271,14 @@
 														<div class="modal-footer">
 															<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 															<button type="button" class="btn btn-success status-approve-button"
-																data-id="{{ $pending->id }}" data-status="approved">Approve</button>
+																data-id="{{ $data->id }}" data-status="approved">Approve</button>
 														</div>
 													</div>
 												</div>
 											</div>
 
 
-											<div class="modal fade" id="reject-hiring-request-approvals-{{$pending->id}}"
+											<div class="modal fade" id="reject-hiring-request-approvals-{{$data->id}}"
 												tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 												<div class="modal-dialog ">
 													<div class="modal-content">
@@ -1228,8 +1295,8 @@
 																				<label class="form-label font-size-13">Rejection By Position</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																					{{$pending->is_auth_user_can_approve['current_approve_position']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																					{{$data->is_auth_user_can_approve['current_approve_position']}}
 																				@endif
 																			</div>
 																		</div>
@@ -1238,20 +1305,20 @@
 																				<label class="form-label font-size-13">Rejection By Name</label>
 																			</div>
 																			<div class="col-lg-6 col-md-6 col-sm-6">
-																				@if(isset($pending->is_auth_user_can_approve['current_approve_person']))
-																					{{$pending->is_auth_user_can_approve['current_approve_person']}}
+																				@if(isset($data->is_auth_user_can_approve['current_approve_person']))
+																					{{$data->is_auth_user_can_approve['current_approve_person']}}
 																				@endif
 																			</div>
 																		</div>
-																		@if(isset($pending->is_auth_user_can_approve['current_approve_position']))
-																			<input hidden id="current_approve_position_{{$pending->id}}" name="current_approve_position" value="{{$pending->is_auth_user_can_approve['current_approve_position']}}">
+																		@if(isset($data->is_auth_user_can_approve['current_approve_position']))
+																			<input hidden id="current_approve_position_{{$data->id}}" name="current_approve_position" value="{{$data->is_auth_user_can_approve['current_approve_position']}}">
 																		@endif
 																		<div class="row mt-2">
 																			<div class="col-lg-12 col-md-12 col-sm-12">
 																				<label class="form-label font-size-13">Comments</label>
 																			</div>
 																			<div class="col-lg-12 col-md-12 col-sm-12">
-																				<textarea rows="5" id="reject-comment-{{$pending->id}}" class="form-control" name="comment">
+																				<textarea rows="5" id="reject-comment-{{$data->id}}" class="form-control" name="comment">
 																				</textarea>
 																			</div>
 																		</div>
@@ -1261,7 +1328,7 @@
 														</div>
 														<div class="modal-footer">
 															<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-															<button type="button" class="btn btn-danger  status-reject-button" data-id="{{ $pending->id }}"
+															<button type="button" class="btn btn-danger  status-reject-button" data-id="{{ $data->id }}"
 																data-status="rejected">Reject</button>
 														</div>
 													</div>
@@ -1301,26 +1368,30 @@
 									</thead>
 									<tbody>
 										<div hidden>{{$i=0;}}</div>
-										@foreach ($HRManagerApproved as $key => $approvedOne)
+										@foreach ($HRManagerApproved as $key => $data)
 										<tr data-id="1">
 										<td>{{ ++$i }}</td>
-											<td>{{$approvedOne->uuid ?? ''}}</td><td>{{ $approvedOne->request_date ?? '' }}</td>
-											<td>{{ $approvedOne->department_name ?? '' }}</td>
-											<td>{{ $approvedOne->department_location ?? '' }}</td>
-											<td>{{ $approvedOne->requested_by_name ?? '' }}</td>
-											<td>{{ $approvedOne->requested_job_name ?? '' }}</td>
-											<td>{{ $approvedOne->divisionHead->name ?? '' }}</td>							
-											<td>{{ $approvedOne->experience_level_name ?? ''}}</td>
-											<td>{{ $approvedOne->salary_range_start_in_aed ?? ''}} - {{$approvedOne->salary_range_end_in_aed ?? ''}}</td>
-											<td>{{ $approvedOne->work_time_start ?? ''}} - {{$approvedOne->work_time_end ?? ''}}</td>
-											<td>{{ $approvedOne->number_of_openings ?? ''}}</td>
-											<td>{{$approvedOne->type_of_role_name}}</td>
-											<td>{{$approvedOne->replacement_for_employee_name}}</td>
-											<td>{{$approvedOne->explanation_of_new_hiring}}</td>
-											<td>{{$approvedOne->created_by_name}}</td>
-											<td>{{$approvedOne->created_at}}</td>
+											<td>{{$data->uuid ?? ''}}</td><td>@if($data->request_date != '')
+												{{\Carbon\Carbon::parse($data->request_date)->format('d M Y') ?? ''}}											
+												@endif</td>
+											<td>{{ $data->department_name ?? '' }}</td>
+											<td>{{ $data->department_location ?? '' }}</td>
+											<td>{{ $data->requested_by_name ?? '' }}</td>
+											<td>{{ $data->requested_job_name ?? '' }}</td>
+											<td>{{ $data->divisionHead->name ?? '' }}</td>							
+											<td>{{ $data->experience_level_name ?? ''}}</td>
+											<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+											<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+											<td>{{ $data->number_of_openings ?? ''}}</td>
+											<td>{{$data->type_of_role_name}}</td>
+											<td>{{$data->replacement_for_employee_name}}</td>
+											<td>{{$data->explanation_of_new_hiring}}</td>
+											<td>{{$data->created_by_name}}</td>
+											<td>@if($data->created_at != '')
+												{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+												@endif</td>
 											<td>
-												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$approvedOne->id)}}">
+												<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 													<i class="fa fa-eye" aria-hidden="true"></i> View Details
 												</a>
 											</td>
@@ -1358,26 +1429,30 @@
 									</thead>
 									<tbody>
 										<div hidden>{{$i=0;}}</div>
-										@foreach ($HRManagerRejected as $key => $rejectedOne)
+										@foreach ($HRManagerRejected as $key => $data)
 										<tr data-id="1">
 										<td>{{ ++$i }}</td>
-											<td>{{$rejectedOne->uuid ?? ''}}</td><td>{{ $rejectedOne->request_date ?? '' }}</td>
-											<td>{{ $rejectedOne->department_name ?? '' }}</td>
-											<td>{{ $rejectedOne->department_location ?? '' }}</td>
-											<td>{{ $rejectedOne->requested_by_name ?? '' }}</td>
-											<td>{{ $rejectedOne->requested_job_name ?? '' }}</td>
-											<td>{{ $rejectedOne->divisionHead->name ?? '' }}</td>							
-											<td>{{ $rejectedOne->experience_level_name ?? ''}}</td>
-											<td>{{ $rejectedOne->salary_range_start_in_aed ?? ''}} - {{$rejectedOne->salary_range_end_in_aed ?? ''}}</td>
-											<td>{{ $rejectedOne->work_time_start ?? ''}} - {{$rejectedOne->work_time_end ?? ''}}</td>
-											<td>{{ $rejectedOne->number_of_openings ?? ''}}</td>
-											<td>{{$rejectedOne->type_of_role_name}}</td>
-											<td>{{$rejectedOne->replacement_for_employee_name}}</td>
-											<td>{{$rejectedOne->explanation_of_new_hiring}}</td>
-											<td>{{$rejectedOne->created_by_name}}</td>
-											<td>{{$rejectedOne->created_at}}</td>
+											<td>{{$data->uuid ?? ''}}</td><td>@if($data->request_date != '')
+												{{\Carbon\Carbon::parse($data->request_date)->format('d M Y') ?? ''}}											
+												@endif</td>
+											<td>{{ $data->department_name ?? '' }}</td>
+											<td>{{ $data->department_location ?? '' }}</td>
+											<td>{{ $data->requested_by_name ?? '' }}</td>
+											<td>{{ $data->requested_job_name ?? '' }}</td>
+											<td>{{ $data->divisionHead->name ?? '' }}</td>							
+											<td>{{ $data->experience_level_name ?? ''}}</td>
+											<td>{{ $data->salary_range_start_in_aed ?? ''}} - {{$data->salary_range_end_in_aed ?? ''}}</td>
+											<td>{{ $data->work_time_start ?? ''}} - {{$data->work_time_end ?? ''}}</td>
+											<td>{{ $data->number_of_openings ?? ''}}</td>
+											<td>{{$data->type_of_role_name}}</td>
+											<td>{{$data->replacement_for_employee_name}}</td>
+											<td>{{$data->explanation_of_new_hiring}}</td>
+											<td>{{$data->created_by_name}}</td>
+											<td>@if($data->created_at != '')
+												{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+												@endif</td>
 											<td>
-											<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$rejectedOne->id)}}">
+											<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 												<i class="fa fa-eye" aria-hidden="true"></i> View Details
 											</a>
 											</td>

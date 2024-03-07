@@ -80,9 +80,17 @@
 											<td>{{ $data->basic_salary ?? ''}}</td>
 											<td>{{ $data->other_allowances ?? ''}}</td>
 											<td>{{ $data->total_salary ?? ''}}</td>
-											<td>{{\Carbon\Carbon::parse($data->interviewSummary->offer_letter_send_at)->format('d M Y') ?? ''}}</td>
+											<td>
+												@if(isset($data) && isset($data->interviewSummary) && $data->interviewSummary->offer_letter_send_at != '')
+												{{\Carbon\Carbon::parse($data->interviewSummary->offer_letter_send_at)->format('d M Y') ?? ''}}
+												@endif
+											</td>
 											<td>{{ $data->interviewSummary->offerLetterSendBy->name ?? ''}}</td>
-											<td>{{\Carbon\Carbon::parse($data->interviewSummary->offer_signed_at)->format('d M Y') ?? ''}}</td>
+											<td>
+												@if(isset($data) && isset($data->interviewSummary) && $data->interviewSummary->offer_signed_at != '')
+												{{\Carbon\Carbon::parse($data->interviewSummary->offer_signed_at)->format('d M Y') ?? ''}}
+												@endif
+											</td>
 											<td>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Candidate Details" class="btn btn-sm btn-primary" 
 											href="{{route('interview-summary-report.show', $data->interview_summary_id)}}">
@@ -134,9 +142,17 @@
 											<td>{{ $data->basic_salary ?? ''}}</td>
 											<td>{{ $data->other_allowances ?? ''}}</td>
 											<td>{{ $data->total_salary ?? ''}}</td>
-											<td>{{\Carbon\Carbon::parse($data->interviewSummary->offer_letter_send_at)->format('d M Y') ?? ''}}</td>
+											<td>
+												@if(isset($data) && isset($data->interviewSummary) && $data->interviewSummary->offer_letter_send_at != '')
+												{{\Carbon\Carbon::parse($data->interviewSummary->offer_letter_send_at)->format('d M Y') ?? ''}}
+												@endif
+											</td>
 											<td>{{ $data->interviewSummary->offerLetterSendBy->name ?? ''}}</td>
-											<td>{{\Carbon\Carbon::parse($data->interviewSummary->offer_signed_at)->format('d M Y') ?? ''}}</td>
+											<td>
+												@if(isset($data) && isset($data->interviewSummary) && data->interviewSummary->offer_signed_at != '')
+												{{\Carbon\Carbon::parse($data->interviewSummary->offer_signed_at)->format('d M Y') ?? ''}}
+												@endif
+											</td>
 											<td>{{ $data->interviewSummary->offerLetterVerifiedBy->name ?? ''}}</td>											
 											<td>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Candidate Details" class="btn btn-sm btn-primary" 

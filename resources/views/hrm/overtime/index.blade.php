@@ -100,21 +100,29 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 						@foreach ($pendings as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
-							<td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+							<td>
+								@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->user->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-							<td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+							<td>
+								@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+								{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->total_hours ?? ''}}</td>
 							<td>
-								@if($data->minStartDateTime->start_datetime != '')
+								@if(isset($data)&& isset($data->minStartDateTime) && $data->minStartDateTime->start_datetime != '')
 								{{\Carbon\Carbon::parse($data->minStartDateTime->start_datetime)->format('d M Y') ?? ''}}
 								@endif
 							</td>
 							<td>
-								@if($data->maxStartDateTime->end_datetime != '')
+								@if(isset($data) && isset($data->maxStartDateTime) && $data->maxStartDateTime->end_datetime != '')
 									{{\Carbon\Carbon::parse($data->maxStartDateTime->end_datetime)->format('d M Y') ?? ''}}
 								@endif
 							</td>
@@ -217,7 +225,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 						@foreach ($approved as $key => $data)
 						<tr data-id="1">
 						<td>{{ ++$i }}</td>
-							<td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+							<td>
+								@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->user->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
@@ -226,12 +238,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 							<td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
 							<td>{{ $data->total_hours ?? ''}}</td>
 							<td>
-								@if($data->minStartDateTime->start_datetime != '')
+								@if(isset($data) && isset($data->minStartDateTime) && $data->minStartDateTime->start_datetime != '')
 								{{\Carbon\Carbon::parse($data->minStartDateTime->start_datetime)->format('d M Y') ?? ''}}
 								@endif
 							</td>
 							<td>
-								@if($data->maxStartDateTime->end_datetime != '')
+								@if(isset($data) && isset($data->maxStartDateTime) && $data->maxStartDateTime->end_datetime != '')
 									{{\Carbon\Carbon::parse($data->maxStartDateTime->end_datetime)->format('d M Y') ?? ''}}
 								@endif
 							</td>
@@ -286,7 +298,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 						@foreach ($rejected as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
-							<td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+							<td>
+								@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->user->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
@@ -295,12 +311,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-overtime','
 							<td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
 							<td>{{ $data->total_hours ?? ''}}</td>
 							<td>
-								@if($data->minStartDateTime->start_datetime != '')
+								@if(isset($data) && isset($data->minStartDateTime) && $data->minStartDateTime->start_datetime != '')
 								{{\Carbon\Carbon::parse($data->minStartDateTime->start_datetime)->format('d M Y') ?? ''}}
 								@endif
 							</td>
 							<td>
-								@if($data->maxStartDateTime->end_datetime != '')
+								@if(isset($data) && isset($data->maxStartDateTime) && $data->maxStartDateTime->end_datetime != '')
 									{{\Carbon\Carbon::parse($data->maxStartDateTime->end_datetime)->format('d M Y') ?? ''}}
 								@endif
 							</td>

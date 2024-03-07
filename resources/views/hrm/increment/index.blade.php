@@ -86,7 +86,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-increment',
 						@foreach ($datas as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
-							<td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+							<td>
+								@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->user->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
@@ -95,7 +99,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-increment',
 							<td>{{ $data->basic_salary ?? ''}}</td>
 							<td>{{ $data->other_allowances ?? ''}}</td>
 							<td>{{ $data->total_salary ?? ''}}</td>
-							<td>{{ $data->increament_effective_date ?? ''}}</td>
+							<td>
+								@if($data->increament_effective_date != '')
+                                	{{ \Carbon\Carbon::parse($data->increament_effective_date)->format('d M Y') ?? ''}}</td>	
+                                @endif	
+								{{ $data->increament_effective_date ?? ''}}
+							</td>
                             <td>{{ $data->increment_amount ?? ''}}</td>
                             <td>{{ $data->revised_basic_salary ?? ''}}</td>
 							<td>{{ $data->revised_other_allowance ?? ''}}</td>

@@ -111,7 +111,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-liability-det
                                     <label for="choices-single-default" class="form-label"> Joining Date :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>{{ $data->user->empProfile->company_joining_date ?? '' }}</span>
+                                    <span>
+                                        @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+                                        {{ $data->user->empProfile->company_joining_date ?? '' }}
+                                        @endif
+                                    </span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Reporting Manager :</label>
@@ -134,17 +138,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-liability-det
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                     <span>{{$data->liability_type}}</span>
                                 </div>
-                                <!-- <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                    <label for="choices-single-default" class="form-label"> Joining Date :</label>
-                                </div>
-                                <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                    <span>
-                                        @if($data->trial_period_joining_date)
-                                        {{\Carbon\Carbon::parse($data->trial_period_joining_date)->format('d M Y')}}
-                                    @elseif($data->permanent_joining_date)
-                                    {{\Carbon\Carbon::parse($data->permanent_joining_date)->format('d M Y')}}
-                                    @endif</span>
-                                </div> -->
+                                
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                     <label for="choices-single-default" class="form-label"> Liability Code :</label>
                                 </div>

@@ -83,7 +83,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance',
 						@foreach ($datas as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
-							<td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+							<td>
+								@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+								@endif
+							</td>
 							<td>{{ $data->user->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
@@ -91,15 +95,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance',
 							<!-- <td>{{ $data->user->empProfile->location->name ?? '' }}</td> -->
 							<td>{{ $data->insurance_policy_number ?? ''}}</td>
 							<td>{{ $data->insurance_card_number ?? ''}}</td>
-							<td>{{ $data->insurance_policy_start_date ?? ''}}</td>
-							<td>{{ $data->insurance_policy_end_date ?? ''}}</td>
+							<td>
+								@if($data->insurance_policy_start_date != '')
+								{{ \Carbon\Carbon::parse($data->insurance_policy_start_date)->format('d M Y') ?? ''}}	
+								@enddate
+							</td>
+							<td>
+								@if($data->insurance_policy_end_date != '')
+								{{ \Carbon\Carbon::parse($data->insurance_policy_end_date)->format('d M Y') ?? ''}}	
+								@enddate
+							</td>
                             <td>{{ $data->insurance_cancellation_done ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>{{ $data->updatedBy->name ?? ''}}</td>
 							<td>
                                 @if($data->updated_by != NULL)
-                                {{ \Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}</td>	
-                                @endif							
+                                {{ \Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}	
+                                @endif	
+								</td>						
 							<td>							
 								@canany(['view-all-insurance-details','view-current-user-insurance-details'])
 								@php

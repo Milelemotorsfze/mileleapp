@@ -76,17 +76,33 @@
 										@foreach ($employeePendings as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if($data->created_at != '')
+                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->user->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->department->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+                                                {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->leave_type ?? ''}}</td>
                                             <td>{{ $data->type_of_leave_description ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if($data->leave_start_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($data->leave_end_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->total_no_of_days ?? ''}}</td>	
                                             <td>{{ $data->no_of_paid_days ?? ''}}</td>		
                                             <td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
@@ -152,17 +168,31 @@
 										@foreach ($employeeApproved as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+                                            <td>@if($data->created_at != '')
+                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+                                                @endif</td>
                                             <td>{{ $data->user->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->department->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+                                                {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->leave_type ?? ''}}</td>
                                             <td>{{ $data->type_of_leave_description ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if($data->leave_start_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($data->leave_end_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->total_no_of_days ?? ''}}</td>	
                                             <td>{{ $data->no_of_paid_days ?? ''}}</td>		
                                             <td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
@@ -213,17 +243,31 @@
 										@foreach ($employeeRejected as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+                                            <td>@if($data->created_at != '')
+                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+                                                @endif</td>
                                             <td>{{ $data->user->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->department->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+                                                {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->leave_type ?? ''}}</td>
                                             <td>{{ $data->type_of_leave_description ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if($data->leave_start_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($data->leave_end_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->total_no_of_days ?? ''}}</td>	
                                             <td>{{ $data->no_of_paid_days ?? ''}}</td>		
                                             <td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
@@ -297,17 +341,31 @@
 										@foreach ($HRManagerPendings as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+                                            <td>@if($data->created_at != '')
+                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+                                                @endif</td>
                                             <td>{{ $data->user->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->department->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+                                                {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->leave_type ?? ''}}</td>
                                             <td>{{ $data->type_of_leave_description ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if($data->leave_start_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($data->leave_end_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->total_no_of_days ?? ''}}</td>	
                                             <td>{{ $data->no_of_paid_days ?? ''}}</td>		
                                             <td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
@@ -373,17 +431,31 @@
 										@foreach ($ReportingManagerApproved as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+                                            <td>@if($data->created_at != '')
+                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+                                                @endif</td>
                                             <td>{{ $data->user->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->department->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+                                                {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->leave_type ?? ''}}</td>
                                             <td>{{ $data->type_of_leave_description ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if($data->leave_start_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($data->leave_end_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->total_no_of_days ?? ''}}</td>	
                                             <td>{{ $data->no_of_paid_days ?? ''}}</td>		
                                             <td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
@@ -434,17 +506,31 @@
 										@foreach ($ReportingManagerRejected as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+                                            <td>@if($data->created_at != '')
+                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+                                                @endif</td>
                                             <td>{{ $data->user->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->department->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+                                                {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->leave_type ?? ''}}</td>
                                             <td>{{ $data->type_of_leave_description ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if($data->leave_start_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($data->leave_end_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->total_no_of_days ?? ''}}</td>	
                                             <td>{{ $data->no_of_paid_days ?? ''}}</td>		
                                             <td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
@@ -519,17 +605,31 @@
 										@foreach ($ReportingManagerPendings as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+                                            <td>@if($data->created_at != '')
+                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+                                                @endif</td>
                                             <td>{{ $data->user->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->department->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+                                                {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->leave_type ?? ''}}</td>
                                             <td>{{ $data->type_of_leave_description ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if($data->leave_start_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($data->leave_end_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->total_no_of_days ?? ''}}</td>	
                                             <td>{{ $data->no_of_paid_days ?? ''}}</td>		
                                             <td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
@@ -595,17 +695,31 @@
 										@foreach ($employeeApproved as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+                                            <td>@if($data->created_at != '')
+                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+                                                @endif</td>
                                             <td>{{ $data->user->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->department->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+                                                {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->leave_type ?? ''}}</td>
                                             <td>{{ $data->type_of_leave_description ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if($data->leave_start_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($data->leave_end_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->total_no_of_days ?? ''}}</td>	
                                             <td>{{ $data->no_of_paid_days ?? ''}}</td>		
                                             <td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
@@ -656,17 +770,31 @@
 										@foreach ($employeeRejected as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+                                            <td>@if($data->created_at != '')
+                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+                                                @endif</td>
                                             <td>{{ $data->user->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->department->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+                                                {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->leave_type ?? ''}}</td>
                                             <td>{{ $data->type_of_leave_description ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if($data->leave_start_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($data->leave_end_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->total_no_of_days ?? ''}}</td>	
                                             <td>{{ $data->no_of_paid_days ?? ''}}</td>		
                                             <td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
@@ -742,17 +870,31 @@
 										@foreach ($divisionHeadPendings as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+                                            <td>@if($data->created_at != '')
+                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+                                                @endif</td>
                                             <td>{{ $data->user->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->department->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+                                                {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->leave_type ?? ''}}</td>
                                             <td>{{ $data->type_of_leave_description ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if($data->leave_start_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($data->leave_end_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->total_no_of_days ?? ''}}</td>	
                                             <td>{{ $data->no_of_paid_days ?? ''}}</td>		
                                             <td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
@@ -818,17 +960,31 @@
 										@foreach ($ReportingManagerApproved as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+                                            <td>@if($data->created_at != '')
+                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+                                                @endif</td>
                                             <td>{{ $data->user->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->department->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date!= '')
+                                                {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->leave_type ?? ''}}</td>
                                             <td>{{ $data->type_of_leave_description ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if($data->leave_start_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($data->leave_end_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->total_no_of_days ?? ''}}</td>	
                                             <td>{{ $data->no_of_paid_days ?? ''}}</td>		
                                             <td>{{ $data->no_of_unpaid_days ?? ''}}</td>		
@@ -879,17 +1035,30 @@
 										@foreach ($ReportingManagerRejected as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}</td>
+                                            <td>@if($data->created_at != '')
+                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y') ?? ''}}
+                                                @endif</td>
                                             <td>{{ $data->user->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->department->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? '' }}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+                                                {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
                                             <td>{{ $data->leave_type ?? ''}}</td>
                                             <td>{{ $data->type_of_leave_description ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}</td>
-                                            <td>{{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}</td>
+                                            <td>
+                                                @if($data->leave_start_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_start_date)->format('d M Y') ?? ''}}
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($data->leave_end_date != '')
+                                                {{\Carbon\Carbon::parse($data->leave_end_date)->format('d M Y') ?? ''}}
+                                            @endif</td>
                                             <td>{{ $data->total_no_of_days ?? ''}}</td>	
                                             <td>{{ $data->no_of_paid_days ?? ''}}</td>		
                                             <td>{{ $data->no_of_unpaid_days ?? ''}}</td>		

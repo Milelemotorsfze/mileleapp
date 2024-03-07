@@ -677,6 +677,17 @@ redirect()->route('home')->send();
 
                 if (selectedValue == 'with_employee' || selectedValue == 'with_company') {
                     container.show();
+                    $('#purposes_of_submit_id').select2({
+                        allowClear: true,
+                        maximumSelectionLength: 1,
+                        placeholder: "Choose Passport Submission Purpose",
+                    });
+
+                    $('#purposes_of_release_id').select2({
+                        allowClear: true,
+                        maximumSelectionLength: 1,
+                        placeholder: "Choose Passport Release Purpose",
+                    });
                 } else {
                     container.hide();
                 }

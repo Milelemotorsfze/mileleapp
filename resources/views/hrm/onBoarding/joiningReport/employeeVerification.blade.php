@@ -80,35 +80,37 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="row">
+                                                        
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                             <label for="choices-single-default" class="form-label"> Employee Name :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span>{{ $data->candidate->first_name ?? '' }} {{ $data->candidate->last_name ?? '' }}</span>
+                                                            <span>@if(isset($data) && isset($data->candidate)){{ $data->candidate->first_name ?? '' }} {{ $data->candidate->last_name ?? '' }} @endif</span>
                                                         </div>
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                             <label for="choices-single-default" class="form-label"> Employee Code :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span>{{ $data->candidate->employee_code ?? '' }}</span>
+                                                            <span>@if(isset($data) && isset($data->candidate)){{ $data->candidate->employee_code ?? '' }} @endif</span>
                                                         </div>
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                             <label for="choices-single-default" class="form-label"> Designation :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span>{{ $data->candidate->designation->name ?? '' }}</span>
+                                                            <span>@if(isset($data) && isset($data->candidate)){{ $data->candidate->designation->name ?? '' }} @endif</span>
                                                         </div>
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                             <label for="choices-single-default" class="form-label"> Department :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span>{{ $data->candidate->department->name ?? '' }}</span>
+                                                            <span>@if(isset($data) && isset($data->candidate)){{ $data->candidate->department->name ?? '' }} @endif</span>
                                                         </div>
+                                                       
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                             <label for="choices-single-default" class="form-label"> Reporting Manager :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span>{{ $data->reportingManager->name ?? '' }}</span>
+                                                            <span>@if(isset($data) && isset($data->reportingManager)) {{ $data->reportingManager->name ?? '' }} @endif</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -144,7 +146,7 @@
                                                             <label for="choices-single-default" class="form-label"> Location :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                            <span>{{ $data->joiningLocation->name ?? '' }}</span>
+                                                            <span>@if(isset($data) && isset($data->joiningLocation)){{ $data->joiningLocation->name ?? '' }} @endif</span>
                                                         </div>
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                                             <label for="choices-single-default" class="form-label"> Remarks :</label>
@@ -156,7 +158,7 @@
                                                             <label for="choices-single-default" class="form-label"> Prepared By :</label>
                                                         </div>
                                                         <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                                        <span>{{ $data->preparedBy->name ?? '' }}</span>
+                                                        <span>@if(isset($data) && isset($data->preparedBy)) {{ $data->preparedBy->name ?? '' }} @endif</span>
                                                         </div>
                                                         @if($data->comments_by_employee != NULL)
                                                         <div class="col-lg-5 col-md-5 col-sm-6 col-12">

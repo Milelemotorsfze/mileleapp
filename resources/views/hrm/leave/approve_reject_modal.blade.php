@@ -37,7 +37,7 @@
 								<label class="form-label font-size-13">Passport Expiry :</label>
 							</div>
 							<div class="col-lg-3 col-md-3 col-sm-3">
-								@if($data->user->empProfile->passport_expiry_date != NULL)
+								@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->passport_expiry_date != NULL)
 									{{\Carbon\Carbon::parse($data->user->empProfile->passport_expiry_date)->format('d M Y') ?? ''}}
 								@endif
 							</div>
@@ -45,7 +45,7 @@
 								<label class="form-label font-size-13">Visa Expiry :</label>
 							</div>
 							<div class="col-lg-3 col-md-3 col-sm-3">
-								@if($data->user->empProfile->visa_expiry_date != NULL)
+								@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->visa_expiry_date != NULL)
 									{{\Carbon\Carbon::parse($data->user->empProfile->visa_expiry_date)->format('d M Y') ?? ''}}
 								@endif
 							</div>

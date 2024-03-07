@@ -47,6 +47,7 @@ class JoiningReport extends Model
         'deleted_by',
         'old_reporting_manager',
         'new_reporting_manager',
+        'internal_transfer_type'
     ];
     protected $appends = [
         'is_auth_user_can_approve',
@@ -102,6 +103,8 @@ class JoiningReport extends Model
         else if($this->joining_type == 'new_employee' && $this->new_emp_joining_type =='permanent') {
             $joiningTypeName = 'New Employee - Permanent';
         }
+        // dd($this->id);
+        // dd($joiningTypeName);
         return $joiningTypeName;
     } 
     // public function employee() {

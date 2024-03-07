@@ -23,7 +23,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-re
                         <label for="choices-single-default" class="form-label"> Request Date :</label>
                     </div>
                     <div class="col-lg-4 col-md-3 col-sm-6 col-12">
-                        <span>{{ $data->request_date ?? '' }}</span>
+                        <span>
+                        @if($data->request_date != '')
+												{{\Carbon\Carbon::parse($data->request_date)->format('d M Y') ?? ''}}											
+												@endif
+                        </span>
                     </div>
                     <div class="col-lg-2 col-md-3 col-sm-6 col-12">
                         <label for="choices-single-default" class="form-label"> Current Status :</label>

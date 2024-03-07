@@ -72,13 +72,21 @@
 										@foreach ($employeePendings as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+                                            <td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+                                            <td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -140,13 +148,21 @@
 										@foreach ($employeeApproved as $key => $data)
 										<tr data-id="1">
 										    <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+											<td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -193,13 +209,21 @@
 										@foreach ($employeeRejected as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+                                            <td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -270,13 +294,21 @@
 										@foreach ($ReportingManagerPendings as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+                                            <td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -338,13 +370,21 @@
 										@foreach ($employeeApproved as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+                                            <td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -391,13 +431,21 @@
 										@foreach ($employeeRejected as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+                                            <td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -467,13 +515,21 @@
 										@foreach ($financeManagerPendings as $key => $data)
 										<tr data-id="1">
 											<td>{{ ++$i }}</td>
-											<td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+                                            <td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -535,13 +591,21 @@
 										@foreach ($HRManagerApproved as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+                                            <td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -588,13 +652,21 @@
 										@foreach ($HRManagerRejected as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+                                            <td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -664,13 +736,21 @@
 										@foreach ($HRManagerPendings as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+                                            <td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -732,13 +812,21 @@
 										@foreach ($ReportingManagerApproved as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+                                            <td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -785,13 +873,21 @@
 										@foreach ($ReportingManagerRejected as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+                                            <td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -861,13 +957,21 @@
 										@foreach ($divisionHeadPendings as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+                                            <td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -929,13 +1033,21 @@
 										@foreach ($ReportingManagerApproved as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+                                            <td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	
@@ -982,13 +1094,21 @@
 										@foreach ($ReportingManagerRejected as $key => $data)
 										<tr data-id="1">
                                             <td>{{ ++$i }}</td>
-                                            <td>{{ $data->request_date ?? ''}}</td>
+											<td>
+												@if($data->request_date != '')
+													{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->liability_type ?? '' }}</td>
                                             <td>{{ $data->code ?? '' }}</td>
                                             <td>{{ $data->user->name ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
-                                            <td>{{ $data->user->empProfile->company_joining_date ?? ''}}</td>
+											<td>
+												@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
+													{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
+												@endif												
+											</td>
                                             <td>{{ $data->user->empProfile->department->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->location->name ?? ''}}</td>
                                             <td>{{ $data->total_amount ?? ''}}</td>	

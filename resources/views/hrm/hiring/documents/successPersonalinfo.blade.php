@@ -21,7 +21,7 @@
                                     <!-- <div class="card-header" style="background-color:#d2e7f9!important;">
 										<h4 class="card-title"><center>CANDIDATE PERSONAL INFORMATION & DOCUMENTS SHAREING FORM</center></h4>
 									</div> -->
-                                    <div class="card-body">{{$successMessage}}
+                                    <div class="card-body">{{$successMessage ?? ''}}
                                     </div>
                                 </div>
                             </div>
