@@ -10,14 +10,14 @@
             Inventory Lists
         </h4>
             <div class="ml-auto float-end">
-{{--                @can('supplier-inventory-create')--}}
-{{--                    @php--}}
-{{--                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-create');--}}
-{{--                    @endphp--}}
-{{--                    @if ($hasPermission)--}}
-{{--                        <a  class="btn btn-sm btn-info float-end" href="{{ route('supplier-inventories.createNew') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>--}}
-{{--                    @endif--}}
-{{--                @endcan--}}
+                @can('supplier-inventory-create')
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-create');
+                    @endphp
+                    @if ($hasPermission)
+                        <a  class="btn btn-sm btn-info float-end" href="{{ route('supplier-inventories.createNew') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+                    @endif
+                @endcan
                 @can('supplier-inventory-list-view-all')
                     @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-view-all');

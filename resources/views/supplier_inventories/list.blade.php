@@ -39,7 +39,7 @@
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <button type="submit"  class="btn btn-primary mt-4 search">Serach</button>
+                            <button type="submit"  class="btn btn-primary mt-4 search">Search</button>
                             <a href="{{route('supplier-inventories.lists')}}">
                                 <button type="button"  class="btn btn-primary mt-4 ">Refresh</button>
                             </a>
