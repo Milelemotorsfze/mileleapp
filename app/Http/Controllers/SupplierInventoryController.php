@@ -15,10 +15,12 @@ use App\Models\Supplier;
 use App\Models\SupplierInventory;
 use App\Models\SupplierInventoryHistory;
 use App\Models\ApprovedLetterOfIndentItem;
+use App\Models\SupplierInventoryLog;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -130,6 +132,14 @@ class SupplierInventoryController extends Controller
         $models  = MasterModel::select('model','id')->groupBy('model')->get();
         return view('supplier_inventories.create', compact('suppliers','models'));
     }
+    public function inventoryLog($action,$id) {
+
+        $supplierInventoryLog = new SupplierInventoryLog();
+        $supplierInventoryLog->updated_by = Auth::id();
+        $supplierInventoryLog->supplier_inventory_id = $id;
+        $supplierInventoryLog->action = $action;
+        $supplierInventoryLog->save();
+    }
     public function store(Request $request)
     {
         $request->validate([
@@ -197,6 +207,7 @@ class SupplierInventoryController extends Controller
                 }
             }
         }
+        DB::beginTransaction();
 
         $supplierInventory = new SupplierInventory();
 
@@ -216,8 +227,12 @@ class SupplierInventoryController extends Controller
         $supplierInventory->upload_status = SupplierInventory::UPLOAD_STATUS_ACTIVE;
         $supplierInventory->date_of_entry = Carbon::now()->format('Y-m-d');
         $supplierInventory->master_model_id = $masterModel->id ?? '';
-
         $supplierInventory->save();
+
+        $action = "Inventory Item Added";
+        $this->inventoryLog($action, $supplierInventory->id);
+
+        DB::commit();
 
         return  redirect()->route('supplier-inventories.index')->with('success', 'Inventory added successfully.');
     }
@@ -574,6 +589,9 @@ class SupplierInventoryController extends Controller
                                 }
                                 $supplierInventory->save();
 
+                                $action = "Inventory Item Added";
+                                $this->inventoryLog($action, $supplierInventory->id);
+
                                 $newlyAddedRowIds[] = $supplierInventory->id;
                             }
 
@@ -677,6 +695,9 @@ class SupplierInventoryController extends Controller
                                                     $SimilarRowWithNullChaisis->chasis  = $uploadFileContent['chasis'];
                                                     $SimilarRowWithNullChaisis->save();
 
+                                                    $action = "Chasis Updated";
+                                                    $this->inventoryLog($action, $SimilarRowWithNullChaisis->id);
+
                                                     $updatedRowsIds[] = $SimilarRowWithNullChaisis->id;
                                                     $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                                     $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -722,6 +743,10 @@ class SupplierInventoryController extends Controller
                                                         }
                                                         $rowWithoutUpdate->save();
 
+                                                        $action = "Row updated by inventory Excel upload";
+                                                        $this->inventoryLog($action, $rowWithoutUpdate->id);
+
+
                                                         $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                                         $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
                                                         $updatedRows[$i]['chasis'] = $uploadFileContent['chasis'];
@@ -759,6 +784,9 @@ class SupplierInventoryController extends Controller
                                                         }
                                                         $supplierInventory->save();
 
+                                                        $action = "Inventory Item Added";
+                                                        $this->inventoryLog($action, $supplierInventory->id);
+
                                                         $newlyAddedRowIds[] = $supplierInventory->id;
                                                     }
                                                 }
@@ -769,6 +797,7 @@ class SupplierInventoryController extends Controller
                                             $isChasisExist = SupplierInventory::where('chasis', $uploadFileContent['chasis'])
                                                 ->whereNotNull('chasis')
                                                 ->first();
+
                                             if($isChasisExist) {
 
                                                 $updatedRowsIds[] = $isChasisExist->id;
@@ -790,6 +819,9 @@ class SupplierInventoryController extends Controller
                                                     $isChasisExist->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                                 }
                                                 $isChasisExist->save();
+
+                                                $action = "Row updated by inventory Excel upload";
+                                                $this->inventoryLog($action, $isChasisExist->id);
 
                                             }else{
                                                 // already checking chasis above condition.
@@ -823,6 +855,9 @@ class SupplierInventoryController extends Controller
                                                     $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                                 }
                                                 $supplierInventory->save();
+
+                                                $action = "Inventory Item Added";
+                                                $this->inventoryLog($action, $supplierInventory->id);
 
                                                 $newlyAddedRowIds[] = $supplierInventory->id;
                                             }
@@ -869,6 +904,10 @@ class SupplierInventoryController extends Controller
                                             $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                         }
                                         $supplierInventory->save();
+
+                                        $action = "Row updated by inventory Excel upload";
+                                        $this->inventoryLog($action, $supplierInventory->id);
+
 //                                        }
                                     }
                                 }
@@ -919,6 +958,9 @@ class SupplierInventoryController extends Controller
                                             }
                                             $inventoryRow->save();
 
+                                            $action = "Row updated by inventory Excel upload";
+                                            $this->inventoryLog($action, $inventoryRow->id);
+
                                             $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                             $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
                                             $updatedRows[$i]['chasis'] = $uploadFileContent['chasis'];
@@ -967,6 +1009,9 @@ class SupplierInventoryController extends Controller
                                             }
                                             $nullChasisRow->save();
 
+                                            $action = "Row updated by inventory Excel upload";
+                                            $this->inventoryLog($action, $nullChasisRow->id);
+
                                             $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                             $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
                                             $updatedRows[$i]['chasis'] = $uploadFileContent['chasis'];
@@ -1013,6 +1058,9 @@ class SupplierInventoryController extends Controller
                                                 }
                                                 $supplierInventory->save();
 
+                                                $action = "Inventory Item Added";
+                                                $this->inventoryLog($action, $supplierInventory->id);
+
                                                 $newlyAddedRowIds[] = $supplierInventory->id;
                                                 info("coming row count is > existing chance for adding row also check any row updation is there");
                                             }
@@ -1046,6 +1094,9 @@ class SupplierInventoryController extends Controller
                                                 $nullChasisRow->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                                             }
                                             $nullChasisRow->save();
+
+                                            $action = "Row updated by inventory Excel upload";
+                                            $this->inventoryLog($action, $nullChasisRow->id);
 
                                             $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                             $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -1105,6 +1156,9 @@ class SupplierInventoryController extends Controller
                     foreach ($deletedRows as $deletedRow) {
                         $deletedRow->upload_status = SupplierInventory::VEH_STATUS_DELETED;
                         $deletedRow->save();
+
+                        $action = "Inventory Item deleted";
+                        $this->inventoryLog($action, $deletedRow->id);
                     }
 
                     info("updated rows");
@@ -1172,6 +1226,10 @@ class SupplierInventoryController extends Controller
                                 $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                             }
                             $supplierInventory->save();
+
+                            $action = "Inventory Item Added";
+                            $this->inventoryLog($action, $supplierInventory->id);
+
 
                             $supplierInventoryHistory = new SupplierInventoryHistory();
 
@@ -1323,7 +1381,6 @@ class SupplierInventoryController extends Controller
 
             $inventory = SupplierInventory::find($inventoryId);
             if($fieldName == 'model_year') {
-
                 $masterModel = MasterModel::where('model', $inventory->masterModel->model)
                     ->where('sfx', $inventory->masterModel->sfx)
                     ->where('model_year', $fieldValue)
@@ -1334,6 +1391,7 @@ class SupplierInventoryController extends Controller
                 $inventory->$fieldName = Carbon::parse($fieldValue)->format('Y-m-d');
             }
             else if($fieldName == 'pord_month') {
+
                 $modelYear = substr($fieldValue, 0, -2);
                 $productionMonth = substr($fieldValue, -2);
                 $modelYearCalculationCategories = ModelYearCalculationCategory::all();
@@ -1365,6 +1423,7 @@ class SupplierInventoryController extends Controller
                 $inventory->$fieldName = $fieldValue;
                 $inventory->master_model_id = $masterModel->id;
             }else if($fieldName == 'color_code') {
+
                 if($fieldValue) {
                     $colourcode = $fieldValue;
                     $colourcodecount = strlen($fieldValue);
@@ -1408,15 +1467,18 @@ class SupplierInventoryController extends Controller
                     $inventory->exterior_color_code_id = $exteriorColorId;
                 }
             }else if($fieldName == 'delivery_note' ) {
-
                 $inventory->$fieldName = $fieldValue;
                 if ($fieldValue && is_numeric($fieldValue)) {
                     $inventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
                 }
             }
             else{
+
                $inventory->$fieldName = $fieldValue;
             }
+
+            $action = str_replace('_', ' ', $fieldName) ." updated";
+            (new SupplierInventoryController)->inventoryLog($action, $inventory->id);
 
             $inventory->save();
         }
