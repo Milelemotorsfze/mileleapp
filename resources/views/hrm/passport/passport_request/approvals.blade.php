@@ -393,7 +393,7 @@
 			@if(count($divisionHeadPendings) > 0 || count($divisionHeadApproved) > 0 || count($divisionHeadRejected) > 0)
 				<div class="card-header">
 					<h4 class="card-title">
-					Employee Joining Report Approvals By Division Head
+					Employee Passport Submit Request Approvals By Division Head
 					</h4>
 				</div>
 				<div class="portfolio">
@@ -575,7 +575,7 @@
 			@if(count($hrManagerPendings) > 0 || count($hrManagerApproved) > 0 || count($hrManagerRejected) > 0)
 				<div class="card-header">
 					<h4 class="card-title">
-					Employee Joining Report Approvals By HR Manager
+					Employee Passport Submit Request Approvals By HR Manager
 					</h4>
 				</div>
 				<div class="portfolio">

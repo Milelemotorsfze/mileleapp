@@ -15,6 +15,7 @@ use App\Models\HRM\Employee\EmployeeProfile;
 use App\Models\HRM\Approvals\ApprovalByPositions;
 use App\Models\Masters\MasterDivisionWithHead;
 use Carbon\Carbon;
+use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 
 class EmployeeLeaveController extends Controller
 {
