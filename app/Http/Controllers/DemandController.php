@@ -180,7 +180,7 @@ class DemandController extends Controller
         }
 
         if($request->selectedModelIds) {
-          $data =  $data->whereNotIn('id', $request->selectedModelIds);
+            $data = $data->whereNotIn('id', $request->selectedModelIds);
         }
 
         $data = $data->groupBy('model')->orderBy('id','ASC')->get();
