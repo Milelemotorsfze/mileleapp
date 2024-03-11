@@ -225,14 +225,16 @@ class CandidatePersonalInfoController extends Controller
                                     ->subject($subject);
                             }
                         );
+                        $status ='success';
                 $msg ='Offer Letter and Personal Information Form Successfully Send To Candidate';   
                 }
                 else {
+                    $status ='error';
                     $msg ="can't send offer letter and personal information link ,because this candidate's offer letter or personal information already verified ";
                 }
                DB::commit();
                 return redirect()->back()
-                                    ->with('success',$msg);
+                                    ->with($status,$msg);
             } 
             catch (\Exception $e) {
                 DB::rollback();
