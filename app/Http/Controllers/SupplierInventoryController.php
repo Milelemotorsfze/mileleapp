@@ -142,6 +142,7 @@ class SupplierInventoryController extends Controller
 
         if(!empty($request->prod_month)) {
             $productionMonth = substr($request->prod_month,  -2);
+            $modelYear = substr($request->prod_month, 0, -2);
             if($productionMonth < 0 || $productionMonth > 12) {
                 return redirect()->back()->with('error', 'Invalid Production Month '.$productionMonth.', Last 2 digit indicating Invalid month!');
             }
@@ -192,6 +193,11 @@ class SupplierInventoryController extends Controller
             }
         }
 
+        $masterModel = MasterModel::where('model', $request->model)
+            ->where('sfx', $request->sfx)
+            ->where('model_year', $modelYear)->first();
+
+
         $supplierInventory = new SupplierInventory();
 
         $supplierInventory->supplier_id = $request->supplier_id;
@@ -208,6 +214,7 @@ class SupplierInventoryController extends Controller
         $supplierInventory->veh_status = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
         $supplierInventory->upload_status = SupplierInventory::UPLOAD_STATUS_ACTIVE;
         $supplierInventory->date_of_entry = Carbon::now()->format('Y-m-d');
+        $supplierInventory->master_model_id = $masterModel->id ?? '';
 
         $supplierInventory->save();
 

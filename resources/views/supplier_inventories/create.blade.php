@@ -114,7 +114,8 @@
                                 <label for="choices-single-default" class="form-label text-muted"> Colour Code</label>
                                 <input type="text" name="color_code" placeholder="Enter Colour Code" class="form-control widthinput">
                             </div>
-                        </div>  <div class="col-lg-3 col-md-4">
+                        </div>
+                        <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted"> Production Month</label>
                                 <input type="text" name="pord_month" placeholder="Enter Production Month" onkeyup="CheckProductionMonth()" id="pord_month" class="form-control widthinput">
@@ -214,37 +215,37 @@
             });
         }
         function CheckProductionMonth() {
-               let productionMonth =  $('#pord_month').val();
-               let model =  $('#model').val();
-               let sfx =  $('#sfx').val();
-               let url = '{{ route('supplier-inventories.uniqueProductionMonth') }}';
+           let productionMonth =  $('#pord_month').val();
+           let model =  $('#model').val();
+           let sfx =  $('#sfx').val();
+           let url = '{{ route('supplier-inventories.uniqueProductionMonth') }}';
 
-              if(productionMonth.length == 6  && model.length > 0 && sfx.length > 0) {
+           if(productionMonth.length == 6  && model.length > 0 && sfx.length > 0) {
 
-                  $.ajax({
-                      type:"GET",
-                      url: url,
-                      data: {
-                          prod_month: productionMonth,
-                          model: model,
-                          sfx: sfx,
-                      },
-                      dataType : 'json',
-                      success: function(data) {
-                          var InputId = 'pord_month_error';
-                          if(data !== 1) {
-                              feildValidInput = true;
-                              $msg = 'The model,sfx and the requested model year ('+ data +') combination not existing in the system.';
+              $.ajax({
+                  type:"GET",
+                  url: url,
+                  data: {
+                      prod_month: productionMonth,
+                      model: model,
+                      sfx: sfx,
+                  },
+                  dataType : 'json',
+                  success: function(data) {
+                      var InputId = 'pord_month_error';
+                      if(data !== 1) {
+                          feildValidInput = true;
+                          $msg = 'The model,sfx and the requested model year ('+ data +') combination not existing in the system.';
 
-                              showValidationError(InputId,$msg);
-                          }else{
-                              feildValidInput = false;
-                              removeValidationError(InputId);
-                          }
+                          showValidationError(InputId,$msg);
+                      }else{
+                          feildValidInput = false;
+                          removeValidationError(InputId);
                       }
-                  });
-              }
-            }
+                  }
+              });
+          }
+        }
         function CheckUniqueChasis() {
             let url = '{{ route('supplier-inventories.unique-chasis') }}';
             let chasis = $('#chasis').val();
