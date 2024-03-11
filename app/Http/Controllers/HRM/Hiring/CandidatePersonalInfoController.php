@@ -51,7 +51,9 @@ class CandidatePersonalInfoController extends Controller
                     $update->email = $request->email;
                 }
                 $update->update();
-                if(($update && $update->email == '') OR ($update && $update->email != '' && !isset($update->candidateDetails)) OR ($update && $update->email != '' && isset($update->candidateDetails) && $update->candidateDetails->documents_verified_at != '')) {
+                if(($update && $update->email == '') OR 
+                    ($update && $update->email != '' && !isset($update->candidateDetails)) OR 
+                    ($update && $update->email != '' && isset($update->candidateDetails) && $update->candidateDetails->documents_verified_at == '')) {
                 $data['comment'] = '';
                 if($request->comment) {
                     $data['comment'] = $request->comment;
