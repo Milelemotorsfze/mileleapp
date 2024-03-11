@@ -16,6 +16,7 @@ use App\Models\HRM\Employee\EmployeeProfile;
 use App\Models\HRM\Approvals\ApprovalByPositions;
 use App\Models\Masters\MasterDivisionWithHead;
 use Carbon\Carbon;
+use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 
 class OverTimeController extends Controller
 {
@@ -83,13 +84,20 @@ class OverTimeController extends Controller
                 }
                 if(count($startTime) == 0 && count($endTime) == 0) {                  
                     $authId = Auth::id();
+                    $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
+                    if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
+                        $createHandOvr['lead_or_manager_id'] = $employ->team_lead_or_reporting_manager;
+                        $createHandOvr['approval_by_id'] = $employ->team_lead_or_reporting_manager;
+                        $createHandOvr['created_by'] = $authId;
+                        $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
+                    }
                     $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                     $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                     $divisionHead = MasterDivisionWithHead::where('id',$employee->department->division_id)->first();
                     $input = $request->all();
                     $input['created_by'] = $authId; 
                     $input['hr_manager_id'] = $HRManager->handover_to_id;                
-                    $input['department_head_id'] = $employee->team_lead_or_reporting_manager;
+                    $input['department_head_id'] = $employee->leadManagerHandover->approval_by_id;
                     $input['division_head_id'] = $divisionHead->approval_handover_to;
                     $createRequest = OverTime::create($input);
                     if(count($request->overtime) > 0) {
@@ -210,6 +218,13 @@ class OverTimeController extends Controller
                 }
                 if(count($startTime) == 0 && count($endTime) == 0) {                  
                     $authId = Auth::id();
+                    $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
+                    if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
+                        $createHandOvr['lead_or_manager_id'] = $employ->team_lead_or_reporting_manager;
+                        $createHandOvr['approval_by_id'] = $employ->team_lead_or_reporting_manager;
+                        $createHandOvr['created_by'] = $authId;
+                        $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
+                    }
                     $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                     $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                     $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
@@ -221,7 +236,7 @@ class OverTimeController extends Controller
                         $createRequest->employee_action_at = NULL;                       
                         $createRequest->comments_by_employee = NULL;
                         $createRequest->action_by_department_head = NULL;
-                        $createRequest->department_head_id = $employee->team_lead_or_reporting_manager;
+                        $createRequest->department_head_id = $employee->leadManagerHandover->approval_by_id;
                         $createRequest->department_head_action_at = NULL;
                         $createRequest->comments_by_department_head = NULL;
                         $createRequest->action_by_division_head = NULL;

@@ -470,7 +470,7 @@
 			@if(count($financeManagerPendings) > 0 || count($financeManagerApproved) > 0 || count($financeManagerRejected) > 0)
 				<div class="card-header">
 					<h4 class="card-title">
-					Employee Joining Report Approvals By Finance Manager
+					Employee Liability Request Approvals By Finance Manager
 					</h4>
 				</div>
 				<div class="portfolio">
@@ -691,7 +691,7 @@
 			@if(count($HRManagerPendings) > 0 || count($HRManagerApproved) > 0 || count($HRManagerRejected) > 0)
 				<div class="card-header">
 					<h4 class="card-title">
-					Employee Joining Report Approvals By HR Manager
+					Employee Liability Request Approvals By HR Manager
 					</h4>
 				</div>
 				<div class="portfolio">
@@ -912,7 +912,7 @@
 			@if(count($divisionHeadPendings) > 0 || count($divisionHeadApproved) > 0 || count($divisionHeadRejected) > 0)
 				<div class="card-header">
 					<h4 class="card-title">
-					Employee Joining Report Approvals By Division Head
+					Employee Liability Request Approvals By Division Head
 					</h4>
 				</div>
 				<div class="portfolio">

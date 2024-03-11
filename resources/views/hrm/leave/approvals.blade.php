@@ -1,6 +1,6 @@
 @extends('layouts.table')
 	@section('content')
-		@if(Auth::user()->joining_report_approval['can'] == true)
+		@if(Auth::user()->leave_request_approval['can'] == true)
 			@if(count($employeePendings) > 0 || count($employeeApproved) > 0 || count($employeeRejected) > 0)
 				<div class="card-header">
 					<h4 class="card-title">
@@ -292,7 +292,7 @@
             @if(count($HRManagerPendings) > 0 || count($HRManagerApproved) > 0 || count($HRManagerRejected) > 0)
 				<div class="card-header">
 					<h4 class="card-title">
-					Employee Joining Report Approvals By HR Manager
+					Employee Leave Request Approvals By HR Manager
 					</h4>
 				</div>
 				<div class="portfolio">
@@ -821,7 +821,7 @@
 			@if(count($divisionHeadPendings) > 0 || count($divisionHeadApproved) > 0 || count($divisionHeadRejected) > 0)
 				<div class="card-header">
 					<h4 class="card-title">
-					Employee Joining Report Approvals By Division Head
+					Employee Leave Request Approvals By Division Head
 					</h4>
 				</div>
 				<div class="portfolio">

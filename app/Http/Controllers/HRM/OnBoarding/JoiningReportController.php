@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\Masters\MasterDepartment;
 use App\Models\HRM\Employee\Leave;
+use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 
 class JoiningReportController extends Controller
 {
@@ -162,6 +163,13 @@ class JoiningReportController extends Controller
                     $emp = EmployeeProfile::where('id',$request->employee_id)->first();
                 }
                 else if($request->joining_type == 'internal_transfer' OR $request->joining_type == 'vacations_or_leave') {
+                    $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
+                    if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
+                        $createHandOvr['lead_or_manager_id'] = $employ->team_lead_or_reporting_manager;
+                        $createHandOvr['approval_by_id'] = $employ->team_lead_or_reporting_manager;
+                        $createHandOvr['created_by'] = $authId;
+                        $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
+                    }
                     $emp = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 }
                 if($emp) {
@@ -193,7 +201,7 @@ class JoiningReportController extends Controller
                     }
                 }
                 else {
-                    $input['department_head_id'] = $emp->team_lead_or_reporting_manager;
+                    $input['department_head_id'] = $employee->leadManagerHandover->approval_by_id;
                 }
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $input['hr_manager_id'] = $HRManager->handover_to_id;
@@ -251,6 +259,13 @@ class JoiningReportController extends Controller
             DB::beginTransaction();
             try {
                 DB::commit();
+                $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
+                if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
+                    $createHandOvr['lead_or_manager_id'] = $employ->team_lead_or_reporting_manager;
+                    $createHandOvr['approval_by_id'] = $employ->team_lead_or_reporting_manager;
+                    $createHandOvr['created_by'] = $authId;
+                    $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
+                }
                 $emp = EmployeeProfile::where('id',$request->employee_id)->first();
                 if($emp) {
                     $emp->employee_code = $request->employee_code;
@@ -281,7 +296,7 @@ class JoiningReportController extends Controller
                     $createJoinRep->action_by_hr_manager = NULL;
                     $createJoinRep->hr_manager_action_at = NULL;
                     $createJoinRep->comments_by_hr_manager = NULL;
-                    $createJoinRep->department_head_id = $request->team_lead_or_reporting_manager;
+                    $createJoinRep->department_head_id = $emp->leadManagerHandover->approval_by_id;
                     $createJoinRep->action_by_department_head = NULL;
                     $createJoinRep->department_head_action_at = NULL;
                     $createJoinRep->comments_by_department_head = NULL;                    
