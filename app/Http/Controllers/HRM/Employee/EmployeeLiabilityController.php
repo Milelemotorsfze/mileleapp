@@ -18,6 +18,7 @@ use App\Models\Masters\MasterDivisionWithHead;
 use Exception;
 use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
+use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 
 class EmployeeLiabilityController extends Controller
 {
@@ -276,6 +277,13 @@ class EmployeeLiabilityController extends Controller
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
+                $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
+                if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
+                    $createHandOvr['lead_or_manager_id'] = $employ->team_lead_or_reporting_manager;
+                    $createHandOvr['approval_by_id'] = $employ->team_lead_or_reporting_manager;
+                    $createHandOvr['created_by'] = $authId;
+                    $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
+                }
                 $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 $financeManager = ApprovalByPositions::where('approved_by_position','Finance Manager')->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();

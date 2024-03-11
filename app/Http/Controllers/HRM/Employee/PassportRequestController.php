@@ -15,6 +15,7 @@ use App\Models\HRM\Employee\EmployeeProfile;
 use App\Models\HRM\Approvals\DepartmentHeadApprovals;
 use App\Models\Masters\MasterDivisionWithHead;
 use App\Models\HRM\Approvals\ApprovalByPositions;
+use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 use App\Models\HRM\Employee\PassportRequestHistory;
 use App\Http\Controllers\UserActivityController;
 use Exception;
@@ -188,6 +189,13 @@ class PassportRequestController extends Controller
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
+                $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
+                if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
+                    $createHandOvr['lead_or_manager_id'] = $employ->team_lead_or_reporting_manager;
+                    $createHandOvr['approval_by_id'] = $employ->team_lead_or_reporting_manager;
+                    $createHandOvr['created_by'] = $authId;
+                    $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
+                }
                 $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 $divisionHead = MasterDivisionWithHead::where('id',$employee->department->division_id)->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
