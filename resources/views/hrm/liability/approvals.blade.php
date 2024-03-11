@@ -1,6 +1,6 @@
 @extends('layouts.table')
 	@section('content')
-		@if(Auth::user()->joining_report_approval['can'] == true)
+		@if(Auth::user()->liability_request_approval['can'] == true)
 			@if(count($employeePendings) > 0 || count($employeeApproved) > 0 || count($employeeRejected) > 0)
 				<div class="card-header">
 					<h4 class="card-title">
