@@ -291,7 +291,7 @@ class EmployeeLiabilityController extends Controller
                 $input = $request->all();
                 if($id == 'new') {
                     $input['created_by'] = $authId;                   
-                    $input['department_head_id'] = $employee->team_lead_or_reporting_manager;
+                    $input['department_head_id'] = $employee->leadManagerHandover->approval_by_id;
                     $input['finance_manager_id'] = $financeManager->handover_to_id;
                     $input['hr_manager_id'] = $HRManager->handover_to_id;
                     $input['division_head_id'] = $divisionHead->approval_handover_to;
@@ -304,7 +304,7 @@ class EmployeeLiabilityController extends Controller
                     $createHistory = LiabilityHistory::create($history);
                     $history2['liability_id'] = $createRequest->id;
                     $history2['icon'] = 'icons8-send-30.png';
-                    $history2['message'] = 'Employee liability request send to Team Lead / Reporting Manager ( '.$employee->teamLeadOrReportingManager->name.' - '.$employee->teamLeadOrReportingManager->email.' ) for approval';
+                    $history2['message'] = 'Employee liability request send to Team Lead / Reporting Manager ( '.$employee->teamLeadOrReportingManager->handOverTo->name.' - '.$employee->teamLeadOrReportingManager->handOverTo->email.' ) for approval';
                     $createHistory2 = LiabilityHistory::create($history2);
                     (new UserActivityController)->createActivity('Employee Liability Request Created');
                     $successMessage = "Employee Liability Hiring Request Created Successfully";
@@ -336,7 +336,7 @@ class EmployeeLiabilityController extends Controller
                         $update->action_by_division_head = NULL;
                         $update->division_head_action_at = NULL;
                         $update->comments_by_division_head = NULL;
-                        $update->department_head_id = $employee->team_lead_or_reporting_manager;
+                        $update->department_head_id =  $employee->leadManagerHandover->approval_by_id;
                         $update->finance_manager_id = $financeManager->handover_to_id;
                         $update->hr_manager_id = $HRManager->handover_to_id;
                         $update->division_head_id = $divisionHead->approval_handover_to;
