@@ -145,7 +145,16 @@ class SupplierInventoryController extends Controller
             $modelYear = substr($request->prod_month, 0, -2);
             if($productionMonth < 0 || $productionMonth > 12) {
                 return redirect()->back()->with('error', 'Invalid Production Month '.$productionMonth.', Last 2 digit indicating Invalid month!');
+
             }
+            $masterModel = MasterModel::where('model', $request->model)
+                ->where('sfx', $request->sfx)
+                ->where('model_year', $modelYear)->first();
+        }else{
+            $masterModel = MasterModel::where('model', $request->model)
+                                    ->where('sfx', $request->sfx)
+                                    ->orderBy('model_year','DESC')
+                                    ->first();
         }
 
         $colourcode = $request->color_code;
@@ -166,17 +175,14 @@ class SupplierInventoryController extends Controller
                 $altercolourcode = "0" . $colourcode;
                 $extColour = substr($altercolourcode, 0, 3);
                 $intColour = substr($altercolourcode, -2);
-                $colourcode = $extColour.''.$intColour;
 
             }
             if($extColour) {
                 $extColourRow = ColorCode::where('code', $extColour)
                                         ->where('belong_to', ColorCode::EXTERIOR)
                                         ->first();
-
                 if ($extColourRow)
                 {
-                    $exteriorColor = $extColourRow->name;
                     $exteriorColorId = $extColourRow->id;
                 }
             }
@@ -187,25 +193,20 @@ class SupplierInventoryController extends Controller
 
                 if ($intColourRow)
                 {
-                    $interiorColor = $intColourRow->name;
                     $interiorColorId = $intColourRow->id;
                 }
             }
         }
-
-        $masterModel = MasterModel::where('model', $request->model)
-            ->where('sfx', $request->sfx)
-            ->where('model_year', $modelYear)->first();
-
 
         $supplierInventory = new SupplierInventory();
 
         $supplierInventory->supplier_id = $request->supplier_id;
         $supplierInventory->whole_sales = $request->whole_sales;
         $supplierInventory->country = $request->country;
-        $supplierInventory->eta_import = \Illuminate\Support\Carbon::parse($request->eta_import)->format('Y-m-d');
+        $supplierInventory->eta_import = $request->eta_import ? \Illuminate\Support\Carbon::parse($request->eta_import)->format('Y-m-d') : NULL;
         $supplierInventory->chasis = $request->chasis;
         $supplierInventory->engine_number = $request->engine_number;
+        $supplierInventory->pord_month = $request->prod_month;
         $supplierInventory->color_code = $request->color_code;
         $supplierInventory->po_arm = $request->po_arm;
         $supplierInventory->delivery_note = $request->delivery_note;
@@ -1977,6 +1978,7 @@ class SupplierInventoryController extends Controller
                 }
             }
         }
+        info($modelYear);
 
         $isExistModelCombination =  MasterModel::where('model', $request->model)
             ->where('sfx', $request->sfx)

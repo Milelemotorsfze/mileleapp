@@ -109,19 +109,9 @@ class LetterOfIndentController extends Controller
      */
     public function create()
     {
-//        $LOI = LetterOfIndent::where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
-//            ->whereBetween('date',[Carbon::now()->subMonth(6), Carbon::now()])
-//            ->where('dealers', 'Trans Cars')
-//            ->whereHas('letterOfIndentItems', function ($query) {
-//                $query()
-//            })
-//            ->get();
-//
-//        dd($LOI->pluck('date'));
-
         $countries = Country::all();
         $customers = Customer::all();
-        $models = MasterModel::whereNotNull('transcar_loi_description')->groupBy('model')->orderBy('id','ASC')->get();
+        $models = MasterModel::where('is_transcar', true)->groupBy('model')->orderBy('id','ASC')->get();
 
         return view('letter_of_indents.create',compact('countries','customers','models'));
     }
@@ -375,9 +365,9 @@ class LetterOfIndentController extends Controller
         $countries = Country::all();
         $customers = Customer::all();
         if($letterOfIndent->dealers == 'Trans Cars') {
-            $models = MasterModel::whereNotNull('transcar_loi_description');
+            $models = MasterModel::where('is_transcar', true);
         }else{
-            $models = MasterModel::whereNotNull('milele_loi_description');
+            $models = MasterModel::where('is_milele', true);
         }
 
         $models = $models->groupBy('model')->orderBy('id','ASC')->get();
@@ -395,7 +385,7 @@ class LetterOfIndentController extends Controller
         }
 
         return view('letter_of_indents.edit', compact('countries','customers','letterOfIndent','models',
-        'letterOfIndentItems'));
+                                'letterOfIndentItems'));
     }
 
     /**
@@ -474,10 +464,24 @@ class LetterOfIndentController extends Controller
                     ->where('model_year', $request->model_year[$key])
                     ->first();
                 if ($masterModel) {
+                    $latestRow = LetterOfIndentItem::withTrashed()->orderBy('id', 'desc')->first();
+                    $length = 7;
+                    $offset = 4;
+                    $prefix = "LOI-";
+                    if($latestRow){
+                        $latestUUID =  $latestRow->uuid;
+                        $latestUUIDNumber = substr($latestUUID, $offset, $length);
+
+                        $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
+                        $code =  $prefix.$newCode;
+                    }else{
+                        $code = $prefix.'001';
+                    }
                     $LOIItem = new LetterOfIndentItem();
                     $LOIItem->letter_of_indent_id = $LOI->id;
                     $LOIItem->master_model_id = $masterModel->id ?? '';
                     $LOIItem->quantity = $quantity;
+                    $LOIItem->uuid = $code;
                     $LOIItem->save();
                 }
             }

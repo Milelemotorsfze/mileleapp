@@ -112,13 +112,15 @@
                         <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted"> Colour Code</label>
-                                <input type="text" name="color_code" placeholder="Enter Colour Code" class="form-control widthinput">
+                                <input type="text" name="color_code" placeholder="Enter Colour Code" oninput="checkColorCode()" id="color_code" class="form-control widthinput">
+                                <span id="color_code_error" class="error"></span>
+
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted"> Production Month</label>
-                                <input type="text" name="pord_month" placeholder="Enter Production Month" onkeyup="CheckProductionMonth()" id="pord_month" class="form-control widthinput">
+                                <input type="text" name="prod_month" placeholder="Enter Production Month" onkeyup="CheckProductionMonth()" id="pord_month" class="form-control widthinput">
                                 <span id="pord_month_error" class="error"></span>
                             </div>
                         </div>
@@ -131,12 +133,14 @@
                         <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted"> Delivery Note </label>
-                                <input type="text" name="delivery_note" placeholder="Enter Delivery Note" class="form-control widthinput">
+                                <input type="text" name="delivery_note" oninput="deliveryNote()" id="delivery_note" placeholder="Enter Delivery Note"
+                                       class="form-control widthinput">
+                                <span id="delivery_note_error" class="error"></span>
                             </div>
                         </div>
                     </div>
                     <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary"> Submit </button>
+                        <button type="submit" id="submit-button" class="btn btn-primary"> Submit </button>
                     </div>
                 </form>
             </div>
@@ -166,12 +170,12 @@
                     required: true,
                 },
                 pord_month: {
-                    maxlength: 6,
+                    maxlength:6,
                     minlength:6,
                 },
                 color_code:{
                     minlength:4,
-                    maxlength:6
+                    maxlength:5
                 }
             },
         });
@@ -221,29 +225,36 @@
            let url = '{{ route('supplier-inventories.uniqueProductionMonth') }}';
 
            if(productionMonth.length == 6  && model.length > 0 && sfx.length > 0) {
+               var InputId = 'pord_month_error';
+               let modelYear =  productionMonth.slice(-2);
+               if(modelYear > 12) {
+                   feildValidInput = false;
+                   $msg = 'production Month should be valid'
+                   showValidationError(InputId,$msg);
+               }else{
+                   $.ajax({
+                       type:"GET",
+                       url: url,
+                       data: {
+                           prod_month: productionMonth,
+                           model: model,
+                           sfx: sfx,
+                       },
+                       dataType : 'json',
+                       success: function(data) {
 
-              $.ajax({
-                  type:"GET",
-                  url: url,
-                  data: {
-                      prod_month: productionMonth,
-                      model: model,
-                      sfx: sfx,
-                  },
-                  dataType : 'json',
-                  success: function(data) {
-                      var InputId = 'pord_month_error';
-                      if(data !== 1) {
-                          feildValidInput = true;
-                          $msg = 'The model,sfx and the requested model year ('+ data +') combination not existing in the system.';
+                           if(data !== 1) {
+                               feildValidInput = false;
+                               $msg = 'The model,sfx and the requested model year ('+ data +') combination not existing in the system.';
 
-                          showValidationError(InputId,$msg);
-                      }else{
-                          feildValidInput = false;
-                          removeValidationError(InputId);
-                      }
-                  }
-              });
+                               showValidationError(InputId,$msg);
+                           }else{
+                               feildValidInput = true;
+                               removeValidationError(InputId);
+                           }
+                       }
+                   });
+               }
           }
         }
         function CheckUniqueChasis() {
@@ -261,15 +272,72 @@
                     success: function(data) {
                         var InputId = 'chasis_error';
                         if(data == 1) {
+                            feildValidInput = false;
                             $msg = "This chasis is already existing";
                             showValidationError(InputId, $msg);
                         }else{
+                            feildValidInput = true;
                             removeValidationError(InputId);
                         }
                     }
                 });
             }
         }
+        function checkColorCode() {
+            let url = '{{ route('supplier-inventories.isExistColorCode') }}';
+            let colorCode = $('#color_code').val();
+            var InputId = 'color_code_error';
+
+            if(colorCode.length == 5 || colorCode.length == 4) {
+                $.ajax({
+                    type:"GET",
+                    url: url,
+                    data: {
+                        color_code: colorCode,
+                    },
+                    dataType : 'json',
+                    success: function(data) {
+                        if(data == 0) {
+                            feildValidInput = false;
+                            $msg = "This color code is not existing in our master Color Codes.";
+                            showValidationError(InputId, $msg);
+                        }else{
+                            feildValidInput = true;
+                            removeValidationError(InputId);
+                        }
+                    }
+                });
+            }else{
+                feildValidInput = true;
+                removeValidationError(InputId);
+            }
+        }
+        function deliveryNote(){
+            let deliveryNote = $('#delivery_note').val();
+            let InputId = 'delivery_note_error';
+
+            if($.isNumeric(deliveryNote)) {
+                if(deliveryNote.length < 5) {
+                    $msg = "Delivey Note minimum length should be 5";
+                    showValidationError(InputId,$msg);
+                    feildValidInput == false;
+                }else {
+                    removeValidationError(InputId);
+                    feildValidInput == true;
+                }
+            }else{
+                if(deliveryNote != 'waiting' && deliveryNote != 'WAITING'){
+                    $msg = "Only Waiting status is allowed or any DN Number can add.";
+                    showValidationError(InputId,$msg);
+                    feildValidInput == false;
+                }else {
+                    removeValidationError(InputId);
+                    feildValidInput == true;
+
+                }
+            }
+        }
+
 
         function showValidationError(InputId,$msg){
           $('#'+InputId).html($msg);
@@ -277,6 +345,11 @@
         function removeValidationError(InputId,$msg){
             $('#'+InputId).html("");
         }
+        $('form').submit(function (e) {
+            if (feildValidInput == false) {
+                e.preventDefault();
+            }
+        });
     </script>
 @endpush
 
