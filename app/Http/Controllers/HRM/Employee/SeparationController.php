@@ -15,6 +15,7 @@ use DB;
 use App\Models\HRM\Employee\EmployeeProfile;
 use App\Models\HRM\Approvals\ApprovalByPositions;
 use App\Http\Controllers\UserActivityController;
+use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 
 class SeparationController extends Controller
 {
@@ -46,7 +47,7 @@ class SeparationController extends Controller
                     $createRequest->takeover_employee_action_at = NULL;
                     $createRequest->comments_by_takeover_employee = NULL;
                     $createRequest->action_by_department_head = NULL;
-                    $createRequest->department_head_id = $employee->team_lead_or_reporting_manager;
+                    $createRequest->department_head_id = $employee->leadManagerHandover->approval_by_id;
                     $createRequest->department_head_action_at = NULL;
                     $createRequest->comments_by_department_head = NULL;
                     $createRequest->action_by_hr_manager = NULL;
@@ -114,12 +115,19 @@ class SeparationController extends Controller
             DB::beginTransaction();
             try {
                 $input = $request->all();
+                $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
+                if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
+                    $createHandOvr['lead_or_manager_id'] = $employ->team_lead_or_reporting_manager;
+                    $createHandOvr['approval_by_id'] = $employ->team_lead_or_reporting_manager;
+                    $createHandOvr['created_by'] = $authId;
+                    $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
+                }
                 $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 // $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
                 $input['created_by'] = Auth::id();
                 $input['hr_manager_id'] = $HRManager->handover_to_id;                
-                $input['department_head_id'] = $employee->team_lead_or_reporting_manager;
+                $input['department_head_id'] = $employee->leadManagerHandover->approval_by_id;
                 $createRequest = Separation::create($input);
                 $history['separations_id'] = $createRequest->id;
                 $history['icon'] = 'icons8-document-30.png';
