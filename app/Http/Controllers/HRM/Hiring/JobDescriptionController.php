@@ -109,7 +109,8 @@ class JobDescriptionController extends Controller
         else {
             DB::beginTransaction();
             try {
-                $authId = Auth::id();
+                $authId = Auth::id();               
+                $hiringRequest = EmployeeHiringRequest::where('id',$request->hiring_request_id)->first();
                 $employ = EmployeeProfile::where('user_id',$hiringRequest->requested_by)->first();
                 if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
                     $createHandOvr['lead_or_manager_id'] = $employ->team_lead_or_reporting_manager;
@@ -117,7 +118,6 @@ class JobDescriptionController extends Controller
                     $createHandOvr['created_by'] = $authId;
                     $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
                 }
-                $hiringRequest = EmployeeHiringRequest::where('id',$request->hiring_request_id)->first();
                 $teamLeadOrReportingManager = EmployeeProfile::where('user_id',$hiringRequest->requested_by)->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $input = $request->all();
