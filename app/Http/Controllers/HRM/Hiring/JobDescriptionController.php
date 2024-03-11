@@ -110,13 +110,20 @@ class JobDescriptionController extends Controller
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
+                $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
+                if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
+                    $createHandOvr['lead_or_manager_id'] = $employ->team_lead_or_reporting_manager;
+                    $createHandOvr['approval_by_id'] = $employ->team_lead_or_reporting_manager;
+                    $createHandOvr['created_by'] = $authId;
+                    $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
+                }
                 $hiringRequest = EmployeeHiringRequest::where('id',$request->hiring_request_id)->first();
                 $teamLeadOrReportingManager = EmployeeProfile::where('user_id',$hiringRequest->requested_by)->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $input = $request->all();
                 if($id == 'new' && isset($hiringRequest->questionnaire) && !isset($hiringRequest->jobDescription)) {
                     $input['created_by'] = $authId;
-                    $input['department_head_id'] = $teamLeadOrReportingManager->team_lead_or_reporting_manager;
+                    $input['department_head_id'] =  $teamLeadOrReportingManager->leadManagerHandover->approval_by_id;
                     $input['action_by_department_head'] = 'pending';
                     $input['hr_manager_id'] = $HRManager->handover_to_id;
                     $createRequest = JobDescription::create($input);
@@ -126,7 +133,7 @@ class JobDescriptionController extends Controller
                     $createHistory = EmployeeHiringRequestHistory::create($history);
                     $history2['hiring_request_id'] = $request->hiring_request_id;
                     $history2['icon'] = 'icons8-send-30.png';
-                    $history2['message'] = 'Employee hiring job description send to Team Lead / Reporting Manager ( '.$teamLeadOrReportingManager->teamLeadOrReportingManager->name.' - '.$teamLeadOrReportingManager->teamLeadOrReportingManager->email.' ) for approval';
+                    $history2['message'] = 'Employee hiring job description send to Team Lead / Reporting Manager ( '.$teamLeadOrReportingManager->leadManagerHandover->handOverTo->name.' - '.$teamLeadOrReportingManager->leadManagerHandover->handOverTo->email.' ) for approval';
                     $createHistory2 = EmployeeHiringRequestHistory::create($history2);
                     (new UserActivityController)->createActivity('New Employee Hiring Job Description Created');
                     $successMessage = "New Employee Hiring Job Description Created Successfully";
@@ -148,7 +155,7 @@ class JobDescriptionController extends Controller
                         $update->updated_by = $authId;
                         $update->status = 'pending';
                         $update->action_by_department_head = 'pending';
-                        $update->department_head_id = $teamLeadOrReportingManager->team_lead_or_reporting_manager;
+                        $update->department_head_id = $teamLeadOrReportingManager->leadManagerHandover->approval_by_id;
                         $update->department_head_action_at = NULL;
                         $update->action_by_hr_manager = 'pending';
                         $update->hr_manager_id = $HRManager->handover_to_id;

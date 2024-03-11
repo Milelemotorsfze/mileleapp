@@ -21,4 +21,5 @@ class TeamLeadOrReportingManagerHandOverTo extends Model
     public function handOverTo() {
         return $this->hasOne(User::class,'id','approval_by_id');
     }
+    
 }

@@ -238,6 +238,13 @@ class EmployeeLeaveController extends Controller
             DB::beginTransaction();
             try {
                 $authId = Auth::id();
+                $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
+                if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
+                    $createHandOvr['lead_or_manager_id'] = $employ->team_lead_or_reporting_manager;
+                    $createHandOvr['approval_by_id'] = $employ->team_lead_or_reporting_manager;
+                    $createHandOvr['created_by'] = $authId;
+                    $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
+                }
                 $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 // $departmentHead = DepartmentHeadApprovals::where('department_id',$employee->department_id)->first();
@@ -246,7 +253,7 @@ class EmployeeLeaveController extends Controller
                 if($id == 'new') {
                     $input['created_by'] = $authId;   
                     $input['hr_manager_id'] = $HRManager->handover_to_id;                
-                    $input['department_head_id'] = $employee->team_lead_or_reporting_manager;
+                    $input['department_head_id'] = $employee->leadManagerHandover->approval_by_id;
                     $input['division_head_id'] = $divisionHead->approval_handover_to;
                     $input['alternative_home_contact_no'] = $request->alternative_home_contact_no['full'];
                     if($request->type_of_leave != 'others') {
@@ -294,7 +301,7 @@ class EmployeeLeaveController extends Controller
                         $update->hr_manager_action_at = NULL;
                         // $update->comments_by_hr_manager =NULL:
                         $update->action_by_department_head = NULL;
-                        $update->department_head_id = $employee->team_lead_or_reporting_manager;
+                        $update->department_head_id = $employee->leadManagerHandover->approval_by_id;
                         $update->department_head_action_at = NULL;
                         // $update->comments_by_department_head = NULL;
                         // $update->to_be_replaced_by 
