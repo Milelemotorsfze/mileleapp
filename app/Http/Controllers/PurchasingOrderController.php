@@ -71,7 +71,7 @@ class PurchasingOrderController extends Controller
                                                 ->get();
         }else{
             $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->orderBy('po_number', 'desc')->get();
-        }  
+        }
     }
         return view('warehouse.index', compact('data'));
     }
@@ -883,6 +883,7 @@ public function checkcreatevins(Request $request)
                 $purchasingOrderId = $vehicle->purchasing_order_id;
                 $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
                 if ($purchasingOrder) {
+                    info($fieldName);
 //                    check the po is under demand planning
 
                     $loiPurchasingOrder = LOIItemPurchaseOrder::where('purchase_order_id', $purchasingOrderId)->first();
@@ -901,6 +902,12 @@ public function checkcreatevins(Request $request)
                                if($fieldName == 'ex_colour') {
                                    $supplierInventory->exterior_color_code_id = $fieldValue ?? '';
                                }
+                               if($fieldName == 'engine') {
+                                   $supplierInventory->engine_number = $fieldValue ?? '';
+                               }
+                               $action = str_replace('_', ' ', $fieldName) ." updated";
+                               (new SupplierInventoryController)->inventoryLog($action, $supplierInventory->id);
+
                                $supplierInventory->save();
                            }
                        }
