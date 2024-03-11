@@ -1249,9 +1249,11 @@
                 if(jQuery.inArray("demand_planning", data) === -1) {
                     // demand planning not exits
                     $('#vendor-name-checkbox').attr('hidden', true);
+
                 }else{
                     // demand planning exits
                     $('#vendor-name-checkbox').attr('hidden', false);
+
                 }
             });
             $(document.body).on('select2:unselect', "#supplier_type", function (e) {
@@ -1725,6 +1727,8 @@
                     } else {
                         var contactNumber =  contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                         var name = $('#supplier').val();
+                        var supplierType = $('#supplier_type').val();
+                       alert("ok");
                         var url = '{{ route('vendor.vendorUniqueCheck') }}';
                         $.ajax({
                             type: "GET",
@@ -1732,16 +1736,27 @@
                             dataType: "json",
                             data: {
                                 contact_number: contactNumber,
-                                name: name
+                                name: name,
+                                supplierType:supplierType,
                             },
                             success:function (data) {
                                 if(data.error) {
+                                    removeSupplierError();
                                     showContactNumberError(data.error);
                                     formInputError == true;
                                     e.preventDefault();
                                     $('#submit').html('Save');
                                     $('.overlay').hide();
-                                }else{
+                                }else if(data.name_error) {
+                                    removeContactNumberError();
+                                    showSupplierError(data.name_error);
+                                    formInputError == true;
+                                    e.preventDefault();
+                                    $('#submit').html('Save');
+                                    $('.overlay').hide();
+                                }
+                                else{
+                                    removeSupplierError();
                                     removeContactNumberError();
                                 }
                             }

@@ -414,6 +414,7 @@ class SupplierController extends Controller
     }
     public function store(Request $request)
     {
+        info($request->all());
         $payment_methods_id = $addon_id = [];
         (new UserActivityController)->createActivity('Created Vendor');
 
@@ -1428,16 +1429,28 @@ class SupplierController extends Controller
     public function vendorUniqueCheck(Request $request)
     {
         // dd('hi');
+        info($request->all());
         $contactNumber = $request->contact_number;
-        $isVendorExist = Supplier::where('contact_number', $contactNumber)->where('supplier', $request->name);
+        if(in_array(Supplier::SUPPLIER_TYPE_DEMAND_PLANNING, $request->supplierType)) {
+            $isVendorExist = Supplier::where('supplier', $request->name);
+
+        }else{
+            $isVendorExist = Supplier::where('contact_number', $contactNumber)->where('supplier', $request->name);
+        }
+
         if($request->id) {
             $isVendorExist = $isVendorExist->whereNot('id', $request->id);
         }
         $isVendorExist = $isVendorExist->first();
         $data = [];
         if($isVendorExist) {
-
-            $data['error'] = 'Combination of Name and Contact Number should be unique';
+            if(in_array(Supplier::SUPPLIER_TYPE_DEMAND_PLANNING, $request->supplierType)) {
+                $data['name_error'] = 'Supplier Name already existing';
+                $data['error'] = "";
+            }else{
+                $data['error'] = 'Combination of Name and Contact Number should be unique';
+                $data['name_error'] = "";
+            }
             return response($data);
         }else{
             return response($data);

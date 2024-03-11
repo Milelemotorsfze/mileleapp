@@ -1799,6 +1799,8 @@
                     }else {
                         var contactNumber = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                         var name = $('#supplier').val();
+                        var supplierType = $('#supplier_type').val();
+
                         var url = '{{ route('vendor.vendorUniqueCheck') }}';
                         e.preventDefault();
                         $.ajax({
@@ -1808,15 +1810,26 @@
                             data: {
                                 contact_number: contactNumber,
                                 name: name,
+                                supplierType:supplierType,
                                 id: '{{ $supplier->id }}'
                             },
                             success:function (data) {
                                 if(data.error) {
-                                formInputError = true;
-                                $('#submit').html('Save');
+                                    formInputError = true;
+                                    $('#submit').html('Save');
                                     $('.overlay').hide();
                                     showContactNumberError(data.error);
-                                }else{
+                                    removeSupplierError();
+                                }else if(data.name_error) {
+                                    removeContactNumberError();
+                                    showSupplierError(data.name_error);
+                                    formInputError == true;
+                                    e.preventDefault();
+                                    $('#submit').html('Save');
+                                    $('.overlay').hide();
+                                }
+                                else{
+                                    removeSupplierError();
                                     removeContactNumberError();
                                     if(formInputError == false )
                                     {
