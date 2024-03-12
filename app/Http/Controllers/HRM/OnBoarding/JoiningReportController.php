@@ -165,6 +165,7 @@ class JoiningReportController extends Controller
                 else if($request->joining_type == 'internal_transfer' OR $request->joining_type == 'vacations_or_leave') {
                     $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
                     if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
+                        $createHandOvr = [];
                         $createHandOvr['lead_or_manager_id'] = $employ->team_lead_or_reporting_manager;
                         $createHandOvr['approval_by_id'] = $employ->team_lead_or_reporting_manager;
                         $createHandOvr['created_by'] = $authId;
@@ -194,7 +195,19 @@ class JoiningReportController extends Controller
                 $input['prepared_by_id'] = Auth::id();
                 $input['created_by'] = Auth::id();
                 if(isset($request->team_lead_or_reporting_manager)) {
-                    $input['department_head_id'] = $request->team_lead_or_reporting_manager;
+                    $hanovr = TeamLeadOrReportingManagerHandOverTo::where('lead_or_manager_id',$request->team_lead_or_reporting_manager)->first();
+                    if($hanovr == '') {
+                        $createHandOvr = [];
+                        $createHandOvr['lead_or_manager_id'] = $request->team_lead_or_reporting_manager;
+                        $createHandOvr['approval_by_id'] = $request->team_lead_or_reporting_manager;
+                        $createHandOvr['created_by'] = $authId;
+                        $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
+                    }
+                    $hanovrData = TeamLeadOrReportingManagerHandOverTo::where('lead_or_manager_id',$request->team_lead_or_reporting_manager)->first();
+                    if($hanovrData) {
+                        $input['department_head_id'] = $hanovrData->approval_by_id;
+                    }
+                   
                     if($request->joining_type == 'internal_transfer' && $request->internal_transfer_type == 'permanent') {
                         $input['new_reporting_manager'] = $request->team_lead_or_reporting_manager;
                         $input['old_reporting_manager'] = $oldRepMangr;
