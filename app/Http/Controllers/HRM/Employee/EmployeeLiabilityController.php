@@ -304,7 +304,7 @@ class EmployeeLiabilityController extends Controller
                     $createHistory = LiabilityHistory::create($history);
                     $history2['liability_id'] = $createRequest->id;
                     $history2['icon'] = 'icons8-send-30.png';
-                    $history2['message'] = 'Employee liability request send to Team Lead / Reporting Manager ( '.$employee->teamLeadOrReportingManager->handOverTo->name.' - '.$employee->teamLeadOrReportingManager->handOverTo->email.' ) for approval';
+                    $history2['message'] = 'Employee liability request send to Team Lead / Reporting Manager ( '.$employee->leadManagerHandover->handOverTo->name.' - '.$employee->leadManagerHandover->handOverTo->email.' ) for approval';
                     $createHistory2 = LiabilityHistory::create($history2);
                     (new UserActivityController)->createActivity('Employee Liability Request Created');
                     $successMessage = "Employee Liability Hiring Request Created Successfully";
