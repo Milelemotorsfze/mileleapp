@@ -361,8 +361,8 @@
                                     </div>
                                 </div>
                             </div>
-                            @if($supplier->is_MMC == true || $supplier->is_AMS == true)
-                                <div class="col-xxl-6 col-lg-6 col-md-12" id="vendor-name-checkbox">
+
+                                <div class="col-xxl-6 col-lg-6 col-md-12" id="vendor-name-checkbox"  @if($supplier->is_MMC == false && $supplier->is_AMS == false) hidden @endif >
                                     <div class="row">
                                         <div class="col-xxl-3 col-lg-6 col-md-12">
                                             <!-- <span class="error">* </span> -->
@@ -378,7 +378,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            @endif
+
                         </div>
                     </div>
                 </div>
