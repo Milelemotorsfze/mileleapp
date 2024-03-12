@@ -362,6 +362,12 @@ class InterviewSummaryReportController extends Controller
                         $update->resume_file_name  = $fileName;
                     }
                     $update->updated_by = $authId;
+                    if(isset($request->candidate_selected)) {
+                        $update->candidate_selected = $request->candidate_selected;
+                    }
+                    if(isset($request->final_evaluation_of_candidate)) {
+                        $update->final_evaluation_of_candidate = $request->final_evaluation_of_candidate;
+                    }
                     $update->update();
                     $previousInterviewers = Interviewers::where('interview_summary_report_id',$update->id)->where('round',$request->round)->get();
                     if(count($previousInterviewers) > 0) {

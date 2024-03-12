@@ -298,6 +298,43 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-s
 		</div>
 		@endif
 
+		@if($currentInterviewReport != '' && $currentInterviewReport->candidate_selected != '')
+		<div class="card">
+			<div class="card-header">
+				<h4 class="card-title">Final Evaluation Of Candidate</h4>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-xxl-12 col-lg-12 col-md-12">
+						<label for="date" class="form-label font-size-13">{{ __('Candidate Selected') }}</label>
+					</div>
+					<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
+						<fieldset style="margin-top:5px;" class="radio-div-container">
+							<div class="row some-class">
+								<div class="col-xxl-6 col-lg-6 col-md-6">
+									<input type="radio" class="candidate_selected" name="candidate_selected" value="yes" id="yes" @if($currentInterviewReport->candidate_selected == 'yes') checked @endif />
+									<label for="yes">Yes</label>
+								</div>
+								<div class="col-xxl-6 col-lg-6 col-md-6">
+									<input type="radio" class="candidate_selected" name="candidate_selected" value="no" id="no" @if($currentInterviewReport->candidate_selected == 'no') checked @endif />
+									<label for="no">No</label>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12">
+						<label class="form-label font-size-13">Final Evaluation of Candidate</label>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12">
+						<textarea rows="5" id="final_evaluation_of_candidate" type="text" class="form-control @error('final_evaluation_of_candidate') is-invalid @enderror"
+							name="final_evaluation_of_candidate" placeholder="" value="{{ old('final_evaluation_of_candidate') }}"  autocomplete="final_evaluation_of_candidate"
+							autofocus>{{$currentInterviewReport->final_evaluation_of_candidate ?? ''}}</textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+		@endif
+
         <div class="card">
 			<div class="card-header">
 				<h4 class="card-title">Rate the Appearance Of Applicant</h4>

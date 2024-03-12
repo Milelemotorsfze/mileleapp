@@ -375,7 +375,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                     <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Final Evaluation Of Candidate</h4>
+                                <div class="row">
+                                    <div class="col-lg-8 col-md-8 col-sm-8 col-8">
+                                        <h4 class="card-title">Final Evaluation Of Candidate</h4>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-4">
+                                        @if($data->candidate_selected == 'no')
+                                            <label class="badge badge-soft-danger">Not Selected</label>
+                                        @elseif($data->candidate_selected == 'yes')  
+                                            <label class="badge badge-soft-success">Selected</label> 
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="row">
