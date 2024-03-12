@@ -161,9 +161,13 @@ class Supplier extends Model
             if($supplierInventories <= 0) {
                 $demands = Demand::where('supplier_id', $this->id)->count();
                 if($demands <= 0) {
-                    $letterOfIndents = LetterOfIndent::where('supplier_id', $this->id)->count();
-                    if($letterOfIndents <= 0) {
-                        return true;
+                    $pfis = PFI::where('supplier_id', $this->id)->count();
+                    if($pfis <= 0) {
+                        $purchaseOrders = PurchasingOrder::where('vendors_id', $this->id)->count();
+                        if($purchaseOrders <= 0) {
+                           return true;
+
+                        }
                     }
                 }
             }
