@@ -364,6 +364,18 @@ class InterviewSummaryReportController extends Controller
                     $update->updated_by = $authId;
                     if(isset($request->candidate_selected)) {
                         $update->candidate_selected = $request->candidate_selected;
+                        if($request->candidate_selected == 'yes') {
+                            $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                            $update->hr_manager_id = $HRManager->handover_to_id;
+                            $update->action_by_hr_manager = 'pending';
+                            $hiringRequest = EmployeeHiringRequest::where('id',$update->hiring_request_id)->first();
+                            $update->division_head_id = $hiringRequest->division_head_id;
+                        }
+                        elseif($request->candidate_selected == 'no') {
+                            $update->hr_manager_id = NULL;
+                            $update->action_by_hr_manager = NULL;
+                            $update->division_head_id = NULL;
+                        }
                     }
                     if(isset($request->final_evaluation_of_candidate)) {
                         $update->final_evaluation_of_candidate = $request->final_evaluation_of_candidate;
