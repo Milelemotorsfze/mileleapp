@@ -261,19 +261,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-insurance
                                         <td>{{ $one->insurance_policy_number ?? ''}}</td>
                                         <td>{{ $one->insurance_card_number ?? ''}}</td>
                                         <td>
-                                            @if($data->insurance_policy_start_date != NULL)
-                                                {{\Carbon\Carbon::parse($data->insurance_policy_start_date)->format('d M Y') ?? ''}}
+                                            @if($one->insurance_policy_start_date != NULL)
+                                                {{\Carbon\Carbon::parse($one->insurance_policy_start_date)->format('d M Y') ?? ''}}
                                             @endif
                                         </td>
                                         <td>
-                                            @if($data->insurance_policy_end_date != NULL)
-                                                {{\Carbon\Carbon::parse($data->insurance_policy_end_date)->format('d M Y') ?? ''}}
+                                            @if($one->insurance_policy_end_date != NULL)
+                                                {{\Carbon\Carbon::parse($one->insurance_policy_end_date)->format('d M Y') ?? ''}}
                                             @endif
                                         </td>
                                         <td>{{ $one->insurance_cancellation_done ?? ''}}</td>
                                         <td>
-                                            @if($data->created_at != NULL)
-                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+                                            @if($one->created_at != NULL)
+                                                {{\Carbon\Carbon::parse($one->created_at)->format('d M Y, H:i:s') ?? ''}}
                                             @endif
                                         </td>
                                         <td>{{ $one->createdBy->name ?? ''}}</td>
