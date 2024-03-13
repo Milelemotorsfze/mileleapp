@@ -203,8 +203,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-d
                                         <td>{{ $one->po_year ?? ''}}</td>
                                         <td>{{ $one->po_number ?? ''}}</td>
                                         <td>
-                                            @if($data->created_at != NULL)
-                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+                                            @if($one->created_at != NULL)
+                                                {{\Carbon\Carbon::parse($one->created_at)->format('d M Y, H:i:s') ?? ''}}
                                             @endif
                                         </td>
                                         <td>{{ $one->createdBy->name ?? ''}}</td>

@@ -277,17 +277,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['all-increment-deta
                                     @foreach($all as $one)
                                     <tr>
                                         <td>{{ ++$i }}</td>
-                                        <td>{{ $data->basic_salary ?? ''}}</td>
-                                        <td>{{ $data->other_allowances ?? ''}}</td>
-                                        <td>{{ $data->total_salary ?? ''}}</td>
-                                        <td>{{ $data->increament_effective_date ?? ''}}</td>
-                                        <td>{{ $data->increment_amount ?? ''}}</td>
-                                        <td>{{ $data->revised_basic_salary ?? ''}}</td>
-                                        <td>{{ $data->revised_other_allowance ?? ''}}</td>
-                                        <td>{{ $data->revised_total_salary ?? ''}}</td>
+                                        <td>{{ $one->basic_salary ?? ''}}</td>
+                                        <td>{{ $one->other_allowances ?? ''}}</td>
+                                        <td>{{ $one->total_salary ?? ''}}</td>
+                                        <td>{{ $one->increament_effective_date ?? ''}}</td>
+                                        <td>{{ $one->increment_amount ?? ''}}</td>
+                                        <td>{{ $one->revised_basic_salary ?? ''}}</td>
+                                        <td>{{ $one->revised_other_allowance ?? ''}}</td>
+                                        <td>{{ $one->revised_total_salary ?? ''}}</td>
                                         <td>
-                                            @if($data->created_at != NULL)
-                                                {{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+                                            @if($one->created_at != NULL)
+                                                {{\Carbon\Carbon::parse($one->created_at)->format('d M Y, H:i:s') ?? ''}}
                                             @endif
                                         </td>
                                         <td>{{ $one->createdBy->name ?? ''}}</td>

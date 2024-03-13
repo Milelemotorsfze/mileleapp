@@ -402,20 +402,20 @@
                     previewFilePhotograph.removeChild(previewFilePhotograph.firstChild);
                 }
                 const file = files[0];
-                if (file.type.match("application/pdf")) {
+                // if (file.type.match("application/pdf")) {
                     document.getElementById('passport-size-photograph-label').textContent="Passport Size Photograph";
                     const objectUrl = URL.createObjectURL(file);
                     const iframe = document.createElement("iframe");
                     iframe.src = objectUrl;
                     previewFilePhotograph.appendChild(iframe);
-                }
-                else if (file.type.match("image/*")) {
-                    document.getElementById('passport-size-photograph-label').textContent="Passport Size Photograph";
-                    const objectUrl = URL.createObjectURL(file);
-                    const image = new Image();
-                    image.src = objectUrl;
-                    previewFilePhotograph.appendChild(image);
-                }
+                // }
+                // else if (file.type.match("image/*")) {
+                //     document.getElementById('passport-size-photograph-label').textContent="Passport Size Photograph";
+                //     const objectUrl = URL.createObjectURL(file);
+                //     const image = new Image();
+                //     image.src = objectUrl;
+                //     previewFilePhotograph.appendChild(image);
+                // }
             });
             fileInputResume.addEventListener("change", function(event) {
                 $('.preview-div').attr('hidden', false);
@@ -424,22 +424,22 @@
                     previewFileResume.removeChild(previewFileResume.firstChild);
                 }
                 const file = files[0];
-                if (file.type.match("application/pdf"))
-                {
+                // if (file.type.match("application/pdf"))
+                // {
                     document.getElementById('resume-label').textContent="Resume";
                     const objectUrl = URL.createObjectURL(file);
                     const iframe = document.createElement("iframe");
                     iframe.src = objectUrl;
                     previewFileResume.appendChild(iframe);
-                }
-                else if (file.type.match("image/*"))
-                {
-                    document.getElementById('resume-label').textContent="Resume";
-                    const objectUrl = URL.createObjectURL(file);
-                    const image = new Image();
-                    image.src = objectUrl;
-                    previewFileResume.appendChild(image);
-                }
+                // }
+                // else if (file.type.match("image/*"))
+                // {
+                //     document.getElementById('resume-label').textContent="Resume";
+                //     const objectUrl = URL.createObjectURL(file);
+                //     const image = new Image();
+                //     image.src = objectUrl;
+                //     previewFileResume.appendChild(image);
+                // }
             });
             fileInputVisa.addEventListener("change", function(event) {
                 $('.preview-div').attr('hidden', false);
@@ -448,22 +448,22 @@
                     previewFileVisa.removeChild(previewFileVisa.firstChild);
                 }
                 const file = files[0];
-                if (file.type.match("application/pdf"))
-                {
+                // if (file.type.match("application/pdf"))
+                // {
                     document.getElementById('visa-label').textContent="Visa";
                     const objectUrl = URL.createObjectURL(file);
                     const iframe = document.createElement("iframe");
                     iframe.src = objectUrl;
                     previewFileVisa.appendChild(iframe);
-                }
-                else if (file.type.match("image/*"))
-                {
-                    document.getElementById('visa-label').textContent="Visa";
-                    const objectUrl = URL.createObjectURL(file);
-                    const image = new Image();
-                    image.src = objectUrl;
-                    previewFileVisa.appendChild(image);
-                }
+                // }
+                // else if (file.type.match("image/*"))
+                // {
+                //     document.getElementById('visa-label').textContent="Visa";
+                //     const objectUrl = URL.createObjectURL(file);
+                //     const image = new Image();
+                //     image.src = objectUrl;
+                //     previewFileVisa.appendChild(image);
+                // }
             });
             fileInputEmiratesId.addEventListener("change", function(event) {
                 $('.preview-div').attr('hidden', false);
@@ -472,97 +472,109 @@
                     previewFileEmiratesId.removeChild(previewFileEmiratesId.firstChild);
                 }
                 const file = files[0];
-                if (file.type.match("application/pdf"))
-                {
+                // if (file.type.match("application/pdf"))
+                // {
                     document.getElementById('emirates-id-label').textContent="Emirates ID";
                     const objectUrl = URL.createObjectURL(file);
                     const iframe = document.createElement("iframe");
                     iframe.src = objectUrl;
                     previewFileEmiratesId.appendChild(iframe);
-                }
-                else if (file.type.match("image/*"))
-                {
-                    document.getElementById('emirates-id-label').textContent="Emirates ID";
-                    const objectUrl = URL.createObjectURL(file);
-                    const image = new Image();
-                    image.src = objectUrl;
-                    previewFileEmiratesId.appendChild(image);
-                }
+                // }
+                // else if (file.type.match("image/*"))
+                // {
+                //     document.getElementById('emirates-id-label').textContent="Emirates ID";
+                //     const objectUrl = URL.createObjectURL(file);
+                //     const image = new Image();
+                //     image.src = objectUrl;
+                //     previewFileEmiratesId.appendChild(image);
+                // }
             });
             fileInputPassport.addEventListener("change", function(event) {
                 $('.preview-div').attr('hidden', false);
                 const files = event.target.files;
+                while (previewFilePassport.firstChild) {
+                    previewFilePassport.removeChild(previewFilePassport.firstChild);
+                }
                 document.getElementById('passport-label').textContent="Passport";
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
-                    if (file.type.match("application/pdf")) {
+                    // if (file.type.match("application/pdf")) {
                         const objectUrl = URL.createObjectURL(file);
                         const iframe = document.createElement("iframe");
                         iframe.src = objectUrl;
                         previewFilePassport.appendChild(iframe);
-                    } else if (file.type.match("image/*")) {
-                        const objectUrl = URL.createObjectURL(file);
-                        const image = new Image();
-                        image.src = objectUrl;
-                        previewFilePassport.appendChild(image);
-                    }
+                    // } else if (file.type.match("image/*")) {
+                    //     const objectUrl = URL.createObjectURL(file);
+                    //     const image = new Image();
+                    //     image.src = objectUrl;
+                    //     previewFilePassport.appendChild(image);
+                    // }
                 }
             });
             fileInputNationalId.addEventListener("change", function(event) {
                 $('.preview-div').attr('hidden', false);
                 const files = event.target.files;
+                while (previewFileNationalId.firstChild) {
+                    previewFileNationalId.removeChild(previewFileNationalId.firstChild);
+                }
                 document.getElementById('national-id-label').textContent="National ID";
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
-                    if (file.type.match("application/pdf")) {
+                    // if (file.type.match("application/pdf")) {
                         const objectUrl = URL.createObjectURL(file);
                         const iframe = document.createElement("iframe");
                         iframe.src = objectUrl;
                         previewFileNationalId.appendChild(iframe);
-                    } else if (file.type.match("image/*")) {
-                        const objectUrl = URL.createObjectURL(file);
-                        const image = new Image();
-                        image.src = objectUrl;
-                        previewFileNationalId.appendChild(image);
-                    }
+                    // } else if (file.type.match("image/*")) {
+                    //     const objectUrl = URL.createObjectURL(file);
+                    //     const image = new Image();
+                    //     image.src = objectUrl;
+                    //     previewFileNationalId.appendChild(image);
+                    // }
                 }
             });
             fileInputEducationalDocs.addEventListener("change", function(event) {
                 $('.preview-div').attr('hidden', false);
                 const files = event.target.files;
+                while (previewFileEducationalDocs.firstChild) {
+                    previewFileEducationalDocs.removeChild(previewFileEducationalDocs.firstChild);
+                }
                 document.getElementById('educational-docs-label').textContent="Attested Educational Documents";
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
-                    if (file.type.match("application/pdf")) {
+                    // if (file.type.match("application/pdf")) {
                         const objectUrl = URL.createObjectURL(file);
                         const iframe = document.createElement("iframe");
                         iframe.src = objectUrl;
                         previewFileEducationalDocs.appendChild(iframe);
-                    } else if (file.type.match("image/*")) {
-                        const objectUrl = URL.createObjectURL(file);
-                        const image = new Image();
-                        image.src = objectUrl;
-                        previewFileEducationalDocs.appendChild(image);
-                    }
+                    // } else if (file.type.match("image/*")) {
+                    //     const objectUrl = URL.createObjectURL(file);
+                    //     const image = new Image();
+                    //     image.src = objectUrl;
+                    //     previewFileEducationalDocs.appendChild(image);
+                    // }
                 }
             });
             fileInputProfDiploCertificates.addEventListener("change", function(event) {
                 $('.preview-div').attr('hidden', false);
                 const files = event.target.files;
+                while (previewFileProfDiploCertificates.firstChild) {
+                    previewFileProfDiploCertificates.removeChild(previewFileProfDiploCertificates.firstChild);
+                }
                 document.getElementById('professional-diploma-certificates-label').textContent="Attested Professional Diplomas / Certificates";
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
-                    if (file.type.match("application/pdf")) {
+                    // if (file.type.match("application/pdf")) {
                         const objectUrl = URL.createObjectURL(file);
                         const iframe = document.createElement("iframe");
                         iframe.src = objectUrl;
                         previewFileProfDiploCertificates.appendChild(iframe);
-                    } else if (file.type.match("image/*")) {
-                        const objectUrl = URL.createObjectURL(file);
-                        const image = new Image();
-                        image.src = objectUrl;
-                        previewFileProfDiploCertificates.appendChild(image);
-                    }
+                    // } else if (file.type.match("image/*")) {
+                    //     const objectUrl = URL.createObjectURL(file);
+                    //     const image = new Image();
+                    //     image.src = objectUrl;
+                    //     previewFileProfDiploCertificates.appendChild(image);
+                    // }
                 }
             });
             $(document).ready(function() {                

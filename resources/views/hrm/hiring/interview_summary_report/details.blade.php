@@ -16,7 +16,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
     <div class="portfolio">
         <ul class="nav nav-pills nav-fill" id="my-tab">      
             <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="pill" href="#interview-summary"> Interview Summary Report</a>
+                <a class="nav-link active" data-bs-toggle="pill" href="#interview-summary-{{$data->id}}"> Interview Summary Report</a>
             </li>
             @if(isset($data->candidateDetails))
             @canany(['view-interview-summary-report-details'])
@@ -25,16 +25,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
             @endphp
             @if ($hasPermission)
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="pill" href="#documents"> Documents</a>
+                <a class="nav-link" data-bs-toggle="pill" href="#documents-{{$data->id}}"> Documents</a>
             </li>
             @if($data->offer_letter_send_at != '')
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="pill" href="#job-offer-letter"> Job Offer Letter</a>
+                <a class="nav-link" data-bs-toggle="pill" href="#job-offer-letter-{{$data->id}}"> Job Offer Letter</a>
             </li>
             @endif
             @if($data->candidateDetails->personal_information_created_at != '')
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="pill" href="#personal-info"> Personal Information</a>
+                <a class="nav-link" data-bs-toggle="pill" href="#personal-info-{{$data->id}}"> Personal Information</a>
             </li>
             @endif
             @endcanany
@@ -44,7 +44,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
     </div>
     </br>
     <div class="tab-content">
-        <div class="tab-pane fade show active" id="interview-summary">
+        <div class="tab-pane fade show active" id="interview-summary-{{$data->id}}">
             <div class="row">
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                     <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
@@ -375,7 +375,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                     <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Final Evaluation Of Candidate</h4>
+                                <div class="row">
+                                    <div class="col-lg-8 col-md-8 col-sm-8 col-8">
+                                        <h4 class="card-title">Final Evaluation Of Candidate</h4>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-4">
+                                        @if($data->candidate_selected == 'no')
+                                            <label class="badge badge-soft-danger">Not Selected</label>
+                                        @elseif($data->candidate_selected == 'yes')  
+                                            <label class="badge badge-soft-success">Selected</label> 
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -566,7 +577,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade show" id="documents">
+        <div class="tab-pane fade show" id="documents-{{$data->id}}">
             <div class="card">
                 <div class="card-header">
                     <div class="card-title fw-bold">Documents</div>
@@ -653,22 +664,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                     </div>
                     <div class="row">
                         <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                        @if($data->candidateDetails->image_path)
-                        <div class="row">
-                            <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
-                                <h6 class="fw-bold text-center mb-1" style="float:left">Passport Size Photograph</h6>
-                            </div>
-                            <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-                                <a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" target="_blank">
-                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                </a>
-                                <a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" download>
-                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                </a>
-                            </div>
-                        </div>
-                        <iframe src="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" alt="Passport Size Photograph" style="height:400px;"></iframe>
-                                
+                            @if($data->candidateDetails->image_path)
+                                <div class="row">
+                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left">Passport Size Photograph</h6>
+                                    </div>
+                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                        <a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" target="_blank">
+                                            <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                        </a>
+                                        <a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" download>
+                                            <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                        </a>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" alt="Passport Size Photograph"></iframe>
+                                    
 
                             @endif
                         </div>
@@ -687,7 +698,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         </a>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/resume/' . $data->candidateDetails->resume) }}" alt="Resume" style="height:400px;"></iframe>
+                                <iframe src="{{ url('hrm/employee/resume/' . $data->candidateDetails->resume) }}" alt="Resume"></iframe>
                             @endif
                         </div>
                         <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
@@ -705,7 +716,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         </a>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/visa/' . $data->candidateDetails->visa) }}" alt="Visa" style="height:400px;"></iframe>
+                                <iframe src="{{ url('hrm/employee/visa/' . $data->candidateDetails->visa) }}" alt="Visa"></iframe>
                             @endif
                         </div>
                         <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
@@ -723,7 +734,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         </a>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/emirates_id/' . $data->candidateDetails->emirates_id_file) }}" alt="Emirates ID" style="height:400px;"></iframe>
+                                <iframe src="{{ url('hrm/employee/emirates_id/' . $data->candidateDetails->emirates_id_file) }}" alt="Emirates ID"></iframe>
                             @endif
                         </div>
                     </div>
@@ -738,7 +749,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                 <a href="{{ url('hrm/employee/passport/' . $document->document_path) }}" download>
                                     <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
                                 </a>
-                                <iframe src="{{ url('hrm/employee/passport/' . $document->document_path) }}" alt="Passport (First & Second page)" style="height:400px;"></iframe>                                 
+                                <iframe src="{{ url('hrm/employee/passport/' . $document->document_path) }}" alt="Passport (First & Second page)"></iframe>                                 
                             </div>
                             @endforeach
                         </div>
@@ -754,7 +765,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                     <a href="{{ url('hrm/employee/national_id/' . $document->document_path) }}" download>
                                         <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
                                     </a>
-                                    <iframe src="{{ url('hrm/employee/national_id/' . $document->document_path) }}" alt="National ID (First & Second page)" style="height:400px;"></iframe>                                  
+                                    <iframe src="{{ url('hrm/employee/national_id/' . $document->document_path) }}" alt="National ID (First & Second page)"></iframe>                                  
                                 </div>
                                 @endforeach
                         </div>
@@ -770,7 +781,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                     <a href="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" download>
                                         <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
                                     </a>
-                                    <iframe src="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" alt="Attested Educational Documents" style="height:400px;"></iframe>                                  
+                                    <iframe src="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" alt="Attested Educational Documents"></iframe>                                  
                                 </div>
                                 @endforeach
                         </div>
@@ -786,7 +797,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                     <a href="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" download>
                                         <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
                                     </a>
-                                    <iframe src="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" alt="Attested Professional Diplomas / Certificates" style="height:400px;"></iframe>                                   
+                                    <iframe src="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" alt="Attested Professional Diplomas / Certificates"></iframe>                                   
                                 </div>
                                 @endforeach
                         </div>
@@ -794,7 +805,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade show" id="job-offer-letter">
+        <div class="tab-pane fade show" id="job-offer-letter-{{$data->id}}">
             <div class="card">
                 <div class="card-header">
                     <div class="card-title fw-bold">Job Offer Letter</div>
@@ -832,7 +843,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade show" id="personal-info">                
+        <div class="tab-pane fade show" id="personal-info-{{$data->id}}">                
             <div class="row">
                 <div class="col-xxl-12 col-lg-12 col-md-12">
                     @canany(['verify-candidate-personal-information'])

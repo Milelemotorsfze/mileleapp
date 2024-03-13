@@ -183,4 +183,8 @@ class SeparationController extends Controller
         $rejected =$rejected->get();
         return view('hrm.separation.index',compact('pendings','approved','rejected'));
     }
+    public function show($id) {
+        $errorMsg ="Comong Soon ! This page is under development phase now.. You can access later !";
+        return view('hrm.notaccess',compact('errorMsg'));
+    }
 }
