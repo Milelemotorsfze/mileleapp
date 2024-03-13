@@ -16,7 +16,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
     <div class="portfolio">
         <ul class="nav nav-pills nav-fill" id="my-tab">      
             <li class="nav-item">
-                <a class="nav-link active" data-bs-toggle="pill" href="#interview-summary"> Interview Summary Report</a>
+                <a class="nav-link active" data-bs-toggle="pill" href="#interview-summary-{{$data->id}}"> Interview Summary Report</a>
             </li>
             @if(isset($data->candidateDetails))
             @canany(['view-interview-summary-report-details'])
@@ -25,16 +25,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
             @endphp
             @if ($hasPermission)
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="pill" href="#documents"> Documents</a>
+                <a class="nav-link" data-bs-toggle="pill" href="#documents-{{$data->id}}"> Documents</a>
             </li>
             @if($data->offer_letter_send_at != '')
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="pill" href="#job-offer-letter"> Job Offer Letter</a>
+                <a class="nav-link" data-bs-toggle="pill" href="#job-offer-letter-{{$data->id}}"> Job Offer Letter</a>
             </li>
             @endif
             @if($data->candidateDetails->personal_information_created_at != '')
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="pill" href="#personal-info"> Personal Information</a>
+                <a class="nav-link" data-bs-toggle="pill" href="#personal-info-{{$data->id}}"> Personal Information</a>
             </li>
             @endif
             @endcanany
@@ -44,7 +44,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
     </div>
     </br>
     <div class="tab-content">
-        <div class="tab-pane fade show active" id="interview-summary">
+        <div class="tab-pane fade show active" id="interview-summary-{{$data->id}}">
             <div class="row">
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                     <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
@@ -577,7 +577,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade show" id="documents">
+        <div class="tab-pane fade show" id="documents-{{$data->id}}">
             <div class="card">
                 <div class="card-header">
                     <div class="card-title fw-bold">Documents</div>
@@ -805,7 +805,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade show" id="job-offer-letter">
+        <div class="tab-pane fade show" id="job-offer-letter-{{$data->id}}">
             <div class="card">
                 <div class="card-header">
                     <div class="card-title fw-bold">Job Offer Letter</div>
@@ -843,7 +843,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade show" id="personal-info">                
+        <div class="tab-pane fade show" id="personal-info-{{$data->id}}">                
             <div class="row">
                 <div class="col-xxl-12 col-lg-12 col-md-12">
                     @canany(['verify-candidate-personal-information'])
