@@ -664,22 +664,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                     </div>
                     <div class="row">
                         <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-                        @if($data->candidateDetails->image_path)
-                        <div class="row">
-                            <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
-                                <h6 class="fw-bold text-center mb-1" style="float:left">Passport Size Photograph</h6>
-                            </div>
-                            <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-                                <a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" target="_blank">
-                                    <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
-                                </a>
-                                <a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" download>
-                                    <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
-                                </a>
-                            </div>
-                        </div>
-                        <iframe src="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" alt="Passport Size Photograph" style="height:400px;"></iframe>
-                                
+                            @if($data->candidateDetails->image_path)
+                                <div class="row">
+                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
+                                        <h6 class="fw-bold text-center mb-1" style="float:left">Passport Size Photograph</h6>
+                                    </div>
+                                    <div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
+                                        <a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" target="_blank">
+                                            <button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
+                                        </a>
+                                        <a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" download>
+                                            <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
+                                        </a>
+                                    </div>
+                                </div>
+                                <iframe src="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" alt="Passport Size Photograph"></iframe>
+                                    
 
                             @endif
                         </div>
@@ -698,7 +698,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         </a>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/resume/' . $data->candidateDetails->resume) }}" alt="Resume" style="height:400px;"></iframe>
+                                <iframe src="{{ url('hrm/employee/resume/' . $data->candidateDetails->resume) }}" alt="Resume"></iframe>
                             @endif
                         </div>
                         <div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
@@ -716,7 +716,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         </a>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/visa/' . $data->candidateDetails->visa) }}" alt="Visa" style="height:400px;"></iframe>
+                                <iframe src="{{ url('hrm/employee/visa/' . $data->candidateDetails->visa) }}" alt="Visa"></iframe>
                             @endif
                         </div>
                         <div class="col-xxl-6 col-md-6 col-sm-12 text-center">
@@ -734,7 +734,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         </a>
                                     </div>
                                 </div>
-                                <iframe src="{{ url('hrm/employee/emirates_id/' . $data->candidateDetails->emirates_id_file) }}" alt="Emirates ID" style="height:400px;"></iframe>
+                                <iframe src="{{ url('hrm/employee/emirates_id/' . $data->candidateDetails->emirates_id_file) }}" alt="Emirates ID"></iframe>
                             @endif
                         </div>
                     </div>
@@ -749,7 +749,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                 <a href="{{ url('hrm/employee/passport/' . $document->document_path) }}" download>
                                     <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
                                 </a>
-                                <iframe src="{{ url('hrm/employee/passport/' . $document->document_path) }}" alt="Passport (First & Second page)" style="height:400px;"></iframe>                                 
+                                <iframe src="{{ url('hrm/employee/passport/' . $document->document_path) }}" alt="Passport (First & Second page)"></iframe>                                 
                             </div>
                             @endforeach
                         </div>
@@ -765,7 +765,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                     <a href="{{ url('hrm/employee/national_id/' . $document->document_path) }}" download>
                                         <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
                                     </a>
-                                    <iframe src="{{ url('hrm/employee/national_id/' . $document->document_path) }}" alt="National ID (First & Second page)" style="height:400px;"></iframe>                                  
+                                    <iframe src="{{ url('hrm/employee/national_id/' . $document->document_path) }}" alt="National ID (First & Second page)"></iframe>                                  
                                 </div>
                                 @endforeach
                         </div>
@@ -781,7 +781,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                     <a href="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" download>
                                         <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
                                     </a>
-                                    <iframe src="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" alt="Attested Educational Documents" style="height:400px;"></iframe>                                  
+                                    <iframe src="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" alt="Attested Educational Documents"></iframe>                                  
                                 </div>
                                 @endforeach
                         </div>
@@ -797,7 +797,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                     <a href="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" download>
                                         <button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
                                     </a>
-                                    <iframe src="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" alt="Attested Professional Diplomas / Certificates" style="height:400px;"></iframe>                                   
+                                    <iframe src="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" alt="Attested Professional Diplomas / Certificates"></iframe>                                   
                                 </div>
                                 @endforeach
                         </div>
