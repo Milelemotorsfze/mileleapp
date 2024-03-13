@@ -850,7 +850,9 @@ class CandidatePersonalInfoController extends Controller
                 $inwords['other_allowances'] = $this->decimalNumberInWords($emp->other_allowances);
                 $inwords['total_salary'] = $this->decimalNumberInWords($emp->total_salary);
                 $data->isAuth = 2;
-                                return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr'));
+                $success = '';
+                $success = 'Signature sent successfully';
+                return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr','success'));
             } 
             catch (\Exception $e) {
                 DB::rollback();
