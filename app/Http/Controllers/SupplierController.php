@@ -63,6 +63,13 @@ class SupplierController extends Controller
                  })
                  ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
                  ->get();
+
+            $inactiveSuppliers = Supplier::with('supplierTypes')
+                ->whereHas('supplierTypes', function ($query){
+                    $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+                })
+                ->where('status', Supplier::SUPPLIER_STATUS_INACTIVE)
+                ->get();
          }
         return view('suppliers.index',compact('suppliers','inactiveSuppliers'));
     }
@@ -414,7 +421,6 @@ class SupplierController extends Controller
     }
     public function store(Request $request)
     {
-        info($request->all());
         $payment_methods_id = $addon_id = [];
         (new UserActivityController)->createActivity('Created Vendor');
 
@@ -937,7 +943,6 @@ class SupplierController extends Controller
         }
         if($request->supplier_types)
         {
-            info($request->supplier_types);
             if($request->form_action == 'UPDATE') {
                 $existingSupplierTypes = SupplierType::where('supplier_id', $request->supplier_id)->delete();
             }
