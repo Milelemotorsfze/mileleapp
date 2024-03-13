@@ -134,7 +134,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-separation-
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['current-user-overtime-details','all-separation-employee-handover-details','current-user-separation-handover-details']);
 								@endphp
 								@if ($hasPermission) 
-								<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('overtime.show',$data->id)}}">
+								<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('separation-handover.show',$data->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i> View Details
 										</a>
 									</li>
