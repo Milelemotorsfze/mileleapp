@@ -269,7 +269,7 @@ class SupplierInventoryController extends Controller
             $colourname = NULL;
 
             $date = Carbon::today()->format('Y-m-d');
-//            $date = '2024-02-19';
+//            $date = '2024-02-15';
             $unavailableExtColours = [];
             $unavailableIntColours = [];
 
@@ -665,7 +665,7 @@ class SupplierInventoryController extends Controller
 
                                         info($isNullChaisis->get());
 
-                                        //                                    $isNullChaisisExist = $isNullChaisis->first();
+                                        //  $isNullChaisisExist = $isNullChaisis->first();
                                         info($isNullChaisis->count());
                                         if ($isNullChaisis->count() > 0) {
                                             info("null chasis row exist");
@@ -1152,10 +1152,43 @@ class SupplierInventoryController extends Controller
 
                     info("deleted rows");
                     info($deletedRows->pluck('id'));
+                    $previousFileDate = SupplierInventoryHistory::orderBy('date_of_entry', 'DESC')
+                        ->groupBy('date_of_entry')
+                        ->skip(1)
+                        ->first();
+
+//                    return $previousFileDate;
 
                     foreach ($deletedRows as $deletedRow) {
                         $deletedRow->upload_status = SupplierInventory::VEH_STATUS_DELETED;
                         $deletedRow->save();
+
+                        if($previousFileDate) {
+//                            return 1;/
+                            $isSameRowExist = SupplierInventoryHistory::whereDate('date_of_entry', $previousFileDate->date_of_entry)
+                                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_INACTIVE)
+                                ->where('supplier_id', $deletedRow->supplier_id)
+                                ->where('whole_sales', $deletedRow->whole_sales)
+                                ->where('master_model_id', $deletedRow->master_model_id)
+                                ->where('chasis', $deletedRow->chasis)
+                                ->where('engine_number', $deletedRow->engine_number)
+                                ->where('color_code', $deletedRow->color_code)
+                                ->where('pord_month', $deletedRow->pord_month)
+                                ->where('po_arm', $deletedRow->po_arm)
+                                ->where('eta_import', $deletedRow->eta_import)
+                                ->where('delivery_note', $deletedRow->delivery_note)
+                                ->first();
+
+//                            return $isSameRowExist;
+
+                            if($isSameRowExist) {
+//                                return $isSameRowExist;
+                                $isSameRowExist->upload_status = SupplierInventory::VEH_STATUS_DELETED;
+                                $isSameRowExist->save();
+                            }
+                        }
+
 
                         $action = "Inventory Item deleted";
                         $this->inventoryLog($action, $deletedRow->id);
@@ -1870,16 +1903,27 @@ class SupplierInventoryController extends Controller
         }
         info("updated Rows");
         info($updatedRowsIds);
-        $deletedRows = SupplierInventoryHistory::whereDate('date_of_entry', $request->first_file)
+        $latestdate = SupplierInventoryHistory::whereBetween('date_of_entry', [$request->first_file, $request->second_file])
+                                                ->groupBy('date_of_entry')->orderBy('date_of_entry', 'DESC')
+                                                ->skip(1)
+                                                ->first();
+        $previousDate = SupplierInventoryHistory::where('date_of_entry', '<=', $request->first_file)
+                                        ->groupBy('date_of_entry')->orderBy('date_of_entry', 'DESC')
+                                        ->skip(1)
+                                        ->first();
+//        return $previousDate;
+
+        $deletedRows = SupplierInventoryHistory::whereBetween('date_of_entry', [$previousDate->date_of_entry, $latestdate->date_of_entry])
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('supplier_id', $request->supplier_id)
             ->where('whole_sales', $request->whole_sales)
-            ->whereNotIn('id', $noChangeRowIds)
-            ->whereNotIn('id', $updatedRowsIds)
-            ->where(function ($query) use($deliveryNote) {
-                $query->whereNull('delivery_note')
-                    ->orwhere('delivery_note', $deliveryNote);
-            })
+            ->where('upload_status', SupplierInventory::VEH_STATUS_DELETED)
+//            ->whereNotIn('id', $noChangeRowIds)
+//            ->whereNotIn('id', $updatedRowsIds)
+//            ->where(function ($query) use($deliveryNote) {
+//                $query->whereNull('delivery_note')
+//                    ->orwhere('delivery_note', $deliveryNote);
+//            })
 //            ->whereNotIn('id', $newlyAddedRowIds)
             ->get();
             info($deletedRows->pluck('id'));
