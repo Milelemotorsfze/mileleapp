@@ -28,7 +28,7 @@ class DivisionController extends Controller
         $data = MasterDivisionWithHead::where('id',$id)->first();
         $previous = MasterDivisionWithHead::where('id', '<', $id)->max('id');
         $next = MasterDivisionWithHead::where('id', '>', $id)->min('id');
-        $divisionHeads = User::whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.department','empProfile.designation','empProfile.location')->whereIn('id',[2,26,31,10,62])->get();
+        $divisionHeads = User::whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.department','empProfile.designation','empProfile.location')->whereIn('id',[2,26,31,10,62,57])->get();
         return view('hrm.masters.division.edit',compact('data','previous','next','divisionHeads'));
     }
     public function update(Request $request, $id) {
