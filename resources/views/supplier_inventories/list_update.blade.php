@@ -99,7 +99,6 @@
                     <th>SFX</th>
                     <th>Model Year</th>
                     <th>Variant</th>
-
                     <th>Chasis</th>
                     <th>Engine Number</th>
                     <th>Color Code</th>
@@ -112,6 +111,14 @@
                     <th>PFI Number </th>
                     <th>PO Number</th>
                     <th>PO AMS</th>
+                    @can('inventory-log-details')
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('inventory-log-details');
+                        @endphp
+                        @if ($hasPermission)
+                            <th>Action</th>
+                        @endif
+                    @endcan
                 </tr>
                 </thead>
                 <tbody>
@@ -122,7 +129,7 @@
                             <td>
                                 <select class="country" data-field="country" data-id="{{ $supplierInventory->id }}" id="country-editable-{{$supplierInventory->id}}">
                                     <option value="UAE" {{ $supplierInventory->country == 'UAE' ? 'selected' : '' }} >UAE</option>
-                                    <option value="Belgium" {{ $supplierInventory->country == 'Belguim' ? 'selected' : '' }}>Belgium</option>
+                                    <option value="Belgium" {{ $supplierInventory->country == 'Belgium' ? 'selected' : '' }}>Belgium</option>
                                 </select>
                             </td>
                             <td>
@@ -179,6 +186,17 @@
                             <td data-field="po_arm" class="po_arm"  id="po_arm-editable-{{$supplierInventory->id}}"  contenteditable="true"
                                 data-id="{{$supplierInventory->id}}" >{{ $supplierInventory->po_arm }}</td>
 
+                            @can('inventory-log-details')
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('inventory-log-details');
+                                @endphp
+                                @if ($hasPermission)
+                                 <td>
+                                     <a data-placement="top" href="{{ route('inventory-logs.lists', $supplierInventory->id) }}"
+                                        title="Inventory Log Details" class="btn btn-info btn-sm"><i class="fa fa-list"></i></a>
+                                 </td>
+                                @endif
+                            @endcan
                         </tr>
                 @endforeach
                 </tbody>
@@ -204,7 +222,6 @@
             });
 
             $('#dtBasicExample3 tbody td').on('change', '.model-year', function () {
-
                 var id = $(this).data('id');
                 var field = $(this).data('field');
                 if(feildValidInput == true) {
