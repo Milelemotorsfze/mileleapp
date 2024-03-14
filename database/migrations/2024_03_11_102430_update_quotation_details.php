@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('movements', function (Blueprint $table) {
-            // Alter the remarks column to be nullable
-            $table->string('remarks')->nullable()->change();
+        Schema::table('quotation_details', function (Blueprint $table) {
+            $table->date('due_date')->nullable();
         });
     }
 
@@ -22,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('movements', function (Blueprint $table) {
-            $table->string('remarks')->nullable(false)->change();
+        Schema::table('quotation_details', function (Blueprint $table) {
+            $table->dropColumn('due_date');
         });
     }
 };

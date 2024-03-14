@@ -11,7 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::table('movements', function (Blueprint $table) {
+            // Alter the remarks column to be nullable
+            $table->string('remarks')->nullable()->change();
+        });
     }
 
     /**
@@ -19,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('movements', function (Blueprint $table) {
+            $table->string('remarks')->nullable(false)->change();
+        });
     }
 };
