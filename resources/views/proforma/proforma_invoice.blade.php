@@ -427,48 +427,11 @@
                     <td> </td>
                     <td> </td>
                     <td> </td>
-                    <!-- <td style="font-weight: bold">Discount</td> -->
-                    <td> </td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;text-align: left"> Account Name
-Bank Name
-
-
-MlLELE MOTORS FZE
-AE230400000882723910001
-NRAKAEAK
-RAK BANK
-DRAGON MART
-DUBAI UAE</td>
-                    <td>Swift Code </td>
-                    <td></td>
-                    <td style="font-weight: bold">Net Amount</td>
-                    <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }}</td>
-                </tr>
-                <tr>
-                    <td>IBAN </td>
-                    <td> </td>
-                    <td> </td>
-                    <td style="font-weight: bold">VAT:(0%)</td>
-                    <td>0.00</td>
-                </tr>
-                <tr>
-                    <td>Bank Name </td>
-                    <td> </td>
-                    <td> </td>
-                    <!-- <td style="font-weight: bold">Gross Amount</td> -->
-                    <td> </td>
-                </tr>
-                <tr>
-                    <td> </td>
-                    <td> </td>
-                    <td> </td>
                     <td style="font-weight: bold"> Advance Paid</td>
                     <td> {{ number_format($quotationDetail->advance_amount, 2) }} </td>
                 </tr>
                 <tr>
-                    <td>Branch Name </td>
+                    <td></td>
                     <td> </td>
                     <td> </td>
                     <td style="font-weight: bold"> Remaining Amount({{ $quotation->currency }})</td>
