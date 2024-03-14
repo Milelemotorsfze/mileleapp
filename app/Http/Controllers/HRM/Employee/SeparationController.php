@@ -184,6 +184,8 @@ class SeparationController extends Controller
         return view('hrm.separation.index',compact('pendings','approved','rejected'));
     }
     public function show($id) {
+        // $data = Separation::where('id',$id)->with('user.empProfile.department','user.empProfile.designation','user.empProfile.location')->first();
+        // return view('hrm.separation.show',compact('data'));
         $errorMsg ="Comong Soon ! This page is under development phase now.. You can access later !";
         return view('hrm.notaccess',compact('errorMsg'));
     }

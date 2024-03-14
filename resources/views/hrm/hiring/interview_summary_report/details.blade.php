@@ -970,6 +970,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                 <h4 class="card-title">Dependents</h4>
                             </div>
                             <div class="card-body">
+                                @if(isset($data) && isset($data->candidateDetails) && (isset($data->candidateDetails->spouse_name) OR isset($data->candidateDetails->spouse_passport_number) OR 
+                                isset($data->candidateDetails->spouse_passport_expiry_date) OR isset($data->candidateDetails->spouse_dob) OR isset($data->candidateDetails->spouseNationality->name)))
                                 <div class="row">
                                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
                                         <label for="choices-single-default" class="form-label"> Spouse Name  :</label>
@@ -1010,11 +1012,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                         <span>{{ $data->candidateDetails->spouseNationality->name ?? '' }}</span>
                                     </div>
                                 </div>
-                                @if(isset($data->candidateDetails->candidateChildren))
+                                @else
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+                                        <label for="choices-single-default" class="form-label">Spouse details not added in the system</label>
+                                    </div>
+                                </div>
+                                @endif
+                               
                                 <div class="card-header">
                                 <h4 class="card-title">Children</h4>
                                 </div>
                                 </br>
+                                @if(isset($data->candidateDetails->candidateChildren) && count($data->candidateDetails->candidateChildren) > 0)
                                 @foreach($data->candidateDetails->candidateChildren as $children)
                                 <div class="row" style="border:1px solid #e9e9ef; margin-bottom:10px;">
                                     <div class="col-lg-5 col-md-5 col-sm-6 col-12">
@@ -1049,6 +1059,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                                     </div>
                                 </div>
                                 @endforeach
+                                @else
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+                                        <label for="choices-single-default" class="form-label">Children details not added in the system</label>
+                                    </div>
+                                </div>
                                 @endif
                             </div>
                         </div>

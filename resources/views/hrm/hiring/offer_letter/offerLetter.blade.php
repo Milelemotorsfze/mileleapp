@@ -79,9 +79,26 @@
             #offer-letter-page input[type=text] {
                 background-color: #f5fbff;
             }
+            .alert-success {
+    color: #1d7f58;
+    background-color: #aae1cb;
+    border-color: #95dabe;
+}
+.alert {
+    position: relative;
+    padding: .75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 2px solid transparent;
+    border-radius: .25rem;
+}
         </style>
     </head>
     <body id="offer-letter-page">
+	@if(isset($success) && $success != '')
+	<div class="alert alert-success" id="success-alert">
+		{{$success ?? ''}}
+	</div>
+	@endif
         <div class="book">
             <div class="page">
                 <div class="subpage justify" style="font-style:Serif;" id="justify">
