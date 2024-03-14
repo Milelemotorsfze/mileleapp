@@ -93,7 +93,12 @@
                                             ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
                                             ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action','create-job-description'
                                             ,'edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details',
-                                            'view-interview-summary-report-listing','create-interview-summary-report'])
+                                            'view-interview-summary-report-listing','create-interview-summary-report','view-division-listing','view-current-user-division'
+                                            ,'view-department-listing','view-current-user-department-lising','division-approval-listing','view-asset-allocation-request-listing'
+                                            ,'view-joining-report-listing','current-user-view-joining-report-listing','view-passport-request-list','current-user-view-passport-request-list'
+                                            ,'view-liability-list','current-user-view-liability-list','view-leave-list','view-current-user-leave-list'
+                                            ,'list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'
+                                            ,'list-all-overtime','list-current-user-overtime'])
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request','view-all-pending-hiring-request-listing',
                                             'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
@@ -106,7 +111,12 @@
                                             ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action',
                                             'hiring-request-cancel-action','create-job-description'
                                             ,'edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details',
-                                            'view-interview-summary-report-listing','create-interview-summary-report']);
+                                            'view-interview-summary-report-listing','create-interview-summary-report','view-division-listing','view-current-user-division'
+                                            ,'view-department-listing','view-current-user-department-lising','division-approval-listing','view-asset-allocation-request-listing'
+                                            ,'view-joining-report-listing','current-user-view-joining-report-listing','view-passport-request-list','current-user-view-passport-request-list'
+                                            ,'view-liability-list','current-user-view-liability-list','view-leave-list','view-current-user-leave-list'
+                                            ,'list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'
+                                            ,'list-all-overtime','list-current-user-overtime']);
                                 @endphp
                                 @if ($hasPermission)
                                 <li class="nav-item dropdown">
