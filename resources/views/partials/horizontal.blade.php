@@ -652,7 +652,6 @@
                                 </li>
                                 @endif
                                 @endcanany
-                            @canany(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action','verify-candidate-personal-information','send-personal-info-form-action'])
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action','verify-candidate-personal-information','send-personal-info-form-action']);
                             @endphp
@@ -660,7 +659,7 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                     <i data-feather="grid"></i>
-                                    <span data-key="t-extra-pages">{{Auth::user()->leave_request_approval['count'] ?? 'x'}}Approvals @if((Auth::user()->joining_report_approval['count']+Auth::user()->candidate_personal_information_varify+Auth::user()->candidate_docs_varify+Auth::user()->overtime_request_approval['count']+Auth::user()->liability_request_approval['count']+Auth::user()->leave_request_approval['count']+Auth::user()->passport_submit_request_approval['count']+Auth::user()->passport_release_request_approval['count']+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->verify_offer_letters) > 0)
+                                    <span data-key="t-extra-pages">Approvals @if((Auth::user()->joining_report_approval['count']+Auth::user()->candidate_personal_information_varify+Auth::user()->candidate_docs_varify+Auth::user()->overtime_request_approval['count']+Auth::user()->liability_request_approval['count']+Auth::user()->leave_request_approval['count']+Auth::user()->passport_submit_request_approval['count']+Auth::user()->passport_release_request_approval['count']+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->verify_offer_letters) > 0)
                                     <span class="approval-count">{{Auth::user()->overtime_request_approval['count']+Auth::user()->liability_request_approval['count']+Auth::user()->leave_request_approval['count']+Auth::user()->passport_submit_request_approval['count']+Auth::user()->passport_release_request_approval['count']+Auth::user()->hiring_request_approval['count']+Auth::user()->job_description_approval['count']+Auth::user()->interview_summary_report_approval['count']+Auth::user()->candidate_docs_varify+Auth::user()->candidate_personal_information_varify+Auth::user()->verify_offer_letters+Auth::user()->joining_report_approval['count']}}</span>
                                                 @endif
                                             </span>
@@ -858,7 +857,6 @@
                                 </div>
                             </li>
                             @endif
-                            @endcanany
 
                                 @can('Calls-view')
                                 @php
