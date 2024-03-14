@@ -332,13 +332,17 @@ Route::get('/d', function () {
     });
 
     // Joining Report
-    Route::resource('joining_report', JoiningReportController::class);
+    Route::resource('joining_report', JoiningReportController::class)->only('store','update','show','edit');
+    // Route::resource('enquires', EnquiresController::class)
     Route::controller(JoiningReportController::class)->group(function(){
         Route::post('joining_report_action', 'requestAction')->name('joiningReport.action');
         Route::get('joining_report_approval_awaiting', 'approvalAwaiting')->name('joiningReport.approvalAwaiting');
         Route::get('employee_joining_report/{type}','index')->name('employee_joining_report.index');
         Route::get('create_joining_report/{type}','create')->name('create_joining_report.create');
     });
+    Route::get('joining_report_employee_verification/{id}', [JoiningReportController::class, 'employeeVerification'])->name('employee_joining_report.verification');
+    Route::post('employee_joining_report/verified', [JoiningReportController::class, 'employeeVerified'])->name('employee_joining_report.verified');
+
     // Asset Allocation
     Route::resource('asset_allocation', AssetAllocationController::class);
     // Employee Passport Request
@@ -767,9 +771,7 @@ Route::get('/d', function () {
     Route::get('candidate/success_personal_info', [CandidatePersonalInfoController::class, 'successPersonalinfo'])->name('candidate.successPersonalinfo');
     Route::get('candidate-offer-letter/sign/{id}', [CandidatePersonalInfoController::class, 'signJobOfferLetter'])->name('candidate-offer-letter.sign');
     Route::post('offer-letter/signed', [CandidatePersonalInfoController::class, 'signedOfferLetter'])->name('offerletter.signed');
-    Route::get('joining_report_employee_verification/{id}', [JoiningReportController::class, 'employeeVerification'])->name('employee_joining_report.verification');
-    Route::post('employee_joining_report/verified', [JoiningReportController::class, 'employeeVerified'])->name('employee_joining_report.verified');
-
+   
 
     //Payment Terms
     Route::resource('paymentterms', PaymentTermsController::class);

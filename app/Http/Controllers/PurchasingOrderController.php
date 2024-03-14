@@ -44,7 +44,7 @@ class PurchasingOrderController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $userId = auth()->user()->id;
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
         if ($hasPermission){
         if(Auth::user()->hasPermissionForSelectedRole('demand-planning-po-list')){
             $demandPlanningPoIds = LOIItemPurchaseOrder::groupBy('purchase_order_id')->pluck('purchase_order_id');
@@ -55,7 +55,7 @@ class PurchasingOrderController extends Controller
             $data = PurchasingOrder::with('purchasing_order_items')->whereIn('id', $demandPlanningPoIds)
                                                 ->get();
         }else{
-            $data = PurchasingOrder::with('purchasing_order_items')->orderBy('po_number', 'desc')->get();
+            $data = PurchasingOrder::with('purchasing_order_items')->orderBy('id', 'desc')->get();
         }
     }
     else
@@ -70,8 +70,8 @@ class PurchasingOrderController extends Controller
                                                 ->whereIn('id', $demandPlanningPoIds)
                                                 ->get();
         }else{
-            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->orderBy('po_number', 'desc')->get();
-        }
+            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->orderBy('id', 'desc')->get();
+        }  
     }
         return view('warehouse.index', compact('data'));
     }
@@ -83,30 +83,42 @@ class PurchasingOrderController extends Controller
     public function filterapprovedonly($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
-        ->whereExists(function ($query) {
-            $query->select(DB::raw(1))
-                ->from('vehicles')
-                ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                ->where(function ($query) {
-                    $query->where('status', 'Approved')
-                        ->orWhere(function ($query) {
-                            $query->whereNotIn('payment_status', ['Payment Initiate Request Rejected', 'Request Rejected', 'Payment Release Rejected', 'Incoming Stock'])
-                                ->where(function ($query) {
-                                    $query->whereNotNull('payment_status')
-                                        ->where('payment_status', '<>', '');
-                                });
-                        });
-                });
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        if ($hasPermission){
+            $data = PurchasingOrder::with('purchasing_order_items')
+            ->where('purchasing_order.status', 'Approved')
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('vehicles')
+            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.status', 'Approved');
+    })
+            ->groupBy('purchasing_order.id')
+            ->get();
+        }
+        else{
+        $data = PurchasingOrder::with('purchasing_order_items')->where('purchasing_order.status', 'Approved')
+        ->where(function ($query) use ($userId) {
+            $query->where('purchasing_order.created_by', $userId)
+                ->orWhere('purchasing_order.created_by', 16);
         })
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('vehicles')
+            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.status', 'Approved');
+    })
         ->groupBy('purchasing_order.id')
-        ->get();
+        ->get();   
+        }
         return view('warehouse.index', compact('data'));
     }
     public function filterapproved($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        if ($hasPermission){
+        $data = PurchasingOrder::with('purchasing_order_items')
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('vehicles')
@@ -124,12 +136,39 @@ class PurchasingOrderController extends Controller
         })
         ->groupBy('purchasing_order.id')
         ->get();
+    }
+        else{
+            $data = PurchasingOrder::with('purchasing_order_items')
+            ->where(function ($query) use ($userId) {
+                $query->where('purchasing_order.created_by', $userId)
+                    ->orWhere('purchasing_order.created_by', 16);
+            })
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where(function ($query) {
+                        $query->where('status', 'Request for Payment')
+                            ->orWhere(function ($query) {
+                                $query->whereNotIn('payment_status', ['Payment Initiate Request Rejected', 'Request Rejected', 'Payment Release Rejected', 'Incoming Stock'])
+                                    ->where(function ($query) {
+                                        $query->whereNotNull('payment_status')
+                                            ->where('payment_status', '<>', '');
+                                    });
+                            });
+                    });
+            })
+            ->groupBy('purchasing_order.id')
+            ->get();
+        }
         return view('warehouse.index', compact('data'));
     }
     public function filterincomings($status)
 {
     $userId = auth()->user()->id;
-    $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+    if ($hasPermission){
+    $data = PurchasingOrder::with('purchasing_order_items')
     ->where('status', $status)
     ->whereNotExists(function ($query) {
         $query->select(DB::raw(1))
@@ -139,6 +178,24 @@ class PurchasingOrderController extends Controller
     })
     ->groupBy('purchasing_order.id')
     ->get();
+}
+else
+{
+    $data = PurchasingOrder::with('purchasing_order_items')
+    ->where(function ($query) use ($userId) {
+        $query->where('purchasing_order.created_by', $userId)
+            ->orWhere('purchasing_order.created_by', 16);
+    })
+    ->where('status', $status)
+    ->whereNotExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('vehicles')
+            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->whereNotIn('payment_status', ['Payment Rejected', 'Payment Release Rejected', 'Payment Initiate Request Rejected', 'Incoming Stock']);
+    })
+    ->groupBy('purchasing_order.id')
+    ->get();  
+}
     return view('warehouse.index', compact('data'));
 }
     public function filterpayment($status)
@@ -156,59 +213,121 @@ class PurchasingOrderController extends Controller
     public function filterpaymentrel($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+    if ($hasPermission){
+        $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where('vehicles.payment_status', 'Payment Initiated')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
-
+    }
+    else
+    {
+        $data = PurchasingOrder::with('purchasing_order_items')
+        ->where(function ($query) use ($userId) {
+            $query->where('purchasing_order.created_by', $userId)
+                ->orWhere('purchasing_order.created_by', 16);
+        })
+        ->where('purchasing_order.status', $status)
+        ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+        ->where('vehicles.payment_status', 'Payment Initiated')
+        ->select('purchasing_order.*')
+        ->groupBy('purchasing_order.id')
+        ->get(); 
+    }
         return view('warehouse.index', compact('data'));
     }
     public function filterintentreq($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+    if ($hasPermission){
+        $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where('vehicles.status', 'Request for Payment')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
-
+    }
+    else
+    {
+        $data = PurchasingOrder::with('purchasing_order_items')
+        ->where(function ($query) use ($userId) {
+            $query->where('purchasing_order.created_by', $userId)
+                ->orWhere('purchasing_order.created_by', 16);
+        })
+        ->where('purchasing_order.status', $status)
+        ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+        ->where('vehicles.status', 'Request for Payment')
+        ->select('purchasing_order.*')
+        ->groupBy('purchasing_order.id')
+        ->get();  
+    }
         return view('warehouse.index', compact('data'));
     }
     public function filterpendingrelease($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        if ($hasPermission){
+        $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where('vehicles.payment_status', 'Payment Initiate Request Approved')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
-
+        }
+        else 
+        {
+            $data = PurchasingOrder::with('purchasing_order_items')
+            ->where(function ($query) use ($userId) {
+                $query->where('purchasing_order.created_by', $userId)
+                    ->orWhere('purchasing_order.created_by', 16);
+            })
+            ->where('purchasing_order.status', $status)
+            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.payment_status', 'Payment Initiate Request Approved')
+            ->select('purchasing_order.*')
+            ->groupBy('purchasing_order.id')
+            ->get();  
+        }
         return view('warehouse.index', compact('data'));
     }
     public function filterpendingdebits($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        if ($hasPermission){
+        $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where('vehicles.payment_status', 'Payment Release Approved')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
-
+        }
+        else
+        {
+            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+            ->where('purchasing_order.status', $status)
+            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.payment_status', 'Payment Release Approved')
+            ->select('purchasing_order.*')
+            ->groupBy('purchasing_order.id')
+            ->get();   
+        }
         return view('warehouse.index', compact('data'));
     }
     public function filterpendingfellow($status)
     {
     $userId = auth()->user()->id;
-    $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+    if ($hasPermission){
+    $data = PurchasingOrder::with('purchasing_order_items')
         ->where('status', $status)
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
@@ -221,7 +340,23 @@ class PurchasingOrderController extends Controller
         })
         ->groupBy('purchasing_order.id')
         ->get();
-
+    }
+    else
+    {
+        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+        ->where('status', $status)
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('vehicles')
+                ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                ->where(function ($query) {
+                    $query->where('payment_status', 'Payment Completed')
+                          ->orWhere('payment_status', 'Vendor Confirmed');
+                });
+        })
+        ->groupBy('purchasing_order.id')
+        ->get();  
+    }
     return view('warehouse.index', compact('data'));
 }
 
@@ -1730,7 +1865,7 @@ public function allpaymentreqssfinpay(Request $request)
     $vehicles = DB::table('vehicles')
     ->where('purchasing_order_id', $id)
     ->where('status', 'Payment Requested')
-    ->where('payment_status', 'Payment Initiate Request Approved')
+    ->where('payment_status', 'Payment Initiated Request')
     ->get();
     foreach ($vehicles as $vehicle) {
         $status = 'Payment Requested';

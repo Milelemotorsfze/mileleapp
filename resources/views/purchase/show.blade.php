@@ -184,7 +184,7 @@
                                 <span id="status-badge" class="badge badge-soft-danger float-middle badge-large">Rejected</span>
                             @endif
                             @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-approval');
                             @endphp
                             @if ($hasPermission)
                                 @if ($purchasingOrder->status === 'Pending Approval')
@@ -194,7 +194,7 @@
                             @endif
                         </div>
                         @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
                         @endphp
                         @if ($hasPermission)
                             @if ($purchasingOrder->status === 'Approved')
@@ -203,11 +203,15 @@
                                         <label for="choices-single-default" class="form-label"><strong>Payment Initiation Request</strong></label>
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-12">
-                                        <button id="approval-btn" class="btn btn-success" onclick="updateallStatus('Approved', {{ $purchasingOrder->id }})">Approve All</button>
-                                        <button id="rejection-btn" class="btn btn-danger" onclick="updateallStatus('Rejected', {{ $purchasingOrder->id }})">Reject All</button>
+                                    <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfinpay('Approved', {{ $purchasingOrder->id }})">Approval All</button>
                                     </div>
                                 @endif
                             @endif
+                            @endif
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
+                        @endphp
+                        @if ($hasPermission)
                             @if ($purchasingOrder->status === 'Approved')
                                 @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Initiated'))
                                     <div class="col-lg-2 col-md-3 col-sm-12">
@@ -219,7 +223,7 @@
                                     </div>
                                 @endif
                             @endif
-                        @endif
+                            @endif
                         @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                         @endphp
@@ -256,16 +260,16 @@
                             @endif
                         @endif
                         @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
                         @endphp
                         @if ($hasPermission)
                             @if ($purchasingOrder->status === 'Approved')
                                 @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('status', 'Request for Payment'))
                                     <div class="col-lg-2 col-md-3 col-sm-12">
-                                        <label for="choices-single-default" class="form-label"><strong>Payment Request Initiation</strong></label>
+                                        <label for="choices-single-default" class="form-label"><strong>Payment Request Approval</strong></label>
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-12">
-                                        <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfin('Approved', {{ $purchasingOrder->id }})">Request for All</button>
+                                        <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfin('Approved', {{ $purchasingOrder->id }})">Approved All</button>
                                     </div>
                                 @endif
                             @endif
@@ -279,7 +283,12 @@
                                     </div>
                                 @endif
                             @endif
-                            @if ($purchasingOrder->status === 'Approved')
+                        @endif
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
+                        @endphp
+                        @if ($hasPermission)
+                        @if ($purchasingOrder->status === 'Approved')
                                 @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Release Approved'))
                                     <div class="col-lg-2 col-md-3 col-sm-12">
                                         <label for="choices-single-default" class="form-label"><strong>Payment Completed</strong></label>
@@ -289,7 +298,7 @@
                                     </div>
                                 @endif
                             @endif
-                        @endif
+                            @endif
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-12">
@@ -331,31 +340,23 @@
                             <td style="font-size: 12px;">{{ $vehiclesrejectedcount }}</td>
                         </tr>
                         <tr>
-                            <td style="font-size: 12px;">Payment Requested</td>
+                            <td style="font-size: 12px;">Payment Requested To Manager</td>
                             <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
                         </tr>
                         <tr>
-                            <td style="font-size: 12px;">Payment Request Initiated</td>
+                            <td style="font-size: 12px;">Payment Request To Finance</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitail }}</td>
                         </tr>
                         <tr>
-                            <td style="font-size: 12px;">Payment Request Approved</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailapp }}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">Payment Request Rejected</td>
-                            <td style="font-size: 12px;">{{ $vehiclescountintitailreq }}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">Payment Initiated</td>
+                            <td style="font-size: 12px;">Payment Initiated By Finance</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailrelreq }}</td>
                         </tr>
                         <tr>
-                            <td style="font-size: 12px;">Payment Release Approved</td>
+                            <td style="font-size: 12px;">Payment Released</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailrelapp }}</td>
                         </tr>
                         <tr>
-                            <td style="font-size: 12px;">Payment Release Rejected</td>
+                            <td style="font-size: 12px;">Payment Released Rejected</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailrelrej }}</td>
                         </tr>
                         <tr>
@@ -414,7 +415,7 @@
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
                                 <th id="serno" style="vertical-align: middle;">Vehicle Status:</th>
                                 @php
-                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit', 'edit-po-colour-details']);
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details']);
                                 @endphp
                                 @if ($hasPermission)
                                     <th>Payment Status</th>
@@ -529,7 +530,7 @@
 							              @endif
                             @endif
                             @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval']);
                             @endphp
                             @if ($hasPermission)
                             <td>
@@ -575,7 +576,7 @@
                             @endif
                             </td>
                             @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit', 'edit-po-colour-details']);
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details']);
                             @endphp
                             @if ($hasPermission)
                             <td>{{ ucfirst(strtolower($vehicles->payment_status)) }}</td>
@@ -586,7 +587,7 @@
             <div class="col-lg-8">
                         {{-- For Management  --}}
                         @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-approval');
                         @endphp
                         @if ($hasPermission)
                         @if ($vehicles->payment_status === '')
@@ -594,24 +595,22 @@
                         <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.approvedcancel', $vehicles->id) }}" onclick="return confirmApprovedcancel();"style="white-space: nowrap;">
                             Approved Cancel
                         </a>
-                        @elseif ($vehicles->status != 'Rejected')
+                        @elseif ($vehicles->status != 'Rejected' && $vehicles->status != 'Request for Payment')
                         <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmRejected();"style="white-space: nowrap;">
                             Reject / Cancel
                         </a>
-                        @else
+                        @elseif ($vehicles->status == 'Rejected')
                         <a title="UnReject" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.unrejecteds', $vehicles->id) }}" onclick="return confirmunRejected();" style="white-space: nowrap;">
                             Un-Reject
                         </a>
                         @endif
-                        @elseif ($vehicles->payment_status === 'Payment Initiated Request')
-                        <div style="display: flex; gap: 10px;">
-                        <a title="Payment Initiated Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleaseconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
-                        Approved
-                        </a>
-                        <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.paymentreleaserejected', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
-                        Reject
-                        </a>
-                        @elseif ($vehicles->payment_status === 'Payment Initiated')
+                        @endif
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
+                        @endphp
+                        @if ($hasPermission)
+                        @if ($vehicles->payment_status === 'Payment Initiated')
                         <div style="display: flex; gap: 10px;">
                         <a title="Payment Release Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleasesconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
                         Approved
@@ -666,14 +665,25 @@
 										@endif
 							{{-- End For Initiate Payment procurement  --}}
 							{{-- For Initiate Payment Finance  --}}
+                            @if ($vehicles->payment_status === 'Payment Initiated Request')
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
+                        @endphp
+                        @if ($hasPermission)
+                        <div style="display: flex; gap: 10px;">
+                        <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+                        Approved
+                        </a>
+                        @endif
+                        @endif
 										@php
-											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+											$hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
 											@endphp
 											@if ($hasPermission)
 											@if ($purchasingOrder->status === 'Approved')
 											@if ($vehicles->status === 'Request for Payment')
 											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentintconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-											Initiate Payment Request
+											Approved Payment
 											</a>
 											@endif
 											@endif
@@ -695,7 +705,7 @@
 								{{-- End For Release Request  --}}
 								{{-- For Amount Debited  --}}
 									@php
-									$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+									$hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
 									@endphp
 									@if ($hasPermission)
 									@if ($purchasingOrder->status === 'Approved')
@@ -895,7 +905,7 @@
                                         @endphp
                                         {{ ucfirst(strtolower($change_bys)) }}
                                     </td>
-                                    <td>
+                                    <td>  
                                         @php
                                             $selected = DB::table('roles')->where('id', $vehicleslog->role)->first();
                                             $roleselected = $selected ? $selected->name : null;

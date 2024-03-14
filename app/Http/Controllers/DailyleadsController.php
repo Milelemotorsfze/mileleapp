@@ -39,13 +39,26 @@ class DailyleadsController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $id = Auth::user()->id;
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+        if($hasPermission)
+        {
         $pendingdata = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
     ->where('calls.status', 'New')
-    ->where('calls.sales_person', $id)
     ->orderByRaw("FIELD(lead_source.priority, 'Low', 'Normal', 'High') DESC")
     ->orderBy('calls.created_by', 'desc')
     ->select('calls.*', 'lead_source.priority')
     ->get();
+    }
+    else
+    {
+        $pendingdata = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
+        ->where('calls.status', 'New')
+        ->where('calls.sales_person', $id)
+        ->orderByRaw("FIELD(lead_source.priority, 'Low', 'Normal', 'High') DESC")
+        ->orderBy('calls.created_by', 'desc')
+        ->select('calls.*', 'lead_source.priority')
+        ->get();
+    }
         if ($request->ajax()) {
             $status = $request->input('status');
             if($status === "Preorder")

@@ -80,7 +80,7 @@ class QuotationController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+    { 
         $isVehicle = 0;
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
@@ -126,6 +126,8 @@ class QuotationController extends Controller
         $quotationDetail->cb_number = $request->cb_number;
         $quotationDetail->agents_id = $request->agents_id;
         $quotationDetail->advance_amount = $request->advance_amount;
+        $quotationDetail->due_date = $request->due_date;
+        $quotationDetail->selected_bank = $request->select_bank;
         $quotationDetail->save();
         if($request->agents_id) {
             $agentCommission = new AgentCommission();
@@ -138,22 +140,27 @@ class QuotationController extends Controller
         }
         $commissionAED = 0;
         $quotationItemIds = [];
-
         foreach ($request->prices as $key => $price) {
             $item = "";
-            if($request->system_code_currency[$key] == 'U') {
+        if($request->agents_id)
+        {
+            if($request->system_code_currency[$key] == 'U') { 
                 $amount = $request->system_code_amount[$key] * $aed_to_usd_rate->value;
             }else{
                 $amount = $request->system_code_amount[$key];
             }
-            $commissionAED = $commissionAED + $amount;
+           $commissionAED = $commissionAED + $amount;
+        }
            $quotationItem = new QuotationItem();
            $quotationItem->unit_price = $price;
            $quotationItem->quantity = $request->quantities[$key];
            $quotationItem->description = $request->descriptions[$key];
            $quotationItem->total_amount = $request->total_amounts[$key];
+           if($request->agents_id)
+           {
            $quotationItem->system_code_amount = $request->system_code_amount[$key];
            $quotationItem->system_code_currency = $request->system_code_currency[$key];
+           }
            $quotationItem->quotation_id = $quotation->id;
            $quotationItem->uuid = $request->uuids[$key];
            $quotationItem->is_addon = $request->is_addon[$key];
@@ -930,12 +937,12 @@ public function addqaddone(Request $request)
         return $shippingPorts;
     }
     public function getShippingCharges(Request $request) {
-        info($request->all());
+        info($request->from_shipping_port_id);
+        info($request->to_shipping_port_id);
         $shippingCharges = Shipping::with('shippingMedium')
                             ->where('from_port', $request->from_shipping_port_id)
                             ->where('to_port', $request->to_shipping_port_id)
                             ->get();
-        info($shippingCharges);
         return $shippingCharges;
     }
     public function getvinsqoutation(Request $request)

@@ -1631,8 +1631,10 @@
                         to_shipping_port_id: toShippingPortId,
                     },
                     success:function (response) {
+                        console.log(response);
                         var slNo = 0;
                         var data = response.map(function(response) {
+                            
                             slNo = slNo + 1;
                             var addButton = '<div class="add-button circle-button" data-button-type="Shipping" data-shipping-id="'+ response.id +'" ></div>';
 
