@@ -176,8 +176,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">Signature </label>
-                        <input type="file" id="signature-upload" name="loi_signature"  onchange="readURL(event)"
-                               class="form-control widthinput">
+                        <input type="file" id="signature-upload" name="loi_signature" accept="image/*" class="form-control widthinput">
                     </div>
                 </div>
             </div>
@@ -297,19 +296,6 @@
             }
         });
 
-        // function readURL(input) {
-        //     if (input.files && input.files[0]) {
-        //         var reader = new FileReader();
-        //         reader.onload = function(e) {
-        //             $("#preview")
-        //                 .attr("src", e.target.result)
-        //                 .width(100)
-        //                 .height(100);
-        //         };
-        //         reader.readAsDataURL(input.files[0]);
-        //     }
-        // }
-
         const signatureFileInput = document.querySelector("#signature-upload");
         const signaturePreviewFile = document.querySelector("#signature-preview");
 
@@ -328,15 +314,6 @@
 
         });
         getCustomers();
-
-        // jQuery.validator.addMethod('signature', function(value, element) {
-        //     let dealer = $('#dealer').val();
-        //     if(dealer == 'Milele Motors') {
-        //         return true;
-        //     }else{
-        //         return false;
-        //     }
-        // },'This feild is required');
 
         $("#form-create").validate({
             ignore: [],
@@ -373,6 +350,9 @@
                     extension: "pdf"
                 },
                 loi_signature: {
+                    required:function(element) {
+                        return $("#dealer").val() == 'Milele Motors'
+                    },
                     extension: "png|jpeg|jpg|svg"
                 },
                 messages: {

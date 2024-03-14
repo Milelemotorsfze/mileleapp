@@ -182,10 +182,12 @@
             </div>
             <div class="row">
                 <div class="col-lg-3 col-md-6 col-sm-12">
-                    @if($letterOfIndent->signature)  <label class="form-label fw-bold" id="signature-label">Signature</label> @endif
                     <div class="mb-3" id="signature-preview">
                         @if($letterOfIndent->signature)
-                            <iframe src="{{ url('/LOI-Signature/'.$letterOfIndent->signature) }}"></iframe>
+                            <iframe src="{{ url('/LOI-Signature/'.$letterOfIndent->signature) }}"   ></iframe>
+                            @if($letterOfIndent->dealers == 'Trans Cars' || request()->dealers == 'Trans Cars')
+                                <a href="#" class="btn btn-danger text-center mt-2 remove-signature-button"><i class="fa fa-trash"></i> </a>
+                            @endif
                         @endif
                     </div>
                 </div>
@@ -233,7 +235,6 @@
                             @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
                                 <div class="row Loi-items-row-div" id="row-{{$key+1}}">
                                     <div class="col-lg-2 col-md-6 col-sm-12">
-{{--                                        <label class="form-label">Model</label>--}}
                                         <select class="form-select widthinput text-dark models" multiple data-index="{{$key+1}}" name="models[]" id="model-{{$key+1}}" autofocus>
                                             <option value="" >Select Model</option>
                                             @foreach($models as $model)
@@ -247,7 +248,6 @@
                                         @enderror
                                     </div>
                                     <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-{{--                                        <label class="form-label">SFX</label>--}}
                                         <select class="form-select widthinput text-dark sfx" multiple  data-index="{{$key+1}}" name="sfx[]" id="sfx-{{$key+1}}" >
                                             @foreach($letterOfIndentItem->sfxLists as $sfx)
                                                 <option value="{{ $sfx}}" {{$sfx == $letterOfIndentItem->masterModel->sfx ? 'selected' : ''}} >{{ $sfx }}</option>
@@ -260,7 +260,6 @@
                                         @enderror
                                     </div>
                                     <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-{{--                                        <label class="form-label">Model Year</label>--}}
                                         <select class="form-select widthinput text-dark model-years" multiple  data-index="{{$key+1}}" name="model_year[]" id="model-year-{{$key+1}}">
                                             @foreach($letterOfIndentItem->modelYearLists as $modelYear)
                                                 <option value="{{ $modelYear }}" {{$modelYear == $letterOfIndentItem->masterModel->model_year ? 'selected' : ''}} >{{ $modelYear }}</option>
@@ -273,19 +272,16 @@
                                         @enderror
                                     </div>
                                     <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
-{{--                                        <label class="form-label">LOI Description</label>--}}
                                         <input type="text" readonly placeholder="LOI Description"
                                                class="form-control widthinput text-dark loi-descriptions"
                                                value="{{$letterOfIndentItem->loi_description}}" data-index="{{$key+1}}" id="loi-description-{{$key+1}}">
                                     </div>
                                     <div class="col-lg-1 col-md-6 col-sm-12">
-{{--                                        <label class="form-label">Quantity</label>--}}
                                         <input type="number" name="quantity[]" placeholder="Quantity"  maxlength="5" value="{{$letterOfIndentItem->quantity}}" data-index="{{$key+1}}"
                                                class="form-control widthinput quantities text-dark"
                                                step="1" oninput="validity.valid||(value='');" min="0" id="quantity-{{$key+1}}">
                                     </div>
                                     <div class="col-lg-1 col-md-6 col-sm-12">
-{{--                                        <label class="form-label">Inventory Qty</label>--}}
                                         <input type="number" readonly id="inventory-quantity-{{$key+1}}" value="{{$letterOfIndentItem->inventory_quantity}}" data-index="{{$key+1}}" class="form-control widthinput inventory-qty" >
                                         <input type="hidden" name="master_model_ids[]" class="master-model-ids" value="{{$letterOfIndentItem->master_model_id}}" id="master-model-id-{{$key+1}}">
                                     </div>
@@ -305,6 +301,7 @@
                         </div>
                     </div>
                 </div>
+            <input type="hidden" name="is_signature_removed" id="is_signature_removed" value="0">
             <select name="deletedIds[]" id="deleted-docs" hidden="hidden" multiple>
             </select>
             <input type="hidden" id="remaining-document-count" value="{{ $letterOfIndent->LOIDocuments->count() }}" >
@@ -370,12 +367,15 @@
                 $('#dealer-input').val(value);
 
                 getModels('all','dealer-change');
-
             });
 
             $('#customer-type').change(function () {
                 getCustomers();
             });
+        $('.remove-signature-button').click(function () {
+            $('#is_signature_removed').val(1);
+            $('#signature-preview').hide();
+        });
 
             $('.remove-doc-button').click(function () {
                 let id = $(this).attr('data-id');
@@ -441,15 +441,6 @@
                 });
             }
 
-         jQuery.validator.addMethod('signature', function(value, element) {
-             let dealer = $('#dealer').val();
-             if(dealer == 'Milele Motors') {
-                 return true;
-             }else{
-                 return false;
-             }
-         },'This feild is required');
-
 
         jQuery.validator.addMethod('file', function(value, element) {
             let remainingCount = $('#remaining-document-count').val();
@@ -495,6 +486,10 @@
                     extension: "pdf"
                 },
                 loi_signature: {
+                    required:function(element) {
+                        let currentDealer = '{{ $letterOfIndent->dealers }}';
+                        return $("#dealer").val() == 'Milele Motors' && currentDealer == 'Trans Cars'
+                    },
                     extension: "png|jpeg|jpg|svg"
                 },
                 messages: {
