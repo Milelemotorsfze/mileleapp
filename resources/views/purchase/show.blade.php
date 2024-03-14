@@ -94,6 +94,16 @@
                             <span>{{date('d-M-Y', strtotime($purchasingOrder->po_date))}}</span>
                         </div>
                     </div>
+                    @if($purchasingOrder->is_demand_planning_purchase_order == true)
+                        <div class="row">
+                            <div class="col-lg-2 col-md-3 col-sm-12">
+                                <label for="choices-single-default" class="form-label"><strong>PFI Number</strong></label>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-12">
+                                <span> {{ $purchasingOrder->LOIPurchasingOrder->approvedLOI->pfi->pfi_reference_number ?? '' }} </span>
+                            </div>
+                        </div>
+                    @endif
                     <div class="row">
                         <div class="col-lg-2 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Vendor Name</strong></label>
@@ -102,6 +112,7 @@
                             <span>{{ucfirst(strtolower($vendorsname))}}</span>
                         </div>
                     </div>
+
                     <div class="row">
                         <div class="col-lg-2 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>Total Vehicles</strong></label>
