@@ -969,6 +969,17 @@
 
                                 @endif
                                 @endcan
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                                @endphp
+                                @if ($hasPermission)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
+                                        <i data-feather="film"></i>
+                                        <span data-key="t-extra-pages">Leads</span>
+                                    </a>
+                                </li>
+                                @endif
                                 @can('sales-view')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
