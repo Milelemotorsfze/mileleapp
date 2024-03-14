@@ -157,13 +157,16 @@
                                                         <input id="educational_qualification" type="text" class="form-control widthinput @error('educational_qualification') is-invalid @enderror" name="educational_qualification"
                                                             placeholder="Educational Qualification" value="" autocomplete="educational_qualification" autofocus>
                                                     </div>
-                                                    <div class="col-xxl-3 col-lg-6 col-md-6">
+                                                    <div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+                                                    <div class="dropdown-option-div">
                                                         <span class="error">* </span>
                                                         <label for="year_of_completion" class="col-form-label text-md-end">{{ __('Year of Completion') }}</label>
-                                                        <input id="year_of_completion" type="number" min="1950" max="2023" step="1" class="form-control widthinput @error('year_of_completion') is-invalid @enderror" name="year_of_completion"
+                                                        <input id="year_of_completion" type="number" min="1950" max="<?= date('Y'); ?>" step="1" class="form-control widthinput @error('year_of_completion') is-invalid @enderror" name="year_of_completion"
                                                             placeholder="Year of Completion" value="" autocomplete="year_of_completion" autofocus>
                                                     </div>
-                                                    <div class="col-xxl-3 col-lg-6 col-md-6">
+                                                    </div>
+                                                    <div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+                                                    <div class="dropdown-option-div">
                                                         <span class="error">* </span>
                                                         <label for="religion" class="col-form-label text-md-end">{{ __('Choose Religion') }}</label>
                                                         <select name="religion" id="religion" multiple="true" class="form-control widthinput" autofocus>
@@ -171,6 +174,7 @@
                                                             <option value="{{$religion->id}}">{{$religion->name}}</option>
                                                             @endforeach
                                                         </select>
+                                                        </div>
                                                     </div>
                                                     <div class="col-xxl-3 col-lg-6 col-md-6">
                                                         <span class="error">* </span>
@@ -178,7 +182,8 @@
                                                         <input id="dob" type="date" class="form-control widthinput @error('dob') is-invalid @enderror" name="dob"
                                                             value="" autocomplete="dob" autofocus>
                                                     </div>
-                                                    <div class="col-xxl-3 col-lg-6 col-md-6">
+                                                    <div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+                                                    <div class="dropdown-option-div">
                                                         <span class="error">* </span>
                                                         <label for="language_id" class="col-form-label text-md-end">{{ __('Choose Spoken Languages') }}</label>
                                                         <select name="language_id[]" id="language_id" multiple="true" class="form-control widthinput" autofocus>
@@ -186,6 +191,7 @@
                                                         <option value="{{$masterLanguage->id}}" {{ $candidate && $candidate->candidateDetails && $candidate->candidateDetails->candidateLanguages && in_array($masterLanguage->id, $candidate->candidateDetails->candidateLanguages->pluck('language_id')->toArray()) ? 'selected' : '' }}>{{$masterLanguage->name}}</option>
                                                         @endforeach
                                                         </select>
+                                                    </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -211,20 +217,24 @@
                                                                 <span class="error">* </span>
                                                                 <label for="residence_telephone_number" class="col-form-label text-md-end">{{ __('Residence Telephone Number') }}</label>
                                                             </div>
-                                                            <div class="col-xxl-8 col-lg-8 col-md-8 mt-2">
+                                                            <div class="col-xxl-8 col-lg-8 col-md-8 mt-2 select-button-main-div">
+                                                            <div class="dropdown-option-div">
                                                                 <input id="residence_telephone_number" type="tel" class="widthinput contact form-control @error('residence_telephone_number[full]')
                                                                     is-invalid @enderror" name="residence_telephone_number[main]" placeholder="Enter Alternative Contact Number" oninput="validationOnKeyUp(this)"
                                                                     value="{{$candidate->candidateDetails->residence_telephone_number ?? ''}}" autocomplete="residence_telephone_number[full]" autofocus
                                                                     >
                                                             </div>
+                                                            </div>
                                                             <div class="col-xxl-4 col-lg-4 col-md-4 mt-2">
                                                                 <span class="error">* </span>
                                                                 <label for="contact_number" class="col-form-label text-md-end">{{ __('Mobile Number:') }}</label>
                                                             </div>
-                                                            <div class="col-xxl-8 col-lg-8 col-md-8 mt-2">
+                                                            <div class="col-xxl-8 col-lg-8 col-md-8 mt-2 select-button-main-div">
+                                                            <div class="dropdown-option-div">
                                                                 <input id="contact_number" type="tel" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
                                                                     name="contact_number[main]" placeholder="Mobile Number" value="{{old('hiddencontact')}}" oninput="validationOnKeyUp(this)"
                                                                     autocomplete="contact_number[main]" autofocus>
+                                                            </div>
                                                             </div>
                                                             <div class="col-xxl-4 col-lg-4 col-md-4 mt-2">
                                                                 <span class="error">* </span>
@@ -317,16 +327,20 @@
                                                             <input id="ecu_email_1" type="text" class="form-control widthinput @error('ecu_email') is-invalid @enderror" 
                                                                 name="ecu[1][email_address]" data-index=1 placeholder="Email" value="" autocomplete="ecu_email" autofocus>
                                                         </div>
-                                                        <div class="col-xxl-2 col-lg-6 col-md-6">
+                                                        <div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div">
+                                                            <div class="dropdown-option-div">
                                                             <span class="error">* </span>
                                                             <label for="ecu_contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                                                             <input id="ecu_contact_number_1" type="tel" class="form-control widthinput @error('ecu_contact_number[main]') is-invalid @enderror" oninput="validationOnKeyUp(this)"
                                                                 name="ecu[1][contact_number][main]" data-index=1 placeholder="Contact Number" value="" autocomplete="ecu_contact_number[main]" autofocus>
                                                         </div>
-                                                        <div class="col-xxl-2 col-lg-6 col-md-6">
+                                                        </div>
+                                                        <div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div">
+                                                            <div class="dropdown-option-div">
                                                             <label for="ecu_alternative_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
                                                             <input id="ecu_alternative_number_1" type="tel" class="form-control widthinput @error('ecu_alternative_number[main]') is-invalid @enderror" oninput="validationOnKeyUp(this)"
                                                                 name="ecu[1][alternative_contact_number][main]" data-index=1 placeholder="Alternative Number" value="" autocomplete="ecu_alternative_number[main]" autofocus>
+                                                        </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -388,18 +402,22 @@
                                                                     <span class="error">* </span>
                                                                     <label for="ech_contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                                                                 </div>
-                                                                <div class="col-xxl-9 col-lg-9 col-md-9">
+                                                                <div class="col-xxl-9 col-lg-9 col-md-9 select-button-main-div">
+                                                                <div class="dropdown-option-div">
                                                                     <input id="ech_contact_number_1" type="tel" class="form-control widthinput @error('ech_contact_number') is-invalid @enderror" 
                                                                         name="ech[1][contact_number][main]" data-index=1 oninput="validationOnKeyUp(this)"
                                                                         placeholder="Contact Number" value="" autocomplete="ech_contact_number" autofocus>
                                                                 </div>
+                                                                </div>
                                                                 <div class="col-xxl-3 col-lg-3 col-md-3">
                                                                     <label for="ech_alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Number') }}</label>
                                                                 </div>
-                                                                <div class="col-xxl-9 col-lg-9 col-md-9">
+                                                                <div class="col-xxl-9 col-lg-9 col-md-9 select-button-main-div">
+                                                                <div class="dropdown-option-div">
                                                                     <input id="ech_alternative_contact_number_1" type="tel" class="form-control widthinput @error('ech_alternative_contact_number') is-invalid @enderror" 
                                                                         name="ech[1][alternative_contact_number][main]" data-index=1 oninput="validationOnKeyUp(this)"
                                                                         placeholder="Alternative Contact Number" value="" autocomplete="ech_alternative_contact_number" autofocus>
+                                                                </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -815,16 +833,20 @@
                                 <input id="ecu_email_${index}" type="text" class="form-control widthinput @error('ecu_email') is-invalid @enderror" 
                                 name="ecu[${index}][email_address]" data-index=${index} placeholder="Email" value="" autocomplete="ecu_email" autofocus>
                             </div>
-                            <div class="col-xxl-2 col-lg-6 col-md-6">
+                            <div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div">
+                                                            <div class="dropdown-option-div">
                                 <span class="error">* </span>
                                 <label for="ecu_contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                                 <input id="ecu_contact_number_${index}" type="tel" class="form-control widthinput @error('ecu_contact_number[main]') is-invalid @enderror" 
                                 oninput="validationOnKeyUp(this)" name="ecu[${index}][contact_number][main]" data-index=${index} placeholder="Contact Number"  value="" autocomplete="ecu_contact_number[main]" autofocus>
                             </div>
-                            <div class="col-xxl-2 col-lg-6 col-md-6">
+                            </div>
+                            <div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div">
+                                                            <div class="dropdown-option-div">
                                 <label for="ecu_alternative_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
                                 <input id="ecu_alternative_number_${index}" type="tel" class="form-control widthinput @error('ecu_alternative_number[main]') is-invalid @enderror" 
                                 oninput="validationOnKeyUp(this)" name="ecu[${index}][alternative_contact_number][main]" data-index=${index} placeholder="Alternative Number"  value="" autocomplete="ecu_alternative_number[main]" autofocus>
+                            </div>
                             </div>
                             <div class="col-xxl-1 col-lg-6 col-md-6 add_del_btn_outer">
                                 <a class="btn_round remove_node_btn_frm_field" title="Remove Row">
@@ -882,18 +904,22 @@
                                         <span class="error">* </span>
                                         <label for="ech_contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                                     </div>
-                                    <div class="col-xxl-9 col-lg-9 col-md-9">
+                                    <div class="col-xxl-9 col-lg-9 col-md-9 select-button-main-div">
+                                                            <div class="dropdown-option-div">
                                         <input id="ech_contact_number_${index}" type="tel" class="form-control widthinput @error('ech_contact_number') is-invalid @enderror" 
                                         name="ech[${index}][contact_number][main]" data-index=${index} oninput="validationOnKeyUp(this)"
                                             placeholder="Contact Number" value="" autocomplete="ech_contact_number" autofocus>
                                     </div>
+                                    </div>
                                     <div class="col-xxl-3 col-lg-3 col-md-3">
                                         <label for="ech_alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Number') }}</label>
                                     </div>
-                                    <div class="col-xxl-9 col-lg-9 col-md-9">
+                                    <div class="col-xxl-9 col-lg-9 col-md-9 select-button-main-div">
+                                                            <div class="dropdown-option-div">
                                         <input id="ech_alternative_contact_number_${index}" type="tel" class="form-control widthinput @error('ech_alternative_contact_number') is-invalid @enderror" 
                                         name="ech[${index}][alternative_contact_number][main]" data-index=${index} oninput="validationOnKeyUp(this)"
                                             placeholder="Alternative Contact Number" value="" autocomplete="ech_alternative_contact_number" autofocus>
+                                    </div>
                                     </div>
                                 </div>
                             </div>
@@ -1172,9 +1198,32 @@
                     if ( element.prop( "type" ) === "checkbox" ) {
                         error.insertAfter( element.parent( "label" ) );
                     }
-                    else if (element.hasClass("select2-hidden-accessible")) {
-                        element = $("#select2-" + element.attr("id") + "-container").parent();
-                        error.insertAfter(element);
+                    else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+                        if (!element.val() || element.val().length === 0) {
+                            console.log("Error is here with length", element.val().length);
+                            error.addClass('select-error');
+                            error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+                        } else {
+                            console.log("No error");
+                        }
+                    }
+                    else if (element.prop( "type" ) === "number"  && element.closest('.select-button-main-div').length > 0) {
+                        if (!element.val() || element.val().length === 0) {
+                            console.log("Error is here with length", element.val().length);
+                            error.addClass('select-error');
+                            error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+                        } else {
+                            console.log("No error");
+                        }
+                    }
+                    else if (element.prop( "type" ) === "tel"  && element.closest('.select-button-main-div').length > 0) {
+                        if (!element.val() || element.val().length === 0) {
+                            console.log("Error is here with length", element.val().length);
+                            error.addClass('select-error');
+                            error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+                        } else {
+                            console.log("No error");
+                        }
                     }
                     else if (element.parent().hasClass('input-group')) {
                         error.insertAfter(element.parent());
@@ -1338,6 +1387,11 @@
                     signature: {
                         required: true,
                     }
+                },
+                messages: {
+                    signature:{
+                        required:"Signature is required, Click on Save signature before submit the form",
+                    },
                 },
             });
             function validationOnKeyUp(currentPriceInput) {
