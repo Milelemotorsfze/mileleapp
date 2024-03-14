@@ -439,16 +439,6 @@
                     </div>
                     <div class="row mt-2">
                         <div class="col-sm-6">
-                            Port of Discharge :
-                        </div>
-                        <div class="col-sm-6">
-                            <select class="form-control col" id="shipping_port" multiple name="from_shipping_port_id" style="width: 100%">
-                                <option></option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col-sm-6">
                             Port of Loading :
                         </div>
                         <div class="col-sm-6">
@@ -457,6 +447,16 @@
                                 @foreach($shippingPorts as $shippingPort)
                                     <option value="{{ $shippingPort->id }}">{{ $shippingPort->name }}</option>
                                 @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-sm-6">
+                            Port of Discharge :
+                        </div>
+                        <div class="col-sm-6">
+                            <select class="form-control col" id="shipping_port" multiple name="from_shipping_port_id" style="width: 100%">
+                                <option></option>
                             </select>
                         </div>
                     </div>
@@ -554,6 +554,33 @@
                     <div class="col-sm-6">
                         <input type="number" min="0" class="form-control form-control-xs advance-amount"
                                name="advance_amount" id="advance-amount" placeholder="Advance Amount" >
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4"  id="due-date-div" hidden>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Payment Due Date :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="date" min="0" class="form-control form-control-xs due-date"
+                               name="due_date" id="due-date" placeholder="Due Date" >
+                        <span class="required-message" style="display: none; color: red;">This field is required</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4"  id="select-bank-div" hidden>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Bank For Payment :
+                    </div>
+                    <div class="col-sm-6">
+                    <select name="select_bank" class="form-control">
+                        <option value="rak-aed">RAK BANK AED</option>
+                        <option value="rak-usd">RAK BANK USD</option>
+                        <option value="city-aed">CITY BANK AED</option>
+                        <option value="city-usd">CITY BANK USD</option>
+                    </select>
                     </div>
                 </div>
             </div>
@@ -1586,6 +1613,7 @@ $(document).ready(function () {
             getShippingCharges();
         });
         function getShippingCharges() {
+            console.log("pouch");
             let fromShippingPortId = $('#shipping_port').val();
             let toShippingPortId = $('#to_shipping_port').val();
             var table = $('#shipping-table').DataTable();
@@ -1778,9 +1806,17 @@ $(document).ready(function () {
             var documentType = $(this).val();
             if(documentType == 'Proforma') {
                 $('#advance-amount-div').attr('hidden', false);
+                $('#due-date-div').attr('hidden', false);
+                $('#due-date').prop('required', true);
+                $('#select-bank-div').attr('hidden', false);
+                $('.required-message').show();
             }else{
                 $('#advance-amount').val();
                 $('#advance-amount-div').attr('hidden', true);
+                $('#due-date-div').attr('hidden', true);
+                $('#due-date').prop('required', false);
+                $('#select-bank-div').attr('hidden', true);
+                $('.required-message').hide();
             }
         });
 
@@ -1990,7 +2026,6 @@ $(document).ready(function () {
                 url: '{{ route('quotation.getaddonmodel', ['brandId' => '__brandId__','type'=>'P']) }}'
                     .replace('__brandId__', brandId),
                 success: function(response) {
-                    // $('#accessories_model_line').append('<option value="allmodellines">All Model Lines</option>');
                     $.each(response, function(key, value) {
                         $('#accessories_model_line').append('<option value="' + key + '">' + value + '</option>');
                     });
@@ -2165,19 +2200,26 @@ $(document).ready(function () {
                 }
             },
             {
-                targets: -5,
-                data: null,
-                render: function (data, type, row) {
-                    return '<div class="input-group"> ' +
-                                '<input type="number" min="0"  value="1" step="1" class="system-code form-control"  name="system_code_amount[]"  id="system-code-amount-'+ row['index'] +'" />' +
-                                '<div class="input-group-append"> ' +
-                                    '<select class="form-control system-code-currency" name="system_code_currency[]"  id="system-code-currency-'+ row['index'] +'">' +
-                                        '<option value="A">A</option><option value="U">U</option>' +
-                                '</select>' +
-                                '</div> ' +
-                            '</div>';
-                }
-            },
+    targets: -5,
+    data: null,
+    render: function (data, type, row) {
+        // Check if agent id is selected
+        var agentId = $("#agents_id").val();
+        if (agentId) {
+            return '<div class="input-group"> ' +
+                        '<input type="number" min="0"  value="1" step="1" class="system-code form-control"  name="system_code_amount[]"  id="system-code-amount-'+ row['index'] +'" />' +
+                        '<div class="input-group-append"> ' +
+                            '<select class="form-control system-code-currency" name="system_code_currency[]"  id="system-code-currency-'+ row['index'] +'">' +
+                                '<option value="A">A</option><option value="U">U</option>' +
+                            '</select>' +
+                        '</div> ' +
+                    '</div>';
+        } else {
+            // If agent id is not selected, return empty string to hide the column
+            return '';
+             }
+            }
+        },
             {
                 targets: -3,
                 data: null,

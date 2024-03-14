@@ -9,6 +9,10 @@ class PurchasingOrder extends Model
 {
     use HasFactory;
     protected $table = 'purchasing_order';
+    protected $appends = [
+        'is_demand_planning_purchase_order',
+
+    ];
     public function purchasing_order_items()
     {
         return $this->hasMany(PurchasingOrderItems::class);
@@ -21,4 +25,12 @@ class PurchasingOrder extends Model
     {
         return $this->hasOne(LOIItemPurchaseOrder::class, 'purchase_order_id');
     }
+    public function getIsDemandPlanningPurchaseOrderAttribute() {
+        $isDemandPlanningPO = LOIItemPurchaseOrder::where('purchase_order_id', $this->id)->count();
+        if($isDemandPlanningPO > 0) {
+            return true;
+        }
+        return false;
+    }
+
 }
