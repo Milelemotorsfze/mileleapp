@@ -64,7 +64,7 @@
                 </tr>
             </table>
         </div>
-        <div  style="color: black">
+        <div style="color: black">
             <table style="border: none;">
                 <tr style="font-weight: bold;background-color: #bbbbbd">
                     <td colspan="2">Document Details</td>
@@ -75,7 +75,7 @@
                     <td style="font-weight: bold;">Document No :</td>
                     <td>{{ $data['document_number'] }}</td>
                     <td style="font-weight: bold;">Customer:</td>
-                    <td> {{ $data['client_id'] }}</td>
+                    <td> {{ $data['client_name'] }}</td>
                     <td style="font-weight: bold;"> @if($quotation->shipping_method == 'EXW') Final Des : @else Place Of Supply :  @endif</td>
                     <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->country->name ?? '' }} @else
                         {{ $quotationDetail->place_of_supply }}  @endif </td>
@@ -84,8 +84,13 @@
                 <tr>
                     <td style="font-weight: bold;">Document Date :</td>
                     <td>{{ $data['document_date'] }}</td>
+                    @if($data['company'])
                     <td style="font-weight: bold;">Company :</td>
                     <td>{{ $data['company'] }}</td>
+                    @else
+                    <td style="font-weight: bold;">Phone :</td>
+                    <td>{{  $data['client_phone']  }} </td>
+                    @endif
                     <td style="font-weight: bold;">
                         @if($quotation->shipping_method == 'EXW') Incoterm :@endif </td>
                     <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->incoterm  }} @endif </td>
@@ -104,8 +109,10 @@
                 <tr>
                     <td style="font-weight: bold;">Sales Person :</td>
                     <td>{{$data['sales_person'] }}</td>
+                    @if($data['company'] && $data['client_phone'])
                     <td style="font-weight: bold;">Phone :</td>
                     <td>{{  $data['client_phone']  }} </td>
+                    @endif
                     <td style="font-weight: bold;">
                         @if($quotation->shipping_method == 'EXW') POL :@endif </td>
                     <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->shippingPortOfLoad->name ??''   }} @endif </td>
@@ -140,23 +147,37 @@
         <div  style="color: black">
             <table style="border: none;">
                 <tr style="background-color: #bbbbbd;color: #000000;font-weight: bold">
+                @if($quotationDetail->payment_terms)
                     <td colspan="2">Payment Details</td>
+                    @endif
+                    @if ($quotationDetail->representative_name && $quotationDetail->cb_name )
                     <td colspan="4">Client  Representative</td>
+                    @endif
                 </tr>
                 <tr>
+                    @if($quotationDetail->payment_terms)
                     <td style="font-weight: bold;">Payment Terms :</td>
                     <td>{{ $quotationDetail->payment_terms }}</td>
+                    @endif
+                    @if($quotationDetail->representative_name)
                     <td style="font-weight: bold;">Rep Name :</td>
                     <td> {{ $quotationDetail->representative_name }}</td>
+                    @endif
+                    @if($quotationDetail->cb_name)
                     <td style="font-weight: bold;"> CB Name :</td>
                     <td> {{ $quotationDetail->cb_name }} </td>
+                    @endif
                 </tr>
                 <tr>
                     <td></td><td></td>
+                    @if($quotationDetail->representative_name)
                     <td style="font-weight: bold;">Rep No. :</td>
                     <td> {{ $quotationDetail->representative_number }}</td>
+                    @endif
+                    @if($quotationDetail->cb_name)
                     <td style="font-weight: bold;"> CB No :</td>
                     <td> {{ $quotationDetail->cb_number }} </td>
+                    @endif
                 </tr>
             </table>
         </div>
@@ -165,7 +186,9 @@
             @if($vehicles->count() > 0  || $otherVehicles->count() || $vehicleWithBrands->count() > 0)
                 <tr style="font-size: 12px;background-color: #bbbbbd;">
                     <th>VEHICLE</th>
+                    @if($quotationDetail->cb_name)
                     <th>SYSTEM CODE</th>
+                    @endif
                     <th>QTY</th>
                     <th>PRICE</th>
                     <th>AMOUNT</th>
@@ -176,7 +199,9 @@
                             $vehicleUnitPrice = $vehicle->vehicle_unit_price + $shippingPerVehiclequantityPrice;
                             $totalAmount = $vehicleUnitPrice * $vehicle->quantity ?>
                         <td><span style="font-weight: bold;font-size: 14px;" > {{ $key+1 }}. </span> {{ $vehicle->description }}</td>
+                        @if($quotationDetail->cb_name)
                         <td> {{$vehicle->system_code_currency ."". $vehicle->system_code_amount }}</td>
+                        @endif
                         <td>{{ $vehicle->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($vehicleUnitPrice, 2) }} </td>
                         <td>
@@ -223,7 +248,9 @@
                             $vehicleUnitPrice = $otherVehicle->vehicle_unit_price + $shippingPerVehiclequantityPrice;
                             $totalAmount = $vehicleUnitPrice * $otherVehicle->quantity ?>
                         <td> <span style="font-weight: bold;font-size: 14px;" > {{  $vehicles->count() + $key+1 }}. </span> {{ $otherVehicle->description }}</td>
+                        @if($quotationDetail->cb_name)
                         <td> {{ $otherVehicle->system_code_currency ."". $otherVehicle->system_code_amount }}</td>
+                        @endif
                         <td>{{ $otherVehicle->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($vehicleUnitPrice, 2) }}</td>
                         <td>
@@ -235,7 +262,9 @@
                             <tr style="color: #643702">
                                 <td><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>
                                     {{ $otherVehicleAddon->quotationItem->description ?? ''}}</td>
+                                    @if($quotationDetail->cb_name)
                                 <td> {{$otherVehicleAddon->quotationItem->system_code_currency ."". $otherVehicleAddon->quotationItem->system_code_amount }}</td>
+                                @endif
                                 <td>{{ $otherVehicleAddon->quotationItem->quantity ?? ''}}</td>
                                 <td>{{ $quotation->currency ." ". number_format($otherVehicleAddon->quotationItem->unit_price, 2) }}</td>
                                 <td>{{ $quotation->currency ." ". number_format($otherVehicleAddon->quotationItem->total_amount, 2) }}</td>
@@ -249,7 +278,9 @@
                             $vehicleUnitPrice = $vehicleWithBrand->vehicle_unit_price + $shippingPerVehiclequantityPrice;
                             $totalAmount = $vehicleUnitPrice * $vehicleWithBrand->quantity ?>
                         <td> <span style="font-weight: bold;font-size: 14px;" > {{$vehicles->count() + $otherVehicles->count() + $key+1 }}. </span> {{ $vehicleWithBrand->description }}</td>
+                        @if($quotationDetail->cb_name)
                         <td> {{ $vehicleWithBrand->system_code_currency ."". $vehicleWithBrand->system_code_amount }}</td>
+                        @endif
                         <td>{{ $vehicleWithBrand->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($vehicleUnitPrice, 2) }}</td>
                         <td>
@@ -261,7 +292,9 @@
                             <tr style="color: #643702">
                                 <td><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>
                                     {{ $otherVehicleWithBrandAddon->quotationItem->description ?? ''}}</td>
+                                    @if($quotationDetail->cb_name)
                                 <td> {{$otherVehicleWithBrandAddon->quotationItem->system_code_currency ."". $otherVehicleWithBrandAddon->quotationItem->system_code_amount }}</td>
+                                @endif
                                 <td>{{ $otherVehicleWithBrandAddon->quotationItem->quantity ?? ''}} </td>
                                 <td>{{ $quotation->currency ." ". number_format($otherVehicleWithBrandAddon->quotationItem->unit_price, 2) }}</td>
                                 <td>{{ $quotation->currency ." ". number_format($otherVehicleWithBrandAddon->quotationItem->total_amount, 2) }}</td>
@@ -281,7 +314,9 @@
                 @foreach($shippingCharges as $key => $shippingCharge)
                     <tr>
                         <td><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>{{ $shippingCharge->description }}</td>
+                        @if($quotationDetail->cb_name)
                         <td> {{$shippingCharge->system_code_currency ."". $shippingCharge->system_code_amount }}</td>
+                        @endif
                         <td>{{ $shippingCharge->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($shippingCharge->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($shippingCharge->total_amount, 2) }}</td>
@@ -290,7 +325,9 @@
                 @foreach($shippingDocuments as $key => $shippingDocument)
                     <tr>
                         <td><span style="font-weight: bold;margin-right: 5px;" > {{ $shippingCharges->count() + $key+1 }}. </span> {{ $shippingDocument->description }}</td>
+                        @if($quotationDetail->cb_name)
                         <td> {{$shippingDocument->system_code_currency ."". $shippingDocument->system_code_amount }}</td>
+                        @endif
                         <td>{{ $shippingDocument->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($shippingDocument->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($shippingDocument->total_amount, 2) }}</td>
@@ -309,7 +346,9 @@
                 @foreach($addons as $key => $addon)
                     <tr>
                         <td> <span style="font-weight: bold;margin-right: 5px;" > {{ $key + 1 }}. </span> {{ $addon->description }}</td>
+                        @if($quotationDetail->cb_name)
                         <td> {{ $addon->system_code_currency ."". $addon->system_code_amount }}</td>
+                        @endif
                         <td>{{ $addon->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($addon->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($addon->total_amount, 2) }}</td>
@@ -327,7 +366,9 @@
                     @foreach($OtherAddons as $key => $OtherAddon)
                         <tr>
                             <td><span style="font-weight: bold;margin-right: 5px;" > {{ $addons->count() + $key+1 }}. </span> {{ $OtherAddon->description }}</td>
+                            @if($quotationDetail->cb_name)
                             <td> {{$OtherAddon->system_code_currency ."". $OtherAddon->system_code_amount }}</td>
+                            @endif
                             <td>{{ $OtherAddon->quantity }}</td>
                             <td>{{ $quotation->currency ." ". number_format($OtherAddon->unit_price, 2) }}</td>
                             <td>{{ $quotation->currency ." ". number_format($OtherAddon->total_amount, 2) }}</td>
@@ -352,7 +393,9 @@
                 @foreach($shippingCertifications as $key => $shippingCertification)
                     <tr>
                         <td><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>  {{ $shippingCertification->description }}</td>
+                        @if($quotationDetail->cb_name)
                         <td> {{ $shippingCertification->system_code_currency ."". $shippingCertification->system_code_amount }}</td>
+                        @endif
                         <td>{{ $shippingCertification->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($shippingCertification->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($shippingCertification->total_amount, 2) }}</td>
@@ -361,31 +404,22 @@
                 @foreach($otherDocuments as $key => $otherDocument)
                     <tr>
                         <td><span style="font-weight: bold;margin-right: 5px;" > {{ $shippingCertifications->count() + $key+1 }}. </span>  {{ $otherDocument->description }}</td>
+                        @if($quotationDetail->cb_name)
                         <td> {{$otherDocument->system_code_currency ."". $otherDocument->system_code_amount }}</td>
+                        @endif
                         <td>{{ $otherDocument->quantity }}</td>
                         <td>{{ $quotation->currency ." ". number_format($otherDocument->unit_price, 2) }}</td>
                         <td>{{ $quotation->currency ." ". number_format($otherDocument->total_amount, 2) }}</td>
                     </tr>
                 @endforeach
             @endif
-                @if($quotation->document_type == 'Proforma Invoice')
-                    <tr style="font-size: 12px;">
-                        <th colspan="4"> DEPOSIT / PAYMENT RECEIVED</th>
-                        <th>AMOUNT</th>
-                    </tr>
-                    <tr>
-                        <td colspan="4">Deposit</td>
-                        <td> {{ $quotation->currency ." ". number_format($quotationDetail->advance_amount, 2) }}</td>
-                    </tr>
-                @endif
         </table>
-        <br>
         <table style="color: black;width: 100%;text-align: right">
             <tr>
                 <td style="font-weight: bold;text-align: left">Note:- Third Party Payments will not be accepted.</td>
                 <td> </td>
                 <td> </td>
-                <td style="font-weight: bold"> SUB TOTAL</td>
+                <td style="font-weight: bold"> TOTAL</td>
                 <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }} </td>
             </tr>
             @if($quotation->document_type == 'Proforma Invoice')
@@ -393,28 +427,37 @@
                     <td> </td>
                     <td> </td>
                     <td> </td>
-                    <td style="font-weight: bold">Discount</td>
+                    <!-- <td style="font-weight: bold">Discount</td> -->
                     <td> </td>
                 </tr>
                 <tr>
-                    <td> </td>
-                    <td> </td>
-                    <td> </td>
+                    <td style="font-weight: bold;text-align: left"> Account Name
+Bank Name
+
+
+MlLELE MOTORS FZE
+AE230400000882723910001
+NRAKAEAK
+RAK BANK
+DRAGON MART
+DUBAI UAE</td>
+                    <td>Swift Code </td>
+                    <td></td>
                     <td style="font-weight: bold">Net Amount</td>
                     <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }}</td>
                 </tr>
                 <tr>
-                    <td> </td>
+                    <td>IBAN </td>
                     <td> </td>
                     <td> </td>
                     <td style="font-weight: bold">VAT:(0%)</td>
                     <td>0.00</td>
                 </tr>
                 <tr>
+                    <td>Bank Name </td>
                     <td> </td>
                     <td> </td>
-                    <td> </td>
-                    <td style="font-weight: bold">Gross Amount</td>
+                    <!-- <td style="font-weight: bold">Gross Amount</td> -->
                     <td> </td>
                 </tr>
                 <tr>
@@ -425,7 +468,7 @@
                     <td> {{ number_format($quotationDetail->advance_amount, 2) }} </td>
                 </tr>
                 <tr>
-                    <td> </td>
+                    <td>Branch Name </td>
                     <td> </td>
                     <td> </td>
                     <td style="font-weight: bold"> Remaining Amount({{ $quotation->currency }})</td>
@@ -433,7 +476,40 @@
                 </tr>
                 @if($quotation->currency != 'AED' && $quotation->shippingDocument == 'EXW')
                 <tr>
-                    <td> </td>
+                    <td> Bank Address 
+
+
+
+
+
+
+                    +
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    
+                    </td>
                     <td> </td>
                     <td> </td>
                     <td style="font-weight: bold"> Remaining Amount(AED)</td>
@@ -458,7 +534,27 @@
             @endif
         </table>
         @if($quotation->document_type == 'Proforma Invoice')
-            <p style="font-weight: bold">payment due By: </p>
+        @if($quotationDetail->advance_amount)
+        <br>
+        <table>
+                    <tr style="font-size: 12px;">
+                        <th colspan="4"> DEPOSIT / PAYMENT RECEIVED</th>
+                        <th>AMOUNT</th>
+                    </tr>
+                    <tr>
+                        <td colspan="4">Deposit</td>
+                        <td> {{ $quotation->currency ." ". number_format($quotationDetail->advance_amount, 2) }}</td>
+                    </tr>
+                    </table>
+                @endif
+                @endif
+    <br>
+        @if($quotation->document_type == 'Proforma Invoice')
+        @php
+        $due_date = $quotationDetail->due_date;
+        $formatted_due_date = date("j F Y", strtotime($due_date));
+        @endphp
+            <p style="font-weight: bold">Payment Due Date:  {{$formatted_due_date}} </p>
         @endif
         <p>I hereby acknowledge to honor the payment by the agreed due date.</p>
          <p> In case of my failure to clear payment on time, I stand to lose the right to my payments and my order may be delayed or subject to cancellation.</p>
@@ -488,18 +584,11 @@
                     {{ $aed_to_eru_rate }}. </p>
             @endif
         @endif
-        <table>
-            <td style="font-weight: bold">
-                <p> Accepted By </p>
-                <p> Board of Director : </p>
-            </td>
-            <td style="font-weight: bold">
-                <p>Client Name: </p>
-                <p>Signature: </p>
-                <p>Date: </p>
-
-            </td>
-        </table>
+        <div class="footer">
+        <p>Client Name: {{ $data['client_name'] }}</p>
+        <p>Signature: _______________________</p>
+        <p>Date: {{ $data['document_date'] }}</p>
+    </div>
     </div>
 </body>
 </html>
