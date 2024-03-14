@@ -176,19 +176,19 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">Signature</label>
-                        <input type="file" id="signature" name="loi_signature" class="form-control widthinput" accept="image/*">
+                        <input type="file" id="signature" name="loi_signature" class="form-control widthinput" accept="image/*" >
                     </div>
                 </div>
             </div>
             <div class="row">
-                @if($letterOfIndent->signature)
-                    <div class="col-lg-3 col-md-6 col-sm-12">
-                        <label class="form-label fw-bold">Signature</label>
-                        <div class="mb-3" id="signature-preview">
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    @if($letterOfIndent->signature)  <label class="form-label fw-bold" id="signature-label">Signature</label> @endif
+                    <div class="mb-3" id="signature-preview">
+                        @if($letterOfIndent->signature)
                             <iframe src="{{ url('/LOI-Signature/'.$letterOfIndent->signature) }}"></iframe>
-                        </div>
+                        @endif
                     </div>
-                @endif
+                </div>
                 @if($letterOfIndent->LOIDocuments->count() > 0)
                     <label class="form-label fw-bold">LOI Document</label>
                     @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
@@ -322,12 +322,9 @@
         const previewFile = document.querySelector("#file-preview");
         fileInputLicense.addEventListener("change", function(event) {
             const files = event.target.files;
-            // while (previewFile.firstChild) {
-            //     previewFile.removeChild(previewFile.firstChild);
-            // }
-            // while (previewImage.firstChild) {
-            //     previewImage.removeChild(previewImage.firstChild);
-            // }
+            while (previewFile.firstChild) {
+                previewFile.removeChild(previewFile.firstChild);
+            }
             for (let i = 0; i < files.length; i++)
             {
                 const file = files[i];
@@ -338,13 +335,6 @@
                     iframe.src = objectUrl;
                     previewFile.appendChild(iframe);
                 }
-                // else if (file.type.match("image/*"))
-                // {
-                //     const objectUrl = URL.createObjectURL(file);
-                //     const image = new Image();
-                //     image.src = objectUrl;
-                //     previewImage.appendChild(image);
-                // }
             }
         });
 
@@ -359,32 +349,12 @@
             for (let i = 0; i < files.length; i++)
             {
                 const file = files[i];
-                if (file.type.match("application/pdf"))
-                {
-                    const objectUrl = URL.createObjectURL(file);
-                    const iframe = document.createElement("iframe");
-                    iframe.src = objectUrl;
-                    signaturePreviewFile.appendChild(iframe);
-                }
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                signaturePreviewFile.appendChild(iframe);
             }
         });
-
-        // signatureFileInput.addEventListener("change", function(event) {
-        //     const files = event.target.files;
-        //     // while (signaturePreviewFile.firstChild) {
-        //     //     signaturePreviewFile.removeChild(signaturePreviewFile.firstChild);
-        //     // }
-        //
-        //     const file = files[0];
-        //     if (file.type.match("application/pdf"))
-        //     {
-        //         const objectUrl = URL.createObjectURL(file);
-        //         const iframe = document.createElement("iframe");
-        //         iframe.src = objectUrl;
-        //         signaturePreviewFile.closest('.row').appendChild(iframe);
-        //     }
-        //
-        // });
 
             getCustomers();
 
@@ -419,8 +389,6 @@
                     $("#deleted-docs option").attr("selected", "selected");
                 });
                 let count = $('#remaining-document-count').val();
-                console.log("count");
-                console.log(count);
                 let remainingCount = count - 1;
                 $('#remaining-document-count').val(remainingCount);
             });
@@ -472,30 +440,6 @@
                     }
                 });
             }
-        {{--    $('.loi-doc-button-delete').on('click',function(){--}}
-        {{--        alert("ok");--}}
-        {{--    let id = $(this).attr('data-id');--}}
-        {{--    let url =  $(this).attr('data-url');--}}
-        {{--    var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {--}}
-        {{--        if (e) {--}}
-        {{--            $.ajax({--}}
-        {{--                type: "POST",--}}
-        {{--                url: url,--}}
-        {{--                dataType: "json",--}}
-        {{--                data: {--}}
-        {{--                    _method: 'DELETE',--}}
-        {{--                    id: 'id',--}}
-        {{--                    _token: '{{ csrf_token() }}'--}}
-        {{--                },--}}
-        {{--                success:function (data) {--}}
-        {{--                    location.reload();--}}
-
-        {{--                    alertify.success('Item Deleted successfully.');--}}
-        {{--                }--}}
-        {{--            });--}}
-        {{--        }--}}
-        {{--    }).set({title:"Delete Item"})--}}
-        {{--});--}}
 
          jQuery.validator.addMethod('signature', function(value, element) {
              let dealer = $('#dealer').val();
