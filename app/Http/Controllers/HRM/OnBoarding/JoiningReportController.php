@@ -142,6 +142,7 @@ class JoiningReportController extends Controller
         }
     }
     public function store(Request $request) { 
+        $authId = Auth::id();
         $oldRepMangr = '';
         $validator = Validator::make($request->all(), [
             'employee_id' => 'required|integer',
