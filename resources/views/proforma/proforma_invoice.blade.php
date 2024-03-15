@@ -65,123 +65,110 @@
             </table>
         </div>
         <div style="color: black">
-            <table style="border: none;">
-                <tr style="font-weight: bold;background-color: #bbbbbd">
-                    <td colspan="2">Document Details</td>
-                    <td colspan="2">Client Details</td>
-                    <td colspan="2">Delivery Details</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Document No :</td>
-                    <td>{{ $data['document_number'] }}</td>
-                    <td style="font-weight: bold;">Customer:</td>
-                    <td> {{ $data['client_name'] }}</td>
-                    <td style="font-weight: bold;"> @if($quotation->shipping_method == 'EXW') Final Des : @else Place Of Supply :  @endif</td>
-                    <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->country->name ?? '' }} @else
-                        {{ $quotationDetail->place_of_supply }}  @endif </td>
-
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Document Date :</td>
-                    <td>{{ $data['document_date'] }}</td>
-                    @if($data['company'])
-                    <td style="font-weight: bold;">Company :</td>
-                    <td>{{ $data['company'] }}</td>
-                    @else
+    <table style="border: none;">
+    <tr style="font-weight: bold;background-color: #bbbbbd">
+            <td style="font-weight: bold;">Document Details</td>
+            <td style="font-weight: bold;">Client Details</td>
+            <td style="font-weight: bold;">Delivery Details</td>
+        </tr>
+        <tr>
+            <td style="vertical-align: top;">
+                <table style="border: none;">
+                    <tr>
+                        <td style="font-weight: bold;">Document No :</td>
+                        <td>{{ $data['document_number'] }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Document Date :</td>
+                        <td>{{ $data['document_date'] }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Validity :</td>
+                        <td>{{ $quotationDetail->document_validity }} @if($quotationDetail->document_validity == 1) Day @else Days @endif</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Sales Person :</td>
+                        <td>{{ $data['sales_person'] }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Sales Office :</td>
+                        <td>{{ $data['sales_office'] }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Sales Email :</td>
+                        <td>{{ $data['sales_email'] }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Sales Contact :</td>
+                        <td>{{ $data['sales_phone'] }}</td>
+                    </tr>
+                </table>
+            </td>
+            <td style="vertical-align: top;">
+                <table style="border: none;">
+                    <tr>
+                        <td style="font-weight: bold;">Customer:</td>
+                        <td>{{ $data['client_name'] }}</td>
+                    </tr>
+                    @if($data['client_phone'])
+                    <tr>
                     <td style="font-weight: bold;">Phone :</td>
                     <td>{{  $data['client_phone']  }} </td>
+                    </tr>
                     @endif
+                    @if($data['company'])
+                    <tr>
+                    <td style="font-weight: bold;">Company :</td>
+                    <td>{{  $data['company']  }} </td>
+                    </tr>
+                    @endif
+                    @if($data['client_contact_person'])
+                    <tr>
+                    <td style="font-weight: bold;">Contact Person :</td>
+                    <td>{{  $data['client_contact_person']  }} </td>
+                    </tr>
+                    @endif
+                    @if($data['client_email'])
+                    <tr>
+                    <td style="font-weight: bold;">Email :</td>
+                    <td>{{  $data['client_email']  }} </td>
+                    </tr>
+                    @endif
+                    @if($data['client_address'])
+                    <tr>
+                    <td style="font-weight: bold;">Address :</td>
+                    <td>{{  $data['client_address']  }} </td>
+                    </tr>
+                    @endif
+                </table>
+            </td>
+            <td style="vertical-align: top;">
+                <table style="border: none;">
+                    <tr>
+                        <td style="font-weight: bold;">@if($quotation->shipping_method == 'EXW') Final Des : @else Place Of Supply :  @endif</td>
+                        <td>@if($quotation->shipping_method == 'EXW') {{ $quotationDetail->country->name ?? '' }} @else {{ $quotationDetail->place_of_supply }}  @endif </td>
+                    </tr>
+                    <tr>
                     <td style="font-weight: bold;">
                         @if($quotation->shipping_method == 'EXW') Incoterm :@endif </td>
                     <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->incoterm  }} @endif </td>
-
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Validity :</td>
-                    <td>{{ $quotationDetail->document_validity }} @if($quotationDetail->document_validity == 1) Day @else Days @endif</td>
-                    <td style="font-weight: bold;">Person :</td>
-                    <td>{{  $data['client_name']  }} </td>
+                    </tr>
+                    <tr>
                     <td style="font-weight: bold;">
                         @if($quotation->shipping_method == 'EXW') POD :@endif </td>
                     <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->shippingPort->name ?? ''   }} @endif </td>
-                </tr>
-
-                <tr>
-                    <td style="font-weight: bold;">Sales Person :</td>
-                    <td>{{$data['sales_person'] }}</td>
-                    @if($data['company'] && $data['client_phone'])
-                    <td style="font-weight: bold;">Phone :</td>
-                    <td>{{  $data['client_phone']  }} </td>
-                    @endif
+                    </tr>
+                    <tr>
                     <td style="font-weight: bold;">
                         @if($quotation->shipping_method == 'EXW') POL :@endif </td>
                     <td> @if($quotation->shipping_method == 'EXW') {{ $quotationDetail->shippingPortOfLoad->name ??''   }} @endif </td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Sales Office :</td>
-                    <td>{{ $data['sales_office']  }}</td>
-                    <td style="font-weight: bold;">Email :</td>
-                    <td>{{  $data['client_email'] }} </td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Sales Email :</td>
-                    <td>{{ $data['sales_email']  }}</td>
-                    <td style="font-weight: bold;">Address :</td>
-                    <td>{{  $data['client_address']  }} </td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold;">Sales Contact :</td>
-                    <td>{{ $data['sales_phone']  }}</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </table>
-        </div>
-
-        <div  style="color: black">
-            <table style="border: none;">
-                <tr style="background-color: #bbbbbd;color: #000000;font-weight: bold">
-                @if($quotationDetail->payment_terms)
-                    <td colspan="2">Payment Details</td>
-                    @endif
-                    @if ($quotationDetail->representative_name && $quotationDetail->cb_name )
-                    <td colspan="4">Client  Representative</td>
-                    @endif
-                </tr>
-                <tr>
-                    @if($quotationDetail->payment_terms)
-                    <td style="font-weight: bold;">Payment Terms :</td>
-                    <td>{{ $quotationDetail->payment_terms }}</td>
-                    @endif
-                    @if($quotationDetail->representative_name)
-                    <td style="font-weight: bold;">Rep Name :</td>
-                    <td> {{ $quotationDetail->representative_name }}</td>
-                    @endif
-                    @if($quotationDetail->cb_name)
-                    <td style="font-weight: bold;"> CB Name :</td>
-                    <td> {{ $quotationDetail->cb_name }} </td>
-                    @endif
-                </tr>
-                <tr>
-                    <td></td><td></td>
-                    @if($quotationDetail->representative_name)
-                    <td style="font-weight: bold;">Rep No. :</td>
-                    <td> {{ $quotationDetail->representative_number }}</td>
-                    @endif
-                    @if($quotationDetail->cb_name)
-                    <td style="font-weight: bold;"> CB No :</td>
-                    <td> {{ $quotationDetail->cb_number }} </td>
-                    @endif
-                </tr>
-            </table>
-        </div>
-
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+        
         <table id="details">
             @if($vehicles->count() > 0  || $otherVehicles->count() || $vehicleWithBrands->count() > 0)
                 <tr style="font-size: 12px;background-color: #bbbbbd;">
@@ -414,67 +401,51 @@
                 @endforeach
             @endif
         </table>
+        
         <table style="color: black;width: 100%;text-align: right">
             <tr>
                 <td style="font-weight: bold;text-align: left">Note:- Third Party Payments will not be accepted.</td>
-                <td> </td>
-                <td> </td>
+                <td></td>
+                <td></td>
                 <td style="font-weight: bold"> TOTAL</td>
                 <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }} </td>
             </tr>
             @if($quotation->document_type == 'Proforma Invoice')
                 <tr>
-                    <td> </td>
-                    <td> </td>
-                    <td> </td>
-                    <td style="font-weight: bold"> Advance Paid</td>
-                    <td> {{ number_format($quotationDetail->advance_amount, 2) }} </td>
+                @if($quotationDetail->selected_bank == "rak-aed")
+                <td style="font-weight: bold;text-align: left">Account Name : MlLELE MOTORS FZE</td>
+                @elseif ($quotationDetail->selected_bank == "rak-usd")
+                <td style="font-weight: bold;text-align: left">Account Name : MlLELE MOTORS FZE</td>
+                @elseif ($quotationDetail->selected_bank == "city-aed")
+                <td style="font-weight: bold;text-align: left">Account Name : MlLELE MOTORS FZE</td>
+                @else
+                <td style="font-weight: bold;text-align: left">Account Name : MlLELE MOTORS FZE</td>
+                @endif
+                <td></td>
+                <td></td>
+                <td style="font-weight: bold"> Advance Paid</td>
+                <td> {{ number_format($quotationDetail->advance_amount, 2) }} </td>
                 </tr>
                 <tr>
+                @if($quotationDetail->selected_bank == "rak-aed")
+                <td style="font-weight: bold;text-align: left">IBAN : AE230400000882723910001</td>
+                @elseif ($quotationDetail->selected_bank == "rak-usd")
+                <td style="font-weight: bold;text-align: left">IBAN : AE930400000882723910002</td>
+                @elseif ($quotationDetail->selected_bank == "city-aed")
+                <td style="font-weight: bold;text-align: left">IBAN : AE880211000000110720211</td>
+                @else
+                <td style="font-weight: bold;text-align: left">IBAN : AE380211000000110720238</td>
+                @endif
                     <td></td>
-                    <td> </td>
-                    <td> </td>
+                    <td></td>
                     <td style="font-weight: bold"> Remaining Amount({{ $quotation->currency }})</td>
                     <td> {{ $quotation->currency ." ". number_format($quotation->deal_value - $quotationDetail->advance_amount) }} </td>
                 </tr>
                 @if($quotation->currency != 'AED' && $quotation->shippingDocument == 'EXW')
                 <tr>
-                    <td> Bank Address 
-
-
-
-
-
-
-                    +
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    
-                    </td>
-                    <td> </td>
-                    <td> </td>
+                    <td>Bank Address</td>
+                    <td></td>
+                    <td></td>
                     <td style="font-weight: bold"> Remaining Amount(AED)</td>
                     <td>
 
@@ -488,11 +459,79 @@
                 </tr>
                 @endif
                 <tr>
-                    <td> </td>
-                    <td> </td>
-                    <td>  </td>
-                    <td> </td>
+                @if($quotationDetail->selected_bank == "rak-aed")
+                <td style="font-weight: bold;text-align: left">Account No : 0882723910001</td>
+                @elseif ($quotationDetail->selected_bank == "rak-usd")
+                <td style="font-weight: bold;text-align: left">Account No : 0882723910002</td>
+                @elseif ($quotationDetail->selected_bank == "city-aed")
+                <td style="font-weight: bold;text-align: left">Account No : 0110720211</td>
+                @else
+                <td style="font-weight: bold;text-align: left">Account No : 0110720238</td>
+                @endif
+                    <td></td>
+                    <td></td>
+                    <td></td>
                     <td style="color: #de2121">  * VAT is not applicable for Export Bill </td>
+                </tr>
+                <tr>
+                @if($quotationDetail->selected_bank == "rak-aed")
+                <td style="font-weight: bold;text-align: left">Swift Code : NRAKAEAK</td>
+                @elseif ($quotationDetail->selected_bank == "rak-usd")
+                <td style="font-weight: bold;text-align: left">Swift Code : NRAKAEAK</td>
+                @elseif ($quotationDetail->selected_bank == "city-aed")
+                <td style="font-weight: bold;text-align: left">Swift Code : CITIAEAD</td>
+                @else
+                <td style="font-weight: bold;text-align: left">Swift Code : CITIAEAD</td>
+                @endif
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                @if($quotationDetail->selected_bank == "rak-aed")
+                <td style="font-weight: bold;text-align: left">Bank Name : RAK BANK</td>
+                @elseif ($quotationDetail->selected_bank == "rak-usd")
+                <td style="font-weight: bold;text-align: left">Bank Name : RAK BANK</td>
+                @elseif ($quotationDetail->selected_bank == "city-aed")
+                <td style="font-weight: bold;text-align: left">Bank Name : CITI BANK N.A</td>
+                @else
+                <td style="font-weight: bold;text-align: left">Bank Name : CITI BANK N.A</td>
+                @endif
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                @if($quotationDetail->selected_bank == "rak-aed")
+                <td style="font-weight: bold;text-align: left">Branch Name : DRAGON MART</td>
+                @elseif ($quotationDetail->selected_bank == "rak-usd")
+                <td style="font-weight: bold;text-align: left">Branch Name : DRAGON MART</td>
+                @elseif ($quotationDetail->selected_bank == "city-aed")
+                <td style="font-weight: bold;text-align: left">Branch Name : AL WASL BRANCH</td>
+                @else
+                <td style="font-weight: bold;text-align: left">Branch Name : AL WASL BRANCH</td>
+                @endif
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                @if($quotationDetail->selected_bank == "rak-aed")
+                <td style="font-weight: bold;text-align: left">Bank Address : DUBAI UAE</td>
+                @elseif ($quotationDetail->selected_bank == "rak-usd")
+                <td style="font-weight: bold;text-align: left">Bank Address : DUBAI UAE</td>
+                @elseif ($quotationDetail->selected_bank == "city-aed")
+                <td style="font-weight: bold;text-align: left">Bank Address : DUBAI UAE</td>
+                @else
+                <td style="font-weight: bold;text-align: left">Bank Address : DUBAI UAE</td>
+                @endif
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
             @endif
         </table>

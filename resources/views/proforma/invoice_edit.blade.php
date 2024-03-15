@@ -236,15 +236,15 @@
                         Document Type :
                     </div>
                     <div class="col-sm-6">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input document_type" type="checkbox" name="document_type" id="inlineCheckbox1" value="Quotation" <?php echo ($quotation->document_type == 'Quotation') ? 'checked' : ''; ?>>
-                            <label class="form-check-label" for="inlineCheckbox1">Quotation</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input document_type" type="checkbox" name="document_type" id="inlineCheckbox2" value="Proforma" <?php echo ($quotation->document_type == 'Proforma') ? 'checked' : ''; ?>>
-                            <label class="form-check-label" for="inlineCheckbox2">Proforma Invoice</label>
-                        </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input document_type" type="checkbox" name="document_type" id="inlineCheckbox1" value="Quotation" {{ $quotation->document_type == 'Quotation' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="inlineCheckbox1">Quotation</label>
                     </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input document_type" type="checkbox" name="document_type" id="inlineCheckbox2" value="Proforma" {{ $quotation->document_type == 'Proforma' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="inlineCheckbox2">Proforma Invoice</label>
+                    </div>
+                </div>
                 </div>
             </div>
             <div class="col-sm-4">
@@ -563,6 +563,33 @@
                     <div class="col-sm-6">
                         <input type="number" min="0" class="form-control form-control-xs advance-amount"
                                name="advance_amount" id="advance-amount" placeholder="Advance Amount" value="{{$quotation_details->advance_amount}}">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4"  id="due-date-div" hidden>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Payment Due Date :
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="date" min="0" class="form-control form-control-xs due-date"
+                               name="due_date" id="due-date" placeholder="Due Date" value="{{$quotation_details->due_date}}">
+                        <span class="required-message" style="display: none; color: red;">This field is required</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4"  id="select-bank-div" hidden>
+                <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Bank For Payment :
+                    </div>
+                    <div class="col-sm-6">
+                    <select name="select_bank" class="form-control">
+                        <option value="rak-aed">RAK BANK AED</option>
+                        <option value="rak-usd">RAK BANK USD</option>
+                        <option value="city-aed">CITY BANK AED</option>
+                        <option value="city-usd">CITY BANK USD</option>
+                    </select>
                     </div>
                 </div>
             </div>
@@ -1811,9 +1838,17 @@
             var documentType = $(this).val();
             if(documentType == 'Proforma') {
                 $('#advance-amount-div').attr('hidden', false);
+                $('#due-date-div').attr('hidden', false);
+                $('#due-date').prop('required', true);
+                $('#select-bank-div').attr('hidden', false);
+                $('.required-message').show();
             }else{
                 $('#advance-amount').val();
                 $('#advance-amount-div').attr('hidden', true);
+                $('#due-date-div').attr('hidden', true);
+                $('#due-date').prop('required', false);
+                $('#select-bank-div').attr('hidden', true);
+                $('.required-message').hide();
             }
         });
 
