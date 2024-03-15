@@ -78,10 +78,12 @@
                         <td style="font-weight: bold;">Document No :</td>
                         <td>{{ $data['document_number'] }}</td>
                     </tr>
+                    @if($data['document_date'])
                     <tr>
                         <td style="font-weight: bold;">Document Date :</td>
                         <td>{{ $data['document_date'] }}</td>
                     </tr>
+                    @endif
                     <tr>
                         <td style="font-weight: bold;">Validity :</td>
                         <td>{{ $quotationDetail->document_validity }} @if($quotationDetail->document_validity == 1) Day @else Days @endif</td>
@@ -90,18 +92,24 @@
                         <td style="font-weight: bold;">Sales Person :</td>
                         <td>{{ $data['sales_person'] }}</td>
                     </tr>
+                    @if($data['sales_office'])
                     <tr>
                         <td style="font-weight: bold;">Sales Office :</td>
                         <td>{{ $data['sales_office'] }}</td>
                     </tr>
+                    @endif
+                    @if($data['sales_email'])
                     <tr>
                         <td style="font-weight: bold;">Sales Email :</td>
                         <td>{{ $data['sales_email'] }}</td>
                     </tr>
+                    @endif
+                    @if($data['sales_phone'])
                     <tr>
                         <td style="font-weight: bold;">Sales Contact :</td>
                         <td>{{ $data['sales_phone'] }}</td>
                     </tr>
+                    @endif
                 </table>
             </td>
             <td style="vertical-align: top;">
