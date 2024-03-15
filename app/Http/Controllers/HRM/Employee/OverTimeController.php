@@ -227,7 +227,7 @@ class OverTimeController extends Controller
                     }
                     $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
                     $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
-                    $divisionHead = MasterDivisionWithHead::where('id',$employee->division)->first();
+                    $divisionHead = MasterDivisionWithHead::where('id',$employee->department->division_id)->first();
                     $createRequest = OverTime::where('id',$id)->first();
                     if($createRequest != '') {
                         $createRequest->employee_id = $request->employee_id;

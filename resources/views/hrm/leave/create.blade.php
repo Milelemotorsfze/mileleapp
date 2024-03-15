@@ -183,7 +183,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
                     <div class="col-xxl-12 col-lg-12 col-md-12">
                         <textarea rows="5" id="address_while_on_leave" type="text" class="form-control @error('address_while_on_leave') is-invalid @enderror"
                             name="address_while_on_leave" placeholder="Enter Additional Remarks" value="{{ old('address_while_on_leave') }}"  autocomplete="address_while_on_leave"
-                            autofocus>{{$data->address_while_on_leave}}</textarea>
+                            autofocus>{{$data->address_while_on_leave ?? ''}}</textarea>
                         @error('address_while_on_leave')
                         <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>

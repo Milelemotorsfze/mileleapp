@@ -3015,11 +3015,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																				<input name="passport_number" id="passport_number_{{$data->id}}" class="form-control" required
 																				placeholder="Enter Candidate Passport Number" value="@if($data->candidateDetails->passport_number){{$data->candidateDetails->passport_number}}@endif">																		
 																		</div>
-																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
+																		<div class="col-xxl-6 col-lg-6 col-md-6  select-button-main-div">
+                                                            				<div class="dropdown-option-div">
 																		<label for="contact_number" class="form-label font-size-13">{{ __('Mobile Phone') }}</label>
 																		<input id="contact_number_{{$i}}" type="tel" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
 																				name="contact_number[main]" placeholder="Mobile Number" value="@if($data->candidateDetails->contact_number){{$data->candidateDetails->contact_number}} @endif"
 																				autocomplete="contact_number[main]" autofocus oninput="validationOnKeyUp(this)">
+																		</div>
 																		</div>
 																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
 																			<label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
@@ -3435,10 +3437,16 @@ $.ajaxSetup({
         errorElement: "p",
         errorPlacement: function ( error, element ) {
             error.addClass( "invalid-feedback font-size-13" );
-            // if ( element.prop( "type" ) === "checkbox" ) {
-            //     error.insertAfter( element.parent( "label" ) );
-            // }
-            // else
+            if ( element.prop( "type" ) === "tel" ) {
+                if (!element.val() || element.val().length === 0) {
+                    console.log("Error is here with length", element.val().length);
+                    error.addClass('select-error');
+                    error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+                } else {
+                    console.log("No error");
+                }
+            }
+            else
 			 if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
                 if (!element.val() || element.val().length === 0) {
                     console.log("Error is here with length", element.val().length);

@@ -425,15 +425,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['hiring-request-close-action']);
 									@endphp
 									@if ($hasPermission)
-									@if(isset($data->shortlistedCandidates))
-									@if(count($data->shortlistedCandidates) > 0)
+									@if(isset($data) && isset($data->can_close) && $data->can_close == 'yes')
 									<li>
 										<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 											data-bs-target="#closed-hiring-request-{{$data->id}}">
 											<i class="fa fa-check" aria-hidden="true"></i> Closed
 										</button>
 									</li>
-									@endif
 									@endif
 									@endif
 									@endcanany
@@ -487,8 +485,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="cancelled-comment-{{$data->id}}" class="form-control" name="comment">
-																</textarea>
+																<textarea rows="5" id="cancelled-comment-{{$data->id}}" class="form-control" name="comment"></textarea>
 															</div>
 														</div>
 													</div>
@@ -520,8 +517,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="on-hold-comment-{{$data->id}}" class="form-control" name="comment">
-																</textarea>
+																<textarea rows="5" id="on-hold-comment-{{$data->id}}" class="form-control" name="comment"></textarea>
 															</div>
 														</div>
 													</div>
@@ -568,8 +564,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 																<label class="form-label font-size-13">Comments</label>
 															</div>
 															<div class="col-lg-12 col-md-12 col-sm-12">
-																<textarea rows="5" id="closed-comment-{{$data->id}}" class="form-control" name="comment">
-																</textarea>
+																<textarea rows="5" id="closed-comment-{{$data->id}}" class="form-control" name="comment"></textarea>
 															</div>
 														</div>
 													</div>

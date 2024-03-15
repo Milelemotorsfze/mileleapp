@@ -12,6 +12,7 @@ use App\Models\Masters\MasterJobPosition;
 use App\Models\Masters\MasterExperienceLevel;
 use App\Models\HRM\Approvals\ApprovalByPositions;
 use App\Models\HRM\Approvals\DepartmentHeadApprovals;
+use App\Models\HRM\Employee\JoiningReport;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\HRM\Hiring\InterviewSummaryReport;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
@@ -80,6 +81,7 @@ class EmployeeHiringRequest extends Model
         });
     }
     protected $appends = [
+        'can_close',
         'department_name',
         'department_location',
         'requested_by_name',
@@ -97,6 +99,19 @@ class EmployeeHiringRequest extends Model
         'is_auth_user_can_approve',
         'current_status',
     ];
+    public function getCanCloseAttribute() {
+        $canClose = 'no';
+        $joined = [];
+        $joined = JoiningReport::where('joining_type','new_employee')->where('status','approved')->whereHas('candidate', function($query) {
+            $query->whereHas('interviewSummary', function($query1) {
+                $query1->where('hiring_request_id',$this->id);
+            });
+        })->get();
+        if(count($joined) > 0) {
+            $canClose = 'yes';
+        }
+        return $canClose;
+    }
     public function getDepartmentNameAttribute() {
         $departmentName = '';
         $department = MasterDepartment::find($this->department_id);
