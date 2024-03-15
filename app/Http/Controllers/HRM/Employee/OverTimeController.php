@@ -190,33 +190,33 @@ class OverTimeController extends Controller
         else {
             DB::beginTransaction();
             try {
-                $startTime =[];
-                $endTime = [];
-                if(count($request->overtime) > 0) {
-                    foreach($request->overtime as $overtime) {
-                        if($overtime['start_datetime'] != NULL && $overtime['end_datetime'] != NULL && $request->employee_id) {
-                            $startTime = OverTimeDateTime::where('start_datetime','<=',$overtime['start_datetime'])
-                            ->where('end_datetime','>=',$overtime['start_datetime'])
-                            ->whereHas('overtime', function($q) use($request) {
-                                    $q->where('employee_id',$request->employee_id);
-                            });
-                            if(isset($overtime['time_id']) && $overtime['time_id'] > 0) {
-                                $startTime = $startTime->whereNot('over_times_id',$overtime['time_id']);
-                            }
-                            $startTime = $startTime->get();                          
-                            $endTime = OverTimeDateTime::where('start_datetime','<=',$overtime['end_datetime'])
-                                ->where('end_datetime','>=',$overtime['end_datetime'])
-                                ->whereHas('overtime', function($q) use($request) {
-                                        $q->where('employee_id',$request->employee_id);
-                                });
-                            if(isset($overtime['time_id']) && $overtime['time_id'] > 0) {
-                                $endTime = $endTime->whereNot('over_times_id',$overtime['time_id']);
-                            }
-                            $endTime = $endTime->get();
-                        }
-                    }
-                }
-                if(count($startTime) == 0 && count($endTime) == 0) {                  
+                // $startTime =[];
+                // $endTime = [];
+                // if(count($request->overtime) > 0) {
+                //     foreach($request->overtime as $overtime) {
+                //         if($overtime['start_datetime'] != NULL && $overtime['end_datetime'] != NULL && $request->employee_id) {
+                //             $startTime = OverTimeDateTime::where('start_datetime','<=',$overtime['start_datetime'])
+                //             ->where('end_datetime','>=',$overtime['start_datetime'])
+                //             ->whereHas('overtime', function($q) use($request) {
+                //                     $q->where('employee_id',$request->employee_id);
+                //             });
+                //             if(isset($overtime['time_id']) && $overtime['time_id'] > 0) {
+                //                 $startTime = $startTime->whereNot('over_times_id',$overtime['time_id']);
+                //             }
+                //             $startTime = $startTime->get();                          
+                //             $endTime = OverTimeDateTime::where('start_datetime','<=',$overtime['end_datetime'])
+                //                 ->where('end_datetime','>=',$overtime['end_datetime'])
+                //                 ->whereHas('overtime', function($q) use($request) {
+                //                         $q->where('employee_id',$request->employee_id);
+                //                 });
+                //             if(isset($overtime['time_id']) && $overtime['time_id'] > 0) {
+                //                 $endTime = $endTime->whereNot('over_times_id',$overtime['time_id']);
+                //             }
+                //             $endTime = $endTime->get();
+                //         }
+                //     }
+                // } 
+                // if(count($startTime) == 0 && count($endTime) == 0) {                  
                     $authId = Auth::id();
                     $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
                     if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
@@ -278,10 +278,10 @@ class OverTimeController extends Controller
                     $successMessage = "Employee OverTime Application Updated Successfully";                   
                     DB::commit();
                     return redirect()->route('overtime.index')->with('success',$successMessage); 
-                }
-                else {
-                    return redirect()->back()->withInput();
-                }
+                // }
+                // else {
+                //     return redirect()->back()->withInput();
+                // }
             }
             catch (\Exception $e) {
                 DB::rollback();
