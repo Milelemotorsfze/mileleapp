@@ -410,139 +410,120 @@
             @endif
         </table>
         
-        <table style="color: black;width: 100%;text-align: right">
-            <tr>
-                <td style="font-weight: bold;text-align: left">Note:- Third Party Payments will not be accepted.</td>
-                <td></td>
-                <td></td>
-                <td style="font-weight: bold"> TOTAL</td>
-                <td style="text-align: end">{{ $quotation->currency ." ". number_format($quotation->deal_value) }} </td>
-            </tr>
+        <table style="color: black;width: 100%;">
+    <tr>
+        <td style="font-weight: bold;text-align: left;vertical-align: top;width: 55%;">
+            <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+                <p>Note:- Third Party Payments will not be accepted.</p>
             @if($quotation->document_type == 'Proforma Invoice')
-                <tr>
                 @if($quotationDetail->selected_bank == "rak-aed")
-                <td style="font-weight: bold;text-align: left">Account Name : MlLELE MOTORS FZE</td>
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE230400000882723910001<br>
+                Account No : 0882723910001<br>
+                Swift Code : NRAKAEAK<br>
+                Bank Name : RAK BANK<br>
+                Branch Name : DRAGON MART<br>
+                Bank Address : DUBAI UAE<br>
                 @elseif ($quotationDetail->selected_bank == "rak-usd")
-                <td style="font-weight: bold;text-align: left">Account Name : MlLELE MOTORS FZE</td>
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE930400000882723910002<br>
+                Account No : 0882723910002<br>
+                Swift Code : NRAKAEAK<br>
+                Bank Name : RAK BANK<br>
+                Branch Name : DRAGON MART<br>
+                Bank Address : DUBAI UAE<br>
                 @elseif ($quotationDetail->selected_bank == "city-aed")
-                <td style="font-weight: bold;text-align: left">Account Name : MlLELE MOTORS FZE</td>
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE880211000000110720211<br>
+                Account No : 0110720211<br>
+                Swift Code : CITIAEAD<br>
+                Bank Name : CITI BANK N.A<br>
+                Branch Name : AL WASL BRANCH<br>
+                Bank Address : DUBAI UAE<br>
                 @else
-                <td style="font-weight: bold;text-align: left">Account Name : MlLELE MOTORS FZE</td>
+                Account Name : MlLELE MOTORS FZE<br>
+                IBAN : AE380211000000110720238<br>
+                Account No : 0110720238<br>
+                Swift Code : CITIAEAD<br>
+                Bank Name : CITI BANK N.A<br>
+                Branch Name : AL WASL BRANCH<br>
+                Bank Address : DUBAI UAE<br>
                 @endif
-                <td></td>
-                <td></td>
-                <td style="font-weight: bold"> Advance Paid</td>
-                <td> {{ number_format($quotationDetail->advance_amount, 2) }} </td>
-                </tr>
-                <tr>
-                @if($quotationDetail->selected_bank == "rak-aed")
-                <td style="font-weight: bold;text-align: left">IBAN : AE230400000882723910001</td>
-                @elseif ($quotationDetail->selected_bank == "rak-usd")
-                <td style="font-weight: bold;text-align: left">IBAN : AE930400000882723910002</td>
-                @elseif ($quotationDetail->selected_bank == "city-aed")
-                <td style="font-weight: bold;text-align: left">IBAN : AE880211000000110720211</td>
-                @else
-                <td style="font-weight: bold;text-align: left">IBAN : AE380211000000110720238</td>
-                @endif
-                    <td></td>
-                    <td></td>
-                    <td style="font-weight: bold"> Remaining Amount({{ $quotation->currency }})</td>
-                    <td> {{ $quotation->currency ." ". number_format($quotation->deal_value - $quotationDetail->advance_amount) }} </td>
-                </tr>
-                @if($quotation->currency != 'AED' && $quotation->shippingDocument == 'EXW')
-                <tr>
-                    <td>Bank Address</td>
-                    <td></td>
-                    <td></td>
-                    <td style="font-weight: bold"> Remaining Amount(AED)</td>
-                    <td>
-
-                       @if($quotation->currency == 'USD')
-                             {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_usd_rate->value, 2) }}
-                       @elseif($quotation->currency == 'EUR')
-                            {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_eru_rate->value, 2) }}
-                       @endif
-
-                    </td>
-                </tr>
-                @endif
-                <tr>
-                @if($quotationDetail->selected_bank == "rak-aed")
-                <td style="font-weight: bold;text-align: left">Account No : 0882723910001</td>
-                @elseif ($quotationDetail->selected_bank == "rak-usd")
-                <td style="font-weight: bold;text-align: left">Account No : 0882723910002</td>
-                @elseif ($quotationDetail->selected_bank == "city-aed")
-                <td style="font-weight: bold;text-align: left">Account No : 0110720211</td>
-                @else
-                <td style="font-weight: bold;text-align: left">Account No : 0110720238</td>
-                @endif
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td style="color: #de2121">  * VAT is not applicable for Export Bill </td>
-                </tr>
-                <tr>
-                @if($quotationDetail->selected_bank == "rak-aed")
-                <td style="font-weight: bold;text-align: left">Swift Code : NRAKAEAK</td>
-                @elseif ($quotationDetail->selected_bank == "rak-usd")
-                <td style="font-weight: bold;text-align: left">Swift Code : NRAKAEAK</td>
-                @elseif ($quotationDetail->selected_bank == "city-aed")
-                <td style="font-weight: bold;text-align: left">Swift Code : CITIAEAD</td>
-                @else
-                <td style="font-weight: bold;text-align: left">Swift Code : CITIAEAD</td>
-                @endif
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                @if($quotationDetail->selected_bank == "rak-aed")
-                <td style="font-weight: bold;text-align: left">Bank Name : RAK BANK</td>
-                @elseif ($quotationDetail->selected_bank == "rak-usd")
-                <td style="font-weight: bold;text-align: left">Bank Name : RAK BANK</td>
-                @elseif ($quotationDetail->selected_bank == "city-aed")
-                <td style="font-weight: bold;text-align: left">Bank Name : CITI BANK N.A</td>
-                @else
-                <td style="font-weight: bold;text-align: left">Bank Name : CITI BANK N.A</td>
-                @endif
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                @if($quotationDetail->selected_bank == "rak-aed")
-                <td style="font-weight: bold;text-align: left">Branch Name : DRAGON MART</td>
-                @elseif ($quotationDetail->selected_bank == "rak-usd")
-                <td style="font-weight: bold;text-align: left">Branch Name : DRAGON MART</td>
-                @elseif ($quotationDetail->selected_bank == "city-aed")
-                <td style="font-weight: bold;text-align: left">Branch Name : AL WASL BRANCH</td>
-                @else
-                <td style="font-weight: bold;text-align: left">Branch Name : AL WASL BRANCH</td>
-                @endif
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                @if($quotationDetail->selected_bank == "rak-aed")
-                <td style="font-weight: bold;text-align: left">Bank Address : DUBAI UAE</td>
-                @elseif ($quotationDetail->selected_bank == "rak-usd")
-                <td style="font-weight: bold;text-align: left">Bank Address : DUBAI UAE</td>
-                @elseif ($quotationDetail->selected_bank == "city-aed")
-                <td style="font-weight: bold;text-align: left">Bank Address : DUBAI UAE</td>
-                @else
-                <td style="font-weight: bold;text-align: left">Bank Address : DUBAI UAE</td>
-                @endif
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
+            </div>
             @endif
-        </table>
+        </td>
+        <td style="vertical-align: top;width: 45%;">
+    <table style="width: 100%;">
+    @if($quotation->currency == "AED")
+    <tr>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                Net Total In AED:
+            </td>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                {{ $quotation->currency ." ". number_format($quotation->deal_value) }}
+            </td>
+        </tr>
+    @endif
+    @if($quotation->currency == "USD")
+        <tr>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                Net Total In AED:
+            </td>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                {{ $quotation->currency ." ". number_format($quotation->deal_value) }}
+            </td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                Net Total In USD:
+            </td>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                {{ $quotation->currency ." ". number_format($quotation->deal_value * 3.67) }}
+            </td>
+        </tr>
+        @endif
+        @if($quotation->document_type == 'Proforma Invoice')
+        <tr>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
+                Advance Paid:
+            </td>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
+                {{ $quotation->currency ." ". number_format($quotationDetail->advance_amount, 2) }}
+            </td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
+                Remaining Amount({{ $quotation->currency }}):
+            </td>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
+                {{ $quotation->currency ." ". number_format($quotation->deal_value - $quotationDetail->advance_amount) }}
+            </td>
+        </tr>
+        @if($quotation->currency != 'AED' && $quotation->shippingDocument == 'EXW')
+        <tr>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
+                Remaining Amount(AED):
+            </td>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
+                @if($quotation->currency == 'USD')
+                {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_usd_rate->value, 2) }}
+                @elseif($quotation->currency == 'EUR')
+                {{ $quotation->currency ." ". number_format(($quotation->deal_value - $quotationDetail->advance_amount)  * $aed_to_eru_rate->value, 2) }}
+                @endif
+            </td>
+        </tr>
+        @endif
+        <tr>
+            <td colspan="2" style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px;">
+                * VAT is not applicable for Export Bill
+            </td>
+        </tr>
+        @endif
+    </table>
+</td>
+
+    </tr>
+</table>
         @if($quotation->document_type == 'Proforma Invoice')
         @if($quotationDetail->advance_amount)
         <br>
