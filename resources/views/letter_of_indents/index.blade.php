@@ -512,7 +512,7 @@
                                         <td>
                                             @if($letterOfIndent->is_pfi_pending_for_loi == true)
                                                 <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
-                                                    <button type="button"  class="btn btn-soft-blue btn-sm" >Add PFI</button>
+                                                    <button type="button"  class="btn btn-soft-blue btn-sm">Add PFI</button>
                                                 </a>
                                             @endif
         {{--                                    <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">--}}
@@ -618,6 +618,12 @@
                                                                         </div>
                                                                     </div>
                                                                 @endforeach
+                                                                <div class="col-lg-12 m-5">
+                                                                    <label class="form-label">Signature</label>
+                                                                    @if($letterOfIndent->signature)
+                                                                        <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" width="100px;" height="100px">
+                                                                    @endif
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>

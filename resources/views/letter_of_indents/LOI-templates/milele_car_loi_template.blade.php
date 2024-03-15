@@ -158,8 +158,8 @@
                                     <td  style="background-color: black;color: black"></td>
                                 </tr>
                             @endfor
-                            <tr id="footer-table" style="background-color: #FFFFFF">
-                                <td style="border: none;">Name:
+                            <tr id="footer-table" style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
+                                <td colspan="2" style="border: none;">Name:
                                     <span style="margin-left: 10px">
                                          @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)
                                             {{ $letterOfIndent->customer->name }}
@@ -168,33 +168,30 @@
                                         @endif
                                     </span>
                                 </td>
-                                <td style="border: none">
 
-                                </td>
                                 <td style="border: none;text-align: end">SUBTOTAL</td>
                                 <td  style="border: none;background-color: black;color: black" ></td>
                             </tr >
-                            <tr style="background-color: #FFFFFF" id="date-div">
-                                <td style="border: none">Date:
+                            <tr style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF;" id="date-div">
+                                <td colspan="2" style="border: none">Date:
                                     <span>
                                          {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}
                                     </span>
-                                </td>
-                                <td style="border: none">
                                     <img class="overlay-image" src="{{ url('milele_seal.png') }}" style="width: 170px; height: 140px;"></img>
                                 </td>
+{{--                                <td style="border: none">--}}
+{{--                                  --}}
+{{--                                </td>--}}
                                 <td style="border: none;text-align: end">SALES VAT</td>
                                 <td  style="border: none;background-color: black;color: black" ></td>
                             </tr>
-                            <tr style="background-color: #FFFFFF">
-                                <td style="border: none">
+                            <tr style=";background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
+                                <td colspan="2" style="border: none">
                                     @if($letterOfIndent->signature)
                                         <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
                                     @endif
                                 </td>
-                                <td style="border: none">
 
-                                </td>
                                 <td style="border: none;text-align: end">TOTAL</td>
                                 <td style="background-color: #000000;border: none" ></td>
                             </tr>

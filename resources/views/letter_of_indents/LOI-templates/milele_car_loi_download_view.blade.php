@@ -164,8 +164,8 @@
                 </tr>
             @endfor
 
-            <tr style="background-color: #FFFFFF">
-                <td style="border: none;font-size: 14px">Name :
+            <tr style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
+                <td colspan="2" style="border: none;font-size: 14px">Name :
                     <span style="margin-left: 3px" >
                              @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)
                             {{ $letterOfIndent->customer->name }}
@@ -174,32 +174,30 @@
                         @endif
                         </span>
                 </td>
-                <td style="border: none">
 
-                </td>
                 <td style="border: none;text-align: end">SUBTOTAL</td>
                 <td class="hide" style="border: none" ></td>
             </tr>
-            <tr style="background-color: #FFFFFF" id="date-div">
-                <td style="border: none;font-size: 14px;">Date :
-                <span style="margin-left: 3px"> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}</span></td>
-                <td style="border: none">
-
+            <tr style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF" id="date-div">
+                <td colspan="2" style="border: none;font-size: 14px;">Date :
+                <span style="margin-left: 3px"> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}</span>
+                    <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 140px; height: 130px;"></img>
                 </td>
+{{--                <td style="border: none">--}}
+
+{{--                </td>--}}
                 <td style="border: none;text-align: end">SALES VAT</td>
                 <td class="hide" style="border: none" ></td>
             </tr>
-            <tr style="background-color: #FFFFFF">
-                <td style="border: none;color: #0f0f0f">
+            <tr style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
+                <td colspan="2" style="border: none;">
                     <span style="margin-left: 3px;margin-bottom: 10px">
                         @if($letterOfIndent->signature)
                             <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 60px;width: 140px">
                         @endif
                     </span>
                 </td>
-                <td style="border: none">
-                    <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 150px; height: 140px;"></img>
-                </td>
+
                 <td style="border: none;text-align: end">TOTAL</td>
                 <td style="background-color: #000000;border: none" ></td>
             </tr>

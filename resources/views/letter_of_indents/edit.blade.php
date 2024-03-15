@@ -184,10 +184,8 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3" id="signature-preview">
                         @if($letterOfIndent->signature)
-                            <iframe src="{{ url('/LOI-Signature/'.$letterOfIndent->signature) }}"   ></iframe>
-                            @if($letterOfIndent->dealers == 'Trans Cars' || request()->dealers == 'Trans Cars')
-                                <a href="#" class="btn btn-danger text-center mt-2 remove-signature-button"><i class="fa fa-trash"></i> </a>
-                            @endif
+                            <iframe src="{{ url('/LOI-Signature/'.$letterOfIndent->signature) }}" ></iframe>
+                            <a href="#" class="btn btn-danger text-center mt-2 remove-signature-button"><i class="fa fa-trash"></i> </a>
                         @endif
                     </div>
                 </div>
@@ -201,7 +199,7 @@
                         </div>
                     @endforeach
                 @endif
-                <div class="col-lg-3 col-md-6 col-sm-12"  >
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div id="file-preview">
                     </div>
                 </div>
@@ -354,6 +352,8 @@
         });
 
             getCustomers();
+            let dealer = '{{ $letterOfIndent->dealers }}';
+            showSignatureRemoveButton(dealer)
 
             $('#country').select2({
                 placeholder: 'Select Country',
@@ -365,7 +365,7 @@
             $('#dealer').change(function () {
                 var value = $('#dealer').val();
                 $('#dealer-input').val(value);
-
+                showSignatureRemoveButton(value)
                 getModels('all','dealer-change');
             });
 
@@ -731,7 +731,13 @@
 
             // get the unseleted index and match with each row  item if model and sfx is matching append that row
         });
-
+        function showSignatureRemoveButton(value) {
+            if(value == 'Trans Cars') {
+                $('.remove-signature-button').attr('hidden', false);
+            }else{
+                $('.remove-signature-button').attr('hidden', true);
+            }
+        }
         function getModels(index,type) {
 
             var totalIndex = $("#loi-items").find(".Loi-items-row-div").length;

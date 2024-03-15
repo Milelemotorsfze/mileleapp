@@ -268,8 +268,8 @@ class SupplierInventoryController extends Controller
             $uploadFileContents = [];
             $colourname = NULL;
 
-            $date = Carbon::today()->format('Y-m-d');
-//            $date = '2024-02-15';
+//            $date = Carbon::today()->format('Y-m-d');
+            $date = '2024-02-22';
             $unavailableExtColours = [];
             $unavailableIntColours = [];
 
@@ -508,7 +508,7 @@ class SupplierInventoryController extends Controller
                     $updatedRowsIds = [];
                     $noChangeRowIds = [];
 
-                    $supplierInventoryHistories = SupplierInventoryHistory::all();
+                    $supplierInventoryHistories = SupplierInventoryHistory::where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)->get();
 
                     foreach ($supplierInventoryHistories as $inventoryHistory) {
                         $inventoryHistory->upload_status = SupplierInventory::UPLOAD_STATUS_INACTIVE;
@@ -1903,7 +1903,7 @@ class SupplierInventoryController extends Controller
         }
         info("updated Rows");
         info($updatedRowsIds);
-        $latestdate = SupplierInventoryHistory::whereBetween('date_of_entry', [$request->first_file, $request->second_file])
+        $latestDate = SupplierInventoryHistory::whereBetween('date_of_entry', [$request->first_file, $request->second_file])
                                                 ->groupBy('date_of_entry')->orderBy('date_of_entry', 'DESC')
                                                 ->skip(1)
                                                 ->first();
@@ -1911,12 +1911,19 @@ class SupplierInventoryController extends Controller
                                         ->groupBy('date_of_entry')->orderBy('date_of_entry', 'DESC')
                                         ->skip(1)
                                         ->first();
-//        return $previousDate;
+        if(empty($previousDate)) {
+            $previousDate = SupplierInventoryHistory::orderBy('id', 'ASC')->groupBy('date_of_entry')->first();
+        }
+        if(empty($latestDate)) {
+            $latestDate = SupplierInventoryHistory::orderBy('id', 'DESC')->groupBy('date_of_entry')->first();
+        }
+//        return $latestDate;
 
-        $deletedRows = SupplierInventoryHistory::whereBetween('date_of_entry', [$previousDate->date_of_entry, $latestdate->date_of_entry])
-            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->where('supplier_id', $request->supplier_id)
-            ->where('whole_sales', $request->whole_sales)
+        $deletedRows = SupplierInventoryHistory::whereDate('date_of_entry', '>=', $previousDate->date_of_entry)
+            ->whereDate('date_of_entry', '<=' ,$latestDate->date_of_entry)
+//           es) ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+//            ->where('supplier_id', $request->supplier_id)
+//            ->where('whole_sales', $request->whole_sal
             ->where('upload_status', SupplierInventory::VEH_STATUS_DELETED)
 //            ->whereNotIn('id', $noChangeRowIds)
 //            ->whereNotIn('id', $updatedRowsIds)
@@ -1925,7 +1932,8 @@ class SupplierInventoryController extends Controller
 //                    ->orwhere('delivery_note', $deliveryNote);
 //            })
 //            ->whereNotIn('id', $newlyAddedRowIds)
-            ->get();
+              ->get();
+//        return $deletedRows;
             info($deletedRows->pluck('id'));
 
         return view('supplier_inventories.file_comparision',compact('newlyAddedRows',
