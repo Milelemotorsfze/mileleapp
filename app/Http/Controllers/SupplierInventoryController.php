@@ -2100,5 +2100,11 @@ class SupplierInventoryController extends Controller
         return response($data);
 
     }
+    public function inventoryLogs($id)
+    {
+        $supplierInventoryLogs = SupplierInventoryLog::where('supplier_inventory_id', $id)->orderBy('id', 'DESC')->get();
+
+        return view('supplier_inventories.inventory_logs.index', compact('supplierInventoryLogs'));
+    }
 
 }

@@ -445,6 +445,7 @@ Route::get('/d', function () {
     Route::get('/check-production-month', [SupplierInventoryController::class,'checkProductionMonth'])->name('supplier-inventories.checkProductionMonth');
     Route::get('/isExistColorCode', [SupplierInventoryController::class,'isExistColorCode'])->name('supplier-inventories.isExistColorCode');
     Route::get('/unique-production-month', [SupplierInventoryController::class,'uniqueProductionMonth'])->name('supplier-inventories.uniqueProductionMonth');
+    Route::get('inventory-logs/{id}', [SupplierInventoryController::class,'inventoryLogs'])->name('inventory-logs.lists');
 
 
     //BL Module

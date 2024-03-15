@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class SupplierInventoryLog extends Model
 {
     use HasFactory;
+    public function updatedBy()
+    {
+        return $this->hasOne(User::class,'id', 'updated_by');
+
+    }
 }

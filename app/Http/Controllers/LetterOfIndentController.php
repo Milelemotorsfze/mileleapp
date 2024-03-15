@@ -420,7 +420,9 @@ class LetterOfIndentController extends Controller
             $LOI->destination = $request->destination;
             $LOI->so_number = $request->so_number;
             $LOI->prefered_location = $request->prefered_location;
-
+            if($request->is_signature_removed == 1) {
+                $LOI->signature = NULL;
+            }
             if ($request->has('loi_signature'))
             {
                 $file = $request->file('loi_signature');
