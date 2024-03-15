@@ -38,8 +38,7 @@ tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 <label class="form-label font-size-13">Comments</label>
 </div>
 <div class="col-lg-12 col-md-12 col-sm-12">
-<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment">{{$data->is_auth_user_can_approve['comments']}}
-</textarea>
+<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment">{{$data->is_auth_user_can_approve['comments'] ?? ''}}</textarea>
 </div>
 </div>
 </div>
@@ -94,8 +93,7 @@ tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 <label class="form-label font-size-13">Comments</label>
 </div>
 <div class="col-lg-12 col-md-12 col-sm-12">
-<textarea rows="5" id="reject-comment-{{$data->id}}" class="form-control" name="comment">{{$data->is_auth_user_can_approve['comments']}}
-</textarea>
+<textarea rows="5" id="reject-comment-{{$data->id}}" class="form-control" name="comment">{{$data->is_auth_user_can_approve['comments'] ?? ''}}</textarea>
 </div>
 </div>
 </div>

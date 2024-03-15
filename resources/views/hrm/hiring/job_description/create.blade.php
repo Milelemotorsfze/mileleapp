@@ -166,13 +166,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-job-descript
                         </div>
                     </div>
 
-                    @foreach($allHiringRequests as $a)
-                    <!-- JobTitle :: {{$a->questionnaire->designation->name ?? ''}} -->
-                    <!-- Dep Name :: {{$a->questionnaire->department->name ?? ''}}, -->
-                    <!-- Work Location :: {{$a->questionnaire->workLocation->name ?? ''}}, -->
-                    <!-- Reporting To :: {{$a->department_head_name ?? ''}}, -->
-
-                    @endforeach
+                    
 
                     <!-- Department Section -->
                     <div class="col-lg-4 col-md-4 col-sm-4 col-12 dep-section-div">
@@ -204,7 +198,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-job-descript
                     <label for="job_purpose" class="form-label heading-name"><span class="error">* </span>Job Purpose</label>
                 </div>
                 <div class="col-lg-12  ">
-                    <textarea cols="25" rows="3" class="form-control" name="job_purpose" placeholder="Job Purpose">{{$jobDescription->job_purpose}}</textarea>
+                    <textarea cols="25" rows="3" class="form-control" name="job_purpose" placeholder="Job Purpose">{{$jobDescription->job_purpose ?? ''}}</textarea>
                 </div>
             </div>
 
@@ -213,7 +207,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-job-descript
                     <label for="duties_and_responsibilities" class="form-label heading-name"><span class="error">* </span>Duties and Responsibilities (Generic) of the position </label>
                 </div>
                 <div class="col-lg-12  ">
-                    <textarea cols="25" rows="7" class="form-control" name="duties_and_responsibilities" placeholder="Duties and Responsibilities">{{$jobDescription->duties_and_responsibilities}}</textarea>
+                    <textarea cols="25" rows="7" class="form-control" name="duties_and_responsibilities" placeholder="Duties and Responsibilities">{{$jobDescription->duties_and_responsibilities ?? ''}}</textarea>
                 </div>
             </div>
 
@@ -223,7 +217,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-job-descript
                     <label for="skills_required" class="form-label heading-name"><span class="error">* </span>Skills required to fulfil the position </label>
                 </div>
                 <div class="col-lg-12  ">
-                    <textarea cols="25" rows="7" class="form-control" name="skills_required" placeholder="Required Skills">{{$jobDescription->skills_required}}</textarea>
+                    <textarea cols="25" rows="7" class="form-control" name="skills_required" placeholder="Required Skills">{{$jobDescription->skills_required ?? ''}}</textarea>
                 </div>
             </div>
 
@@ -233,33 +227,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-job-descript
                     <label for="position_qualification" class="form-label heading-name"><span class="error">* </span>Position Qualification (Academic & Professional) </label>
                 </div>
                 <div class="col-lg-12  ">
-                    <textarea cols="25" rows="7" class="form-control" name="position_qualification" placeholder="Position Qualification">{{$jobDescription->position_qualification}}</textarea>
+                    <textarea cols="25" rows="7" class="form-control" name="position_qualification" placeholder="Position Qualification">{{$jobDescription->position_qualification ?? ''}}</textarea>
                 </div>
             </div>
-
-            <!-- <div >
-                <div class="col-lg-12  job-description-lable-name-1">
-                    <span class="error">* </span>
-                    <label for="basicpill-firstname-input" class="form-label heading-name">Approvals: </label>
-                </div>
-                <div class="row ">
-                    <div class="col-lg-6 col-md-6 col-6 manager-1">
-                        <input class="form-control job-desc-signature " name="depmanagersign" placeholder=""></input>
-                    </div>
-                    <div class="col-lg-6 col-md-6 col-6 manager-2">
-                        <input class="form-control job-desc-signature " name="hrmanagersign" placeholder=""></input>
-                    </div>
-                </div>
-
-                <div class="row job-desc-signature-name">
-                    <div class="col-lg-6 col-md-6 col-6 manager-1">
-                        <label for="basicpill-firstname-input" class="form-control" name="depmanager"><b class="approvals-managers">Department Manager</b></label>
-                    </div>
-                    <div class="col-lg-6 col-md-6 col-6 manager-2">
-                        <label for="basicpill-firstname-input" class="form-control" name="hrmanager"><b class="approvals-managers">HR Manager</b></label>
-                    </div>
-                </div>
-            </div> -->
 
         </div>
         <br />

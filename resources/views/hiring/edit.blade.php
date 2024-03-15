@@ -25,7 +25,7 @@
                         </div>
     					<div class="col-lg-12 col-md-12">
                             <label for="basicpill-firstname-input" class="form-label">Job Details</label>
-                            <textarea name="job_details" placeholder="Enter Job Details" class="form-control">{{ $hiring->job_details }}</textarea>
+                            <textarea name="job_details" placeholder="Enter Job Details" class="form-control">{{ $hiring->job_details ?? ''}}</textarea>
                         </div>
     					<div class="col-lg-12 col-md-12">
                             <label for="basicpill-firstname-input" class="form-label">Role</label>
@@ -41,11 +41,11 @@
                         </div>
                         <div class="col-lg-12 col-md-12">
                             <label for="basicpill-firstname-input" class="form-label">Skills</label>
-                            <textarea name="job_skills" placeholder="Enter Require Set of Skills" class="form-control">{{ $hiring->job_skills }}</textarea>
+                            <textarea name="job_skills" placeholder="Enter Require Set of Skills" class="form-control">{{ $hiring->job_skills ?? '' }}</textarea>
                         </div>
                         <div class="col-lg-12 col-md-12">
                             <label for="basicpill-firstname-input" class="form-label">Other Notes</label>
-                            <textarea name="job_other" placeholder="Enter Side Note Here" class="form-control">{{ $hiring->job_other }}</textarea>
+                            <textarea name="job_other" placeholder="Enter Side Note Here" class="form-control">{{ $hiring->job_other ?? ''}}</textarea>
                         </div>
     			     </div>
                     <div class="clearfix"></div>

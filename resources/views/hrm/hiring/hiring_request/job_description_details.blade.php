@@ -66,8 +66,7 @@
                                                             <label class="form-label font-size-13">Comments</label>
                                                         </div>
                                                         <div class="col-lg-12 col-md-12 col-sm-12">
-                                                            <textarea rows="5" id="comment-{{$data->jobDescription->id}}" class="form-control" name="comment">
-                                                            </textarea>
+                                                            <textarea rows="5" id="comment-{{$data->jobDescription->id}}" class="form-control" name="comment"></textarea>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -122,8 +121,7 @@
                                                             <label class="form-label font-size-13">Comments</label>
                                                         </div>
                                                         <div class="col-lg-12 col-md-12 col-sm-12">
-                                                            <textarea rows="5" id="comment-{{$data->jobDescription->id}}" class="form-control" name="comment">
-                                                            </textarea>
+                                                            <textarea rows="5" id="comment-{{$data->jobDescription->id}}" class="form-control" name="comment"></textarea>
                                                         </div>
                                                     </div>
                                                 </div>

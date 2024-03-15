@@ -81,8 +81,6 @@ class EmployeeHiringQuestionnaireController extends Controller
             'salary_range_end_in_aed' => 'required',
             'visa_type' => 'required',
             'nationality' => 'required',
-            'min_age' => 'required',
-            'max_age' => 'required',
             'required_to_travel_for_work_purpose' => 'required',
             'requires_multiple_industry_experience' => 'required',
             'team_handling_experience_required' => 'required',
@@ -100,8 +98,6 @@ class EmployeeHiringQuestionnaireController extends Controller
             'travel_experience' => 'required',
             'department_id' => 'required',
             'career_level_id' => 'required',
-            'current_or_past_employer_size_start' => 'required',
-            'current_or_past_employer_size_end' => 'required',
             'trial_pay_in_aed' => 'required',
             'out_of_office_visit' => 'required',
             'remote_work' => 'required',
@@ -149,8 +145,18 @@ class EmployeeHiringQuestionnaireController extends Controller
                     $update->salary_range_end_in_aed  = $request->salary_range_end_in_aed ;
                     $update->visa_type  = $request->visa_type ;
                     $update->nationality  = $request->nationality ;
-                    $update->min_age  = $request->min_age ;
-                    $update->max_age  = $request->max_age ;
+                    if(isset($request->min_age) && $request->min_age != '') {
+                        $update->min_age  = $request->min_age ;
+                    }
+                    else {
+                        $update->min_age  = NULL;
+                    }
+                    if(isset($request->max_age) && $request->max_age != '') {
+                        $update->max_age  = $request->max_age ;
+                    }
+                    else {
+                        $update->max_age  = NULL;
+                    }
                     $update->required_to_travel_for_work_purpose  = $request->required_to_travel_for_work_purpose ;
                     $update->requires_multiple_industry_experience  = $request->requires_multiple_industry_experience ;
                     $update->team_handling_experience_required  = $request->team_handling_experience_required ;
@@ -210,8 +216,18 @@ class EmployeeHiringQuestionnaireController extends Controller
                     $update->travel_experience = $request->travel_experience ;
                     $update->department_id = $request->department_id ;
                     $update->career_level_id = $request->career_level_id ;
-                    $update->current_or_past_employer_size_start = $request->current_or_past_employer_size_start ;
-                    $update->current_or_past_employer_size_end = $request->current_or_past_employer_size_end ;
+                    if(isset($request->current_or_past_employer_size_start) && $request->current_or_past_employer_size_start != '') {
+                        $update->current_or_past_employer_size_start = $request->current_or_past_employer_size_start ;
+                    }
+                    else {
+                        $update->current_or_past_employer_size_start = NULL;
+                    }
+                    if(isset($request->current_or_past_employer_size_end) && $request->current_or_past_employer_size_end != '') {
+                        $update->current_or_past_employer_size_end = $request->current_or_past_employer_size_end ;
+                    }
+                    else {
+                        $update->current_or_past_employer_size_end = NULL;
+                    }
                     $update->trial_pay_in_aed = $request->trial_pay_in_aed ;
                     $update->out_of_office_visit = $request->out_of_office_visit ;
                     $update->remote_work = $request->remote_work ;

@@ -28,13 +28,22 @@ class OverTime extends Model
         $sumMinutes = 0;
         $sumTime = '';
         foreach($this->times as $time) {
-            $explodedTime = explode(':', $time->hours); 
+            $explodedTime = explode(':', $time->hours_for_sum); 
             $eachminutes = $explodedTime[0]*60+$explodedTime[1];
             $sumMinutes = $sumMinutes+$eachminutes;
         }
         $hours = floor($sumMinutes/60);
         $minutes = $sumMinutes - ($hours * 60);
-        $sumTime = $hours.':'.$minutes;
+        if($hours != 0) {
+            $sumTime =  $hours.' Hours';
+        }
+        if($hours != 0 && $minutes != 0) {
+            $sumTime = $sumTime.' And ';
+        }
+        if($minutes != 0) {
+            $sumTime = $sumTime.$minutes.' Minutes';
+        }
+        // $sumTime = $hours.':'.$minutes;
         return $sumTime;
     }
     public function getCurrentStatusAttribute() {

@@ -327,7 +327,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 						<label for="additional_remarks" class="col-form-label text-md-end">{{ __('Remarks') }}</label>
 					</div>
                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                        <textarea rows="5" name="remarks" placeholder="Enter Remarks" class="form-control">{{$data->remarks}}</textarea>
+                        <textarea rows="5" name="remarks" placeholder="Enter Remarks" class="form-control">{{$data->remarks ?? ''}}</textarea>
                     </div>
                 </div>
 			</div>

@@ -92,6 +92,7 @@ class QuotationController extends Controller
         $call->name = $request->name;
         $call->phone = $request->phone;
         $call->email = $request->email;
+        $call->client_contact_person = $request->contact_person;
         $call->address = $request->address;
         $call->save();
         $quotation = new Quotation();
@@ -343,6 +344,7 @@ class QuotationController extends Controller
         $data['client_id'] = $call->id;
         $data['client_email'] = $call->email;
         $data['client_name'] = $call->name;
+        $data['client_contact_person'] = $call->client_contact_person;
         $data['client_phone'] = $call->phone;
         $data['client_address'] = $call->address;
         $data['document_number'] = $quotation->id;
@@ -798,6 +800,7 @@ class QuotationController extends Controller
         $data['client_id'] = $call->id;
         $data['client_email'] = $call->email;
         $data['client_name'] = $call->name;
+        $data['client_contact_person'] = $call->client_contact_person;
         $data['client_phone'] = $call->phone;
         $data['client_address'] = $call->address;
         $data['document_number'] = $quotation->id;

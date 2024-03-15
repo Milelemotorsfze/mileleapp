@@ -302,7 +302,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-questionnair
                     </div>
 
                     <div class="col-lg-4 col-md-6 col-sm-12">
-                        <label for="age" class="form-label"><span class="error">* </span>{{ __('Age:') }}</label>
+                        <label for="age" class="form-label">{{ __('Age:') }}</label>
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6 col-12">
                                 <div class="input-group">
@@ -672,7 +672,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-questionnair
                     </div>
 
                     <div class="col-lg-4 col-md-6 col-sm-12">
-                        <label for="current_or_past_employer_size_start" class="form-label"><span class="error">* </span>{{ __('Current or Past Employer Size:') }}</label>
+                        <label for="current_or_past_employer_size_start" class="form-label">{{ __('Current or Past Employer Size:') }}</label>
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6 col-12">
                                 <div class="input-group">
@@ -1197,11 +1197,9 @@ redirect()->route('home')->send();
                 required: true,
             },
             min_age: {
-                required: true,
                 twoDigitValues: true,
             },
             max_age: {
-                required: true,
                 twoDigitValues: true,
                 greaterThanFirstValueValidate: "#min_age",
             },
@@ -1308,11 +1306,9 @@ redirect()->route('home')->send();
                 required: true,
             },
             current_or_past_employer_size_start: {
-                required: true,
                 threeDigitValuesWithZero: true,
             },
             current_or_past_employer_size_end: {
-                required: true,
                 threeDigitValues: true,
                 greaterThanFirstValueValidate: "#current_or_past_employer_size_start",
 
