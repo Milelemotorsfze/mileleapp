@@ -119,7 +119,7 @@ class OverTimeController extends Controller
                     $createHistory = OverTimeHistory::create($history);
                     $history2['over_times_id'] = $createRequest->id;
                     $history2['icon'] = 'icons8-send-30.png';
-                    $history2['message'] = 'Employee Overtime Application request send to Employee ( '.$employee->user->name.' - '.$employee->personal_email_address.' ) for approval';
+                    $history2['message'] = 'Employee Overtime Application request send to Employee ( '.$employee->first_name.' - '.$employee->personal_email_address.' ) for approval';
                     $createHistory2 = OverTimeHistory::create($history2);
                     (new UserActivityController)->createActivity('Employee OverTime Application Created');
                     $successMessage = "Employee OverTime Application Created Successfully";                   
@@ -273,7 +273,7 @@ class OverTimeController extends Controller
                     $createHistory = OverTimeHistory::create($history);
                     $history2['over_times_id'] = $createRequest->id;
                     $history2['icon'] = 'icons8-send-30.png';
-                    $history2['message'] = 'Employee Overtime Application request send to Employee ( '.$employee->user->name.' - '.$employee->personal_email_address.' ) for approval';
+                    $history2['message'] = 'Employee Overtime Application request send to Employee ( '.$employee->first_name.' - '.$employee->personal_email_address.' ) for approval';
                     $createHistory2 = OverTimeHistory::create($history2);
                     (new UserActivityController)->createActivity('Employee OverTime Application Updated');
                     $successMessage = "Employee OverTime Application Updated Successfully";                   

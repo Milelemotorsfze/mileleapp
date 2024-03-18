@@ -79,7 +79,7 @@ class SeparationController extends Controller
                 $createHistory = SeparationHistory::create($history);
                 $history2['separations_id'] = $createRequest->id;
                 $history2['icon'] = 'icons8-send-30.png';
-                $history2['message'] = 'Separation Employee Handover request send to Employee ( '.$employee->user->name.' - '.$employee->personal_email_address.' ) for approval';
+                $history2['message'] = 'Separation Employee Handover request send to Employee ( '.$employee->first_name.' - '.$employee->personal_email_address.' ) for approval';
                 $createHistory2 = SeparationHistory::create($history2);
                 (new UserActivityController)->createActivity('Separation Employee Handover Updated');
                 $successMessage = "Separation Employee Handover Updated Successfully";                   
@@ -135,7 +135,7 @@ class SeparationController extends Controller
                 $createHistory = SeparationHistory::create($history);
                 $history2['separations_id'] = $createRequest->id;
                 $history2['icon'] = 'icons8-send-30.png';
-                $history2['message'] = 'Separation Employee Handover request send to Employee ( '.$employee->user->name.' - '.$employee->personal_email_address.' ) for approval';
+                $history2['message'] = 'Separation Employee Handover request send to Employee ( '.$employee->first_name.' - '.$employee->personal_email_address.' ) for approval';
                 $createHistory2 = SeparationHistory::create($history2);
                 (new UserActivityController)->createActivity('Separation Employee Handover request Created');
                 $successMessage = "Separation Employee Handover Created Successfully";                   
