@@ -68,26 +68,52 @@ class JobDescriptionController extends Controller
             if($hiring_id != 'new') {
                 $currentHiringRequest = EmployeeHiringRequest::where('id',$hiring_id)->where('status','approved')->where('final_status','open')
                 ->whereDoesntHave('jobDescription');
-                // if(Auth::user()->hasPermissionForSelectedRole(['view-rejected-job-description-list'])) {
-                //     // $rejected = $rejected->latest();
-                // }
-                // else if(Auth::user()->hasPermissionForSelectedRole(['view-current-user-rejected-job-description-list'])) {
-                //     // $rejected = $rejected->whereHas('employeeHiringRequest',function($query) use($authId) {
-                //     //     $query->where('requested_by',$authId);
-                //     // })->latest();
-                // }
+                if(Auth::user()->hasPermissionForSelectedRole(['view-all-approved-hiring-request-listing'])) {
+                    $currentHiringRequest = $currentHiringRequest->latest();
+                }
+                else if(Auth::user()->hasPermissionForSelectedRole(['view-approved-hiring-request-listing-of-current-user'])) {
+                    $currentHiringRequest = $currentHiringRequest->where('requested_by',$authId)->latest();
+                }
                 $currentHiringRequest =$currentHiringRequest->first();
             }
             else {
                 $currentHiringRequest ='';
             }    
-            $allHiringRequests = EmployeeHiringRequest::whereHas('questionnaire')->where('status','approved')->where('final_status','open')->whereDoesntHave('jobDescription')->get();
+            $allHiringRequests = EmployeeHiringRequest::whereHas('questionnaire')->where('status','approved')->where('final_status','open')->whereDoesntHave('jobDescription');
+            if(Auth::user()->hasPermissionForSelectedRole(['view-all-approved-hiring-request-listing'])) {
+                $allHiringRequests = $allHiringRequests->latest();
+            }
+            else if(Auth::user()->hasPermissionForSelectedRole(['view-approved-hiring-request-listing-of-current-user'])) {
+                $allHiringRequests = $allHiringRequests->where('requested_by',$authId)->latest();
+            }
+            $allHiringRequests = $allHiringRequests->get();
         }
         else {
             $jobDescriptionId = $jobDescription->id;
-            $currentHiringRequest = EmployeeHiringRequest::where('id',$jobDescription->hiring_request_id)->first();
-            $allHiringRequests1 = EmployeeHiringRequest::where('status','approved')->where('final_status','open')->whereDoesntHave('jobDescription')->get();
-            $allHiringRequests2 = EmployeeHiringRequest::where('status','approved')->where('final_status','open')->where('id',$jobDescription->hiring_request_id)->get();
+            $currentHiringRequest = EmployeeHiringRequest::where('id',$jobDescription->hiring_request_id);
+            if(Auth::user()->hasPermissionForSelectedRole(['view-all-approved-hiring-request-listing'])) {
+                $currentHiringRequest = $currentHiringRequest->latest();
+            }
+            else if(Auth::user()->hasPermissionForSelectedRole(['view-approved-hiring-request-listing-of-current-user'])) {
+                $currentHiringRequest = $currentHiringRequest->where('requested_by',$authId)->latest();
+            }
+            $currentHiringRequest = $currentHiringRequest->first();
+            $allHiringRequests1 = EmployeeHiringRequest::where('status','approved')->where('final_status','open')->whereDoesntHave('jobDescription');
+            if(Auth::user()->hasPermissionForSelectedRole(['view-all-approved-hiring-request-listing'])) {
+                $allHiringRequests1 = $allHiringRequests1->latest();
+            }
+            else if(Auth::user()->hasPermissionForSelectedRole(['view-approved-hiring-request-listing-of-current-user'])) {
+                $allHiringRequests1 = $allHiringRequests1->where('requested_by',$authId)->latest();
+            }
+            $allHiringRequests1 = $allHiringRequests1->get();
+            $allHiringRequests2 = EmployeeHiringRequest::where('status','approved')->where('final_status','open')->where('id',$jobDescription->hiring_request_id);
+            if(Auth::user()->hasPermissionForSelectedRole(['view-all-approved-hiring-request-listing'])) {
+                $allHiringRequests2 = $allHiringRequests2->latest();
+            }
+            else if(Auth::user()->hasPermissionForSelectedRole(['view-approved-hiring-request-listing-of-current-user'])) {
+                $allHiringRequests2 = $allHiringRequests2->where('requested_by',$authId)->latest();
+            }
+            $allHiringRequests2 = $allHiringRequests2->get();
             $allHiringRequests = $allHiringRequests1->merge($allHiringRequests2);
         }
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
