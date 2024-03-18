@@ -467,7 +467,7 @@
     @if($quotation->currency == "USD")
         <tr>
             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                Net Total In AED:
+                Net Total In USD:
             </td>
             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
                 {{ $quotation->currency ." ". number_format($quotation->deal_value) }}
@@ -475,10 +475,28 @@
         </tr>
         <tr>
             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                Net Total In USD:
+                Net Total In AED:
             </td>
             <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
-                {{ $quotation->currency ." ". number_format($quotation->deal_value * 3.67) }}
+                {{"AED ". number_format($quotation->deal_value * 3.65) }}
+            </td>
+        </tr>
+        @endif
+        @if($quotation->currency == "EUR")
+        <tr>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                Net Total In EUR:
+            </td>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                {{ $quotation->currency ." ". number_format($quotation->deal_value) }}
+            </td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                Net Total In AED:
+            </td>
+            <td style="border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; width: 50%;">
+                {{"AED ". number_format($quotation->deal_value * 4) }}
             </td>
         </tr>
         @endif
