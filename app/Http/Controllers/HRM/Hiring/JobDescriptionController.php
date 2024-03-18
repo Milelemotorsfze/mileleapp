@@ -74,7 +74,7 @@ class JobDescriptionController extends Controller
                 else if(Auth::user()->hasPermissionForSelectedRole(['view-approved-hiring-request-listing-of-current-user'])) {
                     $currentHiringRequest = $currentHiringRequest->where('requested_by',$authId)->latest();
                 }
-                $currentHiringRequest =$currentHiringRequest->first();
+                $currentHiringRequest =$currentHiringRequest->with('questionnaire.designation','questionnaire.department','questionnaire.workLocation')->first();
             }
             else {
                 $currentHiringRequest ='';
@@ -86,7 +86,7 @@ class JobDescriptionController extends Controller
             else if(Auth::user()->hasPermissionForSelectedRole(['view-approved-hiring-request-listing-of-current-user'])) {
                 $allHiringRequests = $allHiringRequests->where('requested_by',$authId)->latest();
             }
-            $allHiringRequests = $allHiringRequests->get();
+            $allHiringRequests = $allHiringRequests->with('questionnaire.designation','questionnaire.department','questionnaire.workLocation')->get();
         }
         else {
             $jobDescriptionId = $jobDescription->id;
@@ -97,7 +97,7 @@ class JobDescriptionController extends Controller
             else if(Auth::user()->hasPermissionForSelectedRole(['view-approved-hiring-request-listing-of-current-user'])) {
                 $currentHiringRequest = $currentHiringRequest->where('requested_by',$authId)->latest();
             }
-            $currentHiringRequest = $currentHiringRequest->first();
+            $currentHiringRequest = $currentHiringRequest->with('questionnaire.designation','questionnaire.department','questionnaire.workLocation')->first();
             $allHiringRequests1 = EmployeeHiringRequest::where('status','approved')->where('final_status','open')->whereDoesntHave('jobDescription');
             if(Auth::user()->hasPermissionForSelectedRole(['view-all-approved-hiring-request-listing'])) {
                 $allHiringRequests1 = $allHiringRequests1->latest();
@@ -105,7 +105,7 @@ class JobDescriptionController extends Controller
             else if(Auth::user()->hasPermissionForSelectedRole(['view-approved-hiring-request-listing-of-current-user'])) {
                 $allHiringRequests1 = $allHiringRequests1->where('requested_by',$authId)->latest();
             }
-            $allHiringRequests1 = $allHiringRequests1->get();
+            $allHiringRequests1 = $allHiringRequests1->with('questionnaire.designation','questionnaire.department','questionnaire.workLocation')->get();
             $allHiringRequests2 = EmployeeHiringRequest::where('status','approved')->where('final_status','open')->where('id',$jobDescription->hiring_request_id);
             if(Auth::user()->hasPermissionForSelectedRole(['view-all-approved-hiring-request-listing'])) {
                 $allHiringRequests2 = $allHiringRequests2->latest();
@@ -113,7 +113,7 @@ class JobDescriptionController extends Controller
             else if(Auth::user()->hasPermissionForSelectedRole(['view-approved-hiring-request-listing-of-current-user'])) {
                 $allHiringRequests2 = $allHiringRequests2->where('requested_by',$authId)->latest();
             }
-            $allHiringRequests2 = $allHiringRequests2->get();
+            $allHiringRequests2 = $allHiringRequests2->with('questionnaire.designation','questionnaire.department','questionnaire.workLocation')->get();
             $allHiringRequests = $allHiringRequests1->merge($allHiringRequests2);
         }
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
