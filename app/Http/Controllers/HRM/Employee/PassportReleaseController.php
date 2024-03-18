@@ -113,6 +113,7 @@ class PassportReleaseController extends Controller
         return view('hrm.passport.passport_release.edit',compact('data','masterEmployees','submissionPurpose','releasePurpose'));
     }
     public function index() {
+        $authId = Auth::id();
         $pendings = PassportRelease::where('release_submit_status','pending');
         if(Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list'])) {
             $pendings = $pendings->latest();

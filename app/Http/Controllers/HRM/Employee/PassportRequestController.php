@@ -104,6 +104,7 @@ class PassportRequestController extends Controller
         'reportingManagerApproved','reportingManagerRejected','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','hrManagerPendings','hrManagerApproved','hrManagerRejected'));
     }
     public function index() {
+        $authId = Auth::id();
         $pendings = PassportRequest::where('submit_status','pending');
         if(Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list'])) {
             $pendings = $pendings->latest();
@@ -215,7 +216,7 @@ class PassportRequestController extends Controller
                         $history['message'] = 'Employee passport submit request created by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
                         $createHistory = PassportRequestHistory::create($history);                  
                         $history2['icon'] = 'icons8-send-30.png';
-                        $history2['message'] = 'Employee passport '.$request->purposes_of_submit.' request send to Employee ( '.$employee->first_name.' '.$employee->last_name.' - '.$employee->personal_email_adddress.' ) for approval';
+                        $history2['message'] = 'Employee passport '.$request->purposes_of_submit.' request send to Employee ( '.$employee->first_name.' - '.$employee->personal_email_adddress.' ) for approval';
                         $createHistory2 = PassportRequestHistory::create($history2);
                         (new UserActivityController)->createActivity('Employee Passport Submit Request Created');
                         $successMessage = "Employee Passport Submit Request Created Successfully";
@@ -241,7 +242,7 @@ class PassportRequestController extends Controller
                             $history['message'] = 'Employee passport release request created by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
                             $createHistory = PassportReleaseHistory::create($history);                  
                             $history2['icon'] = 'icons8-send-30.png';
-                            $history2['message'] = 'Employee passport '.$request->purposes_of_submit.' request send to Employee ( '.$employee->first_name.' '.$employee->last_name.' - '.$employee->personal_email_adddress.' ) for approval';
+                            $history2['message'] = 'Employee passport '.$request->purposes_of_submit.' request send to Employee ( '.$employee->first_name.' - '.$employee->personal_email_adddress.' ) for approval';
                             $createHistory2 = PassportReleaseHistory::create($history2);
                             (new UserActivityController)->createActivity('Employee Passport Release Request Created');
                             $successMessage = "Employee Passport Release Request Created Successfully"; 

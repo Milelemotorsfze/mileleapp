@@ -137,7 +137,6 @@
 										@foreach ($employeeApproved as $key => $data)
 										<tr data-id="1">
 										<td>{{ ++$i }}</td>
-                                            <td>{{ ++$i }}</td>
                                             <td>{{ $data->user->name ?? ''}}</td>
                                             <td>{{ $data->user->empProfile->employee_code ?? '' }}</td>
                                             <td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
