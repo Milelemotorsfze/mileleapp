@@ -269,7 +269,7 @@ class SupplierInventoryController extends Controller
             $colourname = NULL;
 
 //            $date = Carbon::today()->format('Y-m-d');
-            $date = '2024-02-22';
+            $date = '2024-03-06';
             $unavailableExtColours = [];
             $unavailableIntColours = [];
 
@@ -1157,17 +1157,16 @@ class SupplierInventoryController extends Controller
                         ->skip(1)
                         ->first();
 
-//                    return $previousFileDate;
-
                     foreach ($deletedRows as $deletedRow) {
+                        info("deleted row id");
+                        info($deletedRow);
                         $deletedRow->upload_status = SupplierInventory::VEH_STATUS_DELETED;
                         $deletedRow->save();
 
                         if($previousFileDate) {
-//                            return 1;/
                             $isSameRowExist = SupplierInventoryHistory::whereDate('date_of_entry', $previousFileDate->date_of_entry)
                                 ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-                                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_INACTIVE)
+                                ->whereNot('upload_status', SupplierInventory::VEH_STATUS_DELETED)
                                 ->where('supplier_id', $deletedRow->supplier_id)
                                 ->where('whole_sales', $deletedRow->whole_sales)
                                 ->where('master_model_id', $deletedRow->master_model_id)
@@ -1180,7 +1179,8 @@ class SupplierInventoryController extends Controller
                                 ->where('delivery_note', $deletedRow->delivery_note)
                                 ->first();
 
-//                            return $isSameRowExist;
+                            info("similar deleted rows");
+                            info($isSameRowExist);
 
                             if($isSameRowExist) {
 //                                return $isSameRowExist;
@@ -1917,10 +1917,9 @@ class SupplierInventoryController extends Controller
         if(empty($latestDate)) {
             $latestDate = SupplierInventoryHistory::orderBy('id', 'DESC')->groupBy('date_of_entry')->first();
         }
-//        return $latestDate;
 
-        $deletedRows = SupplierInventoryHistory::whereDate('date_of_entry', '>=', $previousDate->date_of_entry)
-            ->whereDate('date_of_entry', '<=' ,$latestDate->date_of_entry)
+        $deletedRows = SupplierInventoryHistory::whereDate('date_of_entry', '>=', $request->first_file)
+            ->whereDate('date_of_entry', '<' ,$request->second_file)
 //           es) ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
 //            ->where('supplier_id', $request->supplier_id)
 //            ->where('whole_sales', $request->whole_sal
