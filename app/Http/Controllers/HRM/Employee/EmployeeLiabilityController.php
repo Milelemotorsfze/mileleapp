@@ -208,6 +208,7 @@ class EmployeeLiabilityController extends Controller
         }
     }
     public function index() {
+        $authId = Auth::id();
         $page = 'listing';
         $pendings = Liability::where('status','pending');
         if(Auth::user()->hasPermissionForSelectedRole(['view-liability-list'])) {
