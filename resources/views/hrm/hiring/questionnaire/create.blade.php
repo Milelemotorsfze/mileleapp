@@ -221,7 +221,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-questionnair
             </div>
             <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                <label for="certification" class="form-label"><span class="error">* </span>{{ __('Certification :') }} </label>
+                <label for="certification" class="form-label">{{ __('Certification :') }} </label>
                 <input type="text" placeholder="Certification" name="certification" class="form-control" id="certification" value="{{$data->questionnaire->certification ?? ''}}">
             </div>
         </div>
@@ -1176,9 +1176,6 @@ redirect()->route('home')->send();
                 required: true,
             },
             education: {
-                required: true,
-            },
-            certification: {
                 required: true,
             },
             salary_range_start_in_aed: {

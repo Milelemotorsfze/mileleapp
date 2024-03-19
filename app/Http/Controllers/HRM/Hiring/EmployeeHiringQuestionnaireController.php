@@ -74,7 +74,6 @@ class EmployeeHiringQuestionnaireController extends Controller
             'work_time_start' => 'required',
             'work_time_end' => 'required',
             'education' => 'required',
-            'certification' => 'required',
             'industry_experience_id' => 'required',
             'specific_company_experience' => 'required',
             'salary_range_start_in_aed' => 'required',
@@ -138,7 +137,12 @@ class EmployeeHiringQuestionnaireController extends Controller
                     else {
                         $update->education_certificates  = NULL ;
                     }
-                    $update->certification  = $request->certification ;
+                    if(isset($request->certification)) {
+                        $update->certification  = $request->certification ;
+                    }
+                    else {
+                        $update->certification  = NULL ;
+                    }
                     $update->industry_experience_id  = $request->industry_experience_id ;
                     $update->specific_company_experience  = $request->specific_company_experience ;
                     $update->salary_range_start_in_aed  = $request->salary_range_start_in_aed ;
