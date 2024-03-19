@@ -72,7 +72,8 @@
                 <tr>
                   <th>Port Name</th>
                   <th>Country</th>
-                  <th>Created By</th>
+                  <th>Created At</th>
+                  <th>Edit</th>
                 </tr>
               </thead>
               <tbody>
@@ -90,6 +91,16 @@
                 { data: 'name', name: 'master_shipping_ports.name' },
                 { data: 'countryname', name: 'countries.name' },
                 { data: 'created_at', name: 'created_at' },
+                {
+    data: null,
+    render: function (data) {
+        var editRoute = "{{ route('ports.edit', ':id') }}";
+        editRoute = editRoute.replace(':id', data.id);
+        return `<a href="${editRoute}" class="btn btn-info btn-sm">
+        <i class="fa fa-arrow-circle-right"></i>
+                </a>`;
+    }
+},
             ]
         });
   });

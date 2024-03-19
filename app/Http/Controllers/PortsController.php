@@ -88,7 +88,9 @@ class PortsController extends Controller
      */
     public function edit(string $id)
     {
-        //
+       $countries = Country::all();
+       $ports =  MasterShippingPorts::find($id);
+       return view('ports.edit', compact('ports','countries'));
     }
 
     /**
