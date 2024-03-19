@@ -283,7 +283,6 @@
                         }));
                     }else{
                         $('select[name="second_file"]').html('<option value="" > Select Second File </option>');
-
                     }
                     jQuery.each(data, function(key,value){
                         // getSelectedDates();

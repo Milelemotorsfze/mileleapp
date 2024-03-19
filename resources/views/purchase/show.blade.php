@@ -718,7 +718,7 @@
 									@endif
 									{{-- End For Amount Debited  --}}
 									</div>
-                  <div class="col-lg-4">
+                            <div class="col-lg-4">
 								{{-- Cancel & Delete for procurement  --}}
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
@@ -737,8 +737,8 @@
 								@endif
 								@endif
 							{{-- End Cancel & Delete For Procurement  --}}
-              </div>
-              </div>
+                        </div>
+                        </div>
 							</div>
                         </td>
                         </tr>
@@ -905,7 +905,7 @@
                                         @endphp
                                         {{ ucfirst(strtolower($change_bys)) }}
                                     </td>
-                                    <td>  
+                                    <td>
                                         @php
                                             $selected = DB::table('roles')->where('id', $vehicleslog->role)->first();
                                             $roleselected = $selected ? $selected->name : null;
