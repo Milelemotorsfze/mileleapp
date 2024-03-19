@@ -48,7 +48,6 @@
                                                 <th>Response Time</th>
                                                 <th>Open Leads</th>
                                                 <th>Lead Closed</th>
-                                                <th>Lead Closed Time</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -89,17 +88,6 @@
                                                 ->count();
                                             @endphp
                                             <td>{{ $closedLeadsCount }}</td>
-                                            @php
-                                            $closedtime = null;
-                                            $closedtime = DB::table('calls')
-                                                ->leftJoin('lead_closed', 'calls.id', '=', 'lead_closed.call_id')
-                                                ->where('calls.status', '!=', 'New')
-                                                ->where('calls.sales_person', '=', $lead->sales_person)
-                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
-                                                ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, calls.created_at, lead_closed.created_at)) as average_closed_time'))
-                                                ->first();
-                                            @endphp
-                                            <td>{{ $closedtime ? $closedtime->average_closed_time : 'N/A' }}</td>
                                         </tr>
                                     @empty
                                         <tr>
