@@ -209,6 +209,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-questionnair
                 <label for="education" class="form-label"><span class="error">* </span>{{ __('Education') }}</label>
                 <select name="education" id="education" class="form-control widthinput" autofocus>
                     <option value="" disabled selected>Choose Option</option>
+                    <option value="secondary_school_or_below" {{ $data && $data->questionnaire && $data->questionnaire->education == 'secondary_school_or_below' ? 'selected' : '' }}>Secondary School Or Below</option>
                     <option value="high_school" {{ $data && $data->questionnaire && $data->questionnaire->education == 'high_school' ? 'selected' : '' }}>High School</option>
                     <option value="bachelors" {{ $data && $data->questionnaire && $data->questionnaire->education == 'bachelors' ? 'selected' : '' }}>Bachelors</option>
                     <option value="pg_in_same_specialisation_or_related_to_department" {{ $data && $data->questionnaire && $data->questionnaire->education == 'pg_in_same_specialisation_or_related_to_department' ? 'selected' : '' }}>PG in the same specialization or related to the department</option>
