@@ -477,7 +477,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
 
                     <div class="col-lg-4  ">
                         <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Interviewed By:</label>
+                        <label for="basicpill-firstname-input" class="form-label">Interview Organized By:</label>
                         <select name="designation" id="designation" class="form-control widthinput" autofocus>
                             <option value=""></option>
                             <option value="option1">option1</option>

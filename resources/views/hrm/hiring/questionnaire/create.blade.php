@@ -544,7 +544,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-questionnair
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
                         <div class="dropdown-option-div">
-                            <label for="interviewd_by" class="form-label"><span class="error">* </span>{{ __('Interviewed By:') }}</label>
+                            <label for="interviewd_by" class="form-label"><span class="error">* </span>{{ __('Interview Organized By:') }}</label>
                             <select name="interviewd_by" id="interviewd_by" class="form-control widthinput" multiple="true" autofocus>
                                 @foreach($interviewdByUsers as $User)
                                 <option value="{{$User->id}}" {{$data && $data->questionnaire && $data->questionnaire->interviewd_by && $User->id == $data->questionnaire->interviewd_by ? 'selected' : '' }}>{{$User->name}}</option>
