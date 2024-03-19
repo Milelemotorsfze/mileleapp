@@ -176,7 +176,46 @@
         </tr>
     </table>
 </div>
-        
+<div  style="color: black">
+            <table style="border: none;">
+                <tr style="background-color: #bbbbbd;color: #000000;font-weight: bold">
+                @if($quotationDetail->payment_terms)
+                    <td colspan="2">Payment Details</td>
+                    @endif
+                    @if ($quotationDetail->representative_name || $quotationDetail->cb_name )
+                    <td colspan="4">Client  Representative</td>
+                    @endif
+                </tr>
+                <tr>
+                    @if($quotationDetail->payment_terms)
+                    <td style="font-weight: bold;">Payment Terms :</td>
+                    <td>{{ $quotationDetail->payment_terms }}</td>
+                    @endif
+                    @if($quotationDetail->representative_name)
+                    <td style="font-weight: bold;">Rep Name :</td>
+                    <td> {{ $quotationDetail->representative_name }}</td>
+                    @endif
+                    @if($quotationDetail->cb_name)
+                    <td style="font-weight: bold;"> CB Name :</td>
+                    <td> {{ $quotationDetail->cb_name }} </td>
+                    @endif
+                </tr>
+                <tr>
+                @if($quotationDetail->payment_terms)
+                    <td></td>
+                    <td></td>
+                @endif
+                    @if($quotationDetail->representative_name)
+                    <td style="font-weight: bold;">Rep No. :</td>
+                    <td> {{ $quotationDetail->representative_number }}</td>
+                    @endif
+                    @if($quotationDetail->cb_name)
+                    <td style="font-weight: bold;"> CB No :</td>
+                    <td> {{ $quotationDetail->cb_number }} </td>
+                    @endif
+                </tr>
+            </table>
+        </div>
         <table id="details">
             @if($vehicles->count() > 0  || $otherVehicles->count() || $vehicleWithBrands->count() > 0)
                 <tr style="font-size: 12px;background-color: #bbbbbd;">
