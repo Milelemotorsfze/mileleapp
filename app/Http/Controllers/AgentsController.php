@@ -207,10 +207,14 @@ class AgentsController extends Controller
     public function getAgentNames()
     {
         $userId = auth()->user()->id;
-        $agentData = Agents::join('agents_creating', 'agents.id', '=', 'agents_creating.agents_id')
-            ->where('agents_creating.created_by', $userId)
-            ->select('agents.id', 'agents.name', 'agents.phone')
-            ->get();
+        $hasPermission = auth()->user()->hasPermissionForSelectedRole('sales-support-full-access');
+        $agentData = Agents::select('agents.id', 'agents.name', 'agents.phone');
+    if (!$hasPermission) {
+        $agentData->join('agents_creating', 'agents.id', '=', 'agents_creating.agents_id')
+                  ->where('agents_creating.created_by', $userId);
+    }
+
+    $agentData = $agentData->get();
         return response()->json($agentData);
     }
 }

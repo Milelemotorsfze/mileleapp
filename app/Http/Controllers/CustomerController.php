@@ -171,15 +171,16 @@ class CustomerController extends Controller
 
     }
     public function salescustomers(Request $request)
-{
+    {
     $useractivities = new UserActivities();
     $useractivities->activity = "Open The Customers Page";
     $useractivities->users_id = Auth::id();
     $userid = Auth::id();
     $useractivities->save();
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
     if ($request->ajax()) {
-        $data = Clients::where('created_by' , $userid)->select([
-            'id', // Include the Client ID
+        $data = Clients::select([
+            'id',
             'name',
             'phone',
             'email',
@@ -192,6 +193,9 @@ class CustomerController extends Controller
             'tender',
             'passport',
         ]);
+        if (!$hasPermission) {
+            $data->where('created_by', $userid);
+        }
         return DataTables::of($data)
             ->addColumn('file_icons', function ($row) {
                 $icons = '';
@@ -200,7 +204,6 @@ class CustomerController extends Controller
                     'tender' => 'fas fa-gavel',
                     'passport' => 'fas fa-passport',
                 ];
-
                 foreach ($fileTypes as $column => $iconClass) {
                     $fileLink = $row->$column;
 
@@ -209,7 +212,6 @@ class CustomerController extends Controller
                         $icons .= '<a href="#" class="file-icon" data-file="' . $fileLink . '" data-toggle="tooltip" title="' . $fileName . '"><i class="' . $iconClass . ' fa-lg"></i></a>';
                     }
                 }
-
                 return $icons;
             })
             ->addColumn('view_history_icon', function ($row) {
@@ -220,7 +222,7 @@ class CustomerController extends Controller
     }
 
     return view('clients.index');
-}
+    }
     public function viewHistory($clientId)
 {
     // return view('clients.view_history', compact('clientId'));

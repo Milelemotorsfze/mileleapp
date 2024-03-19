@@ -3,7 +3,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
                     @section('content')
                     @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
                     @endphp
                     @if ($hasPermission)
   <div class="card-header">
@@ -154,7 +154,6 @@ input[type=number]::-webkit-outer-spin-button
               {{ Session::get('success') }}
           </div>
       @endif
-      @can('sales-view')
       <a class="btn btn-sm btn-info float-end" href="{{ route('salescustomers.index') }}" text-align: right>
         <i class="fa fa-users" aria-hidden="true"></i> Customers
       </a>
@@ -173,7 +172,6 @@ input[type=number]::-webkit-outer-spin-button
       </a> -->
       <div class="clearfix"></div>
 <br>
-    @endcan
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
@@ -202,7 +200,6 @@ input[type=number]::-webkit-outer-spin-button
     </ul>
   </div>
   <div class="tab-content">
-    @can('sales-view')
       <div class="tab-pane fade show active" id="tab1">
       <br>
       <!-- <div class="row">
@@ -299,7 +296,6 @@ input[type=number]::-webkit-outer-spin-button
       <i class="fa fa-bars" aria-hidden="true"></i>
     </button>
     <ul class="dropdown-menu dropdown-menu-end">
-    @can('sales-view')
       <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Unique Inquiry / Demand</a></li>
       <!-- <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li> -->
@@ -310,7 +306,6 @@ input[type=number]::-webkit-outer-spin-button
       <!-- <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Sales Order</a></li> -->
       <!-- <li><a class="dropdown-item"href="{{route('salesorder.createsalesorder',['callId'=> $calls->id]) }}">Sales Order</a></li> -->
       <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li>
-      @endcan
     </ul>
   </div>
                     </td>
@@ -685,8 +680,6 @@ input[type=number]::-webkit-outer-spin-button
         </div>
     </div>
 </div>
-    @endcan
-    @can('sales-view')
       <div class="tab-pane fade show" id="tab2">
       <br>
       <!-- <div class="row">
@@ -721,8 +714,6 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
-      @endcan
-      @can('sales-view')
         <div class="tab-pane fade show" id="tab3">
         <br>
       <!-- <div class="row">
@@ -756,8 +747,6 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
           </div>
-        @endcan
-		    @can('sales-view')
       <div class="tab-pane fade show" id="tab4">
       <br>
       <!-- <div class="row">
@@ -796,8 +785,6 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
-    @endcan
-    @can('sales-view')
       <div class="tab-pane fade show" id="tab5">
       <br>
       <!-- <div class="row">
@@ -839,8 +826,6 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
-    @endcan
-    @can('sales-view')
       <div class="tab-pane fade show" id="tab6">
       <br>
       <!-- <div class="row">
@@ -887,8 +872,6 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
-    @endcan
-    @can('sales-view')
       <div class="tab-pane fade show" id="tab8">
       <br>
       <!-- <div class="row">
@@ -919,8 +902,6 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
-    @endcan
-    @can('sales-view')
       <div class="tab-pane fade show" id="tab7">
       <br>
       <!-- <div class="row">
@@ -964,7 +945,6 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
-    @endcan
       </div><!-- end tab-content-->
     </div>
   </div>
