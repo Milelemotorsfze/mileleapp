@@ -1,6 +1,6 @@
-@canany(['view-questionnaire-details'])
+@canany(['view-questionnaire-details','view-current-user-questionnaire'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-questionnaire-details']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-questionnaire-details','view-current-user-questionnaire']);
 @endphp
 @if ($hasPermission)
 @if(isset($data->questionnaire))
