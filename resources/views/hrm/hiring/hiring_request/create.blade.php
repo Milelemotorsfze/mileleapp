@@ -232,22 +232,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 		else {
 			document.getElementById('request_date').valueAsDate = new Date();
 		}
-		if(user.department != null) {
+		if(user.department != '') {
 			$("#department_id").val(user.department);
-			// $("#department_main_div").hide();
+			$("#department_main_div").hide();
 		}
-		else {
+		else{
 			$("#department_id").val(data.department_id);
-			// $("#department_main_div").show();
+			$("#department_main_div").show();
 		}
 		$("#location_id").val(data.location_id);
-		if(user.id != null) {
+		if(user.id != '') {
 			$("#requested_by").val(user.id);
-			// $("#requested_by_main_div").hide();
+			$("#requested_by_main_div").hide();
 		}
-		else {
+		else{
 			$("#requested_by").val(data.requested_by);
-			// $("#requested_by_main_div").show();
+			$("#requested_by_main_div").show();
 		}		
 		$("#requested_job_title").val(data.requested_job_title);
 		$("#reporting_to").val(data.reporting_to);
