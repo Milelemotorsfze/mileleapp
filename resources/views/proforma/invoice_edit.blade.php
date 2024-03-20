@@ -316,6 +316,28 @@
                 </div>
                 </div>
                 @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                    @endphp
+                    @if ($hasPermission)
+                    <div class="row mt-2">
+                    <div class="col-sm-6">
+                        Sales Person :
+                    </div>
+                    <div class="col-sm-6">
+    <select id="salespersons" name="salespersons" class="form-select" required>
+        @foreach ($sales_persons as $sales_person)
+            @php
+                $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
+                $sales_person_name = $sales_person_details->name;
+                $selected = ($sales_person->model_id == $quotation->created_by) ? 'selected' : '';
+            @endphp
+            <option value="{{ $sales_person->model_id }}" {{ $selected }}>{{ $sales_person_name }}</option>      
+        @endforeach
+    </select>
+</div>
+                </div>
+                    @else
+                @php
                 $user = \Illuminate\Support\Facades\Auth::user();
                 $empProfile = $user->empProfile;
                 @endphp
@@ -351,6 +373,7 @@
                     {{ isset($empProfile->phone) ? $empProfile->phone : '' }}
                     </div>
                 </div>
+                @endif
             </div>
             <div class="col-sm-4">
                 <div class="row mt-2">
@@ -1315,6 +1338,74 @@
  <input type="hidden" name="is_shipping_charge_added" value="0" id="is-shipping-charge-added">
 @endsection
 @push('scripts')
+<script>
+     function addAgentModal() {
+        $('#addAgentModal').modal('show');
+    }
+$(document).ready(function () {
+    $('#cb_name').change(function () {
+        var selectedAgentId = $(this).val();
+        var selectedAgentName = $(this).find(':selected').text();
+        $('#agents_id').val(selectedAgentId);
+        $('#selected_cb_name').val(selectedAgentName);
+    });
+    fetchAgentData();
+    function fetchAgentData() {
+        $.ajax({
+            url: "{{ route('agents.getAgentNames') }}",
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                // Clear existing options
+                $('#cb_name').empty();
+                $('#cb_name').append('<option value="" disabled selected>Select Agent</option>');
+                // Add fetched options
+                $.each(data, function (index, agent) {
+                    $('#cb_name').append('<option value="' + agent.id + '">' + agent.name + '</option>');
+                });
+
+                // Update CB No on change
+                $('#cb_name').change(function () {
+                    var selectedAgentId = $(this).val();
+                    var selectedAgent = data.find(agent => agent.id == selectedAgentId);
+
+                    if (selectedAgent) {
+                        $('#cb_number').val(selectedAgent.phone).trigger('change');
+                    } else {
+                        $('#cb_number').val('').trigger('change');
+                    }
+                });
+            },
+            error: function (error) {
+                console.error('Error fetching agent data:', error);
+            }
+        });
+    }
+
+    // Intercept form submission and handle it through AJAX
+    $('#form-update2_492').submit(function (e) {
+        e.preventDefault();
+        var formData = new FormData($(this)[0]);
+        $.ajax({
+            url: "{{ route('agents.store') }}",
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                $('#cb_name').append('<option value="' + response.agent_id + '">' + response.name + '</option>');
+                $('#cb_name').val(response.agent_id).trigger('change');
+                $('#cb_number').val(response.phone).trigger('change');
+                $('#form-update2_492')[0].reset();
+                $('#addAgentModal').modal('hide');
+            },
+            error: function (error) {
+                console.error('Error submitting form:', error);
+            }
+        });
+    });
+});
+</script>
 <script>
     // Initialize values for editing
     var editingMode = false;

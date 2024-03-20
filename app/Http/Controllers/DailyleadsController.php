@@ -45,7 +45,6 @@ class DailyleadsController extends Controller
         $pendingdata = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
     ->where('calls.status', 'New')
     ->orderByRaw("FIELD(lead_source.priority, 'Low', 'Normal', 'High') DESC")
-    ->orderBy('calls.created_by', 'desc')
     ->select('calls.*', 'lead_source.priority')
     ->get();
     }
@@ -93,11 +92,28 @@ class DailyleadsController extends Controller
             $data = Calls::select(['calls.id', DB::raw("DATE_FORMAT(calls.created_at, '%d-%b-%Y') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")]);
             if($status === "Prospecting")
             {
-            $data->whereIn('status', ['Prospecting', 'New Demand'])->where('sales_person', $id)->orderBy('created_at', 'desc');  
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                if($hasPermission)
+                {
+                    $data->whereIn('status', ['Prospecting', 'New Demand'])->orderBy('created_at', 'desc');
+                }
+                else
+                {
+                    $data->whereIn('status', ['Prospecting', 'New Demand'])->where('sales_person', $id)->orderBy('created_at', 'desc');
+                }
             }
             else
             {
-            $data->where('status', $status)->where('sales_person', $id)->orderBy('created_at', 'desc');
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+                if($hasPermission)
+                {
+                    $data->where('status', $status)->orderBy('created_at', 'desc');
+                
+                }
+                else
+                {
+                    $data->where('status', $status)->where('sales_person', $id)->orderBy('created_at', 'desc');
+                }
             }
             $data->addSelect(DB::raw('(SELECT GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ") FROM calls_requirement
                 JOIN master_model_lines ON calls_requirement.model_line_id = master_model_lines.id
