@@ -511,7 +511,7 @@
 <div class="col-xl-12">
                             <div class="card">
                             <div class="col-lg-6">
-                                <a class="btn btn-sm btn-success" href="{{ route('calls.addnewleads') }}" text-align: right>
+                                <a class="btn btn-sm btn-success" href="{{ route('dailyleads.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
       </a>
 </div>
