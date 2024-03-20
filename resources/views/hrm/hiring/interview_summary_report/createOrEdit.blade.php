@@ -1,9 +1,9 @@
 @extends('layouts.main')
 @include('layouts.formstyle')
 @section('content')
-@canany(['create-interview-summary-report','edit-interview-summary-report'])
+@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary','edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','edit-interview-summary-report']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary','edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">

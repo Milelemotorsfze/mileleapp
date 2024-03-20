@@ -7,9 +7,9 @@
         }
     }
 </style>
-@canany(['view-interview-summary-report-details'])
+@canany(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
 @endphp
 @if ($hasPermission)
 <div class="card-body">
@@ -19,9 +19,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 <a class="nav-link active" data-bs-toggle="pill" href="#interview-summary-{{$data->id}}"> Interview Summary Report</a>
             </li>
             @if(isset($data->candidateDetails))
-            @canany(['view-interview-summary-report-details'])
+            @canany(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary'])
             @php
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
             @endphp
             @if ($hasPermission)
             <li class="nav-item">
@@ -516,9 +516,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
             </div>
         </div>
         @if(isset($data->candidateDetails))
-        @canany(['view-interview-summary-report-details'])
+        @canany(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary'])
         @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
         @endphp 
         @if ($hasPermission) 
         <div class="row">

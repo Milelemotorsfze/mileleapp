@@ -23,9 +23,9 @@
 }
 </style>
 @section('content')
-@canany(['view-interview-summary-report-details'])
+@canany(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">

@@ -23,9 +23,9 @@
 }
 </style>
 @section('content')
-@canany(['view-interview-summary-report-details','view-questionnaire-details','view-current-user-questionnaire','view-all-hiring-request-details','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'])
+@canany(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary','view-questionnaire-details','view-current-user-questionnaire','view-all-hiring-request-details','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','view-questionnaire-details','view-current-user-questionnaire','view-all-hiring-request-details','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary','view-questionnaire-details','view-current-user-questionnaire','view-all-hiring-request-details','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
@@ -110,9 +110,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
         @endif
         @endcanany
 
-        @canany(['view-interview-summary-report-details'])
+        @canany(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary'])
         @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
         @endphp
         @if ($hasPermission)
         @if(count($data->allInterview) > 0)
@@ -429,9 +429,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-questionnaire
 @endif
 @endcanany
 
-@canany(['view-interview-summary-report-details'])
+@canany(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
 @endphp
 @if ($hasPermission)
 @if(count($data->allInterview) > 0)
