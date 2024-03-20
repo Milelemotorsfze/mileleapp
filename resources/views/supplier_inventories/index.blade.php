@@ -61,9 +61,9 @@
                         </div>
                     </div>
                     <div class="col-md-2">
-                        <button type="submit"  class="btn btn-primary mt-4 search">Search</button>
+                        <button type="submit" class="btn btn-primary mt-4 search">Search</button>
                         <a href="{{route('supplier-inventories.index')}}">
-                            <button type="button"  class="btn btn-info mt-4 ">Refresh</button>
+                            <button type="button"  class="btn btn-info mt-4">Refresh</button>
                         </a>
                     </div>
                 </div>

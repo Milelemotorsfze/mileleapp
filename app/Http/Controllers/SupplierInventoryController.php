@@ -677,6 +677,7 @@ class SupplierInventoryController extends Controller
                                                 ->where('pord_month', $uploadFileContent['pord_month'])
                                                 ->where('po_arm', $uploadFileContent['po_arm'])
                                                 ->where('eta_import', $uploadFileContent['eta_import'])
+                                                ->where('delivery_note', $uploadFileContent['delivery_note'])
                                                 ->first();
 
                                             info($SimilarRowWithNullChaisis);
@@ -1694,6 +1695,7 @@ class SupplierInventoryController extends Controller
                                     ->where('pord_month', $secondFileRowDetail['pord_month'])
                                     ->where('po_arm', $secondFileRowDetail['po_arm'])
                                     ->where('eta_import', $secondFileRowDetail['eta_import'])
+                                    ->where('delivery_note', $secondFileRowDetail['delivery_note'])
                                     ->first();
 
                                 info($SimilarRowWithNullChaisis);
