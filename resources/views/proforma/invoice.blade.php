@@ -1336,7 +1336,6 @@ $(document).ready(function () {
     $('#cb_name').change(function () {
         var selectedAgentId = $(this).val();
         var selectedAgentName = $(this).find(':selected').text();
-
         $('#agents_id').val(selectedAgentId);
         $('#selected_cb_name').val(selectedAgentName);
     });
