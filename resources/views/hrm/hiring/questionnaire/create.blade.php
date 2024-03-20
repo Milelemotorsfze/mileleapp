@@ -209,6 +209,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-questionnair
                 <label for="education" class="form-label"><span class="error">* </span>{{ __('Education') }}</label>
                 <select name="education" id="education" class="form-control widthinput" autofocus>
                     <option value="" disabled selected>Choose Option</option>
+                    <option value="secondary_school_or_below" {{ $data && $data->questionnaire && $data->questionnaire->education == 'secondary_school_or_below' ? 'selected' : '' }}>Secondary School Or Below</option>
                     <option value="high_school" {{ $data && $data->questionnaire && $data->questionnaire->education == 'high_school' ? 'selected' : '' }}>High School</option>
                     <option value="bachelors" {{ $data && $data->questionnaire && $data->questionnaire->education == 'bachelors' ? 'selected' : '' }}>Bachelors</option>
                     <option value="pg_in_same_specialisation_or_related_to_department" {{ $data && $data->questionnaire && $data->questionnaire->education == 'pg_in_same_specialisation_or_related_to_department' ? 'selected' : '' }}>PG in the same specialization or related to the department</option>
@@ -221,7 +222,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-questionnair
             </div>
             <div class=" col-lg-4 col-md-6 col-sm-6 ">
 
-                <label for="certification" class="form-label"><span class="error">* </span>{{ __('Certification :') }} </label>
+                <label for="certification" class="form-label">{{ __('Certification :') }} </label>
                 <input type="text" placeholder="Certification" name="certification" class="form-control" id="certification" value="{{$data->questionnaire->certification ?? ''}}">
             </div>
         </div>
@@ -543,7 +544,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-questionnair
 
                     <div class=" col-lg-4 col-md-6 col-sm-6 select-button-main-div">
                         <div class="dropdown-option-div">
-                            <label for="interviewd_by" class="form-label"><span class="error">* </span>{{ __('Interviewed By:') }}</label>
+                            <label for="interviewd_by" class="form-label"><span class="error">* </span>{{ __('Interview Organized By:') }}</label>
                             <select name="interviewd_by" id="interviewd_by" class="form-control widthinput" multiple="true" autofocus>
                                 @foreach($interviewdByUsers as $User)
                                 <option value="{{$User->id}}" {{$data && $data->questionnaire && $data->questionnaire->interviewd_by && $User->id == $data->questionnaire->interviewd_by ? 'selected' : '' }}>{{$User->name}}</option>
@@ -1176,9 +1177,6 @@ redirect()->route('home')->send();
                 required: true,
             },
             education: {
-                required: true,
-            },
-            certification: {
                 required: true,
             },
             salary_range_start_in_aed: {

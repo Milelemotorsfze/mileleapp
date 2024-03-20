@@ -166,6 +166,9 @@ class EmployeeProfile extends Model
         }
         return $candidateJoiningType;
     }
+    public function user() {
+        return $this->hasOne(User::class,'id','user_id');
+    }
     public function teamLeadOrReportingManager() {
         return $this->hasOne(User::class,'id','team_lead_or_reporting_manager');
     }

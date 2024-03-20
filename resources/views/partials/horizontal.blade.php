@@ -93,7 +93,7 @@
                                             ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
                                             ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action','create-job-description'
                                             ,'edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details',
-                                            'view-interview-summary-report-listing','create-interview-summary-report','view-division-listing','view-current-user-division'
+                                            'view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing','create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary','view-division-listing','view-current-user-division'
                                             ,'view-department-listing','view-current-user-department-lising','division-approval-listing','view-asset-allocation-request-listing'
                                             ,'view-joining-report-listing','current-user-view-joining-report-listing','view-passport-request-list','current-user-view-passport-request-list'
                                             ,'view-liability-list','current-user-view-liability-list','view-leave-list','view-current-user-leave-list'
@@ -111,7 +111,7 @@
                                             ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action',
                                             'hiring-request-cancel-action','create-job-description'
                                             ,'edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details',
-                                            'view-interview-summary-report-listing','create-interview-summary-report','view-division-listing','view-current-user-division'
+                                            'view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing','create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary','view-division-listing','view-current-user-division'
                                             ,'view-department-listing','view-current-user-department-lising','division-approval-listing','view-asset-allocation-request-listing'
                                             ,'view-joining-report-listing','current-user-view-joining-report-listing','view-passport-request-list','current-user-view-passport-request-list'
                                             ,'view-liability-list','current-user-view-liability-list','view-leave-list','view-current-user-leave-list'
@@ -182,7 +182,7 @@
                                             ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
                                             ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
                                             ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action'
-                                            ,'create-questionnaire','edit-questionnaire','edit-current-user-questionnaire','view-questionnaire-details','create-job-description','edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details'])
+                                            ,'create-questionnaire','edit-questionnaire','edit-current-user-questionnaire','view-questionnaire-details','view-current-user-questionnaire','create-job-description','edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details'])
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request','view-all-pending-hiring-request-listing',
                                             'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
@@ -193,7 +193,7 @@
                                             ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
                                             ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
                                             ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action'
-                                            ,'create-questionnaire','edit-questionnaire','edit-current-user-questionnaire','view-questionnaire-details','create-job-description','edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details']);
+                                            ,'create-questionnaire','edit-questionnaire','edit-current-user-questionnaire','view-questionnaire-details','view-current-user-questionnaire','create-job-description','edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details']);
                                             @endphp
                                             @if ($hasPermission)
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
@@ -210,7 +210,7 @@
                                             ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
                                             ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
                                             ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action',
-                                            'hiring-request-cancel-action','create-questionnaire','edit-questionnaire','edit-current-user-questionnaire','view-questionnaire-details','create-job-description'])
+                                            'hiring-request-cancel-action','create-questionnaire','edit-questionnaire','edit-current-user-questionnaire','view-questionnaire-details','view-current-user-questionnaire','create-job-description'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request',
                                                 'view-all-pending-hiring-request-listing','view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing',
@@ -222,7 +222,7 @@
                                                 ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
                                                 ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
                                                 ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action',
-                                                'hiring-request-cancel-action','create-questionnaire','edit-questionnaire','edit-current-user-questionnaire','view-questionnaire-details','create-job-description']);
+                                                'hiring-request-cancel-action','create-questionnaire','edit-questionnaire','edit-current-user-questionnaire','view-questionnaire-details','view-current-user-questionnaire','create-job-description']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('employee-hiring-request.index') }}" class="dropdown-item" data-key="t-login">Hiring Requests</a>
@@ -236,9 +236,9 @@
                                                 <a href="{{ route('job_description.index') }}" class="dropdown-item" data-key="t-login">Job Descriptions</a>
                                                 @endif
                                                 @endcanany
-                                                @canany(['view-interview-summary-report-listing','create-interview-summary-report'])
+                                                @canany(['view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing','create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing','create-interview-summary-report']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing','create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('interview-summary-report.index') }}" class="dropdown-item" data-key="t-login">Interview Summary</a>

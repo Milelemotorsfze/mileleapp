@@ -107,6 +107,8 @@ class EmployeeHiringRequestController extends Controller
     }
     public function createOrEdit($id) {
         $authId = Auth::id();
+        $user['id'] = '';
+        $user['department'] = '';
         $data = $previous = $next = '';
         if($id == 'new') {
             $data = new EmployeeHiringRequest();         
@@ -146,8 +148,19 @@ class EmployeeHiringRequestController extends Controller
         $requestedByUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
         $reportingToUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
         $replacementForEmployees = User::whereNotIn('id',['1','16'])->select('id','name')->get();
+        if(Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request'])) { 
+            $user['id'] = '';
+            $user['department'] = '';
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['edit-current-user-hiring-request'])) {
+            $user['id'] = $authId;
+            $emp = EmployeeProfile::where('user_id',$authId)->first();
+            if($emp) {
+                $user['department'] = $emp->department_id;
+            }
+        }
         if($data) {
-            return view('hrm.hiring.hiring_request.create',compact('id','data','previous','next','masterdepartments','masterExperienceLevels','masterJobPositions','masterOfficeLocations',
+            return view('hrm.hiring.hiring_request.create',compact('id','data','user','previous','next','masterdepartments','masterExperienceLevels','masterJobPositions','masterOfficeLocations',
             'requestedByUsers','reportingToUsers','replacementForEmployees'));
         }
         else {

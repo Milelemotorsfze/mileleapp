@@ -52,7 +52,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 			</div>
 			<div class="card-body">
 				<div class="row">
-					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="department_main_div">
 					<div class="dropdown-option-div">
 						<span class="error">* </span>
 						<label for="department_id" class="col-form-label text-md-end">{{ __('Choose Department Name') }}</label>
@@ -74,7 +74,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 						</select>
 					</div>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="requested_by_main_div">
 					<div class="dropdown-option-div">
 						<span class="error">* </span>
 						<label for="requested_by" class="col-form-label text-md-end">{{ __('Choose Requested By') }}</label>
@@ -223,6 +223,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
 	var data = {!! json_encode($data) !!};
+	var user = {!! json_encode($user) !!};
 	$(document).ready(function () {
 		$("#replacement_for_employee_div").hide();
 		if(data.request_date) {
@@ -231,9 +232,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 		else {
 			document.getElementById('request_date').valueAsDate = new Date();
 		}
-		$("#department_id").val(data.department_id);
+		if(user.department != '') {
+			$("#department_id").val(user.department);
+			$("#department_main_div").hide();
+		}
+		else{
+			$("#department_id").val(data.department_id);
+			$("#department_main_div").show();
+		}
 		$("#location_id").val(data.location_id);
-		$("#requested_by").val(data.requested_by);
+		if(user.id != '') {
+			$("#requested_by").val(user.id);
+			$("#requested_by_main_div").hide();
+		}
+		else{
+			$("#requested_by").val(data.requested_by);
+			$("#requested_by_main_div").show();
+		}		
 		$("#requested_job_title").val(data.requested_job_title);
 		$("#reporting_to").val(data.reporting_to);
 		$("#experience_level").val(data.experience_level);

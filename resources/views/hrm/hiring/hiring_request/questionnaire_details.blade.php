@@ -1,6 +1,6 @@
-@canany(['view-questionnaire-details'])
+@canany(['view-questionnaire-details','view-current-user-questionnaire'])
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-questionnaire-details']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-questionnaire-details','view-current-user-questionnaire']);
 @endphp
 @if ($hasPermission)
 @if(isset($data->questionnaire))
@@ -212,7 +212,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-questionnaire
                             <span>{{$data->questionnaire->mandatory_skills ?? ''}}</span>
                         </div>
                         <div class="col-lg-6 col-md-3 col-sm-6">
-                            <label for="choices-single-default" class="form-label">Interviewed by :</label>
+                            <label for="choices-single-default" class="form-label">Interview Organized by :</label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-6">
                             <span>{{$data->questionnaire->interviewedBy->name ?? ''}} ( {{$data->questionnaire->interviewedBy->email ?? ''}} )</span>

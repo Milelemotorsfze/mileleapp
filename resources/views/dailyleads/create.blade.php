@@ -57,7 +57,7 @@ input[type=number]::-webkit-outer-spin-button {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
 @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access') || Auth::user()->hasPermissionForSelectedRole('sales-view');
                     @endphp
                     @if ($hasPermission)
 <div class="card-header">
@@ -113,6 +113,7 @@ input[type=number]::-webkit-outer-spin-button {
                     </datalist>
                     </div>
                     </div>
+                    
                     </br>
                     <div class="maindd">
                         <div id="row-container">

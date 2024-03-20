@@ -137,6 +137,9 @@ class EmployeeHiringQuestionnaire extends Model
         else if($this->education == 'pg_in_same_specialisation_or_related_to_department') {
             $educationName = 'PG in the same specailisation or related to department';
         }
+        else if($this->education == 'secondary_school_or_below') {
+            $educationName = 'Secondary School Or Below';
+        }
         return $educationName;
     }
     public function getJobEvaluationStakeHoldersAttribute() {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Addon;
+use App\Models\User;
 use App\Models\UserActivities;
 use App\Models\Clients;
 use App\Models\LeadSource;
@@ -102,7 +103,14 @@ class QuotationController extends Controller
             $quotation->deal_value = $request->deal_value;
         }
         $quotation->sales_notes = $request->remarks;
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+        if (!$hasPermission) {
         $quotation->created_by = Auth::id();
+        }
+        else
+        {
+        $quotation->created_by = $request->salespersons;   
+        }
         $quotation->calls_id = $request->calls_id;
         $quotation->currency = $request->currency;
         $quotation->document_type = $request->document_type;
@@ -336,11 +344,12 @@ class QuotationController extends Controller
             ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
         $salesPersonDetail = EmployeeProfile::where('user_id', Auth::id())->first();
+        $salespersonqu = User::find($quotation->created_by);
         $data = [];
-        $data['sales_person'] = Auth::user()->name;
+        $data['sales_person'] = $salespersonqu->name;
         $data['sales_office'] = 'Central 191';
         $data['sales_phone'] = '';
-        $data['sales_email'] = Auth::user()->email;
+        $data['sales_email'] = $salespersonqu->email;
         $data['client_id'] = $call->id;
         $data['client_email'] = $call->email;
         $data['client_name'] = $call->name;
@@ -467,7 +476,7 @@ class QuotationController extends Controller
         $quotation->deal_value = $request->deal_value;
     }
     $quotation->sales_notes = $request->remarks;
-    $quotation->created_by = Auth::id();
+    $quotation->created_by = $request->salespersons;
     $quotation->calls_id = $request->calls_id;
     $quotation->currency = $request->currency;
     $quotation->document_type = $request->document_type;
@@ -707,13 +716,15 @@ class QuotationController extends Controller
             $isVehicle = 0;
         }
         if($request->agents_id) {
-            $agentCommission = AgentCommission::where('quotation_id', $qoutationid); 
-            $agentCommission->commission = $commissionAED ?? '';
-            $agentCommission->status = 'Quotation';
-            $agentCommission->agents_id  =  $request->agents_id ?? '';
-            $agentCommission->created_by = Auth::id();
-            $agentCommission->save();
-        }
+            $agentCommission = AgentCommission::where('quotation_id', $qoutationid)->first();
+            if($agentCommission) {
+                $agentCommission->commission = $commissionAED ?? '';
+                $agentCommission->status = 'Quotation';
+                $agentCommission->agents_id  =  $request->agents_id ?? '';
+                $agentCommission->created_by = Auth::id();
+                $agentCommission->save();
+            }
+        }        
         $quotationDetail->system_code = $commissionAED;
         $quotationDetail->save();
         foreach ($quotationItemIds as $itemId) {
@@ -792,11 +803,12 @@ class QuotationController extends Controller
             ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
         $salesPersonDetail = EmployeeProfile::where('user_id', Auth::id())->first();
+        $salespersonqu = User::find($quotation->created_by);
         $data = [];
-        $data['sales_person'] = Auth::user()->name;
+        $data['sales_person'] = $salespersonqu->name;
         $data['sales_office'] = 'Central 191';
         $data['sales_phone'] = '';
-        $data['sales_email'] = Auth::user()->email;
+        $data['sales_email'] = $salespersonqu->email;
         $data['client_id'] = $call->id;
         $data['client_email'] = $call->email;
         $data['client_name'] = $call->name;

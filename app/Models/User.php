@@ -308,9 +308,9 @@ class User extends Authenticatable
         $employeePendings = PassportRequest::where([['submit_action_by_employee','pending'],['employee_id',$this->id],])->latest()->get();
         $employeeApproved = PassportRequest::where([['submit_action_by_employee','approved'],['employee_id',$this->id],])->latest()->get();
         $employeeRejected = PassportRequest::where([['submit_action_by_employee','rejected'],['employee_id',$this->id],])->latest()->get();
-        $reportingManagerPendings = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','pending']])->latest()->get();
-        $reportingManagerApproved = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved']])->latest()->get();
-        $reportingManagerRejected = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','rejected']])->latest()->get();
+        $reportingManagerPendings = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','pending'],['submit_department_head_id',$this->id]])->latest()->get();
+        $reportingManagerApproved = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved'],['submit_department_head_id',$this->id]])->latest()->get();
+        $reportingManagerRejected = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','rejected'],['submit_department_head_id',$this->id]])->latest()->get();
         $divisionHeadPendings = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved'],['submit_action_by_division_head','pending'],
             ['submit_hr_manager_id',$this->id],])->latest()->get();
         $divisionHeadApproved = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved'],['submit_action_by_division_head','approved'],
@@ -344,9 +344,9 @@ class User extends Authenticatable
         $employeePendings = PassportRelease::where([['release_action_by_employee','pending'],['employee_id',$this->id],])->latest()->get();
         $employeeApproved = PassportRelease::where([['release_action_by_employee','approved'],['employee_id',$this->id],])->latest()->get();
         $employeeRejected = PassportRelease::where([['release_action_by_employee','rejected'],['employee_id',$this->id],])->latest()->get();
-        $reportingManagerPendings = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','pending']])->latest()->get();
-        $reportingManagerApproved = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved']])->latest()->get();
-        $reportingManagerRejected = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','rejected']])->latest()->get();
+        $reportingManagerPendings = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','pending'],['release_department_head_id',$this->id]])->latest()->get();
+        $reportingManagerApproved = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved'],['release_department_head_id',$this->id]])->latest()->get();
+        $reportingManagerRejected = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','rejected'],['release_department_head_id',$this->id]])->latest()->get();
         $divisionHeadPendings = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved'],['release_action_by_division_head','pending'],
             ['release_hr_manager_id',$this->id],])->latest()->get();
         $divisionHeadApproved = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved'],['release_action_by_division_head','approved'],

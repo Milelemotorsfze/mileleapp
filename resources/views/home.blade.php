@@ -48,7 +48,6 @@
                                                 <th>Response Time</th>
                                                 <th>Open Leads</th>
                                                 <th>Lead Closed</th>
-                                                <th>Lead Closed Time</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -62,6 +61,7 @@
                                                     ->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id')
                                                     ->where('calls.status', '!=', 'New')
                                                     ->where('calls.sales_person', '=', $lead->sales_person)
+                                                    ->whereDate('calls.created_at', '>=', '2023-10-01')
                                                     ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, calls.created_at, prospectings.created_at)) as average_response_time'))
                                                     ->first();
                                             @endphp
@@ -73,6 +73,7 @@
                                                         ->orWhere('calls.status', '!=', 'Rejected');
                                                 })
                                                 ->where('calls.sales_person', '=', $lead->sales_person)
+                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
                                                 ->count();
                                             @endphp
                                             <td>{{ $openLeadsCount }}</td>
@@ -83,19 +84,10 @@
                                                         ->orWhere('calls.status', '=', 'Rejected');
                                                 })
                                                 ->where('calls.sales_person', '=', $lead->sales_person)
+                                                ->whereDate('calls.created_at', '>=', '2023-10-01')
                                                 ->count();
                                             @endphp
                                             <td>{{ $closedLeadsCount }}</td>
-                                            @php
-                                            $closedtime = null;
-                                            $closedtime = DB::table('calls')
-                                                ->leftJoin('lead_closed', 'calls.id', '=', 'lead_closed.call_id')
-                                                ->where('calls.status', '!=', 'New')
-                                                ->where('calls.sales_person', '=', $lead->sales_person)
-                                                ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, calls.created_at, lead_closed.created_at)) as average_closed_time'))
-                                                ->first();
-                                            @endphp
-                                            <td>{{ $closedtime ? $closedtime->average_closed_time : 'N/A' }}</td>
                                         </tr>
                                     @empty
                                         <tr>
@@ -519,7 +511,7 @@
 <div class="col-xl-12">
                             <div class="card">
                             <div class="col-lg-6">
-                                <a class="btn btn-sm btn-success" href="{{ route('calls.addnewleads') }}" text-align: right>
+                                <a class="btn btn-sm btn-success" href="{{ route('dailyleads.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
       </a>
 </div>

@@ -88,7 +88,9 @@ class PortsController extends Controller
      */
     public function edit(string $id)
     {
-        //
+       $countries = Country::all();
+       $ports =  MasterShippingPorts::find($id);
+       return view('ports.edit', compact('ports','countries'));
     }
 
     /**
@@ -96,7 +98,15 @@ class PortsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'port_name' => 'required|string|max:255',
+            'country' => 'required|exists:countries,id',
+        ]);
+        $port = MasterShippingPorts::findOrFail($id);
+        $port->name = $request->port_name;
+        $port->country_id = $request->country;
+        $port->save();
+        return redirect()->route('ports.index')->with('success', 'Port updated successfully');
     }
 
     /**

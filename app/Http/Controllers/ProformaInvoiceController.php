@@ -7,6 +7,7 @@ use App\Models\MasterShippingPorts;
 use App\Models\OtherLogisticsCharges;
 use App\Models\Setting;
 use App\Models\Quotation;
+use App\Models\ModelHasRoles;
 use App\Models\QuotationClient;
 use App\Models\QuotationDetail;
 use App\Models\QuotationItem;
@@ -41,7 +42,7 @@ class ProformaInvoiceController extends Controller {
         $kitsDesc = AddonDescription::whereHas('Addon', function($q) {
             $q->where('addon_type','K');
         })->get();
-
+        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
         $countries = Country::all();
         $shippingPorts = MasterShippingPorts::all();
         $shippings = ShippingMedium::all();
@@ -54,7 +55,7 @@ class ProformaInvoiceController extends Controller {
 
         return view('proforma.invoice', compact('callDetails', 'brands','assessoriesDesc',
             'sparePartsDesc','kitsDesc','shippings','certifications','countries','shippingPorts',
-           'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate'));
+           'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate', 'sales_persons'));
     }
     public function getaddonModels(Request $request, $brandId, $type) {
         $modelLines = MasterModelLines::where('brand_id', $brandId)
@@ -501,9 +502,10 @@ class ProformaInvoiceController extends Controller {
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
         $usd_to_eru_rate = Setting::where('key', 'usd_to_euro_convertion_rate')->first();
+        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
         $existingItemsJson = json_encode($quotationitems);
         return view('proforma.invoice_edit', compact('callDetails', 'brands','assessoriesDesc',
             'sparePartsDesc','kitsDesc','shippings','certifications','countries','shippingPorts',
-           'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate', 'quotation_details', 'quotation_vins', 'quotation', 'quotationitems', 'existingItemsJson', 'callId'));
+           'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate', 'quotation_details', 'quotation_vins', 'quotation', 'quotationitems', 'existingItemsJson', 'callId', 'sales_persons'));
     }
     }
