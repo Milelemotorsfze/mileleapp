@@ -216,9 +216,15 @@ $totalvariantss = [
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-log-activity');
         if ($hasPermission)
         {
+    $sales_persons_w = ModelHasRoles::where('role_id', 7)
+    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+    ->where('users.status', 'active')
+    ->where('users.sales_rap', 'Yes')
+    ->get();
     $leadsCount = DB::table('calls')
     ->join('users', 'calls.sales_person', '=', 'users.id')
     ->where('calls.status', '=', 'New')
+    ->whereIn('calls.sales_person', $sales_persons_w->pluck('id')->toArray())
     ->groupBy('users.name')
     ->select('users.name as salespersonname', DB::raw('count(*) as lead_count'), 'calls.*')
     ->get();
