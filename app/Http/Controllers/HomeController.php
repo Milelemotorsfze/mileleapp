@@ -280,8 +280,12 @@ $totalvariantss = [
     public function leaddistruition(Request $request) {
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
+        $sales_persons_w = ModelHasRoles::where('role_id', 7)
+        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+        ->where('users.status', 'active')
+        ->where('users.sales_rap', 'Yes')
+        ->get();
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
-    
         $query = DB::table('calls')
             ->join('users', 'calls.sales_person', '=', 'users.id')
             ->selectRaw('DATE(calls.created_at) AS call_date, users.name AS sales_person_name');
@@ -297,6 +301,7 @@ $totalvariantss = [
         }
         $query->whereDate('calls.created_at', '>=', $startDate)
             ->whereDate('calls.created_at', '<=', $endDate)
+            ->whereIn('calls.sales_person', $sales_persons_w->pluck('id')->toArray())
             ->groupBy('call_date', 'sales_person_name'); 
         if ($hasPermission) {
             $query->orderByDesc('calls.id');
