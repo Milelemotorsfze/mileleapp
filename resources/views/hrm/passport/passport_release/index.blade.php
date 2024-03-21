@@ -106,7 +106,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-passport-re
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-details','current-user-view-passport-request-details']);
 								@endphp
 								@if ($hasPermission)                                           
-                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('passport_request.show',$data->id)}}">
+                                    <li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('passport_release.show',$data->id)}}">
 											<i class="fa fa-eye" aria-hidden="true"></i> View Details
 										</a>
 									</li>
@@ -243,7 +243,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-passport-re
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-details','current-user-view-passport-request-details']);
 								@endphp
 								@if ($hasPermission)                                           
-								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('passport_request.show',$data->id)}}">
+								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('passport_release.show',$data->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
 							</a>
 								@endif
