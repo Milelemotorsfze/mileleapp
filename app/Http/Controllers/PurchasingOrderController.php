@@ -71,7 +71,7 @@ class PurchasingOrderController extends Controller
                                                 ->get();
         }else{
             $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->orderBy('id', 'desc')->get();
-        }  
+        }
     }
         return view('warehouse.index', compact('data'));
     }
@@ -109,7 +109,7 @@ class PurchasingOrderController extends Controller
             ->where('vehicles.status', 'Approved');
     })
         ->groupBy('purchasing_order.id')
-        ->get();   
+        ->get();
         }
         return view('warehouse.index', compact('data'));
     }
@@ -194,20 +194,33 @@ else
             ->whereNotIn('payment_status', ['Payment Rejected', 'Payment Release Rejected', 'Payment Initiate Request Rejected', 'Incoming Stock']);
     })
     ->groupBy('purchasing_order.id')
-    ->get();  
+    ->get();
 }
     return view('warehouse.index', compact('data'));
 }
     public function filterpayment($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        if ($hasPermission){
+            $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Initiated Request')
+            ->where('vehicles.status', 'Request for Payment')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
+        }
+        else
+        {
+            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+            ->where('purchasing_order.status', $status)
+            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.status', 'Request for Payment')
+            ->select('purchasing_order.*')
+            ->groupBy('purchasing_order.id')
+            ->get();
+        }
         return view('warehouse.index', compact('data'));
     }
     public function filterpaymentrel($status)
@@ -235,7 +248,7 @@ else
         ->where('vehicles.payment_status', 'Payment Initiated')
         ->select('purchasing_order.*')
         ->groupBy('purchasing_order.id')
-        ->get(); 
+        ->get();
     }
         return view('warehouse.index', compact('data'));
     }
@@ -264,7 +277,7 @@ else
         ->where('vehicles.status', 'Request for Payment')
         ->select('purchasing_order.*')
         ->groupBy('purchasing_order.id')
-        ->get();  
+        ->get();
     }
         return view('warehouse.index', compact('data'));
     }
@@ -276,12 +289,12 @@ else
         $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Initiate Request Approved')
+            ->where('vehicles.payment_status', 'Payment Initiated Request')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
         }
-        else 
+        else
         {
             $data = PurchasingOrder::with('purchasing_order_items')
             ->where(function ($query) use ($userId) {
@@ -293,7 +306,7 @@ else
             ->where('vehicles.payment_status', 'Payment Initiate Request Approved')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
-            ->get();  
+            ->get();
         }
         return view('warehouse.index', compact('data'));
     }
@@ -318,7 +331,7 @@ else
             ->where('vehicles.payment_status', 'Payment Release Approved')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
-            ->get();   
+            ->get();
         }
         return view('warehouse.index', compact('data'));
     }
@@ -355,7 +368,7 @@ else
                 });
         })
         ->groupBy('purchasing_order.id')
-        ->get();  
+        ->get();
     }
     return view('warehouse.index', compact('data'));
 }
@@ -473,7 +486,9 @@ public function getBrandsAndModelLines(Request $request)
                 $vehicle->int_colour = $int_colour;
                 $vehicle->estimation_date = $estimation_arrival;
                 $vehicle->engine = $engine;
-                if($request->po_from != 'DEMAND_PLANNING') {
+                if($request->po_from == 'DEMAND_PLANNING') {
+                    $vehicle->territory = 'Africa';
+                }else{
                     $territorys = $territory[$key];
                     $vehicle->territory = $territorys;
                 }
@@ -499,7 +514,9 @@ public function getBrandsAndModelLines(Request $request)
                 $purchasinglog->purchasing_order_id = $purchasingOrderId;
                 $purchasinglog->variant = $variantId;
                 $purchasinglog->estimation_date = $estimation_arrival;
-                if($request->po_from != 'DEMAND_PLANNING') {
+                if($request->po_from == 'DEMAND_PLANNING') {
+                    $purchasinglog->territory = 'Africa';
+                }else{
                     $purchasinglog->territory = $territorys;
                 }
                 $purchasinglog->ex_colour = $ex_colour;
@@ -721,7 +738,9 @@ public function getBrandsAndModelLines(Request $request)
                 $vehicle->ex_colour = $ex_colour;
                 $vehicle->int_colour = $int_colour;
                 $vehicle->estimation_date = $estimated_arrivals;
-                if($request->po_from != 'DEMAND_PLANNING') {
+                if($request->po_from == 'DEMAND_PLANNING') {
+                    $vehicle->territory = 'Africa';
+                }else{
                     $territorys = $territory[$key];
                     $vehicle->territory = $territorys;
                 }
@@ -749,7 +768,9 @@ public function getBrandsAndModelLines(Request $request)
                 $purchasinglog->purchasing_order_id = $purchasingOrderId;
                 $purchasinglog->variant = $variantId;
                 $purchasinglog->estimation_date = $estimated_arrivals;
-                if($request->po_from != 'DEMAND_PLANNING') {
+                if($request->po_from == 'DEMAND_PLANNING') {
+                    $vehicle->territory = 'Africa';
+                }else{
                     $purchasinglog->territory = $territorys;
                 }
                 $purchasinglog->ex_colour = $ex_colour;

@@ -111,7 +111,7 @@ class LetterOfIndentController extends Controller
     {
         $countries = Country::all();
         $customers = Customer::all();
-        $models = MasterModel::where('is_transcar', true)->groupBy('model')->orderBy('id','ASC')->get();
+        $models = MasterModel::whereNotNull('transcar_loi_description')->groupBy('model')->orderBy('id','ASC')->get();
 
         return view('letter_of_indents.create',compact('countries','customers','models'));
     }
@@ -166,7 +166,6 @@ class LetterOfIndentController extends Controller
                 }
                 $filePath = public_path('LOI-Signature/' . $file);
                 $LOI->signature = $fileName;
-
             }
 
             $LOI->save();

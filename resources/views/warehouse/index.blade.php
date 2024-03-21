@@ -95,7 +95,11 @@ th.nowrap-td {
         @endphp
         @else
         @php
-        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->where('created_by', $userId)->orWhere('created_by', 16)->count();
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->where(function($query) use ($userId) {
+        $query->where('created_by', $userId)
+              ->orWhere('created_by', 16);
+        })
+        ->count();
         @endphp
         @endif
         @if ($pendongpoapproval > 0)
@@ -153,7 +157,7 @@ th.nowrap-td {
         @php
     $userId = auth()->user()->id;
     $inProgressPurchasingOrders = DB::table('vehicles')
-        ->whereExists(function ($query) use ($userId) {
+        ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('purchasing_order')
                 ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id');
@@ -174,24 +178,27 @@ th.nowrap-td {
         @else
         @php    
         $inProgressPurchasingOrders = DB::table('vehicles')
-        ->whereExists(function ($query) use ($userId) {
-            $query->select(DB::raw(1))
-                ->from('purchasing_order')
-                ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-                ->where('purchasing_order.created_by', $userId)->orWhere('created_by', 16);
-        })
-        ->where(function ($query) {
-            $query->where('status', 'Request for Payment')
-                ->orWhere(function ($query) {
-                    $query->whereNotIn('payment_status', ['Payment Initiate Request Rejected', 'Request Rejected', 'Payment Release Rejected', 'Incoming Stock'])
-                          ->where(function ($query) {
-                              $query->whereNotNull('payment_status')
-                                    ->where('payment_status', '<>', '');
-                          });
-                });
-        })
-        ->distinct('vehicles.purchasing_order_id')
-        ->count('vehicles.purchasing_order_id');
+    ->whereExists(function ($query) use ($userId) {
+        $query->select(DB::raw(1))
+            ->from('purchasing_order')
+            ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+            ->where(function ($query) use ($userId) {
+                $query->where('purchasing_order.created_by', $userId)
+                    ->orWhere('purchasing_order.created_by', 16);
+            });
+    })
+    ->where(function ($query) {
+        $query->where('status', 'Request for Payment')
+            ->orWhere(function ($query) {
+                $query->whereNotIn('payment_status', ['Payment Initiate', 'Request Rejected', 'Payment Release Rejected', 'Incoming Stock'])
+                    ->where(function ($query) {
+                        $query->whereNotNull('payment_status')
+                            ->where('payment_status', '<>', '');
+                    });
+            });
+    })
+    ->distinct('vehicles.purchasing_order_id')
+    ->count('vehicles.purchasing_order_id');
 @endphp
 @endif
     @if ($inProgressPurchasingOrders > 0)
@@ -346,7 +353,7 @@ th.nowrap-td {
                 $query->select(DB::raw(1))
                     ->from('vehicles')
                     ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Initiate Request Approved');
+                    ->where('vehicles.payment_status', 'Payment Initiated Request');
             })
             ->count();
         @endphp
@@ -362,7 +369,7 @@ th.nowrap-td {
                 $query->select(DB::raw(1))
                     ->from('vehicles')
                     ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Initiate Request Approved');
+                    ->where('vehicles.payment_status', 'Payment Initiated Request');
             })
             ->count();
             @endphp
@@ -448,7 +455,11 @@ th.nowrap-td {
         @endphp
         @else
         @php
-        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->where('created_by', $userId)->orWhere('created_by', 16)->count();
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->where(function($query) use ($userId) {
+        $query->where('created_by', $userId)
+              ->orWhere('created_by', 16);
+        })
+        ->count();
         @endphp
         @endif
         @if ($pendongpoapproval > 0)
@@ -477,7 +488,7 @@ th.nowrap-td {
                 $query->select(DB::raw(1))
                     ->from('vehicles')
                     ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Initiated Request');
+                    ->where('vehicles.status', 'Request for Payment');
             })
             ->count();
         @endphp
@@ -493,7 +504,7 @@ th.nowrap-td {
                 $query->select(DB::raw(1))
                     ->from('vehicles')
                     ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Initiated Request');
+                    ->where('vehicles.status', 'Request for Payment');
             })
             ->count();
         @endphp

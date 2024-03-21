@@ -235,6 +235,12 @@
                                                                         </div>
                                                                     </div>
                                                                 @endforeach
+                                                                @if($letterOfIndent->signature)
+                                                                    <div class="col-lg-12 m-5">
+                                                                        <label class="form-label fw-bold">Signature</label>
+                                                                        <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}">
+                                                                    </div>
+                                                                @endif
                                                             </div>
                                                         </div>
                                                     </div>
@@ -421,6 +427,12 @@
                                                                         </div>
                                                                     </div>
                                                                 @endforeach
+                                                                @if($letterOfIndent->signature)
+                                                                    <div class="col-lg-12 m-5">
+                                                                        <label class="form-label fw-bold">Signature</label>
+                                                                        <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" width="100px;" height="100px">
+                                                                    </div>
+                                                                @endif
                                                             </div>
                                                         </div>
                                                     </div>
@@ -618,12 +630,12 @@
                                                                         </div>
                                                                     </div>
                                                                 @endforeach
-                                                                <div class="col-lg-12 m-5">
-                                                                    <label class="form-label">Signature</label>
-                                                                    @if($letterOfIndent->signature)
-                                                                        <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" width="100px;" height="100px">
-                                                                    @endif
-                                                                </div>
+                                                                @if($letterOfIndent->signature)
+                                                                    <div class="col-lg-12 m-5">
+                                                                        <label class="form-label fw-bold">Signature</label>
+                                                                            <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" width="100px;" height="100px">
+                                                                    </div>
+                                                                @endif
                                                             </div>
                                                         </div>
                                                     </div>
@@ -939,6 +951,12 @@
                                                                         </div>
                                                                     </div>
                                                                 @endforeach
+                                                                @if($letterOfIndent->signature)
+                                                                    <div class="col-lg-12 m-5">
+                                                                        <label class="form-label fw-bold">Signature</label>
+                                                                        <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" width="100px;" height="100px">
+                                                                    </div>
+                                                                @endif
                                                             </div>
                                                         </div>
                                                     </div>

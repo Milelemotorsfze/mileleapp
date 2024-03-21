@@ -76,7 +76,7 @@
                                 <span id="poNumberError" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-lg-2 col-md-6 col-sm-12">
+                        <div class="col-lg-1 col-md-6 col-sm-12">
                             <div class="mb-3">
                             <span class="error" style="color:red">* </span>
                                 <label for="choices-single-default" class="form-label font-size-13 ">PO Date</label>
@@ -102,6 +102,12 @@
                                 <option value="Normal">Normal</option>
                                 <option value="Payment Adjustment">Payment Adjustment</option>
                             </select>
+                        </div>
+                        <div class="col-lg-1 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label font-size-13 "> Territory </label>
+                                <input type="text" class="form-control" readonly value="Africa">
+                            </div>
                         </div>
                         <div class="col-lg-1 col-md-6 col-sm-12">
                             <div class="mb-3">
