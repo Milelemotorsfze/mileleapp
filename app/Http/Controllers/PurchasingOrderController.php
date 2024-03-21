@@ -201,13 +201,26 @@ else
     public function filterpayment($status)
     {
         $userId = auth()->user()->id;
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        if ($hasPermission){
+            $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Initiated Request')
+            ->where('vehicles.status', 'Request for Payment')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
+        }
+        else
+        {
+            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+            ->where('purchasing_order.status', $status)
+            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.status', 'Request for Payment')
+            ->select('purchasing_order.*')
+            ->groupBy('purchasing_order.id')
+            ->get();
+        }
         return view('warehouse.index', compact('data'));
     }
     public function filterpaymentrel($status)
@@ -276,7 +289,7 @@ else
         $data = PurchasingOrder::with('purchasing_order_items')
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Initiate Request Approved')
+            ->where('vehicles.payment_status', 'Payment Initiated Request')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
