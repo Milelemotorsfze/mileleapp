@@ -644,8 +644,8 @@ $(document).ready(function() {
             { data: 'variantseat', name: 'variantseat' },
             { data: 'variantfuel_type', name: 'variantfuel_type' },
             { data: 'transmission', name: 'transmission' },
-            { data: 'interiorcolours', name: 'interiorcolours' },
             { data: 'exteriorcolour', name: 'exteriorcolour' },
+            { data: 'interiorcolours', name: 'interiorcolours' },
             { data: 'upholestry', name: 'upholestry' },
             { data: 'extra_features', name: 'extra_features' },
             @endif

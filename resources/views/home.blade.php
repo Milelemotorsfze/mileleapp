@@ -31,6 +31,147 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @section('content')
 @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('finance-dashboard-summary');
+        @endphp
+        @if ($hasPermission)
+        <div class="card">
+                            <div class="card-body px-0">
+                                <div class="table-responsive px-3">
+                                <div class="card-header align-items-center ">
+                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Purchase Orders Summary</h4>
+                            </div>
+                                <table id="dtBasicExample2" class="table table-striped table-bordered">
+                                                <thead class="bg-soft-secondary">
+                                            <tr>
+                                            <th>Department</th>
+                                                <th>Pending Approvals</th>
+                                                <th>Approved</th>
+                                                <th>Request for Payment Initination</th>
+                                                <th>Request for Payment Release</th>
+                                                <th>Payment Completed</th>
+                                                <th>Closed PO</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+<tr>
+    <td>
+        Demand & Planning
+</td>
+<td onclick="window.location='{{ route('purchasing.filter', ['status' => 'Pending Approval']) }}';">
+        @php
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->count();
+        @endphp
+        {{$pendongpoapproval}}
+</td>
+<td onclick="window.location='{{ route('purchasing.filterapprovedonly', ['status' => 'Approved']) }}';">
+@php
+        $alreadyapproved = DB::table('purchasing_order')
+    ->where('purchasing_order.status', 'Approved')
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('vehicles')
+            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.status', 'Approved');
+    })
+    ->count();
+        @endphp
+        {{$alreadyapproved}}
+</td>
+<td onclick="window.location='{{ route('purchasing.filterapproved', ['status' => 'Approved']) }}';">
+@php
+    $inProgressPurchasingOrders = DB::table('vehicles')
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('purchasing_order')
+                ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id');
+        })
+        ->where(function ($query) {
+            $query->where('status', 'Request for Payment')
+                ->orWhere(function ($query) {
+                    $query->whereNotIn('payment_status', ['Payment Initiate Request Rejected', 'Request Rejected', 'Payment Release Rejected', 'Incoming Stock'])
+                          ->where(function ($query) {
+                              $query->whereNotNull('payment_status')
+                                    ->where('payment_status', '<>', '');
+                          });
+                });
+        })
+        ->distinct('vehicles.purchasing_order_id')
+        ->count('vehicles.purchasing_order_id');
+        @endphp
+        {{$inProgressPurchasingOrders}}
+</td>
+<td>
+@php
+    $requestpaymentinitination = DB::table('vehicles')
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('purchasing_order')
+                ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id');
+        })
+        ->where(function ($query) {
+            $query->where('status', 'Payment Requested')
+                ->orWhere(function ($query) {
+                    $query->where('payment_status', ['Payment Initiate Request Approved'])
+                          ->where(function ($query) {
+                              $query->whereNotNull('payment_status')
+                                    ->where('payment_status', '<>', '');
+                          });
+                });
+        })
+        ->distinct('vehicles.purchasing_order_id')
+        ->count('vehicles.purchasing_order_id');
+        @endphp
+        {{$requestpaymentinitination}}
+</td>
+<td>
+        Demand & Planning
+</td>
+<td onclick="window.location='{{ route('purchasing.filterincomings', ['status' => 'Approved']) }}';">
+@php
+    $completedPos = DB::table('purchasing_order')
+    ->where('purchasing_order.status', 'Approved')
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('vehicles')
+            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.status', 'Incoming Stock');
+    })
+        ->count();
+    @endphp
+    {{$completedPos}}
+</td>
+</tr>
+<tr>
+<td>
+Procurement
+</td>
+<td>
+        Demand & Planning
+</td>
+<td>
+        Demand & Planning
+</td>
+<td>
+        Demand & Planning
+</td>
+<td>
+        Demand & Planning
+</td>
+<td>
+        Demand & Planning
+</td>
+<td>
+        Demand & Planning
+</td>
+</tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- end card body -->
+                        </div>
+        @endif
+@php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-log-activity');
         @endphp
         @if ($hasPermission)

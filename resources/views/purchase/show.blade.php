@@ -415,7 +415,7 @@
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
                                 <th id="serno" style="vertical-align: middle;">Vehicle Status:</th>
                                 @php
-                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details']);
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval', 'edit-po-colour-details', 'cancel-vehicle-purchased-order']);
                                 @endphp
                                 @if ($hasPermission)
                                     <th>Payment Status</th>
@@ -583,8 +583,8 @@
                                 @endif
                                 <td style ="width:160px;">
                                 <div class="row">
-        <div class="col-lg-12" style="display: inline-flex;">
-            <div class="col-lg-8">
+                                <div class="col-lg-12" style="display: inline-flex;">
+                                <div class="col-lg-8">
                         {{-- For Management  --}}
                         @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-approval');
@@ -721,7 +721,7 @@
                             <div class="col-lg-4">
 								{{-- Cancel & Delete for procurement  --}}
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole('cancel-vehicle-purchased-order');
 								@endphp
 								@if ($hasPermission)
 								@if ($purchasingOrder->status === 'Approved'  || $purchasingOrder->status === 'Pending Approval' && $vehicles->payment_status === '')

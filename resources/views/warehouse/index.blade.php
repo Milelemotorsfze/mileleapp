@@ -153,7 +153,7 @@ th.nowrap-td {
         @php
     $userId = auth()->user()->id;
     $inProgressPurchasingOrders = DB::table('vehicles')
-        ->whereExists(function ($query) use ($userId) {
+        ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('purchasing_order')
                 ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id');
