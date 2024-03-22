@@ -526,9 +526,9 @@ th.nowrap-td {
        <th style="font-size: 12px;">PO QTY</th>
     </thead>
     <tbody>
-    <tr onclick="window.location='{{ route('purchasing.filterpendingfellow', ['status' => 'Approved']) }}';">
+    <tr onclick="window.location='{{ route('purchasing.paymentinitiation', ['status' => 'Approved']) }}';">
     <td style="font-size: 12px;">
-        <a href="{{ route('purchasing.filterpendingfellow', ['status' => 'Approved']) }}">
+        <a href="{{ route('purchasing.paymentinitiation', ['status' => 'Approved']) }}">
         Pending Payments Initiation
         </a>
     </td>
@@ -546,8 +546,7 @@ th.nowrap-td {
             ->from('vehicles')
             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where(function ($query) {
-                $query->where('payment_status', 'Payment Completed')
-                      ->orWhere('payment_status', 'Vendor Confirmed');
+                $query->where('status', 'Approved');
             });
     })
     ->count();
@@ -565,8 +564,7 @@ $pendingvendorfol = DB::table('purchasing_order')
             ->from('vehicles')
             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where(function ($query) {
-                $query->where('payment_status', 'Payment Completed')
-                      ->orWhere('payment_status', 'Vendor Confirmed');
+                $query->where('status', 'Approved');
             });
     })
     ->count();
@@ -599,8 +597,7 @@ $pendingvendorfol = DB::table('purchasing_order')
             ->from('vehicles')
             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where(function ($query) {
-                $query->where('payment_status', 'Payment Completed')
-                      ->orWhere('payment_status', 'Vendor Confirmed');
+                $query->Where('payment_status', 'Vendor Confirmed');
             });
     })
     ->count();
@@ -618,8 +615,7 @@ $pendingvendorfol = DB::table('purchasing_order')
             ->from('vehicles')
             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where(function ($query) {
-                $query->where('payment_status', 'Payment Completed')
-                      ->orWhere('payment_status', 'Vendor Confirmed');
+                $query->Where('payment_status', 'Vendor Confirmed');
             });
     })
     ->count();
@@ -632,9 +628,9 @@ $pendingvendorfol = DB::table('purchasing_order')
         @endif
     </td>
 </tr>
-<tr onclick="window.location='{{ route('purchasing.filterpendingfellow', ['status' => 'Approved']) }}';">
+<tr onclick="window.location='{{ route('purchasing.filterconfirmation', ['status' => 'Approved']) }}';">
     <td style="font-size: 12px;">
-        <a href="{{ route('purchasing.filterpendingfellow', ['status' => 'Approved']) }}">
+        <a href="{{ route('purchasing.filterconfirmation', ['status' => 'Approved']) }}">
         Pending Incoming Confirmation
         </a>
     </td>

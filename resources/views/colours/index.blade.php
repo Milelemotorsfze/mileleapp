@@ -78,10 +78,13 @@
                         @endphp
                         {{ $created_bys ?? '' }}</td>
                         <td>
-                            @can('colour-edit')
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('colour-edit');
+                            @endphp
+                            @if ($hasPermission)
                                 <a data-placement="top" href="{{ route('colourcode.edit', $colorcodes->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
                                 </a>
-                            @endcan
+                            @endif
                         </td>
                     </tr>
                 @endforeach

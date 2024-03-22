@@ -303,7 +303,7 @@ else
             })
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-            ->where('vehicles.payment_status', 'Payment Initiate Request Approved')
+            ->where('vehicles.payment_status', 'Payment Initiated Request')
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
@@ -347,8 +347,7 @@ else
                 ->from('vehicles')
                 ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
                 ->where(function ($query) {
-                    $query->where('payment_status', 'Payment Completed')
-                          ->orWhere('payment_status', 'Vendor Confirmed');
+                    $query->Where('payment_status', 'Vendor Confirmed');
                 });
         })
         ->groupBy('purchasing_order.id')
@@ -363,8 +362,7 @@ else
                 ->from('vehicles')
                 ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
                 ->where(function ($query) {
-                    $query->where('payment_status', 'Payment Completed')
-                          ->orWhere('payment_status', 'Vendor Confirmed');
+                    $query->Where('payment_status', 'Vendor Confirmed');
                 });
         })
         ->groupBy('purchasing_order.id')
@@ -372,7 +370,76 @@ else
     }
     return view('warehouse.index', compact('data'));
 }
-
+public function filterconfirmation($status)
+{
+$userId = auth()->user()->id;
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+if ($hasPermission){
+$data = PurchasingOrder::with('purchasing_order_items')
+    ->where('status', $status)
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('vehicles')
+            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where(function ($query) {
+                $query->Where('payment_status', 'Vendor Confirmed');
+            });
+    })
+    ->groupBy('purchasing_order.id')
+    ->get();
+}
+else
+{
+    $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+    ->where('status', $status)
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('vehicles')
+            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where(function ($query) {
+                $query->Where('payment_status', 'Vendor Confirmed');
+            });
+    })
+    ->groupBy('purchasing_order.id')
+    ->get();
+}
+return view('warehouse.index', compact('data'));
+}
+public function paymentinitiation($status)
+{
+$userId = auth()->user()->id;
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+if ($hasPermission){
+$data = PurchasingOrder::with('purchasing_order_items')
+    ->where('status', $status)
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('vehicles')
+            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where(function ($query) {
+                $query->where('status', 'Approved');
+            });
+    })
+    ->groupBy('purchasing_order.id')
+    ->get();
+}
+else
+{
+    $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+    ->where('status', $status)
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('vehicles')
+            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where(function ($query) {
+                $query->where('status', 'Approved');
+            });
+    })
+    ->groupBy('purchasing_order.id')
+    ->get();
+}
+return view('warehouse.index', compact('data'));
+}
     /**
      * Show the form for creating a new resource.
      */
