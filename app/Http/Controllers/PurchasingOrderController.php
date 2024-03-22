@@ -347,7 +347,7 @@ else
                 ->from('vehicles')
                 ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
                 ->where(function ($query) {
-                    $query->Where('payment_status', 'Vendor Confirmed');
+                    $query->Where('payment_status', 'Payment Completed');
                 });
         })
         ->groupBy('purchasing_order.id')
@@ -362,7 +362,7 @@ else
                 ->from('vehicles')
                 ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
                 ->where(function ($query) {
-                    $query->Where('payment_status', 'Vendor Confirmed');
+                    $query->Where('payment_status', 'Payment Completed');
                 });
         })
         ->groupBy('purchasing_order.id')
@@ -382,7 +382,7 @@ $data = PurchasingOrder::with('purchasing_order_items')
             ->from('vehicles')
             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where(function ($query) {
-                $query->Where('payment_status', 'Vendor Confirmed');
+                $query->Where('payment_status', 'Vendor confirmed');
             });
     })
     ->groupBy('purchasing_order.id')
@@ -397,7 +397,7 @@ else
             ->from('vehicles')
             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where(function ($query) {
-                $query->Where('payment_status', 'Vendor Confirmed');
+                $query->Where('payment_status', 'Vendor confirmed');
             });
     })
     ->groupBy('purchasing_order.id')

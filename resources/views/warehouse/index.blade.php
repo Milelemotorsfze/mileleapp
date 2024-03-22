@@ -597,7 +597,7 @@ $pendingvendorfol = DB::table('purchasing_order')
             ->from('vehicles')
             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where(function ($query) {
-                $query->Where('payment_status', 'Vendor Confirmed');
+                $query->Where('payment_status', 'Payment Completed');
             });
     })
     ->count();
@@ -615,7 +615,7 @@ $pendingvendorfol = DB::table('purchasing_order')
             ->from('vehicles')
             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where(function ($query) {
-                $query->Where('payment_status', 'Vendor Confirmed');
+                $query->Where('payment_status', 'Payment Completed');
             });
     })
     ->count();
@@ -648,8 +648,7 @@ $pendingvendorfol = DB::table('purchasing_order')
             ->from('vehicles')
             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where(function ($query) {
-                $query->where('payment_status', 'Payment Completed')
-                      ->orWhere('payment_status', 'Vendor Confirmed');
+                $query->where('payment_status', 'Vendor confirmed');
             });
     })
     ->count();
@@ -667,8 +666,7 @@ $pendingvendorfol = DB::table('purchasing_order')
             ->from('vehicles')
             ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where(function ($query) {
-                $query->where('payment_status', 'Payment Completed')
-                      ->orWhere('payment_status', 'Vendor Confirmed');
+                $query->where('payment_status', 'Vendor confirmed');
             });
     })
     ->count();
