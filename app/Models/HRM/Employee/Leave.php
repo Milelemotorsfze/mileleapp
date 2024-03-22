@@ -16,7 +16,7 @@ class Leave extends Model {
         'address_while_on_leave','alternative_home_contact_no','alternative_personal_email','status','action_by_employee','employee_action_at','comments_by_employee',
         'advance_or_loan_balance','others','action_by_hr_manager','hr_manager_id','hr_manager_action_at','comments_by_hr_manager','action_by_department_head',
         'department_head_id','department_head_action_at','comments_by_department_head','to_be_replaced_by','action_by_division_head','division_head_id',
-        'division_head_action_at','comments_by_division_head','created_by','updated_by','deleted_by'       
+        'division_head_action_at','comments_by_division_head','created_by','updated_by','deleted_by','joining_reports_id'      
     ];
     protected $appends = [
         'leave_type',

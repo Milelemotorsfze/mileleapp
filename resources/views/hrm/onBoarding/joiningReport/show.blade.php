@@ -143,8 +143,42 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                     <span>{{ $data->joining_type_name ?? ''}}</span>
                                 </div>
+                                @if($data->joining_type_name == 'Internal Transfer - Temporary' OR $data->joining_type_name == 'Internal Transfer - Permanent')
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                        <label for="choices-single-default" class="form-label"> Transfer From Department :</label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                        <span>@if(isset($data) && isset($data->transferFromDepartment)){{ $data->transferFromDepartment->name ?? ''}} @endif</span>
+                                    </div>
+                                @endif
+                                @if($data->joining_type_name == 'Internal Transfer - Temporary')
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                        <label for="choices-single-default" class="form-label"> Transfer From Date :</label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                        <span>
+                                            @if($data->transfer_from_date != NULL)
+                                                {{ \Carbon\Carbon::parse($data->transfer_from_date)->format('d M Y') }}
+                                            @endif
+                                        </span>
+                                    </div>
+                                @endif
+                                @if($data->joining_type_name == 'Internal Transfer - Temporary' OR $data->joining_type_name == 'Internal Transfer - Permanent')
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                        <label for="choices-single-default" class="form-label"> Transfer From Location :</label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                        <span>@if(isset($data) && isset($data->transferFromLocation)) {{ $data->transferFromLocation->name ?? ''}} @endif</span>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+                                        <label for="choices-single-default" class="form-label"> Transfer To Department :</label>
+                                    </div>
+                                    <div class="col-lg-7 col-md-7 col-sm-6 col-12">
+                                        <span>@if(isset($data) && isset($data->transferToDepartment)) {{ $data->transferToDepartment->name ?? ''}} @endif</span>
+                                    </div>
+                                @endif
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                    <label for="choices-single-default" class="form-label"> Joining Date :</label>
+                                    <label for="choices-single-default" class="form-label"> @if($data->joining_type_name == 'Internal Transfer - Temporary' OR $data->joining_type_name == 'Internal Transfer - Permanent') Transfer To @else Joining @endif Date :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                     <span>
@@ -154,7 +188,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                                         </span>
                                 </div>
                                 <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                    <label for="choices-single-default" class="form-label"> Location :</label>
+                                    <label for="choices-single-default" class="form-label"> @if($data->joining_type_name == 'Internal Transfer - Temporary' OR $data->joining_type_name == 'Internal Transfer - Permanent') Transfer To @endif Location :</label>
                                 </div>
                                 <div class="col-lg-7 col-md-7 col-sm-6 col-12">
                                     <span>{{ $data->joiningLocation->name ?? '' }}</span>
@@ -174,6 +208,71 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-repor
                             </div>
                         </div>
                     </div>
+                    @if($data->joining_type_name == 'Vacations Or Leave')
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Leave Details</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-pane fade show active">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-editable table-edits table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sl No</th>
+                                                    <th>Leave Type</th>
+                                                    <th>Leave Details</th>
+                                                    <th>Leave Start Date</th>
+                                                    <th>Leave End Date</th>
+                                                    <th>Total Number Of Days</th>
+                                                    <th>Number Of Paid Days(If Any)</th>
+                                                    <th>Number Of Unpaid Days(If Any)</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <div hidden>{{$i=0;}}</div>
+                                                @foreach ($data->leave as $key => $leave)
+                                                <tr data-id="1">
+                                                    <td>{{ ++$i }}</td>
+                                                    <td>{{ $leave->leave_type ?? ''}}</td>
+                                                    <td>{{ $leave->type_of_leave_description ?? ''}}</td>
+                                                    <td>
+                                                        @if($leave->leave_start_date != '')
+                                                        {{\Carbon\Carbon::parse($leave->leave_start_date)->format('d M Y') ?? ''}}
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if($leave->leave_end_date != '')
+                                                        {{\Carbon\Carbon::parse($leave->leave_end_date)->format('d M Y') ?? ''}}
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ $leave->total_no_of_days ?? ''}}</td>	
+                                                    <td>{{ $leave->no_of_paid_days ?? ''}}</td>		
+                                                    <td>{{ $leave->no_of_unpaid_days ?? ''}}</td>	
+                                                    <td>
+                                                    @canany(['view-leave-details','current-user-view-leave-details'])
+                                                    @php
+                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details','current-user-view-leave-details']);
+                                                    @endphp
+                                                    @if ($hasPermission) 
+                                                    <a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_leave.show',$leave->id)}}">
+                                                                <i class="fa fa-eye" aria-hidden="true"></i> View Details
+                                                            </a>
+                                                    @endif
+                                                    @endcanany
+                                                    </td>								
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title"><center>History</center></h4>
