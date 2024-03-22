@@ -1,6 +1,5 @@
 @extends('layouts.table')
 @section('content')
-@can('list-color-code')
     @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-color-code');
     @endphp
@@ -79,10 +78,13 @@
                         @endphp
                         {{ $created_bys ?? '' }}</td>
                         <td>
-                            @can('colour-edit')
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('colour-edit');
+                            @endphp
+                            @if ($hasPermission)
                                 <a data-placement="top" href="{{ route('colourcode.edit', $colorcodes->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
                                 </a>
-                            @endcan
+                            @endif
                         </td>
                     </tr>
                 @endforeach
@@ -91,7 +93,6 @@
         </div>
     </div>
     @endif
-        @endcan
     <script>
         $('.btn-delete').on('click',function(e){
             e.preventDefault();
