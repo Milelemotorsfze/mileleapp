@@ -1,6 +1,5 @@
 @extends('layouts.table')
 @section('content')
-@can('list-color-code')
     @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-color-code');
     @endphp
@@ -91,7 +90,6 @@
         </div>
     </div>
     @endif
-        @endcan
     <script>
         $('.btn-delete').on('click',function(e){
             e.preventDefault();
