@@ -343,7 +343,6 @@ class DailyleadsController extends Controller
         {
         if ($modelLineIds[0] !== null) {
         foreach ($modelLineIds as $modelLineId) {
-        dd($modelLineId);
         $datacalls = [
         'lead_id' => $table_id,
         'model_line_id' => $modelLineId,
