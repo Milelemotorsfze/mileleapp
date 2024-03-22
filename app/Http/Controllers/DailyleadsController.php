@@ -301,7 +301,6 @@ class DailyleadsController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $modelLineIdsRaw = $request->input('model_line_ids');
-        dd($modelLineIdsRaw);
         if($modelLineIdsRaw)
         {
         $modelLineIds = json_decode($modelLineIdsRaw, true);
