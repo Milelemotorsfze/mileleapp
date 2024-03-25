@@ -89,7 +89,7 @@
         <div class="card-body">
         <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="price-update-modalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
-    <form id="form-update2_492" action="{{ route('shipping.updateprice') }}" method="POST">
+    <form id="form-update_basicdetails" action="{{ route('purchasing-order.updatebasicdetails') }}" method="POST">
       @csrf
       <div class="modal-content">
         <div class="modal-header">
@@ -100,24 +100,10 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4 p-3">
-                <label for="poType" class="form-label font-size-13 text-center">PO Type:</label>
-            </div>
-            <div class="col-md-8 p-3">
-            <select class="form-control" autofocus name="po_type" required>
-            <option value="Normal" <?php echo ($purchasingOrder->po_type == 'Normal') ? 'selected' : ''; ?>>Normal</option>
-            <option value="Payment Adjustment" <?php echo ($purchasingOrder->po_type == 'Payment Adjustment') ? 'selected' : ''; ?>>Payment Adjustment</option>
-            </select>
-            </div>
-            <div class="col-md-4 p-3">
-                <label for="poDate" class="form-label font-size-13 text-center">PO Date:</label>
-            </div>
-            <div class="col-md-8 p-3">
-            <input type="text" id="poDate" name="poDate" class="form-control" placeholder="Enter PO Date" value="{{ date('d-M-Y', strtotime($purchasingOrder->po_date)) }}">
-            </div>
-            <div class="col-md-4 p-3">
                 <label for="vendorName" class="form-label font-size-13 text-center">Vendor Name:</label>
             </div>
             <div class="col-md-8 p-3">
+            <input type="hidden" id="purchasing_order_id" name="purchasing_order_id" class="form-control" value="{{ $purchasingOrder->id }}">
             <select class="form-control" autofocus name="vendors_id" id="vendors" required>
                 <option value="" disabled>Select The Vendor</option>
                 @foreach($vendors as $vendor)
@@ -1843,7 +1829,8 @@
         });
         if (allBlank) {
             console.log("All VIN values are blank");
-            callback(1); // Indicate all values are blank
+            callback(1);
+            // Indicate all values are blank
         } else {
             var Po = "{{$purchasingOrder->id}}";
             $.ajaxSetup({
@@ -1880,4 +1867,28 @@ $(document).ready(function() {
   });
 });
 </script>
+<script>
+$(document).ready(function() {
+    $('#form-update_basicdetails').submit(function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        var formData = $(this).serialize(); // Serialize form data
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: formData,
+            success: function(response) {
+                // Handle success response, maybe show a success message
+                alert('Purchase order details updated successfully!');
+                location.reload(); // Refresh the page
+            },
+            error: function(xhr, status, error) {
+                // Handle error response, maybe show an error message
+                console.error(xhr.responseText);
+                alert('An error occurred while updating purchase order details.');
+            }
+        });
+    });
+});
+</script>
+
 @endsection

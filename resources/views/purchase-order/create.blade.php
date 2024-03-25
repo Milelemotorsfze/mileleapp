@@ -353,20 +353,18 @@
 
     }
     $('.add-row-btn').click(function(e) {
+        $('.bar').show();
+        var variantQuantity = '{{ $pfiVehicleVariants->count() }}';
+        var price = 0;
 
-        // if(formValid == true) {
-            $('.bar').show();
-            var variantQuantity = '{{ $pfiVehicleVariants->count() }}';
-            var price = 0;
-
-            // Move the declaration and assignment inside the click event function
-            var exColours = <?= json_encode($exColours) ?>;
-            var intColours = <?= json_encode($intColours) ?>;
-            var sum = $('#total-price').val();
-            for (var i = 0; i < variantQuantity; i++) {
-                checkQuantity(i);
-                if(formValid == true) {
-                    var qty = $('#quantity-'+i).val();
+        // Move the declaration and assignment inside the click event function
+        var exColours = <?= json_encode($exColours) ?>;
+        var intColours = <?= json_encode($intColours) ?>;
+        var sum = $('#total-price').val();
+        for (var i = 0; i < variantQuantity; i++) {
+            checkQuantity(i);
+            if(formValid == true) {
+                var qty = $('#quantity-'+i).val();
                 var actualQuantity = $('#quantity-'+i).attr('data-quantity');
                 var remaingQuantity = parseInt(actualQuantity) - parseInt(qty);
                 $('#quantity-'+i).attr('data-quantity',remaingQuantity);
@@ -420,16 +418,11 @@
                     }
                     newRow.append(LoiItemCol,masterModelCol, ModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol, removeBtn);
                     $('#variantRowsContainer').append(newRow);
-
-
                 }
-                }
-
+                $('#variantRowsContainer').show();
             }
 
-            $('#variantRowsContainer').show();
-        // }
-
+        }
     });
 
     $(document).on('click', '.remove-row-btn', function() {

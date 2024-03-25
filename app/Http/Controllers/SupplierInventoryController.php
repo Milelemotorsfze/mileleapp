@@ -1190,7 +1190,6 @@ class SupplierInventoryController extends Controller
                             }
                         }
 
-
                         $action = "Inventory Item deleted";
                         $this->inventoryLog($action, $deletedRow->id);
                     }
