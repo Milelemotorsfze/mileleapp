@@ -1724,7 +1724,8 @@
         });
         if (allBlank) {
             console.log("All VIN values are blank");
-            callback(1); // Indicate all values are blank
+            callback(1);
+            // Indicate all values are blank
         } else {
             var Po = "{{$purchasingOrder->id}}";
             $.ajaxSetup({

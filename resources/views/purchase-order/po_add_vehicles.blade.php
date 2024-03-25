@@ -82,7 +82,7 @@
                         <input type="hidden" name="approved_loi_ids[]" value="{{$pfiVehicleVariant->id}}">
                         <input type="hidden" name="item_quantity_selected[]" id="item-quantity-selected-{{$pfiVehicleVariant->id}}" value="0">
                         <input type="hidden" id="master-model-id-{{$key}}" name="selected_model_ids[]"  value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->id ?? ''}}">
-                        <div class="col-lg-2 col-md-6 mt-md-2">
+                        <div class="col-lg-2 col-md-6">
                             <input type="text"  class="form-control" placeholder="Model" id="model-{{$key}}"
                                    value="{{ $pfiVehicleVariant->letterOfIndentItem->masterModel->model ."-". $pfiVehicleVariant->letterOfIndentItem->masterModel->sfx}}" readonly>
                         </div>
@@ -148,20 +148,20 @@
         if(parseInt(selectedQuantity) > parseInt(inventoryQuantity)) {
             formValid = false;
             $('.QuantityError-'+key).text("Please Enter Quantity less than inventory Quantity "+inventoryQuantity);
-            $('.add-row-btn').attr('disabled', true);
+            $('.add-vehicle-btn').attr('disabled', true);
         }
         else if(parseInt(selectedQuantity) > parseInt(variantQuantity)){
             formValid = false;
             $('.QuantityError-'+key).text("Please Enter Quantity less than Maximum allocated Quantity "+variantQuantity);
-            $('.add-row-btn').attr('disabled', true);
+            $('.add-vehicle-btn').attr('disabled', true);
         }
         else{
             formValid = true;
             $('.QuantityError-'+key).text("");
-            $('.add-row-btn').attr('disabled', false);
+            $('.add-vehicle-btn').attr('disabled', false);
         }
     }
-    function checkDuplicateVIN() {
+    function checkUniqueVIN() {
 
         var vinValues = $('input[name="vin[]"]').map(function() {
             return $(this).val();
@@ -208,7 +208,7 @@
             });
         }
     }
-    $(document).ready(function() {
+    // $(document).ready(function() {
         $('.add-vehicle-btn').click(function (e) {
 
             // if(formValid == true) {
@@ -278,11 +278,12 @@
                         newRow.append(LoiItemCol, masterModelCol, ModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, engineNumber, unitPrice, vinCol, removeBtn);
                         $('#VehiclevariantRowsContainer').append(newRow);
                     }
+                    $('#VehiclevariantRowsContainer').show();
                 }
 
             }
 
-            $('#VehiclevariantRowsContainer').show();
+            //
             // }
 
         });
@@ -343,11 +344,11 @@
             } else {
                 // alert("variant is there");
                 formValid = true;
-                checkDuplicateVIN();
+                checkUniqueVIN();
             }
             if (formValid == true) {
                 $('#po-create-form').unbind('submit').submit();
             }
         });
-    });
+    // });
 </script>
