@@ -10,7 +10,6 @@
 	}
 </style>
 @section('content')
-@canany(['create-insurance','edit-insurance','view-all-list-insurance','view-current-user-list-insurance','view-all-insurance-details','view-current-user-insurance-details'])
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance','edit-insurance','view-all-list-insurance','view-current-user-list-insurance','view-all-insurance-details','view-current-user-insurance-details']);
 @endphp
@@ -19,7 +18,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance',
 	<h4 class="card-title">
 		Employee Insurance Info
 	</h4>
-	@canany(['create-insurance'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance']);
 	@endphp
@@ -28,7 +26,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance',
 	<i class="fa fa-plus" aria-hidden="true"></i> New Insurance
 	</a>
 	@endif
-	@endcanany	
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -112,7 +109,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance',
 								@endif	
 							</td>
 							<td>							
-								@canany(['view-all-insurance-details','view-current-user-insurance-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-insurance-details','view-current-user-insurance-details']);
 								@endphp
@@ -121,8 +117,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance',
 								<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
 								@endif
-								@endcanany
-								@canany(['edit-insurance'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-insurance']);
 								@endphp
@@ -131,7 +125,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance',
 								<i class="fa fa-edit" aria-hidden="true"></i>
 								</a>
 								@endif
-								@endcanany
 							</td>
 						</tr>
 						@endforeach
@@ -141,6 +134,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-insurance',
 		</div>
 	</div>
 </div>
+@else
+<div class="card-header">
+	<p class="card-title">Sorry ! You don't have permission to access this page</p>
+	<a style="float:left;" class="btn btn-sm btn-info" href="/"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
+</div>
 @endif
-@endcanany
 @endsection

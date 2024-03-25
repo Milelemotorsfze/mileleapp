@@ -1,16 +1,15 @@
 @extends('layouts.table')
 <style>
 	.required-class {
-        margin-top: .25rem;
-        font-size: 80%;
-        color: #fd625e;
-    }
+	margin-top: .25rem;
+	font-size: 80%;
+	color: #fd625e;
+	}
 	.widthinput {
 	height:32px!important;
 	}
 </style>
 @section('content')
-@canany(['create-ticket-po','edit-ticket-po','view-ticket-listing','view-ticket-listing-of-current-user','view-ticket-details','view-ticket-details-of-current-user'])
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po','edit-ticket-po','view-ticket-listing','view-ticket-listing-of-current-user','view-ticket-details','view-ticket-details-of-current-user']);
 @endphp
@@ -18,17 +17,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po',
 <div class="card-header">
 	<h4 class="card-title">
 		Employee Ticket Allowance PO Info
-	</h4>	
-	@canany(['create-ticket-po'])
+	</h4>
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po']);
 	@endphp
 	@if ($hasPermission)
 	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('ticket_allowance.create') }}">
-      <i class="fa fa-plus" aria-hidden="true"></i> New Ticket Allowance PO
-    </a>
+	<i class="fa fa-plus" aria-hidden="true"></i> New Ticket Allowance PO
+	</a>
 	@endif
-	@endcanany	
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -61,19 +58,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po',
 					<thead>
 						<tr>
 							<th>Sl No</th>
-                            <th>Request Date</th>
-							<th>Employee Name</th>						
-                            <th>Employee Code</th>
+							<th>Request Date</th>
+							<th>Employee Name</th>
+							<th>Employee Code</th>
 							<th>Designation</th>
-                            <th>Department</th>
+							<th>Department</th>
 							<th>Location</th>
 							<th>Ticket Allowance Eligibility Year</th>
 							<th>Ticket Allowance Eligibility Date</th>
 							<th>Ticket Allowance PO for Year</th>
 							<th>Ticket Allowance PO Number</th>
-                            <th>Created By</th>
-                            <th>Updated By</th>
-                            <th>Updated At</th>
+							<th>Created By</th>
+							<th>Updated By</th>
+							<th>Updated At</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -99,31 +96,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po',
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>{{ $data->updatedBy->name ?? ''}}</td>
 							<td>
-                                @if($data->updated_by != NULL)
-                                {{ \Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}	
-                                @endif	
-								</td>						
+								@if($data->updated_by != NULL)
+								{{ \Carbon\Carbon::parse($data->updated_at)->format('d M Y, H:i:s') ?? ''}}	
+								@endif	
+							</td>
 							<td>							
-								@canany(['view-ticket-details','view-ticket-details-of-current-user'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-ticket-details','view-ticket-details-of-current-user']);
 								@endphp
 								@if ($hasPermission) 
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('ticket_allowance.show',$data->id)}}">
-                                    <i class="fa fa-eye" aria-hidden="true"></i>
-                                </a>
+								<i class="fa fa-eye" aria-hidden="true"></i>
+								</a>
 								@endif
-								@endcanany
-								@canany(['edit-ticket-po'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-ticket-po']);
 								@endphp
 								@if ($hasPermission) 								
-                                <a title="Edit" class="btn btn-sm btn-info" href="{{route('ticket_allowance.edit',$data->id)}}">
-                                    <i class="fa fa-edit" aria-hidden="true"></i>
-                                </a>
+								<a title="Edit" class="btn btn-sm btn-info" href="{{route('ticket_allowance.edit',$data->id)}}">
+								<i class="fa fa-edit" aria-hidden="true"></i>
+								</a>
 								@endif
-								@endcanany
 							</td>
 						</tr>
 						@endforeach
@@ -133,8 +126,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-ticket-po',
 		</div>
 	</div>
 </div>
+@else
+<div class="card-header">
+	<p class="card-title">Sorry ! You don't have permission to access this page</p>
+	<a style="float:left;" class="btn btn-sm btn-info" href="/"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
+</div>
 @endif
-@endcanany
 @endsection
 @push('scripts')
 <script type="text/javascript">

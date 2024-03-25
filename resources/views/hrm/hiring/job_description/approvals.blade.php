@@ -50,8 +50,9 @@
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
 							<td>@if($data->request_date != '')
-									{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								@endif
+							</td>
 							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
 							<td>{{ $data->location->name ?? '' }}</td>
 							<td>{{ $data->job_purpose ?? ''}}</td>
@@ -60,7 +61,7 @@
 							<td>{{ $data->position_qualification ?? ''}}</td>
 							<td>{{$data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
 								@endif
 							</td>
 							<td>{{$data->departmentHeadName->name ?? ''}}</td>
@@ -255,8 +256,9 @@
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
 							<td>@if($data->request_date != '')
-									{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								@endif
+							</td>
 							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
 							<td>{{ $data->location->name ?? '' }}</td>
 							<td>{{ $data->job_purpose ?? ''}}</td>
@@ -265,13 +267,15 @@
 							<td>{{ $data->position_qualification ?? ''}}</td>
 							<td>{{$data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->departmentHeadName->name ?? ''}}</td>
 							<td>{{$data->action_by_department_head ?? ''}}</td>
 							<td>@if($data->department_head_action_at != '')
-									{{\Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_department_head ?? ''}}</td>
 							<td>{{$data->hrManagerName->name ?? ''}}</td>
 							<td>
@@ -326,8 +330,9 @@
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
 							<td>@if($data->request_date != '')
-									{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								@endif
+							</td>
 							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
 							<td>{{ $data->location->name ?? '' }}</td>
 							<td>{{ $data->job_purpose ?? ''}}</td>
@@ -336,13 +341,15 @@
 							<td>{{ $data->position_qualification ?? ''}}</td>
 							<td>{{$data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->departmentHeadName->name ?? ''}}</td>
 							<td>{{$data->action_by_department_head ?? ''}}</td>
 							<td>@if($data->department_head_action_at != '')
-									{{\Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_department_head ?? ''}}</td>
 							<td>{{$data->hrManagerName->name ?? ''}}</td>
 							<td>
@@ -420,8 +427,9 @@
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
 							<td>@if($data->request_date != '')
-									{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								@endif
+							</td>
 							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
 							<td>{{ $data->location->name ?? '' }}</td>
 							<td>{{ $data->job_purpose ?? ''}}</td>
@@ -430,13 +438,14 @@
 							<td>{{ $data->position_qualification ?? ''}}</td>
 							<td>{{$data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->departmentHeadName->name ?? ''}}</td>
 							<td>{{$data->action_by_department_head ?? ''}}</td>
 							<td>
-							@if($data->department_head_action_at != '')
-									{{\Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s')}}
+								@if($data->department_head_action_at != '')
+								{{\Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s')}}
 								@endif
 							</td>
 							<td>{{$data->comments_by_department_head ?? ''}}</td>
@@ -633,33 +642,34 @@
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
 							<td>@if($data->request_date != '')
-									{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								@endif
+							</td>
 							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
 							<td>{{ $data->location->name ?? '' }}</td>
 							<td>{{ $data->job_purpose ?? ''}}</td>
 							<td>{{ $data->duties_and_responsibilities ?? ''}}</td>
 							<td>{{ $data->skills_required ?? ''}}</td>
 							<td>{{ $data->position_qualification ?? ''}}</td>
-							<td>{{$data->createdBy->name ?? ''}}</td>							
+							<td>{{$data->createdBy->name ?? ''}}</td>
 							<td>
-							@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
 								@endif
 							</td>
-
 							<td>{{$data->departmentHeadName->name ?? ''}}</td>
 							<td>{{$data->action_by_department_head ?? ''}}</td>
 							<td>@if($data->department_head_action_at != '')
-									{{\Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_department_head ?? ''}}</td>
 							<td>{{$data->hrManagerName->name ?? ''}}</td>
 							<td>{{$data->action_by_hr_manager ?? ''}}</td>
 							<td>@if($data->hr_manager_action_at != '')
-									{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
+								{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
 								@endif
-								</td>
+							</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>
 								<div class="dropdown">
@@ -716,8 +726,9 @@
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
 							<td>@if($data->request_date != '')
-									{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->request_date)->format('d M Y')}}
+								@endif
+							</td>
 							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
 							<td>{{ $data->location->name ?? '' }}</td>
 							<td>{{ $data->job_purpose ?? ''}}</td>
@@ -726,20 +737,22 @@
 							<td>{{ $data->position_qualification ?? ''}}</td>
 							<td>{{$data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif</td>
-
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->departmentHeadName->name ?? ''}}</td>
 							<td>{{$data->action_by_department_head ?? ''}}</td>
 							<td>@if($data->department_head_action_at != '')
-									{{\Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_department_head ?? ''}}</td>
 							<td>{{$data->hrManagerName->name ?? ''}}</td>
 							<td>{{$data->action_by_hr_manager ?? ''}}</td>
 							<td>@if($data->hr_manager_action_at != '')
-									{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
-								@endif</td>
+								{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
+								@endif
+							</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>
 								<div class="dropdown">

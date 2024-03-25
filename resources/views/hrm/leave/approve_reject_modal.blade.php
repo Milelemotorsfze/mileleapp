@@ -33,49 +33,49 @@
 						I do confirm that I will report back to duty on the due date as approved by the Management, otherwise the Company will consider me as an absentee as per the Law.
 						<span id="checkError_{{$data->id}}" class="required-class invalid-feedback"></span>
 						@elseif(isset($data->is_auth_user_can_approve['current_approve_position']) && $data->is_auth_user_can_approve['current_approve_position'] == 'HR Manager')
-							<div class="col-lg-3 col-md-3 col-sm-3">
-								<label class="form-label font-size-13">Passport Expiry :</label>
-							</div>
-							<div class="col-lg-3 col-md-3 col-sm-3">
-								@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->passport_expiry_date != NULL)
-									{{\Carbon\Carbon::parse($data->user->empProfile->passport_expiry_date)->format('d M Y') ?? ''}}
-								@endif
-							</div>
-							<div class="col-lg-3 col-md-3 col-sm-3">
-								<label class="form-label font-size-13">Visa Expiry :</label>
-							</div>
-							<div class="col-lg-3 col-md-3 col-sm-3">
-								@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->visa_expiry_date != NULL)
-									{{\Carbon\Carbon::parse($data->user->empProfile->visa_expiry_date)->format('d M Y') ?? ''}}
-								@endif
-							</div>
-							<div class="col-lg-3 col-md-3 col-sm-3">
-								<label class="form-label font-size-13">Advance/Loan Balance :</label>
-							</div>
-							<div class="col-lg-3 col-md-3 col-sm-3">
-								{{$data->user->advance_or_loan_balance ?? ''}} AED
-							</div>
-							<div class="col-lg-3 col-md-3 col-sm-3">
-								<label class="form-label font-size-13">Others :</label>
-							</div>
-							<div class="col-lg-3 col-md-3 col-sm-3">
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							<label class="form-label font-size-13">Passport Expiry :</label>
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->passport_expiry_date != NULL)
+							{{\Carbon\Carbon::parse($data->user->empProfile->passport_expiry_date)->format('d M Y') ?? ''}}
+							@endif
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							<label class="form-label font-size-13">Visa Expiry :</label>
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->visa_expiry_date != NULL)
+							{{\Carbon\Carbon::parse($data->user->empProfile->visa_expiry_date)->format('d M Y') ?? ''}}
+							@endif
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							<label class="form-label font-size-13">Advance/Loan Balance :</label>
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							{{$data->user->advance_or_loan_balance ?? ''}} AED
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							<label class="form-label font-size-13">Others :</label>
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-3">
 							<input type="text" name="others" id="others_{{$data->id}}"
 								class="form-control widthinput" placeholder="Others"
-								 aria-label="measurement" aria-describedby="basic-addon2" value="">
-							</div>
-							@elseif(isset($data->is_auth_user_can_approve['current_approve_position']) && $data->is_auth_user_can_approve['current_approve_position'] == 'Reporting Manager')
-							<div class="col-lg-3 col-md-3 col-sm-3">
-								<label class="form-label font-size-13">To Be Replaced By :</label>
-							</div>
-							<div class="col-lg-9 col-md-9 col-sm-9">
-								<select class="form-control widthinput" name="to_be_replaced_by" id="to_be_replaced_by_{{$data->id}}">
-									@foreach($leavePersonReplacedBy as $employee)
-										<option value="{{$employee->id}}">{{$employee->name}}</option>
-									@endforeach
-								</select>
-							</div>							
-							@endif
-							@if(isset($data->is_auth_user_can_approve['current_approve_position']) && $data->is_auth_user_can_approve['current_approve_position'] != 'Employee')
+								aria-label="measurement" aria-describedby="basic-addon2" value="">
+						</div>
+						@elseif(isset($data->is_auth_user_can_approve['current_approve_position']) && $data->is_auth_user_can_approve['current_approve_position'] == 'Reporting Manager')
+						<div class="col-lg-3 col-md-3 col-sm-3">
+							<label class="form-label font-size-13">To Be Replaced By :</label>
+						</div>
+						<div class="col-lg-9 col-md-9 col-sm-9">
+							<select class="form-control widthinput" name="to_be_replaced_by" id="to_be_replaced_by_{{$data->id}}">
+								@foreach($leavePersonReplacedBy as $employee)
+								<option value="{{$employee->id}}">{{$employee->name}}</option>
+								@endforeach
+							</select>
+						</div>
+						@endif
+						@if(isset($data->is_auth_user_can_approve['current_approve_position']) && $data->is_auth_user_can_approve['current_approve_position'] != 'Employee')
 						<div class="row mt-2">
 							<div class="col-lg-12 col-md-12 col-sm-12">
 								<label class="form-label font-size-13">Comments</label>
@@ -152,90 +152,90 @@
 	</div>
 </div>
 <script type="text/javascript">
-    $(document).ready(function () {
-        $('.status-reject-button').click(function (e) {
-	        var id = $(this).attr('data-id');
-	        var status = $(this).attr('data-status');
-	        approveOrRejectHiringrequest(id, status)
-	    })
-	    $('.status-approve-button').click(function (e) {
-	        var id = $(this).attr('data-id');
-			var status = $(this).attr('data-status');
-			if($("#current_approve_position_"+id).val() == 'Employee') {
-				var isChecked=$("#comment-check-"+id).is(":checked");
-				if(isChecked == true) {
-					removeAddonTypeError(id);
-					approveOrRejectHiringrequest(id, status)
+	$(document).ready(function () {
+	    $('.status-reject-button').click(function (e) {
+	     var id = $(this).attr('data-id');
+	     var status = $(this).attr('data-status');
+	     approveOrRejectHiringrequest(id, status)
+	 })
+	 $('.status-approve-button').click(function (e) {
+	     var id = $(this).attr('data-id');
+	var status = $(this).attr('data-status');
+	if($("#current_approve_position_"+id).val() == 'Employee') {
+	var isChecked=$("#comment-check-"+id).is(":checked");
+	if(isChecked == true) {
+		removeAddonTypeError(id);
+		approveOrRejectHiringrequest(id, status)
+	}
+	else {
+		showAddonTypeError(id);
+	}
+	}
+	else {
+	approveOrRejectHiringrequest(id, status)
+	}
+	 })
+	function showAddonTypeError(id) {
+	document.getElementById("checkError_"+id).textContent='Please check the box';
+	document.getElementById("comment-check-"+id).classList.add("is-invalid");
+	document.getElementById("checkError_"+id).classList.add("paragraph-class");
+	}
+	function removeAddonTypeError(id) {
+	document.getElementById("checkError_"+id).textContent="";
+	document.getElementById("comment-check-"+id).classList.remove("is-invalid");
+	document.getElementById("checkError_"+id).classList.remove("paragraph-class");
+	}
+	    function approveOrRejectHiringrequest(id, status) {
+	var comment = $("#comment-"+id).val();
+	var current_approve_position = $("#current_approve_position_"+id).val();
+	if(current_approve_position == 'Employee') {
+	var isChecked = $("#comment-check-"+id).val();
+	if(isChecked == 'on') {
+		comment = "I do confirm that I will report back to duty on the due date as approved by the Management, otherwise the Company will consider me as an absentee as per the Law.";
+	}
+	}
+	var others = '';
+	if(current_approve_position == 'HR Manager') {
+	others = $("others_"+id).val();
+	}
+	var to_be_replaced_by = '';
+	if(current_approve_position == 'Reporting Manager') {
+	to_be_replaced_by = $("#to_be_replaced_by_"+id).val();
+	}
+	     let url = '{{ route('leaveRequest.action') }}'; 
+	     if(status == 'rejected') {
+	         var message = 'Reject';
+	     }else{
+	         var message = 'Approve';
+	     }
+	     var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee leave request ?',function (e) {
+	         if (e) {
+	             $.ajax({
+	                 type: "POST",
+	                 url: url,
+	                 dataType: "json",
+	                 data: {
+	                     id: id,
+	                     status: status,
+	                     comment: comment,
+				others: others,
+				current_approve_position: current_approve_position,
+				to_be_replaced_by: to_be_replaced_by,
+	                     _token: '{{ csrf_token() }}'
+	                 },
+	                 success: function (data) {
+				if(data == 'success') {
+					window.location.reload();
+					alertify.success(status + " Successfully")
 				}
-				else {
-					showAddonTypeError(id);
-				}
-			}
-			else {
-				approveOrRejectHiringrequest(id, status)
-			}
-	    })
-		function showAddonTypeError(id) {
-			document.getElementById("checkError_"+id).textContent='Please check the box';
-			document.getElementById("comment-check-"+id).classList.add("is-invalid");
-			document.getElementById("checkError_"+id).classList.add("paragraph-class");
-		}
-		function removeAddonTypeError(id) {
-			document.getElementById("checkError_"+id).textContent="";
-			document.getElementById("comment-check-"+id).classList.remove("is-invalid");
-			document.getElementById("checkError_"+id).classList.remove("paragraph-class");
-		}
-        function approveOrRejectHiringrequest(id, status) {
-			var comment = $("#comment-"+id).val();
-			var current_approve_position = $("#current_approve_position_"+id).val();
-			if(current_approve_position == 'Employee') {
-				var isChecked = $("#comment-check-"+id).val();
-				if(isChecked == 'on') {
-					comment = "I do confirm that I will report back to duty on the due date as approved by the Management, otherwise the Company will consider me as an absentee as per the Law.";
-				}
-			}
-			var others = '';
-			if(current_approve_position == 'HR Manager') {
-				others = $("others_"+id).val();
-			}
-			var to_be_replaced_by = '';
-			if(current_approve_position == 'Reporting Manager') {
-				to_be_replaced_by = $("#to_be_replaced_by_"+id).val();
-			}
-	        let url = '{{ route('leaveRequest.action') }}'; 
-	        if(status == 'rejected') {
-	            var message = 'Reject';
-	        }else{
-	            var message = 'Approve';
-	        }
-	        var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee leave request ?',function (e) {
-	            if (e) {
-	                $.ajax({
-	                    type: "POST",
-	                    url: url,
-	                    dataType: "json",
-	                    data: {
-	                        id: id,
-	                        status: status,
-	                        comment: comment,
-							others: others,
-							current_approve_position: current_approve_position,
-							to_be_replaced_by: to_be_replaced_by,
-	                        _token: '{{ csrf_token() }}'
-	                    },
-	                    success: function (data) {
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-
-							}
-	                    }
-	                });
-	            }
+				else if(data == 'error') {
 	
-	        }).set({title:"Confirmation"})
-	    }
-    });
+				}
+	                 }
+	             });
+	         }
+	
+	     }).set({title:"Confirmation"})
+	 }
+	});
 </script>

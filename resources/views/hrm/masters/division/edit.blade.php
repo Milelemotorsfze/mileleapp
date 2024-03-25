@@ -3,7 +3,6 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 @section('content')
-@canany(['edit-division'])
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 @endphp
@@ -29,16 +28,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 		</ul>
 	</div>
 	@endif
-
-		
-		<form id="editDivisionForm" name="editDivisionForm" enctype="multipart/form-data" method="POST" action="{{route('division.update',$data->id)}}">
+	<form id="editDivisionForm" name="editDivisionForm" enctype="multipart/form-data" method="POST" action="{{route('division.update',$data->id)}}">
 		@csrf
 		@method("PUT")
-
 		<div class="row">
 			<div class="col-xxl-12 col-lg-6 col-md-6">
 				<p><span style="float:right;" class="error">* Required Field</span></p>
-			</div>			
+			</div>
 		</div>
 		<br>
 		<div class="card">
@@ -51,31 +47,31 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 						<span class="error">* </span>
 						<label for="name" class="col-form-label text-md-end">{{ __('Department Name') }}</label>
 						<input type="text" name="name" id="name"
-								class="form-control widthinput" placeholder="Enter Leave Type If Others"
-								 aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->name ?? ''}}">
+							class="form-control widthinput" placeholder="Enter Leave Type If Others"
+							aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->name ?? ''}}">
 					</div>
-                    <div class="col-xxl-4 col-lg-4 col-md-4 select-button-main-div">
-					<div class="dropdown-option-div">
-						<span class="error">* </span>
-						<label for="division_head_id" class="col-form-label text-md-end">{{ __('Division Head Name') }}</label>
-                        <select name="division_head_id" id="division_head_id" multiple="true" class="division_head_id form-control widthinput" onchange="" autofocus>
-                            @foreach($divisionHeads as $divisionHead)
-                                <option value="{{$divisionHead->id}}" @if($data->division_head_id == $divisionHead->id) selected @endif>{{$divisionHead->name}}</option>
-                            @endforeach
-                        </select>
-					</div>
-					</div>	 
 					<div class="col-xxl-4 col-lg-4 col-md-4 select-button-main-div">
-					<div class="dropdown-option-div">
-						<span class="error">* </span>
-						<label for="approval_handover_to" class="col-form-label text-md-end">{{ __('Division Head Approval Hand Over To') }}</label>
-                        <select name="approval_handover_to" id="approval_handover_to" multiple="true" class="approval_handover_to form-control widthinput" onchange="" autofocus>
-                            @foreach($divisionHeads as $approvalBy)
-                                <option value="{{$approvalBy->id}}" @if($data->approval_handover_to == $approvalBy->id) selected @endif>{{$approvalBy->name}}</option>
-                            @endforeach
-                        </select>
+						<div class="dropdown-option-div">
+							<span class="error">* </span>
+							<label for="division_head_id" class="col-form-label text-md-end">{{ __('Division Head Name') }}</label>
+							<select name="division_head_id" id="division_head_id" multiple="true" class="division_head_id form-control widthinput" onchange="" autofocus>
+							@foreach($divisionHeads as $divisionHead)
+							<option value="{{$divisionHead->id}}" @if($data->division_head_id == $divisionHead->id) selected @endif>{{$divisionHead->name}}</option>
+							@endforeach
+							</select>
+						</div>
 					</div>
-					</div>	           
+					<div class="col-xxl-4 col-lg-4 col-md-4 select-button-main-div">
+						<div class="dropdown-option-div">
+							<span class="error">* </span>
+							<label for="approval_handover_to" class="col-form-label text-md-end">{{ __('Division Head Approval Hand Over To') }}</label>
+							<select name="approval_handover_to" id="approval_handover_to" multiple="true" class="approval_handover_to form-control widthinput" onchange="" autofocus>
+							@foreach($divisionHeads as $approvalBy)
+							<option value="{{$approvalBy->id}}" @if($data->approval_handover_to == $approvalBy->id) selected @endif>{{$approvalBy->name}}</option>
+							@endforeach
+							</select>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -85,8 +81,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 	</form>
 </div>
 <div class="overlay"></div>
+@else
+<div class="card-header">
+	<p class="card-title">Sorry ! You don't have permission to access this page</p>
+	<a style="float:left;" class="btn btn-sm btn-info" href="/"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
+</div>
 @endif
-@endcanany
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
@@ -94,47 +95,47 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 	var oldData = {!! json_encode($data) !!};
 	$(document).ready(function () {
 		$('#division_head_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder:"Choose Employee Name",
-        });
+	           allowClear: true,
+	           maximumSelectionLength: 1,
+	           placeholder:"Choose Employee Name",
+	       });
 		$('#approval_handover_to').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder:"Choose Employee Name",
-        });
+	           allowClear: true,
+	           maximumSelectionLength: 1,
+	           placeholder:"Choose Employee Name",
+	       });
 	});	
 	jQuery.validator.setDefaults({
-        errorClass: "is-invalid",
-        errorElement: "p",
-        errorPlacement: function ( error, element ) {
-            error.addClass( "invalid-feedback font-size-13" );
+	       errorClass: "is-invalid",
+	       errorElement: "p",
+	       errorPlacement: function ( error, element ) {
+	           error.addClass( "invalid-feedback font-size-13" );
 			if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
-                if (!element.val() || element.val().length === 0) {
-                    console.log("Error is here with length", element.val().length);
-                    error.addClass('select-error');
-                    error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
-                } else {
-                    console.log("No error");
-                }
-            }
-            else {
-                error.insertAfter( element );
-            }
-        }
-    });
-	$('#editDivisionForm').validate({ // initialize the plugin
-        rules: {           
-            name: {
-                required: true,
-            },
+	               if (!element.val() || element.val().length === 0) {
+	                   console.log("Error is here with length", element.val().length);
+	                   error.addClass('select-error');
+	                   error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+	               } else {
+	                   console.log("No error");
+	               }
+	           }
+	           else {
+	               error.insertAfter( element );
+	           }
+	       }
+	   });
+	$('#editDivisionForm').validate({ 
+	       rules: {           
+	           name: {
+	               required: true,
+	           },
 			division_head_id: {
-                required: true,
-            },
+	               required: true,
+	           },
 			approval_handover_to: {
 				required: true,
 			},
-        },
-    });
+	       },
+	   });
 </script>
 @endsection
