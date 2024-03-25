@@ -308,6 +308,7 @@ class InterviewSummaryReportController extends Controller
         }      
     }
     public function createOrEdit($id) {
+        $authId = Auth::id();
         $currentInterviewReport = InterviewSummaryReport::with('telephonicInterviewers','firstRoundInterviewers','secondRoundInterviewers',
         'thirdRoundInterviewers','forthRoundInterviewers','fifthRoundInterviewers')->where('id',$id)->first();
         if(!$currentInterviewReport) {
@@ -319,14 +320,42 @@ class InterviewSummaryReportController extends Controller
         }
         $hiringrequests = EmployeeHiringRequest::where('final_status','open')->whereHas('questionnaire')->whereHas('jobDescription', function($q){
             $q->where('status', 'approved');
-        })->with('questionnaire.department','questionnaire.designation')->get();
-        $data = EmployeeHiringRequest::where('id',$id)->first();
+        })->with('questionnaire.department','questionnaire.designation');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $hiringrequests = $hiringrequests->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $hiringrequests = $hiringrequests->where('requested_by',$authId)->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $hiringrequests = $hiringrequests->whereHas('questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $hiringrequests = $hiringrequests->get();
+        $data = EmployeeHiringRequest::where('id',$id);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $data = $data->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $data = $data->where('requested_by',$authId)->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $data = $data->whereHas('questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $data = $data->first();
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterGender = MasterGender::whereIn('id',[1,2])->get();
         $interviewersNames = User::whereNotIn('id',[1,16])->whereHas('empProfile')->select('id','name')->get();
-        if($id != 'new') {
-            return view('hrm.hiring.interview_summary_report.createOrEdit',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
-            'masterGender','interviewersNames','hiringrequests'));
+        if($id == 'new') {
+            return view('hrm.hiring.interview_summary_report.create',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
+            'masterGender','interviewersNames','hiringrequests'));   
+        }
+        else if($data == '') {
+            $errorMsg ="Sorry ! You don't have permission to access this page";
+            return view('hrm.notaccess',compact('errorMsg'));
         }
         else {
             return view('hrm.hiring.interview_summary_report.create',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',

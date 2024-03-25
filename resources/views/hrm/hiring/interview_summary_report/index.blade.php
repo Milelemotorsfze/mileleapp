@@ -4,36 +4,35 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
 	.form-label {
-		margin-top: 0.5rem;
+	margin-top: 0.5rem;
 	}
 	.iti {
-		width: 100%;
+	width: 100%;
 	}
 	.texttransform {
-    	text-transform: capitalize;
+	text-transform: capitalize;
 	}
 	.light {
-		background-color:#e6e6e6!important;
-		font-weight: 700!important;
+	background-color:#e6e6e6!important;
+	font-weight: 700!important;
 	}
 	.dark {
-		background-color:#d9d9d9!important;
-		font-weight: 700!important;
+	background-color:#d9d9d9!important;
+	font-weight: 700!important;
 	}
 	.paragraph-class {
-		color: red;
-		font-size:11px;
+	color: red;
+	font-size:11px;
 	}
 	.other-error {
-		color: red;
+	color: red;
 	}
 	.table-edits input, .table-edits select {
-		height:38px!important;
+	height:38px!important;
 	}
 </style>
 @section('content')
 <div class="card-header">
-	@canany(['view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing']);
 	@endphp
@@ -42,17 +41,14 @@
 		Interview Summary Report Info
 	</h4>
 	@endif
-	@endcanany
-	@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
 	@endphp
 	@if ($hasPermission)
 	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('interview-summary-report.create-or-edit','new')}}">
-	    <i class="fa fa-plus" aria-hidden="true"></i> New Interview Summary Report
+	<i class="fa fa-plus" aria-hidden="true"></i> New Interview Summary Report
 	</a>
 	@endif
-	@endcanany
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -77,7 +73,6 @@
 	</div>
 	@endif
 </div>
-@canany(['view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing'])
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing']);
 @endphp
@@ -170,8 +165,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif	</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	
+							</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -182,7 +178,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										@if($data->employeeHiringRequest->final_status != 'closed')
 										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
-											$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
 										@if ($hasPermission)
 										<li>
@@ -194,7 +190,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										@endcanany
 										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
-											$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
 										@endphp
 										@if ($hasPermission)
 										<li>
@@ -331,10 +327,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->genderName->name ?? '' }}</td>
 							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-							
 							<td>
 								@if($data->date_of_telephonic_interview != '')
-									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -349,8 +344,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif	</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	
+							</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -359,7 +355,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<ul class="dropdown-menu dropdown-menu-end">
 										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
-
 										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
@@ -372,7 +367,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-
 										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
@@ -386,7 +380,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-
 										@endif
 									</ul>
 								</div>
@@ -420,14 +413,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																		<label class="form-label font-size-13">Choose First Round Interviewers Names</label>
 																	</div>
 																	<div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
-																	<div class="dropdown-option-div">
-																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
-																			class="interviewer_id form-control widthinput">
-																			@foreach($interviewersNames as $interviewer)
-																			<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
-																			@endforeach
-																		</select>
-																	</div>
+																		<div class="dropdown-option-div">
+																			<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
+																				class="interviewer_id form-control widthinput">
+																				@foreach($interviewersNames as $interviewer)
+																				<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
+																				@endforeach
+																			</select>
+																		</div>
 																	</div>
 																	@endif
 																	@endif
@@ -517,7 +510,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
 							<td>
 								@if($data->date_of_telephonic_interview != '')
-									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -530,10 +523,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
-							
 							<td>
 								@if($data->date_of_first_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -548,23 +540,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->first_round ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif	</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	
+							</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
-										
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
 										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
 										@if ($hasPermission)
-										
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
@@ -572,7 +563,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-
 										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
@@ -586,7 +576,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-										
 										@endif
 									</ul>
 								</div>
@@ -622,13 +611,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																	</div>
 																	<div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
 																		<div class="dropdown-option-div">
-																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
-																			class="interviewer_id form-control widthinput" autofocus>
-																			@foreach($interviewersNames as $interviewer)
-																			<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
-																			@endforeach
-																		</select>
-																	</div>
+																			<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
+																				class="interviewer_id form-control widthinput" autofocus>
+																				@foreach($interviewersNames as $interviewer)
+																				<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
+																				@endforeach
+																			</select>
+																		</div>
 																	</div>
 																	@endif
 																	@endif
@@ -649,7 +638,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 													<button type="submit" class="btn btn-primary add-interview-summary"
 														data-id="{{ $data->id }}" data-status="second">Submit</button>
 												</div>
-                                            </form>
+											</form>
 										</div>
 									</div>
 								</div>
@@ -661,227 +650,224 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 			</div>
 		</div>
 	</div>
-    <div class="tab-pane fade show" id="second_round">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table id="second-round-table" class="table table-striped table-editable table-edits table">
-                    <thead>
-                        <tr>
-                            <th rowspan="2" class="light">Sl No</th>
-                            <th colspan="2" class="dark">
-                                <center>Hiring Request</center>
-                            </th>
-                            <th colspan="3" class="light">
-                                <center>Candidate</center>
-                            </th>
-                            <th colspan="2" class="dark">
-                                <center>Rate Appearance</center>
-                            </th>
-                            <th colspan="3" class="light">
-                                <center>Telephonic Round</center>
-                            </th>
-                            <th colspan="3" class="dark">
-                                <center>First Round</center>
-                            </th>
-                            <th colspan="3" class="light">
-                                <center>Second Round</center>
-                            </th>
-                            <th rowspan="2" class="dark">Created By</th>
-                            <th rowspan="2" class="light">Created At</th>
-                            <th rowspan="2" class="dark">Action</th>
-                        </tr>
-                        <tr>
-                            <td class="dark">UUID</td>
-                            <td class="dark">Job Position</td>
-                            <td class="light">Name</td>
-                            <td class="light">Nationality</td>
-                            <td class="light">Gender</td>
-                            <td class="dark">Dress</td>
-                            <td class="dark">Body Language</td>
-                            <td class="light">Date</td>
-                            <td class="light">Name Of Interviewer</td>
-                            <td class="light">Summary</td>
-                            <td class="dark">Date</td>
-                            <td class="dark">Name Of Interviewer</td>
-                            <td class="dark">Summary</td>
-                            <td class="light">Date</td>
-                            <td class="light">Name Of Interviewer</td>
-                            <td class="light">Summary</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <div hidden>{{$i=0;}}</div>
-                        @foreach ($seconds as $key => $data)
-                        <tr data-id="1">
-                            <td>{{ ++$i }}</td>
-                            <td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
-                            <td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
-                            <td>{{ $data->candidate_name ?? '' }}</td>
-                            <td>{{ $data->nationalities->name ?? '' }}</td>
-                            <td>{{ $data->genderName->name ?? '' }}</td>
-                            <td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
-                            <td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
-                            <td>
+	<div class="tab-pane fade show" id="second_round">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table id="second-round-table" class="table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th rowspan="2" class="light">Sl No</th>
+							<th colspan="2" class="dark">
+								<center>Hiring Request</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Candidate</center>
+							</th>
+							<th colspan="2" class="dark">
+								<center>Rate Appearance</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Telephonic Round</center>
+							</th>
+							<th colspan="3" class="dark">
+								<center>First Round</center>
+							</th>
+							<th colspan="3" class="light">
+								<center>Second Round</center>
+							</th>
+							<th rowspan="2" class="dark">Created By</th>
+							<th rowspan="2" class="light">Created At</th>
+							<th rowspan="2" class="dark">Action</th>
+						</tr>
+						<tr>
+							<td class="dark">UUID</td>
+							<td class="dark">Job Position</td>
+							<td class="light">Name</td>
+							<td class="light">Nationality</td>
+							<td class="light">Gender</td>
+							<td class="dark">Dress</td>
+							<td class="dark">Body Language</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+							<td class="dark">Date</td>
+							<td class="dark">Name Of Interviewer</td>
+							<td class="dark">Summary</td>
+							<td class="light">Date</td>
+							<td class="light">Name Of Interviewer</td>
+							<td class="light">Summary</td>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($seconds as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->employeeHiringRequest->uuid ?? ''}}</td>
+							<td>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</td>
+							<td>{{ $data->candidate_name ?? '' }}</td>
+							<td>{{ $data->nationalities->name ?? '' }}</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td class="texttransform">{{ $data->rate_dress_appearance ?? ''}}</td>
+							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
+							<td>
 								@if($data->date_of_telephonic_interview != '')
-									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
 								@endif
 							</td>
-                            <td>
-                                @if(isset($data->telephonicInterviewers))
-                                @if(count($data->telephonicInterviewers) > 0)
-                                @foreach($data->telephonicInterviewers as $telephonicInterviewers)
-                                {{ $telephonicInterviewers->interviewerName->name ?? '' }},
-                                @endforeach
-                                @endif
-                                @endif
-                            </td>
-                            <td>{{ $data->telephonic_interview ?? ''}}</td>
-                            <td>
+							<td>
+								@if(isset($data->telephonicInterviewers))
+								@if(count($data->telephonicInterviewers) > 0)
+								@foreach($data->telephonicInterviewers as $telephonicInterviewers)
+								{{ $telephonicInterviewers->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{ $data->telephonic_interview ?? ''}}</td>
+							<td>
 								@if($data->date_of_first_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
 								@endif
 							</td>
-                            <td>
-                                @if(isset($data->firstRoundInterviewers))
-                                @if(count($data->firstRoundInterviewers) > 0)
-                                @foreach($data->firstRoundInterviewers as $firstRoundInterviewer)
-                                {{ $firstRoundInterviewer->interviewerName->name ?? '' }},
-                                @endforeach
-                                @endif
-                                @endif
-                            </td>
-                            <td>{{$data->first_round ?? ''}}</td>
-                            <td>
+							<td>
+								@if(isset($data->firstRoundInterviewers))
+								@if(count($data->firstRoundInterviewers) > 0)
+								@foreach($data->firstRoundInterviewers as $firstRoundInterviewer)
+								{{ $firstRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->first_round ?? ''}}</td>
+							<td>
 								@if($data->date_of_second_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
 								@endif
 							</td>
-                            <td>
-                                @if(isset($data->secondRoundInterviewers))
-                                @if(count($data->secondRoundInterviewers) > 0)
-                                @foreach($data->secondRoundInterviewers as $secondRoundInterviewer)
-                                {{ $secondRoundInterviewer->interviewerName->name ?? '' }},
-                                @endforeach
-                                @endif
-                                @endif
-                            </td>
-                            <td>{{$data->second_round ?? ''}}</td>
-                            <td>{{ $data->createdBy->name ?? ''}}</td>
-                            <td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif	</td>
-                            <td>
-                                <div class="dropdown">
-                                    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
-										
+							<td>
+								@if(isset($data->secondRoundInterviewers))
+								@if(count($data->secondRoundInterviewers) > 0)
+								@foreach($data->secondRoundInterviewers as $secondRoundInterviewer)
+								{{ $secondRoundInterviewer->interviewerName->name ?? '' }},
+								@endforeach
+								@endif
+								@endif
+							</td>
+							<td>{{$data->second_round ?? ''}}</td>
+							<td>{{ $data->createdBy->name ?? ''}}</td>
+							<td>@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	
+							</td>
+							<td>
+								<div class="dropdown">
+									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+									<i class="fa fa-bars" aria-hidden="true"></i>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
 										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
 										@if ($hasPermission)
-										
 										<li>
-                                            <a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
-                                            <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                            </a>
-                                        </li>
+											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
+											<i class="fa fa-edit" aria-hidden="true"></i> Edit
+											</a>
+										</li>
 										@endif
 										@endcanany
-
 										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
 										@endphp
 										@if ($hasPermission)
 										<li>
-                                            <button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-                                                data-bs-target="#shortlisted-candidate-{{$data->id}}">
-                                            <i class="fa fa-plus" aria-hidden="true"></i> Third Round
-                                            </button>
-                                        </li>
+											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Closed" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+												data-bs-target="#shortlisted-candidate-{{$data->id}}">
+											<i class="fa fa-plus" aria-hidden="true"></i> Third Round
+											</button>
+										</li>
 										@endif
 										@endcanany
-										
 										@endif
-                                    </ul>
-                                </div>
-                                <div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
-                                    tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog ">
-                                        <div class="modal-content">
-                                            <form method="POST" action="{{route('interview-summary-report.round-summary')}}" id="form_{{$data->id}}">
-                                                @csrf
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Third Round Interview Summary</h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body p-3">
-                                                    <div class="col-lg-12">
-                                                        <div class="row">
-                                                            <div class="col-12">
-                                                                <div class="row">
-                                                                    <div class="col-xxl-6 col-lg-6 col-md-6">
-                                                                        <label for="date" class="form-label font-size-13">{{ __('Third Round Interview Date') }}</label>
-                                                                    </div>
-                                                                    <div class="col-xxl-6 col-lg-6 col-md-6">
-                                                                        <input type="text" name="id" value="{{$data->id}}" hidden>
-                                                                        <input type="text" name="round" value="third" hidden>
-                                                                        <input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
-                                                                    </div>
-                                                                </div>
-                                                                <div class="row">
-                                                                    @if(isset($interviewersNames))
-                                                                    @if(count($interviewersNames) > 0)
-                                                                    <div class="col-lg-12 col-md-12 col-sm-12">
-                                                                        <label class="form-label font-size-13">Choose Third Round Interviewers Names</label>
-                                                                    </div>
-                                                                    <div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
-																		<div class="dropdown-option-div">
-                                                                        <select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
-                                                                            class="interviewer_id form-control widthinput" autofocus>
-                                                                            @foreach($interviewersNames as $interviewer)
-                                                                            <option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
-                                                                            @endforeach
-                                                                        </select>
+									</ul>
+								</div>
+								<div class="modal fade" id="shortlisted-candidate-{{$data->id}}"
+									tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog ">
+										<div class="modal-content">
+											<form method="POST" action="{{route('interview-summary-report.round-summary')}}" id="form_{{$data->id}}">
+												@csrf
+												<div class="modal-header">
+													<h1 class="modal-title fs-5" id="exampleModalLabel">Third Round Interview Summary</h1>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body p-3">
+													<div class="col-lg-12">
+														<div class="row">
+															<div class="col-12">
+																<div class="row">
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<label for="date" class="form-label font-size-13">{{ __('Third Round Interview Date') }}</label>
 																	</div>
-                                                                    </div>
-                                                                    @endif
-                                                                    @endif
-                                                                    <div class="col-lg-12 col-md-12 col-sm-12">
-                                                                        <label class="form-label font-size-13">Comments</label>
-                                                                    </div>
-                                                                    <div class="col-lg-12 col-md-12 col-sm-12">
-                                                                        <textarea rows="5" id="comment-{{$data->id}}" type="text" class="form-control @error('comment') is-invalid @enderror"
-                                                                            name="comment" placeholder="" value="{{ old('comment') }}"  autocomplete="comment"
-                                                                            autofocus></textarea>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn btn-primary add-interview-summary"
-                                                        data-id="{{ $data->id }}" data-status="third">Submit</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+																	<div class="col-xxl-6 col-lg-6 col-md-6">
+																		<input type="text" name="id" value="{{$data->id}}" hidden>
+																		<input type="text" name="round" value="third" hidden>
+																		<input type="date" name="date" id="date-{{$data->id}}" class="form-control widthinput" aria-label="measurement" aria-describedby="basic-addon2">
+																	</div>
+																</div>
+																<div class="row">
+																	@if(isset($interviewersNames))
+																	@if(count($interviewersNames) > 0)
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Choose Third Round Interviewers Names</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
+																		<div class="dropdown-option-div">
+																			<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
+																				class="interviewer_id form-control widthinput" autofocus>
+																				@foreach($interviewersNames as $interviewer)
+																				<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
+																				@endforeach
+																			</select>
+																		</div>
+																	</div>
+																	@endif
+																	@endif
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<label class="form-label font-size-13">Comments</label>
+																	</div>
+																	<div class="col-lg-12 col-md-12 col-sm-12">
+																		<textarea rows="5" id="comment-{{$data->id}}" type="text" class="form-control @error('comment') is-invalid @enderror"
+																			name="comment" placeholder="" value="{{ old('comment') }}"  autocomplete="comment"
+																			autofocus></textarea>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+													<button type="submit" class="btn btn-primary add-interview-summary"
+														data-id="{{ $data->id }}" data-status="third">Submit</button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 	<div class="tab-pane fade show" id="third_round">
 		<div class="card-body">
 			<div class="table-responsive">
@@ -950,7 +936,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
 							<td>
 								@if($data->date_of_telephonic_interview != '')
-									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -965,7 +951,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
 							<td>
 								@if($data->date_of_first_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -980,7 +966,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->first_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_second_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -995,7 +981,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->second_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_third_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1010,23 +996,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->third_round ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif	</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	
+							</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
-										
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
 										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
 										@if ($hasPermission)
-										
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
@@ -1034,7 +1019,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-
 										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
@@ -1048,7 +1032,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-										
 										@endif
 									</ul>
 								</div>
@@ -1084,13 +1067,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																	</div>
 																	<div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
 																		<div class="dropdown-option-div">
-																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
-																			class="interviewer_id form-control widthinput" autofocus>
-																			@foreach($interviewersNames as $interviewer)
-																			<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
-																			@endforeach
-																		</select>
-																	</div>
+																			<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
+																				class="interviewer_id form-control widthinput" autofocus>
+																				@foreach($interviewersNames as $interviewer)
+																				<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
+																				@endforeach
+																			</select>
+																		</div>
 																	</div>
 																	@endif
 																	@endif
@@ -1198,7 +1181,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
 							<td>
 								@if($data->date_of_telephonic_interview != '')
-									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1213,7 +1196,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
 							<td>
 								@if($data->date_of_first_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1228,7 +1211,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->first_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_second_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1243,7 +1226,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->second_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_third_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1258,7 +1241,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->third_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_forth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1273,23 +1256,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->forth_round ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif	</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	
+							</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
-										
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
 										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
 										@if ($hasPermission)
-										
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
@@ -1297,7 +1279,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-
 										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
@@ -1311,7 +1292,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-										
 										@endif
 									</ul>
 								</div>
@@ -1347,13 +1327,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																	</div>
 																	<div class="col-lg-12 col-md-12 col-sm-12 select-button-main-div">
 																		<div class="dropdown-option-div">
-																		<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
-																			class="interviewer_id form-control widthinput" autofocus>
-																			@foreach($interviewersNames as $interviewer)
-																			<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
-																			@endforeach
-																		</select>
-																	</div>
+																			<select name="interviewer_id[]" id="interviewer_id_{{$data->id}}" multiple="true" style="width:100%;"
+																				class="interviewer_id form-control widthinput" autofocus>
+																				@foreach($interviewersNames as $interviewer)
+																				<option value="{{$interviewer->id}}">{{$interviewer->name}}</option>
+																				@endforeach
+																			</select>
+																		</div>
 																	</div>
 																	@endif
 																	@endif
@@ -1467,7 +1447,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
 							<td>
 								@if($data->date_of_telephonic_interview != '')
-									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1482,7 +1462,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
 							<td>
 								@if($data->date_of_first_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1497,7 +1477,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->first_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_second_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1512,7 +1492,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->second_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_third_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1527,7 +1507,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->third_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_forth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1542,7 +1522,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->forth_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_fifth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1557,23 +1537,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->fifth_round ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif	</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	
+							</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
-										
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
 										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
 										@if ($hasPermission)
-										
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
@@ -1581,7 +1560,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-
 										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
@@ -1595,7 +1573,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-										
 										@endif
 									</ul>
 								</div>
@@ -1748,7 +1725,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
 							<td>
 								@if($data->date_of_telephonic_interview != '')
-									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1763,7 +1740,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
 							<td>
 								@if($data->date_of_first_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1778,7 +1755,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->first_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_second_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1793,7 +1770,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->second_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_third_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1808,7 +1785,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->third_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_forth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1823,7 +1800,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->forth_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_fifth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1839,23 +1816,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->final_evaluation_of_candidate ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif	</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	
+							</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
-										
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
 										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
 										@if ($hasPermission)
-										
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
@@ -1863,7 +1839,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-										
 										@endif
 									</ul>
 								</div>
@@ -1967,7 +1942,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
 							<td>
 								@if($data->date_of_telephonic_interview != '')
-									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1982,7 +1957,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
 							<td>
 								@if($data->date_of_first_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -1997,7 +1972,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->first_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_second_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2012,7 +1987,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->second_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_third_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2027,7 +2002,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->third_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_forth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2042,7 +2017,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->forth_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_fifth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2059,16 +2034,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->hrManager->name ?? ''}}</td>
 							<td>{{$data->action_by_hr_manager ?? ''}}</td>
 							<td>
-							@if($data->hr_manager_action_at != '')
-									{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
+								@if($data->hr_manager_action_at != '')
+								{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
 								@endif
 							</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>{{$data->divisionHeadName->name ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif	</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	
+							</td>
 							<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
 							<td>
 								<div class="dropdown">
@@ -2076,15 +2052,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
-										
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
 										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
 										@if ($hasPermission)
-										
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
@@ -2092,7 +2066,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-										
 										<li>
 											@if(isset($type))
 											@if($type == 'approve')
@@ -2227,7 +2200,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
 							<td>
 								@if($data->date_of_telephonic_interview != '')
-									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2242,7 +2215,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
 							<td>
 								@if($data->date_of_first_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2257,7 +2230,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->first_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_second_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2272,7 +2245,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->second_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_third_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2287,7 +2260,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->third_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_forth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2300,10 +2273,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->forth_round ?? ''}}</td>
-							
 							<td>
 								@if($data->date_of_fifth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2320,40 +2292,37 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->hrManager->name ?? ''}}</td>
 							<td>{{$data->action_by_hr_manager ?? ''}}</td>
 							<td>
-							@if($data->hr_manager_action_at != '')
-									{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
+								@if($data->hr_manager_action_at != '')
+								{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
 								@endif
 							</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>{{$data->divisionHeadName->name ?? ''}}</td>
 							<td>{{$data->action_by_division_head ?? ''}}</td>
-							
 							<td>
-							@if($data->division_head_action_at != '')
-									{{\Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s')}}
+								@if($data->division_head_action_at != '')
+								{{\Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s')}}
 								@endif
 							</td>
 							<td>{{$data->comments_by_division_head ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif	</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	
+							</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
-										
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
-
 										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
 										@if ($hasPermission)
-										
 										<li>
 											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" href="{{route('interview-summary-report.create-or-edit',$data->id)}}">
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
@@ -2361,7 +2330,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</li>
 										@endif
 										@endcanany
-
 										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
@@ -2370,28 +2338,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Salary Details" type="button" class="btn btn-info btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#shortlisted-candidate-{{$data->id}}">
-												<i class="fa fa-plus" aria-hidden="true"></i> Salary Details
+											<i class="fa fa-plus" aria-hidden="true"></i> Salary Details
 											</button>
 										</li>
 										@endif
 										@endcanany
-
 										@if($data->candidate_expected_salary != 0.00 && $data->total_salary != 0.00)
 										@canany(['send-candidate-documents-request-form'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-candidate-documents-request-form']);
 										@endphp
 										@if ($hasPermission)
-										
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Send Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#send-personal-info-form-{{$data->id}}">
-												<i class="fa fa-paper-plane" aria-hidden="true"></i> Request Documents
+											<i class="fa fa-paper-plane" aria-hidden="true"></i> Request Documents
 											</button>
 										</li>
 										@endif
 										@endcanany
-
 										@endif
 										@endif
 									</ul>
@@ -2422,7 +2387,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																	<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
 																		<div class="input-group">
 																			<input name="candidate_expected_salary" id="candidate_expected_salary_{{$data->id}}" class="form-control" required
-																			oninput="inputNumberAbs(this)" placeholder="Enter Candidate Expected Salary" value="@if($data->candidate_expected_salary != '0.00') {{$data->candidate_expected_salary}} @endif">
+																				oninput="inputNumberAbs(this)" placeholder="Enter Candidate Expected Salary" value="@if($data->candidate_expected_salary != '0.00') {{$data->candidate_expected_salary}} @endif">
 																			<div class="input-group-append">
 																				<span class="input-group-text widthinput" id="basic-addon2">AED</span>
 																			</div>
@@ -2434,7 +2399,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																	<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
 																		<div class="input-group">
 																			<input name="total_salary" id="total_salary_{{$data->id}}" class="form-control" required
-																			oninput="inputNumberAbs(this)" placeholder="Enter Finalised Salary" value="@if($data->total_salary != '0.00') {{$data->total_salary ?? ''}} @endif">
+																				oninput="inputNumberAbs(this)" placeholder="Enter Finalised Salary" value="@if($data->total_salary != '0.00') {{$data->total_salary ?? ''}} @endif">
 																			<div class="input-group-append">
 																				<span class="input-group-text widthinput" id="basic-addon2">AED</span>
 																			</div>
@@ -2462,7 +2427,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 												@csrf
 												<div class="modal-header">
 													<h1 class="modal-title fs-5" id="exampleModalLabel">Send Candidate's Documents Request Form
-
 													</h1>
 													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 												</div>
@@ -2480,7 +2444,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																		<label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
 																	</div>
 																	<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
-																			<input name="email" id="email_{{$data->id}}" class="form-control" required
+																		<input name="email" id="email_{{$data->id}}" class="form-control" required
 																			placeholder="Enter Candidate Email" value="@if($data->email){{$data->email}}@endif">																		
 																	</div>
 																</div>
@@ -2600,7 +2564,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
 							<td>
 								@if($data->date_of_telephonic_interview != '')
-									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2615,7 +2579,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
 							<td>
 								@if($data->date_of_first_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2630,7 +2594,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->first_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_second_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2645,7 +2609,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->second_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_third_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2660,7 +2624,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->third_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_forth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2675,7 +2639,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->forth_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_fifth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2692,30 +2656,31 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->hrManager->name ?? ''}}</td>
 							<td>{{$data->action_by_hr_manager ?? ''}}</td>
 							<td>
-							@if($data->hr_manager_action_at != '')
-									{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
+								@if($data->hr_manager_action_at != '')
+								{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
 								@endif
 							</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>{{$data->divisionHeadName->name ?? ''}}</td>
 							<td>{{$data->action_by_division_head ?? ''}}</td>
 							<td>
-							@if($data->division_head_action_at != '')
-									{{\Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s')}}
+								@if($data->division_head_action_at != '')
+								{{\Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s')}}
 								@endif
 							</td>
 							<td>{{$data->comments_by_division_head ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif	</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	
+							</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-									@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
+										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 									</ul>
 								</div>
 							</td>
@@ -2810,7 +2775,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
 						<input hidden value="{{$docsUploaded->count()}}" id="count_docs">
-						
 						@foreach ($docsUploaded as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
@@ -2823,7 +2787,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
 							<td>
 								@if($data->date_of_telephonic_interview != '')
-									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2838,7 +2802,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
 							<td>
 								@if($data->date_of_first_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2853,7 +2817,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->first_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_second_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2868,7 +2832,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->second_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_third_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2883,7 +2847,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->third_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_forth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2898,7 +2862,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->forth_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_fifth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -2915,23 +2879,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->hrManager->name ?? ''}}</td>
 							<td>{{$data->action_by_hr_manager ?? ''}}</td>
 							<td>
-							@if($data->hr_manager_action_at != '')
-									{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
+								@if($data->hr_manager_action_at != '')
+								{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
 								@endif
 							</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>{{$data->divisionHeadName->name ?? ''}}</td>
 							<td>{{$data->action_by_division_head ?? ''}}</td>
 							<td>
-							@if($data->division_head_action_at != '')
-									{{\Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s')}}
+								@if($data->division_head_action_at != '')
+								{{\Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s')}}
 								@endif
 							</td>
 							<td>{{$data->comments_by_division_head ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif	</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	
+							</td>
 							<td>
 								<div class="dropdown">
 									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
@@ -2944,16 +2909,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-candidate-documents-request-form']);
 										@endphp
 										@if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL)
-										
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Resend Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#send-personal-info-form-{{$data->id}}">
-												<i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Docs Form
+											<i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Docs Form
 											</button>
 										</li>
 										@endif
 										@endcanany
-
 										@canany(['verify-candidates-documents'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents']);
@@ -2962,12 +2925,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-personalinfo"  data-bs-toggle="modal"
 												data-bs-target="#verify-personal-info-form-{{$data->id}}" data-id="{{$data->id}}">
-												<i class="fa fa-check" aria-hidden="true"></i> Docs Verified
+											<i class="fa fa-check" aria-hidden="true"></i> Docs Verified
 											</button>
 										</li>
 										@endif
 										@endcanany
-										
 										@canany(['send-offer-letter'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-offer-letter']);
@@ -2976,7 +2938,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Send Offer Letter & Personal Info Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#send-offer-letter-{{$data->id}}">
-												<i class="fa fa-paper-plane" aria-hidden="true"></i> Send Offer Letter & Personal Info Form
+											<i class="fa fa-paper-plane" aria-hidden="true"></i> Send Offer Letter & Personal Info Form
 											</button>
 										</li>
 										@endif
@@ -2990,7 +2952,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 													@csrf
 													<div class="modal-header">
 														<h1 class="modal-title fs-5" id="exampleModalLabel">Send Offer Letter & Personal Info Form To Candidate
-
 														</h1>
 														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 													</div>
@@ -3006,22 +2967,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																	<div class="row">
 																		<input type="hidden" id="candidateId" name="candidateId" value="{{$data->id}}">
 																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
-																		<label for="candidate_name" class="form-label font-size-13">{{ __('Candidate Name') }}</label>
-																				<input name="candidate_name" id="candidate_name_{{$data->id}}" class="form-control" required
+																			<label for="candidate_name" class="form-label font-size-13">{{ __('Candidate Name') }}</label>
+																			<input name="candidate_name" id="candidate_name_{{$data->id}}" class="form-control" required
 																				placeholder="Enter Candidate Name" value="@if($data->candidate_name){{$data->candidate_name}}@endif">																		
 																		</div>
 																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
-																		<label for="passport_number" class="form-label font-size-13">{{ __('Passport Number') }}</label>
-																				<input name="passport_number" id="passport_number_{{$data->id}}" class="form-control" required
+																			<label for="passport_number" class="form-label font-size-13">{{ __('Passport Number') }}</label>
+																			<input name="passport_number" id="passport_number_{{$data->id}}" class="form-control" required
 																				placeholder="Enter Candidate Passport Number" value="@if($data->candidateDetails->passport_number){{$data->candidateDetails->passport_number}}@endif">																		
 																		</div>
 																		<div class="col-xxl-6 col-lg-6 col-md-6  select-button-main-div">
-                                                            				<div class="dropdown-option-div">
-																		<label for="contact_number" class="form-label font-size-13">{{ __('Mobile Phone') }}</label>
-																		<input id="contact_number_{{$i}}" type="tel" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
-																				name="contact_number[main]" placeholder="Mobile Number" value="@if($data->candidateDetails->contact_number){{$data->candidateDetails->contact_number}} @endif"
-																				autocomplete="contact_number[main]" autofocus oninput="validationOnKeyUp(this)">
-																		</div>
+																			<div class="dropdown-option-div">
+																				<label for="contact_number" class="form-label font-size-13">{{ __('Mobile Phone') }}</label>
+																				<input id="contact_number_{{$i}}" type="tel" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
+																					name="contact_number[main]" placeholder="Mobile Number" value="@if($data->candidateDetails->contact_number){{$data->candidateDetails->contact_number}} @endif"
+																					autocomplete="contact_number[main]" autofocus oninput="validationOnKeyUp(this)">
+																			</div>
 																		</div>
 																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
 																			<label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
@@ -3035,35 +2996,34 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																				placeholder="Enter Candidate Job Position" value="{{$data->employeeHiringRequest->questionnaire->designation->name ?? ''}}">																		
 																		</div>
 																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
-																		<label for="probation_period" class="form-label font-size-13">{{ __('Probation Period') }}</label>
-																		<div class="input-group">													
-																		<input type="number" name="probation_duration_in_months" id="probation_period_{{$data->id}}" class="form-control" required
-																				placeholder="Enter Probation Period" value="{{$data->candidateDetails->probation_length_in_months ?? $data->employeeHiringRequest->questionnaire->probation_length_in_months ?? ''}}">	
+																			<label for="probation_period" class="form-label font-size-13">{{ __('Probation Period') }}</label>
+																			<div class="input-group">
+																				<input type="number" name="probation_duration_in_months" id="probation_period_{{$data->id}}" class="form-control" required
+																					placeholder="Enter Probation Period" value="{{$data->candidateDetails->probation_length_in_months ?? $data->employeeHiringRequest->questionnaire->probation_length_in_months ?? ''}}">	
 																				<div class="input-group-append">
 																					<span class="input-group-text widthinput" >Months</span>
 																				</div>
 																			</div>
-																																					
 																		</div>
 																		<div class="col-xxl-4 col-lg-4 col-md-4 radio-main-div">
-																		<label for="basic_salary" class="form-label font-size-13">{{ __('Basic Salary ( Per Month )') }}</label>
-																		<div class="input-group">													
-																		<input name="basic_salary" id="basic_salary_{{$data->id}}" class="form-control" required data-value="{{$data->id}}"
-																				placeholder="Enter Basic Salary" value="@if($data->candidateDetails->basic_salary != 0.00){{$data->candidateDetails->basic_salary}}@else{{($data->total_salary*40)/100}}@endif" oninput="validation(this)">	
+																			<label for="basic_salary" class="form-label font-size-13">{{ __('Basic Salary ( Per Month )') }}</label>
+																			<div class="input-group">
+																				<input name="basic_salary" id="basic_salary_{{$data->id}}" class="form-control" required data-value="{{$data->id}}"
+																					placeholder="Enter Basic Salary" value="@if($data->candidateDetails->basic_salary != 0.00){{$data->candidateDetails->basic_salary}}@else{{($data->total_salary*40)/100}}@endif" oninput="validation(this)">	
 																				<div class="input-group-append">
 																					<span class="input-group-text widthinput" >AED</span>
 																				</div>
-																			</div>																	
+																			</div>
 																		</div>
 																		<div class="col-xxl-4 col-lg-4 col-md-4 radio-main-div">
-																		<label for="other_allowances" class="form-label font-size-13">{{ __('Other Allowance ( Per Month )') }}</label>
-																		<div class="input-group">
-																		<input name="other_allowances" id="other_allowances_{{$data->id}}" class="form-control" required data-value="{{$data->id}}"
-																		oninput="validation(this)" placeholder="Enter Other Allowance" value="@if($data->candidateDetails->other_allowances != 0.00){{$data->candidateDetails->other_allowances}}@else{{($data->total_salary*60)/100}}@endif">	
+																			<label for="other_allowances" class="form-label font-size-13">{{ __('Other Allowance ( Per Month )') }}</label>
+																			<div class="input-group">
+																				<input name="other_allowances" id="other_allowances_{{$data->id}}" class="form-control" required data-value="{{$data->id}}"
+																					oninput="validation(this)" placeholder="Enter Other Allowance" value="@if($data->candidateDetails->other_allowances != 0.00){{$data->candidateDetails->other_allowances}}@else{{($data->total_salary*60)/100}}@endif">	
 																				<div class="input-group-append">
 																					<span class="input-group-text widthinput" >AED</span>
 																				</div>
-																			</div>																										
+																			</div>
 																		</div>
 																		<div class="col-xxl-4 col-lg-4 col-md-4 radio-main-div">
 																			<label for="total_salary" class="form-label font-size-13">{{ __('Total Salary ( Per Month )') }}</label>
@@ -3072,8 +3032,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																				<div class="input-group-append">
 																					<span class="input-group-text widthinput" >AED</span>
 																				</div>
-																			</div>																													
-																		</div>																		
+																			</div>
+																		</div>
 																	</div>
 																</div>
 															</div>
@@ -3096,7 +3056,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 													@csrf
 													<div class="modal-header">
 														<h1 class="modal-title fs-5" id="exampleModalLabel">Resend Personal Information Form To candidate for Edit
-
 														</h1>
 														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 													</div>
@@ -3114,14 +3073,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																			<label for="email" class="form-label font-size-13">{{ __('Comments send to candidate') }}</label>
 																		</div>
 																		<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
-																				<textarea rows="5" name="comment"  id="comments_{{$data->id}}" class="form-control" required
+																			<textarea rows="5" name="comment"  id="comments_{{$data->id}}" class="form-control" required
 																				placeholder="Comments send to candidate" value=""></textarea>																		
 																		</div>
 																		<div class="col-xxl-12 col-lg-12 col-md-12">
 																			<label for="email" class="form-label font-size-13">{{ __('Email') }}</label>
 																		</div>
 																		<div class="col-xxl-12 col-lg-12 col-md-12 radio-main-div">
-																				<input name="email" id="email_{{$data->id}}" class="form-control" required
+																			<input name="email" id="email_{{$data->id}}" class="form-control" required
 																				placeholder="Enter Candidate Email" value="@if($data->email){{$data->email}}@endif">																		
 																		</div>
 																	</div>
@@ -3138,7 +3097,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</div>
 										</div>
 									</div>
-									
 								</div>
 							</td>
 						</tr>
@@ -3243,7 +3201,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td class="texttransform">{{ $data->rate_body_language_appearance ?? ''}}</td>
 							<td>
 								@if($data->date_of_telephonic_interview != '')
-									{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -3258,7 +3216,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{ $data->telephonic_interview ?? ''}}</td>
 							<td>
 								@if($data->date_of_first_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -3273,7 +3231,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->first_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_second_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -3288,7 +3246,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->second_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_third_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -3301,10 +3259,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								@endif
 							</td>
 							<td>{{$data->third_round ?? ''}}</td>
-							
 							<td>
 								@if($data->date_of_forth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -3319,7 +3276,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->forth_round ?? ''}}</td>
 							<td>
 								@if($data->date_of_fifth_round != '')
-									{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+								{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
 								@endif
 							</td>
 							<td>
@@ -3336,25 +3293,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->hrManager->name ?? ''}}</td>
 							<td>{{$data->action_by_hr_manager ?? ''}}</td>
 							<td>
-							@if($data->hr_manager_action_at != '')
-									{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
+								@if($data->hr_manager_action_at != '')
+								{{\Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s')}}
 								@endif
 							</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>{{$data->divisionHeadName->name ?? ''}}</td>
 							<td>{{$data->action_by_division_head ?? ''}}</td>
 							<td>
-							@if($data->division_head_action_at != '')
-									{{\Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s')}}
+								@if($data->division_head_action_at != '')
+								{{\Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s')}}
 								@endif
 							</td>
 							<td>{{$data->comments_by_division_head ?? ''}}</td>
 							<td>{{ $data->createdBy->name ?? ''}}</td>
 							<td>@if($data->created_at != '')
-									{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
-								@endif	</td>
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s')}}
+								@endif	
+							</td>
 							<td>
-							@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
+								@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 							</td>
 						</tr>
 						@endforeach
@@ -3364,16 +3322,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 		</div>
 	</div>
 </div>
+@else
+<div class="card-header">
+	<p class="card-title">Sorry ! You don't have permission to access this page</p>
+	<a style="float:left;" class="btn btn-sm btn-info" href="/"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
+</div>
 @endif
-@endcanany
 @endsection
 @push('scripts')
 <script type="text/javascript">
-$.ajaxSetup({
-    headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    }
-});
+	$.ajaxSetup({
+	    headers: {
+	        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	    }
+	});
 </script>
 <script type="text/javascript">
 	var shortlists = {!! json_encode($shortlists) !!};
@@ -3475,55 +3438,55 @@ $.ajaxSetup({
 			"value must be less than total salary"
 		);
 		jQuery.validator.addMethod("uniquePassport", 
-        function(value, element) {
-            var result = false;
+	       function(value, element) {
+	           var result = false;
 			var candidateId = $("#candidateId").val();
-            $.ajax({
-                type:"POST",
-                async: false,
-                url: "{{route('employee.uniquePassport')}}", // script to validate in server side
-                data: {passportNumber: value,candidateId:candidateId},
-                success: function(data) {
-                    result = (data == true) ? true : false;
-                }
-            });
-            // return true if username is exist in database
-            return result; 
-        }, 
-        "This Password is already taken! Try another."
-    );
+	           $.ajax({
+	               type:"POST",
+	               async: false,
+	               url: "{{route('employee.uniquePassport')}}", // script to validate in server side
+	               data: {passportNumber: value,candidateId:candidateId},
+	               success: function(data) {
+	                   result = (data == true) ? true : false;
+	               }
+	           });
+	           // return true if username is exist in database
+	           return result; 
+	       }, 
+	       "This Password is already taken! Try another."
+	   );
 	jQuery.validator.setDefaults({
-        errorClass: "is-invalid",
-        errorElement: "p",
-        errorPlacement: function ( error, element ) {
-            error.addClass( "invalid-feedback font-size-13" );
-            if ( element.prop( "type" ) === "tel" ) {
-                if (!element.val() || element.val().length === 0) {
-                    console.log("Error is here with length", element.val().length);
-                    error.addClass('select-error');
-                    error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
-                } else {
-                    console.log("No error");
-                }
-            }
-            else
+	       errorClass: "is-invalid",
+	       errorElement: "p",
+	       errorPlacement: function ( error, element ) {
+	           error.addClass( "invalid-feedback font-size-13" );
+	           if ( element.prop( "type" ) === "tel" ) {
+	               if (!element.val() || element.val().length === 0) {
+	                   console.log("Error is here with length", element.val().length);
+	                   error.addClass('select-error');
+	                   error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+	               } else {
+	                   console.log("No error");
+	               }
+	           }
+	           else
 			 if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
-                if (!element.val() || element.val().length === 0) {
-                    console.log("Error is here with length", element.val().length);
-                    error.addClass('select-error');
-                    error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
-                } else {
-                    console.log("No error");
-                }
-            }
+	               if (!element.val() || element.val().length === 0) {
+	                   console.log("Error is here with length", element.val().length);
+	                   error.addClass('select-error');
+	                   error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+	               } else {
+	                   console.log("No error");
+	               }
+	           }
 			// else if (element.parent().hasClass('input-group')) {
-            //     error.insertAfter(element.parent());
-            // }
-            else {
-                error.insertAfter( element );
-            }
-        }
-    });
+	           //     error.insertAfter(element.parent());
+	           // }
+	           else {
+	               error.insertAfter( element );
+	           }
+	       }
+	   });
 		$('.add-interview-summary').click(function (e) {
 	        var id = $(this).attr('data-id');
 	        var status = $(this).attr('data-status');
@@ -3600,7 +3563,7 @@ $.ajaxSetup({
 					email: {
 						required: true,
 						email: true,
-                        accept:"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}"
+	                       accept:"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}"
 					},
 				},
 			});
@@ -3610,23 +3573,23 @@ $.ajaxSetup({
 			$('#offer_letter_'+id).validate({ 
 				rules: {
 					candidate_name: {
-                        required: true,
-                        lettersonly: true,
-                    },
+	                       required: true,
+	                       lettersonly: true,
+	                   },
 					passport_number: {
-                        required: true,
-                        validPassport:true,
+	                       required: true,
+	                       validPassport:true,
 						uniquePassport: true,
-                    },
+	                   },
 					"contact_number[main]": {
-                        required: true,
-                        minlength: 5,
-                        maxlength: 20,
-                    },
+	                       required: true,
+	                       minlength: 5,
+	                       maxlength: 20,
+	                   },
 					email: {
 						required: true,
 						email: true,
-                        accept:"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}"
+	                       accept:"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}"
 					},
 					designation_id: {
 						required: true,
@@ -3643,12 +3606,12 @@ $.ajaxSetup({
 						required: true,
 					},
 					probation_duration_in_months: {
-                        required: true,
-                        minlength: 1,
-                        maxlength: 2,
+	                       required: true,
+	                       minlength: 1,
+	                       maxlength: 2,
 						max: 12,
 						min: 1,
-                    },					
+	                   },					
 				},
 			});
 		})
@@ -3699,7 +3662,7 @@ $.ajaxSetup({
 							alertify.success(status + " Successfully")
 						}
 						else if(data == 'error') {
-
+	
 						}
 					}
 				});

@@ -1,29 +1,27 @@
 @extends('layouts.table')
 <style>
-  .texttransform {
-    text-transform: capitalize;
-  }
-  
-/* element.style {
-} */
-.nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
-    width: 99%;
-    border: 1px solid #4ba6ef !important;
-    background-color: #c1e1fb !important;
-}
-.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
-    color: black!important;
-    background-image: linear-gradient(to right,#4ba6ef,#4ba6ef,#0065ac)!important;
-}
-.nav-link:focus{
-    color: black!important;
-}
-.nav-link:hover {
-    color: black!important;
-}
+	.texttransform {
+	text-transform: capitalize;
+	}
+	/* element.style {
+	} */
+	.nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
+	width: 99%;
+	border: 1px solid #4ba6ef !important;
+	background-color: #c1e1fb !important;
+	}
+	.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+	color: black!important;
+	background-image: linear-gradient(to right,#4ba6ef,#4ba6ef,#0065ac)!important;
+	}
+	.nav-link:focus{
+	color: black!important;
+	}
+	.nav-link:hover {
+	color: black!important;
+	}
 </style>
 @section('content')
-@canany(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary'])
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
 @endphp
@@ -61,50 +59,55 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	</div>
 	@endif
 </div>
-	<div class="card-body">
-		<div class="tab-content">
-			<div class="tab-pane fade show active" id="requests">
-				<br>
-					<div class="card">
-					<div class="card-header" style="background-color:#e8f3fd;">
-			<div class="row">
-				<div class="col-lg-4 col-md-4 col-sm-4 col-12">
-					<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-						<center><label for="choices-single-default" class="form-label"> <strong> Hiring Request UUID </strong></label></center>
-					</div>
-					<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-					<center><span>{{ $data->employeeHiringRequest->uuid ?? '' }}</span></center>
+<div class="card-body">
+	<div class="tab-content">
+		<div class="tab-pane fade show active" id="requests">
+			<br>
+			<div class="card">
+				<div class="card-header" style="background-color:#e8f3fd;">
+					<div class="row">
+						<div class="col-lg-4 col-md-4 col-sm-4 col-12">
+							<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+								<center><label for="choices-single-default" class="form-label"> <strong> Hiring Request UUID </strong></label></center>
+							</div>
+							<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+								<center><span>{{ $data->employeeHiringRequest->uuid ?? '' }}</span></center>
+							</div>
+						</div>
+						<div class="col-lg-4 col-md-4 col-sm-4 col-12">
+							<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+								<center><label for="choices-single-default" class="form-label"> <strong> Job Position</strong></label></center>
+							</div>
+							<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+								<center><span>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</span></center>
+							</div>
+						</div>
+						<div class="col-lg-4 col-md-4 col-sm-4 col-12">
+							<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+								<center><label for="choices-single-default" class="form-label"> <strong> Job Location</strong></label></center>
+							</div>
+							<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+								<center><span>{{ $data->employeeHiringRequest->questionnaire->workLocation->name ?? '' }}</span></center>
+							</div>
+						</div>
+						<div class="col-lg-2 col-md-2 col-sm-4 col-12">
+						</div>
+						<div class="col-lg-2 col-md-2 col-sm-4 col-12">
+						</div>
 					</div>
 				</div>
-				<div class="col-lg-4 col-md-4 col-sm-4 col-12">
-					<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-						<center><label for="choices-single-default" class="form-label"> <strong> Job Position</strong></label></center>
-					</div>
-					<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-					<center><span>{{ $data->employeeHiringRequest->questionnaire->designation->name ?? '' }}</span></center>
-					</div>
-				</div>
-				<div class="col-lg-4 col-md-4 col-sm-4 col-12">
-					<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-				<center><label for="choices-single-default" class="form-label"> <strong> Job Location</strong></label></center>
-					</div>
-					<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-					<center><span>{{ $data->employeeHiringRequest->questionnaire->workLocation->name ?? '' }}</span></center>
-					</div>
-				</div>
-				<div class="col-lg-2 col-md-2 col-sm-4 col-12">
-				</div>
-				<div class="col-lg-2 col-md-2 col-sm-4 col-12">
-				</div>
+				@include('hrm.hiring.interview_summary_report.details')
 			</div>
-		</div>
-			@include('hrm.hiring.interview_summary_report.details')
 		</div>
 	</div>
 </div>
+@else
+<div class="card-header">
+	<p class="card-title">Sorry ! You don't have permission to access this page</p>
+	<a style="float:left;" class="btn btn-sm btn-info" href="/"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
 </div>
 @endif
-@endcanany
 @endsection
 @push('scripts')
 <script>

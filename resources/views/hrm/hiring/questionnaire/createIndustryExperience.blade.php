@@ -30,57 +30,57 @@
 	</div>
 </div>
 <script type="text/javascript">
-    $(document).ready(function () {
-        $('.industry-exp-modal-button').on('click', function() {
-		$('#createNewIndustryExperience').modal('show');
+	$(document).ready(function () {
+	    $('.industry-exp-modal-button').on('click', function() {
+	$('#createNewIndustryExperience').modal('show');
 	});
-    });   	
+	});   	
 	function closemodalIndExp() {
-	    $('.overlay').hide();
-		$('#createNewIndustryExperience').modal('hide');
+	 $('.overlay').hide();
+	$('#createNewIndustryExperience').modal('hide');
 	}
-    $('#createIndustryExpId').on('click', function() {
-	    var value = $('#new_industry_experience').val();
-	    if(value == '') {
-	        $msg = 'Industry Experience is Required';
-	        showNewIndustryExperienceError($msg);
-	    }
-	    else {
-	        $.ajax({
-	            url:"{{url('industry-experience')}}",
-	            type: "POST",
-	            data:{
-	                name: value,
-	                _token: '{{csrf_token()}}'
-	            },
-	            dataType : 'json',
-	            success: function(result) { console.log(result);
-	                if(result.error) {
-	                    $msg = result.error;
-	                    showNewIndustryExperienceError($msg);
-	                }
-					else {
-	                    $('.overlay').hide();
-						closemodalIndExp();
-	                    $('#requested_industry_experience').append("<option value='" + result.id + "'>" + result.name + "</option>");
-	                    $('#requested_industry_experience').val(result.id);
-	                    removeNewIndustryExperienceError();						
-	                }
-	            }
-	        });
-	    }
+	$('#createIndustryExpId').on('click', function() {
+	 var value = $('#new_industry_experience').val();
+	 if(value == '') {
+	     $msg = 'Industry Experience is Required';
+	     showNewIndustryExperienceError($msg);
+	 }
+	 else {
+	     $.ajax({
+	         url:"{{url('industry-experience')}}",
+	         type: "POST",
+	         data:{
+	             name: value,
+	             _token: '{{csrf_token()}}'
+	         },
+	         dataType : 'json',
+	         success: function(result) { console.log(result);
+	             if(result.error) {
+	                 $msg = result.error;
+	                 showNewIndustryExperienceError($msg);
+	             }
+		else {
+	                 $('.overlay').hide();
+			closemodalIndExp();
+	                 $('#requested_industry_experience').append("<option value='" + result.id + "'>" + result.name + "</option>");
+	                 $('#requested_industry_experience').val(result.id);
+	                 removeNewIndustryExperienceError();						
+	             }
+	         }
+	     });
+	 }
 	});
 	function showNewIndustryExperienceError($msg) {
-		document.getElementById("newIndustryExperienceError").textContent=$msg;
-	    document.getElementById("new_industry_experience").classList.add("is-invalid");
-	    document.getElementById("newIndustryExperienceError").classList.add("paragraph-class");
-		
-		document.getElementById("newIndustryExperienceError").style.color = "red";
-
+	document.getElementById("newIndustryExperienceError").textContent=$msg;
+	 document.getElementById("new_industry_experience").classList.add("is-invalid");
+	 document.getElementById("newIndustryExperienceError").classList.add("paragraph-class");
+	
+	document.getElementById("newIndustryExperienceError").style.color = "red";
+	
 	}
 	function removeNewIndustryExperienceError() {
-	    document.getElementById("newIndustryExperienceError").textContent="";
-	    document.getElementById("new_industry_experience").classList.remove("is-invalid");
-	    document.getElementById("newIndustryExperienceError").classList.remove("paragraph-class");
+	 document.getElementById("newIndustryExperienceError").textContent="";
+	 document.getElementById("new_industry_experience").classList.remove("is-invalid");
+	 document.getElementById("newIndustryExperienceError").classList.remove("paragraph-class");
 	}
 </script>

@@ -109,55 +109,55 @@
 	</div>
 </div>
 <script type="text/javascript">
-    $(document).ready(function () {
-		var comment = '';
-        $('.status-reject-button').click(function (e) {
-	        var id = $(this).attr('data-id');
-	        var status = $(this).attr('data-status');
-			comment = $("#reject-comment-"+id).val();
-	        approveOrRejectHiringrequest(id, status,comment)
-	    })
-	    $('.status-approve-button').click(function (e) {
-	        var id = $(this).attr('data-id');
-	        var status = $(this).attr('data-status');
-			comment = $("#comment-"+id).val();
-	        approveOrRejectHiringrequest(id, status,comment)
-	    })
-        function approveOrRejectHiringrequest(id, status,comment) {
-			
-			var current_approve_position = $("#current_approve_position_"+id).val();
-	        let url = '{{ route('employee-hiring-job-description.request-action') }}';
-	        if(status == 'rejected') {
-	            var message = 'Reject';
-	        }else{
-	            var message = 'Approve';
-	        }
-	        var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee hiring job description ?',function (e) {
-	            if (e) {
-	                $.ajax({
-	                    type: "POST",
-	                    url: url,
-	                    dataType: "json",
-	                    data: {
-	                        id: id,
-	                        status: status,
-	                        comment: comment,
-							current_approve_position: current_approve_position,
-	                        _token: '{{ csrf_token() }}'
-	                    },
-	                    success: function (data) {
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-
-							}
-	                    }
-	                });
-	            }
+	$(document).ready(function () {
+	var comment = '';
+	    $('.status-reject-button').click(function (e) {
+	     var id = $(this).attr('data-id');
+	     var status = $(this).attr('data-status');
+	comment = $("#reject-comment-"+id).val();
+	     approveOrRejectHiringrequest(id, status,comment)
+	 })
+	 $('.status-approve-button').click(function (e) {
+	     var id = $(this).attr('data-id');
+	     var status = $(this).attr('data-status');
+	comment = $("#comment-"+id).val();
+	     approveOrRejectHiringrequest(id, status,comment)
+	 })
+	    function approveOrRejectHiringrequest(id, status,comment) {
 	
-	        }).set({title:"Confirmation"})
-	    }
-    });
+	var current_approve_position = $("#current_approve_position_"+id).val();
+	     let url = '{{ route('employee-hiring-job-description.request-action') }}';
+	     if(status == 'rejected') {
+	         var message = 'Reject';
+	     }else{
+	         var message = 'Approve';
+	     }
+	     var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee hiring job description ?',function (e) {
+	         if (e) {
+	             $.ajax({
+	                 type: "POST",
+	                 url: url,
+	                 dataType: "json",
+	                 data: {
+	                     id: id,
+	                     status: status,
+	                     comment: comment,
+				current_approve_position: current_approve_position,
+	                     _token: '{{ csrf_token() }}'
+	                 },
+	                 success: function (data) {
+				if(data == 'success') {
+					window.location.reload();
+					alertify.success(status + " Successfully")
+				}
+				else if(data == 'error') {
+	
+				}
+	                 }
+	             });
+	         }
+	
+	     }).set({title:"Confirmation"})
+	 }
+	});
 </script>

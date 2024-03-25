@@ -1,6 +1,5 @@
 @extends('layouts.table')
 @section('content')
-@canany(['view-division-listing','view-current-user-division'])
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-listing','view-current-user-division']);
 @endphp
@@ -8,7 +7,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-list
 <div class="card-header">
 	<h4 class="card-title">
 		Division Approvals
-	</h4>	
+	</h4>
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -41,9 +40,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-list
 					<thead>
 						<tr>
 							<th>Sl No</th>
-                            <th>Division</th>
+							<th>Division</th>
 							<th>Division Head</th>
-                            <th>Approval HandOver To (Optional)</th>
+							<th>Approval HandOver To (Optional)</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -60,28 +59,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-list
 								@endif
 							</td>
 							<td>
-								@canany(['view-division-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-details']);
 								@endphp
 								@if ($hasPermission)  
-                                    <a title="View Details" class="btn btn-sm btn-warning" href="{{route('division.show',$dataOne->id)}}">
-											<i class="fa fa-eye" aria-hidden="true"></i>
-										</a>
+								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('division.show',$dataOne->id)}}">
+								<i class="fa fa-eye" aria-hidden="true"></i>
+								</a>
 								@endif
-								@endcanany
-
-								@canany(['edit-division','edit-current-user-division'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division','edit-current-user-division']);
 								@endphp
 								@if ($hasPermission)  
-									
-										<a title="Edit" class="btn btn-sm btn-info" href="{{route('division.edit',$dataOne->id) }}">
-											<i class="fa fa-edit" aria-hidden="true"></i>
-										</a>
+								<a title="Edit" class="btn btn-sm btn-info" href="{{route('division.edit',$dataOne->id) }}">
+								<i class="fa fa-edit" aria-hidden="true"></i>
+								</a>
 								@endif
-								@endcanany
 							</td>
 						</tr>
 						@endforeach
@@ -91,6 +84,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-list
 		</div>
 	</div>
 </div>
+@else
+<div class="card-header">
+	<p class="card-title">Sorry ! You don't have permission to access this page</p>
+	<a style="float:left;" class="btn btn-sm btn-info" href="/"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
+</div>
 @endif
-@endcanany
 @endsection

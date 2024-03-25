@@ -32,8 +32,8 @@
 						<input class="form-check-input" type="checkbox" name="comment_check" id="comment-check-{{$data->id}}" data-id="{{ $data->id }}">
 						I agreed that no employee will be paid for overtime unless this form has been completed and approved by the direct manager and overtime will be paid on a basic salary. 
 						<span id="checkError_{{$data->id}}" class="required-class invalid-feedback"></span>													
-							@endif
-							@if(isset($data->is_auth_user_can_approve['current_approve_position']) && $data->is_auth_user_can_approve['current_approve_position'] != 'Employee')
+						@endif
+						@if(isset($data->is_auth_user_can_approve['current_approve_position']) && $data->is_auth_user_can_approve['current_approve_position'] != 'Employee')
 						<div class="row mt-2">
 							<div class="col-lg-12 col-md-12 col-sm-12">
 								<label class="form-label font-size-13">Comments</label>
@@ -110,90 +110,90 @@
 	</div>
 </div>
 <script type="text/javascript">
-    $(document).ready(function () {
-        $('.status-reject-button').click(function (e) {
-	        var id = $(this).attr('data-id');
-	        var status = $(this).attr('data-status');
-	        approveOrRejectHiringrequest(id, status)
-	    })
-	    $('.status-approve-button').click(function (e) {
-	        var id = $(this).attr('data-id');
-			var status = $(this).attr('data-status');
-			if($("#current_approve_position_"+id).val() == 'Employee') {
-				var isChecked=$("#comment-check-"+id).is(":checked");
-				if(isChecked == true) {
-					removeAddonTypeError(id);
-					approveOrRejectHiringrequest(id, status)
+	$(document).ready(function () {
+	    $('.status-reject-button').click(function (e) {
+	     var id = $(this).attr('data-id');
+	     var status = $(this).attr('data-status');
+	     approveOrRejectHiringrequest(id, status)
+	 })
+	 $('.status-approve-button').click(function (e) {
+	     var id = $(this).attr('data-id');
+	var status = $(this).attr('data-status');
+	if($("#current_approve_position_"+id).val() == 'Employee') {
+	var isChecked=$("#comment-check-"+id).is(":checked");
+	if(isChecked == true) {
+		removeAddonTypeError(id);
+		approveOrRejectHiringrequest(id, status)
+	}
+	else {
+		showAddonTypeError(id);
+	}
+	}
+	else {
+	approveOrRejectHiringrequest(id, status)
+	}
+	 })
+	function showAddonTypeError(id) {
+	document.getElementById("checkError_"+id).textContent='Please check the box';
+	document.getElementById("comment-check-"+id).classList.add("is-invalid");
+	document.getElementById("checkError_"+id).classList.add("paragraph-class");
+	}
+	function removeAddonTypeError(id) {
+	document.getElementById("checkError_"+id).textContent="";
+	document.getElementById("comment-check-"+id).classList.remove("is-invalid");
+	document.getElementById("checkError_"+id).classList.remove("paragraph-class");
+	}
+	    function approveOrRejectHiringrequest(id, status) {
+	var comment = $("#comment-"+id).val();
+	var current_approve_position = $("#current_approve_position_"+id).val();
+	if(current_approve_position == 'Employee') {
+	var isChecked = $("#comment-check-"+id).val();
+	if(isChecked == 'on') {
+		comment = "I do confirm that I will report back to duty on the due date as approved by the Management, otherwise the Company will consider me as an absentee as per the Law.";
+	}
+	}
+	var others = '';
+	if(current_approve_position == 'HR Manager') {
+	others = $("others_"+id).val();
+	}
+	var to_be_replaced_by = '';
+	if(current_approve_position == 'Reporting Manager') {
+	to_be_replaced_by = $("#to_be_replaced_by_"+id).val();
+	}
+	     let url = '{{ route('overtimeRequest.action') }}'; 
+	     if(status == 'rejected') {
+	         var message = 'Reject';
+	     }else{
+	         var message = 'Approve';
+	     }
+	     var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee overtime request ?',function (e) {
+	         if (e) {
+	             $.ajax({
+	                 type: "POST",
+	                 url: url,
+	                 dataType: "json",
+	                 data: {
+	                     id: id,
+	                     status: status,
+	                     comment: comment,
+				others: others,
+				current_approve_position: current_approve_position,
+				to_be_replaced_by: to_be_replaced_by,
+	                     _token: '{{ csrf_token() }}'
+	                 },
+	                 success: function (data) {
+				if(data == 'success') {
+					window.location.reload();
+					alertify.success(status + " Successfully")
 				}
-				else {
-					showAddonTypeError(id);
-				}
-			}
-			else {
-				approveOrRejectHiringrequest(id, status)
-			}
-	    })
-		function showAddonTypeError(id) {
-			document.getElementById("checkError_"+id).textContent='Please check the box';
-			document.getElementById("comment-check-"+id).classList.add("is-invalid");
-			document.getElementById("checkError_"+id).classList.add("paragraph-class");
-		}
-		function removeAddonTypeError(id) {
-			document.getElementById("checkError_"+id).textContent="";
-			document.getElementById("comment-check-"+id).classList.remove("is-invalid");
-			document.getElementById("checkError_"+id).classList.remove("paragraph-class");
-		}
-        function approveOrRejectHiringrequest(id, status) {
-			var comment = $("#comment-"+id).val();
-			var current_approve_position = $("#current_approve_position_"+id).val();
-			if(current_approve_position == 'Employee') {
-				var isChecked = $("#comment-check-"+id).val();
-				if(isChecked == 'on') {
-					comment = "I do confirm that I will report back to duty on the due date as approved by the Management, otherwise the Company will consider me as an absentee as per the Law.";
-				}
-			}
-			var others = '';
-			if(current_approve_position == 'HR Manager') {
-				others = $("others_"+id).val();
-			}
-			var to_be_replaced_by = '';
-			if(current_approve_position == 'Reporting Manager') {
-				to_be_replaced_by = $("#to_be_replaced_by_"+id).val();
-			}
-	        let url = '{{ route('overtimeRequest.action') }}'; 
-	        if(status == 'rejected') {
-	            var message = 'Reject';
-	        }else{
-	            var message = 'Approve';
-	        }
-	        var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee overtime request ?',function (e) {
-	            if (e) {
-	                $.ajax({
-	                    type: "POST",
-	                    url: url,
-	                    dataType: "json",
-	                    data: {
-	                        id: id,
-	                        status: status,
-	                        comment: comment,
-							others: others,
-							current_approve_position: current_approve_position,
-							to_be_replaced_by: to_be_replaced_by,
-	                        _token: '{{ csrf_token() }}'
-	                    },
-	                    success: function (data) {
-							if(data == 'success') {
-								window.location.reload();
-								alertify.success(status + " Successfully")
-							}
-							else if(data == 'error') {
-
-							}
-	                    }
-	                });
-	            }
+				else if(data == 'error') {
 	
-	        }).set({title:"Confirmation"})
-	    }
-    });
+				}
+	                 }
+	             });
+	         }
+	
+	     }).set({title:"Confirmation"})
+	 }
+	});
 </script>

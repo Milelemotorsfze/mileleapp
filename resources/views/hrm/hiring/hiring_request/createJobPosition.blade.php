@@ -30,57 +30,57 @@
 	</div>
 </div>
 <script type="text/javascript">
-    $(document).ready(function () {
-        $('.modal-button').on('click', function() {
-		$('#createNewJobPosition').modal('show');
+	$(document).ready(function () {
+	    $('.modal-button').on('click', function() {
+	$('#createNewJobPosition').modal('show');
 	});
-    });   	
+	});   	
 	function closemodal() {
-	    $('.overlay').hide();
-		$('#createNewJobPosition').modal('hide');
+	 $('.overlay').hide();
+	$('#createNewJobPosition').modal('hide');
 	}
-    $('#createTitleId').on('click', function() {
-	    var value = $('#new_job_title').val();
-	    if(value == '') {
-	        $msg = 'Job Title is Required';
-	        showNewTitleError($msg);
-	    }
-	    else {
-	        $.ajax({
-	            url:"{{url('master-job-position')}}",
-	            type: "POST",
-	            data:{
-	                name: value,
-	                _token: '{{csrf_token()}}'
-	            },
-	            dataType : 'json',
-	            success: function(result) { console.log(result);
-	                if(result.error) {
-	                    $msg = result.error;
-	                    showNewTitleError($msg);
-	                }
-					else {
-	                    $('.overlay').hide();
-						closemodal();
-	                    $('#requested_job_title').append("<option value='" + result.id + "'>" + result.name + "</option>");
-	                    $('#requested_job_title').val(result.id);
-	                    removeNewTitleError();						
-	                }
-	            }
-	        });
-	    }
+	$('#createTitleId').on('click', function() {
+	 var value = $('#new_job_title').val();
+	 if(value == '') {
+	     $msg = 'Job Title is Required';
+	     showNewTitleError($msg);
+	 }
+	 else {
+	     $.ajax({
+	         url:"{{url('master-job-position')}}",
+	         type: "POST",
+	         data:{
+	             name: value,
+	             _token: '{{csrf_token()}}'
+	         },
+	         dataType : 'json',
+	         success: function(result) { console.log(result);
+	             if(result.error) {
+	                 $msg = result.error;
+	                 showNewTitleError($msg);
+	             }
+		else {
+	                 $('.overlay').hide();
+			closemodal();
+	                 $('#requested_job_title').append("<option value='" + result.id + "'>" + result.name + "</option>");
+	                 $('#requested_job_title').val(result.id);
+	                 removeNewTitleError();						
+	             }
+	         }
+	     });
+	 }
 	});
 	function showNewTitleError($msg) {
-		document.getElementById("newTitleError").textContent=$msg;
-	    document.getElementById("new_job_title").classList.add("is-invalid");
-	    document.getElementById("newTitleError").classList.add("paragraph-class");
-
-		document.getElementById("newTitleError").style.color = "red";
-
+	document.getElementById("newTitleError").textContent=$msg;
+	 document.getElementById("new_job_title").classList.add("is-invalid");
+	 document.getElementById("newTitleError").classList.add("paragraph-class");
+	
+	document.getElementById("newTitleError").style.color = "red";
+	
 	}
 	function removeNewTitleError() {
-	    document.getElementById("newTitleError").textContent="";
-	    document.getElementById("new_job_title").classList.remove("is-invalid");
-	    document.getElementById("newTitleError").classList.remove("paragraph-class");
+	 document.getElementById("newTitleError").textContent="";
+	 document.getElementById("new_job_title").classList.remove("is-invalid");
+	 document.getElementById("newTitleError").classList.remove("paragraph-class");
 	}
 </script>

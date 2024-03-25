@@ -83,57 +83,36 @@
                                     </a>
                                 </li>
                                 <!-- HRM -->
-                                @canany(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request','view-all-pending-hiring-request-listing',
-                                            'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
-                                            'view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing','view-pending-hiring-request-listing-of-current-user',
-                                            'view-approved-hiring-request-listing-of-current-user','view-closed-hiring-request-listing-of-current-user','view-on-hold-hiring-request-listing-of-current-user',
-                                            'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
-                                            'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
-                                            ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
-                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
-                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action','create-job-description'
-                                            ,'edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details',
-                                            'view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing','create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary','view-division-listing','view-current-user-division'
-                                            ,'view-department-listing','view-current-user-department-lising','division-approval-listing','view-asset-allocation-request-listing'
-                                            ,'view-joining-report-listing','current-user-view-joining-report-listing','view-passport-request-list','current-user-view-passport-request-list'
-                                            ,'view-liability-list','current-user-view-liability-list','view-leave-list','view-current-user-leave-list'
-                                            ,'list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'
-                                            ,'list-all-overtime','list-current-user-overtime'])
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request','view-all-pending-hiring-request-listing',
-                                            'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
-                                            'view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing','view-pending-hiring-request-listing-of-current-user',
-                                            'view-approved-hiring-request-listing-of-current-user','view-closed-hiring-request-listing-of-current-user','view-on-hold-hiring-request-listing-of-current-user',
-                                            'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
-                                            'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
-                                            ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
-                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
-                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action',
-                                            'hiring-request-cancel-action','create-job-description'
-                                            ,'edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details',
-                                            'view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing','create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary','view-division-listing','view-current-user-division'
-                                            ,'view-department-listing','view-current-user-department-lising','division-approval-listing','view-asset-allocation-request-listing'
-                                            ,'view-joining-report-listing','current-user-view-joining-report-listing','view-passport-request-list','current-user-view-passport-request-list'
-                                            ,'view-liability-list','current-user-view-liability-list','view-leave-list','view-current-user-leave-list'
-                                            ,'list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'
-                                            ,'list-all-overtime','list-current-user-overtime']);
+                                'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
+                                'view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing','view-pending-hiring-request-listing-of-current-user',
+                                'view-approved-hiring-request-listing-of-current-user','view-closed-hiring-request-listing-of-current-user','view-on-hold-hiring-request-listing-of-current-user',
+                                'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
+                                'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
+                                ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
+                                ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
+                                ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action',
+                                'hiring-request-cancel-action','create-job-description'
+                                ,'edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details',
+                                'view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing','create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary','view-division-listing','view-current-user-division'
+                                ,'view-department-listing','view-current-user-department-lising','division-approval-listing','view-asset-allocation-request-listing'
+                                ,'view-joining-report-listing','current-user-view-joining-report-listing','view-passport-request-list','current-user-view-passport-request-list'
+                                ,'view-liability-list','current-user-view-liability-list','view-leave-list','view-current-user-leave-list'
+                                ,'list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'
+                                ,'list-all-overtime','list-current-user-overtime']);
                                 @endphp
                                 @if ($hasPermission)
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                         <i data-feather="file-text"></i>
                                         <span data-key="t-extra-pages">
-                                           HR
+                                        HR
                                         </span>
                                         <div class="arrow-down"></div>
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="topnav-more">
-
-                                        <!-- <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee.index') }}"  id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Employee Relation</span>
-                                        </a> -->
                                         <div class="dropdown">
-                                            @canany(['view-division-listing','view-department-listing','division-approval-listing','view-current-user-department-lising','view-current-user-division'])
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-listing','view-current-user-division','division-approval-listing','view-department-listing','view-current-user-department-lising']);
                                             @endphp
@@ -143,46 +122,28 @@
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                @canany(['view-division-listing','view-current-user-division'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-listing','view-current-user-division']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('division.index') }}" class="dropdown-item" data-key="t-login">Division Approvals</a>
                                                 @endif
-                                                @endcanany
-
-                                                @canany(['view-department-listing','view-current-user-department-lising'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-listing','view-current-user-department-lising']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('department.index') }}" class="dropdown-item" data-key="t-login">Department Approvals</a>
                                                 @endif
-                                                @endcanany
-                                                @canany(['division-approval-listing'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['division-approval-listing']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('designation-approvals.index') }}" class="dropdown-item" data-key="t-login">Designation Approvals</a>
                                                 @endif
-                                                @endcanany
                                             </div>
                                             @endif
-                                            @endcanany
                                         </div>
                                         <div class="dropdown">
-                                            @canany(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request','view-all-pending-hiring-request-listing',
-                                            'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
-                                            'view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing','view-pending-hiring-request-listing-of-current-user',
-                                            'view-approved-hiring-request-listing-of-current-user','view-closed-hiring-request-listing-of-current-user','view-on-hold-hiring-request-listing-of-current-user',
-                                            'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
-                                            'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
-                                            ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
-                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
-                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action','hiring-request-cancel-action'
-                                            ,'create-questionnaire','edit-questionnaire','edit-current-user-questionnaire','view-questionnaire-details','view-current-user-questionnaire','create-job-description','edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details'])
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request','view-all-pending-hiring-request-listing',
                                             'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
@@ -201,16 +162,6 @@
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                @canany(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request','view-all-pending-hiring-request-listing',
-                                            'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
-                                            'view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing','view-pending-hiring-request-listing-of-current-user',
-                                            'view-approved-hiring-request-listing-of-current-user','view-closed-hiring-request-listing-of-current-user','view-on-hold-hiring-request-listing-of-current-user',
-                                            'view-cancelled-hiring-request-listing-of-current-user','view-rejected-hiring-request-listing-of-current-user','view-all-deleted-hiring-request-listing',
-                                            'view-deleted-hiring-request-listing-of-current-user','view-all-hiring-request-details','view-hiring-request-details-of-current-user'
-                                            ,'view-all-hiring-request-history','view-all-hiring-request-approval-details','view-all-hiring-request-history','view-all-hiring-request-approval-details'
-                                            ,'view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'
-                                            ,'hiring-request-cancel-action','hiring-request-of-current-user-delete-action','hiring-request-close-action','hiring-request-on-hold-action',
-                                            'hiring-request-cancel-action','create-questionnaire','edit-questionnaire','edit-current-user-questionnaire','view-questionnaire-details','view-current-user-questionnaire','create-job-description'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request',
                                                 'view-all-pending-hiring-request-listing','view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing',
@@ -227,30 +178,22 @@
                                                 @if ($hasPermission)
                                                 <a href="{{ route('employee-hiring-request.index') }}" class="dropdown-item" data-key="t-login">Hiring Requests</a>
                                                 @endif
-                                                @endcanany
-                                                @canany(['create-job-description','edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description','edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('job_description.index') }}" class="dropdown-item" data-key="t-login">Job Descriptions</a>
                                                 @endif
-                                                @endcanany
-                                                @canany(['view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing','create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing','create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('interview-summary-report.index') }}" class="dropdown-item" data-key="t-login">Interview Summary</a>
                                                 @endif
-                                                @endcanany
-
                                             </div>
                                             @endif
-                                            @endcanany
                                         </div>
                                         <div class="dropdown">
-                                            @canany(['view-asset-allocation-request-listing'])
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-asset-allocation-request-listing']);
                                             @endphp
@@ -260,38 +203,30 @@
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                @canany(['view-joining-report-listing','current-user-view-joining-report-listing'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('employee_joining_report.index','new_employee') }}" class="dropdown-item" data-key="t-login">Joining Report</a>
-
                                                 @endif
-                                                @endcanany
-                                                <!-- @canany(['view-asset-allocation-request-listing'])
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-asset-allocation-request-listing']);
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <a href="{{ route('asset_allocation.index') }}" class="dropdown-item" data-key="t-login">Asset Allocation</a>
-                                                @endif
-                                                @endcanany -->
-                                                @canany([])
+                                                <!-- 
+                                                    @php
+                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-asset-allocation-request-listing']);
+                                                    @endphp
+                                                    @if ($hasPermission)
+                                                    <a href="{{ route('asset_allocation.index') }}" class="dropdown-item" data-key="t-login">Asset Allocation</a>
+                                                    @endif
+                                                    -->
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole([]);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('interview-summary-report.index') }}" class="dropdown-item" data-key="t-login">HandOver Form</a>
                                                 @endif
-                                                @endcanany
-
                                             </div>
                                             @endif
-                                            @endcanany
                                         </div>
                                         <div class="dropdown">
-                                            @canany(['view-passport-request-list','current-user-view-passport-request-list'])
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list','current-user-view-passport-request-list']);
                                             @endphp
@@ -301,48 +236,38 @@
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                @canany(['view-passport-request-list','current-user-view-passport-request-list'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list','current-user-view-passport-request-list']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('passport_request.index') }}" class="dropdown-item" data-key="t-login">Passport Submit</a>
                                                 @endif
-                                                @endcanany
-                                                @canany(['view-passport-request-list','current-user-view-passport-request-list'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-request-list','current-user-view-passport-request-list']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('passport_release.index') }}" class="dropdown-item" data-key="t-login">Passport Release</a>
                                                 @endif
-                                                @endcanany
                                             </div>
                                             @endif
-                                            @endcanany
                                         </div>
-                                        @canany(['view-liability-list','current-user-view-liability-list'])
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-liability-list','current-user-view-liability-list']);
                                         @endphp
                                         @if ($hasPermission)
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee_liability.index') }}"  id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Liability</span>
+                                        <span data-key="t-utility">Liability</span>
                                         </a>
                                         @endif
-                                        @endcanany
-                                        @canany(['view-leave-list','view-current-user-leave-list'])
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-list','view-current-user-leave-list']);
                                         @endphp
                                         @if ($hasPermission)
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('employee_leave.index') }}"  id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Leave</span>
+                                        <span data-key="t-utility">Leave</span>
                                         </a>
                                         @endif
-                                        @endcanany
                                         <div class="dropdown">
-                                            @canany(['view-joining-report-listing','current-user-view-joining-report-listing'])
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
                                             @endphp
@@ -352,7 +277,6 @@
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                @canany(['view-joining-report-listing','current-user-view-joining-report-listing'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
                                                 @endphp
@@ -362,13 +286,10 @@
                                                 <a href="{{ route('employee_joining_report.index','permanent') }}" class="dropdown-item" data-key="t-login">Permanent Internal Transfer</a>                                    
                                                 <a href="{{ route('employee_joining_report.index','vacations_or_leave') }}" class="dropdown-item" data-key="t-login">Vacations Or Leave</a>
                                                 @endif
-                                                @endcanany
                                             </div>
                                             @endif
-                                            @endcanany
                                         </div>
                                         <div class="dropdown">
-                                            @canany(['list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'])
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-increment','list-current-user-increment','view-all-list-insurance','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user']);
                                             @endphp
@@ -378,119 +299,52 @@
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                @canany(['list-all-increment','list-current-user-increment'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-increment','list-current-user-increment']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('increment.index') }}" class="dropdown-item" data-key="t-login">Salary Increment</a>
                                                 @endif
-                                                @endcanany
-                                                @canany(['view-all-list-insurance','view-current-user-list-insurance'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-list-insurance','view-current-user-list-insurance']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('insurance.index') }}" class="dropdown-item" data-key="t-login">Insurance</a>
                                                 @endif
-                                                @endcanany
-                                                @canany(['view-birthday-po-list'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-list']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('birthday_gift.index') }}" class="dropdown-item" data-key="t-login">Birthday Gift</a>
                                                 @endif
-                                                @endcanany
-                                                @canany(['view-ticket-listing','view-ticket-listing-of-current-user'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-ticket-listing','view-ticket-listing-of-current-user']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('ticket_allowance.index') }}" class="dropdown-item" data-key="t-login">Ticket Allowance</a>
                                                 @endif
-                                                @endcanany
-
                                             </div>
                                             @endif
-                                            @endcanany
                                         </div>
-                                        @canany(['list-all-overtime','list-current-user-overtime'])
-                                            @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-overtime','list-current-user-overtime']);
-                                            @endphp
-                                            @if ($hasPermission)
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('overtime.index') }}" id="topnav-utility" role="button">
-                                                <span data-key="t-utility">Over Time Application</span>
-                                            </a>
-                                            @endif
-                                            @endcanany
-                                            @canany(['list-all-separation-employee-handover','list-current-user-separation-handover'])
-                                            @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-separation-employee-handover','list-current-user-separation-handover']);
-                                            @endphp
-                                            @if ($hasPermission)
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('separation-handover.index') }}" id="topnav-utility" role="button">
-                                                <span data-key="t-utility">Separation Employee Handover</span>
-                                            </a>
-                                            @endif
-                                            @endcanany
-                                        <!-- <div class="dropdown">
-                                            @canany(['list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'])
-                                            @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-increment','list-current-user-increment','view-all-list-insurance','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user']);
-                                            @endphp
-                                            @if ($hasPermission)
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility">Off Boarding</span>
-                                                <div class="arrow-down"></div>
-                                            </a>
-                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                @canany(['list-all-increment','list-current-user-increment'])
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-increment','list-current-user-increment']);
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <a href="" class="dropdown-item" data-key="t-login">Resignation</a>
-                                                @endif
-                                                @endcanany
-                                                @canany(['view-all-list-insurance','view-current-user-list-insurance'])
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-list-insurance','view-current-user-list-insurance']);
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <a href="" class="dropdown-item" data-key="t-login">Termination</a>
-                                                @endif
-                                                @endcanany
-                                            </div>
-                                            @endif
-                                            @endcanany
-                                        </div> -->
-                                            
-                                        <div class="dropdown">
-                                            <!-- @canany(['list-all-overtime','list-current-user-overtime','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'])
-                                            @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-overtime','list-current-user-overtime','view-all-list-insurance','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user']);
-                                            @endphp
-                                            @if ($hasPermission) -->
-                                            <!-- <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility">Reimbursement</span>
-                                            </a>
-                                           
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility">My Reportees</span>
-                                            </a>
-
-                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                                <span data-key="t-utility">Payroll</span>
-                                            </a> -->
-                                            <!-- @endif
-                                            @endcanany -->
-                                        </div>
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-overtime','list-current-user-overtime']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('overtime.index') }}" id="topnav-utility" role="button">
+                                        <span data-key="t-utility">Over Time Application</span>
+                                        </a>
+                                        @endif
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['list-all-separation-employee-handover','list-current-user-separation-handover']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('separation-handover.index') }}" id="topnav-utility" role="button">
+                                        <span data-key="t-utility">Separation Employee Handover</span>
+                                        </a>
+                                        @endif
                                     </div>
                                 </li>
                                 @endif
-                                @endcanany
                                 <!-- HRM -->
                                 @canany(['addon-supplier-create', 'addon-supplier-list'])
                                 @php

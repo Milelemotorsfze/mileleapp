@@ -1,6 +1,5 @@
 @extends('layouts.table')
 @section('content')
-@canany(['create-job-description','edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details'])
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description','edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details']);
 @endphp
@@ -9,7 +8,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 	<h4 class="card-title">
 		Job Description Info
 	</h4>
-	@canany(['create-job-description'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
 	@endphp
@@ -18,7 +16,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 	<i class="fa fa-plus" aria-hidden="true"></i> New Job Description
 	</a>
 	@endif
-	@endcanany
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -45,7 +42,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 </div>
 <div class="portfolio">
 	<ul class="nav nav-pills nav-fill" id="my-tab">
-		@canany(['edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list'])
 		@php
 		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list']);
 		@endphp
@@ -54,8 +50,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 			<a class="nav-link active" data-bs-toggle="pill" href="#pending-hiring-requests">Pending</a>
 		</li>
 		@endif
-		@endcanany
-		@canany(['edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list'])
 		@php
 		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list']);
 		@endphp
@@ -64,8 +58,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 			<a class="nav-link" data-bs-toggle="pill" href="#approved-hiring-requests">Approved</a>
 		</li>
 		@endif
-		@endcanany
-		@canany(['edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list'])
 		@php
 		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list']);
 		@endphp
@@ -74,7 +66,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 			<a class="nav-link" data-bs-toggle="pill" href="#rejected-hiring-requests">Rejected</a>
 		</li>
 		@endif
-		@endcanany
 	</ul>
 </div>
 <div class="tab-content" id="selling-price-histories" >
@@ -129,7 +120,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-										@canany(['view-job-description-details','view-current-user-job-description-details'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-job-description-details','view-current-user-job-description-details']);
 										@endphp
@@ -139,8 +129,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 											</a>
 										</li>
 										@endif
-										@endcanany
-										@canany(['edit-job-description','edit-current-user-job-description'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-job-description','edit-current-user-job-description']);
 										@endphp
@@ -151,7 +139,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 											</a>
 										</li>
 										@endif
-										@endcanany
 										<li>
 											@if(isset($type))
 											@if($type == 'approve')
@@ -254,7 +241,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 								@endif	
 							</td>
 							<td>
-								@canany(['view-job-description-details','view-current-user-job-description-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-job-description-details','view-current-user-job-description-details']);
 								@endphp
@@ -263,7 +249,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 								<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
 								@endif
-								@endcanany
 							</td>
 						</tr>
 						@endforeach
@@ -336,7 +321,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 							</td>
 							<td>{{$data->comments_by_hr_manager ?? ''}}</td>
 							<td>
-								@canany(['view-job-description-details','view-current-user-job-description-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-job-description-details','view-current-user-job-description-details']);
 								@endphp
@@ -345,8 +329,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 								<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
 								@endif
-								@endcanany
-								@canany(['edit-job-description','edit-current-user-job-description'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-job-description','edit-current-user-job-description']);
 								@endphp
@@ -355,7 +337,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 								<i class="fa fa-edit" aria-hidden="true"></i> 
 								</a>
 								@endif
-								@endcanany
 							</td>
 						</tr>
 						@endforeach
@@ -365,6 +346,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-descrip
 		</div>
 	</div>
 </div>
+@else
+<div class="card-header">
+	<p class="card-title">Sorry ! You don't have permission to access this page</p>
+	<a style="float:left;" class="btn btn-sm btn-info" href="/"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
+</div>
 @endif
-@endcanany
 @endsection

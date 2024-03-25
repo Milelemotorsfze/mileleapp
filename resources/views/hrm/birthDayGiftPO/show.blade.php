@@ -1,44 +1,42 @@
 @extends('layouts.table')
 <style>
-    tr {
-        border:1px solid #e9e9ef !important;
-    }
-    td {
-        padding-top:10px!important;
-        padding-bottom:10px!important;
-        padding-right:10px!important;
-        padding-left:10px!important;
-    }
-    th {
-        padding-top:10px!important;
-        padding-bottom:10px!important;
-        padding-right:10px!important;
-        padding-left:10px!important;
-    }
-  .texttransform {
-    text-transform: capitalize;
-  }
-  
-/* element.style {
-} */
-.nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
-    width: 99%;
-    border: 1px solid #4ba6ef !important;
-    background-color: #c1e1fb !important;
-}
-.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
-    color: black!important;
-    background-image: linear-gradient(to right,#4ba6ef,#4ba6ef,#0065ac)!important;
-}
-.nav-link:focus{
-    color: black!important;
-}
-.nav-link:hover {
-    color: black!important;
-}
+	tr {
+	border:1px solid #e9e9ef !important;
+	}
+	td {
+	padding-top:10px!important;
+	padding-bottom:10px!important;
+	padding-right:10px!important;
+	padding-left:10px!important;
+	}
+	th {
+	padding-top:10px!important;
+	padding-bottom:10px!important;
+	padding-right:10px!important;
+	padding-left:10px!important;
+	}
+	.texttransform {
+	text-transform: capitalize;
+	}
+	/* element.style {
+	} */
+	.nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link {
+	width: 99%;
+	border: 1px solid #4ba6ef !important;
+	background-color: #c1e1fb !important;
+	}
+	.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+	color: black!important;
+	background-image: linear-gradient(to right,#4ba6ef,#4ba6ef,#0065ac)!important;
+	}
+	.nav-link:focus{
+	color: black!important;
+	}
+	.nav-link:hover {
+	color: black!important;
+	}
 </style>
 @section('content')
-@canany(['view-birthday-po-details'])
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-details']);
 @endphp
@@ -76,160 +74,166 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-d
 	</div>
 	@endif
 </div>
-	<div class="card-body">
-        <div class="row">
-            <div class="col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Employee Details</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Employee Name :</label>
-                            </div>
-                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{ $data->user->name ?? '' }}</span>
-                            </div>
-                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Employee Code :</label>
-                            </div>
-                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{ $data->user->empProfile->employee_code ?? '' }}</span>
-                            </div>
-                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Designation :</label>
-                            </div>
-                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{ $data->user->empProfile->designation->name ?? '' }}</span>
-                            </div>
-                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Department :</label>
-                            </div>
-                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{ $data->user->empProfile->department->name ?? '' }}</span>
-                            </div>
-                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Location :</label>
-                            </div>
-                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{ $data->user->empProfile->location->name ?? '' }}</span>
-                            </div>
-                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Passport Number :</label>
-                            </div>
-                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{ $data->user->empProfile->passport_number ?? '' }}</span>
-                            </div>
-                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Joining Date :</label>
-                            </div>
-                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>
-                                    @if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != NULL)
-                                        {{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
-                                    @endif
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Birthday Gift PO Details</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Birthday Gift PO Year :</label>
-                            </div>
-                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{$data->po_year}}</span>
-                            </div>
-                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Birthday Gift PO Number :</label>
-                            </div>
-                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>{{ $data->po_number ?? '' }}</span>
-                            </div>
-                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Date :</label>
-                            </div>
-                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                                <span>
-                                    @if($data->created_at != NULL)
-                                        {{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
-                                    @endif
-                                </span>
-                            </div>
-                            <div class="col-lg-5 col-md-5 col-sm-6 col-12">
-                                <label for="choices-single-default" class="form-label"> Created By :</label>
-                            </div>
-                            <div class="col-lg-7 col-md-7 col-sm-6 col-12">
-                            <span>{{ $data->createdBy->name ?? '' }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">All BirthDay Gift PO Details</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Sl No</th>
-                                        <th>Birthday Gift PO For Year</th>
-                                        <th>Birthday Gift PO Number</th>
-                                        <th>Created At</th>
-                                        <th>Created By</th>
-                                        <th>Updated At</th>
-                                        <th>Updated By</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                <div hidden>{{$i=0;}}</div>
-                                    @foreach($all as $one)
-                                    <tr>
-                                        <td>{{ ++$i }}</td>
-                                        <td>{{ $one->po_year ?? ''}}</td>
-                                        <td>{{ $one->po_number ?? ''}}</td>
-                                        <td>
-                                            @if($one->created_at != NULL)
-                                                {{\Carbon\Carbon::parse($one->created_at)->format('d M Y, H:i:s') ?? ''}}
-                                            @endif
-                                        </td>
-                                        <td>{{ $one->createdBy->name ?? ''}}</td>
-                                        <td>
-                                            @if($one->updated_by != NULL)
-                                                {{\Carbon\Carbon::parse($one->updated_at)->format('d M Y, H:i:s') ?? ''}}
-                                            @endif
-                                        </td>
-                                        <td> @if($one->updated_by != NULL)
-                                            {{$one->updatedBy->name ?? ''}}
-                                            @endif</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="card-body">
+	<div class="row">
+		<div class="col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+			<div class="card">
+				<div class="card-header">
+					<h4 class="card-title">Employee Details</h4>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+							<label for="choices-single-default" class="form-label"> Employee Name :</label>
+						</div>
+						<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+							<span>{{ $data->user->name ?? '' }}</span>
+						</div>
+						<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+							<label for="choices-single-default" class="form-label"> Employee Code :</label>
+						</div>
+						<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+							<span>{{ $data->user->empProfile->employee_code ?? '' }}</span>
+						</div>
+						<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+							<label for="choices-single-default" class="form-label"> Designation :</label>
+						</div>
+						<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+							<span>{{ $data->user->empProfile->designation->name ?? '' }}</span>
+						</div>
+						<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+							<label for="choices-single-default" class="form-label"> Department :</label>
+						</div>
+						<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+							<span>{{ $data->user->empProfile->department->name ?? '' }}</span>
+						</div>
+						<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+							<label for="choices-single-default" class="form-label"> Location :</label>
+						</div>
+						<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+							<span>{{ $data->user->empProfile->location->name ?? '' }}</span>
+						</div>
+						<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+							<label for="choices-single-default" class="form-label"> Passport Number :</label>
+						</div>
+						<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+							<span>{{ $data->user->empProfile->passport_number ?? '' }}</span>
+						</div>
+						<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+							<label for="choices-single-default" class="form-label"> Joining Date :</label>
+						</div>
+						<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+							<span>
+							@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != NULL)
+							{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y') ?? ''}}
+							@endif
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+			<div class="card">
+				<div class="card-header">
+					<h4 class="card-title">Birthday Gift PO Details</h4>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+							<label for="choices-single-default" class="form-label"> Birthday Gift PO Year :</label>
+						</div>
+						<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+							<span>{{$data->po_year}}</span>
+						</div>
+						<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+							<label for="choices-single-default" class="form-label"> Birthday Gift PO Number :</label>
+						</div>
+						<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+							<span>{{ $data->po_number ?? '' }}</span>
+						</div>
+						<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+							<label for="choices-single-default" class="form-label"> Date :</label>
+						</div>
+						<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+							<span>
+							@if($data->created_at != NULL)
+							{{\Carbon\Carbon::parse($data->created_at)->format('d M Y, H:i:s') ?? ''}}
+							@endif
+							</span>
+						</div>
+						<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+							<label for="choices-single-default" class="form-label"> Created By :</label>
+						</div>
+						<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+							<span>{{ $data->createdBy->name ?? '' }}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+			<div class="card">
+				<div class="card-header">
+					<h4 class="card-title">All BirthDay Gift PO Details</h4>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<table>
+							<thead>
+								<tr>
+									<th>Sl No</th>
+									<th>Birthday Gift PO For Year</th>
+									<th>Birthday Gift PO Number</th>
+									<th>Created At</th>
+									<th>Created By</th>
+									<th>Updated At</th>
+									<th>Updated By</th>
+								</tr>
+							</thead>
+							<tbody>
+								<div hidden>{{$i=0;}}</div>
+								@foreach($all as $one)
+								<tr>
+									<td>{{ ++$i }}</td>
+									<td>{{ $one->po_year ?? ''}}</td>
+									<td>{{ $one->po_number ?? ''}}</td>
+									<td>
+										@if($one->created_at != NULL)
+										{{\Carbon\Carbon::parse($one->created_at)->format('d M Y, H:i:s') ?? ''}}
+										@endif
+									</td>
+									<td>{{ $one->createdBy->name ?? ''}}</td>
+									<td>
+										@if($one->updated_by != NULL)
+										{{\Carbon\Carbon::parse($one->updated_at)->format('d M Y, H:i:s') ?? ''}}
+										@endif
+									</td>
+									<td> @if($one->updated_by != NULL)
+										{{$one->updatedBy->name ?? ''}}
+										@endif
+									</td>
+								</tr>
+								@endforeach
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 </div>
+</div>
+@else
+<div class="card-header">
+	<p class="card-title">Sorry ! You don't have permission to access this page</p>
+	<a style="float:left;" class="btn btn-sm btn-info" href="/"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go To Dashboard</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
+</div>
 @endif
-@endcanany
 @endsection
 @push('scripts')
 <script>
