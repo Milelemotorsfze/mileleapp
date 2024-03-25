@@ -53,6 +53,17 @@
         $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
     @endphp
     <div class="card-body">
+    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                    @endphp
+                    @if ($hasPermission)
+                    <div class ="row">
+                    <div class="col-lg-9 col-md-6 col-sm-6">    
+                    <a href="#" class="btn btn-sm btn-primary float-end edit-basic-btn" data-purchase-id="{{ $purchasingOrder->id }}">Edit Basic Details</a>
+                    <a href="#" class="btn btn-sm btn-success float-end update-basic-btn" style="display: none;">Update Basic Details</a>
+                    </div>
+                    </div>
+                    @endif
         @if (count($errors) > 0)
             <div class="alert alert-danger">
                 <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -76,6 +87,114 @@
             </div>
         @endif
         <div class="card-body">
+        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="price-update-modalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form id="form-update2_492" action="{{ route('shipping.updateprice') }}" method="POST">
+      @csrf
+      <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title fs-5" id="adoncode">Edit Basic Details <span id="addonId"></span></h5>
+          <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 p-3">
+                <label for="poType" class="form-label font-size-13 text-center">PO Type:</label>
+            </div>
+            <div class="col-md-8 p-3">
+            <select class="form-control" autofocus name="po_type" required>
+            <option value="Normal" <?php echo ($purchasingOrder->po_type == 'Normal') ? 'selected' : ''; ?>>Normal</option>
+            <option value="Payment Adjustment" <?php echo ($purchasingOrder->po_type == 'Payment Adjustment') ? 'selected' : ''; ?>>Payment Adjustment</option>
+            </select>
+            </div>
+            <div class="col-md-4 p-3">
+                <label for="poDate" class="form-label font-size-13 text-center">PO Date:</label>
+            </div>
+            <div class="col-md-8 p-3">
+            <input type="text" id="poDate" name="poDate" class="form-control" placeholder="Enter PO Date" value="{{ date('d-M-Y', strtotime($purchasingOrder->po_date)) }}">
+            </div>
+            <div class="col-md-4 p-3">
+                <label for="vendorName" class="form-label font-size-13 text-center">Vendor Name:</label>
+            </div>
+            <div class="col-md-8 p-3">
+            <select class="form-control" autofocus name="vendors_id" id="vendors" required>
+                <option value="" disabled>Select The Vendor</option>
+                @foreach($vendors as $vendor)
+                    <option value="{{ $vendor->id }}" {{ ($vendor->supplier === $vendorsname) ? 'selected' : '' }}>{{ $vendor->supplier }}</option>
+                @endforeach
+            </select>
+            </div>
+            <div class="col-md-4 p-3">
+                <label for="paymentTerms" class="form-label font-size-13 text-center">Payment Terms:</label>
+            </div>
+            <div class="col-md-8 p-3">
+            <select name="payment_term_id" class="form-select" id="payment_term" required>
+                                <option value="" disabled>Select Payment Term</option>
+                                @foreach($payments as $payment)
+                                    <option value="{{ $payment->id }}"{{ ($payment->id === $paymentterms->id) ? 'selected' : '' }}>{{ $payment->name }}</option>
+                                @endforeach
+                            </select>
+            </div>
+            <div class="col-md-4 p-3">
+                <label for="currency" class="form-label font-size-13 text-center">Currency:</label>
+            </div>
+            <div class="col-md-8 p-3">
+                <select class="form-control" autofocus name="currency" required>
+                <option value="AED" {{ $purchasingOrder->currency === 'AED' ? 'selected' : '' }}>AED</option>
+                <option value="USD" {{ $purchasingOrder->currency === 'USD' ? 'selected' : '' }}>USD</option>
+                <option value="EUR" {{ $purchasingOrder->currency === 'EUR' ? 'selected' : '' }}>EUR</option>
+                <option value="GBP" {{ $purchasingOrder->currency === 'GBP' ? 'selected' : '' }}>GBP</option>
+                <option value="JPY" {{ $purchasingOrder->currency === 'JPY' ? 'selected' : '' }}>JPY</option>
+            </select>
+            </div>
+            <div class="col-md-4 p-3">
+                <label for="shippingMethod" class="form-label font-size-13 text-center">Shipping Method:</label>
+            </div>
+            <div class="col-md-8 p-3">
+            <select class="form-control" id="shippingmethod" name="shippingmethod">
+                <option value="EXW" {{ $purchasingOrder->shippingmethod === 'EXW' ? 'selected' : '' }}>EXW</option>
+                <option value="CNF" {{ $purchasingOrder->shippingmethod === 'CNF' ? 'selected' : '' }}>CNF</option>
+                <option value="CIF" {{ $purchasingOrder->shippingmethod === 'CIF' ? 'selected' : '' }}>CIF</option>
+                <option value="FOB" {{ $purchasingOrder->shippingmethod === 'FOB' ? 'selected' : '' }}>FOB</option>
+                <option value="Local" {{ $purchasingOrder->shippingmethod === 'Local' ? 'selected' : '' }}>Local</option>
+            </select>
+            </div>
+            <div class="col-md-4 p-3">
+                <label for="shippingCost" class="form-label font-size-13 text-center">Shipping Cost:</label>
+            </div>
+            <div class="col-md-8 p-3">
+            <input type="number" id="shippingcost" name="shippingcost" class="form-control" placeholder="Shipping Cost" value="{{$purchasingOrder->shippingcost}}">
+            </div>
+            <div class="col-md-4 p-3">
+            <label for="Incoterm" class="form-label">Port of Loading:</label>
+            </div>
+            <div class="col-md-8 p-3">
+              <input type="text" id="pol" name="pol" class="form-control" placeholder="Port of Loading" value="{{$purchasingOrder->pol}}">
+            </div>
+            <div class="col-md-4 p-3">
+            <label for="Incoterm" class="form-label">Port of Discharge:</label>
+            </div>
+            <div class="col-md-8 p-3">
+              <input type="text" id="pod" name="pod" class="form-control" placeholder="Port of Discharge" value="{{$purchasingOrder->pod}}">
+            </div>
+            <div class="col-md-4 p-3">
+            <label for="Incoterm" class="form-label">Preferred Destination:</label>
+            </div>
+            <div class="col-md-8 p-3">
+              <input type="text" id="fd" name="fd" class="form-control" placeholder="Preferred Destination" value="{{$purchasingOrder->fd}}">
+            </div>
+        </div>
+    </div>
+</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="submit_b_492" class="btn btn-primary btn-sm createAddonId">Submit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
             <div class="row">
                 <div class="col-lg-9 col-md-6 col-sm-12">
                     <div class="row">
@@ -1751,5 +1870,14 @@
             });
         }
     }
+</script>
+<script>
+$(document).ready(function() {
+  $('.edit-basic-btn').on('click', function() {
+    var purchaseId = $(this).data('purchase-id');
+    $('#purchaseId').val(purchaseId); // Set the value in the hidden input field
+    $('#editModal').modal('show'); // Show the modal
+  });
+});
 </script>
 @endsection
