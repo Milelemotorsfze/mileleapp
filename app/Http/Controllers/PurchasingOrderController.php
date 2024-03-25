@@ -2154,4 +2154,21 @@ public function allpaymentreqssfinpay(Request $request)
             $vehicle->delete();
             return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
         }
+        public function updatebasicdetails(Request $request)
+        {
+            $purchasingOrder = PurchasingOrder::find($request->input('purchasing_order_id'));
+            if (!$purchasingOrder) {
+                return response()->json(['error' => 'Purchasing order not found'], 404);
+            }
+            $purchasingOrder->vendors_id = $request->input('vendors_id');
+            $purchasingOrder->payment_term_id = $request->input('payment_term_id');
+            $purchasingOrder->currency = $request->input('currency');
+            $purchasingOrder->shippingmethod = $request->input('shippingmethod');
+            $purchasingOrder->shippingcost = $request->input('shippingcost');
+            $purchasingOrder->pol = $request->input('pol');
+            $purchasingOrder->pod = $request->input('pod');
+            $purchasingOrder->fd = $request->input('fd');
+            $purchasingOrder->save();
+            return response()->json(['message' => 'Purchase order details updated successfully'], 200);
+        }        
 }
