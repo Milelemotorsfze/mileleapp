@@ -744,15 +744,15 @@
                         </select>
                     </div>
                     <div class="col-lg-2 col-md-6">
-                        <label class="form-label">Interior Color</label>
-                        <select class="form-control col" id="interior_color" style="width: 100%" name="interior_color" disabled>
-                            <option value="">Select Interior Color</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-2 col-md-6">
                         <label class="form-label">Exterior Color</label>
                         <select class="form-control col" id="exterior_color" style="width: 100%" name="exterior_color" disabled>
                             <option value="">Select Exterior Color</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <label class="form-label">Interior Color</label>
+                        <select class="form-control col" id="interior_color" style="width: 100%" name="interior_color" disabled>
+                            <option value="">Select Interior Color</option>
                         </select>
                     </div>
                     <div class="col-lg-1 col-md-6" style="margin-top: 26px;">
@@ -775,8 +775,8 @@
                                         <th>Model Details</th>
                                         <th>Variant Name</th>
                                         <th>Variant Detail</th>
-                                        <th>Interior Color</th>
                                         <th>Exterior Color</th>
+                                        <th>Interior Color</th>
                                         <th>Price</th>
                                         <th style="width:30px;">Add Into Quotation</th>
                                     </tr>
@@ -2259,7 +2259,7 @@ $(document).ready(function () {
                         var modelDescription = row[3];
                         var interiorColor = row[6];
                         var exteriorColor = row[7];
-                        var combinedValue = brand + ', ' + modelDescription + ', ' + interiorColor + ', ' + exteriorColor;
+                        var combinedValue = brand + ', ' + modelDescription + ', ' + exteriorColor + ', ' + interiorColor;
 
                     }
                     else if(row['button_type'] == 'Shipping' || row['button_type'] == 'Shipping-Document' || row['button_type'] == 'Certification' || row['button_type'] == 'Other') {
@@ -2288,7 +2288,7 @@ $(document).ready(function () {
                         if(row[6] == "") {
                             var comma5 = " ";
                         }
-                        combinedValue =  row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[4] + comma4 + row[5]+ comma5 + row[6];
+                        combinedValue =  row[1] + comma1 + row[2] + comma2 + row[3]+ comma3 + row[5] + comma4 + row[4]+ comma5 + row[6];
                         if(row['table_type'] !== 'vehicle-table') {
 
                             combinedValue = row[0] + comma0 + combinedValue;
@@ -2846,8 +2846,8 @@ $(document).ready(function () {
                         vehicle.model_detail,
                         vehicle.variant_name,
                         vehicle.variant_detail,
-                        vehicle.interior_color,
                         vehicle.exterior_color,
+                        vehicle.interior_color,
                         vehicle.price,
                         addButton
                     ];
@@ -2866,8 +2866,8 @@ $(document).ready(function () {
                         { title: 'Model Detail' },
                         { title: 'Variant Name' },
                         { title: 'Variant Detail' },
-                        { title: 'Interior Color' },
                         { title: 'Exterior Color' },
+                        { title: 'Interior Color' },
                         { title: 'Price' },
                         {
                             title: 'Actions',

@@ -681,6 +681,7 @@ public function getBrandsAndModelLines(Request $request)
         ->get();
     $purchasingOrder = PurchasingOrder::findOrFail($id);
     $paymentterms = PaymentTerms::findorfail($purchasingOrder->payment_term_id);
+    $payments = PaymentTerms::get();
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
     $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
     $vehicleslog = Vehicleslog::whereIn('vehicles_id', $vehicles->pluck('id'))->get();
@@ -690,6 +691,9 @@ public function getBrandsAndModelLines(Request $request)
 
         $variantCount = 0;
         $pfiVehicleVariants = [];
+        $vendors = Supplier::whereHas('vendorCategories', function ($query) {
+            $query->where('category', 'Vehicles');
+        })->get();
         if($purchasingOrder->LOIPurchasingOrder) {
             $pfi = PFI::findOrFail($purchasingOrder->LOIPurchasingOrder->approvedLOI->pfi->id);
             $dealer = $pfi->letterOfIndent->dealers ?? '';
@@ -730,7 +734,7 @@ public function getBrandsAndModelLines(Request $request)
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments'));
     }
 
     public function edit($id)
