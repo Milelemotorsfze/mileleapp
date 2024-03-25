@@ -54,6 +54,7 @@ class Liability extends Model
     protected $appends = [
         'liability_type',
         'is_auth_user_can_approve',
+        'liability_code'
     ];
     public function getLiabilityTypeAttribute() {
         $liabilityType = '';
@@ -101,6 +102,23 @@ class Liability extends Model
                 $isAuthUserCanApprove['current_approve_person'] = $this->hrManager->name;
         }
         return $isAuthUserCanApprove;
+    }
+    public function getLiabilityCodeAttribute() {
+        $liabilityCode = '';
+        if($this->code != '' && $this->type != '' && $this->created_at != '') {
+            $liabilityCode = 'ELF/';
+            if($this->type == 'loan') {
+                $liabilityCode =$liabilityCode.'LOAN/';
+            }
+            elseif($this->type == 'advances') {
+                $liabilityCode =$liabilityCode.'ADVANCE/';
+            }
+            elseif($this->type == 'penalty_or_fine') {
+                $liabilityCode =$liabilityCode.'FINE/';
+            }
+            $liabilityCode =$liabilityCode.\Carbon\Carbon::parse($this->created_at)->format('M_Y').'/'.$this->code;
+        }
+        return $liabilityCode;
     }
     public function user() {
         return $this->hasOne(User::class,'id','employee_id');

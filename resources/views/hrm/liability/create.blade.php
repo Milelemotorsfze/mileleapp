@@ -100,13 +100,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 							</div>
 						</fieldset>
 					</div>
-					<div class="col-xxl-6 col-lg-6 col-md-6">
+					<!-- <div class="col-xxl-6 col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="code" class="col-form-label text-md-end">{{ __('Liability Code') }}</label>
 						<input type="text" name="code" id="code"
 							class="form-control widthinput" placeholder="Enter Liability Code"
 							aria-label="measurement" aria-describedby="basic-addon2" value="ELF/FINE/DEC_2023/0086">
-					</div>
+					</div> -->
 					<div class="col-xxl-4 col-lg-4 col-md-4">
 						<span class="error">* </span>
 						<label for="total_amount" class="col-form-label text-md-end">{{ __('Total Amount') }}</label>
@@ -338,9 +338,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 			type: {
 				required: true,
 			},           
-	           code: {
-	               required: true,
-	           },
+	        //    code: {
+	        //        required: true,
+	        //    },
 	           total_amount: {
 	               required: true,
 				money: true,

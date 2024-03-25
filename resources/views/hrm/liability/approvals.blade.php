@@ -78,7 +78,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -154,7 +154,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -215,7 +215,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -299,7 +299,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -375,7 +375,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -436,7 +436,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -520,7 +520,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -596,7 +596,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -657,7 +657,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -741,7 +741,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -817,7 +817,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -878,7 +878,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -962,7 +962,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -1038,7 +1038,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
@@ -1099,7 +1099,7 @@
 								@endif												
 							</td>
 							<td>{{ $data->liability_type ?? '' }}</td>
-							<td>{{ $data->code ?? '' }}</td>
+							<td>{{ $data->liability_code ?? '' }}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>

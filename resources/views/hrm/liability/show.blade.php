@@ -140,7 +140,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-liability-det
 								<label for="choices-single-default" class="form-label"> Liability Code :</label>
 							</div>
 							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-								<span>{{ $data->code ?? '' }}</span>
+								<span>{{ $data->liability_code ?? '' }}</span>
 							</div>
 							<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 								<label for="choices-single-default" class="form-label"> Total Amount (AED) :</label>
