@@ -249,8 +249,12 @@ class LetterOfIndentController extends Controller
                 $directory = public_path('LOI');
                 \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
                 $pdfFile->save($directory . '/' . $filename);
-                $pdf = $this->pdfMerge($letterOfIndent->id);
-                return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
+                try{
+                    $pdf = $this->pdfMerge($letterOfIndent->id);
+                    return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
+                }catch (\Exception $e){
+                    return $e->getMessage();
+                }
 
             }
             return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
@@ -266,8 +270,12 @@ class LetterOfIndentController extends Controller
                 $directory = public_path('LOI');
                 \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
                 $pdfFile->save($directory . '/' . $filename);
-                $pdf = $this->pdfMerge($letterOfIndent->id);
-                return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
+                try{
+                    $pdf = $this->pdfMerge($letterOfIndent->id);
+                    return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
+                }catch (\Exception $e){
+                    return $e->getMessage();
+                }
 
             }
             return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
@@ -282,8 +290,12 @@ class LetterOfIndentController extends Controller
                 $directory = public_path('LOI');
                 \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
                 $pdfFile->save($directory . '/' . $filename);
-                $pdf = $this->pdfMerge($letterOfIndent->id);
-                return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
+                try{
+                    $pdf = $this->pdfMerge($letterOfIndent->id);
+                    return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
+                }catch (\Exception $e){
+                    return $e->getMessage();
+                }
 
             }
             return view('letter_of_indents.LOI-templates.business_template', compact('letterOfIndent','letterOfIndentItems'));
@@ -300,9 +312,12 @@ class LetterOfIndentController extends Controller
                 $directory = public_path('LOI');
                 \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
                 $pdfFile->save($directory . '/' . $filename);
-                $pdf = $this->pdfMerge($letterOfIndent->id);
-                return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
-
+                try{
+                    $pdf = $this->pdfMerge($letterOfIndent->id);
+                    return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
+                }catch (\Exception $e){
+                    return $e->getMessage();
+                }
             }
             return view('letter_of_indents.LOI-templates.individual_template', compact('letterOfIndent','letterOfIndentItems'));
         }

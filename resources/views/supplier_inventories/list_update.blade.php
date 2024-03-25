@@ -127,13 +127,15 @@
                         <tr>
                             <td>{{ ++$i }}</td>
                             <td>
-                                <select class="country" data-field="country" data-id="{{ $supplierInventory->id }}" id="country-editable-{{$supplierInventory->id}}">
+                                <select class="country" data-field="country"  @if($supplierInventory->purchase_order_id) disabled @endif
+                                data-id="{{ $supplierInventory->id }}" id="country-editable-{{$supplierInventory->id}}">
                                     <option value="UAE" {{ $supplierInventory->country == 'UAE' ? 'selected' : '' }} >UAE</option>
                                     <option value="Belgium" {{ $supplierInventory->country == 'Belgium' ? 'selected' : '' }}>Belgium</option>
                                 </select>
                             </td>
                             <td>
-                                <select class="whole_sales" data-field="whole_sales" data-id="{{ $supplierInventory->id }}" id="whole_sales-editable-{{$supplierInventory->id}}">
+                                <select class="whole_sales" data-field="whole_sales" @if($supplierInventory->purchase_order_id) disabled @endif
+                                data-id="{{ $supplierInventory->id }}"  id="whole_sales-editable-{{$supplierInventory->id}}">
                                     <option value="{{ \App\Models\SupplierInventory::DEALER_TRANS_CARS }}"
                                         {{ $supplierInventory->whole_sales == \App\Models\SupplierInventory::DEALER_TRANS_CARS ? 'selected' : ''}} >
                                         Trans Cars </option>
@@ -143,7 +145,8 @@
                                 </select>
                             </td>
                             <td>
-                                <select  class="supplier" data-field="supplier_id" data-id="{{ $supplierInventory->id }}" id="supplier_id-editable-{{$supplierInventory->id}}">
+                                <select  class="supplier" data-field="supplier_id" @if($supplierInventory->purchase_order_id) disabled @endif
+                                        data-id="{{ $supplierInventory->id }}" id="supplier_id-editable-{{$supplierInventory->id}}">
                                     @foreach($suppliers as $supplier)
                                         <option value="{{ $supplier->id }}" {{ $supplierInventory->supplier_id == $supplier->id ? 'selected' : '' }}>
                                             {{ $supplier->supplier }}
@@ -154,7 +157,7 @@
                             <td>{{ $supplierInventory->masterModel->model ?? '' }}</td>
                             <td> {{ $supplierInventory->masterModel->sfx ?? '' }}</td>
                             <td>
-                                <select  class="model-year" data-field="model_year" data-id="{{ $supplierInventory->id }}" id="model_year-editable-{{$supplierInventory->id}}">
+                                <select  class="model-year" data-field="model_year" @if($supplierInventory->purchase_order_id) disabled @endif data-id="{{ $supplierInventory->id }}" id="model_year-editable-{{$supplierInventory->id}}">
                                    @foreach($supplierInventory->modelYears as $modelYear)
                                        <option value="{{ $modelYear }}" {{ $modelYear == $supplierInventory->masterModel->model_year ? 'selected' : '' }}>
                                            {{ $modelYear }}
