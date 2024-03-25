@@ -140,4 +140,7 @@ class JoiningReport extends Model
     public function hr() {
         return $this->hasOne(User::class,'id','hr_manager_id');
     }
+    public function leave() {
+        return $this->hasMany(Leave::class,'joining_reports_id','id');
+    }
 }

@@ -81,12 +81,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							@endif
 							@if($type == 'permanent' OR $type == 'temporary')
 							<th>Transfer From Department</th>
+							@endif
+							@if($type == 'temporary')
 							<th>Transfer From Date</th>
+							@endif
+							@if($type == 'permanent' OR $type == 'temporary')
 							<th>Transfer From Location</th>
 							<th>Transfer To Department</th>
 							@endif
+							@if($type == 'temporary')
+							<th>Transfer To Date</th>
+							<th>Transfer To Location</th>
+							@else
 							<th>Joining Date</th>
 							<th>Joining Location</th>
+							@endif
 							<th>Reporting Manager</th>
 							<th>Remarks</th>
 							<th>Prepared By</th>
@@ -132,11 +141,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							@endif
 							@if($type == 'permanent' OR $type == 'temporary')
 							<td>@if(isset($data) && isset($data->transferFromDepartment)){{ $data->transferFromDepartment->name ?? ''}} @endif</td>
+							@endif
+							@if($type == 'temporary')
 							<td>
 								@if($data->transfer_from_date != NULL)
 								{{ \Carbon\Carbon::parse($data->transfer_from_date)->format('d M Y') }}
 								@endif
 							</td>
+							@endif
+							@if($type == 'permanent' OR $type == 'temporary')
 							<td>@if(isset($data) && isset($data->transferFromLocation)) {{ $data->transferFromLocation->name ?? ''}} @endif</td>
 							<td>@if(isset($data) && isset($data->transferToDepartment)) {{ $data->transferToDepartment->name ?? ''}} @endif</td>
 							@endif
@@ -235,12 +248,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							@endif
 							@if($type == 'permanent' OR $type == 'temporary')
 							<th>Transfer From Department</th>
+							@endif
+							@if($type == 'temporary')
 							<th>Transfer From Date</th>
+							@endif
+							@if($type == 'permanent' OR $type == 'temporary')
 							<th>Transfer From Location</th>
 							<th>Transfer To Department</th>
 							@endif
+							@if($type == 'temporary')
+							<th>Transfer To Date</th>
+							<th>Transfer To Location</th>
+							@else
 							<th>Joining Date</th>
 							<th>Joining Location</th>
+							@endif
 							<th>Reporting Manager</th>
 							<th>Remarks</th>
 							<th>Prepared By</th>
@@ -284,11 +306,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							@endif
 							@if($type == 'permanent' OR $type == 'temporary')
 							<td>@if(isset($data) && isset($data->transferFromDepartment)) {{ $data->transferFromDepartment->name ?? ''}} @endif</td>
+							@endif
+							@if($type == 'temporary')
 							<td>
 								@if($data->transfer_from_date != NULL)
 								{{ \Carbon\Carbon::parse($data->transfer_from_date)->format('d M Y') }}
 								@endif
 							</td>
+							@endif
+							@if($type == 'permanent' OR $type == 'temporary')
 							<td>{{ $data->transferFromLocation->name ?? ''}}</td>
 							<td>{{ $data->transferToDepartment->name ?? ''}}</td>
 							@endif
@@ -338,12 +364,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							@endif
 							@if($type == 'permanent' OR $type == 'temporary')
 							<th>Transfer From Department</th>
+							@endif
+							@if($type == 'temporary')
 							<th>Transfer From Date</th>
+							@endif
+							@if($type == 'permanent' OR $type == 'temporary')
 							<th>Transfer From Location</th>
 							<th>Transfer To Department</th>
 							@endif
+							@if($type == 'temporary')
+							<th>Transfer To Date</th>
+							<th>Transfer To Location</th>
+							@else
 							<th>Joining Date</th>
 							<th>Joining Location</th>
+							@endif
 							<th>Reporting Manager</th>
 							<th>Remarks</th>
 							<th>Prepared By</th>
@@ -387,11 +422,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							@endif
 							@if($type == 'permanent' OR $type == 'temporary')
 							<td>@if(isset($data) && isset($data->transferFromDepartment)) {{ $data->transferFromDepartment->name ?? ''}} @endif</td>
+							@endif
+							@if($type == 'temporary')
 							<td>
 								@if($data->transfer_from_date != NULL)
 								{{ \Carbon\Carbon::parse($data->transfer_from_date)->format('d M Y') }}
 								@endif
 							</td>
+							@endif
+							@if($type == 'permanent' OR $type == 'temporary')
 							<td>@if(isset($data) && isset($data->transferFromLocation)) {{ $data->transferFromLocation->name ?? ''}} @endif</td>
 							<td>@if(isset($data) && isset($data->transferToDepartment)) {{ $data->transferToDepartment->name ?? ''}} @endif</td>
 							@endif

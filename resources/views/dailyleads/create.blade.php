@@ -188,81 +188,85 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
         $(document).ready(function () {
             $('select[name="client_id"]').select2();
         });
-$(document).ready(function() {
-  var max_fields = 10;
-  var wrapper = $("#row-container");
-  var add_button = $(".add-row-btn");
-  var x = 1;
-  function updateDropdownList() {
-    var selectedValues = $('input[name="model_line_id[]"]').map(function() {
-      return $(this).val();
-    }).get();
+        $(document).ready(function() {
+    var max_fields = 10;
+    var wrapper = $("#row-container");
+    var add_button = $(".add-row-btn");
+    var x = 1;
 
-    $('.new-select').each(function() {
-      var currentInput = $(this);
-      var datalistId = currentInput.attr('list');
-      var datalist = $('#' + datalistId);
-      var options = '';
+    function updateDropdownList() {
+        var selectedValues = $('input[name="model_line_id[]"]').map(function() {
+            return $(this).val();
+        }).get();
 
-      $('#brandList option').each(function() {
-        if (selectedValues.indexOf($(this).val()) === -1) {
-          options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+        $('.new-select').each(function() {
+            var currentInput = $(this);
+            var datalistId = currentInput.attr('list');
+            var datalist = $('#' + datalistId);
+            var options = '';
+
+            $('#brandList option').each(function() {
+                if (selectedValues.indexOf($(this).val()) === -1) {
+                    options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+                }
+            });
+
+            datalist.html(options);
+        });
+    }
+
+    $(add_button).click(function(e) {
+        e.preventDefault();
+        if (x < max_fields) {
+            x++;
+            var selectedValues = $('input[name="model_line_id[]"]').map(function() {
+                return $(this).val();
+            }).get();
+            var datalist = $('<datalist id="brandList' + x + '"></datalist>');
+            var options = '';
+            $('#brandList option').each(function() {
+                if (selectedValues.indexOf($(this).val()) === -1) {
+                    options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+                }
+            });
+            datalist.html(options);
+            var newRow = $('<div class="row"></div>');
+            var col1 = $('<div class="col-lg-4 col-md-6"></div>');
+            var input = $('<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" class="form-control mb-1 new-select" id="brandInput' + x + '" list="brandList' + x + '" autocomplete="off" /><input type="hidden" name="model_line_ids" class="selectedBrandId">');
+            col1.append(input);
+            col1.append(datalist);
+            var col2 = $('<div class="col-lg-4 col-md-6 align-self-end"></div>');
+            var removeBtn = $('<a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a>');
+            col2.append(removeBtn);
+            newRow.append(col1);
+            newRow.append(col2);
+            $(wrapper).append(newRow);
+            updateDropdownList();
         }
-      });
-
-      datalist.html(options);
     });
-  }
 
-  $(add_button).click(function(e) {
-    e.preventDefault();
-    if (x < max_fields) {
-      x++;
-      var selectedValues = $('input[name="model_line_id[]"]').map(function() {
-        return $(this).val();
-      }).get();
-      var datalist = $('<datalist id="brandList' + x + '"></datalist>');
-      var options = '';
-      $('#brandList option').each(function() {
-        if (selectedValues.indexOf($(this).val()) === -1) {
-          options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+    $(wrapper).on("click", ".remove-row-btn", function(e) {
+        e.preventDefault();
+        $(this).closest('.row').remove();
+        x--;
+        updateDropdownList();
+    });
+
+    $(wrapper).on("input", "input[name='model_line_id[]']", function() {
+        var selectedBrandInput = $(this);
+        var selectedOption = selectedBrandInput.val();
+        var selectedOptionId = selectedBrandInput.siblings('datalist').find('option[value="' + selectedOption + '"]').data('value');
+        var selectedBrandIds = $('input[name="model_line_ids"]', selectedBrandInput.closest('.row')).val() || '[]';
+        selectedBrandIds = JSON.parse(selectedBrandIds);
+        selectedBrandIds = selectedBrandIds.filter(function(id) {
+            return id !== null;
+        });
+        if (selectedBrandIds.indexOf(selectedOptionId) === -1) {
+            selectedBrandIds.push(selectedOptionId);
         }
-      });
-      datalist.html(options);
-      var newRow = $('<div class="row"></div>');
-      var col1 = $('<div class="col-lg-4 col-md-6"></div>');
-      var input = $('<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" class="form-control mb-1 new-select" id="brandInput' + x + '" list="brandList' + x + '" autocomplete="off" /><input type="hidden" name="model_line_ids" class="selectedBrandId">');
-      col1.append(input);
-      col1.append(datalist);
-      var col2 = $('<div class="col-lg-4 col-md-6 align-self-end"></div>');
-      var removeBtn = $('<a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a>');
-      col2.append(removeBtn);
-      newRow.append(col1);
-      newRow.append(col2);
-      $(wrapper).append(newRow);
-      updateDropdownList();
-    }
-  });
-  $(wrapper).on("click", ".remove-row-btn", function(e) {
-    e.preventDefault();
-    $(this).closest('.row').remove();
-    x--;
-    updateDropdownList();
-  });
-
-  $(wrapper).on("input", "input[name='model_line_id[]']", function() {
-    var selectedBrandInput = $(this);
-    var selectedBrandIdInput = selectedBrandInput.next('input[name="model_line_ids"]');
-    var selectedOption = selectedBrandInput.val();
-    var selectedOptionId = selectedBrandInput.siblings('datalist').find('option[value="' + selectedOption + '"]').data('value');
-    var selectedBrandIds = $('input[name="model_line_ids"]').val() || '[]';
-    selectedBrandIds = JSON.parse(selectedBrandIds);
-    if (selectedBrandIds.indexOf(selectedOptionId) === -1) {
-      selectedBrandIds.push(selectedOptionId);
-    }
-    $('input[name="model_line_ids"]').val(JSON.stringify(selectedBrandIds));
-    updateDropdownList();
-  });
+        $('input[name="model_line_ids"]', selectedBrandInput.closest('.row')).val(JSON.stringify(selectedBrandIds));
+        updateDropdownList();
+    });
 });
     document.getElementById('brandInput').addEventListener('input', function(event) {
         var input = event.target;

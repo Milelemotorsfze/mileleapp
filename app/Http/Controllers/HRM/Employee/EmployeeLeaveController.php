@@ -278,9 +278,9 @@ class EmployeeLeaveController extends Controller
                         $update->employee_id = $request->employee_id;
                         $update->type_of_leave = $request->type_of_leave;
                         if($request->type_of_leave != 'others') {
-                            $update->type_of_leave_description == NULL;
+                            $update->type_of_leave_description = NULL;
                         }
-                        else {
+                        else { 
                             $update->type_of_leave_description = $request->type_of_leave_description;
                         }
                         $update->leave_start_date = $request->leave_start_date;

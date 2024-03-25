@@ -252,6 +252,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 			if(oldData.user.emp_profile.location != null) {
 				document.getElementById('location').textContent=oldData.user.emp_profile.location.name;
 			}
+			if(oldData.type_of_leave == 'others') {
+				$("#other_leave_type").show();
+			}
+			else {
+				$("#other_leave_type").hide();
+			}
 		}
         $('.type_of_leave').click(function() {
             if($(this).val() == 'others') {

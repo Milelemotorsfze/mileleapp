@@ -26,6 +26,7 @@ use App\Http\Controllers\HRM\Hiring\CandidatePersonalInfoController;
 class InterviewSummaryReportController extends Controller
 {
     public function index() {
+        $authId = Auth::id();
         $shortlists = InterviewSummaryReport::where([
             ['date_of_fifth_round',NULL],
             ['date_of_forth_round',NULL],
@@ -34,7 +35,21 @@ class InterviewSummaryReportController extends Controller
             ['date_of_first_round',NULL],
             ['date_of_telephonic_interview',NULL],
             ['status','pending'],
-        ])->latest()->get();
+        ]);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $shortlists = $shortlists->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $shortlists = $shortlists->whereHas('employeeHiringRequest', function($q1) use($authId) {
+                $q1->where('requested_by',$authId);
+            })->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $shortlists = $shortlists->whereHas('employeeHiringRequest.questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $shortlists = $shortlists->get();
         $telephonics = InterviewSummaryReport::where([
             ['date_of_fifth_round',NULL],
             ['date_of_forth_round',NULL],
@@ -43,7 +58,21 @@ class InterviewSummaryReportController extends Controller
             ['date_of_first_round',NULL],
             ['date_of_telephonic_interview','!=',NULL],
             ['status','pending'],
-        ])->latest()->get();
+        ]);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $telephonics = $telephonics->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $telephonics = $telephonics->whereHas('employeeHiringRequest', function($q1) use($authId) {
+                $q1->where('requested_by',$authId);
+            })->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $telephonics = $telephonics->whereHas('employeeHiringRequest.questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $telephonics = $telephonics->get();
         $firsts = InterviewSummaryReport::where([
             ['date_of_fifth_round',NULL],
             ['date_of_forth_round',NULL],
@@ -52,7 +81,21 @@ class InterviewSummaryReportController extends Controller
             ['date_of_first_round','!=',NULL],
             ['date_of_telephonic_interview','!=',NULL],
             ['status','pending'],
-        ])->latest()->get();
+        ]);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $firsts = $firsts->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $firsts = $firsts->whereHas('employeeHiringRequest', function($q1) use($authId) {
+                $q1->where('requested_by',$authId);
+            })->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $firsts = $firsts->whereHas('employeeHiringRequest.questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $firsts = $firsts->get();
         $seconds = InterviewSummaryReport::where([
             ['date_of_fifth_round',NULL],
             ['date_of_forth_round',NULL],
@@ -61,7 +104,21 @@ class InterviewSummaryReportController extends Controller
             ['date_of_first_round','!=',NULL],
             ['date_of_telephonic_interview','!=',NULL],
             ['status','pending'],
-        ])->latest()->get();
+        ]);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $seconds = $seconds->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $seconds = $seconds->whereHas('employeeHiringRequest', function($q1) use($authId) {
+                $q1->where('requested_by',$authId);
+            })->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $seconds = $seconds->whereHas('employeeHiringRequest.questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $seconds = $seconds->get();
         $thirds = InterviewSummaryReport::where([
             ['date_of_fifth_round',NULL],
             ['date_of_forth_round',NULL],
@@ -70,7 +127,21 @@ class InterviewSummaryReportController extends Controller
             ['date_of_first_round','!=',NULL],
             ['date_of_telephonic_interview','!=',NULL],
             ['status','pending'],
-        ])->latest()->get();
+        ]);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $thirds = $thirds->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $thirds = $thirds->whereHas('employeeHiringRequest', function($q1) use($authId) {
+                $q1->where('requested_by',$authId);
+            })->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $thirds = $thirds->whereHas('employeeHiringRequest.questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $thirds = $thirds->get();
         $forths = InterviewSummaryReport::where([
             ['date_of_fifth_round',NULL],
             ['date_of_forth_round','!=',NULL],
@@ -79,7 +150,21 @@ class InterviewSummaryReportController extends Controller
             ['date_of_first_round','!=',NULL],
             ['date_of_telephonic_interview','!=',NULL],
             ['status','pending'],
-        ])->latest()->get();
+        ]);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $forths = $forths->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $forths = $forths->whereHas('employeeHiringRequest', function($q1) use($authId) {
+                $q1->where('requested_by',$authId);
+            })->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $forths = $forths->whereHas('employeeHiringRequest.questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $forths = $forths->get();
         $fifths = InterviewSummaryReport::where([
             ['date_of_fifth_round','!=',NULL],
             ['date_of_forth_round','!=',NULL],
@@ -89,7 +174,21 @@ class InterviewSummaryReportController extends Controller
             ['date_of_telephonic_interview','!=',NULL],
             ['candidate_selected',NULL],
             ['status','pending'],
-        ])->latest()->get();
+        ]);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $fifths = $fifths->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $fifths = $fifths->whereHas('employeeHiringRequest', function($q1) use($authId) {
+                $q1->where('requested_by',$authId);
+            })->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $fifths = $fifths->whereHas('employeeHiringRequest.questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $fifths = $fifths->get();
         $notSelected = InterviewSummaryReport::where([
             ['date_of_fifth_round','!=',NULL],
             ['date_of_forth_round','!=',NULL],
@@ -99,7 +198,21 @@ class InterviewSummaryReportController extends Controller
             ['date_of_telephonic_interview','!=',NULL],
             ['status','pending'],
             ['candidate_selected','no'],
-        ])->latest()->get();
+        ]);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $notSelected = $notSelected->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $notSelected = $notSelected->whereHas('employeeHiringRequest', function($q1) use($authId) {
+                $q1->where('requested_by',$authId);
+            })->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $notSelected = $notSelected->whereHas('employeeHiringRequest.questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $notSelected = $notSelected->get();
         $pendings = InterviewSummaryReport::where([
             ['date_of_fifth_round','!=',NULL],
             ['date_of_forth_round','!=',NULL],
@@ -109,16 +222,90 @@ class InterviewSummaryReportController extends Controller
             ['date_of_telephonic_interview','!=',NULL],
             ['status','pending'],
             ['candidate_selected','yes'],
-        ])->latest()->get();
-        // $pendings = InterviewSummaryReport::where('status','pending')->latest()->get();
-        $approved = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')->whereDoesntHave('candidateDetails')->latest()->get(); 
-        $rejected = InterviewSummaryReport::where('status','rejected')->where('seleced_status','pending')->latest()->get();
-        $selectedForJob = InterviewSummaryReport::where('status','approved')->where('seleced_status','selected')->latest()->get(); 
-        $docsUploaded = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')->whereHas('candidateDetails')->latest()->get();
-        // dd($docsUploaded);
+        ]);
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $pendings = $pendings->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $pendings = $pendings->whereHas('employeeHiringRequest', function($q1) use($authId) {
+                $q1->where('requested_by',$authId);
+            })->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $pendings = $pendings->whereHas('employeeHiringRequest.questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $pendings = $pendings->get();
+        $approved = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')->whereDoesntHave('candidateDetails');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $approved = $approved->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $approved = $approved->whereHas('employeeHiringRequest', function($q1) use($authId) {
+                $q1->where('requested_by',$authId);
+            })->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $approved = $approved->whereHas('employeeHiringRequest.questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $approved = $approved->get();
+        $rejected = InterviewSummaryReport::where('status','rejected')->where('seleced_status','pending');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $rejected = $rejected->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $rejected = $rejected->whereHas('employeeHiringRequest', function($q1) use($authId) {
+                $q1->where('requested_by',$authId);
+            })->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $rejected = $rejected->whereHas('employeeHiringRequest.questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $rejected = $rejected->get();
+        $selectedForJob = InterviewSummaryReport::where('status','approved')->where('seleced_status','selected');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $selectedForJob = $selectedForJob->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $selectedForJob = $selectedForJob->whereHas('employeeHiringRequest', function($q1) use($authId) {
+                $q1->where('requested_by',$authId);
+            })->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $selectedForJob = $selectedForJob->whereHas('employeeHiringRequest.questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $selectedForJob = $selectedForJob->get(); 
+        $docsUploaded = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')->whereHas('candidateDetails');
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
+            $docsUploaded = $docsUploaded->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['requestedby-view-interview-summary-listing'])) {
+            $docsUploaded = $docsUploaded->whereHas('employeeHiringRequest', function($q1) use($authId) {
+                $q1->where('requested_by',$authId);
+            })->latest();
+        }
+        else if(Auth::user()->hasPermissionForSelectedRole(['organizedby-view-interview-summary-listing'])) {
+            $docsUploaded = $docsUploaded->whereHas('employeeHiringRequest.questionnaire', function($q2) use($authId) {
+                $q2->where('interviewd_by',$authId);
+            })->latest();
+        }
+        $docsUploaded = $docsUploaded->get();
         $interviewersNames = User::whereHas('empProfile')->whereNotIn('id',[1,16])->select('id','name')->get();
-        return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','notSelected',
-        'pendings','approved','selectedForJob','docsUploaded','rejected','interviewersNames'));
+        if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing'])) {
+            return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','notSelected',
+            'pendings','approved','selectedForJob','docsUploaded','rejected','interviewersNames'));
+        }
+        else {
+            $errorMsg ="Sorry ! You don't have permission to access this page";
+            return view('hrm.notaccess',compact('errorMsg'));
+        }      
     }
     public function createOrEdit($id) {
         $currentInterviewReport = InterviewSummaryReport::with('telephonicInterviewers','firstRoundInterviewers','secondRoundInterviewers',

@@ -312,16 +312,16 @@ class User extends Authenticatable
         $reportingManagerApproved = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved'],['submit_department_head_id',$this->id]])->latest()->get();
         $reportingManagerRejected = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','rejected'],['submit_department_head_id',$this->id]])->latest()->get();
         $divisionHeadPendings = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved'],['submit_action_by_division_head','pending'],
-            ['submit_hr_manager_id',$this->id],])->latest()->get();
+            ['submit_division_head_id',$this->id],])->latest()->get();
         $divisionHeadApproved = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved'],['submit_action_by_division_head','approved'],
-            ['submit_hr_manager_id',$this->id],])->latest()->get();
+            ['submit_division_head_id',$this->id],])->latest()->get();
         $divisionHeadRejected = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved'],['submit_action_by_division_head','rejected'],
-            ['submit_hr_manager_id',$this->id],])->latest()->get();  
-        $hrPendings = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_division_head','approved'],
+            ['submit_division_head_id',$this->id],])->latest()->get();  
+        $hrPendings = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved'],['submit_action_by_division_head','approved'],
             ['submit_action_by_hr_manager','pending'],['submit_hr_manager_id',$this->id],])->latest()->get();
-        $hrApproved = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_division_head','approved'],
+        $hrApproved = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved'],['submit_action_by_division_head','approved'],
             ['submit_action_by_hr_manager','approved'],['submit_hr_manager_id',$this->id],])->latest()->get();
-        $hrRejected = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_division_head','approved'],
+        $hrRejected = PassportRequest::where([['submit_action_by_employee','approved'],['submit_action_by_department_head','approved'],['submit_action_by_division_head','approved'],
             ['submit_action_by_hr_manager','rejected'],['submit_hr_manager_id',$this->id],])->latest()->get();  
         if(count($employeePendings) > 0 OR count($employeeApproved) > 0 OR count($employeeRejected) > 0 OR count($reportingManagerPendings) > 0 OR 
         count($reportingManagerApproved) > 0 OR count($reportingManagerRejected) > 0 OR count($divisionHeadPendings) > 0 OR count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0
@@ -348,16 +348,16 @@ class User extends Authenticatable
         $reportingManagerApproved = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved'],['release_department_head_id',$this->id]])->latest()->get();
         $reportingManagerRejected = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','rejected'],['release_department_head_id',$this->id]])->latest()->get();
         $divisionHeadPendings = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved'],['release_action_by_division_head','pending'],
-            ['release_hr_manager_id',$this->id],])->latest()->get();
+            ['release_division_head_id',$this->id],])->latest()->get();
         $divisionHeadApproved = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved'],['release_action_by_division_head','approved'],
-            ['release_hr_manager_id',$this->id],])->latest()->get();
+            ['release_division_head_id',$this->id],])->latest()->get();
         $divisionHeadRejected = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved'],['release_action_by_division_head','rejected'],
-            ['release_hr_manager_id',$this->id],])->latest()->get();  
-        $hrPendings = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_division_head','approved'],
+            ['release_division_head_id',$this->id],])->latest()->get();  
+        $hrPendings = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved'],['release_action_by_division_head','approved'],
             ['release_action_by_hr_manager','pending'],['release_hr_manager_id',$this->id],])->latest()->get();
-        $hrApproved = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_division_head','approved'],
+        $hrApproved = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved'],['release_action_by_division_head','approved'],
             ['release_action_by_hr_manager','approved'],['release_hr_manager_id',$this->id],])->latest()->get();
-        $hrRejected = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_division_head','approved'],
+        $hrRejected = PassportRelease::where([['release_action_by_employee','approved'],['release_action_by_department_head','approved'],['release_action_by_division_head','approved'],
             ['release_action_by_hr_manager','rejected'],['release_hr_manager_id',$this->id],])->latest()->get();  
         if(count($employeePendings) > 0 OR count($employeeApproved) > 0 OR count($employeeRejected) > 0 OR count($employeePendings) > 0 OR 
         count($employeeApproved) > 0 OR count($employeeRejected) > 0 OR count($divisionHeadPendings) > 0 OR count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0
