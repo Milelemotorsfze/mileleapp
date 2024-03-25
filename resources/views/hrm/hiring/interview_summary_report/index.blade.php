@@ -3376,8 +3376,13 @@ $.ajaxSetup({
 });
 </script>
 <script type="text/javascript">
-	var interviewersNames = {!! json_encode($interviewersNames) !!};
-	$(document).ready(function () {
+	var shortlists = {!! json_encode($shortlists) !!};
+	var telephonics = {!! json_encode($telephonics) !!};
+	var firsts = {!! json_encode($firsts) !!};
+	var seconds = {!! json_encode($seconds) !!};
+	var thirds = {!! json_encode($thirds) !!};
+	var forths = {!! json_encode($forths) !!};
+	$(document).ready(function () { 
 		if($("#count_docs").val() > 0) {
 			for(var i=1; i<=$("#count_docs").val(); i++) {
 				var contact_number = window.intlTelInput(document.querySelector("#contact_number_"+i), {
@@ -3388,14 +3393,69 @@ $.ajaxSetup({
 				});
 			}
 		}		
-		var countinterviewersNames = 0;
-		countinterviewersNames = interviewersNames.length;
-		if(countinterviewersNames > 0 ) {
-			for(var i=0; i<countinterviewersNames; i++) {
-				$('#interviewer_id_'+interviewersNames[i].id).select2({
+		var countshortlists = 0;
+		countshortlists = shortlists.length;
+		if(countshortlists > 0 ) {
+			for(var i=0; i<countshortlists; i++) {
+				$('#interviewer_id_'+shortlists[i].id).select2({
 					allowClear: true,
 					placeholder:"Choose Telephonic Interviewers Names",
-					dropdownParent: $('#shortlisted-candidate-'+interviewersNames[i].id)
+					dropdownParent: $('#shortlisted-candidate-'+shortlists[i].id)
+				});
+			}
+		}
+		var counttelephonics = 0;
+		counttelephonics = telephonics.length;
+		if(counttelephonics > 0 ) {
+			for(var i=0; i<counttelephonics; i++) {
+				$('#interviewer_id_'+telephonics[i].id).select2({
+					allowClear: true,
+					placeholder:"Choose First Round Interviewers Names",
+					dropdownParent: $('#shortlisted-candidate-'+telephonics[i].id)
+				});
+			}
+		}
+		var countfirsts = 0;
+		countfirsts = firsts.length;
+		if(countfirsts > 0 ) {
+			for(var i=0; i<countfirsts; i++) {
+				$('#interviewer_id_'+firsts[i].id).select2({
+					allowClear: true,
+					placeholder:"Choose Second Round Interviewers Names",
+					dropdownParent: $('#shortlisted-candidate-'+firsts[i].id)
+				});
+			}
+		}
+		var countseconds = 0;
+		countseconds = seconds.length;
+		if(countseconds > 0 ) {
+			for(var i=0; i<countseconds; i++) {
+				$('#interviewer_id_'+seconds[i].id).select2({
+					allowClear: true,
+					placeholder:"Choose Third Round Interviewers Names",
+					dropdownParent: $('#shortlisted-candidate-'+seconds[i].id)
+				});
+			}
+		}
+		var countthirds = 0;
+		countthirds = thirds.length;
+		if(countthirds > 0 ) {
+			for(var i=0; i<countthirds; i++) {
+				$('#interviewer_id_'+thirds[i].id).select2({
+					allowClear: true,
+					placeholder:"Choose Forth Round Interviewers Names",
+					dropdownParent: $('#shortlisted-candidate-'+thirds[i].id)
+				});
+			}
+		}
+		var countforths = 0;
+		countforths = forths.length;
+		if(countforths > 0 ) {
+			for(var i=0; i<countforths; i++) {
+				$('#interviewer_id_'+forths[i].id).select2({
+					allowClear: true,
+					placeholder:"Choose Fifth Round Interviewers Names",
+					dropdownParent: $('#shortlisted-candidate-'+forths[i].id)
 				});
 			}
 		}
