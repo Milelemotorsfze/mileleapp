@@ -581,6 +581,7 @@ public function getBrandsAndModelLines(Request $request)
                 $purchasinglog->purchasing_order_id = $purchasingOrderId;
                 $purchasinglog->variant = $variantId;
                 $purchasinglog->estimation_date = $estimation_arrival;
+                $purchasinglog->engine_number = $engine;
                 if($request->po_from == 'DEMAND_PLANNING') {
                     $purchasinglog->territory = 'Africa';
                 }else{
@@ -839,6 +840,7 @@ public function getBrandsAndModelLines(Request $request)
                 $purchasinglog->purchasing_order_id = $purchasingOrderId;
                 $purchasinglog->variant = $variantId;
                 $purchasinglog->estimation_date = $estimated_arrivals;
+                $purchasinglog->engine_number = $engine;
                 if($request->po_from == 'DEMAND_PLANNING') {
                     $vehicle->territory = 'Africa';
                 }else{
@@ -1867,18 +1869,22 @@ public function purchasingallupdateStatusrel(Request $request)
 
             if($vehicle->model_id) {
                 $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
-                    ->pluck('approved_loi_id');
+                                    ->pluck('approved_loi_id');
 
                 $loiItemIds = ApprovedLetterOfIndentItem::whereIn('id', $approvedIds)->pluck('letter_of_indent_item_id');
+                info($loiItemIds);
                 $masterModel = MasterModel::find($vehicle->model_id);
                 $possibleIds = MasterModel::where('model', $masterModel->model)
                     ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
+                info($possibleIds);
 
                 foreach ($loiItemIds as $loiItemId) {
                     $item = LetterOfIndentItem::find($loiItemId);
-
+                    info($item);
                     if(in_array($item->master_model_id, $possibleIds)) {
+                        info("master model id including li item");
                         if($item->utilized_quantity < $item->approved_quantity) {
+                            info("approved_quantity < utilized_quantity");
                             $item->utilized_quantity = $item->utilized_quantity + 1;
                             $item->save();
                             break;
@@ -2170,5 +2176,5 @@ public function allpaymentreqssfinpay(Request $request)
             $purchasingOrder->fd = $request->input('fd');
             $purchasingOrder->save();
             return response()->json(['message' => 'Purchase order details updated successfully'], 200);
-        }        
+        }
 }

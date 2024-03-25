@@ -22,16 +22,20 @@
                     <table id="PFI-table" class="table table-striped table-editable table-edits table table-condensed" style="">
                         <thead class="bg-soft-secondary">
                         <tr>
-                            <th>S.NO</th>                
-                            <th>Created Date</th>
+                            <th>S.NO</th>
                             <th>PFI Number</th>
+                            <th>Vendor</th>
+                            <th>Delivery Location</th>
+                            <th>Currency</th>
                             <th>Customer Name </th>
                             <th>Customer Country</th>
                             <th>Amount</th>
-                            <th>PFI Date</th>
+                            <th>Released Amount</th>
+                            <th>Release Date</th>
                             <th>Comment</th>
                             <th>Status</th>
                             <th>Payment Status</th>
+                            <th>Created Date</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -41,15 +45,19 @@
                         @foreach ($pfis as $key => $pfi)
                             <tr>
                                 <td>{{ ++$i }}</td>
-                                <td>{{ \Illuminate\Support\Carbon::parse($pfi->created_at)->format('d M y') }}</td>
                                 <td>{{ $pfi->pfi_reference_number }}</td>
+                                <td>{{ $pfi->supplier->supplier ?? '' }}</td>
+                                <td>{{ $pfi->delivery_location }}</td>
+                                <td>{{ $pfi->currency }}</td>
                                 <td>{{ $pfi->letterOfIndent->customer->name }}</td>
                                 <td>{{ $pfi->letterOfIndent->customer->country->name ?? ''  }}</td>
                                 <td>{{ $pfi->amount }}</td>
+                                <td>{{ $pfi->released_amount }}</td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($pfi->pfi_date)->format('d M y') }}</td>
                                 <td>{{ $pfi->comment }}</td>
                                 <td>{{ $pfi->status }}</td>
                                 <td>{{ $pfi->payment_status }} </td>
+                                <td>{{ \Illuminate\Support\Carbon::parse($pfi->created_at)->format('d M y') }}</td>
                                 <td>
                                     @if($pfi->status == 'New')
                                         @can('pfi-delete')
