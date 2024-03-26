@@ -209,7 +209,7 @@
                                                 @if ($hasPermission)
                                                 <a href="{{ route('employee_joining_report.index','new_employee') }}" class="dropdown-item" data-key="t-login">Joining Report</a>
                                                 @endif
-                                                <!-- 
+                                                <!--
                                                     @php
                                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-asset-allocation-request-listing']);
                                                     @endphp
@@ -283,7 +283,7 @@
                                                 @if ($hasPermission)
                                                 <a href="{{ route('employee_joining_report.index','new_employee') }}" class="dropdown-item" data-key="t-login">New Employee</a>
                                                 <a href="{{ route('employee_joining_report.index','temporary') }}" class="dropdown-item" data-key="t-login">Temporary Internal Transfer</a>
-                                                <a href="{{ route('employee_joining_report.index','permanent') }}" class="dropdown-item" data-key="t-login">Permanent Internal Transfer</a>                                    
+                                                <a href="{{ route('employee_joining_report.index','permanent') }}" class="dropdown-item" data-key="t-login">Permanent Internal Transfer</a>
                                                 <a href="{{ route('employee_joining_report.index','vacations_or_leave') }}" class="dropdown-item" data-key="t-login">Vacations Or Leave</a>
                                                 @endif
                                             </div>
@@ -1080,6 +1080,14 @@
                                                             @endphp
                                                             @if ($hasPermission)
                                                                 <a href="{{route('loi-mapping-criterias.index')}}" class="dropdown-item" data-key="t-login"> LOI Mapping Months </a>
+                                                            @endif
+                                                        @endcan
+                                                        @can('loi-restricted-country-list')
+                                                            @php
+                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-restricted-country-list');
+                                                            @endphp
+                                                            @if ($hasPermission)
+                                                                <a href="{{route('loi-restricted-countries.index')}}" class="dropdown-item" data-key="t-login"> LOI Restricted Countries </a>
                                                             @endif
                                                         @endcan
                                                         <div class="dropdown">

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LOIMappingCriteriaController;
+use App\Http\Controllers\LoiRestrictedCountriesController;
 use App\Http\Controllers\Masters\MasterJobPositionController;
 use App\Http\Controllers\Masters\MasterSpecificIndustryExperienceController;
 use App\Http\Controllers\Masters\DesignationApprovalsController;
@@ -417,6 +418,8 @@ Route::get('/d', function () {
     Route::get('letter-of-indents/suppliers-LOIs', [LetterOfIndentController::class, 'getSupplierLOI'])->name('letter-of-indents.get-suppliers-LOIs');
     Route::post('letter-of-indents/supplier-approval', [LOIItemsController::class, 'supplierApproval'])->name('letter-of-indents.supplier-approval');
     Route::get('letter-of-indents/milele-approval', [LOIItemsController::class, 'mileleApproval'])->name('letter-of-indents.milele-approval');
+    Route::resource('loi-restricted-countries', LoiRestrictedCountriesController::class);
+    Route::post('loi-restricted-countries/active-inactive', [LoiRestrictedCountriesController::class,'statusChange'])->name('loi-restricted-countries.active-inactive');
 
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::post('letter-of-indent-item/approve', [LOIItemsController::class, 'approveLOIItem'])->name('approve-loi-items');
@@ -774,7 +777,7 @@ Route::get('/d', function () {
     Route::get('candidate/success_personal_info', [CandidatePersonalInfoController::class, 'successPersonalinfo'])->name('candidate.successPersonalinfo');
     Route::get('candidate-offer-letter/sign/{id}', [CandidatePersonalInfoController::class, 'signJobOfferLetter'])->name('candidate-offer-letter.sign');
     Route::post('offer-letter/signed', [CandidatePersonalInfoController::class, 'signedOfferLetter'])->name('offerletter.signed');
-   
+
 
     //Payment Terms
     Route::resource('paymentterms', PaymentTermsController::class);

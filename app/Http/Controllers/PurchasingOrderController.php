@@ -859,7 +859,6 @@ public function getBrandsAndModelLines(Request $request)
                 }
 
     //         Demand planning PO
-
                 $masterModels = $request->master_model_id;
 
                 if($request->po_from == 'DEMAND_PLANNING') {
