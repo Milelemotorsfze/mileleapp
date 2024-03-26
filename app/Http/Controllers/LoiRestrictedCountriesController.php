@@ -82,7 +82,6 @@ class LoiRestrictedCountriesController extends Controller
             ['data' => 'is_only_company_allowed', 'name' => 'is_only_company_allowed','title' => 'Is Only Company Allowed'],
             ['data' => 'min_qty_per_passport', 'name' => 'min_qty_per_passport','title' => 'Minimum QTY/ Passport'],
             ['data' => 'max_qty_per_passport', 'name' => 'max_qty_per_passport','title' => 'Maximum QTY/ Passport'],
-            ['data' => 'status', 'name' => 'status','title' => 'Status'],
             ['data' => 'created_at', 'name' => 'created_at','title' => 'Created At'],
             ['data' => 'updated_by', 'name' => 'updated_by','title' => 'Updated By'],
             ['data' => 'action', 'name' => 'action','title' => 'Action'],
