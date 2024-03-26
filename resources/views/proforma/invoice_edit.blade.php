@@ -630,6 +630,21 @@
                 </div>
             </div>
         </div>
+        <div class="row mt-2">
+            <div class="col-sm-12">
+                <div class="row mt-2">
+                    <div class="col-sm-2">
+                        Third Party Payment :
+                    </div>
+                    <div class="col-sm-2">
+                    <select name="thirdpartypayment" class="form-control">
+                    <option value="No" {{ ($quotation->third_party_payment == 'No') ? 'selected' : '' }}>No</option>
+                    <option value="Yes" {{ ($quotation->third_party_payment == 'Yes') ? 'selected' : '' }}>Yes</option>
+                    </select>
+                    </div>
+                </div>
+            </div>
+        </div>
         <br>
         <div class="card">
             <div class="card-header">

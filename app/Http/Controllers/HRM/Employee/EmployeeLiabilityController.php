@@ -204,7 +204,9 @@ class EmployeeLiabilityController extends Controller
         catch (\Exception $e) {
             // info($e);
             DB::rollback();
-            dd($e);
+            info($e);
+            $errorMsg ="Something went wrong! Contact your admin";
+            return view('hrm.notaccess',compact('errorMsg'));
         }
     }
     public function index() {
@@ -236,12 +238,6 @@ class EmployeeLiabilityController extends Controller
         $rejected = $rejected->get();
         return view('hrm.liability.index',compact('pendings','approved','rejected','page'));
     }
-    public function create() {
-        return view('hrm.liability.create');
-    }
-    public function edit() {
-        return view('hrm.liability.edit');
-    }
     public function show($id) {
         $data = Liability::where('id',$id)->first();
         $previous = Liability::where('id', '<', $id)->max('id');
@@ -265,7 +261,7 @@ class EmployeeLiabilityController extends Controller
         $validator = Validator::make($request->all(), [
             'employee_id' => 'required',
             'type' => 'required',
-            'code' => 'required',
+            // 'code' => 'required',
             'total_amount' => 'required',
             'no_of_installments' => 'required',
             'amount_per_installment' => 'required',
@@ -277,6 +273,17 @@ class EmployeeLiabilityController extends Controller
         else {
             DB::beginTransaction();
             try {
+                $latestRow = Liability::withTrashed()->orderBy('id', 'desc')->first();
+                $length = 4;
+                $offset = 4;
+                $prefix = "";
+                if($latestRow){
+                    $latestUUID =  $latestRow->code; 
+                    $newCode =  str_pad($latestUUID + 1, 4, 0, STR_PAD_LEFT);
+                    $code =  $prefix.$newCode;
+                }else{
+                    $code = $prefix.'0001';
+                }
                 $authId = Auth::id();
                 $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
@@ -298,6 +305,7 @@ class EmployeeLiabilityController extends Controller
                     $input['division_head_id'] = $divisionHead->approval_handover_to;
                     $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                     $input['request_date'] = Carbon::now($dubaiTimeZone);
+                    $input['code'] = $code;
                     $createRequest = Liability::create($input);
                     $history['liability_id'] = $createRequest->id;
                     $history['icon'] = 'icons8-document-30.png';
@@ -314,7 +322,6 @@ class EmployeeLiabilityController extends Controller
                     $update = Liability::find($id);
                     if($update) {
                         $update->employee_id = $request->employee_id;
-                        $update->code = $request->code;
                         $update->type = $request->type;
                         $update->total_amount = $request->total_amount;
                         $update->no_of_installments = $request->no_of_installments;
@@ -357,7 +364,9 @@ class EmployeeLiabilityController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
     }

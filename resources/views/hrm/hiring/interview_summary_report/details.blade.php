@@ -17,8 +17,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 			<li class="nav-item">
 				<a class="nav-link active" data-bs-toggle="pill" href="#interview-summary-{{$data->id}}"> Interview Summary Report</a>
 			</li>
-			@if(isset($data->candidateDetails))
-			@canany(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary'])
+			@if(isset($data->candidateDetails) && $data->candidateDetails->documents_form_submit_at != NULL)
 			@php
 			$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
 			@endphp
@@ -36,7 +35,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 				<a class="nav-link" data-bs-toggle="pill" href="#personal-info-{{$data->id}}"> Personal Information</a>
 			</li>
 			@endif
-			@endcanany
 			@endif
 			@endif
 		</ul>
@@ -520,8 +518,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 				</div>
 			</div>
 		</div>
-		@if(isset($data->candidateDetails))
-		@canany(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary'])
+		@if(isset($data->candidateDetails) && $data->candidateDetails->documents_form_submit_at != NULL)
 		@php
 		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
 		@endphp 
@@ -589,18 +586,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 				<div class="card-body">
 					<div class="row">
 						<div class="col-xxl-12 col-lg-12 col-md-12">
-							@canany(['verify-candidates-documents'])
 							@php
 							$hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents']);
 							@endphp
-							@if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL)
+							@if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL && $data->candidateDetails->documents_form_send_at != NULL && $data->candidateDetails->documents_form_submit_at != NULL)
+							<!-- && $data->candidateDetails->documents_form_send_at < $data->candidateDetails->documents_form_submit_at -->
 							<button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-docs"  data-bs-toggle="modal"
 								data-bs-target="#verify-docs-{{$data->id}}" data-id="{{$data->id}}">
 							<i class="fa fa-check" aria-hidden="true"></i> Verified Documents
 							</button>
 							@endif
-							@endcanany
-							@canany(['send-candidate-documents-request-form'])
 							@php
 							$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-candidate-documents-request-form']);
 							@endphp
@@ -610,7 +605,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Docs Form
 							</button>
 							@endif
-							@endcanany
 							<div class="modal fade" id="send-docs-form-{{$data->id}}"
 								tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 								<div class="modal-dialog ">
@@ -844,7 +838,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 		<div class="tab-pane fade show" id="personal-info-{{$data->id}}">
 			<div class="row">
 				<div class="col-xxl-12 col-lg-12 col-md-12">
-					@canany(['verify-candidate-personal-information'])
 					@php
 					$hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information']);
 					@endphp
@@ -854,8 +847,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					<i class="fa fa-check" aria-hidden="true"></i> Verified Personal information
 					</button>
 					@endif
-					@endcanany
-					@canany(['send-personal-info-form-action'])
 					@php
 					$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-personal-info-form-action']);
 					@endphp
@@ -865,7 +856,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					<i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Personal Info Form
 					</button>
 					@endif
-					@endcanany
 				</div>
 				<div class="col-xxl-6 col-lg-6 col-md-12">
 					<div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
@@ -1205,7 +1195,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 				</div>
 			</div>
 		</div>
-		@endcanany
 		@endif
 		@endif
 	</div>

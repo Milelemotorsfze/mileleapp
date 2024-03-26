@@ -31,9 +31,6 @@ use Illuminate\Http\File;
 
 class CandidatePersonalInfoController extends Controller
 {
-    public function create() {
-        return view('hrm.hiring.documents.create');
-    }
     public function sendDocsEmail(Request $request) {
         $status = $message = '';
         $validator = Validator::make($request->all(), [
@@ -51,6 +48,20 @@ class CandidatePersonalInfoController extends Controller
                     $update->email = $request->email;
                 }
                 $update->update();
+                $createEmp = EmployeeProfile::where('interview_summary_id',$request->id)->first();
+                if($createEmp) {
+                    $createEmp->documents_form_send_at = Carbon::now();
+                    $createEmp->documents_form_send_by = Auth::id();
+                    $createEmp->update();
+                }
+                else {
+                    $input['documents_form_send_by'] = Auth::id();
+                    $input['created_by'] = Auth::id();
+                    $input['type'] = 'candidate';
+                    $input['interview_summary_id'] = $request->id;
+                    $input['documents_form_send_at'] = Carbon::now();
+                    $createEmp = EmployeeProfile::create($input);  
+                }
                 if(($update && $update->email == '') OR 
                     ($update && $update->email != '' && !isset($update->candidateDetails)) OR 
                     ($update && $update->email != '' && isset($update->candidateDetails) && $update->candidateDetails->documents_verified_at == '')) {
@@ -87,7 +98,9 @@ class CandidatePersonalInfoController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
     }
@@ -138,7 +151,9 @@ class CandidatePersonalInfoController extends Controller
             catch (\Exception $e) {
                 DB::rollback();
                 return redirect()->back()->withInput();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
     }
@@ -239,6 +254,8 @@ class CandidatePersonalInfoController extends Controller
             catch (\Exception $e) {
                 DB::rollback();
                 info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
     }
@@ -325,6 +342,7 @@ class CandidatePersonalInfoController extends Controller
                         }
                         $input['type'] = 'candidate';
                         $input['interview_summary_id'] = $request->id;
+                        $input['documents_form_submit_at'] = Carbon::now();
                         $createEmp = EmployeeProfile::create($input);                      
                     }
                     else { 
@@ -352,6 +370,7 @@ class CandidatePersonalInfoController extends Controller
                         else if($request->is_emirates_id_delete == 1) {
                             $createEmp->emirates_id_file = NULL;
                         }
+                        $createEmp->documents_form_submit_at = Carbon::now();
                         $createEmp->update();
                     }
                     if(isset($request->deleted_files)) {
@@ -429,7 +448,9 @@ class CandidatePersonalInfoController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
     }
@@ -592,7 +613,9 @@ class CandidatePersonalInfoController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
     }
@@ -618,7 +641,9 @@ class CandidatePersonalInfoController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
     }
@@ -673,7 +698,9 @@ class CandidatePersonalInfoController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
     }
@@ -699,7 +726,9 @@ class CandidatePersonalInfoController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
     }
@@ -718,6 +747,9 @@ class CandidatePersonalInfoController extends Controller
         $pending = EmployeeProfile::where([
             ['type','candidate'],
             ['documents_verified_at',NULL],
+            ['documents_form_send_at','!=',NULL],
+            ['documents_form_submit_at','!=',NULL],
+            // ['documents_form_send_at','<','documents_form_submit_at']
         ])->get();
         $verified = EmployeeProfile::where([
             ['type','candidate'],
@@ -790,7 +822,9 @@ class CandidatePersonalInfoController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
         else {
@@ -820,7 +854,9 @@ class CandidatePersonalInfoController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
         else {
@@ -856,7 +892,9 @@ class CandidatePersonalInfoController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
     }

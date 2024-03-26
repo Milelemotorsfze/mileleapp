@@ -27,7 +27,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 	</h4>
 	@if(isset($page))
 	@if($page == 'listing')
-	@canany(['create-employee-hiring-request'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request']);
 	@endphp
@@ -36,7 +35,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 	<i class="fa fa-plus" aria-hidden="true"></i> New Hiring Request
 	</a>
 	@endif
-	@endcanany
 	@endif
 	@endif
 	@if (count($errors) > 0)
@@ -65,7 +63,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 </div>
 <div class="portfolio">
 	<ul class="nav nav-pills nav-fill" id="my-tab">
-		@canany(['view-all-pending-hiring-request-listing','view-pending-hiring-request-listing-of-current-user'])
 		@php
 		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-pending-hiring-request-listing','view-pending-hiring-request-listing-of-current-user']);
 		@endphp
@@ -74,8 +71,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 			<a class="nav-link active" data-bs-toggle="pill" href="#pending-hiring-requests">Pending Approvals</a>
 		</li>
 		@endif
-		@endcanany
-		@canany(['view-all-approved-hiring-request-listing','view-approved-hiring-request-listing-of-current-user'])
 		@php
 		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-approved-hiring-request-listing','view-approved-hiring-request-listing-of-current-user']);
 		@endphp
@@ -84,8 +79,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 			<a class="nav-link" data-bs-toggle="pill" href="#approved-hiring-requests">Open Requests</a>
 		</li>
 		@endif
-		@endcanany
-		@canany(['view-all-closed-hiring-request-listing','view-closed-hiring-request-listing-of-current-user'])
 		@php
 		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-closed-hiring-request-listing','view-closed-hiring-request-listing-of-current-user']);
 		@endphp
@@ -94,8 +87,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 			<a class="nav-link" data-bs-toggle="pill" href="#closed-hiring-requests">Closed</a>
 		</li>
 		@endif
-		@endcanany
-		@canany(['view-all-on-hold-hiring-request-listing','view-on-hold-hiring-request-listing-of-current-user'])
 		@php
 		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-on-hold-hiring-request-listing','view-on-hold-hiring-request-listing-of-current-user']);
 		@endphp
@@ -104,8 +95,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 			<a class="nav-link" data-bs-toggle="pill" href="#on-hold-hiring-requests">On Hold</a>
 		</li>
 		@endif
-		@endcanany
-		@canany(['view-all-cancelled-hiring-request-listing','view-cancelled-hiring-request-listing-of-current-user'])
 		@php
 		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-cancelled-hiring-request-listing','view-cancelled-hiring-request-listing-of-current-user']);
 		@endphp
@@ -114,8 +103,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 			<a class="nav-link" data-bs-toggle="pill" href="#cancelled-hiring-requests">Cancelled</a>
 		</li>
 		@endif
-		@endcanany
-		@canany(['view-all-rejected-hiring-request-listing','view-rejected-hiring-request-listing-of-current-user'])
 		@php
 		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-rejected-hiring-request-listing','view-rejected-hiring-request-listing-of-current-user']);
 		@endphp
@@ -124,8 +111,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 			<a class="nav-link" data-bs-toggle="pill" href="#rejected-hiring-requests">Rejected</a>
 		</li>
 		@endif
-		@endcanany
-		@canany(['view-all-deleted-hiring-request-listing','view-deleted-hiring-request-listing-of-current-user'])
 		@php
 		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-deleted-hiring-request-listing','view-deleted-hiring-request-listing-of-current-user']);
 		@endphp
@@ -134,11 +119,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 			<a class="nav-link" data-bs-toggle="pill" href="#deleted-hiring-requests">Deleted</a>
 		</li>
 		@endif
-		@endcanany
 	</ul>
 </div>
 <div class="tab-content" id="selling-price-histories" >
-	@canany(['view-all-pending-hiring-request-listing','view-pending-hiring-request-listing-of-current-user'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-pending-hiring-request-listing','view-pending-hiring-request-listing-of-current-user']);
 	@endphp
@@ -203,7 +186,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-										@canany(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details']);
 										@endphp
@@ -213,8 +195,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 											</a>
 										</li>
 										@endif
-										@endcanany
-										@canany(['edit-employee-hiring-request','edit-current-user-hiring-request'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request','edit-current-user-hiring-request']);
 										@endphp
@@ -225,7 +205,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 											</a>
 										</li>
 										@endif
-										@endcanany
 										<li>
 											@if(isset($type))
 											@if($type == 'approve')
@@ -253,7 +232,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 											@endif
 											@endif
 										</li>
-										@canany(['all-hiring-request-delete-action','hiring-request-of-current-user-delete-action'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['all-hiring-request-delete-action','hiring-request-of-current-user-delete-action']);
 										@endphp
@@ -264,7 +242,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 											</button>
 										</li>
 										@endif
-										@endcanany
 									</ul>
 								</div>
 							</td>
@@ -277,8 +254,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 		</div>
 	</div>
 	@endif
-	@endcanany
-	@canany(['view-all-approved-hiring-request-listing','view-approved-hiring-request-listing-of-current-user'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-approved-hiring-request-listing','view-approved-hiring-request-listing-of-current-user']);
 	@endphp
@@ -341,7 +316,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 									<i class="fa fa-bars" aria-hidden="true"></i>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
-										@canany(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details']);
 										@endphp
@@ -352,10 +326,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 											</a>
 										</li>
 										@endif
-										@endcanany
 										<li>
 											@if(isset($data->questionnaire))
-											@canany(['edit-questionnaire','edit-current-user-questionnaire'])
 											@php
 											$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-questionnaire','edit-current-user-questionnaire']);
 											@endphp
@@ -364,9 +336,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 											<i class="fa fa-list" aria-hidden="true"></i> Edit Questionnaire
 											</a>
 											@endif
-											@endcanany
 											@if(isset($data->jobDescription))
-											@canany(['create-job-description'])
 											@php
 											$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
 											@endphp
@@ -377,9 +347,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 											</a>
 											@endif
 											@endif
-											@endcanany
 											@else
-											@canany(['create-job-description'])
 											@php
 											$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-job-description']);
 											@endphp
@@ -388,10 +356,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 											<i class="fa fa-address-card" aria-hidden="true"></i> Add Job Description
 											</a>
 											@endif
-											@endcanany
 											@endif
 											@else
-											@canany(['create-questionnaire'])
 											@php
 											$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-questionnaire']);
 											@endphp
@@ -400,10 +366,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 											<i class="fa fa-list" aria-hidden="true"></i> Create Questionnaire
 											</a>
 											@endif
-											@endcanany
 											@endif
 										</li>
-										@canany(['hiring-request-close-action'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['hiring-request-close-action']);
 										@endphp
@@ -417,8 +381,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 										</li>
 										@endif
 										@endif
-										@endcanany
-										@canany(['hiring-request-on-hold-action'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['hiring-request-on-hold-action']);
 										@endphp
@@ -430,8 +392,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 											</button>
 										</li>
 										@endif
-										@endcanany
-										@canany(['hiring-request-cancel-action'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['hiring-request-cancel-action']);
 										@endphp
@@ -443,7 +403,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 											</button>
 										</li>
 										@endif
-										@endcanany
 									</ul>
 								</div>
 							</td>
@@ -566,8 +525,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 		</div>
 	</div>
 	@endif
-	@endcanany
-	@canany(['view-all-closed-hiring-request-listing','view-closed-hiring-request-listing-of-current-user'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-closed-hiring-request-listing','view-closed-hiring-request-listing-of-current-user']);
 	@endphp
@@ -625,7 +582,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								@endif
 							</td>
 							<td>
-								@canany(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details']);
 								@endphp
@@ -634,7 +590,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
 								@endif
-								@endcanany
 							</td>
 						</tr>
 						@endforeach
@@ -644,8 +599,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 		</div>
 	</div>
 	@endif
-	@endcanany
-	@canany(['view-all-on-hold-hiring-request-listing','view-on-hold-hiring-request-listing-of-current-user'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-on-hold-hiring-request-listing','view-on-hold-hiring-request-listing-of-current-user']);
 	@endphp
@@ -702,7 +655,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								@endif
 							</td>
 							<td>
-								@canany(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details']);
 								@endphp
@@ -711,7 +663,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
 								@endif
-								@endcanany
 							</td>
 						</tr>
 						@endforeach
@@ -721,8 +672,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 		</div>
 	</div>
 	@endif
-	@endcanany
-	@canany(['view-all-cancelled-hiring-request-listing','view-cancelled-hiring-request-listing-of-current-user'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-cancelled-hiring-request-listing','view-cancelled-hiring-request-listing-of-current-user']);
 	@endphp
@@ -779,7 +728,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								@endif
 							</td>
 							<td>
-								@canany(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details']);
 								@endphp
@@ -788,7 +736,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
 								@endif
-								@endcanany
 							</td>
 						</tr>
 						@endforeach
@@ -798,8 +745,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 		</div>
 	</div>
 	@endif
-	@endcanany
-	@canany(['view-all-rejected-hiring-request-listing','view-rejected-hiring-request-listing-of-current-user'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-rejected-hiring-request-listing','view-rejected-hiring-request-listing-of-current-user']);
 	@endphp
@@ -857,7 +802,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								@endif
 							</td>
 							<td>
-								@canany(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-approval-details-of-current-user','view-hiring-request-details-of-current-user','view-all-hiring-request-history','view-all-hiring-request-approval-details']);
 								@endphp
@@ -866,7 +810,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 								<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
 								@endif
-								@endcanany
 							</td>
 						</tr>
 						@endforeach
@@ -876,8 +819,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 		</div>
 	</div>
 	@endif
-	@endcanany
-	@canany(['view-all-deleted-hiring-request-listing','view-deleted-hiring-request-listing-of-current-user'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-deleted-hiring-request-listing','view-deleted-hiring-request-listing-of-current-user']);
 	@endphp
@@ -940,7 +881,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 		</div>
 	</div>
 	@endif
-	@endcanany
 </div>
 @else
 <div class="card-header">

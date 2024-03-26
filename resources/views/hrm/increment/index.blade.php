@@ -18,7 +18,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-increment',
 	<h4 class="card-title">
 		Employee Salary Increment Info
 	</h4>
-	@canany(['create-increment'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-increment']);
 	@endphp
@@ -27,7 +26,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-increment',
 	<i class="fa fa-plus" aria-hidden="true"></i> New increment
 	</a>
 	@endif
-	@endcanany	
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -115,7 +113,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-increment',
 							</td>
 							@endif							
 							<td>							
-								@canany(['all-increment-details','current-user-increment-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['all-increment-details','current-user-increment-details']);
 								@endphp
@@ -124,8 +121,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-increment',
 								<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
 								@endif
-								@endcanany
-								@canany(['edit-increment'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-increment']);
 								@endphp
@@ -134,7 +129,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-increment',
 								<i class="fa fa-edit" aria-hidden="true"></i>
 								</a>
 								@endif
-								@endcanany
 							</td>
 						</tr>
 						@endforeach

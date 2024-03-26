@@ -176,7 +176,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<ul class="dropdown-menu dropdown-menu-end">
 										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
-										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
@@ -187,8 +186,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</a>
 										</li>
 										@endif
-										@endcanany
-										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
 										@endphp
@@ -200,7 +197,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</button>
 										</li>
 										@endif
-										@endcanany
 										@endif
 									</ul>
 								</div>
@@ -355,7 +351,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<ul class="dropdown-menu dropdown-menu-end">
 										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
-										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
@@ -366,8 +361,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</a>
 										</li>
 										@endif
-										@endcanany
-										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
 										@endphp
@@ -379,7 +372,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</button>
 										</li>
 										@endif
-										@endcanany
 										@endif
 									</ul>
 								</div>
@@ -551,7 +543,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<ul class="dropdown-menu dropdown-menu-end">
 										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
-										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
@@ -562,8 +553,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</a>
 										</li>
 										@endif
-										@endcanany
-										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
 										@endphp
@@ -575,7 +564,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</button>
 										</li>
 										@endif
-										@endcanany
 										@endif
 									</ul>
 								</div>
@@ -768,7 +756,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<ul class="dropdown-menu dropdown-menu-end">
 										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
-										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
@@ -779,8 +766,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</a>
 										</li>
 										@endif
-										@endcanany
-										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
 										@endphp
@@ -792,7 +777,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</button>
 										</li>
 										@endif
-										@endcanany
 										@endif
 									</ul>
 								</div>
@@ -1007,7 +991,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<ul class="dropdown-menu dropdown-menu-end">
 										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
-										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
@@ -1018,8 +1001,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</a>
 										</li>
 										@endif
-										@endcanany
-										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
 										@endphp
@@ -1031,7 +1012,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</button>
 										</li>
 										@endif
-										@endcanany
 										@endif
 									</ul>
 								</div>
@@ -1267,7 +1247,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<ul class="dropdown-menu dropdown-menu-end">
 										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
-										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
@@ -1278,8 +1257,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</a>
 										</li>
 										@endif
-										@endcanany
-										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
 										@endphp
@@ -1291,7 +1268,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</button>
 										</li>
 										@endif
-										@endcanany
 										@endif
 									</ul>
 								</div>
@@ -1548,7 +1524,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<ul class="dropdown-menu dropdown-menu-end">
 										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
-										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
@@ -1559,8 +1534,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</a>
 										</li>
 										@endif
-										@endcanany
-										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
 										@endphp
@@ -1572,7 +1545,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</button>
 										</li>
 										@endif
-										@endcanany
 										@endif
 									</ul>
 								</div>
@@ -1827,7 +1799,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<ul class="dropdown-menu dropdown-menu-end">
 										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
-										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
@@ -1838,7 +1809,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</a>
 										</li>
 										@endif
-										@endcanany
 										@endif
 									</ul>
 								</div>
@@ -2054,7 +2024,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<ul class="dropdown-menu dropdown-menu-end">
 										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
-										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
@@ -2065,7 +2034,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</a>
 										</li>
 										@endif
-										@endcanany
 										<li>
 											@if(isset($type))
 											@if($type == 'approve')
@@ -2318,8 +2286,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<ul class="dropdown-menu dropdown-menu-end">
 										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
 										@if($data->employeeHiringRequest->final_status != 'closed')
-										@canany(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary'])
-										@php
+										<!-- @php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-interview-summary-report','requestedby-edit-interview-summary','organizedby-edit-interview-summary']);
 										@endphp
 										@if ($hasPermission)
@@ -2328,9 +2295,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											<i class="fa fa-edit" aria-hidden="true"></i> Edit
 											</a>
 										</li>
-										@endif
-										@endcanany
-										@canany(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary'])
+										@endif -->
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
 										@endphp
@@ -2342,9 +2307,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</button>
 										</li>
 										@endif
-										@endcanany
 										@if($data->candidate_expected_salary != 0.00 && $data->total_salary != 0.00)
-										@canany(['send-candidate-documents-request-form'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-candidate-documents-request-form']);
 										@endphp
@@ -2356,7 +2319,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</button>
 										</li>
 										@endif
-										@endcanany
 										@endif
 										@endif
 									</ul>
@@ -2694,7 +2656,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show" id="personalinfo_docs">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="selected-for-job-table" class="table table-striped table-editable table-edits table">
+				<table id="selected-for-job-table" class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -2904,7 +2866,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
 										@include('hrm.hiring.interview_summary_report.viewDetailsActionBtn')
-										@canany(['send-candidate-documents-request-form'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-candidate-documents-request-form']);
 										@endphp
@@ -2916,12 +2877,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</button>
 										</li>
 										@endif
-										@endcanany
-										@canany(['verify-candidates-documents'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents']);
 										@endphp
-										@if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL)
+										@if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL && $data->candidateDetails->documents_form_send_at != NULL && $data->candidateDetails->documents_form_submit_at != NULL)
+										<!-- &&  $data->candidateDetails->documents_form_send_at < $data->candidateDetails->documents_form_submit_at -->
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-personalinfo"  data-bs-toggle="modal"
 												data-bs-target="#verify-personal-info-form-{{$data->id}}" data-id="{{$data->id}}">
@@ -2929,8 +2889,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</button>
 										</li>
 										@endif
-										@endcanany
-										@canany(['send-offer-letter'])
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-offer-letter']);
 										@endphp										
@@ -2942,7 +2900,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 											</button>
 										</li>
 										@endif
-										@endcanany
 									</ul>
 									<div class="modal fade" id="send-offer-letter-{{$data->id}}"
 										tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

@@ -620,6 +620,21 @@
                 </div>
             </div>
         </div>
+        <div class="row mt-2">
+            <div class="col-sm-12">
+                <div class="row mt-2">
+                    <div class="col-sm-2">
+                        Third Party Payment :
+                    </div>
+                    <div class="col-sm-2">
+                    <select name="thirdpartypayment" class="form-control">
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                    </div>
+                </div>
+            </div>
+        </div>
         <br>
         <div class="card">
             <div class="card-header">

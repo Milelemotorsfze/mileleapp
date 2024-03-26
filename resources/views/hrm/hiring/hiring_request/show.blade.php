@@ -71,7 +71,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 <div class="card-body">
 	<div class="portfolio">
 		<ul class="nav nav-pills nav-fill" id="my-tab">
-			@canany(['view-all-hiring-request-details','view-hiring-request-details-of-current-user'])
 			@php
 			$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-details-of-current-user']);
 			@endphp
@@ -80,8 +79,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 				<a class="nav-link active" data-bs-toggle="pill" href="#requests"> Hiring Request</a>
 			</li>
 			@endif
-			@endcanany
-			@canany(['view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'])
 			@php
 			$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user']);
 			@endphp
@@ -90,8 +87,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 				<a class="nav-link" data-bs-toggle="pill" href="#approvals-and-history"> Approvals and History</a>
 			</li>
 			@endif
-			@endcanany
-			@canany(['view-questionnaire-details','view-current-user-questionnaire'])
 			@php
 			$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-questionnaire-details','view-current-user-questionnaire']);
 			@endphp
@@ -102,8 +97,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 			</li>
 			@endif
 			@endif
-			@endcanany
-			@canany(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary'])
 			@php
 			$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
 			@endphp
@@ -114,10 +107,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 			</li>
 			@endif
 			@endif
-			@endcanany
 		</ul>
 	</div>
-	@canany(['view-all-hiring-request-details','view-hiring-request-details-of-current-user'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-details','view-hiring-request-details-of-current-user']);
 	@endphp
@@ -150,7 +141,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							@endif
 							@endif
 							@if($data->status == 'pending')
-							@canany(['edit-employee-hiring-request','edit-current-user-hiring-request'])
 							@php
 							$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request','edit-current-user-hiring-request']);
 							@endphp
@@ -159,7 +149,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<i class="fa fa-edit" aria-hidden="true"></i> Edit
 							</a>
 							@endif
-							@endcanany
 							@endif
 						</div>
 					</div>
@@ -171,8 +160,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 		</div>
 	</div>
 	@endif
-	@endcanany
-	@canany(['view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-history','view-all-hiring-request-approval-details','view-hiring-request-history-of-current-user','view-hiring-request-approval-details-of-current-user']);
 	@endphp
@@ -181,7 +168,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 		<div class="tab-pane fade show" id="approvals-and-history">
 			<br>
 			<div class="row">
-				@canany(['view-all-hiring-request-approval-details','view-hiring-request-approval-details-of-current-user'])
 				@php
 				$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-approval-details','view-hiring-request-approval-details-of-current-user']);
 				@endphp
@@ -372,8 +358,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					</div>
 				</div>
 				@endif
-				@endcanany
-				@canany(['view-all-hiring-request-history','view-hiring-request-history-of-current-user'])
 				@php
 				$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-hiring-request-history','view-hiring-request-history-of-current-user']);
 				@endphp
@@ -409,13 +393,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					</div>
 				</div>
 				@endif
-				@endcanany
 			</div>
 		</div>
 	</div>
 	@endif
-	@endcanany
-	@canany(['view-questionnaire-details','view-current-user-questionnaire'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-questionnaire-details','view-current-user-questionnaire']);
 	@endphp
@@ -430,8 +411,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 		</div>
 	</div>
 	@endif
-	@endcanany
-	@canany(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
 	@endphp
@@ -447,7 +426,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	</div>
 	@endif
 	@endif
-	@endcanany
 </div>
 @else
 <div class="card-header">
