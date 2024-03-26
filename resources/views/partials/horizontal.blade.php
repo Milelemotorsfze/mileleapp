@@ -730,10 +730,28 @@
                                     </a>
                                 </li>
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('postingrecords.index') }}" id="topnav-more" role="button">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="" id="topnav-more" role="button">
                                         <i data-feather="upload-cloud"></i>
                                         <span data-key="t-extra-pages">Posting Records</span>
+                                        <div class="arrow-down"></div>
                                     </a>
+                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                        @php
+                                        $posting_platforms = DB::table('posting_platforms')->get();
+                                        @endphp
+                                        @foreach ($posting_platforms as $posting_platform)
+                                            @php
+                                            $lead_source = DB::table('lead_source')->where('id', $posting_platform->lead_source_id)->first();
+                                            @endphp
+                                            @if($lead_source)
+                                            <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('postingrecords', ['id' => $posting_platform->lead_source_id]) }}" id="topnav-utility" role="button">
+                                                    <span data-key="t-utility">{{$lead_source->source_name}}</span>
+                                                </a>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('marketingpurchasingpayments.index') }}" id="topnav-more" role="button">

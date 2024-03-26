@@ -496,7 +496,9 @@ Route::get('/d', function () {
     Route::post('new-leads/storeleads', [CallsController::class, 'storeleads'])->name('calls.storeleads');
     Route::post('new-variants/storenewvarinats', [CallsController::class, 'storenewvarinats'])->name('calls.storenewvarinats');
     Route::resource('sale_person_status', SalesPersonStatusController::class);
-    Route::resource('postingrecords', PostingRecordsController::class);
+    Route::get('postingrecords/{id}', [PostingRecordsController::class, 'postingrecords'])->name('postingrecords');
+    Route::get('createposting/{leadssource_id}', [PostingRecordsController::class, 'createposting'])->name('posting.createposting');
+    Route::post('storeposting/{leadssource_id}', [PostingRecordsController::class, 'storeposting'])->name('posting.storeposting');
     Route::resource('marketingpurchasingpayments', MarketingPurchasingPaymentsController::class);
 
     //Sales
@@ -805,6 +807,8 @@ Route::get('/d', function () {
     //Pre Order
     Route::resource('preorder', PreOrderController::class);
     Route::get('/get-po-for-presale', [PreOrderController::class, 'getpoforpreorder']);
+
+    
 
 
 

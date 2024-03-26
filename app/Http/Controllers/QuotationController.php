@@ -114,6 +114,7 @@ class QuotationController extends Controller
         $quotation->calls_id = $request->calls_id;
         $quotation->currency = $request->currency;
         $quotation->document_type = $request->document_type;
+        $quotation->third_party_payment = $request->thirdpartypayment;
         $quotation->date = Carbon::now();
         if($request->document_type == 'Proforma') {
             $quotation->document_type = 'Proforma Invoice';
@@ -406,9 +407,14 @@ class QuotationController extends Controller
 
         $pdf->setPrintHeader(false);
         $files[] = 'Quotations/'.$filename;
-
-        $files[] = 'Quotations/quotation_attachment_documents.pdf';
-
+        if($quotation->third_party_payment === "Yes")
+        {
+            $files[] = 'Quotations/quotation_attachment_withparty_documents.pdf';
+        }
+        else
+        {
+            $files[] = 'Quotations/quotation_attachment_documents.pdf';
+        }
         foreach ($files as $file) {
             $pageCount = $pdf->setSourceFile($file);
             for ($i=0; $i < $pageCount; $i++)
@@ -480,6 +486,7 @@ class QuotationController extends Controller
     $quotation->calls_id = $request->calls_id;
     $quotation->currency = $request->currency;
     $quotation->document_type = $request->document_type;
+    $quotation->third_party_payment = $request->thirdpartypayment;
     $quotation->date = Carbon::now();
     if($request->document_type == 'Proforma') {
         $quotation->document_type = 'Proforma Invoice';
