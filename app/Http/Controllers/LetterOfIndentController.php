@@ -10,6 +10,7 @@ use App\Models\DemandList;
 use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentDocument;
 use App\Models\LetterOfIndentItem;
+use App\Models\LoiRestrictedCountry;
 use App\Models\MasterModel;
 use App\Models\ModelYearCalculationCategory;
 use App\Models\Supplier;
@@ -109,7 +110,8 @@ class LetterOfIndentController extends Controller
      */
     public function create()
     {
-        $countries = Country::all();
+        $restrictedCountries = LoiRestrictedCountry::where('status', LoiRestrictedCountry::STATUS_ACTIVE)->pluck('country_id');
+        $countries = Country::whereNotIn('id', $restrictedCountries)->get();
         $customers = Customer::all();
         $models = MasterModel::whereNotNull('transcar_loi_description')->groupBy('model')->orderBy('id','ASC')->get();
 
@@ -121,8 +123,6 @@ class LetterOfIndentController extends Controller
      */
     public function store(Request $request)
     {
-
-//        dd($request->all());
 
         $request->validate([
             'customer_id' => 'required',
@@ -376,8 +376,10 @@ class LetterOfIndentController extends Controller
     public function edit(string $id)
     {
         $letterOfIndent = LetterOfIndent::find($id);
-        $countries = Country::all();
+        $restrictedCountries = LoiRestrictedCountry::where('status', LoiRestrictedCountry::STATUS_ACTIVE)->pluck('country_id');
+        $countries = Country::whereNotIn('id', $restrictedCountries)->get();
         $customers = Customer::all();
+
         if($letterOfIndent->dealers == 'Trans Cars') {
             $models = MasterModel::where('is_transcar', true);
         }else{
@@ -487,7 +489,6 @@ class LetterOfIndentController extends Controller
                     if($latestRow){
                         $latestUUID =  $latestRow->uuid;
                         $latestUUIDNumber = substr($latestUUID, $offset, $length);
-
                         $newCode =  str_pad($latestUUIDNumber + 1, 3, 0, STR_PAD_LEFT);
                         $code =  $prefix.$newCode;
                     }else{

@@ -1,5 +1,11 @@
 @extends('layouts.main')
 @section('content')
+    <style>
+        .widthinput
+        {
+            height:32px!important;
+        }
+    </style>
     @can('loi-restricted-country-create')
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-restricted-country-create');
@@ -36,7 +42,7 @@
                     @csrf
                     <div class="row">
                         <div class="row">
-                            <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Country </label>
                                     <select class="form-control widthinput" multiple name="country_id" id="country" autofocus>
@@ -46,14 +52,73 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Restricted Model Line </label>
+                                    <select class="form-control widthinput" multiple name="master_model_line_id" id="model_line" autofocus>
+                                        @foreach($modelLines as $modelLine)
+                                            <option value="{{ $modelLine->id }}"> {{ $modelLine->model_line }} </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label"> Maximum QTY/Passport </label>
+                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"  name="max_qty_per_passport" >
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label"> Minimum QTY/Passport </label>
+                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"  name="min_qty_per_passport" >
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label class="form-label"></label>
+                                <div class="form-check mt-3">
+                                    <input class="form-check-input" type="checkbox" name="is_only_company_allowed" id="is_only_company_allowed" {{ old('is_only_company_allowed') ? 'checked' : '' }} />
+                                    <label class="form-check-label" for="is_only_company_allowed">
+                                        Is LOI Can be Created for Only Company?
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label class="form-label"></label>
+                                <div class="form-check mt-3">
+                                    <input class="form-check-input" type="checkbox" name="is_loi_restricted" id="is_loi_restricted" {{ old('is_loi_restricted') ? 'checked' : '' }} />
+                                    <label class="form-check-label" for="is_loi_restricted">
+                                        Is LOI Restricted ?
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label class="form-label"></label>
+                                <div class="form-check mt-3">
+                                    <input class="form-check-input" type="checkbox" name="is_inflate_qty" id="is_inflate_qty" {{ old('is_inflate_qty') ? 'checked' : '' }} />
+                                    <label class="form-check-label" for="is_inflate_qty">
+                                        Is able to Inflate Quantity ?
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label class="form-label"></label>
+                                <div class="form-check mt-3">
+                                    <input class="form-check-input" type="checkbox" name="is_longer_lead_time" id="is_longer_lead_time" {{ old('is_longer_lead_time') ? 'checked' : '' }} />
+                                    <label class="form-check-label" for="is_longer_lead_time">
+                                        Lead time is More ?
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 mt-3">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Comment </label>
-                                    <textarea cols="25" rows="5" class="form-control" name="comment"> {{ old('comment') }} </textarea>
+                                    <textarea cols="25" rows="5"  class="form-control" name="comment"> {{ old('comment') }} </textarea>
                                 </div>
                             </div>
                             <div class="col-12 text-center">
-                                <button type="submit" class="btn btn-primary ">Submit</button>
+                                <button type="submit" class="btn btn-primary mt-4">Submit</button>
                             </div>
                         </div>
                     </div>
@@ -70,6 +135,12 @@
             allowClear: true,
             maximumSelectionLength: 1
         });
+        $('#model_line').select2({
+            placeholder : 'Select Model Line',
+            allowClear: true,
+            maximumSelectionLength: 1
+        });
+
         $("#form-create").validate({
             ignore: [],
             rules: {

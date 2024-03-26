@@ -45,7 +45,7 @@
     <script>
         $('#country-table').on('click', '.btn-delete', function (e) {
             var url = $(this).data('url');
-            var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+            var confirm = alertify.confirm('Are you sure, Do you want to Delete this item ?',function (e) {
                 if (e) {
                     $.ajax({
                         type: "POST",

@@ -14,6 +14,10 @@ class LoiRestrictedCountry extends Model
     {
         return $this->belongsTo(Country::class,'country_id','id');
     }
+    public function modelLine()
+    {
+        return $this->belongsTo(MasterModelLines::class,'master_model_line_id','id');
+    }
     public function updatedBy()
     {
         return $this->belongsTo(User::class,'updated_by','id');
