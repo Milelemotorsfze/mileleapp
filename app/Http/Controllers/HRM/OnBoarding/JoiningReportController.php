@@ -254,7 +254,9 @@ class JoiningReportController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
     }
@@ -336,7 +338,9 @@ class JoiningReportController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
     }
@@ -473,7 +477,9 @@ class JoiningReportController extends Controller
         } 
         catch (\Exception $e) {
             DB::rollback();
-            dd($e);
+            info($e);
+            $errorMsg ="Something went wrong! Contact your admin";
+            return view('hrm.notaccess',compact('errorMsg'));
         }
     }
     public function employeeVerification($id) {
@@ -487,7 +493,9 @@ class JoiningReportController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
+                return view('hrm.notaccess',compact('errorMsg'));
             }
         }
         else {
@@ -530,7 +538,9 @@ class JoiningReportController extends Controller
         } 
         catch (\Exception $e) {
             DB::rollback();
-            dd($e);
+            info($e);
+            $errorMsg ="Something went wrong! Contact your admin";
+            return view('hrm.notaccess',compact('errorMsg'));
         }
     }
     public function approvalAwaiting(Request $request) {

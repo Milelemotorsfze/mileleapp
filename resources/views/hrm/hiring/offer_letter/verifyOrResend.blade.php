@@ -46,7 +46,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-
 	<div class="tab-pane fade show active" id="data-candidate-info">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="data-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table id="data-selling-price-histories-table" class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -86,7 +86,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-
 							</td>
 							<td>{{ $data->interviewSummary->offerLetterSendBy->name ?? ''}}</td>
 							<td>
-								@if(isset($data) && isset($data->interviewSummary) && $data->interviewSummary->offer_signed_at != '')
+								@if(isset($data) && $data->offer_signed_at != '')
 								{{\Carbon\Carbon::parse($data->interviewSummary->offer_signed_at)->format('d M Y') ?? ''}}
 								@endif
 							</td>
@@ -106,7 +106,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-
 	<div class="tab-pane fade show" id="verified-candidate-info">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="data-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table id="data-selling-price-histories-table" class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -147,11 +147,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-
 							</td>
 							<td>{{ $data->interviewSummary->offerLetterSendBy->name ?? ''}}</td>
 							<td>
-								@if(isset($data) && isset($data->interviewSummary) && data->interviewSummary->offer_signed_at != '')
-								{{\Carbon\Carbon::parse($data->interviewSummary->offer_signed_at)->format('d M Y') ?? ''}}
+								@if(isset($data) && $data->offer_signed_at != '')
+								{{\Carbon\Carbon::parse($data->offer_signed_at)->format('d M Y') ?? ''}}
 								@endif
 							</td>
-							<td>{{ $data->interviewSummary->offerLetterVerifiedBy->name ?? ''}}</td>
+							<td>{{ $data->interviewSummary->offerLetterVerifieddBy->name ?? ''}}</td>
 							<td>
 								<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Candidate Details" class="btn btn-sm btn-primary" 
 									href="{{route('interview-summary-report.show', $data->interview_summary_id)}}">

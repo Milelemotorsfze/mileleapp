@@ -121,6 +121,9 @@ class EmployeeProfile extends Model
         'personal_information_verified_by',
         'documents_verified_at',
         'documents_verified_by',
+        'documents_form_send_at',
+        'documents_form_send_by',
+        'documents_form_submit_at',
 
         'image_path',
         'language',

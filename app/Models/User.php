@@ -201,7 +201,9 @@ class User extends Authenticatable
         $pendingdocsUploaded = 0;
         $pendingdocsUploaded = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')
         ->whereHas('candidateDetails', function($q){
-            $q->where('documents_verified_at', NULL);
+            $q->where('documents_verified_at', NULL)->where('documents_form_send_at','!=',NULL)->where('documents_form_submit_at','!=',NULL)
+            // ->where('documents_form_send_at','<','documents_form_submit_at')
+            ;
         })->latest()->count();
         return $pendingdocsUploaded;
     }

@@ -18,7 +18,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-birthday-po
 	<h4 class="card-title">
 		Employee Birthday Gift PO Info
 	</h4>
-	@canany(['create-birthday-po'])
 	@php
 	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-birthday-po']);
 	@endphp
@@ -27,7 +26,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-birthday-po
 	<i class="fa fa-plus" aria-hidden="true"></i> New Birthday Gift PO
 	</a>
 	@endif
-	@endcanany	
 	@if (count($errors) > 0)
 	<div class="alert alert-danger">
 		<strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -99,7 +97,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-birthday-po
 							</td>
 							@endif							
 							<td>							
-								@canany(['view-birthday-po-details'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-birthday-po-details']);
 								@endphp
@@ -108,8 +105,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-birthday-po
 								<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
 								@endif
-								@endcanany
-								@canany(['edit-birthday-po'])
 								@php
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-birthday-po']);
 								@endphp
@@ -118,7 +113,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-birthday-po
 								<i class="fa fa-edit" aria-hidden="true"></i>
 								</a>
 								@endif
-								@endcanany
 							</td>
 						</tr>
 						@endforeach

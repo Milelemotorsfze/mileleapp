@@ -240,7 +240,8 @@ class DivisionController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                $errorMsg ="Comong Soon ! This function is under testing now.. You can access later !";
+                info($e);
+                $errorMsg ="Something went wrong! Contact your admin";
                 return view('hrm.notaccess',compact('errorMsg'));
             }
         }
