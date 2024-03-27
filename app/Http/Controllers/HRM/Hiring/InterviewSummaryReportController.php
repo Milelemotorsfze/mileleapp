@@ -297,7 +297,7 @@ class InterviewSummaryReportController extends Controller
             })->latest();
         }
         $docsUploaded = $docsUploaded->get();
-        $interviewersNames = User::whereHas('empProfile')->whereNotIn('id',[1,16])->select('id','name')->get();
+        $interviewersNames = User::where('status','active')->whereHas('empProfile')->whereNotIn('id',[1,16])->select('id','name')->get();
         if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing'])) {
             return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','notSelected',
             'pendings','approved','selectedForJob','docsUploaded','rejected','interviewersNames'));
@@ -348,7 +348,7 @@ class InterviewSummaryReportController extends Controller
         $data = $data->first();
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterGender = MasterGender::whereIn('id',[1,2])->get();
-        $interviewersNames = User::whereNotIn('id',[1,16])->whereHas('empProfile')->select('id','name')->get();
+        $interviewersNames = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->select('id','name')->get();
         if($id == 'new') {
             return view('hrm.hiring.interview_summary_report.create',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
             'masterGender','interviewersNames','hiringrequests'));   

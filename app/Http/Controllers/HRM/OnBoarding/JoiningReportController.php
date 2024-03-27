@@ -113,9 +113,9 @@ class JoiningReportController extends Controller
             ;
         })->with('designation','department')->get();
         $masterlocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get(); 
-        $reportingTo = User::where('status','active')->whereNotIn('id',[1,16])->get();
+        $reportingTo = User::where('status','active')->where('status','active')->whereNotIn('id',[1,16])->get();
         $masterDepartments = MasterDepartment::get();
-        $employees = User::whereNotIn('id',[1,16])->whereHas('empProfile');
+        $employees = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile');
         if($type == 'vacations_or_leave') {
             $employees = $employees->whereHas('approvedLeaves');
         }
@@ -366,7 +366,7 @@ class JoiningReportController extends Controller
         })->with('designation','department')->get();
         $masterlocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get(); 
         $reportingTo = User::whereNotIn('id',[1,16])->where('status','active')->get();
-        $emps = User::whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.designation','empProfile.department','empProfile.location')->get();
+        $emps = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.designation','empProfile.department','empProfile.location')->get();
         $masterDepartments = MasterDepartment::get();
         if($data->joining_type == 'new_employee') {
             return view('hrm.onBoarding.joiningReport.edit',compact('data','candidates','masterlocations','reportingTo'));

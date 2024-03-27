@@ -24,7 +24,7 @@ class InsuranceController extends Controller
         return view('hrm.insurance.index',compact('datas'));
     }
     public function create() {
-        $employees = User::whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
+        $employees = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         return view('hrm.insurance.create',compact('employees'));
@@ -69,7 +69,7 @@ class InsuranceController extends Controller
         }       
     }
     public function edit($id) {
-        $employees = User::whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
+        $employees = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         $data = Insurance::where('id',$id)->with('user.empProfile.department','user.empProfile.designation','user.empProfile.location')->first();

@@ -145,9 +145,9 @@ class EmployeeHiringRequestController extends Controller
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
         $masterJobPositions = MasterJobPosition::select('id','name')->get();
         $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
-        $requestedByUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
-        $reportingToUsers = User::whereNotIn('id',['1','16'])->select('id','name')->get();
-        $replacementForEmployees = User::whereNotIn('id',['1','16'])->select('id','name')->get();
+        $requestedByUsers = User::where('status','active')->whereNotIn('id',['1','16'])->select('id','name')->get();
+        $reportingToUsers = User::where('status','active')->whereNotIn('id',['1','16'])->select('id','name')->get();
+        $replacementForEmployees = User::where('status','active')->whereNotIn('id',['1','16'])->select('id','name')->get();
         if(Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request'])) { 
             $user['id'] = '';
             $user['department'] = '';
