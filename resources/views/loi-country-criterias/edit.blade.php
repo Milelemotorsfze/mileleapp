@@ -1,0 +1,195 @@
+@extends('layouts.main')
+@section('content')
+    <style>
+        .widthinput
+        {
+            height:32px!important;
+        }
+    </style>
+    @can('loi-restricted-country-edit')
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-restricted-country-edit');
+        @endphp
+        @if ($hasPermission)
+            <div class="card-header">
+                <h4 class="card-title">Edit LOI Restricted Countries</h4>
+                <a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+            </div>
+            <div class="card-body">
+                @if (count($errors) > 0)
+                    <div class="alert alert-danger">
+                        <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                @if (Session::has('error'))
+                    <div class="alert alert-danger" >
+                        <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                        {{ Session::get('error') }}
+                    </div>
+                @endif
+                @if (Session::has('success'))
+                    <div class="alert alert-success" id="success-alert">
+                        <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                        {{ Session::get('success') }}
+                    </div>
+                @endif
+                <form id="form-create" action="{{ route('loi-country-criterias.update', $loiCountryCriteria->id) }}" method="POST" >
+                    @method('PUT')
+                    @csrf
+                    <div class="row">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label"> Country </label>
+                                    <select class="form-control widthinput" multiple name="country_id" id="country" autofocus>
+                                        @foreach($countries as $country)
+                                            <option value="{{ $country->id }}" {{ $country->id == $loiCountryCriteria->country_id ? 'selected' : '' }}>
+                                                {{ $country->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Restricted Model Line </label>
+                                    <select class="form-control widthinput" multiple name="master_model_line_id" id="model_line" autofocus>
+                                        @foreach($modelLines as $modelLine)
+                                            <option value="{{ $modelLine->id }}" {{ $modelLine->id == $loiCountryCriteria->master_model_line_id ? 'selected' : "" }} > {{ $modelLine->model_line }} </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label"> Minimum QTY/Passport </label>
+                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"
+                                           name="min_qty_per_passport" placeholder="Enter Minimum Quantity / Passport" value="{{ old('min_qty_per_passport', $loiCountryCriteria->min_qty_per_passport) }}" >
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label"> Maximum QTY/Passport </label>
+                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"
+                                           name="max_qty_per_passport" placeholder="Enter Maximum Quantity / Passport" value="{{ old('max_qty_per_passport', $loiCountryCriteria->max_qty_per_passport) }}">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label"> Minimum QTY/ Company </label>
+                                    <input type="number" class="form-control widthinput" placeholder="Enter Minimum Quantity / Company"  step="1" oninput="validity.valid||(value='');" min="1"
+                                           name="min_qty_for_company" value="{{ old('min_qty_for_company', $loiCountryCriteria->min_qty_for_company) }}">
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label"> Maximum QTY/ Company </label>
+                                    <input type="number" class="form-control widthinput"  placeholder="Enter Maximum Quantity / Company" step="1" oninput="validity.valid||(value='');"
+                                           min="1"  name="max_qty_for_company" value="{{ old('max_qty_for_company', $loiCountryCriteria->max_qty_for_company) }}" >
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label for="choices-single-default" class="form-label"> Is LOI Can be Created for Only Company? </label>
+                                <select class="form-control widthinput" multiple name="is_only_company_allowed" id="is_only_company_allowed" autofocus>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::YES }}"
+                                        {{ $loiCountryCriteria->is_only_company_allowed == \App\Models\LoiCountryCriteria::YES ? 'selected'  : ''}}>Yes</option>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::NO }}"
+                                        {{ $loiCountryCriteria->is_only_company_allowed == \App\Models\LoiCountryCriteria::NO ? 'selected'  : '' }} > No </option>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::NONE }}"
+                                        {{ $loiCountryCriteria->is_only_company_allowed == \App\Models\LoiCountryCriteria::NONE  ? 'selected'  : ''}} > None </option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label for="choices-single-default" class="form-label"> Is able to Inflate Quantity ?</label>
+                                <select class="form-control widthinput" multiple name="is_inflate_qty" id="is_inflate_qty" autofocus>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::YES }}"
+                                        {{ $loiCountryCriteria->is_inflate_qty == \App\Models\LoiCountryCriteria::YES ? 'selected'  : ''}}>Yes</option>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::NO }}"
+                                        {{ $loiCountryCriteria->is_inflate_qty == \App\Models\LoiCountryCriteria::NO ? 'selected'  : ''}} > No </option>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::NONE }}"
+                                        {{ $loiCountryCriteria->is_inflate_qty == \App\Models\LoiCountryCriteria::NONE  ? 'selected'  : ''}} > None </option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label for="choices-single-default" class="form-label"> Lead time is More ?</label>
+                                <select class="form-control widthinput" multiple name="is_longer_lead_time" id="is_longer_lead_time" autofocus>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::YES }}"
+                                        {{ $loiCountryCriteria->is_longer_lead_time == \App\Models\LoiCountryCriteria::YES ? 'selected'  : ''}}>Yes</option>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::NO }}"
+                                        {{ $loiCountryCriteria->is_longer_lead_time == \App\Models\LoiCountryCriteria::NO ? 'selected'  : '' }} > No </option>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::NONE }}"
+                                        {{ $loiCountryCriteria->is_only_company_allowed == \App\Models\LoiCountryCriteria::NONE ? 'selected'  : ''}} > None </option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label"> Comment </label>
+                                    <textarea cols="25" rows="5" class="form-control" name="comment"> {{ old('comment', $loiCountryCriteria->comment) }} </textarea>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label class="form-label"></label>
+                                <div class="form-check mt-3">
+                                    <input class="form-check-input" type="checkbox" name="is_loi_restricted" id="is_loi_restricted"
+                                           value="1" {{ true == $loiCountryCriteria->is_loi_restricted  ? 'checked' : ''}}  />
+                                    <label class="form-check-label" for="is_loi_restricted">
+                                        Is LOI Restricted ?
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12 text-center">
+                                <button type="submit" class="btn btn-primary ">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            </div>
+        @endif
+    @endcan
+@endsection
+@push('scripts')
+    <script>
+        $('#country').select2({
+            placeholder : 'Select Country',
+            allowClear: true,
+            maximumSelectionLength: 1
+        });
+        $('#model_line').select2({
+            placeholder : 'Select Model Line',
+            allowClear: true,
+            maximumSelectionLength: 1
+        });
+        $('#is_only_company_allowed').select2({
+            placeholder : 'Select Option',
+            allowClear: true,
+            maximumSelectionLength: 1
+        });
+        $('#is_inflate_qty').select2({
+            placeholder : 'Select Option',
+            allowClear: true,
+            maximumSelectionLength: 1
+        });
+        $('#is_longer_lead_time').select2({
+            placeholder : 'Select Option',
+            allowClear: true,
+            maximumSelectionLength: 1
+        });
+        $("#form-create").validate({
+            ignore: [],
+            rules: {
+                brand_name: {
+                    required: true,
+                    maxlength:255
+                },
+            },
+        });
+    </script>
+@endpush
+

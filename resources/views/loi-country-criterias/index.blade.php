@@ -14,7 +14,7 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-restricted-country-create');
                     @endphp
                     @if ($hasPermission)
-                        <a  class="btn btn-sm btn-info float-end" href="{{ route('loi-restricted-countries.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+                        <a  class="btn btn-sm btn-info float-end" href="{{ route('loi-country-criterias.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
                     @endif
                 @endcan
             </div>
@@ -82,7 +82,7 @@
                         },
                         success:function (data) {
                             location.reload();
-                            if(status == '{{ \App\Models\LoiRestrictedCountry::STATUS_INACTIVE }}') {
+                            if(status == '{{ \App\Models\LoiCountryCriteria::STATUS_INACTIVE }}') {
                                 $msg = 'Item Inactivated Successfully.';
                             }else{
                                 $msg = 'Item Activated Successfully.';

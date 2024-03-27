@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LoiCountryCriteriasController;
 use App\Http\Controllers\LOIMappingCriteriaController;
 use App\Http\Controllers\LoiRestrictedCountriesController;
 use App\Http\Controllers\Masters\MasterJobPositionController;
@@ -64,12 +65,10 @@ use App\Http\Controllers\HiringController;
 use App\Http\Controllers\LeadSourceController;
 use App\Http\Controllers\LOIItemsController;
 use App\Http\Controllers\StrategyController;
-//use App\Http\Controllers\LOIDocumentsController;
 use App\Http\Controllers\Repeatedcustomers;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SupplierAddonController;
 use App\Http\Controllers\PFIController;
-//use App\Http\Controllers\DemandPlanningSupplierController;
 use App\Http\Controllers\VehiclePicturesController;
 use App\Http\Controllers\PurchasingOrderController;
 use App\Http\Controllers\MovementController;
@@ -418,8 +417,9 @@ Route::get('/d', function () {
     Route::get('letter-of-indents/suppliers-LOIs', [LetterOfIndentController::class, 'getSupplierLOI'])->name('letter-of-indents.get-suppliers-LOIs');
     Route::post('letter-of-indents/supplier-approval', [LOIItemsController::class, 'supplierApproval'])->name('letter-of-indents.supplier-approval');
     Route::get('letter-of-indents/milele-approval', [LOIItemsController::class, 'mileleApproval'])->name('letter-of-indents.milele-approval');
-    Route::resource('loi-restricted-countries', LoiRestrictedCountriesController::class);
-    Route::post('loi-restricted-countries/active-inactive', [LoiRestrictedCountriesController::class,'statusChange'])->name('loi-restricted-countries.active-inactive');
+    Route::resource('loi-country-criterias', LoiCountryCriteriasController::class);
+    Route::post('loi-country-criterias/active-inactive', [LoiCountryCriteriasController::class,'statusChange'])->name('loi-country-criterias.active-inactive');
+    Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
 
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::post('letter-of-indent-item/approve', [LOIItemsController::class, 'approveLOIItem'])->name('approve-loi-items');
@@ -811,7 +811,7 @@ Route::get('/d', function () {
     Route::resource('preorder', PreOrderController::class);
     Route::get('/get-po-for-presale', [PreOrderController::class, 'getpoforpreorder']);
 
-    
+
 
 
 

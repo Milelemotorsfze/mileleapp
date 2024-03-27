@@ -1067,7 +1067,7 @@
                                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-restricted-country-list');
                                                             @endphp
                                                             @if ($hasPermission)
-                                                                <a href="{{route('loi-restricted-countries.index')}}" class="dropdown-item" data-key="t-login"> LOI Restricted Countries </a>
+                                                                <a href="{{route('loi-country-criterias.index')}}" class="dropdown-item" data-key="t-login"> LOI Country Criterias </a>
                                                             @endif
                                                         @endcan
                                                         <div class="dropdown">

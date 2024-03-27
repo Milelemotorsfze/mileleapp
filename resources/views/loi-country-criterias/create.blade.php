@@ -12,7 +12,7 @@
         @endphp
         @if ($hasPermission)
             <div class="card-header">
-                <h4 class="card-title">Add LOI Restricted Countries</h4>
+                <h4 class="card-title">Add LOI Country Criteria</h4>
                 <a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
             </div>
             <div class="card-body">
@@ -38,7 +38,7 @@
                         {{ Session::get('success') }}
                     </div>
                 @endif
-                <form id="form-create" action="{{ route('loi-restricted-countries.store') }}" method="POST" >
+                <form id="form-create" action="{{ route('loi-country-criterias.store') }}" method="POST" >
                     @csrf
                     <div class="row">
                         <div class="row">
@@ -64,23 +64,57 @@
                             </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label"> Maximum QTY/Passport </label>
+                                    <label for="choices-single-default" class="form-label"> Minimum QTY/ Passport </label>
+                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"  name="min_qty_per_passport" >
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label"> Maximum QTY/ Passport </label>
                                     <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"  name="max_qty_per_passport" >
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label"> Minimum QTY/Passport </label>
-                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"  name="min_qty_per_passport" >
+                                    <label for="choices-single-default" class="form-label"> Minimum QTY/ Company </label>
+                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"  name="min_qty_for_company" >
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
-                                <label class="form-label"></label>
-                                <div class="form-check mt-3">
-                                    <input class="form-check-input" type="checkbox" name="is_only_company_allowed" id="is_only_company_allowed" {{ old('is_only_company_allowed') ? 'checked' : '' }} />
-                                    <label class="form-check-label" for="is_only_company_allowed">
-                                        Is LOI Can be Created for Only Company?
-                                    </label>
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label"> Maximum QTY/ Company </label>
+                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"  name="max_qty_for_company" >
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label for="choices-single-default" class="form-label"> Is LOI Can be Created for Only Company? </label>
+                                <select class="form-control widthinput" multiple name="is_only_company_allowed" id="is_only_company_allowed" autofocus>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::YES }}">Yes</option>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::NO }}"> No </option>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::NONE }}" > None </option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label for="choices-single-default" class="form-label">  Is able to Inflate Quantity ?</label>
+                                <select class="form-control widthinput" multiple name="is_inflate_qty" id="is_inflate_qty" autofocus>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::YES }}">Yes</option>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::NO }}"> No </option>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::NONE }}" > None </option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label for="choices-single-default" class="form-label">  Lead time is More  ?</label>
+                                <select class="form-control widthinput" multiple name="is_longer_lead_time" id="is_longer_lead_time" autofocus>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::YES }}">Yes</option>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::NO }}"> No </option>
+                                    <option value="{{ \App\Models\LoiCountryCriteria::NONE }}" > None </option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label"> Comment </label>
+                                    <textarea cols="25" rows="5"  class="form-control" name="comment"> {{ old('comment') }} </textarea>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
@@ -90,31 +124,6 @@
                                     <label class="form-check-label" for="is_loi_restricted">
                                         Is LOI Restricted ?
                                     </label>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-md-6 col-sm-12">
-                                <label class="form-label"></label>
-                                <div class="form-check mt-3">
-                                    <input class="form-check-input" type="checkbox" name="is_inflate_qty" id="is_inflate_qty" {{ old('is_inflate_qty') ? 'checked' : '' }} />
-                                    <label class="form-check-label" for="is_inflate_qty">
-                                        Is able to Inflate Quantity ?
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 col-sm-12">
-                                <label class="form-label"></label>
-                                <div class="form-check mt-3">
-                                    <input class="form-check-input" type="checkbox" name="is_longer_lead_time" id="is_longer_lead_time" {{ old('is_longer_lead_time') ? 'checked' : '' }} />
-                                    <label class="form-check-label" for="is_longer_lead_time">
-                                        Lead time is More ?
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 col-sm-12 mt-3">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label"> Comment </label>
-                                    <textarea cols="25" rows="5"  class="form-control" name="comment"> {{ old('comment') }} </textarea>
                                 </div>
                             </div>
                             <div class="col-12 text-center">
@@ -140,16 +149,30 @@
             allowClear: true,
             maximumSelectionLength: 1
         });
-
-        $("#form-create").validate({
-            ignore: [],
-            rules: {
-                brand_name: {
-                    required: true,
-                    maxlength:255
-                },
-            },
+        $('#is_only_company_allowed').select2({
+            placeholder : 'Select Option',
+            allowClear: true,
+            maximumSelectionLength: 1
         });
+        $('#is_inflate_qty').select2({
+            placeholder : 'Select Option',
+            allowClear: true,
+            maximumSelectionLength: 1
+        });
+        $('#is_longer_lead_time').select2({
+            placeholder : 'Select Option',
+            allowClear: true,
+            maximumSelectionLength: 1
+        });
+        // $("#form-create").validate({
+        //     ignore: [],
+        //     rules: {
+        //         brand_name: {
+        //             required: true,
+        //             maxlength:255
+        //         },
+        //     },
+        // });
     </script>
 @endpush
 
