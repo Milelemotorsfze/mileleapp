@@ -46,7 +46,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-
 	<div class="tab-pane fade show active" id="data-candidate-info">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="data-selling-price-histories-table" class="my-datatable table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -106,7 +106,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-
 	<div class="tab-pane fade show" id="verified-candidate-info">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="data-selling-price-histories-table" class="my-datatable table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>

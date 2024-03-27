@@ -129,7 +129,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 	<div class="tab-pane fade show active" id="pending-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="pending-hiring-requests-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -261,7 +261,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 	<div class="tab-pane fade show" id="approved-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="approved-hiring-requests-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -532,7 +532,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 	<div class="tab-pane fade show" id="closed-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="closed-hiring-requests-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -606,7 +606,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 	<div class="tab-pane fade show" id="on-hold-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="on-hold-hiring-requests-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -679,7 +679,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 	<div class="tab-pane fade show" id="cancelled-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="cancelled-hiring-requests-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -752,7 +752,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 	<div class="tab-pane fade show" id="rejected-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="rejected-hiring-requests-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -826,7 +826,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 	<div class="tab-pane fade show" id="deleted-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="deleted-hiring-requests-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>

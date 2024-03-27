@@ -47,7 +47,7 @@
 	<div class="tab-pane fade show active" id="prepared-by-pending-joining-report">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="pending-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -146,7 +146,7 @@
 	<div class="tab-pane fade show" id="prepared-by-approved-joining-report">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="approved-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -221,7 +221,7 @@
 	<div class="tab-pane fade show" id="prepared-by-rejected-joining-report">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="rejected-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -319,7 +319,7 @@
 	<div class="tab-pane fade show active" id="team-lead-pending-joining-report">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="pending-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -417,7 +417,7 @@
 	<div class="tab-pane fade show" id="team-lead-approved-joining-report">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="approved-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -491,7 +491,7 @@
 	<div class="tab-pane fade show" id="team-lead-rejected-joining-report">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="rejected-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -588,7 +588,7 @@
 	<div class="tab-pane fade show active" id="hr-pending-joining-report">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="pending-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -686,7 +686,7 @@
 	<div class="tab-pane fade show" id="hr-approved-joining-report">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="approved-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -760,7 +760,7 @@
 	<div class="tab-pane fade show" id="hr-rejected-joining-report">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="rejected-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -857,7 +857,7 @@
 	<div class="tab-pane fade show active" id="reporting-manager-pending-joining-report">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="pending-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -955,7 +955,7 @@
 	<div class="tab-pane fade show" id="reporting-manager-approved-joining-report">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="approved-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -1029,7 +1029,7 @@
 	<div class="tab-pane fade show" id="reporting-manager-rejected-joining-report">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="rejected-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>

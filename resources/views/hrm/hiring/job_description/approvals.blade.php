@@ -24,7 +24,7 @@
 	<div class="tab-pane fade show active" id="teamlead-pending-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="teamlead-pending-hiring-requests-table" class="table table-striped table-editable table-edits table data-table-class">
+				<table class="my-datatable table table-striped table-editable table-edits table data-table-class">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -227,7 +227,7 @@
 	<div class="tab-pane fade show" id="teamlead-approved-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="teamlead-approved-hiring-requests-table" class="table table-striped table-editable table-edits table data-table-class">
+				<table class="my-datatable table table-striped table-editable table-edits table data-table-class">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -301,7 +301,7 @@
 	<div class="tab-pane fade show" id="teamlead-rejected-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="teamlead-rejected-hiring-requests-table" class="table table-striped table-editable table-edits table data-table-class">
+				<table class="my-datatable table table-striped table-editable table-edits table data-table-class">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -398,7 +398,7 @@
 	<div class="tab-pane fade show active" id="hr-pending-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="hr-pending-hiring-requests-table" class="table table-striped table-editable table-edits table data-table-class">
+				<table class="my-datatable table table-striped table-editable table-edits table data-table-class">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -610,7 +610,7 @@
 	<div class="tab-pane fade show" id="hr-approved-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="hr-approved-hiring-requests-table" class="table table-striped table-editable table-edits table data-table-class">
+				<table class="my-datatable table table-striped table-editable table-edits table data-table-class">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -694,7 +694,7 @@
 	<div class="tab-pane fade show" id="hr-rejected-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="hr-rejected-hiring-requests-table" class="table table-striped table-editable table-edits table data-table-class">
+				<table class="my-datatable table table-striped table-editable table-edits table data-table-class">
 					<thead>
 						<tr>
 							<th>Sl No</th>

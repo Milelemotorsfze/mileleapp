@@ -247,7 +247,7 @@ class DivisionController extends Controller
         }
     }
     public function show($id) {
-        $errorMsg ="Comong Soon ! This page is under testing now.. You can access later !";
+        $errorMsg ="This page will coming very soon !";
         return view('hrm.notaccess',compact('errorMsg'));
     }
 }
