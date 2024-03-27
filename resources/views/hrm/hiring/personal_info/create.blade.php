@@ -336,6 +336,7 @@
 															</div>
 															<div class="col-xxl-2 col-lg-6 col-md-6 select-button-main-div">
 																<div class="dropdown-option-div">
+																<span class="error">* </span>
 																	<label for="ecu_alternative_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
 																	<input id="ecu_alternative_number_1" type="tel" class="form-control widthinput @error('ecu_alternative_number[main]') is-invalid @enderror" oninput="validationOnKeyUp(this)"
 																		name="ecu[1][alternative_contact_number][main]" data-index=1 placeholder="Alternative Number" value="" autocomplete="ecu_alternative_number[main]" autofocus>

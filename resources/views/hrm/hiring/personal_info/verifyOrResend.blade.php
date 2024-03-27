@@ -46,7 +46,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-p
 	<div class="tab-pane fade show active" id="data-candidate-info">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="data-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -80,8 +80,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-p
 							<td>{{ $data->year_of_completion ?? ''}}</td>
 							<td>{{ $data->religionName->name ?? ''}}</td>
 							<td>{{\Carbon\Carbon::parse($data->dob)->format('d M Y') ?? ''}}</td>
-							<td>{{ $data->replacement_for_employee_name ?? ''}}</td>
-							<td>{{ $data->explanation_of_new_hiring ?? ''}}</td>
 							<td>
 								<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Candidate Details" class="btn btn-sm btn-primary" 
 									href="{{route('interview-summary-report.show', $data->interview_summary_id)}}">
@@ -98,7 +96,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-p
 	<div class="tab-pane fade show" id="verified-candidate-info">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="data-selling-price-histories-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -113,6 +111,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-p
 							<th>Year of Completion</th>
 							<th>Religion</th>
 							<th>Date Of Birth</th>
+							<th>Action</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -131,8 +130,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-p
 							<td>{{ $data->year_of_completion ?? ''}}</td>
 							<td>{{ $data->religionName->name ?? ''}}</td>
 							<td>{{\Carbon\Carbon::parse($data->dob)->format('d M Y') ?? ''}}</td>
-							<td>{{ $data->replacement_for_employee_name ?? ''}}</td>
-							<td>{{ $data->explanation_of_new_hiring ?? ''}}</td>
+							<td>
+								<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Candidate Details" class="btn btn-sm btn-primary" 
+									href="{{route('interview-summary-report.show', $data->interview_summary_id)}}">
+								<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+								</a>
+							</td>
 						</tr>
 						@endforeach
 					</tbody>

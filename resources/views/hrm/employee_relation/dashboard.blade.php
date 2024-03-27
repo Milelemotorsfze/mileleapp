@@ -11,7 +11,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-list']);
 
 <div class="card-body">
     <div class="table-responsive">
-        <table id="dtBasicExample" class="table table-striped table-editable table-edits table">
+        <table class="my-datatable table table-striped table-editable table-edits table">
             <thead>
                 <tr>
                     <th>No</th>

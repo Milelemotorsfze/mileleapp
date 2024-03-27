@@ -24,7 +24,7 @@
 	<div class="tab-pane fade show active" id="hr-pending-interview-summary">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="hr-pending-interview-summary-table" class="my-datatable table table-striped table-editable table-edits table data-table-class">
+				<table class="my-datatable table table-striped table-editable table-edits table data-table-class">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -361,7 +361,7 @@
 	<div class="tab-pane fade show" id="hr-approved-interview-summary">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="hr-approved-interview-summary-table" class="my-datatable table table-striped table-editable table-edits table data-table-class">
+				<table class="my-datatable table table-striped table-editable table-edits table data-table-class">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -566,7 +566,7 @@
 	<div class="tab-pane fade show" id="hr-rejected-interview-summary">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="hr-rejected-interview-summary-table" class="my-datatable table table-striped table-editable table-edits table data-table-class">
+				<table class="my-datatable table table-striped table-editable table-edits table data-table-class">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -793,7 +793,7 @@
 	<div class="tab-pane fade show active" id="teamlead-pending-interview-summary">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="teamlead-pending-interview-summary-table" class="my-datatable table table-striped table-editable table-edits table data-table-class">
+				<table class="my-datatable table table-striped table-editable table-edits table data-table-class">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -1134,7 +1134,7 @@
 	<div class="tab-pane fade show" id="teamlead-approved-interview-summary">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="teamlead-approved-interview-summary-table" class="my-datatable table table-striped table-editable table-edits table data-table-class">
+				<table class="my-datatable table table-striped table-editable table-edits table data-table-class">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -1348,7 +1348,7 @@
 	<div class="tab-pane fade show" id="teamlead-rejected-interview-summary">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="teamlead-rejected-interview-summary-table" class="my-datatable table table-striped table-editable table-edits table data-table-class">
+				<table class="my-datatable table table-striped table-editable table-edits table data-table-class">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>

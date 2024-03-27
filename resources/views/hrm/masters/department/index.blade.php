@@ -44,7 +44,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-li
 	<div class="tab-pane fade show active" id="pending-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="pending-hiring-requests-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>

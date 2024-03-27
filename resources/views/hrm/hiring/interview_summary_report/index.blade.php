@@ -124,7 +124,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show active" id="shortlisted-for-interview">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="shortlisted-table" class="table table-striped table-editable table-edits table" style="width:100%;">
+				<table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -278,7 +278,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show" id="telephonic_interview">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="telephonic-interview-round-table" class="table table-striped table-editable table-edits table" style="width:100%;">
+				<table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -449,7 +449,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show" id="first_round">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="first-round-table" class="table table-striped table-editable table-edits table" style="width:100%;">
+				<table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -641,7 +641,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show" id="second_round">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="second-round-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -855,7 +855,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show" id="third_round">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="third-round-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -1090,7 +1090,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show" id="forth_round">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="forth-round-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -1346,7 +1346,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show" id="fifth_round">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="fifth-round-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -1619,7 +1619,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show" id="not_selected_candidates">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="not-selected-candidates-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -1823,7 +1823,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show" id="pending-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="selected-candidates-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -2076,7 +2076,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show" id="approved-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="approved-hiring-requests-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -2434,7 +2434,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show" id="selected_for_job">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="selected-for-job-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -2656,7 +2656,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show" id="personalinfo_docs">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="selected-for-job-table" class="my-datatable table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>
@@ -3066,7 +3066,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	<div class="tab-pane fade show" id="rejected-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="rejected-hiring-requests-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th rowspan="2" class="light">Sl No</th>

@@ -38,7 +38,7 @@ class DesignationApprovalsController extends Controller
      */
     public function show(ApprovalByPositions $approvalByPositions)
     {
-        $errorMsg ="Comong Soon ! This page is under testing now.. You can access later !";
+        $errorMsg ="This page will coming very soon !";
         return view('hrm.notaccess',compact('errorMsg'));
     }
 
@@ -47,7 +47,7 @@ class DesignationApprovalsController extends Controller
      */
     public function edit(ApprovalByPositions $approvalByPositions)
     {
-        $errorMsg ="Comong Soon ! This page is under testing now.. You can access later !";
+        $errorMsg ="This page will coming very soon !";
         return view('hrm.notaccess',compact('errorMsg'));
     }
 

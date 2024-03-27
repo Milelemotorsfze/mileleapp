@@ -482,7 +482,15 @@ class QuotationController extends Controller
         $quotation->deal_value = $request->deal_value;
     }
     $quotation->sales_notes = $request->remarks;
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-access');
+    if ($hasPermission)
+    {
     $quotation->created_by = $request->salespersons;
+    }
+    else
+    {
+        $quotation->created_by = Auth::id(); 
+    }
     $quotation->calls_id = $request->calls_id;
     $quotation->currency = $request->currency;
     $quotation->document_type = $request->document_type;

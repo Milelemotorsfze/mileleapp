@@ -67,7 +67,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 	<div class="tab-pane fade show active" id="pending-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="pending-hiring-requests-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -195,7 +195,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 	<div class="tab-pane fade show" id="approved-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="approved-hiring-requests-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
@@ -277,7 +277,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 	<div class="tab-pane fade show" id="rejected-hiring-requests">
 		<div class="card-body">
 			<div class="table-responsive">
-				<table id="rejected-hiring-requests-table" class="table table-striped table-editable table-edits table">
+				<table class="my-datatable table table-striped table-editable table-edits table">
 					<thead>
 						<tr>
 							<th>Sl No</th>
