@@ -12,6 +12,9 @@
         {
             height:32px!important;
         }
+        .error {
+            color: #FF0000;
+        }
 
     </style>
 
@@ -68,6 +71,7 @@
                             <option value={{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}>{{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}</option>
                             <option value={{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}>{{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}</option>
                         </select>
+                        <span id="customer-type-error" class="error"></span>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-12">
@@ -190,6 +194,9 @@
                     </div>
                 </div>
             </div>
+            <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
+                <span id="country-comment"></span>
+            </div>
             <div class="row">
                 <div class="card p-2" >
                     <div class="card-header">
@@ -264,7 +271,7 @@
                     </div>
                 </div>
                 <div class="col-12 text-end mt-3">
-                    <button type="submit" class="btn btn-primary">Submit </button>
+                    <button type="submit" class="btn btn-primary" id="submit-button">Submit </button>
                 </div>
             </div>
         </form>
@@ -274,7 +281,7 @@
 @push('scripts')
 
     <script type="text/javascript">
-
+        let formValid = true;
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
         // const previewImage = document.querySelector("#image-preview");
@@ -381,6 +388,15 @@
             return this.valid();
         };
 
+        $('#submit-button').click(function (e) {
+            e.preventDefault();
+            if (formValid == true) {
+                if($("#form-create").valid()) {
+                    $('#form-create').unbind('submit').submit();
+                }
+
+            }
+        });
 
         $('#country').select2({
             placeholder : 'Select Country',
@@ -388,10 +404,12 @@
             maximumSelectionLength: 1
         }).on('change', function() {
             getCustomers();
+            checkCountryCriterias()
         });
 
         $('#customer-type').change(function (){
             getCustomers();
+            checkCountryCriterias();
         });
         $('#model-1').select2({
             placeholder: 'Select Model',
@@ -421,6 +439,37 @@
             getModels('all','dealer-change');
         });
 
+        function checkCountryCriterias() {
+
+            let url = '{{ route('loi-country-criteria.check') }}';
+            var country = $('#country').val();
+            var customer_type = $('#customer-type').val();
+
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    country_id: country,
+                    customer_type: customer_type
+                },
+                success:function (data) {
+                    if(data.comment) {
+                        $('#country-comment-div').attr('hidden', false);
+                        $('#country-comment').html(data.comment);
+                    }else{
+                        $('#country-comment-div').attr('hidden', true);
+                    }
+                    if(data.customer_type_error) {
+                        formValid = false;
+                        $('#customer-type-error').html(data.customer_type_error);
+                    }else{
+                        formValid = true;
+                        $('#customer-type-error').attr('hidden', true);
+                    }
+                }
+            });
+        }
         function getCustomers() {
             var country = $('#country').val();
             var customer_type = $('#customer-type').val();

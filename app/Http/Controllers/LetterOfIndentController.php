@@ -10,6 +10,7 @@ use App\Models\DemandList;
 use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentDocument;
 use App\Models\LetterOfIndentItem;
+use App\Models\LoiCountryCriteria;
 use App\Models\LoiRestrictedCountry;
 use App\Models\MasterModel;
 use App\Models\ModelYearCalculationCategory;
@@ -110,8 +111,8 @@ class LetterOfIndentController extends Controller
      */
     public function create()
     {
-        $restrictedCountries = LoiRestrictedCountry::where('status', LoiRestrictedCountry::STATUS_ACTIVE)->pluck('country_id');
-        $countries = Country::whereNotIn('id', $restrictedCountries)->get();
+        $LOICountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->where('is_loi_restricted', false)->pluck('country_id');
+        $countries = Country::whereIn('id', $LOICountries)->get();
         $customers = Customer::all();
         $models = MasterModel::whereNotNull('transcar_loi_description')->groupBy('model')->orderBy('id','ASC')->get();
 
@@ -376,8 +377,8 @@ class LetterOfIndentController extends Controller
     public function edit(string $id)
     {
         $letterOfIndent = LetterOfIndent::find($id);
-        $restrictedCountries = LoiRestrictedCountry::where('status', LoiRestrictedCountry::STATUS_ACTIVE)->pluck('country_id');
-        $countries = Country::whereNotIn('id', $restrictedCountries)->get();
+        $LOICountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->where('is_loi_restricted', false)->pluck('country_id');
+        $countries = Country::whereIn('id', $LOICountries)->get();
         $customers = Customer::all();
 
         if($letterOfIndent->dealers == 'Trans Cars') {
