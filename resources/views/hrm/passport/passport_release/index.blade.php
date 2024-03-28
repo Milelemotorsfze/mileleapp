@@ -66,7 +66,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-passport-re
 							<th>Designation</th>
 							<th>Department</th>
 							<th>Purpose</th>
-							<th>Date</th>
+							<th>Request Date</th>
 							<th>Reporting Manager</th>
 							<th>Division Head</th>
 							<th>HR Manager</th>
@@ -83,7 +83,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-passport-re
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
 							<td>{{ $data->purpose->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>
+								@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y')}}
+								@endif										
+							</td>
 							<td>{{ $data->reportingManager->name ?? ''}}</td>
 							<td>{{ $data->divisionHead->name ?? ''}}</td>
 							<td>{{ $data->hrManager->name ?? ''}}</td>
@@ -149,7 +153,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-passport-re
 							<th>Designation</th>
 							<th>Department</th>
 							<th>Purpose</th>
-							<th>Date</th>
+							<th>Request Date</th>
 							<th>Reporting Manager</th>
 							<th>Division Head</th>
 							<th>HR Manager</th>
@@ -166,7 +170,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-passport-re
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
 							<td>{{ $data->purpose->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>
+								@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y')}}
+								@endif										
+							</td>
 							<td>{{ $data->reportingManager->name ?? ''}}</td>
 							<td>{{ $data->divisionHead->name ?? ''}}</td>
 							<td>{{ $data->hrManager->name ?? ''}}</td>
@@ -199,7 +207,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-passport-re
 							<th>Designation</th>
 							<th>Department</th>
 							<th>Purpose</th>
-							<th>Date</th>
+							<th>Request Date</th>
 							<th>Reporting Manager</th>
 							<th>Division Head</th>
 							<th>HR Manager</th>
@@ -208,7 +216,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-passport-re
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($rejected as $key => $rejectedOne)
+						@foreach ($rejected as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->user->name ?? ''}}</td>
@@ -216,7 +224,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-passport-re
 							<td>{{ $data->user->empProfile->designation->name ?? '' }}</td>
 							<td>{{ $data->user->empProfile->department->name ?? '' }}</td>
 							<td>{{ $data->purpose->name ?? ''}}</td>
-							<td>{{ $data->created_at ?? ''}}</td>
+							<td>
+								@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y')}}
+								@endif										
+							</td>
 							<td>{{ $data->reportingManager->name ?? ''}}</td>
 							<td>{{ $data->divisionHead->name ?? ''}}</td>
 							<td>{{ $data->hrManager->name ?? ''}}</td>

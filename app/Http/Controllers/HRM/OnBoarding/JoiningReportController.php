@@ -357,7 +357,7 @@ class JoiningReportController extends Controller
         return view('hrm.onBoarding.joiningReport.show',compact('data','previous','next'));
     }
     public function edit($id) {
-        $data = JoiningReport::where('id',$id)->first();
+        $data = JoiningReport::where('id',$id)->with('candidate')->first();
         $candidates = EmployeeProfile::where([
             ['personal_information_verified_at','!=',NULL],
             ['type','candidate'],
@@ -398,6 +398,7 @@ class JoiningReportController extends Controller
                 }
                 else {
                     $update->status = 'rejected';
+                    $update->action_by_employee = NULL;
                 }
                 if($update->joining_type == 'new_employee' && $update->candidate->user_id == NULL && $request->status == 'approved') {
                     $data['id'] = Crypt::encrypt($update->id);

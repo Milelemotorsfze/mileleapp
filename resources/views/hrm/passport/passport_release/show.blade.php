@@ -25,7 +25,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-requ
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Employee Passport Release Details</h4>
+	<h4 class="card-title"> Employee Passport Release Request Details</h4>
 	@if($previous != '')
 	<a  class="btn btn-sm btn-info float-first" href="{{ route('passport_release.show',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
 	@endif
@@ -63,7 +63,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-requ
 			<div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
 				<div class="card">
 					<div class="card-header">
-						<h4 class="card-title">Employee Passport Release Details</h4>
+						<h4 class="card-title">Employee Details</h4>
 					</div>
 					<div class="card-body">
 						<div class="row">
@@ -108,6 +108,29 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-requ
 							</div>
 							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 								<span>{{ $data->hrManager->name ?? '' }}</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-header">
+						<h4 class="card-title">Passport Release Request Details</h4>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+								<label for="choices-single-default" class="form-label"> Request Date :</label>
+							</div>
+							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+								<span>@if($data->created_at != '')
+								{{\Carbon\Carbon::parse($data->created_at)->format('d M Y')}}
+								@endif	</span>
+							</div>
+							<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+								<label for="choices-single-default" class="form-label"> Passport Release Purpose :</label>
+							</div>
+							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+								<span>{{ $data->purpose->name ?? ''}}</span>
 							</div>
 						</div>
 					</div>
