@@ -130,7 +130,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-requ
 								<label for="choices-single-default" class="form-label"> Passport Release Purpose :</label>
 							</div>
 							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-								<span>{{ $data->purpose->name ?? ''}}</span>
+								<span>{{ $data->purpose->name ?? ''}} @if($data->purposes_of_release == '13') ( {{ $data->release_purpose ?? ''}} ) @endif</span>
 							</div>
 						</div>
 					</div>
@@ -275,9 +275,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-passport-requ
 											Status :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
-											<label class="badge texttransform @if($data->release_action_by_department_head =='pending') badge-soft-info 
-												@elseif($data->release_action_by_department_head =='approved') badge-soft-success 
-												@else badge-soft-danger @endif">{{$data->release_action_by_department_head ?? ''}}</label>
+											<label class="badge texttransform @if($data->release_action_by_division_head =='pending') badge-soft-info 
+												@elseif($data->release_action_by_division_head =='approved') badge-soft-success 
+												@else badge-soft-danger @endif">{{$data->release_action_by_division_head ?? ''}}</label>
 										</div>
 										<div class="col-lg-2 col-md-12 col-sm-12">
 											Date & Time :
