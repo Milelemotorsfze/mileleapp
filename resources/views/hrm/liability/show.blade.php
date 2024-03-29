@@ -111,7 +111,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-liability-det
 							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 								<span>
 								@if(isset($data) && isset($data->user) && isset($data->user->empProfile) && $data->user->empProfile->company_joining_date != '')
-								{{ $data->user->empProfile->company_joining_date ?? '' }}
+								{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
 								@endif
 								</span>
 							</div>

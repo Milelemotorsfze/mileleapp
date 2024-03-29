@@ -44,14 +44,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 			</div>
 			<div class="card-body">
 				<div class="row">
-					<div class="col-xxl-4 col-lg-4 col-md-4">
-						<span class="error">* </span>
-						<label for="employee_id" class="col-form-label text-md-end">{{ __('Employee Name') }}</label>
-						<select name="employee_id" id="employee_id" multiple="true" class="employee_id form-control widthinput" onchange="" autofocus>
-						@foreach($masterEmployees as $employee)
-						<option value="{{$employee->id}}" @if($data->employee_id == $employee->id) selected @endif>{{$employee->name}}</option>
-						@endforeach
-						</select>
+					<div class="col-xxl-4 col-lg-4 col-md-4 select-button-main-div">
+						<div class="dropdown-option-div">
+							<span class="error">* </span>
+							<label for="employee_id" class="col-form-label text-md-end">{{ __('Employee Name') }}</label>
+							<select name="employee_id" id="employee_id" multiple="true" class="employee_id form-control widthinput" onchange="" autofocus>
+							@foreach($masterEmployees as $employee)
+							<option value="{{$employee->id}}" @if($data->employee_id == $employee->id) selected @endif>{{$employee->name}}</option>
+							@endforeach
+							</select>
+						</div>
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4" id="employee_code_div">
 						<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
@@ -122,14 +124,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 					<div class="col-xxl-3 col-lg-3 col-md-3">
 						<span class="error">* </span>
 						<label for="leave_start_date" class="col-form-label text-md-end">{{ __('Leave Start Date') }}</label>
-						<input type="date" name="leave_start_date" id="leave_start_date"
+						<input type="date" name="leave_start_date" id="leave_start_date" onchange="calculateDays()"
 							class="form-control widthinput"
 							aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->leave_start_date ?? ''}}">
 					</div>
 					<div class="col-xxl-3 col-lg-3 col-md-3">
 						<span class="error">* </span>
 						<label for="leave_end_date" class="col-form-label text-md-end">{{ __('Leave End Date') }}</label>
-						<input type="date" name="leave_end_date" id="leave_end_date"
+						<input type="date" name="leave_end_date" id="leave_end_date" onchange="calculateDays()"
 							class="form-control widthinput"
 							aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->leave_end_date ?? ''}}">
 					</div>
@@ -143,14 +145,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<span class="error">* </span>
 						<label for="no_of_paid_days" class="col-form-label text-md-end">{{ __('Number Of Paid Days(If Any)') }}</label>
-						<input type="number" name="no_of_paid_days" id="no_of_paid_days"
+						<input type="number" name="no_of_paid_days" id="no_of_paid_days" oninput="calculateNotPaid()"
 							class="form-control widthinput" placeholder="Enter Number Of Paid Days(If Any)"
 							aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->no_of_paid_days ?? ''}}">
 					</div>
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<span class="error">* </span>
 						<label for="no_of_unpaid_days" class="col-form-label text-md-end">{{ __('Number Of Unpaid Days(If Any)') }}</label>
-						<input type="number" name="no_of_unpaid_days" id="no_of_unpaid_days"
+						<input type="number" name="no_of_unpaid_days" id="no_of_unpaid_days" oninput="calculatePaid()"
 							class="form-control widthinput" placeholder="Enter Number Of Unpaid Days(If Any)"
 							aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->no_of_unpaid_days ?? ''}}">
 					</div>
@@ -176,12 +178,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 						</span>
 						@enderror
 					</div>
-					<div class="col-xxl-6 col-lg-6 col-md-6">
-						<span class="error">* </span>
-						<label for="alternative_home_contact_no" class="col-form-label text-md-end">{{ __('Home Contact Number') }}</label>
-						<input type="tel" name="alternative_home_contact_no[main]" id="alternative_home_contact_no"
-							class="form-control widthinput" placeholder="Enter Home Contact Number"
-							aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->alternative_home_contact_no}}" oninput="validationOnKeyUp(this)">                                 
+					<div class="col-xxl-6 col-lg-6 col-md-6 select-button-main-div">
+						<div class="dropdown-option-div">
+							<span class="error">* </span>
+							<label for="alternative_home_contact_no" class="col-form-label text-md-end">{{ __('Home Contact Number') }}</label>
+							<input type="tel" name="alternative_home_contact_no[main]" id="alternative_home_contact_no"
+								class="form-control widthinput" placeholder="Enter Home Contact Number"
+								aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->alternative_home_contact_no}}" oninput="validationOnKeyUp(this)">                                 
+						</div>
 					</div>
 					<div class="col-xxl-6 col-lg-6 col-md-6">
 						<span class="error">* </span>
@@ -209,6 +213,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 @endif
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.19.3/jquery.validate.min.js"></script> -->
 <script type="text/javascript">
 	var data = {!! json_encode($masterEmployees) !!};
 	var oldData = {!! json_encode($data) !!};
@@ -232,7 +238,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 				document.getElementById('employee_code').textContent=oldData.user.emp_profile.employee_code;
 			}
 			if(oldData.user.emp_profile.company_joining_date != null) {
-				document.getElementById('joining_date').textContent=oldData.user.emp_profile.company_joining_date;
+				var userDate = oldData.user.emp_profile.company_joining_date; // Replace with your actual date
+				var date = new Date(userDate);
+				var day = date.getDate();
+				var month = date.toLocaleString("default", { month: "short" }); // Get abbreviated month
+				var year = date.getFullYear();
+				var formattedDate = day + " " + month + " " + year;
+				document.getElementById('joining_date').textContent=formattedDate;
 			}
 			if(oldData.user.emp_profile.designation != null) {
 				document.getElementById('designation').textContent=oldData.user.emp_profile.designation.name;
@@ -279,7 +291,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 							document.getElementById('employee_code').textContent=data[i].emp_profile.employee_code;
 						}
 						if(data[i].emp_profile.company_joining_date != null) {
-							document.getElementById('joining_date').textContent=data[i].emp_profile.company_joining_date;
+							var userDate = data[i].emp_profile.company_joining_date; // Replace with your actual date
+							var date = new Date(userDate);
+							var day = date.getDate();
+							var month = date.toLocaleString("default", { month: "short" }); // Get abbreviated month
+							var year = date.getFullYear();
+							var formattedDate = day + " " + month + " " + year;
+							document.getElementById('joining_date').textContent=formattedDate;
 						}
 						if(data[i].emp_profile.designation != null) {
 							document.getElementById('designation').textContent=data[i].emp_profile.designation.name;
@@ -306,81 +324,160 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 			utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
 		});   
 	});	
-	jQuery.validator.setDefaults({
-	       errorClass: "is-invalid",
-	       errorElement: "p",
-	       errorPlacement: function ( error, element ) {
-	           error.addClass( "invalid-feedback font-size-13" );
-	           if ( element.prop( "type" ) === "checkbox" ) {
-	               error.insertAfter( element.parent( "label" ) );
-	           }
-	           else if (element.hasClass("select2-hidden-accessible")) {
-	               element = $("#select2-" + element.attr("id") + "-container").parent();
-	               error.insertAfter(element);
-	           }
-			else if (element.parent().hasClass('input-group')) {
-	               error.insertAfter(element.parent());
-	           }
-	           else {
-	               error.insertAfter( element );
-	           }
-	       }
-	   });
-	$('#employeeLeaveForm').validate({ 
-	       rules: {
+	// Adding a custom validation method named "endDateGreater"
+    $.validator.addMethod("endDateGreater", function(value, element) {
+        var startDate = $('#leave_start_date').val();
+        var endDate = value;
+        var start = new Date(startDate);
+        var end = new Date(endDate);
+        // Check if end date is greater than start date
+        return this.optional(element) || end >= start;
+    }, "End date must be greater than or equal to start date.");
+
+	$.validator.addMethod("checkTotalDays", function(value, element) {
+		var startDate = $('#leave_start_date').val(); 
+		var endDate = $('#leave_end_date').val();  
+		if(startDate != '' && endDate != '') {
+			var start = new Date(startDate);
+			var end = new Date(endDate);
+			var difference = end - start;
+			var days = difference / (1000 * 60 * 60 * 24) +1;
+		}
+        return this.optional(element) || value == days;
+    }, "Total number of days must be same as the date differences");
+	
+	$.validator.addMethod("sumDays", function(value, element) {
+		var totalDays = $('#total_no_of_days').val(); 
+		var paidDays = $('#no_of_paid_days').val();  
+		var unPaidDays = $('#no_of_unpaid_days').val();
+		var daysSum =Number(paidDays)+Number(unPaidDays);
+        return this.optional(element) || totalDays == daysSum;
+    }, "Total days must be the sum of paid and unpaid days");
+
+	
+    // Applying validation rules to your form
+    $("#employeeLeaveForm").validate({
+        rules: {
+            leave_start_date: {
+                required: true,
+                date: true // Validates the start date format
+            },
+            leave_end_date: {
+                required: true,
+                date: true, // Validates the end date format
+                endDateGreater: true // Custom rule for comparing dates
+            },
 			employee_id: {
-	               required: true,
-	           },
+				required: true,
+			},
 			type_of_leave: {
 				required: true,
 			},           
-	           type_of_leave_description: {
-	               required: true,
-	           },
-	           leave_start_date: {
-	               required: true,
-	           },
-			leave_end_date: {
+			type_of_leave_description: {
 				required: true,
-			},			
+			},
 			total_no_of_days: {
-	               required: true,
-	           },
+				required: true,
+				min:1,
+				checkTotalDays: true, // Custom rule for checking total number of days
+			},
 			no_of_paid_days: {
-	               required: true,
-	           },
-	           no_of_unpaid_days: {
-	               required: true,
-	           },
-	           address_while_on_leave: {
-	               required:true,
-	           },
-	           alternative_home_contact_no: {
-	               required:true,
-	               minlength: 5,
-	               maxlength: 20,
-	           },
-	           alternative_personal_email: {
-	               required:true,
-	           },
-	           type_of_leave_description: {                       
-	               required: function(element){
-	                   if($("#type_of_leave").val() == 'others') {
-	                       return false;
-	                   }
-	                   else {
-	                       return true;
-	                   }
-	               },
-	           },
-	       },
-	   });
+				required: true,
+				min:0,
+				sumDays:true,
+			},
+			no_of_unpaid_days: {
+				required: true,
+				min:0,
+				sumDays:true,
+			},
+			address_while_on_leave: {
+				required:true,
+			},
+			"alternative_home_contact_no[main]": {
+				required:true,
+				minlength: 5,
+				maxlength: 20,
+			},
+			alternative_personal_email: {
+				required:true,
+				email:true,
+			},
+			type_of_leave_description: {                       
+				required: function(element){
+					if($("#type_of_leave").val() == 'others') {
+						return false;
+					}
+					else {
+						return true;
+					}
+				},
+			},
+        },
+        messages: {
+            leave_start_date: {
+                required: "Please enter a start date.",
+                date: "Please enter a valid date."
+            },
+            leave_end_date: {
+                required: "Please enter an end date.",
+                date: "Please enter a valid date.",
+                endDateGreater: "End date must be greater than or equal to start date."
+            },
+			total_no_of_days: {
+				checkTotalDays: "Total number of days must be same as the date differences"
+			},
+        },
+		errorPlacement: function(error, element) {
+            error.appendTo(element.parent());
+			if ( element.prop( "type" ) === "tel" && element.closest('.select-button-main-div').length > 0 ) {
+				if (!element.val() || element.val().length === 0) {
+	                   console.log("Error is here with length", element.val().length);
+	                   error.addClass('select-error');
+	                   error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+	               } else {
+	                   console.log("No error");
+	               }
+	           }
+        }
+    });
 	   function validationOnKeyUp(currentPriceInput) {
 	       var id = currentPriceInput.id;
 	       var input = document.getElementById(id);
 	       var val = input.value;
 	       val = val.replace(/^0+|[^\d]/g, '');
 	       input.value = val;
+	   }
+	   function calculateDays() { 
+		var startDate = $('#leave_start_date').val(); 
+		var endDate = $('#leave_end_date').val();     
+		if(startDate != '' && endDate != '') {
+			var start = new Date(startDate);
+			var end = new Date(endDate);
+			var difference = end - start;
+			var days = difference / (1000 * 60 * 60 * 24) +1;
+			document.getElementById('total_no_of_days').value = days;
+		}
+	   }
+	   function calculateNotPaid() {
+		var totalDays = $('#total_no_of_days').val(); 
+		var paidDays = $('#no_of_paid_days').val();  
+		if(totalDays != '' && paidDays != '') {
+			document.getElementById('no_of_unpaid_days').value = totalDays-paidDays;
+		}
+		else if(paidDays == '') {
+			document.getElementById('no_of_unpaid_days').value = ''; 
+		}
+	   }
+	   function calculatePaid() {
+		var totalDays = $('#total_no_of_days').val(); 
+		var unPaidDays = $('#no_of_unpaid_days').val();
+		if(totalDays != '' && unPaidDays != '') {
+			document.getElementById('no_of_paid_days').value = totalDays-unPaidDays;
+		}
+		else if(unPaidDays == '') {
+			document.getElementById('no_of_paid_days').value = ''; 
+		}
 	   }
 </script>
 @endsection

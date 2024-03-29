@@ -310,7 +310,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 											Comments :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
-											{{$data->comments_by_employee ?? ''}}
+										@if($data->employee_action_at != '') {{$data->comments_by_employee ?? ''}} @endif
 										</div>
 									</div>
 								</div>
@@ -357,7 +357,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 											Comments :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
-											{{$data->comments_by_hr_manager ?? ''}}
+										@if($data->hr_manager_action_at != '') {{$data->comments_by_hr_manager ?? ''}} @endif
 										</div>
 									</div>
 								</div>
@@ -404,7 +404,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 											Comments :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
-											{{$data->comments_by_department_head ?? ''}}
+										@if($data->department_head_action_at != '') {{$data->comments_by_department_head ?? ''}} @endif
 										</div>
 									</div>
 								</div>
@@ -445,7 +445,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 											Comments :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
-											{{$data->comments_by_division_head ?? ''}}
+										@if($data->division_head_action_at != '') {{$data->comments_by_division_head ?? ''}} @endif
 										</div>
 									</div>
 								</div>
