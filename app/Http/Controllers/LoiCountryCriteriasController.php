@@ -84,7 +84,7 @@ class LoiCountryCriteriasController extends Controller
             ['data' => 'is_longer_lead_time', 'name' => 'is_longer_lead_time','title' => 'Longer Lead Time'],
             ['data' => 'is_loi_restricted', 'name' => 'is_loi_restricted','title' => 'Is LOI Restricted'],
             ['data' => 'is_only_company_allowed', 'name' => 'is_only_company_allowed','title' => 'Is Only Company Allowed'],
-            ['data' => 'min_qty_per_passport', 'name' => 'min_qty_per_passport','title' => 'Minimum QTY/ Passport'],
+//            ['data' => 'min_qty_per_passport', 'name' => 'min_qty_per_passport','title' => 'Minimum QTY/ Passport'],
             ['data' => 'max_qty_per_passport', 'name' => 'max_qty_per_passport','title' => 'Maximum QTY/ Passport'],
             ['data' => 'max_qty_for_company', 'name' => 'max_qty_for_company','title' => 'Maximum QTY/ Company'],
             ['data' => 'min_qty_for_company', 'name' => 'min_qty_for_company','title' => 'Minimum QTY/ Company'],
@@ -101,8 +101,8 @@ class LoiCountryCriteriasController extends Controller
      */
     public function create()
     {
-        $alreadyAddedIds = LoiCountryCriteria::pluck('country_id');
-        $countries = Country::whereNotIn('id', $alreadyAddedIds)->get();
+        $LOIRestrictedCountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->pluck('country_id');
+        $countries = Country::whereNotIn('id', $LOIRestrictedCountries)->get();
         $modelLines = MasterModelLines::all();
 
         return view('loi-country-criterias.create', compact('countries','modelLines'));
@@ -124,9 +124,6 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria->updated_by = Auth::id();
         $loiCountryCriteria->is_loi_restricted = $request->is_loi_restricted ? true : false;
         $loiCountryCriteria->is_only_company_allowed = $request->is_only_company_allowed;
-        $loiCountryCriteria->is_inflate_qty = $request->is_inflate_qty;
-        $loiCountryCriteria->is_longer_lead_time = $request->is_longer_lead_time;
-        $loiCountryCriteria->min_qty_per_passport = $request->min_qty_per_passport;
         $loiCountryCriteria->max_qty_per_passport = $request->max_qty_per_passport;
         $loiCountryCriteria->max_qty_for_company = $request->max_qty_for_company;
         $loiCountryCriteria->min_qty_for_company = $request->min_qty_for_company;
@@ -177,8 +174,6 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria->is_loi_restricted = $request->is_loi_restricted ? true : false;
         $loiCountryCriteria->is_only_company_allowed = $request->is_only_company_allowed;
         $loiCountryCriteria->is_inflate_qty = $request->is_inflate_qty;
-        $loiCountryCriteria->is_longer_lead_time = $request->is_longer_lead_time;
-        $loiCountryCriteria->min_qty_per_passport = $request->min_qty_per_passport;
         $loiCountryCriteria->max_qty_per_passport = $request->max_qty_per_passport;
         $loiCountryCriteria->max_qty_for_company = $request->max_qty_for_company;
         $loiCountryCriteria->min_qty_for_company = $request->min_qty_for_company;
@@ -217,9 +212,34 @@ class LoiCountryCriteriasController extends Controller
         if(!empty($LoiCountryCriteria->is_only_company_allowed)) {
             if($LoiCountryCriteria->is_only_company_allowed == LoiCountryCriteria::YES ) {
                 if($request->customer_type !== \App\Models\Customer::CUSTOMER_TYPE_COMPANY ) {
-                    $data['customer_type_error'] = 'Only Company Can allow to Create LOI for this Country';
+                    $data['customer_type_error'] = 'Only Company Can allow to Create LOI for this Country.';
                 }
             }
+        }
+        if($request->total_quantities) {
+            if($LoiCountryCriteria->max_qty_per_passport > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL) {
+                if($request->total_quantities > $LoiCountryCriteria->max_qty_per_passport) {
+                    $data['max_qty_per_passport_error'] = 'Quantity should be less than '.$LoiCountryCriteria->max_qty_per_passport;
+                }
+            }
+            if($LoiCountryCriteria->min_qty_for_company > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
+                if($LoiCountryCriteria->min_qty_for_company > $request->total_quantities) {
+                    $data['min_qty_per_company_error'] = 'Quantity should be greater than '.$LoiCountryCriteria->min_qty_for_company;
+                }
+            }
+            if($LoiCountryCriteria->max_qty_for_company > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
+                info("customer is company");
+                info($LoiCountryCriteria->max_qty_for_company);
+                info($request->total_quantities);
+
+                if($LoiCountryCriteria->max_qty_for_company < $request->total_quantities) {
+                    info("Quantity should be less than");
+                    $data['max_qty_per_company_error'] = 'Quantity should be less than '.$LoiCountryCriteria->max_qty_for_company;
+                }
+            }
+        }
+        if($LoiCountryCriteria->is_only_company_allowed == true) {
+            $data['company_only_allowed_error'] = 'Company can Only Create LOI.';
         }
 
         return response()->json($data);

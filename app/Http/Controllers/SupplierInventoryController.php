@@ -1353,8 +1353,6 @@ class SupplierInventoryController extends Controller
             }
 
             if($LOIItem) {
-
-
                 $remaingQuantity = $LOIItem->quantity - $LOIItem->utilized_quantity;
                 $assignedQuantity = 0;
                 if(array_key_exists($LOIItem->id, $alreadyAddedIds)) {

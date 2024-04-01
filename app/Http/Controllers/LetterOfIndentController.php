@@ -124,7 +124,7 @@ class LetterOfIndentController extends Controller
      */
     public function store(Request $request)
     {
-
+//        return $request->all();
         $request->validate([
             'customer_id' => 'required',
             'category' => 'required',
