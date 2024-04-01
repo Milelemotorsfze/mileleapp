@@ -313,7 +313,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-passport-re
 						</div>
 						<div class="other-specific-passport-release-option" style="display: none;">
 							<div class=" col-lg-4 col-md-6 col-sm-6 ">
-								<label for="release_purpose" class="form-label"> </label>
+								<label for="release_purpose" class="form-label"> Specify, if Others</label>
 								<input type="text" placeholder="Please Specify Other" name="release_purpose" class="form-control" id="other_release_purpose" value="">
 							</div>
 						</div>

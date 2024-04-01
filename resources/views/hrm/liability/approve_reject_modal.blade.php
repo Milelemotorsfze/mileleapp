@@ -114,13 +114,13 @@
 	    $('.status-reject-button').click(function (e) {
 	     var id = $(this).attr('data-id');
 	     var status = $(this).attr('data-status');
-	comment = $("#reject-comment-"+id).val();
+		 comment = $("#reject-comment-"+id).val();
 	     approveOrRejectHiringrequest(id, status,comment)
 	 })
 	 $('.status-approve-button').click(function (e) {
 	     var id = $(this).attr('data-id');
 	     var status = $(this).attr('data-status');
-	comment = $("#comment-"+id).val();
+		 comment = $("#comment-"+id).val();
 	     approveOrRejectHiringrequest(id, status,comment)
 	 })
 	    function approveOrRejectHiringrequest(id, status,comment) {

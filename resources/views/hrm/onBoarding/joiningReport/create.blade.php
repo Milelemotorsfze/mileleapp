@@ -130,6 +130,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});
+</script>
+<script type="text/javascript">
 	var candidates = {!! json_encode($candidates) !!};
 	$(document).ready(function () {
 	    $('#employee_code_div').hide();
@@ -142,12 +149,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 	    });
 	$('#joining_location').select2({
 	        allowClear: true,
-	maximumSelectionLength: 1,
+			maximumSelectionLength: 1,
 	        placeholder:"Choose Joining Location",
 	    });	
 	    $('#team_lead_or_reporting_manager').select2({
 	        allowClear: true,
-	maximumSelectionLength: 1,
+			maximumSelectionLength: 1,
 	        placeholder:"Choose Reporting Manager",
 	    });	
 	$('.employee_id').change(function (e) {
@@ -179,10 +186,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 				console.log(candidates[i].team_lead_or_reporting_manager);
 				if(candidates[i].team_lead_or_reporting_manager != null) {
 					$("#team_lead_or_reporting_manager").select2().val(candidates[i].team_lead_or_reporting_manager).trigger("change");
+					$('#team_lead_or_reporting_manager').select2({
+						allowClear: true,
+						maximumSelectionLength: 1,
+						placeholder:"Choose Reporting Manager",
+					});	
 				}
 				if(candidates[i].work_location != null) {
 					$("#joining_location").select2().val(candidates[i].team_lead_or_reporting_manager).trigger("change");
 					$("#joining_location").val(candidates[i].work_location);
+					$('#joining_location').select2({
+						allowClear: true,
+						maximumSelectionLength: 1,
+						placeholder:"Choose Joining Location",
+					});	
 				}
 				console.log(candidates[i].candidate_joining_type);
 			}
@@ -199,6 +216,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 	}			
 	});
 	});
+	jQuery.validator.addMethod("uniqueCandidateEmpCode", 
+	       function(value, element) {
+	           var result = false;
+				var employeeId = $("#employee_id").val();
+	           $.ajax({
+	               type:"POST",
+	               async: false,
+	               url: "{{route('employee.uniqueCandidateEmpCode')}}", // script to validate in server side
+	               data: {_token: '{{csrf_token()}}',employeeCode: value,employeeId:employeeId},
+	               success: function(data) {
+	                   result = (data == true) ? true : false;
+	               }
+	           });
+	           // return true if username is exist in database
+	           return result; 
+	       }, 
+	       "This Employee Code is already taken! Try another."
+	   );
 	jQuery.validator.setDefaults({
 	    errorClass: "is-invalid",
 	    errorElement: "p",     
@@ -222,8 +257,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 	        },
 	        employee_code: {
 	            required: true,
-	minlength: 4,
+				minlength: 4,
 	            maxlength: 4,
+				uniqueCandidateEmpCode: true,
 	        },
 	        team_lead_or_reporting_manager: {
 	            required: true,

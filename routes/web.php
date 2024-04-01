@@ -279,6 +279,7 @@ Route::get('/d', function () {
     Route::resource('employee', EmployeeController::class);
     Route::controller(EmployeeController::class)->group(function(){
         Route::post('employee/passport-unique-check', 'uniquePassport')->name('employee.uniquePassport');
+        Route::post('employee/employee-code-unique-check', 'uniqueCandidateEmpCode')->name('employee.uniqueCandidateEmpCode');
     });
     // Employee Hiring Requset
     Route::resource('employee-hiring-request', EmployeeHiringRequestController::class);

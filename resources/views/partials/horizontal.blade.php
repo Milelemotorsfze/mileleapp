@@ -650,7 +650,7 @@
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('joiningReport.approvalAwaiting') }}" id="topnav-utility" role="button">
                                             <span data-key="t-utility"> Joining Report @if((Auth::user()->joining_report_approval['count']) > 0)
-                                            <span class="approval-count">{{Auth::user()->joining_report_approval['count']+Auth::user()->leave_request_approval['count']}}</span>
+                                            <span class="approval-count">{{Auth::user()->joining_report_approval['count']}}</span>
                                                 @endif
                                             </span>
                                             <!-- <div class="arrow-down"></div> -->

@@ -310,14 +310,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-passport-requ
 								</select>
 							</div>
 						</div>
-						@if($data->purposes_of_release == 13)
 						<div class="other-specific-passport-release-option">
 							<div class=" col-lg-4 col-md-6 col-sm-6 ">
 								<label for="release_purpose" class="form-label"> </label>
 								<input type="text" placeholder="Please Specify Other" name="release_purpose" class="form-control" id="other_release_purpose" value="{{$data->release_purpose ?? ''}}">
 							</div>
 						</div>
-						@endif
 						<div class="col-lg-10 col-md-10 col-sm-10 col-12">
 							<p class="submit-passport-para">However, I can withdraw my passport when required by fulfilling the necessary requirements</p>
 						</div>
@@ -350,10 +348,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-passport-requ
 	    var data = <?php echo json_encode($masterEmployees); ?>;
 	    var passportRequest = '';
 	    var passportRequest = <?php echo json_encode($data); ?>;
+		console.log(passportRequest);
 	    if(passportRequest != '' && passportRequest.purposes_of_submit != '') {
 	        showPassportRequestInput();
 	
 	    }
+		if(passportRequest != '' && passportRequest.purposes_of_release == 13) {
+			$('.other-specific-passport-release-option').show();
+		}
+		else if(passportRequest != '' && passportRequest.purposes_of_release != 13) {
+			$('.other-specific-passport-release-option').hide();
+		}
 	    $('#employee_name_id').select2({
 	        allowClear: true,
 	        maximumSelectionLength: 1,

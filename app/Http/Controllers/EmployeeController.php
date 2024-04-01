@@ -41,4 +41,27 @@ class EmployeeController extends Controller
            }
         }
     }
+    public function uniqueCandidateEmpCode(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'employeeCode' => 'required',
+            'employeeId' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            try {
+                $passport = EmployeeProfile::whereNot('id',$request->employeeId[0])->where('employee_code',$request->employeeCode)->get();
+                if(count($passport) > 0) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+           } 
+           catch (\Exception $e) {
+               dd($e);
+           }
+        }
+    }
 }
