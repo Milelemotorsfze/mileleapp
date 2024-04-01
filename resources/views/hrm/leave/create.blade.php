@@ -213,8 +213,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 @endif
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
-<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/jquery.validation/1.19.3/jquery.validate.min.js"></script> -->
 <script type="text/javascript">
 	var data = {!! json_encode($masterEmployees) !!};
 	var oldData = {!! json_encode($data) !!};
@@ -354,6 +352,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
         return this.optional(element) || totalDays == daysSum;
     }, "Total days must be the sum of paid and unpaid days");
 
+	$.validator.addMethod("paidZero", function(value, element) {
+		var isUnpaid = false;
+		var paidDays = $('#no_of_paid_days').val();  
+		if ($('#unpaid').is(':checked') && paidDays > 0) {
+			isUnpaid = true; 
+        }
+        return this.optional(element) || isUnpaid == false;
+    }, "If leave type is unpaid , then we cannot give any paid days");
+	
 	
     // Applying validation rules to your form
     $("#employeeLeaveForm").validate({
@@ -385,6 +392,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 				required: true,
 				min:0,
 				sumDays:true,
+				paidZero:true,
 			},
 			no_of_unpaid_days: {
 				required: true,

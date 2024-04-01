@@ -117,20 +117,26 @@ class EmployeeLeaveController extends Controller
             $update->comments_by_hr_manager = $request->comment;
             $update->hr_manager_action_at = Carbon::now()->format('Y-m-d H:i:s');
             $update->action_by_hr_manager = $request->status;
-            $update->others = $request->others;
             if($request->status == 'approved') {
+                $update->others = $request->others;
                 $update->action_by_department_head = 'pending';
                 $message = 'Employee passport submit request send to Reporting Manager ( '.$update->reportingManager->name.' - '.$update->reportingManager->email.' ) for approval';
+            }
+            else if($request->status == 'rejected') {
+                $update->others = NULL;
             }
         }
         else if($request->current_approve_position == 'Reporting Manager') {
             $update->comments_by_department_head = $request->comment;
             $update->department_head_action_at = Carbon::now()->format('Y-m-d H:i:s');
             $update->action_by_department_head = $request->status;
-            $update->to_be_replaced_by = $request->to_be_replaced_by;
             if($request->status == 'approved') {
                 $update->action_by_division_head = 'pending';
+                $update->to_be_replaced_by = $request->to_be_replaced_by[0];
                 $message = 'Employee passport submit request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';
+            }
+            else if($request->status == 'rejected') {    
+                $update->to_be_replaced_by = NULL;
             }
         }
         else if($request->current_approve_position == 'Division Head') {

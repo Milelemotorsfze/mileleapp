@@ -137,6 +137,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 								<span>{{$data->user->advance_or_loan_balance ?? ''}} AED</span>
 							</div>
+							<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+								<label for="choices-single-default" class="form-label"> Others :</label>
+							</div>
+							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+								<span>{{$data->others ?? ''}}</span>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -205,6 +211,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 							</div>
 							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 								<span>{{ $data->no_of_unpaid_days ?? '' }}</span>
+							</div>
+							<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+								<label for="choices-single-default" class="form-label"> To Be Replaced By :</label>
+							</div>
+							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+								<span>{{$data->toBeReplacedBy->name ?? ''}}</span>
 							</div>
 						</div>
 					</div>
@@ -310,7 +322,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 											Comments :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
-										@if($data->employee_action_at != '') {{$data->comments_by_employee ?? ''}} @endif
+										@if($data->employee_action_at != '' && ($data->action_by_employee == 'approved' OR $data->action_by_employee == 'rejected')) {{$data->comments_by_employee ?? ''}} @endif
 										</div>
 									</div>
 								</div>
@@ -347,12 +359,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 											{{ \Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s') }}
 											@endif
 										</div>
+										@if($data->action_by_hr_manager == 'approved')
 										<div class="col-lg-2 col-md-12 col-sm-12">
 											Others :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
 											{{$data->others ?? ''}}
 										</div>
+										@endif
 										<div class="col-lg-2 col-md-12 col-sm-12">
 											Comments :
 										</div>
@@ -394,12 +408,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 											{{ \Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s') }}
 											@endif
 										</div>
+										@if($data->action_by_department_head =='approved')
 										<div class="col-lg-2 col-md-12 col-sm-12">
 											To Be Replaced By :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
 											{{$data->toBeReplacedBy->name ?? ''}}
 										</div>
+										@endif
 										<div class="col-lg-2 col-md-12 col-sm-12">
 											Comments :
 										</div>

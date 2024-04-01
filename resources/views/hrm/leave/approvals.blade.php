@@ -431,7 +431,7 @@
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($ReportingManagerApproved as $key => $data)
+						@foreach ($HRManagerApproved as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>@if($data->created_at != '')
@@ -507,7 +507,7 @@
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($ReportingManagerRejected as $key => $data)
+						@foreach ($HRManagerRejected as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>@if($data->created_at != '')
@@ -697,7 +697,7 @@
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($employeeApproved as $key => $data)
+						@foreach ($ReportingManagerApproved as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>@if($data->created_at != '')
@@ -773,7 +773,7 @@
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($employeeRejected as $key => $data)
+						@foreach ($ReportingManagerRejected as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>@if($data->created_at != '')
@@ -963,7 +963,7 @@
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($ReportingManagerApproved as $key => $data)
+						@foreach ($divisionHeadApproved as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>@if($data->created_at != '')
@@ -1039,7 +1039,7 @@
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($ReportingManagerRejected as $key => $data)
+						@foreach ($divisionHeadRejected as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>@if($data->created_at != '')
@@ -1090,3 +1090,8 @@
 @endif
 @endif
 @endsection
+@push('scripts')
+<script type="text/javascript">
+	var ReportingManagerPendings = {!! json_encode($ReportingManagerPendings) !!}
+</script>
+@endpush
