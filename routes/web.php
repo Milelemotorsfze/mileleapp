@@ -376,6 +376,7 @@ Route::get('/d', function () {
         Route::post('employee-leave/store-or-update/{id}', 'storeOrUpdate')->name('employee-leave.store-or-update');
         Route::post('leave_request_action', 'requestAction')->name('leaveRequest.action');
         Route::get('leave_approval_awaiting', 'approvalAwaiting')->name('leave.approvalAwaiting');
+        Route::post('checkLeaveDateAlreadyExist', 'checkLeaveDateAlreadyExist')->name('leave.checkLeaveDateAlreadyExist');
     });
 
     // Employee Birthday Gift PO

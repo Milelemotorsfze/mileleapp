@@ -361,21 +361,43 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
         return this.optional(element) || isUnpaid == false;
     }, "If leave type is unpaid , then we cannot give any paid days");
 	
-	
+	$.validator.addMethod("dateExist", function(value, element) {
+	    var result = false;
+		var startDate = $('#leave_start_date').val(); 
+		var endDate = $('#leave_end_date').val(); 
+		var EmpId = $("#employee_id").val();
+		$.ajax({
+			type:"POST",
+			async: false,
+			url: "{{route('leave.checkLeaveDateAlreadyExist')}}", // script to validate in server side
+			data: {startDate: startDate,
+			endDate: endDate,
+			EmpId: EmpId,
+			id : id,
+			_token: '{{csrf_token()}}'},
+			success: function(data) {
+				result = (data == true) ? true : false;
+			}
+		});
+		return result; 
+	}, "This date is alredy exist in the system, Please select different date.");
     // Applying validation rules to your form
     $("#employeeLeaveForm").validate({
         rules: {
             leave_start_date: {
                 required: true,
-                date: true // Validates the start date format
+                date: true, // Validates the start date format
+				dateExist: true,
             },
             leave_end_date: {
                 required: true,
                 date: true, // Validates the end date format
-                endDateGreater: true // Custom rule for comparing dates
+                endDateGreater: true, // Custom rule for comparing dates
+				dateExist: true,
             },
 			employee_id: {
 				required: true,
+				// dateExist: true,
 			},
 			type_of_leave: {
 				required: true,

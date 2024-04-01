@@ -19,6 +19,35 @@ use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 
 class EmployeeLeaveController extends Controller
 {
+    public function checkLeaveDateAlreadyExist(Request $request) {
+        $isAlreadyExist['startDate'] = 'no';
+        $isAlreadyExist['endDate'] = 'no';
+        $data = true;
+        if($request->startDate != '' && $request->endDate != '' && $request->EmpId != '') {
+            $startDate = Leave::whereIn('status',['pending','approved'])->where('employee_id',$request->EmpId[0])->where('leave_start_date','<=',$request->startDate)
+                ->where('leave_end_date','>=',$request->startDate);
+            if(isset($request->id) && $request->id != 'new') {
+                $startDate = $startDate->whereNot('id',$request->id);
+            }
+            $startDate = $startDate->get();
+            if(count($startDate) > 0) {
+                $isAlreadyExist['startDate'] = 'yes';
+            }
+            $endDate = Leave::whereIn('status',['pending','approved'])->where('employee_id',$request->EmpId[0])->where('leave_start_date','<=',$request->endDate)
+                ->where('leave_end_date','>=',$request->endDate);
+            if(isset($request->id) && $request->id != 'new') {
+                $endDate = $endDate->whereNot('id',$request->id);
+            }
+            $endDate = $endDate->get();
+            if(count($endDate) > 0) {
+                $isAlreadyExist['endDate'] = 'yes';
+            }
+        }    
+        if($isAlreadyExist['startDate'] == 'yes' OR $isAlreadyExist['endDate'] == 'yes')  {
+            $data = false;
+        }
+        return response()->json($data);
+    }
     public function approvalAwaiting(Request $request) {
         $leavePersonReplacedBy = '';
         $leavePersonReplacedBy = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->get();
@@ -199,12 +228,6 @@ class EmployeeLeaveController extends Controller
         $leavePersonReplacedBy = '';
         $leavePersonReplacedBy = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->get();
         return view('hrm.leave.index',compact('pendings','approved','rejected','page','leavePersonReplacedBy'));
-    }
-    public function create() {
-        return view('hrm.leave.create');
-    }
-    public function edit() {
-        return view('hrm.leave.edit');
     }
     public function show($id) {
         $data = Leave::where('id',$id)->first();
