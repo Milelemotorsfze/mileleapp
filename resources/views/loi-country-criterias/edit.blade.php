@@ -66,13 +66,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-6 col-sm-12">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label"> Minimum QTY/Passport </label>
-                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"
-                                           name="min_qty_per_passport" placeholder="Enter Minimum Quantity / Passport" value="{{ old('min_qty_per_passport', $loiCountryCriteria->min_qty_per_passport) }}" >
-                                </div>
-                            </div>
+
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Maximum QTY/Passport </label>
@@ -105,28 +99,7 @@
                                         {{ $loiCountryCriteria->is_only_company_allowed == \App\Models\LoiCountryCriteria::NONE  ? 'selected'  : ''}} > None </option>
                                 </select>
                             </div>
-                            <div class="col-lg-3 col-md-6 col-sm-12">
-                                <label for="choices-single-default" class="form-label"> Is able to Inflate Quantity ?</label>
-                                <select class="form-control widthinput" multiple name="is_inflate_qty" id="is_inflate_qty" autofocus>
-                                    <option value="{{ \App\Models\LoiCountryCriteria::YES }}"
-                                        {{ $loiCountryCriteria->is_inflate_qty == \App\Models\LoiCountryCriteria::YES ? 'selected'  : ''}}>Yes</option>
-                                    <option value="{{ \App\Models\LoiCountryCriteria::NO }}"
-                                        {{ $loiCountryCriteria->is_inflate_qty == \App\Models\LoiCountryCriteria::NO ? 'selected'  : ''}} > No </option>
-                                    <option value="{{ \App\Models\LoiCountryCriteria::NONE }}"
-                                        {{ $loiCountryCriteria->is_inflate_qty == \App\Models\LoiCountryCriteria::NONE  ? 'selected'  : ''}} > None </option>
-                                </select>
-                            </div>
-                            <div class="col-lg-3 col-md-6 col-sm-12">
-                                <label for="choices-single-default" class="form-label"> Lead time is More ?</label>
-                                <select class="form-control widthinput" multiple name="is_longer_lead_time" id="is_longer_lead_time" autofocus>
-                                    <option value="{{ \App\Models\LoiCountryCriteria::YES }}"
-                                        {{ $loiCountryCriteria->is_longer_lead_time == \App\Models\LoiCountryCriteria::YES ? 'selected'  : ''}}>Yes</option>
-                                    <option value="{{ \App\Models\LoiCountryCriteria::NO }}"
-                                        {{ $loiCountryCriteria->is_longer_lead_time == \App\Models\LoiCountryCriteria::NO ? 'selected'  : '' }} > No </option>
-                                    <option value="{{ \App\Models\LoiCountryCriteria::NONE }}"
-                                        {{ $loiCountryCriteria->is_only_company_allowed == \App\Models\LoiCountryCriteria::NONE ? 'selected'  : ''}} > None </option>
-                                </select>
-                            </div>
+
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Comment </label>
