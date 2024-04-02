@@ -1,5 +1,20 @@
 @extends('layouts.table')
 <style>
+	tr {
+	border:1px solid #e9e9ef !important;
+	}
+	td {
+	padding-top:10px!important;
+	padding-bottom:10px!important;
+	padding-right:10px!important;
+	padding-left:10px!important;
+	}
+	th {
+	padding-top:10px!important;
+	padding-bottom:10px!important;
+	padding-right:10px!important;
+	padding-left:10px!important;
+	}
 	.texttransform {
 	text-transform: capitalize;
 	}
@@ -467,6 +482,70 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 								</div>
 							</div>
 						</div>
+					</div>
+				</div>
+			</div>
+			<div class="card">
+				<div class="card-header">
+					<h4 class="card-title">Other Leave Informations</h4>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<table>
+							<thead>
+								<tr>
+									<th>Sl No</th>
+									<th>Request Date</th>
+									<th>Leave Type</th>
+									<th>Start Date</th>
+									<th>End Date</th>
+									<th>Total Days</th>
+									<th>Paid Days</th>
+									<th>Unpaid Days</th>
+									<th>Replaced By</th>
+									<th>Status</th>
+									<th>Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								<div hidden>{{$i=0;}}</div>
+								@foreach($all as $one)
+								<tr>
+									<td>{{ ++$i }}</td>
+									<td>
+										@if($one->created_at != '')
+										{{\Carbon\Carbon::parse($one->created_at)->format('d M Y') ?? ''}}
+										@endif
+									</td>
+									<td>{{ $one->leave_type ?? ''}} @if($one->type_of_leave_description != '') ( {{ $one->type_of_leave_description ?? ''}} ) @endif</td>
+									<td>
+										@if($one->leave_start_date != '')
+										{{\Carbon\Carbon::parse($one->leave_start_date)->format('d M Y') ?? ''}}
+										@endif
+									</td>
+									<td>
+										@if($one->leave_end_date != '')
+										{{\Carbon\Carbon::parse($one->leave_end_date)->format('d M Y') ?? ''}}
+										@endif
+									</td>
+									<td>{{ $one->total_no_of_days ?? ''}}</td>
+									<td>{{ $one->no_of_paid_days ?? ''}}</td>
+									<td>{{ $one->no_of_unpaid_days ?? ''}}</td>
+									<td>{{ $one->toBeReplacedBy->name ?? ''}}</td>
+									<td>{{ $one->status ?? ''}}</td>
+									<td>@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details','current-user-view-leave-details']);
+										@endphp
+										@if ($hasPermission) 
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_leave.show',$one->id)}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> 
+											</a>
+										
+										@endif</td>
+								</tr>
+								@endforeach
+							</tbody>
+						</table>
 					</div>
 				</div>
 			</div>
