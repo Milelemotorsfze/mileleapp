@@ -96,7 +96,7 @@
                                     <option value="{{ \App\Models\LoiCountryCriteria::NO }}"
                                         {{ $loiCountryCriteria->is_only_company_allowed == \App\Models\LoiCountryCriteria::NO ? 'selected'  : '' }} > No </option>
                                     <option value="{{ \App\Models\LoiCountryCriteria::NONE }}"
-                                        {{ $loiCountryCriteria->is_only_company_allowed == \App\Models\LoiCountryCriteria::NONE  ? 'selected'  : ''}} > None </option>
+                                        {{ $loiCountryCriteria->is_only_company_allowed == ' '  ? 'selected'  : ''}} > None </option>
                                 </select>
                             </div>
 

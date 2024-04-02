@@ -30,24 +30,6 @@ class LoiCountryCriteriasController extends Controller
                 ->editColumn('master_model_line_id', function($query) {
                     return $query->modelLine->model_line ?? '';
                 })
-                ->editColumn('is_inflate_qty', function($query) {
-                    if($query->is_inflate_qty == 1) {
-                        return 'Yes';
-                    }else if($query->is_inflate_qty == 2){
-                        return 'No';
-                    }else{
-                        return 'None';
-                    }
-                })
-                ->editColumn('is_longer_lead_time', function($query) {
-                    if($query->is_longer_lead_time == 1) {
-                        return 'Yes';
-                    }else if($query->is_longer_lead_time == 2){
-                        return 'No';
-                    }else{
-                        return 'None';
-                    }
-                })
                 ->editColumn('is_loi_restricted', function($query) {
                     if($query->is_loi_restricted == true) {
                         return 'Yes';
@@ -80,11 +62,8 @@ class LoiCountryCriteriasController extends Controller
             ['data' => 'country.name', 'name' => 'country.name','title' => 'Country'],
             ['data' => 'status', 'name' => 'status','title' => 'Status'],
             ['data' => 'master_model_line_id', 'name' => 'master_model_line_id','title' => 'Restricted Model Line'],
-            ['data' => 'is_inflate_qty', 'name' => 'is_inflate_qty','title' => 'Is Inflate Quantity'],
-            ['data' => 'is_longer_lead_time', 'name' => 'is_longer_lead_time','title' => 'Longer Lead Time'],
             ['data' => 'is_loi_restricted', 'name' => 'is_loi_restricted','title' => 'Is LOI Restricted'],
             ['data' => 'is_only_company_allowed', 'name' => 'is_only_company_allowed','title' => 'Is Only Company Allowed'],
-//            ['data' => 'min_qty_per_passport', 'name' => 'min_qty_per_passport','title' => 'Minimum QTY/ Passport'],
             ['data' => 'max_qty_per_passport', 'name' => 'max_qty_per_passport','title' => 'Maximum QTY/ Passport'],
             ['data' => 'max_qty_for_company', 'name' => 'max_qty_for_company','title' => 'Maximum QTY/ Company'],
             ['data' => 'min_qty_for_company', 'name' => 'min_qty_for_company','title' => 'Minimum QTY/ Company'],
@@ -173,7 +152,7 @@ class LoiCountryCriteriasController extends Controller
         $loiCountryCriteria->updated_by = Auth::id();
         $loiCountryCriteria->is_loi_restricted = $request->is_loi_restricted ? true : false;
         $loiCountryCriteria->is_only_company_allowed = $request->is_only_company_allowed;
-        $loiCountryCriteria->is_inflate_qty = $request->is_inflate_qty;
+//        $loiCountryCriteria->is_inflate_qty = $request->is_inflate_qty;
         $loiCountryCriteria->max_qty_per_passport = $request->max_qty_per_passport;
         $loiCountryCriteria->max_qty_for_company = $request->max_qty_for_company;
         $loiCountryCriteria->min_qty_for_company = $request->min_qty_for_company;
