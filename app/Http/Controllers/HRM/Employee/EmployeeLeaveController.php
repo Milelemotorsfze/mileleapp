@@ -233,7 +233,8 @@ class EmployeeLeaveController extends Controller
         $data = Leave::where('id',$id)->first();
         $previous = Leave::where('id', '<', $id)->max('id');
         $next = Leave::where('id', '>', $id)->min('id');
-        return view('hrm.leave.show',compact('data','previous','next'));
+        $all = Leave::whereNot('id',$id)->where('employee_id',$data->employee_id)->latest()->get();
+        return view('hrm.leave.show',compact('data','previous','next','all'));
     }
     public function createOrEdit($id) {
         if($id == 'new') {
