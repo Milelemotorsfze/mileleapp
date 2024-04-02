@@ -267,89 +267,109 @@ class EmployeeLeaveController extends Controller
         else {
             DB::beginTransaction();
             try {
-                $authId = Auth::id();
-                $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
-                if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
-                    $createHandOvr['lead_or_manager_id'] = $employ->team_lead_or_reporting_manager;
-                    $createHandOvr['approval_by_id'] = $employ->team_lead_or_reporting_manager;
-                    $createHandOvr['created_by'] = $authId;
-                    $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
-                }
-                $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
-                $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
-                // $departmentHead = DepartmentHeadApprovals::where('department_id',$employee->department_id)->first();
-                $divisionHead = MasterDivisionWithHead::where('id',$employee->department->division_id)->first();
-                $input = $request->all();
-                if($id == 'new') {
-                    $input['created_by'] = $authId;   
-                    $input['hr_manager_id'] = $HRManager->handover_to_id;                
-                    $input['department_head_id'] = $employee->leadManagerHandover->approval_by_id;
-                    $input['division_head_id'] = $divisionHead->approval_handover_to;
-                    $input['alternative_home_contact_no'] = $request->alternative_home_contact_no['full'];
-                    if($request->type_of_leave != 'others') {
-                        $input['type_of_leave_description'] = NULL;
+                $startDate =[];
+                $endDate = [];
+                if($request->leave_start_date != '' && $request->leave_end_date != '' && $request->employee_id != '') {
+                    $startDate = Leave::whereIn('status',['pending','approved'])->where('employee_id',$request->employee_id)->where('leave_start_date','<=',$request->leave_start_date)
+                        ->where('leave_end_date','>=',$request->leave_start_date);
+                    if(isset($request->id) && $request->id != 'new') {
+                        $startDate = $startDate->whereNot('id',$request->id);
                     }
-                    $createRequest = Leave::create($input);
-                    $history['leave_id'] = $createRequest->id;
-                    $history['icon'] = 'icons8-document-30.png';
-                    $history['message'] = 'Employee Leave request created by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
-                    $createHistory = LeaveHistory::create($history);
-                    $history2['leave_id'] = $createRequest->id;
-                    $history2['icon'] = 'icons8-send-30.png';
-                    $history2['message'] = 'Employee Leave request send to Employee ( '.$employee->user->name.' - '.$employee->user->email.' ) for approval';
-                    $createHistory2 = LeaveHistory::create($history2);
-                    (new UserActivityController)->createActivity('Employee Leave Request Created');
-                    $successMessage = "Employee Leave Request Created Successfully";
+                    $startDate = $startDate->get();                         
+                    $endDate = Leave::whereIn('status',['pending','approved'])->where('employee_id',$request->employee_id)->where('leave_start_date','<=',$request->leave_end_date)
+                        ->where('leave_end_date','>=',$request->leave_end_date);
+                    if(isset($request->id) && $request->id != 'new') {
+                        $endDate = $endDate->whereNot('id',$request->id);
+                    }
+                    $endDate = $endDate->get();
+                }
+                if(count($startDate) == 0 && count($endDate) == 0) {  
+                    $authId = Auth::id();
+                    $employ = EmployeeProfile::where('user_id',$request->employee_id)->first();
+                    if($employ->team_lead_or_reporting_manager != '' && !isset($employ->leadManagerHandover)) {
+                        $createHandOvr['lead_or_manager_id'] = $employ->team_lead_or_reporting_manager;
+                        $createHandOvr['approval_by_id'] = $employ->team_lead_or_reporting_manager;
+                        $createHandOvr['created_by'] = $authId;
+                        $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
+                    }
+                    $employee = EmployeeProfile::where('user_id',$request->employee_id)->first();
+                    $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                    $divisionHead = MasterDivisionWithHead::where('id',$employee->department->division_id)->first();
+                    $input = $request->all();
+                    if($id == 'new') {
+                        $input['created_by'] = $authId;   
+                        $input['hr_manager_id'] = $HRManager->handover_to_id;                
+                        $input['department_head_id'] = $employee->leadManagerHandover->approval_by_id;
+                        $input['division_head_id'] = $divisionHead->approval_handover_to;
+                        $input['alternative_home_contact_no'] = $request->alternative_home_contact_no['full'];
+                        if($request->type_of_leave != 'others') {
+                            $input['type_of_leave_description'] = NULL;
+                        }
+                        $createRequest = Leave::create($input);
+                        $history['leave_id'] = $createRequest->id;
+                        $history['icon'] = 'icons8-document-30.png';
+                        $history['message'] = 'Employee Leave request created by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
+                        $createHistory = LeaveHistory::create($history);
+                        $history2['leave_id'] = $createRequest->id;
+                        $history2['icon'] = 'icons8-send-30.png';
+                        $history2['message'] = 'Employee Leave request send to Employee ( '.$employee->user->name.' - '.$employee->user->email.' ) for approval';
+                        $createHistory2 = LeaveHistory::create($history2);
+                        (new UserActivityController)->createActivity('Employee Leave Request Created');
+                        $successMessage = "Employee Leave Request Created Successfully";
+                    }
+                    else {
+                        $update = Leave::find($id);
+                        if($update) {
+                            $update->employee_id = $request->employee_id;
+                            $update->type_of_leave = $request->type_of_leave;
+                            if($request->type_of_leave != 'others') {
+                                $update->type_of_leave_description = NULL;
+                            }
+                            else { 
+                                $update->type_of_leave_description = $request->type_of_leave_description;
+                            }
+                            $update->leave_start_date = $request->leave_start_date;
+                            $update->leave_end_date = $request->leave_end_date;
+                            $update->total_no_of_days = $request->total_no_of_days;
+                            $update->no_of_paid_days = $request->no_of_paid_days;
+                            $update->no_of_unpaid_days = $request->no_of_unpaid_days;
+                            $update->address_while_on_leave = $request->address_while_on_leave;
+                            $update->alternative_home_contact_no = $request->alternative_home_contact_no['full'];
+                            $update->alternative_personal_email = $request->alternative_personal_email;
+                            $update->status = 'pending';
+                            $update->action_by_employee = 'pending';
+                            $update->employee_action_at = NULL;
+                            // $update->comments_by_employee = NULL;
+                            // $update->advance_or_loan_balance = 0.00;
+                            // $update->others = NULL;
+                            $update->action_by_hr_manager = NULL;
+                            $update->hr_manager_id = $HRManager->handover_to_id;  
+                            $update->hr_manager_action_at = NULL;
+                            // $update->comments_by_hr_manager =NULL:
+                            $update->action_by_department_head = NULL;
+                            $update->department_head_id = $employee->leadManagerHandover->approval_by_id;
+                            $update->department_head_action_at = NULL;
+                            // $update->comments_by_department_head = NULL;
+                            // $update->to_be_replaced_by 
+                            $update->action_by_division_head = NULL;
+                            $update->division_head_action_at = NULL;
+                            $update->updated_by = $authId;
+                            $update->update();
+                            $history['leave_id'] = $id;
+                            $history['icon'] = 'icons8-edit-30.png';
+                            $history['message'] = 'Employee Leave request edited by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
+                            $createHistory = LeaveHistory::create($history);
+                            (new UserActivityController)->createActivity('Employee Leave Request Edited');
+                            $successMessage = "Employee Leave Request Updated Successfully";
+                        }
+                    }
+                    DB::commit();
+                    return redirect()->route('employee_leave.index')->with('success',$successMessage);
                 }
                 else {
-                    $update = Leave::find($id);
-                    if($update) {
-                        $update->employee_id = $request->employee_id;
-                        $update->type_of_leave = $request->type_of_leave;
-                        if($request->type_of_leave != 'others') {
-                            $update->type_of_leave_description = NULL;
-                        }
-                        else { 
-                            $update->type_of_leave_description = $request->type_of_leave_description;
-                        }
-                        $update->leave_start_date = $request->leave_start_date;
-                        $update->leave_end_date = $request->leave_end_date;
-                        $update->total_no_of_days = $request->total_no_of_days;
-                        $update->no_of_paid_days = $request->no_of_paid_days;
-                        $update->no_of_unpaid_days = $request->no_of_unpaid_days;
-                        $update->address_while_on_leave = $request->address_while_on_leave;
-                        $update->alternative_home_contact_no = $request->alternative_home_contact_no['full'];
-                        $update->alternative_personal_email = $request->alternative_personal_email;
-                        $update->status = 'pending';
-                        $update->action_by_employee = 'pending';
-                        $update->employee_action_at = NULL;
-                        // $update->comments_by_employee = NULL;
-                        // $update->advance_or_loan_balance = 0.00;
-                        // $update->others = NULL;
-                        $update->action_by_hr_manager = NULL;
-                        $update->hr_manager_id = $HRManager->handover_to_id;  
-                        $update->hr_manager_action_at = NULL;
-                        // $update->comments_by_hr_manager =NULL:
-                        $update->action_by_department_head = NULL;
-                        $update->department_head_id = $employee->leadManagerHandover->approval_by_id;
-                        $update->department_head_action_at = NULL;
-                        // $update->comments_by_department_head = NULL;
-                        // $update->to_be_replaced_by 
-                        $update->action_by_division_head = NULL;
-                        $update->division_head_action_at = NULL;
-                        $update->updated_by = $authId;
-                        $update->update();
-                        $history['leave_id'] = $id;
-                        $history['icon'] = 'icons8-edit-30.png';
-                        $history['message'] = 'Employee Leave request edited by '.Auth::user()->name.' ( '.Auth::user()->email.' )';
-                        $createHistory = LeaveHistory::create($history);
-                        (new UserActivityController)->createActivity('Employee Leave Request Edited');
-                        $successMessage = "Employee Leave Request Updated Successfully";
-                    }
+                    $errorMsg ="These leave dates are alredy exist in the system";
+                    return view('hrm.notaccess',compact('errorMsg'));
                 }
-                DB::commit();
-                return redirect()->route('employee_leave.index')
-                                    ->with('success',$successMessage);
             } 
             catch (\Exception $e) {
                 DB::rollback();
