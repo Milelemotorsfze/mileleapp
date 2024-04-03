@@ -1101,6 +1101,7 @@
         $('#submit-button').click(function (e) {
             e.preventDefault();
             checkCountryCriterias();
+            alert(formValid);
             if (formValid == true) {
                 if($("#form-doc-upload").valid()) {
                     $('#form-doc-upload').unbind('submit').submit();
