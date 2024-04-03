@@ -340,6 +340,8 @@ Route::get('/d', function () {
         Route::get('joining_report_approval_awaiting', 'approvalAwaiting')->name('joiningReport.approvalAwaiting');
         Route::get('employee_joining_report/{type}','index')->name('employee_joining_report.index');
         Route::get('create_joining_report/{type}','create')->name('create_joining_report.create');
+        Route::post('checkTempDateExist', 'checkTempDateExist')->name('temptransfer.checkTempDateExist');
+
     });
     Route::get('joining_report_employee_verification/{id}', [JoiningReportController::class, 'employeeVerification'])->name('employee_joining_report.verification');
     Route::post('employee_joining_report/verified', [JoiningReportController::class, 'employeeVerified'])->name('employee_joining_report.verified');

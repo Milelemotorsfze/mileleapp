@@ -7,7 +7,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 @if ($hasPermission)
 <div class="card-header">
 	<h4 class="card-title"> Create Permanent Internal Transfer Joining Report</h4>
-	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee-hiring-request.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee_joining_report.index','permanent') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
 	@if (count($errors) > 0)
