@@ -443,7 +443,6 @@
         });
 
         $(document.body).on('input', ".quantities", function (e) {
-            alert("ok");
             checkCountryCriterias();
         });
 
@@ -458,7 +457,7 @@
                 }
 
             });
-            alert(total_quantities);
+
             if(country.length > 0 && customer_type.length > 0 && total_quantities > 0) {
                 $.ajax({
                     type: "GET",
@@ -1032,7 +1031,6 @@
        }
         $('#submit-button').click(function (e) {
             e.preventDefault();
-            checkCountryCriterias();
             if (formValid == true) {
                 if($("#form-create").valid()) {
                     $('#form-create').unbind('submit').submit();
