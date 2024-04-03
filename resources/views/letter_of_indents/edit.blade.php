@@ -313,7 +313,7 @@
             </select>
             <input type="hidden" id="remaining-document-count" value="{{ $letterOfIndent->LOIDocuments->count() }}" >
             <div class="col-12 text-center">
-                <button type="submit" class="btn btn-primary float-end">Update</button>
+                <button type="submit" class="btn btn-primary float-end" id="submit-button">Update</button>
             </div>
 
         </form>
@@ -321,6 +321,7 @@
 @endsection
 @push('scripts')
     <script>
+        let formValid = true;
         let deletedDocumetIds = [];
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
@@ -390,7 +391,7 @@
             checkCountryCriterias();
         });
 
-        $('.quantities').on('input', function() {
+        $(document.body).on('input', ".quantities", function (e) {
             checkCountryCriterias();
         });
 
@@ -401,9 +402,10 @@
             var customer_type = $('#customer-type').val();
             let total_quantities = 0;
             $(".quantities ").each(function(){
-                total_quantities += parseInt($(this).val());
+                if($(this).val() > 0) {
+                    total_quantities += parseInt($(this).val());
+                }
             });
-
             if(country.length > 0 && customer_type.length > 0 && total_quantities > 0) {
                 $.ajax({
                     type: "GET",
@@ -1096,7 +1098,17 @@
                 $('#dealer').attr("disabled", false);
             }
         }
-
+        $('#submit-button').click(function (e) {
+            e.preventDefault();
+            checkCountryCriterias();
+            if (formValid == true) {
+                if($("#form-doc-upload").valid()) {
+                    $('#form-doc-upload').unbind('submit').submit();
+                }
+            }else{
+                e.preventDefault();
+            }
+        });
     </script>
 @endpush
 
