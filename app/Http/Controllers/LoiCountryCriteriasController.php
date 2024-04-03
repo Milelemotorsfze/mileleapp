@@ -182,6 +182,7 @@ class LoiCountryCriteriasController extends Controller
     }
     public function CheckCountryCriteria(Request $request)
     {
+        info($request->all());
         $LoiCountryCriteria = LoiCountryCriteria::where('country_id', $request->country_id)->where('status', LoiCountryCriteria::STATUS_ACTIVE)->first();
 
         $data = [];

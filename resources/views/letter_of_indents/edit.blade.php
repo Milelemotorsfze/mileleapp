@@ -313,7 +313,7 @@
             </select>
             <input type="hidden" id="remaining-document-count" value="{{ $letterOfIndent->LOIDocuments->count() }}" >
             <div class="col-12 text-center">
-                <button type="submit" class="btn btn-primary float-end">Update</button>
+                <button type="submit" class="btn btn-primary float-end" id="submit-button">Update</button>
             </div>
 
         </form>
@@ -321,6 +321,7 @@
 @endsection
 @push('scripts')
     <script>
+        let formValid = true;
         let deletedDocumetIds = [];
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
@@ -390,7 +391,7 @@
             checkCountryCriterias();
         });
 
-        $('.quantities').on('input', function() {
+        $(document.body).on('input', ".quantities", function (e) {
             checkCountryCriterias();
         });
 
@@ -401,9 +402,10 @@
             var customer_type = $('#customer-type').val();
             let total_quantities = 0;
             $(".quantities ").each(function(){
-                total_quantities += parseInt($(this).val());
+                if($(this).val() > 0) {
+                    total_quantities += parseInt($(this).val());
+                }
             });
-
             if(country.length > 0 && customer_type.length > 0 && total_quantities > 0) {
                 $.ajax({
                     type: "GET",
@@ -416,6 +418,7 @@
                     },
                     success:function (data) {
                         console.log(data);
+                        formValid = true;
                         if(data.comment) {
                             $('#country-comment-div').attr('hidden', false);
                             $('#country-comment').html(data.comment);
@@ -428,7 +431,7 @@
                             $('#customer-type-error').html(data.customer_type_error);
                         }
                         else{
-                            formValid = true;
+
                             $('#customer-type-error').attr('hidden', true);
                         }
                         if (data.max_qty_per_passport_error) {
@@ -436,7 +439,7 @@
                             // $('#quantity-error-div').attr('hidden', false);
                             $('#max-individual-quantity-error').html(data.max_qty_per_passport_error);
                         } else {
-                            formValid = true;
+                            // formValid = true;
                             // $('#quantity-error-div').attr('hidden', true);
                             $('#max-individual-quantity-error').html('');
                         }
@@ -444,21 +447,21 @@
                             formValid = false;
                             $('#min-company-quantity-error').html(data.min_qty_per_company_error);
                         }else{
-                            formValid = true;
+                            // formValid = true;
                             $('#min-company-quantity-error').html('');
                         }
                         if(data.max_qty_per_company_error) {
                             formValid = false;
                             $('#max-company-quantity-error').html(data.max_qty_per_company_error);
                         }else{
-                            formValid = true;
+                            // formValid = true;
                             $('#max-company-quantity-error').html('');
                         }
                         if(data.company_only_allowed_error) {
                             formValid = false;
                             $('#company-only-allowed-error').html(data.company_only_allowed_error);
                         }else{
-                            formValid = true;
+                            // formValid = true;
                             $('#company-only-allowed-error').html('');
                         }
                     }
@@ -1095,7 +1098,17 @@
                 $('#dealer').attr("disabled", false);
             }
         }
+        $('#submit-button').click(function (e) {
+            e.preventDefault();
 
+            if (formValid == true) {
+                if($("#form-doc-upload").valid()) {
+                    $('#form-doc-upload').unbind('submit').submit();
+                }
+            }else{
+                e.preventDefault();
+            }
+        });
     </script>
 @endpush
 
