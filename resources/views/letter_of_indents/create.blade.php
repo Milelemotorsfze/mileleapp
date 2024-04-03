@@ -393,14 +393,6 @@
             return this.valid();
         };
 
-        $('#submit-button').click(function (e) {
-            e.preventDefault();
-            if (formValid == true) {
-                if($("#form-create").valid()) {
-                    $('#form-create').unbind('submit').submit();
-                }
-            }
-        });
 
         $('#country').select2({
             placeholder : 'Select Country',
@@ -455,7 +447,6 @@
         });
 
         function checkCountryCriterias() {
-            // console.log('reached');
             let url = '{{ route('loi-country-criteria.check') }}';
             var country = $('#country').val();
             var customer_type = $('#customer-type').val();
@@ -483,12 +474,12 @@
                         else{
                             $('#country-comment-div').attr('hidden', true);
                         }
+                        formValid = true;
                         if(data.customer_type_error) {
                             formValid = false;
                             $('#customer-type-error').html(data.customer_type_error);
                         }
                         else{
-                            formValid = true;
                             $('#customer-type-error').attr('hidden', true);
                         }
                         if (data.max_qty_per_passport_error) {
@@ -496,7 +487,7 @@
                             // $('#quantity-error-div').attr('hidden', false);
                             $('#max-individual-quantity-error').html(data.max_qty_per_passport_error);
                         } else {
-                            formValid = true;
+                            // formValid = true;
                             // $('#quantity-error-div').attr('hidden', true);
                             $('#max-individual-quantity-error').html('');
                         }
@@ -504,21 +495,21 @@
                             formValid = false;
                             $('#min-company-quantity-error').html(data.min_qty_per_company_error);
                         }else{
-                            formValid = true;
+                            // formValid = true;
                             $('#min-company-quantity-error').html('');
                         }
                         if(data.max_qty_per_company_error) {
                             formValid = false;
                             $('#max-company-quantity-error').html(data.max_qty_per_company_error);
                         }else{
-                            formValid = true;
+                            // formValid = true;
                             $('#max-company-quantity-error').html('');
                         }
                         if(data.company_only_allowed_error) {
                             formValid = false;
                             $('#company-only-allowed-error').html(data.company_only_allowed_error);
                         }else{
-                            formValid = true;
+                            // formValid = true;
                             $('#company-only-allowed-error').html('');
                         }
                     }
@@ -775,7 +766,6 @@
             hideModelYear(index, value);
 
         });
-
 
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
@@ -1036,6 +1026,17 @@
                 $('#dealer').attr("disabled", false);
             }
        }
+        $('#submit-button').click(function (e) {
+            e.preventDefault();
+
+            if (formValid == true) {
+                if($("#form-create").valid()) {
+                    $('#form-create').unbind('submit').submit();
+                }
+            }else{
+                e.preventDefault();
+            }
+        });
 
     </script>
 @endpush

@@ -416,6 +416,7 @@
                     },
                     success:function (data) {
                         console.log(data);
+                        formValid = true;
                         if(data.comment) {
                             $('#country-comment-div').attr('hidden', false);
                             $('#country-comment').html(data.comment);
@@ -428,7 +429,7 @@
                             $('#customer-type-error').html(data.customer_type_error);
                         }
                         else{
-                            formValid = true;
+
                             $('#customer-type-error').attr('hidden', true);
                         }
                         if (data.max_qty_per_passport_error) {
@@ -436,7 +437,7 @@
                             // $('#quantity-error-div').attr('hidden', false);
                             $('#max-individual-quantity-error').html(data.max_qty_per_passport_error);
                         } else {
-                            formValid = true;
+                            // formValid = true;
                             // $('#quantity-error-div').attr('hidden', true);
                             $('#max-individual-quantity-error').html('');
                         }
@@ -444,21 +445,21 @@
                             formValid = false;
                             $('#min-company-quantity-error').html(data.min_qty_per_company_error);
                         }else{
-                            formValid = true;
+                            // formValid = true;
                             $('#min-company-quantity-error').html('');
                         }
                         if(data.max_qty_per_company_error) {
                             formValid = false;
                             $('#max-company-quantity-error').html(data.max_qty_per_company_error);
                         }else{
-                            formValid = true;
+                            // formValid = true;
                             $('#max-company-quantity-error').html('');
                         }
                         if(data.company_only_allowed_error) {
                             formValid = false;
                             $('#company-only-allowed-error').html(data.company_only_allowed_error);
                         }else{
-                            formValid = true;
+                            // formValid = true;
                             $('#company-only-allowed-error').html('');
                         }
                     }
