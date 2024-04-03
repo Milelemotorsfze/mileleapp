@@ -654,7 +654,7 @@
                         class="form-control widthinput text-dark loi-descriptions" data-index="${index}" id="loi-description-${index}" >
                     </div>
                     <div class="col-lg-1 col-md-6 col-sm-12">
-                        <input type="number" name="quantity[]" placeholder="Quantity" maxlength="5" value="1" class="form-control widthinput text-dark quantities"
+                        <input type="number" name="quantity[]" placeholder="Quantity" maxlength="5" value="" class="form-control widthinput text-dark quantities"
                                step="1" oninput="validity.valid||(value='');" min="0" data-index="${index}" id="quantity-${index}">
                     </div>
                     <div class="col-lg-1 col-md-6 col-sm-12">
