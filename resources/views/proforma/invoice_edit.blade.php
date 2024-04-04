@@ -225,6 +225,42 @@
     </form>
   </div>
   </div>
+  <div class="modal fade" id="addMoreAgents" tabindex="-1" role="dialog" aria-labelledby="addMoreAgentsLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form id="form-update3_492" method="POST">
+      @csrf
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fs-5" id="adoncode">Add More Agents</h5>
+          <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row">
+            <div class="col-md-12 form-group">
+              <label for="name">CB Name:</label>
+              <select name="cb_name" id="cb_name_more" class="form-control form-control-xs">
+              </select>
+            </div>
+            <div class="col-md-4 form-group mt-3">
+            <button type="button" id="addAgentButton" class="btn btn-primary btn-sm">Add</button>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-12">
+              <label for="selectedAgents">Selected Agents:</label>
+              <ul id="selectedAgentsList" class="list-group">
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
+          <button type="submit" id="submit_cb_492" class="btn btn-primary btn-sm">Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
   <form action="{{ route('quotation-items.update', ['quotation_item' => $quotation->id]) }}" id="form-create" method="POST">
         @csrf
         @method('PUT')
@@ -577,6 +613,8 @@
                         <input type="text" name="cb_number" id="cb_number" class="form-control form-control-xs" placeholder="CB Number" readonly>
                     </div>
                 </div>
+                <br>
+                <button class="float-end" type="button" onclick="addMoreAgents()">+ Add More Agent</button>
             </div>
             <div class="col-sm-4"  id="advance-amount-div" hidden>
                 <div class="row mt-2">
@@ -1357,7 +1395,10 @@
      function addAgentModal() {
         $('#addAgentModal').modal('show');
     }
-$(document).ready(function () {
+    function addMoreAgents() {
+        $('#addMoreAgents').modal('show');
+    }
+    $(document).ready(function () {
     $('#cb_name').change(function () {
         var selectedAgentId = $(this).val();
         var selectedAgentName = $(this).find(':selected').text();
@@ -1371,19 +1412,14 @@ $(document).ready(function () {
             method: 'GET',
             dataType: 'json',
             success: function (data) {
-                // Clear existing options
                 $('#cb_name').empty();
                 $('#cb_name').append('<option value="" disabled selected>Select Agent</option>');
-                // Add fetched options
                 $.each(data, function (index, agent) {
                     $('#cb_name').append('<option value="' + agent.id + '">' + agent.name + '</option>');
                 });
-
-                // Update CB No on change
                 $('#cb_name').change(function () {
                     var selectedAgentId = $(this).val();
                     var selectedAgent = data.find(agent => agent.id == selectedAgentId);
-
                     if (selectedAgent) {
                         $('#cb_number').val(selectedAgent.phone).trigger('change');
                     } else {
@@ -1396,8 +1432,6 @@ $(document).ready(function () {
             }
         });
     }
-
-    // Intercept form submission and handle it through AJAX
     $('#form-update2_492').submit(function (e) {
         e.preventDefault();
         var formData = new FormData($(this)[0]);
@@ -1420,6 +1454,61 @@ $(document).ready(function () {
         });
     });
 });
+$(document).ready(function () {
+  fetchAgentData();
+  function fetchAgentData() {
+    $.ajax({
+      url: "{{ route('agents.getAgentNames') }}",
+      method: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        $('#cb_name_more').empty();
+        $('#cb_name_more').append('<option value="" disabled selected>Select Agent</option>');
+        $.each(data, function (index, agent) {
+          $('#cb_name_more').append('<option value="' + agent.id + '">' + agent.name + '</option>');
+        });
+
+        $('#cb_name_more').change(function () {
+          var selectedAgentId = $(this).val();
+          var selectedAgent = data.find(agent => agent.id == selectedAgentId);
+
+          if (selectedAgent) {
+            $('#cb_number_more').val(selectedAgent.phone).trigger('change');
+          } else {
+            $('#cb_number_more').val('').trigger('change');
+          }
+        });
+      },
+      error: function (error) {
+        console.error('Error fetching agent data:', error);
+      }
+    });
+  }
+  $('#addAgentButton').click(function () {
+    var selectedAgentId = $('#cb_name_more').val();
+    var selectedAgentName = $('#cb_name_more option:selected').text();
+
+    if (selectedAgentId && selectedAgentName) {
+      var listItem = '<li class="list-group-item d-flex justify-content-between align-items-center">' + selectedAgentName +
+        '<button type="button" class="btn btn-danger btn-sm removeAgentButton" data-agent-id="' + selectedAgentId + '">Remove</button></li>';
+      $('#selectedAgentsList').append(listItem);
+    }
+  });
+  $(document).on('click', '.removeAgentButton', function () {
+    $(this).closest('li').remove();
+  });
+  $('#submit_cb_492').click(function (event) {
+    event.preventDefault();
+    var modalAgentIds = [];
+    $('#selectedAgentsList').find('.removeAgentButton').each(function () {
+        modalAgentIds.push($(this).data('agent-id'));
+    });
+    var otherAgentIds = $('#agents_id').val().split(',').filter(Boolean);
+    var combinedAgentIds = modalAgentIds.concat(otherAgentIds);
+    $('#agents_id').val(combinedAgentIds.join(','));
+    $('#addMoreAgents').modal('hide');
+});
+  });
 </script>
 <script>
     // Initialize values for editing
