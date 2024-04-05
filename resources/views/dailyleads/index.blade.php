@@ -393,7 +393,7 @@ input[type=number]::-webkit-outer-spin-button
               <label for="date" class="form-label">Date:</label>
             </div>
             <div class="col-md-8">
-            <input type="date" class="form-control" id="date" value="{{ date('Y-m-d') }}">
+            <input type="date" class="form-control" id="dateup" value="{{ date('Y-m-d') }}">
             </div>
           </div>
           <div class="row mb-3">
@@ -1313,6 +1313,7 @@ function reloadDataTable(sectionId) {
 function savefollowupdate() {
   var callId = $('#openfellowupdatemodel').data('call-id');
   var date = document.getElementById('date').value;
+  console.log(date);
   var time = document.getElementById('time').value;
   var method = document.getElementById('method').value;
   var salesNotes = document.getElementById('sales-notesfoup').value;
@@ -1361,7 +1362,7 @@ var tableRow = document.querySelector('tr[data-id="' + callId + '"]');
 }
 function savefollowup() {
   var callId = $('#openfellowupmodel').data('call-id');
-  var date = document.getElementById('date').value;
+  var date = document.getElementById('dateup').value;
   var time = document.getElementById('time').value;
   var method = document.getElementById('method').value;
   var salesNotes = document.getElementById('sales-notesfo').value;
@@ -2785,7 +2786,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         { data: 'language', name: 'calls.language' },
         { data: 'location', name: 'calls.location' },
         { data: 'remarks', name: 'calls.remarks' },
-        { data: 'date', name: 'fellow_up.date' },
+        { data: 'datefol', name: 'datefol' },
         { data: 'time', name: 'fellow_up.time' },
         { data: 'method', name: 'fellow_up.method' },
         { data: 'sales_notes', name: 'fellow_up.sales_notes' },
