@@ -177,6 +177,9 @@ input[type=number]::-webkit-outer-spin-button
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
       </li>
       <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab9">FollowUp</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab2">Prospecting</a>
       </li>
       <!-- <li class="nav-item">
@@ -296,6 +299,7 @@ input[type=number]::-webkit-outer-spin-button
       <i class="fa fa-bars" aria-hidden="true"></i>
     </button>
     <ul class="dropdown-menu dropdown-menu-end">
+    <li><a class="dropdown-item" href="#" onclick="openModalfellowup('{{ $calls->id }}')">FollowUp</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Unique Inquiry / Demand</a></li>
       <!-- <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li> -->
@@ -322,6 +326,114 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
+      <div class="modal fade" id="openfellowupdatemodel" tabindex="-1" aria-labelledby="openfellowupdatemodelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="openfellowupdatemodelLabel">Follow Up (Update)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="date" class="form-label">Date:</label>
+            </div>
+            <div class="col-md-8">
+            <input type="date" class="form-control" id="date" value="{{ date('Y-m-d') }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="sales-notes" class="form-label">Time:</label>
+            </div>
+            <div class="col-md-8">
+            <input type="time" class="form-control" id="time" value="{{ date('H:i') }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="document-upload" class="form-label">Method:</label>
+            </div>
+            <div class="col-md-8">
+            <select class="form-select" id="method">
+            <option value="Email">Email</option>
+            <option value="Call">Call</option>
+            <option value="Direct">Direct</option>
+            <option value="SMS">SMS</option>
+            <option value="WhatsApp">WhatsApp</option>
+          </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="document-upload" class="form-label">Sales Notes:</label>
+            </div>
+            <div class="col-md-8">
+            <textarea class="form-control" id="sales-notesfoup"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="savefollowupdate()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<div class="modal fade" id="openfellowupmodel" tabindex="-1" aria-labelledby="openfellowupmodelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="openfellowupmodelLabel">Follow Up</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="date" class="form-label">Date:</label>
+            </div>
+            <div class="col-md-8">
+            <input type="date" class="form-control" id="date" value="{{ date('Y-m-d') }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="sales-notes" class="form-label">Time:</label>
+            </div>
+            <div class="col-md-8">
+            <input type="time" class="form-control" id="time" value="{{ date('H:i') }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="document-upload" class="form-label">Method:</label>
+            </div>
+            <div class="col-md-8">
+            <select class="form-select" id="method">
+            <option value="Email">Email</option>
+            <option value="Call">Call</option>
+            <option value="Direct">Direct</option>
+            <option value="SMS">SMS</option>
+            <option value="WhatsApp">WhatsApp</option>
+          </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="document-upload" class="form-label">Sales Notes:</label>
+            </div>
+            <div class="col-md-8">
+            <textarea class="form-control" id="sales-notesfo"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="savefollowup()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
       <div class="modal fade" id="prospectingmodel" tabindex="-1" aria-labelledby="prospectingmodelLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -945,6 +1057,38 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
+      <div class="tab-pane fade show" id="tab9">
+      <br>
+      <!-- <div class="row">
+  <div class="col-lg-1">
+    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+  </div>
+</div> -->
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="dtBasicExample9" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <thead class="bg-soft-secondary">
+                <tr>
+                  <th>Lead Date</th>
+                  <th>Purchase Type</th>
+                  <th>Customer Name</th>
+                  <th>Customer Phone</th>
+                  <th>Customer Email</th>
+                  <th>Brands & Models</th>
+                  <th>Preferred Language</th>
+                  <th>Location</th>
+                  <th>Remarks & Messages</th>
+                  <th>Followup Date</th>
+                  <th>Followup Time</th>
+                  <th>Method</th>
+                  <th>Sales Notes</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+      </div>
       </div><!-- end tab-content-->
     </div>
   </div>
@@ -1042,6 +1186,30 @@ function openModalp(callId) {
   $('#prospectingmodel').data('call-id', callId);
   $('#prospectingmodel').modal('show');
 }
+function openModalfellowup(callId) {
+  $('#openfellowupmodel').data('call-id', callId);
+  $('#openfellowupmodel').modal('show');
+}
+function openModalfellowupdate(callId) {
+  // Set the callId as a data attribute of the modal
+  $('#openfellowupdatemodel').data('call-id', callId);
+  $.ajax({
+        url: '/update-followup-info-data/' + callId,
+        type: 'GET',
+        success: function(data) {
+            $('#date').val(data.date);
+            $('#time').val(data.time);
+            $('#method').val(data.method);
+            $('#sales-notesfoup').val(data.sales_notes);
+            $('#openfellowupdatemodel').modal('show');
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+            // Handle error appropriately, e.g., show an error message
+        }
+    });
+}
+
 function openModald(callId) {
   $('#demandmodel').data('call-id', callId);
   $('#demandmodel').modal('show');
@@ -1130,7 +1298,7 @@ function openvins(callId) {
 }
 function reloadDataTable(sectionId) {
     let dataTableValue;
-    if (sectionId === 'dataTable2' || sectionId === 'dataTable3' || sectionId === 'dataTable4' || sectionId === 'dataTable5' || sectionId === 'dataTable6' || sectionId === 'dataTable7') {
+    if (sectionId === 'dataTable2' || sectionId === 'dataTable3' || sectionId === 'dataTable4' || sectionId === 'dataTable5' || sectionId === 'dataTable6' || sectionId === 'dataTable7'|| sectionId === 'dataTable9') {
         dataTableValue = eval(sectionId);
         if (dataTableValue) {
             dataTableValue.ajax.reload();
@@ -1141,6 +1309,104 @@ function reloadDataTable(sectionId) {
     } else {
         console.log(`Invalid section ID: ${sectionId}`);
     }
+}
+function savefollowupdate() {
+  var callId = $('#openfellowupdatemodel').data('call-id');
+  var date = document.getElementById('date').value;
+  var time = document.getElementById('time').value;
+  var method = document.getElementById('method').value;
+  var salesNotes = document.getElementById('sales-notesfoup').value;
+  if (salesNotes === '') {
+    alert('Please Write the Sales Notes');
+    return;
+  }
+  if (date === '') {
+    alert('Please select a date');
+    return;
+  }
+  var formData = new FormData();
+  formData.append('callId', callId);
+  formData.append('date', date);
+  formData.append('salesNotes', salesNotes);
+  formData.append('method', method);
+  formData.append('time', time);
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '{{ route('sales.savefollowupdate') }}', true);
+  xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+        if (response.success) {
+var tableRow = document.querySelector('tr[data-id="' + callId + '"]');
+          if (tableRow) {
+            tableRow.remove();
+          }
+          alertify.success('FollowUp submitted successfully');
+          $('#openfellowupdatemodel').modal('hide');
+          reloadDataTable('dataTable9');
+        }
+         else {
+          console.error('Error saving FollowUp');
+          alert('Error saving FollowUp');
+        }
+      } else {
+        console.error('Request failed with status ' + xhr.status);
+        alert('Request failed. Please try again.');
+      }
+    }
+  };
+  xhr.send(formData);
+}
+function savefollowup() {
+  var callId = $('#openfellowupmodel').data('call-id');
+  var date = document.getElementById('date').value;
+  var time = document.getElementById('time').value;
+  var method = document.getElementById('method').value;
+  var salesNotes = document.getElementById('sales-notesfo').value;
+  if (salesNotes === '') {
+    alert('Please Write the Sales Notes');
+    return;
+  }
+  if (date === '') {
+    alert('Please select a date');
+    return;
+  }
+  var formData = new FormData();
+  formData.append('callId', callId);
+  formData.append('date', date);
+  formData.append('salesNotes', salesNotes);
+  formData.append('method', method);
+  formData.append('time', time);
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '{{ route('sales.savefollowup') }}', true);
+  xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+        if (response.success) {
+var tableRow = document.querySelector('tr[data-id="' + callId + '"]');
+          if (tableRow) {
+            tableRow.remove();
+          }
+          alertify.success('FollowUp submitted successfully');
+          $('#openfellowupmodel').modal('hide');
+          reloadDataTable('dataTable2');
+        }
+         else {
+          console.error('Error saving FollowUp');
+          alert('Error saving FollowUp');
+        }
+      } else {
+        console.error('Request failed with status ' + xhr.status);
+        alert('Request failed. Please try again.');
+      }
+    }
+  };
+  xhr.send(formData);
 }
 function saveprospecting() {
   var callId = $('#prospectingmodel').data('call-id');
@@ -1559,7 +1825,7 @@ function s2ab(s) {
 });
 </script>
 <script>
-let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
+let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     $(document).ready(function () {
         dataTable2 = $('#dtBasicExample2').DataTable({
             processing: true,
@@ -2503,6 +2769,48 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
         { data: 'countryname', name: 'countryname' },
         { data: 'description', name: 'pre_orders_items.description' },
         { data: 'status', name: 'status' },
+    ]
+    });
+    dataTable9 = $('#dtBasicExample9').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: "{{ route('dailyleads.index', ['status' => 'followup']) }}",
+    columns: [
+        { data: 'leaddate', name: 'leaddate' },
+        { data: 'type', name: 'calls.type' },
+        { data: 'name', name: 'calls.name' },
+        { data: 'phone', name: 'calls.phone' },
+        { data: 'email', name: 'calls.email' },
+        { data: 'model_line', name: 'master_model_lines.model_line' },
+        { data: 'language', name: 'calls.language' },
+        { data: 'location', name: 'calls.location' },
+        { data: 'remarks', name: 'calls.remarks' },
+        { data: 'date', name: 'fellow_up.date' },
+        { data: 'time', name: 'fellow_up.time' },
+        { data: 'method', name: 'fellow_up.method' },
+        { data: 'sales_notes', name: 'fellow_up.sales_notes' },
+        {
+                    data: 'id',
+                    name: 'id',
+                    searchable: false,
+                    render: function (data, type, row) {
+                      const bookingUrl = `{{ url('booking/create') }}/${data}`;
+                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
+                        return `
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Options">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" onclick="openModalfellowupdate(${data})">Update FollowUp</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalp(${data})">Prospecting</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
+                                    <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                                </ul>
+                            </div>`;
+                  }
+                },
     ]
     });
     });

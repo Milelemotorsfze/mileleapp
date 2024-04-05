@@ -811,7 +811,9 @@ Route::get('/d', function () {
     //Pre Order
     Route::resource('preorder', PreOrderController::class);
     Route::get('/get-po-for-presale', [PreOrderController::class, 'getpoforpreorder']);
-
+    Route::post('/update-followup-info', [DailyleadsController::class, 'savefollowup'])->name('sales.savefollowup');
+    Route::post('/update-followup-info-update', [DailyleadsController::class, 'savefollowupdate'])->name('sales.savefollowupdate');
+    Route::get('/update-followup-info-data/{id}', [DailyleadsController::class, 'followupgetdata'])->name('sales.followupgetdata');
 
 
 
