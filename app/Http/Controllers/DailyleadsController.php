@@ -92,7 +92,7 @@ class DailyleadsController extends Controller
                 $fellowup = Fellowup::select([
                     'calls.id',
                     'fellow_up.time',
-                    'fellow_up.date',
+                    \DB::raw("DATE_FORMAT(fellow_up.date, '%d %b %Y') as datefol"),
                     'fellow_up.method',
                     'calls.name',
                     'calls.phone',
@@ -667,6 +667,7 @@ public function saveprospecting(Request $request)
     }
     public function savefollowup(Request $request)
 	{
+        info($request->date);
         $callsid = $request->callId;
         $callupdate = Calls::find($callsid);
         $callupdate->status = "Follow Up";
@@ -686,6 +687,7 @@ public function saveprospecting(Request $request)
 	}
     public function savefollowupdate(Request $request)
 	{
+        info($request->date);
         $callsid = $request->callId;
         $callupdate = Calls::find($callsid);
         $callupdate->status = "Follow Up";
