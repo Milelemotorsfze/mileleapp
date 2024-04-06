@@ -87,6 +87,8 @@ class QuotationController extends Controller
         $agentsmuiltples = 0;
         $systemcode = $request->system_code_amount;
         $separatedValues = [];
+        if($request->agents_id)
+        {
         foreach ($systemcode as $code) {
             if (strpos($code, '/') !== false) {
                 $agentsmuiltples = 1;
@@ -97,6 +99,7 @@ class QuotationController extends Controller
                 $separatedValues[] = (int)$code;
             }
         }
+    }
         $agentsin = 0;
         $isVehicle = 0;
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
@@ -526,6 +529,8 @@ class QuotationController extends Controller
     $agentsmuiltples = 0;
     $systemcode = $request->system_code_amount;
     $separatedValues = [];
+    if($request->agents_id)
+    {
     foreach ($systemcode as $code) {
         if (strpos($code, '/') !== false) {
             $agentsmuiltples = 1;
@@ -535,6 +540,7 @@ class QuotationController extends Controller
         } else {
             $separatedValues[] = (int)$code;
         }
+    }
     }
     $agentsin = 0;
     $isVehicle = 0;
