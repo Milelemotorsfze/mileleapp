@@ -4,6 +4,9 @@
     div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
+  #dtBasicExample1 tbody tr:hover {
+    cursor: pointer;
+  }
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
   padding: 4px 8px 4px 8px;
   text-align: center;
@@ -30,6 +33,20 @@
       white-space: nowrap;
       height: 10px;
     }
+    .nav-pills .nav-link {
+      position: relative;
+    }
+
+    .badge-notification {
+      position: absolute;
+      top: 0;
+      right: 0;
+      transform: translate(50%, -110%);
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      padding: 0.3rem 0.6rem;
+    }
   </style>
 @section('content')
 @if(session('success'))
@@ -44,22 +61,34 @@
     <br>
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Incoming</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Incoming
+          <span class="badge badge-danger row-badge1 badge-notification"></span>
+        </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Pending Inspection</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Pending Inspection
+        <span class="badge badge-danger row-badge2 badge-notification"></span>
+        </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Available Stock</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Available Stock
+        <span class="badge badge-danger row-badge3 badge-notification"></span>
+        </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Booked</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Booked
+        <span class="badge badge-danger row-badge4 badge-notification"></span>
+        </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab5">Sold</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab5">Sold
+        <span class="badge badge-danger row-badge5 badge-notification"></span>
+        </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Delivered</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Delivered
+        <span class="badge badge-danger row-badge6 badge-notification"></span>
+        </a>
       </li>
     </ul>      
   </div>
@@ -307,7 +336,7 @@
   </div>
   <script>
         $(document).ready(function () {
-         $('#dtBasicExample1').DataTable({
+          var table1 = $('#dtBasicExample1').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Incoming']) }}",
@@ -338,7 +367,15 @@
         'excelHtml5' // Add the export to Excel button
     ]
         });
-        $('#dtBasicExample2').DataTable({
+        table1.on('draw', function () {
+            var rowCount = table1.page.info().recordsDisplay;
+            if (rowCount > 0) {
+                $('.row-badge1').text(rowCount).show();
+            } else {
+                $('.row-badge1').hide();
+            }
+        });
+        var table2 = $('#dtBasicExample2').DataTable({
           processing: true,
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Pending Inspection']) }}",
@@ -367,7 +404,15 @@
                 { data: 'location', name: 'location' }
             ]
         });
-        $('#dtBasicExample3').DataTable({
+        table2.on('draw', function () {
+            var rowCount = table2.page.info().recordsDisplay;
+            if (rowCount > 0) {
+                $('.row-badge2').text(rowCount).show();
+            } else {
+                $('.row-badge2').hide();
+            }
+        });
+        var table3 = $('#dtBasicExample3').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
@@ -395,7 +440,15 @@
                 { data: 'location', name: 'location' }
             ]
         });
-        $('#dtBasicExample4').DataTable({
+        table3.on('draw', function () {
+            var rowCount = table3.page.info().recordsDisplay;
+            if (rowCount > 0) {
+                $('.row-badge3').text(rowCount).show();
+            } else {
+                $('.row-badge3').hide();
+            }
+        });
+        var table4 = $('#dtBasicExample4').DataTable({
           processing: true,
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Booked']) }}",
@@ -426,7 +479,15 @@
                 { data: 'location', name: 'location' }
             ]
         });
-        $('#dtBasicExample5').DataTable({
+        table4.on('draw', function () {
+            var rowCount = table4.page.info().recordsDisplay;
+            if (rowCount > 0) {
+                $('.row-badge4').text(rowCount).show();
+            } else {
+                $('.row-badge4').hide();
+            }
+        });
+        var table5 = $('#dtBasicExample5').DataTable({
           processing: true,
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Sold']) }}",
@@ -457,7 +518,15 @@
                 { data: 'location', name: 'location' }
             ]
         });
-        $('#dtBasicExample6').DataTable({
+        table5.on('draw', function () {
+            var rowCount = table5.page.info().recordsDisplay;
+            if (rowCount > 0) {
+                $('.row-badge5').text(rowCount).show();
+            } else {
+                $('.row-badge5').hide();
+            }
+        });
+        var table6 = $('#dtBasicExample6').DataTable({
           processing: true,
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Delivered']) }}",
@@ -487,6 +556,14 @@
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'location' }
             ]
+        });
+        table6.on('draw', function () {
+            var rowCount = table6.page.info().recordsDisplay;
+            if (rowCount > 0) {
+                $('.row-badge6').text(rowCount).show();
+            } else {
+                $('.row-badge6').hide();
+            }
         });
 });
 function exportToExcel(tableId) {
