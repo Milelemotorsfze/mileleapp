@@ -390,7 +390,7 @@
                         Sales Office :
                     </div>
                     <div class="col-sm-6">
-                    {{ isset($empProfile->office) ? $empProfile->office : '' }}
+                    {{ isset($empProfile->location->name) ? $empProfile->location->name : '' }}
                     </div>
                 </div>
                 <div class="row mt-2">
