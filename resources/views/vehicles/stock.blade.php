@@ -363,6 +363,7 @@
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' }
             ],
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             buttons: [
         'excelHtml5' // Add the export to Excel button
     ]
@@ -402,7 +403,8 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' }
-            ]
+            ],
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table2.on('draw', function () {
             var rowCount = table2.page.info().recordsDisplay;
@@ -438,7 +440,8 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' }
-            ]
+            ],
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table3.on('draw', function () {
             var rowCount = table3.page.info().recordsDisplay;
@@ -477,7 +480,8 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' }
-            ]
+            ],
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table4.on('draw', function () {
             var rowCount = table4.page.info().recordsDisplay;
@@ -516,7 +520,8 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' }
-            ]
+            ],
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table5.on('draw', function () {
             var rowCount = table5.page.info().recordsDisplay;
@@ -539,7 +544,7 @@
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdn.date' },
+                { data: 'gdndate', name: 'gdndate' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
@@ -555,7 +560,8 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' }
-            ]
+            ],
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table6.on('draw', function () {
             var rowCount = table6.page.info().recordsDisplay;
@@ -567,23 +573,16 @@
         });
 });
 function exportToExcel(tableId) {
-    // Get table element by id
     var table = document.getElementById(tableId);
     var rows = table.rows;
     var csvContent = "";
-
-    // Loop through table rows
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
       for (var j = 0; j < row.cells.length; j++) {
-        // Add cell content to CSV string
         csvContent += row.cells[j].innerText + ",";
       }
-      // Add new line after each row
       csvContent += "\n";
     }
-
-    // Create a blob object and download it as a CSV file
     var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     if (navigator.msSaveBlob) { // IE 10+
       navigator.msSaveBlob(blob, 'export.csv');
