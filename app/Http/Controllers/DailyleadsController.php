@@ -45,8 +45,8 @@ class DailyleadsController extends Controller
         {
         $pendingdata = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
     ->where('calls.status', 'New')
-    ->orderByRaw("FIELD(lead_source.priority, 'Low', 'Normal', 'High') DESC")
-    ->select('calls.*', 'lead_source.priority')
+    ->orderByRaw("FIELD(calls.priority, 'Low', 'Normal', 'Hot') DESC")
+    ->select('calls.*')
     ->get();
     }
     else
@@ -54,9 +54,9 @@ class DailyleadsController extends Controller
         $pendingdata = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
         ->where('calls.status', 'New')
         ->where('calls.sales_person', $id)
-        ->orderByRaw("FIELD(lead_source.priority, 'Low', 'Normal', 'High') DESC")
+        ->orderByRaw("FIELD(calls.priority, 'Low', 'Normal', 'Hot') DESC")
         ->orderBy('calls.created_by', 'desc')
-        ->select('calls.*', 'lead_source.priority')
+        ->select('calls.*')
         ->get();
     }
         if ($request->ajax()) {

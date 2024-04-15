@@ -40,25 +40,22 @@ class CallsController extends Controller
     public function index()
     {
         $datahot = Calls::where('calls.status', 'New')
+        ->where('calls.priority', 'Hot')
         ->join('lead_source', 'calls.source', '=', 'lead_source.id')
-        ->where('lead_source.priority', 'High')
         ->orderBy('calls.created_at', 'desc')
         ->select('calls.*', 'lead_source.priority as lead_source_priority')
         ->get();
         $countdatahot = $datahot->count();
         $datanormal = Calls::where('calls.status', 'New')
+        ->where('calls.priority', 'Normal')
         ->join('lead_source', 'calls.source', '=', 'lead_source.id')
-        ->where('lead_source.priority', 'Normal')
         ->orderBy('calls.created_at', 'desc')
         ->select('calls.*', 'lead_source.priority as lead_source_priority')
         ->get();
         $countdatanormal = $datanormal->count();
         $datalow = Calls::where('calls.status', 'New')
+        ->where('calls.priority', 'Low')
     ->join('lead_source', 'calls.source', '=', 'lead_source.id')
-    ->where(function ($query) {
-        $query->where('lead_source.priority', 'Low')
-              ->orWhereNull('lead_source.priority');
-    })
     ->orderBy('calls.created_at', 'desc')
     ->select('calls.*', 'lead_source.priority as lead_source_priority')
     ->get();
@@ -688,6 +685,7 @@ return view('calls.resultbrand', compact('data'));
             $custom_brand_model = $row[9];
             $remarks = $row[10];
             $strategies = $row[11];
+            $priority = $row[12];
             $errorDescription = '';
             if ($sales_person == null) {
                 $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
@@ -925,6 +923,7 @@ return view('calls.resultbrand', compact('data'));
                 $call->remarks = $row[10];
                 $call->source = $lead_source_id;
                 $call->strategies_id = $strategies_id;
+                $call->priority = $row[12];
                 $call->language = $row[6];
                 $call->sales_person = $sales_person_id;
                 $call->created_at = $formattedDate;
