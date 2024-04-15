@@ -342,7 +342,7 @@
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Incoming']) }}",
             columns: [
               { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'po_date' },
+                { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'estimation_date', name: 'vehicles.estimation_date' },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'so_date', name: 'so.so_date' },
@@ -350,18 +350,18 @@
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'variant' },
+                { data: 'variant', name: 'varaints.name' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
                 { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'exterior_color' },
-                { data: 'interior_color', name: 'interior_color' },
+                { data: 'exterior_color', name: 'ex_color.name' },
+                { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'location' }
+                { data: 'location', name: 'warehouse.name' }
             ],
             buttons: [
         'excelHtml5' // Add the export to Excel button
@@ -381,27 +381,27 @@
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Pending Inspection']) }}",
             columns: [
               { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'po_date' },
+              { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'date' },
+                { data: 'date', name: 'grn.date' },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'so_date', name: 'so.so_date' },
                 { data: 'name', name: 'users.name' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'variant' },
+                { data: 'variant', name: 'varaints.name' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
                 { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'exterior_color' },
-                { data: 'interior_color', name: 'interior_color' },
+                { data: 'exterior_color', name: 'ex_color.name' },
+                { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'location' }
+                { data: 'location', name: 'warehouse.name' }
             ]
         });
         table2.on('draw', function () {
@@ -418,26 +418,26 @@
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
             columns: [
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'po_date' },
+                { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'date' },
+                { data: 'date', name: 'grn.date' },
                 { data: 'inspection_date', name: 'inspection_date' },
                 { data: 'grn_remark', name: 'vehicles.grn_remark' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'variant' },
+                { data: 'variant', name: 'varaints.name' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
                 { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'exterior_color' },
-                { data: 'interior_color', name: 'interior_color' },
+                { data: 'exterior_color', name: 'ex_color.name' },
+                { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'location' }
+                { data: 'location', name: 'warehouse.name' }
             ]
         });
         table3.on('draw', function () {
@@ -454,9 +454,9 @@
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Booked']) }}",
             columns: [
               { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'po_date' },
+              { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'date' },
+                { data: 'date', name: 'grn.date' },
                 { data: 'inspection_date', name: 'inspection_date' },
                 { data: 'grn_remark', name: 'vehicles.grn_remark' },
                 { data: 'reservation_start_date', name: 'reservation_start_date' },
@@ -465,18 +465,18 @@
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'variant' },
+                { data: 'variant', name: 'varaints.name' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
                 { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'exterior_color' },
-                { data: 'interior_color', name: 'interior_color' },
+                { data: 'exterior_color', name: 'ex_color.name' },
+                { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'location' }
+                { data: 'location', name: 'warehouse.name' }
             ]
         });
         table4.on('draw', function () {
@@ -493,29 +493,29 @@
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Sold']) }}",
             columns: [
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'po_date' },
+                { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'date' },
+                { data: 'date', name: 'grn.date' },
                 { data: 'inspection_date', name: 'inspection_date' },
                 { data: 'grn_remark', name: 'vehicles.grn_remark' },
-                { data: 'so_date', name: 'so_date' },
+                { data: 'so_date', name: 'so.so_date' },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'name', name: 'users.name' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'variant' },
+                { data: 'variant', name: 'varaints.name' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
                 { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'exterior_color' },
-                { data: 'interior_color', name: 'interior_color' },
+                { data: 'exterior_color', name: 'ex_color.name' },
+                { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'location' }
+                { data: 'location', name: 'warehouse.name' }
             ]
         });
         table5.on('draw', function () {
@@ -532,29 +532,29 @@
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Delivered']) }}",
             columns: [
                 { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'po_date' },
+                { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'date' },
-                { data: 'so_date', name: 'so_date' },
+                { data: 'date', name: 'grn.date' },
+                { data: 'so_date', name: 'so.so_date' },
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdndate' },
+                { data: 'gdndate', name: 'gdn.date' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'variant' },
+                { data: 'variant', name: 'varaints.name' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
                 { data: 'gearbox', name: 'varaints.gearbox' },
-                { data: 'exterior_color', name: 'exterior_color' },
-                { data: 'interior_color', name: 'interior_color' },
+                { data: 'exterior_color', name: 'ex_color.name' },
+                { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'location' }
+                { data: 'location', name: 'warehouse.name' }
             ]
         });
         table6.on('draw', function () {
