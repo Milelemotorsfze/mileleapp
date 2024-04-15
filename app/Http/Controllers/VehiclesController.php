@@ -2689,7 +2689,7 @@ public function viewalls(Request $request)
     public function statuswise(Request $request)
     {
         $useractivities = new UserActivities();
-        $useractivities->activity = "View the Shipping Addons";
+        $useractivities->activity = "View the Stock Status Wise";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         if ($request->ajax()) {

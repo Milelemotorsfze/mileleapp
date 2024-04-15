@@ -66,6 +66,9 @@
   <div class="tab-content">
       <div class="tab-pane fade show active" id="tab1"> 
         <div class="card-body">
+        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample1')">
+  <i class="bi bi-file-earmark-excel"></i> Export to Excel
+</button>
           <div class="table-responsive">
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
             <thead class="bg-soft-secondary">
@@ -101,6 +104,9 @@
       </div>  
       <div class="tab-pane fade show" id="tab2">
         <div class="card-body">
+        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample2')">
+  <i class="bi bi-file-earmark-excel"></i> Export to Excel
+</button>
           <div class="table-responsive">
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -137,6 +143,9 @@
       </div> 
       <div class="tab-pane fade show" id="tab3">
         <div class="card-body">
+        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample3')">
+  <i class="bi bi-file-earmark-excel"></i> Export to Excel
+</button>
           <div class="table-responsive">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -172,6 +181,9 @@
       </div> 
       <div class="tab-pane fade show" id="tab4">
         <div class="card-body">
+        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample4')">
+  <i class="bi bi-file-earmark-excel"></i> Export to Excel
+</button>
           <div class="table-responsive">
             <table id="dtBasicExample4" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -210,6 +222,9 @@
       </div> 
       <div class="tab-pane fade show" id="tab5">
         <div class="card-body">
+        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample5')">
+  <i class="bi bi-file-earmark-excel"></i> Export to Excel
+</button>
           <div class="table-responsive">
             <table id="dtBasicExample5" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -248,6 +263,9 @@
       </div> 
       <div class="tab-pane fade show" id="tab6">
         <div class="card-body">
+        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample6')">
+  <i class="bi bi-file-earmark-excel"></i> Export to Excel
+</button>
           <div class="table-responsive">
             <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
@@ -289,7 +307,7 @@
   </div>
   <script>
         $(document).ready(function () {
-        $('#dtBasicExample1').DataTable({
+         $('#dtBasicExample1').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Incoming']) }}",
@@ -315,7 +333,10 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'location' }
-            ]
+            ],
+            buttons: [
+        'excelHtml5' // Add the export to Excel button
+    ]
         });
         $('#dtBasicExample2').DataTable({
           processing: true,
@@ -468,5 +489,39 @@
             ]
         });
 });
+function exportToExcel(tableId) {
+    // Get table element by id
+    var table = document.getElementById(tableId);
+    var rows = table.rows;
+    var csvContent = "";
+
+    // Loop through table rows
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      for (var j = 0; j < row.cells.length; j++) {
+        // Add cell content to CSV string
+        csvContent += row.cells[j].innerText + ",";
+      }
+      // Add new line after each row
+      csvContent += "\n";
+    }
+
+    // Create a blob object and download it as a CSV file
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    if (navigator.msSaveBlob) { // IE 10+
+      navigator.msSaveBlob(blob, 'export.csv');
+    } else {
+      var link = document.createElement("a");
+      if (link.download !== undefined) {
+        var url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "export.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
+  }
 </script>
 @endsection
