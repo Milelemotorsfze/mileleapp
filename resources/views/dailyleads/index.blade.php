@@ -230,7 +230,7 @@ input[type=number]::-webkit-outer-spin-button
                 @foreach ($pendingdata as $key => $calls)
                     <tr data-id="{{$calls->id}}">
                 <td>
-                    @if ($calls->priority == "High")
+                    @if ($calls->priority == "Hot")
                         <i class="fas fa-circle blink" style="color: red;"> Hot</i>
                     @elseif ($calls->priority == "Normal")
                         <i class="fas fa-circle" style="color: green;"> Normal</i>
