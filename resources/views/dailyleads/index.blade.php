@@ -741,8 +741,17 @@ input[type=number]::-webkit-outer-spin-button
             <label for="reason" class="form-label">Reason:</label>
           </div>
           <div class="col-md-8">
-            <input type="text" class="form-control" id="reason-reject" value="">
-          </div>
+  <select class="form-control" id="reason-reject">
+    <option value="">Select Reason</option>
+    <option value="Brand not available">Brand not available</option>
+    <option value="Model not available">Model not available</option>
+    <option value="Variant not available">Variant not available</option>
+    <option value="Price Issue">Price Issue</option>
+    <option value="Not Interested">Not Interested</option>
+    <option value="Others">Others</option>
+  </select>
+  <input type="text" class="form-control" id="other-reason" style="display: none;" placeholder="Specify Other Reason">
+</div>
         </div>
         <div class="row mb-3">
           <div class="col-md-4">
@@ -1677,10 +1686,21 @@ function savenegotiation() {
   xhr.send(formData);
 }
 function saveRejection() {
+  var reason = document.getElementById('reason-reject').value;
   var callId = $('#rejectionModal').data('callId');
   var date = document.getElementById('date-input-reject').value;
   var reason = document.getElementById('reason-reject').value;
   var salesNotes = document.getElementById('salesnotes-reject').value;
+  if(reason == "")
+  {
+    alert('Please give the Reason');
+  }
+  else
+  {
+  if(reason == "Others")
+  {
+    var reason = document.getElementById('other-reason').value;
+  }
   var formData = new FormData();
   formData.append('callId', callId);
   formData.append('date', date);
@@ -1688,7 +1708,7 @@ function saveRejection() {
   formData.append('salesNotes', salesNotes);
   var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   var xhr = new XMLHttpRequest();
-  xhr.open('POST', '{{ route('sales.rejection') }}', true); // Replace '/profile/rejection' with the actual URL path to your server-side endpoint
+  xhr.open('POST', '{{ route('sales.rejection') }}', true);
   xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
@@ -1716,6 +1736,7 @@ function saveRejection() {
     }
   };
   xhr.send(formData);
+}
 }
 </script>
 <script>
@@ -2829,6 +2850,14 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         $readMoreLink.text('Read More');
     }
 }
+document.getElementById('reason-reject').addEventListener('change', function() {
+  var otherReasonInput = document.getElementById('other-reason');
+  if (this.value === 'Others') {
+    otherReasonInput.style.display = 'block';
+  } else {
+    otherReasonInput.style.display = 'none';
+  }
+});
 </script>
 @else
     @php
