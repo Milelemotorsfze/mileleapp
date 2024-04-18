@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('master_office_locations', function (Blueprint $table) {
             $table->string('registered_company_name')->nullable()->after('name');
         });
+        
     }
 
     /**

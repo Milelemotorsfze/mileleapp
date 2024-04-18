@@ -20,5 +20,6 @@ class MasterOfficeLocation extends Model
         'created_by',
         'updated_by',
         'deleted_by'
+        
     ];
 }
