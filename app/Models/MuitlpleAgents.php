@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Fellowup extends Model
+class MuitlpleAgents extends Model
 {
     use HasFactory;
-    protected $table = 'fellow_up';
+    protected $table = 'muitlple_agents';
 }

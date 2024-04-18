@@ -1269,7 +1269,15 @@
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicles.viewall') }}" id="topnav-more" role="button">
                                         <i data-feather="server"></i>
                                         <span data-key="t-extra-pages">Stock Report</span>
+                                        <div class="arrow-down"></div>
                                     </a>
+                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                    <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.statuswise')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Status Wise</span>
+                                            </a>
+                                            </div>        
+                                            </div>
                                 </li>
                                 @endif
                                 @php

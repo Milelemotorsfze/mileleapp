@@ -19,6 +19,7 @@ use App\Models\Country;
 use App\Models\HRM\Employee\EmployeeProfile;
 use App\Models\MasterShippingPorts;
 use App\Models\OtherLogisticsCharges;
+use App\Models\MuitlpleAgentSystemCode;
 use App\Models\Quotation;
 use App\Models\Calls;
 use App\Models\Brand;
@@ -38,6 +39,7 @@ use App\Models\Vehiclescarts;
 use App\Models\MasterModelLines;
 use App\Models\CartAddon;
 use App\Models\So;
+use App\Models\MuitlpleAgents;
 use App\Models\Soitems;
 use App\Models\BookingRequest;
 use Barryvdh\DomPDF\Facade;
@@ -81,7 +83,24 @@ class QuotationController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    { 
+    {
+        $agentsmuiltples = 0;
+        $systemcode = $request->system_code_amount;
+        $separatedValues = [];
+        if($request->agents_id)
+        {
+        foreach ($systemcode as $code) {
+            if (strpos($code, '/') !== false) {
+                $agentsmuiltples = 1;
+                $values = explode('/', $code);
+                $sum = array_sum($values);
+                $separatedValues[] = $sum;
+            } else {
+                $separatedValues[] = (int)$code;
+            }
+        }
+    }
+        $agentsin = 0;
         $isVehicle = 0;
         $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
@@ -121,6 +140,28 @@ class QuotationController extends Controller
         }
         $quotation->shipping_method = $request->shipping_method;
         $quotation->save();
+        $agentsId = $request->agents_id;
+        if (!isset($agentsId) || empty($agentsId)) {
+        } 
+        else {
+            $agentIdsArray = explode(',', $agentsId);
+            $agentsCount = count($agentIdsArray);
+            if ($agentsCount == 1) {
+                $agentId = $agentIdsArray[0];
+                $agentsId = $agentId;
+            } 
+            else {
+                $agentId = $agentIdsArray[0];
+                $agentsId = $agentId;
+                foreach ($agentIdsArray as $agentId) {
+                    $agentsin = 1;
+                    $multipleAgent = new MuitlpleAgents();
+                    $multipleAgent->agents_id = $agentId;
+                    $multipleAgent->quotations_id = $quotation->id;
+                    $multipleAgent->save();
+                }
+            }
+        }
         $quotationDetail = new QuotationDetail();
         $quotationDetail->quotation_id  = $quotation->id;
         $quotationDetail->country_id  = $request->country_id;
@@ -134,11 +175,14 @@ class QuotationController extends Controller
         $quotationDetail->representative_number = $request->representative_number;
         $quotationDetail->cb_name = $request->selected_cb_name;
         $quotationDetail->cb_number = $request->cb_number;
-        $quotationDetail->agents_id = $request->agents_id;
+        if($agentsin == 1)
+        {
+            $quotationDetail->muitlple_agents_id = $multipleAgent->id;
+        }
+        $quotationDetail->agents_id = $agentsId;
         $quotationDetail->advance_amount = $request->advance_amount;
         $quotationDetail->due_date = $request->due_date;
         $quotationDetail->selected_bank = $request->select_bank;
-        $quotationDetail->save();
         if($request->agents_id) {
             $agentCommission = new AgentCommission();
             $agentCommission->commission = $request->system_code ?? '';
@@ -150,14 +194,15 @@ class QuotationController extends Controller
         }
         $commissionAED = 0;
         $quotationItemIds = [];
+        $quotationItemsArray = [];
         foreach ($request->prices as $key => $price) {
             $item = "";
         if($request->agents_id)
         {
             if($request->system_code_currency[$key] == 'U') { 
-                $amount = $request->system_code_amount[$key] * $aed_to_usd_rate->value;
+                $amount = $separatedValues[$key] * $aed_to_usd_rate->value;
             }else{
-                $amount = $request->system_code_amount[$key];
+                $amount = $separatedValues[$key];
             }
            $commissionAED = $commissionAED + $amount;
         }
@@ -168,7 +213,7 @@ class QuotationController extends Controller
            $quotationItem->total_amount = $request->total_amounts[$key];
            if($request->agents_id)
            {
-           $quotationItem->system_code_amount = $request->system_code_amount[$key];
+           $quotationItem->system_code_amount = $separatedValues[$key];
            $quotationItem->system_code_currency = $request->system_code_currency[$key];
            }
            $quotationItem->quotation_id = $quotation->id;
@@ -270,10 +315,26 @@ class QuotationController extends Controller
                    array_push($quotationItemIds, $quotationItem->id);
                 }
             }
-            $isVehicle = 0;
+            $isVehicle = 0; 
+            $quotationItemsArray[] = $quotationItem;
         }
+        if ($request->agents_id) {
+            foreach ($quotationItemsArray as $index => $quotationItem) {
+                $code = $systemcode[$index]; // Get the corresponding systemcode for the current quotationItem
+                if (strpos($code, '/') !== false) {
+                    $agentsmuiltples = 1;
+                    $values = explode('/', $code);
+                    foreach ($values as $value) {
+                        $muitlpleagentsystemcode = new MuitlpleAgentSystemCode();
+                        $muitlpleagentsystemcode->system_code = $value;
+                        $muitlpleagentsystemcode->quotation_items_id = $quotationItem->id;
+                        $muitlpleagentsystemcode->save();
+                    }
+                }
+            }
+        }        
         $quotationDetail->system_code = $commissionAED;
-        $quotationDetail->save();
+        $quotationDetail->save(); 
         foreach ($quotationItemIds as $itemId) {
             $quotationItemRow = QuotationItem::find($itemId);
             $subItemIds = QuotationItem::where('uuid', $quotationItemRow->uuid)
@@ -361,7 +422,7 @@ class QuotationController extends Controller
         $data['company'] = $call->company_name;
         $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
         if($salesPersonDetail) {
-            $data['sales_office'] = $salesPersonDetail->office;
+            $data['sales_office'] = $salesPersonDetail->location->name;
             $data['sales_phone'] = $salesPersonDetail->contact_number;
         }
         $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
@@ -376,7 +437,9 @@ class QuotationController extends Controller
         }else{
             $shippingChargeDistriAmount = 0;
         }
-        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
+        $quotationid = $quotation->id;
+        $multiplecp = MuitlpleAgents::where('quotations_id', $quotationid)->where('agents_id', $quotationDetail->agents_id)->get();
+        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('multiplecp','quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','directlyAddedAddons','addonsTotalAmount',
         'otherVehicles','vehicleWithBrands','OtherAddons','shippingChargeDistriAmount'));
         $filename = 'quotation_'.$quotation->id.'.pdf';
@@ -463,6 +526,23 @@ class QuotationController extends Controller
     public function update(Request $request, quotation $quotation)
     {
     $qoutationid = request()->input('quotationid');
+    $agentsmuiltples = 0;
+    $systemcode = $request->system_code_amount;
+    $separatedValues = [];
+    if($request->agents_id)
+    {
+    foreach ($systemcode as $code) {
+        if (strpos($code, '/') !== false) {
+            $agentsmuiltples = 1;
+            $values = explode('/', $code);
+            $sum = array_sum($values);
+            $separatedValues[] = $sum;
+        } else {
+            $separatedValues[] = (int)$code;
+        }
+    }
+    }
+    $agentsin = 0;
     $isVehicle = 0;
     $aed_to_eru_rate = Setting::where('key', 'aed_to_euro_convertion_rate')->first();
     $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
@@ -501,6 +581,28 @@ class QuotationController extends Controller
     }
     $quotation->shipping_method = $request->shipping_method;
     $quotation->save();
+    $agentsId = $request->agents_id;
+    if (!isset($agentsId) || empty($agentsId)) {
+    } 
+    else {
+        $agentIdsArray = explode(',', $agentsId);
+        $agentsCount = count($agentIdsArray);
+        if ($agentsCount == 1) {
+            $agentId = $agentIdsArray[0];
+            $agentsId = $agentId;
+        } 
+        else {
+            $agentId = $agentIdsArray[0];
+            $agentsId = $agentId;
+            foreach ($agentIdsArray as $agentId) {
+                $agentsin = 1;
+                $multipleAgent = new MuitlpleAgents();
+                $multipleAgent->agents_id = $agentId;
+                $multipleAgent->quotations_id = $quotation->id;
+                $multipleAgent->save();
+            }
+        }
+    }
     $quotationDetail = QuotationDetail::where('quotation_id', $qoutationid)->first();
     if ($quotationDetail) {
     $quotationDetail->quotation_id  = $quotation->id;
@@ -515,9 +617,22 @@ class QuotationController extends Controller
         $quotationDetail->representative_number = $request->representative_number;
         $quotationDetail->cb_name = $request->selected_cb_name;
         $quotationDetail->cb_number = $request->cb_number;
+        if($agentsin == 1)
+        {
+            $quotationDetail->muitlple_agents_id = $multipleAgent->id;
+        }
         $quotationDetail->agents_id = $request->agents_id;
         $quotationDetail->advance_amount = $request->advance_amount;
-        $quotationDetail->save();
+        $quotationDetail->due_date = $request->due_date;
+        $quotationDetail->selected_bank = $request->select_bank;
+        if($request->agents_id) {
+            $agentCommission = new AgentCommission();
+            $agentCommission->commission = $request->system_code ?? '';
+            $agentCommission->status = 'Quotation';
+            $agentCommission->agents_id  =  $request->agents_id ?? '';
+            $agentCommission->quotation_id  = $quotation->id;
+            $agentCommission->created_by = Auth::id();
+            $agentCommission->save();
         }
         $commissionAED = 0;
         $quotationItemIds = [];
@@ -620,10 +735,14 @@ class QuotationController extends Controller
     }
         foreach ($request->prices as $key => $price) {
             $item = "";
-            if($request->system_code_currency[$key] == 'U') {
-                $amount = $request->system_code_amount[$key] * $aed_to_usd_rate->value;
-            }else{
-                $amount = $request->system_code_amount[$key];
+            if($request->agents_id)
+            {
+                if($request->system_code_currency[$key] == 'U') { 
+                    $amount = $separatedValues[$key] * $aed_to_usd_rate->value;
+                }else{
+                    $amount = $separatedValues[$key];
+                }
+               $commissionAED = $commissionAED + $amount;
             }
            $commissionAED = $commissionAED + $amount;
            if(isset($request->vehiclesitemsid[$key])) {
@@ -635,7 +754,7 @@ class QuotationController extends Controller
            $quotationItem->quantity = $request->quantities[$key];
            $quotationItem->description = $request->descriptions[$key];
            $quotationItem->total_amount = $request->total_amounts[$key];
-           $quotationItem->system_code_amount = $request->system_code_amount[$key];
+           $quotationItem->system_code_amount = $separatedValues[$key];
            $quotationItem->system_code_currency = $request->system_code_currency[$key];
            $quotationItem->quotation_id = $qoutationid;
            $quotationItem->uuid = $request->uuids[$key];
@@ -729,17 +848,23 @@ class QuotationController extends Controller
                 }
             }
             $isVehicle = 0;
+            $quotationItemsArray[] = $quotationItem;
         }
-        if($request->agents_id) {
-            $agentCommission = AgentCommission::where('quotation_id', $qoutationid)->first();
-            if($agentCommission) {
-                $agentCommission->commission = $commissionAED ?? '';
-                $agentCommission->status = 'Quotation';
-                $agentCommission->agents_id  =  $request->agents_id ?? '';
-                $agentCommission->created_by = Auth::id();
-                $agentCommission->save();
+        if ($request->agents_id) {
+            foreach ($quotationItemsArray as $index => $quotationItem) {
+                $code = $systemcode[$index]; // Get the corresponding systemcode for the current quotationItem
+                if (strpos($code, '/') !== false) {
+                    $agentsmuiltples = 1;
+                    $values = explode('/', $code);
+                    foreach ($values as $value) {
+                        $muitlpleagentsystemcode = new MuitlpleAgentSystemCode();
+                        $muitlpleagentsystemcode->system_code = $value;
+                        $muitlpleagentsystemcode->quotation_items_id = $quotationItem->id;
+                        $muitlpleagentsystemcode->save();
+                    }
+                }
             }
-        }        
+        }             
         $quotationDetail->system_code = $commissionAED;
         $quotationDetail->save();
         foreach ($quotationItemIds as $itemId) {
@@ -834,7 +959,7 @@ class QuotationController extends Controller
         $data['company'] = $call->company_name;
         $data['document_date'] = Carbon::parse($quotation->date)->format('M d,Y');
         if($salesPersonDetail) {
-            $data['sales_office'] = $salesPersonDetail->office;
+            $data['sales_office'] = $salesPersonDetail->location->name;
             $data['sales_phone'] = $salesPersonDetail->contact_number;
         }
         $shippingHidedItemAmount = QuotationItem::where('is_enable', false)
@@ -871,7 +996,7 @@ class QuotationController extends Controller
         $newsignatures->save();
         return redirect()->route('dailyleads.index',['quotationFilePath' => $file])->with('success', 'Quotation created successfully.');
     }
-
+    }
     /**
      * Remove the specified resource from storage.
      */
