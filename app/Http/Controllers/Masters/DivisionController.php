@@ -30,7 +30,7 @@ class DivisionController extends Controller
         $next = MasterDivisionWithHead::where('id', '>', $id)->min('id');
         $divisionHeads = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.designation','empProfile.location')->whereIn('id',[2,26,31,78])->get();
         return view('hrm.masters.division.edit',compact('data','previous','next','divisionHeads'));
-    }
+    } 
     public function update(Request $request, $id) {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
