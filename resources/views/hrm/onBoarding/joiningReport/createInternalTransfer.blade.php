@@ -243,6 +243,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 		else {
 	        return true;
 	    }
+		// return this.optional(element) || (fromDept != toDept || fromLoc != toLoc);
 	},"can't transfer to the same department and location");
 
 	// Adding a custom validation method named "endDateGreater"
@@ -273,7 +274,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 			}
 		});
 		return result; 
-	}, "This date is alredy exist in the system, Please select different date.");
+	}, "This date range is already exist in the system, Please select another.");
 
 	$('#joiningReportForm').validate({ 
 	    rules: {
@@ -282,8 +283,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 			},
 			joining_date: {
 				required: true,
-				// greaterStart: true,
-				date: true, // Validates the start date format
+				date: true, 
 				endDateGreater: true, // Custom rule for comparing dates
 				dateExist: true,
 			},
@@ -293,8 +293,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 	        },
 	        transfer_from_date: {
 	            required: true,
-				date: true, // Validates the end date format
-				dateExist: true,
+				date: true,
+				// dateExist: true,
 	        },
 	        transfer_to_department_id: {
 	            required: true,
@@ -303,7 +303,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 		errorPlacement: function ( error, element ) {
 			error.addClass( "invalid-feedback font-size-13" );
 			if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
-	            if (!element.val() || element.val().length === 0) {
+				console.log(element.val().length);
+	            if (!element.val() || element.val().length === 0 || element.val().length > 0) {
 	                console.log("Error is here with length", element.val().length);
 	                error.addClass('select-error');
 	                error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());

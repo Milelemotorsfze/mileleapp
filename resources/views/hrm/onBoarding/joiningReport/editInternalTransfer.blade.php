@@ -374,11 +374,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 							if(employees[i].emp_profile != null && employees[i].emp_profile.department != null && employees[i].emp_profile.department.name != null) {
 								document.getElementById('department').textContent=employees[i].emp_profile.department.name;  
 								document.getElementById('transfer_from_department_id').value=employees[i].emp_profile.department_id;  
-								document.getElementById('transfer_from_department_name').value=employees[i].emp_profile.department.name;  
+								document.getElementById('transfer_from_department_name').textContent=employees[i].emp_profile.department.name;  
 							}
 							if(employees[i].emp_profile != null && employees[i].emp_profile.work_location != null && employees[i].emp_profile.location.name != null) {
 								document.getElementById('transfer_from_location_id').value=employees[i].emp_profile.work_location;  
-								document.getElementById('transfer_from_location_name').value=employees[i].emp_profile.location.name;  
+								document.getElementById('transfer_from_location_name').textContent=employees[i].emp_profile.location.name;  
 							}
 						}
 					}
@@ -397,10 +397,57 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 			}			
 		});
 	});
-	jQuery.validator.setDefaults({
-		errorClass: "is-invalid",
-		errorElement: "p",     
-	});
+	// jQuery.validator.setDefaults({
+	// 	errorClass: "is-invalid",
+	// 	errorElement: "p",     
+	// });
+	$.validator.addMethod("deptLoc", function (value, element, params) {
+		var fromDept = '';
+	    var fromLoc = '';
+		var toDept = '';
+	    var toLoc = '';
+	    fromDept = $('#transfer_from_department_id').val();
+	    fromLoc = $('#transfer_from_location_id').val();
+		toDept = $('#transfer_to_department_id').val();
+	    toLoc = $('#joining_location').val();
+	    if(fromDept == toDept && fromLoc == toLoc) {
+	        return false;
+	    }
+		else {
+	        return true;
+	    }
+	},"can't transfer to the same department and location");
+
+	// Adding a custom validation method named "endDateGreater"
+    $.validator.addMethod("endDateGreater", function(value, element) {
+        var startDate = $('#transfer_from_date').val();
+        var endDate = value;
+        var start = new Date(startDate);
+        var end = new Date(endDate);
+        // Check if end date is greater than start date
+        return this.optional(element) || end >= start;
+    }, "End date must be greater than or equal to start date.");
+
+	$.validator.addMethod("dateExist", function(value, element) {
+	    var result = false;
+		var transfer_from_date = $('#transfer_from_date').val(); 
+		var joining_date = $('#joining_date').val(); 
+		var employee_id = $("#employee_id").val();
+		$.ajax({
+			type:"POST",
+			async: false,
+			url: "{{route('temptransfer.checkTempDateExist')}}", // script to validate in server side
+			data: {transfer_from_date: transfer_from_date,
+			joining_date: joining_date,
+			employee_id: employee_id,
+			_token: '{{csrf_token()}}'},
+			success: function(data) {
+				result = (data == true) ? true : false;
+			}
+		});
+		return result; 
+	}, "This date is alredy exist in the system, Please select different date.");
+
 	$('#joiningReportForm').validate({ 
 		rules: {
 			employee_id: {
@@ -408,15 +455,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 			},
 			joining_date: {
 				required: true,
+				date: true, // Validates the start date format
+				endDateGreater: true, // Custom rule for comparing dates
+				dateExist: true,
 			},
 			joining_location: {
 				required: true,
+				deptLoc: true,
 			},
 			transfer_from_department_id: {
 				required: true,
 			},
 			transfer_from_date: {
 				required: true,
+				date: true, // Validates the end date format
+				dateExist: true,
 			},
 			transfer_from_location_id: {
 				required: true,
@@ -427,23 +480,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 		},
 		errorPlacement: function ( error, element ) {
 			error.addClass( "invalid-feedback font-size-13" );
-			if (element.is(':radio') && element.closest('.radio-main-div').length > 0) {
-				error.addClass('radio-error');
-				error.insertAfter(element.closest('.radio-main-div').find('fieldset.radio-div-container').last());
-			}
-			else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
-				if (!element.val() || element.val().length === 0) {
-					console.log("Error is here with length", element.val().length);
-					error.addClass('select-error');
-					error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
-				} 
-				else {
-					console.log("No error");
-				}
-			}
-			else {
-				error.insertAfter( element );
-			}
+			if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+	            if (!element.val() || element.val().length === 0) {
+	                console.log("Error is here with length", element.val().length);
+	                error.addClass('select-error');
+	                error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+	            } else {
+	                console.log("No error");
+	            }
+	        }
+	        else {
+	            error.insertAfter( element );
+	        }
 		}
 	});
 </script>

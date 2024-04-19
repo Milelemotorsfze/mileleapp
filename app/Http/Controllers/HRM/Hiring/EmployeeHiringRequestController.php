@@ -141,13 +141,13 @@ class EmployeeHiringRequestController extends Controller
                 $next =$next->min('id');
             }
         }
-        $masterdepartments = MasterDepartment::where('status','active')->select('id','name')->get();
+        $masterdepartments = MasterDepartment::orderBy('name', 'ASC')->whereNot('name','Management')->where('status','active')->select('id','name')->get();
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
-        $masterJobPositions = MasterJobPosition::select('id','name')->get();
-        $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
-        $requestedByUsers = User::where('status','active')->whereNotIn('id',['1','16'])->select('id','name')->get();
-        $reportingToUsers = User::where('status','active')->whereNotIn('id',['1','16'])->select('id','name')->get();
-        $replacementForEmployees = User::where('status','active')->whereNotIn('id',['1','16'])->select('id','name')->get();
+        $masterJobPositions = MasterJobPosition::orderBy('name', 'ASC')->select('id','name')->get();
+        $masterOfficeLocations = MasterOfficeLocation::orderBy('name', 'ASC')->where('status','active')->select('id','name','address')->get();
+        $requestedByUsers = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16,2,26,31,78])->select('id','name')->get();
+        $reportingToUsers = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',['1','16'])->select('id','name')->get();
+        $replacementForEmployees = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16,2,26,31,78])->select('id','name')->get();
         if(Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request'])) { 
             $user['id'] = '';
             $user['department'] = '';
@@ -200,7 +200,7 @@ class EmployeeHiringRequestController extends Controller
                     $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
                 }
                 $teamLeadOrReportingManager = EmployeeProfile::where('user_id',$request->requested_by)->first();
-                $department = MasterDepartment::where('id',$request->department_id)->first();
+                $department = MasterDepartment::whereNot('name','Management')->where('id',$request->department_id)->first();
                 $hiringManager = ApprovalByPositions::where('approved_by_position','Recruiting Manager')->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $input = $request->all();

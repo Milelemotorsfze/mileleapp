@@ -97,9 +97,9 @@ class PassportReleaseController extends Controller
     }
     public function edit($id) {
         $data = PassportRelease::where('id',$id)->first();
-        $Users = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->get();
+        $Users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16,2,26,31,78])->whereHas('empProfile')->get();
         $masterEmployees = [];
-        $currentUser = User::where('status','active')->whereNotIn('id',[1,16])->where('id',$data->employee_id)->first();        
+        $currentUser = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16,2,26,31,78])->where('id',$data->employee_id)->first();        
         if($currentUser) {
             array_push($masterEmployees,$currentUser);  
         }
