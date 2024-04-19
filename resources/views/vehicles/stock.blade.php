@@ -90,6 +90,11 @@
         <span class="badge badge-danger row-badge6 badge-notification"></span>
         </a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab7">Full Stock
+          <span class="badge badge-danger row-badge7 badge-notification"></span>
+        </a>
+      </li>
     </ul>      
   </div>
   <div class="tab-content">
@@ -297,6 +302,47 @@
 </button>
           <div class="table-responsive">
             <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
+            <thead class="bg-soft-secondary">
+            <tr>
+                  <th>PO</th>
+                  <th>PO Date</th>
+                  <th>GRN</th>
+                  <th>GRN Date</th>
+                  <th>SO Date</th>
+                  <th>SO Number</th>
+                  <th>Sales Person</th>
+                  <th>GDN</th>
+                  <th>GDN Date</th>
+                  <th>Brand</th>
+                  <th>Model Line</th>
+                  <th>Model Description</th>
+                  <th>Variant</th>
+                  <th>VIN</th>
+                  <th>Engine</th>
+                  <th>MY</th>
+                  <th>Steering</th>
+                  <th>Fuel</th>
+                  <th>Gear</th>
+                  <th>Ext Colour</th>
+                  <th>Int Colour</th>
+                  <th>Upholstery</th>
+                  <th>Production Year</th>
+                  <th>Location</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div> 
+        </div>  
+      </div>
+      <div class="tab-pane fade show" id="tab7">
+        <div class="card-body">
+        <button type="button" class="btn btn-success" onclick="exportToExcel('dtBasicExample7')">
+  <i class="bi bi-file-earmark-excel"></i> Export to Excel
+</button>
+          <div class="table-responsive">
+            <table id="dtBasicExample7" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
             <tr>
                   <th>PO</th>
@@ -569,6 +615,46 @@
                 $('.row-badge6').text(rowCount).show();
             } else {
                 $('.row-badge6').hide();
+            }
+        });
+        var table7 = $('#dtBasicExample7').DataTable({
+          processing: true,
+            serverSide: true,
+            ajax: "{{ route('vehicles.statuswise', ['status' => 'allstock']) }}",
+            columns: [
+                { data: 'po_number', name: 'purchasing_order.po_number' },
+                { data: 'po_date', name: 'purchasing_order.po_date' },
+                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'date', name: 'grn.date' },
+                { data: 'so_date', name: 'so.so_date' },
+                { data: 'so_number', name: 'so.so_number' },
+                { data: 'name', name: 'users.name' },
+                { data: 'gdn_number', name: 'gdn.gdn_number' },
+                { data: 'gdndate', name: 'gdndate' },
+                { data: 'brand_name', name: 'brands.brand_name' },
+                { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'model_detail', name: 'varaints.model_detail' },
+                { data: 'variant', name: 'varaints.name' },
+                { data: 'vin', name: 'vehicles.vin' },
+                { data: 'engine', name: 'vehicles.engine' },
+                { data: 'my', name: 'varaints.my' },
+                { data: 'steering', name: 'varaints.steering' },
+                { data: 'fuel_type', name: 'varaints.fuel_type' },
+                { data: 'gearbox', name: 'varaints.gearbox' },
+                { data: 'exterior_color', name: 'ex_color.name' },
+                { data: 'interior_color', name: 'int_color.name' },
+                { data: 'upholestry', name: 'varaints.upholestry' },
+                { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
+                { data: 'location', name: 'warehouse.name' }
+            ],
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        });
+        table7.on('draw', function () {
+            var rowCount = table7.page.info().recordsDisplay;
+            if (rowCount > 0) {
+                $('.row-badge7').text(rowCount).show();
+            } else {
+                $('.row-badge7').hide();
             }
         });
 });

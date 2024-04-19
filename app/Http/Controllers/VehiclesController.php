@@ -2986,6 +2986,51 @@ public function viewalls(Request $request)
                     ->whereNotNull('vehicles.grn_id');
                     $data = $data->groupBy('vehicles.id');  
                 }
+                else if($status === "allstock")
+                {
+                    $data = Vehicles::select( [
+                        'vehicles.id',
+                        'warehouse.name as location',
+                         DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
+                        'vehicles.ppmmyyy',
+                        'vehicles.vin',
+                        'vehicles.engine',
+                        'brands.brand_name',
+                        'varaints.name as variant',
+                        'varaints.model_detail',
+                        'varaints.detail',
+                        'varaints.seat',
+                        'varaints.upholestry',
+                        'varaints.steering',
+                        'varaints.my',
+                        'varaints.fuel_type',
+                        'varaints.gearbox',
+                        'so.so_number',
+                        'master_model_lines.model_line',
+                        'int_color.name as interior_color',
+                        'ex_color.name as exterior_color',
+                        'purchasing_order.po_number',
+                        'grn.grn_number',
+                        'gdn.gdn_number',
+                        'users.name',
+                        DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
+                        DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
+                        DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
+                    ])
+                    ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+                    ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                    ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
+                    ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
+                    ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
+                    ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                    ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id');
+                    $data = $data->groupBy('vehicles.id');  
+                }
             if ($data) {
                 return DataTables::of($data)->toJson();
             }
