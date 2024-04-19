@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\LeadsNotifications;
+use App\Models\UserActivities;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\DB;
 
 
 class LeadsNotificationsController extends Controller
@@ -22,17 +26,17 @@ class LeadsNotificationsController extends Controller
                     'leads_notifications.id',
                     'leads_notifications.remarks',
                     'leads_notifications.status',
-                    'shipping_medium.description',
-                    'shipping_medium.created_at',
+                    'leads_notifications.calls_id',
                 ])
                 ->leftJoin('users', 'leads_notifications.user_id', '=', 'users.id')
-                ->leftJoin('calls', 'leads_notifications.calls_id', '=', 'calls.id');
-                $data = $data->groupBy('shipping_medium.id');
+                ->leftJoin('calls', 'leads_notifications.calls_id', '=', 'calls.id')
+                ->where('status', 'new');
+                $data = $data->groupBy('leads_notifications.id');
             if ($data) {
                 return DataTables::of($data)->toJson();
             }
         }
-        return view('logistics.shipping');
+        return view('dailyleads.notifications');
     }
 
     /**
