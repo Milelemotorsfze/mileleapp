@@ -136,9 +136,9 @@ class PassportRequestController extends Controller
     // }
     public function edit($id) {
         $data = PassportRequest::where('id',$id)->first();
-        $Users = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->get();
+        $Users = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->whereHas('empProfile')->get();
         $masterEmployees = [];
-        $currentUser = User::where('status','active')->whereNotIn('id',[1,16])->where('id',$data->employee_id)->first();        
+        $currentUser = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->where('id',$data->employee_id)->first();        
         if($currentUser) {
             array_push($masterEmployees,$currentUser);  
         }
@@ -147,8 +147,8 @@ class PassportRequestController extends Controller
                 array_push($masterEmployees,$User);  
             }
         }
-        $submissionPurpose = PassportRequestPurpose::where('type','submit')->get();
-        $releasePurpose = PassportRequestPurpose::where('type','release')->get();
+        $submissionPurpose = PassportRequestPurpose::orderBy('name', 'ASC')->where('type','submit')->get();
+        $releasePurpose = PassportRequestPurpose::orderBy('name', 'ASC')->where('type','release')->get();
         return view('hrm.passport.passport_request.edit',compact('data','masterEmployees','submissionPurpose','releasePurpose'));
     }
     public function show($id) {
@@ -167,7 +167,7 @@ class PassportRequestController extends Controller
             $previous = PassportRequest::where('id', '<', $id)->max('id');
             $next = PassportRequest::where('id', '>', $id)->min('id');
         }
-        $Users = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.designation','empProfile.department','empProfile.location')->get();
+        $Users = User::where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->orderBy('name','ASC')->whereHas('empProfile')->with('empProfile.designation','empProfile.department','empProfile.location')->get();
         $masterEmployees = [];
         foreach($Users as $User) {
             if($User->can_submit_or_release_passport == true) {
@@ -175,8 +175,8 @@ class PassportRequestController extends Controller
             }
         }
         // dd($Users);
-        $submissionPurpose = PassportRequestPurpose::where('type','submit')->get();
-        $releasePurpose = PassportRequestPurpose::where('type','release')->get();
+        $submissionPurpose = PassportRequestPurpose::orderBy('name','Asc')->where('type','submit')->get();
+        $releasePurpose = PassportRequestPurpose::orderBy('name','Asc')->where('type','release')->get();
         return view('hrm.passport.passport_request.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));
     }
     public function storeOrUpdate(Request $request, $id) {
