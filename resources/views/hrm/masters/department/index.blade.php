@@ -63,7 +63,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-li
 							<td>{{ ++$i }}</td>
 							<td>{{ $dataOne->name ?? ''}}</td>
 							<td>{{ $dataOne->departmentHead->name ?? '' }}</td>
-							<td>{{ $dataOne->departmentApprovalBy->name ?? '' }}</td>
+							<td>
+								@if($dataOne->department_head_id != $dataOne->approval_by_id)
+								{{ $dataOne->departmentApprovalBy->name ?? '' }}
+								@endif
+							</td>
 							<td>{{ $dataOne->division->name ?? '' }}</td>
 							<td>{{ $dataOne->division->divisionHead->name ?? '' }}</td>
 							<td>

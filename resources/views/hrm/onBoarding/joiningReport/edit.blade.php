@@ -44,11 +44,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 					</div>
 					<div class="col-xxl-3 col-lg-4 col-md-4" id="designation_div">
 						<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
-						<center><span id="designation">{{$data->employee->designation->name ?? ''}}</span></center>
+						<center><span id="designation">{{$data->candidate->designation->name ?? ''}}</span></center>
 					</div>
 					<div class="col-xxl-3 col-lg-4 col-md-4" id="department_div">
 						<center><label for="department" class="col-form-label text-md-end"><strong>{{ __('Department') }}</strong></label></center>
-						<center><span id="department">{{$data->employee->department->name ?? ''}}</span></center>
+						<center><span id="department">{{$data->candidate->department->name ?? ''}}</span></center>
 					</div>
 				</div>
 			</div>
