@@ -18,7 +18,7 @@ class DepartmentController extends Controller
         $data = MasterDepartment::whereNot('name','Management')->where('id',$id)->first();
         $previous = MasterDepartment::whereNot('name','Management')->where('id', '<', $id)->max('id');
         $next = MasterDepartment::whereNot('name','Management')->where('id', '>', $id)->min('id');
-        $divisionHeads = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.department','empProfile.designation','empProfile.location')->whereIn('id',[2,26,31,10])->get();
+        $divisionHeads = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.department','empProfile.designation','empProfile.location')->where('is_management','yes')->get();
         // return view('hrm.masters.department.edit',compact('data','previous','next','divisionHeads'));
         $errorMsg ="This page will coming very soon !";
         return view('hrm.notaccess',compact('errorMsg'));

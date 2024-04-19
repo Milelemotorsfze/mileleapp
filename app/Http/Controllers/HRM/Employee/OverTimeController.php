@@ -49,7 +49,7 @@ class OverTimeController extends Controller
         return view('hrm.overtime.index',compact('pendings','approved','rejected'));
     }
     public function create() {
-        $employees = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16,2,26,31,78])->whereHas('empProfile', function($q) {
+        $employees = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         return view('hrm.overtime.create',compact('employees'));
@@ -177,7 +177,7 @@ class OverTimeController extends Controller
     }   
     public function edit($id) {
         $data = OverTime::where('id', $id)->with('times','user.empProfile.department','user.empProfile.designation','user.empProfile.location')->first();
-        $employees = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16,2,26,31,78])->whereHas('empProfile', function($q) {
+        $employees = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         return view('hrm.overtime.edit',compact('data','employees'));

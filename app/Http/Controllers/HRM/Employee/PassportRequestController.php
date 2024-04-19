@@ -136,9 +136,9 @@ class PassportRequestController extends Controller
     // }
     public function edit($id) {
         $data = PassportRequest::where('id',$id)->first();
-        $Users = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16,2,26,31,78])->whereHas('empProfile')->get();
+        $Users = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->whereHas('empProfile')->get();
         $masterEmployees = [];
-        $currentUser = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16,2,26,31,78])->where('id',$data->employee_id)->first();        
+        $currentUser = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->where('id',$data->employee_id)->first();        
         if($currentUser) {
             array_push($masterEmployees,$currentUser);  
         }
@@ -167,7 +167,7 @@ class PassportRequestController extends Controller
             $previous = PassportRequest::where('id', '<', $id)->max('id');
             $next = PassportRequest::where('id', '>', $id)->min('id');
         }
-        $Users = User::where('status','active')->whereNotIn('id',[1,16,2,26,31,78])->orderBy('name','ASC')->whereHas('empProfile')->with('empProfile.designation','empProfile.department','empProfile.location')->get();
+        $Users = User::where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->orderBy('name','ASC')->whereHas('empProfile')->with('empProfile.designation','empProfile.department','empProfile.location')->get();
         $masterEmployees = [];
         foreach($Users as $User) {
             if($User->can_submit_or_release_passport == true) {

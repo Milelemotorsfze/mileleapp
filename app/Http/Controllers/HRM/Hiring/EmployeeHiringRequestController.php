@@ -145,9 +145,9 @@ class EmployeeHiringRequestController extends Controller
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
         $masterJobPositions = MasterJobPosition::orderBy('name', 'ASC')->select('id','name')->get();
         $masterOfficeLocations = MasterOfficeLocation::orderBy('name', 'ASC')->where('status','active')->select('id','name','address')->get();
-        $requestedByUsers = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16,2,26,31,78])->select('id','name')->get();
+        $requestedByUsers = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->select('id','name')->get();
         $reportingToUsers = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',['1','16'])->select('id','name')->get();
-        $replacementForEmployees = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16,2,26,31,78])->select('id','name')->get();
+        $replacementForEmployees = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->select('id','name')->get();
         if(Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request'])) { 
             $user['id'] = '';
             $user['department'] = '';

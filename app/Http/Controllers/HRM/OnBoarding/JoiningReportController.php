@@ -171,7 +171,7 @@ class JoiningReportController extends Controller
         $masterlocations = MasterOfficeLocation::orderBy('name', 'ASC')->where('status','active')->select('id','name','address')->get(); 
         $reportingTo = User::orderBy('name', 'ASC')->where('status','active')->where('status','active')->whereNotIn('id',[1,16])->get();
         $masterDepartments = MasterDepartment::orderBy('name', 'ASC')->whereNot('name','Management')->get();
-        $employees = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16,2,26,31,78])->whereHas('empProfile');
+        $employees = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->whereHas('empProfile');
         if($type == 'vacations_or_leave') {
             $employees = $employees->whereHas('approvedLeaves');
         }
