@@ -104,7 +104,7 @@ use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\PreOrderController;
 use App\Http\Controllers\PostingRecordsController;
 use App\Http\Controllers\MarketingPurchasingPaymentsController;
-
+use App\Http\Controllers\LeadsNotificationsController;
 
 
 /*
@@ -815,7 +815,9 @@ Route::get('/d', function () {
     Route::post('/update-followup-info-update', [DailyleadsController::class, 'savefollowupdate'])->name('sales.savefollowupdate');
     Route::get('/update-followup-info-data/{id}', [DailyleadsController::class, 'followupgetdata'])->name('sales.followupgetdata');
 
-
+    //Leads Notifications
+    Route::resource('leadsnotifications', LeadsNotificationsController::class);
+    
 
 
 

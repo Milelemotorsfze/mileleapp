@@ -1377,6 +1377,15 @@
                         <div class="dropdown-divider"></div>
                         @endif
                         @endcanany
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('lead-notification');
+                        @endphp
+                        @if ($hasPermission)
+                        <a class="dropdown-item" href="{{ route('leadsnotifications.index') }}">
+                            <i class="fa fa-bullhorn" aria-hidden="true"></i> Notifications
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        @endif
                         @canany(['master-module-list', 'master-module-create', 'master-module-edit'])
                         @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-module-list', 'master-module-create', 'master-module-edit']);
