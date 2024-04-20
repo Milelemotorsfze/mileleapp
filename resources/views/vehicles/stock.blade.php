@@ -666,7 +666,7 @@
                 } else if (row.inspection_date != null && row.gdn_id != null && row.grn_id != null) {
                     return 'Delivered';
                 } else {
-                    return ''; // Handle any other cases if needed
+                    return '';
                 }
             }
         }
