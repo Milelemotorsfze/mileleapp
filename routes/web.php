@@ -817,6 +817,9 @@ Route::get('/d', function () {
 
     //Leads Notifications
     Route::resource('leadsnotifications', LeadsNotificationsController::class);
+    Route::get('/leads/{call_id}', [LeadsNotificationsController::class, 'viewLead'])->name('view_lead');
+    Route::post('/update-notifications-status', [LeadsNotificationsController::class, 'updateStatus'])->name('update_notifications_status');
+
     
 
 

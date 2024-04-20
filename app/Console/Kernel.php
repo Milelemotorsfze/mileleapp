@@ -14,6 +14,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('export:csv')->monthlyOn(date('t'), '00:00');
         $schedule->command('email:send-daily-activity')->dailyAt('18:00');
+        $schedule->command('notifications:send')->everyMinute();
+        $schedule->command('notificationspendingleads:send')->everyMinute();
     }
 
     /**
@@ -27,5 +29,7 @@ class Kernel extends ConsoleKernel
     }
     protected $commands = [
         \App\Console\Commands\ExportCSV::class,
+        \App\Console\Commands\SendNotifications::class,
+        \App\Console\Commands\SendNotificationspendingleads::class,
     ];
 }
