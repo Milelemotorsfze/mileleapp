@@ -657,16 +657,16 @@
                     return 'Incoming';
                 } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
                     return 'Pending Inspection';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.grn_id != null && (row.reservation_end_date == null || row.reservation_end_date < now)) {
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.grn_id != null && (row.reservation_end_date == null || new Date(row.reservation_end_date) < now)) {
                     return 'Available Stock';
-                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.reservation_end_date <= now && row.grn_id != null) {
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && new Date(row.reservation_end_date) <= now && row.grn_id != null) {
                     return 'Booked';
                 } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
                     return 'Sold';
                 } else if (row.inspection_date != null && row.gdn_id != null && row.grn_id != null) {
                     return 'Delivered';
                 } else {
-                    return ''; // Handle any other cases if needed
+                    return '';
                 }
             }
         }
