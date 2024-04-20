@@ -266,8 +266,14 @@ Route::get('/d', function () {
     // Masters
     // Master Division and head
     Route::resource('division', DivisionController::class);
+    Route::controller(DivisionController::class)->group(function(){
+        Route::post('master/division-unique-check', 'uniqueDivision')->name('master.uniqueDivision');
+    });
     // Master Department and head
     Route::resource('department', DepartmentController::class);
+    Route::controller(DepartmentController::class)->group(function(){
+        Route::post('master/department-unique-check', 'uniqueDepartment')->name('master.uniqueDepartment');
+    });
     // Designation Approvals
     Route::resource('designation-approvals', DesignationApprovalsController::class);
 
