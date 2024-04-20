@@ -618,6 +618,7 @@
                 $('.row-badge6').hide();
             }
         });
+        var now = new Date();
         var table7 = $('#dtBasicExample7').DataTable({
           processing: true,
             serverSide: true,
