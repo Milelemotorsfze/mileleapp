@@ -4,18 +4,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-department']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title">Edit Division Details</h4>
-	@if($previous != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('division.edit',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
-	@endif
-	@if($next != '')
-	<a  class="btn btn-sm btn-info float-first" href="{{ route('division.edit',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
-	@endif
-	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('division.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+	<h4 class="card-title">Create Department Details</h4>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('department.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
 	@if (count($errors) > 0)
@@ -28,9 +22,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 		</ul>
 	</div>
 	@endif
-	<form id="editDivisionForm" name="editDivisionForm" enctype="multipart/form-data" method="POST" action="{{route('division.update',$data->id)}}">
+	<form id="editDivisionForm" name="editDivisionForm" enctype="multipart/form-data" method="POST" action="{{route('department.store')}}">
 		@csrf
-		@method("PUT")
 		<div class="row">
 			<div class="col-xxl-12 col-lg-6 col-md-6">
 				<p><span style="float:right;" class="error">* Required Field</span></p>
@@ -39,36 +32,46 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 		<br>
 		<div class="card">
 			<div class="card-header">
-				<h4 class="card-title">Division Information</h4>
+				<h4 class="card-title">Department Information</h4>
 			</div>
 			<div class="card-body">
 				<div class="row">
-				<input type="hidden" id="current_id" value="{{$data->id ?? ''}}">
-					<div class="col-xxl-4 col-lg-4 col-md-4" id="other_leave_type">
+					<div class="col-xxl-6 col-lg-6 col-md-6" id="other_leave_type">
 						<span class="error">* </span>
-						<label for="name" class="col-form-label text-md-end">{{ __('Division Name') }}</label>
+						<label for="name" class="col-form-label text-md-end">{{ __('Department Name') }}</label>
 						<input type="text" name="name" id="name"
-							class="form-control widthinput" placeholder="Enter Division Name"
-							aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->name ?? ''}}">
+							class="form-control widthinput" placeholder="Enter Department Name"
+							aria-label="measurement" aria-describedby="basic-addon2" value="">
 					</div>
-					<div class="col-xxl-4 col-lg-4 col-md-4 select-button-main-div">
+                    <div class="col-xxl-6 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
-							<label for="division_head_id" class="col-form-label text-md-end">{{ __('Division Head Name') }}</label>
-							<select name="division_head_id" id="division_head_id" multiple="true" class="division_head_id form-control widthinput" onchange="" autofocus>
-							@foreach($divisionHeads as $divisionHead)
-							<option value="{{$divisionHead->id}}" @if($data->division_head_id == $divisionHead->id) selected @endif>{{$divisionHead->name}}</option>
+							<label for="division_id" class="col-form-label text-md-end">{{ __('Division Name') }}</label>
+							<select name="division_id" id="division_id" multiple="true" class="division_id form-control widthinput" onchange="" autofocus>
+							@foreach($divisions as $division)
+							<option value="{{$division->id}}">{{$division->name}}</option>
 							@endforeach
 							</select>
 						</div>
 					</div>
-					<div class="col-xxl-4 col-lg-4 col-md-4 select-button-main-div">
+					<div class="col-xxl-6 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
-							<label for="approval_handover_to" class="col-form-label text-md-end">{{ __('Division Head Approval Hand Over To') }}</label>
-							<select name="approval_handover_to" id="approval_handover_to" multiple="true" class="approval_handover_to form-control widthinput" onchange="" autofocus>
-							@foreach($divisionHeads as $approvalBy)
-							<option value="{{$approvalBy->id}}" @if($data->approval_handover_to == $approvalBy->id) selected @endif>{{$approvalBy->name}}</option>
+							<label for="department_head_id" class="col-form-label text-md-end">{{ __('Department Head Name') }}</label>
+							<select name="department_head_id" id="department_head_id" multiple="true" class="department_head_id form-control widthinput" onchange=setHandover() autofocus>
+							@foreach($deptHeads as $departmentHead)
+							<option value="{{$departmentHead->id}}">{{$departmentHead->name}}</option>
+							@endforeach
+							</select>
+						</div>
+					</div>
+					<div class="col-xxl-6 col-lg-6 col-md-6 select-button-main-div">
+						<div class="dropdown-option-div">
+							<span class="error">* </span>
+							<label for="approval_by_id" class="col-form-label text-md-end">{{ __('Department Head Approval Hand Over To') }}</label>
+							<select name="approval_by_id" id="approval_by_id" multiple="true" class="approval_by_id form-control widthinput" onchange="" autofocus>
+							@foreach($deptHeads as $approvalBy)
+							<option value="{{$approvalBy->id}}">{{$approvalBy->name}}</option>
 							@endforeach
 							</select>
 						</div>
@@ -92,36 +95,39 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
-	var data = {!! json_encode($divisionHeads) !!};
-	var oldData = {!! json_encode($data) !!};
+	var data = {!! json_encode($deptHeads) !!};
 	$(document).ready(function () {
-		$('#division_head_id').select2({
+        $('#division_id').select2({
 	           allowClear: true,
 	           maximumSelectionLength: 1,
-	           placeholder:"Choose Division Head Name",
+	           placeholder:"Choose Division Name",
 	       });
-		$('#approval_handover_to').select2({
+		$('#department_head_id').select2({
 	           allowClear: true,
 	           maximumSelectionLength: 1,
-	           placeholder:"Choose Division Head Approval Hand Over To",
+	           placeholder:"Choose Department Head Name",
+	       });
+		$('#approval_by_id').select2({
+	           allowClear: true,
+	           maximumSelectionLength: 1,
+	           placeholder:"Choose Department Head Approval Hand Over To",
 	       });
 	});	
-	jQuery.validator.addMethod("uniqueDivision", 
+	jQuery.validator.addMethod("uniqueDepartment", 
 	       function(value, element) {
 	           var result = false;
-			   var currentId = $("#current_id").val();
 	           $.ajax({
 	               type:"POST",
 	               async: false,
-	               url: "{{route('master.uniqueDivision')}}", // script to validate in server side
-	               data: {_token: '{{csrf_token()}}',name: value,currentId:currentId},
+	               url: "{{route('master.uniqueDepartment')}}", // script to validate in server side
+	               data: {_token: '{{csrf_token()}}',name: value},
 	               success: function(data) {
 	                   result = (data == true) ? true : false;
 	               }
 	           });
 	           return result; 
 	       }, 
-	       "This Division Name is already taken! Try another."
+	       "This Department Name is already taken! Try another."
 	   );
 	jQuery.validator.setDefaults({
 	    errorClass: "is-invalid",
@@ -150,15 +156,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 	       rules: {           
 	           name: {
 	               required: true,
-				   uniqueDivision: true,
+				   uniqueDepartment: true,
 	           },
-			division_head_id: {
+			department_head_id: {
 	               required: true,
 	           },
-			approval_handover_to: {
+               division_id: {
+	               required: true,
+	           },
+			approval_by_id: {
 				required: true,
 			},
 	       },
 	   });
+       function setHandover() {
+        var department_head_id = $("#department_head_id").val();
+        if(department_head_id.length == 0) {
+			$("#approval_by_id").val('').change();
+		}
+		else {
+			$("#approval_by_id").select2("val", department_head_id);
+		}
+       }
 </script>
 @endsection

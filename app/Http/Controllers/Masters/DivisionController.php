@@ -16,6 +16,13 @@ use App\Models\HRM\Hiring\JobDescription;
 use App\Models\HRM\Hiring\InterviewSummaryReport;
 use App\Models\HRM\Employee\PassportRequest;
 use App\Models\HRM\Employee\PassportRelease;
+use App\Models\HRM\Employee\Liability;
+use App\Models\HRM\Employee\Leave;
+use App\Models\HRM\Employee\JoiningReport;
+use App\Models\HRM\Employee\OverTime;
+use App\Models\HRM\Employee\Separation;
+use App\Models\Masters\MasterDepartment;
+use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 
 class DivisionController extends Controller
 {
@@ -28,10 +35,11 @@ class DivisionController extends Controller
         $data = MasterDivisionWithHead::where('id',$id)->first();
         $previous = MasterDivisionWithHead::where('id', '<', $id)->max('id');
         $next = MasterDivisionWithHead::where('id', '>', $id)->min('id');
-        $divisionHeads = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.designation','empProfile.location')->whereNot('is_management','yes')->get();
+        $divisionHeads = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.designation','empProfile.location')->where('is_management','yes')->get();
         return view('hrm.masters.division.edit',compact('data','previous','next','divisionHeads'));
     } 
     public function update(Request $request, $id) {
+        $successMessage = '';
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'division_head_id' => 'required',
@@ -214,16 +222,62 @@ class DivisionController extends Controller
                                 $joiningDeptHeadData->update();
                             }
                         }
-                        $joiningDivisionHead = JoiningReport::where([
+                        // Overtime Application
+                        $overtimeDeptHead = OverTime::where([
+                            ['action_by_department_head','pending'],
+                            ['department_head_id',$data->approval_handover_to]
+                        ])->get();
+                        if(count($overtimeDeptHead) > 0) {
+                            foreach($overtimeDeptHead as $overtimeDeptHeadData) {
+                                $overtimeDeptHeadData->department_head_id = $request->approval_handover_to;
+                                $overtimeDeptHeadData->updated_by = $authId;
+                                $overtimeDeptHeadData->update();
+                            }
+                        }
+                        $overtimeDivisionHead = OverTime::where([
                             ['action_by_division_head','pending'],
                             ['division_head_id',$data->approval_handover_to]
                         ])->get();
-                        if(count($joiningDivisionHead) > 0) {
-                            foreach($joiningDivisionHead as $joiningDivisionHeadData) {
-                                $joiningDivisionHeadData->division_head_id = $request->approval_handover_to;
-                                $joiningDivisionHeadData->updated_by = $authId;
-                                $joiningDivisionHeadData->update();
+                        if(count($overtimeDivisionHead) > 0) {
+                            foreach($overtimeDivisionHead as $overtimeDivisionHeadData) {
+                                $overtimeDivisionHeadData->division_head_id = $request->approval_handover_to;
+                                $overtimeDivisionHeadData->updated_by = $authId;
+                                $overtimeDivisionHeadData->update();
                             }
+                        }
+                        // Separation Employee Handover
+                        $separationDeptHead = Separation::where([
+                            ['action_by_department_head','pending'],
+                            ['department_head_id',$data->approval_handover_to]
+                        ])->get();
+                        if(count($separationDeptHead) > 0) {
+                            foreach($separationDeptHead as $separationDeptHeadData) {
+                                $separationDeptHeadData->department_head_id = $request->approval_handover_to;
+                                $separationDeptHeadData->updated_by = $authId;
+                                $separationDeptHeadData->update();
+                            }
+                        }
+                        // Master Department
+                        $masterDepts = MasterDepartment::where('department_head_id',$data->division_head_id)->get();
+                        if(count($masterDepts) > 0) {
+                            foreach($masterDepts as $masterDept) {
+                                $masterDept->approval_by_id = $request->approval_handover_to;
+                                $masterDept->updated_by = $authId;
+                                $masterDept->update();
+                            }
+                        }
+                        // Teamlead Or Reporting Manager Handover To
+                        $lead = TeamLeadOrReportingManagerHandOverTo::where('lead_or_manager_id',$data->division_head_id)->first();
+                        if($lead) {
+                            $lead->approval_by_id = $request->approval_handover_to;
+                            $lead->updated_by = $authId;
+                            $lead->update();
+                        }
+                        else {
+                            $handOver['created_by'] = $authId; 
+                            $handOver['lead_or_manager_id'] = $request->department_head_id; 
+                            $handOver['approval_by_id'] = $request->approval_by_id;
+                            $createHandover = TeamLeadOrReportingManagerHandOverTo::create($handOver);
                         }
                     } 
                     $data->name = $request->name;
@@ -249,5 +303,32 @@ class DivisionController extends Controller
     public function show($id) {
         $errorMsg ="This page will coming very soon !";
         return view('hrm.notaccess',compact('errorMsg'));
+    }
+    public function uniqueDivision(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            try {
+                $division = MasterDivisionWithHead::where('name',$request->name);
+                if(isset($request->currentId) && $request->currentId != '') {
+                    $division = $division->whereNot('id',$request->currentId);
+                }
+                $division = $division->get();
+                if(count($division) > 0) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+           } 
+           catch (\Exception $e) {
+               info($e);
+           }
+        }
+        
     }
 }
