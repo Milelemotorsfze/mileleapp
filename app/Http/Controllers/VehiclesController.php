@@ -2990,6 +2990,11 @@ public function viewalls(Request $request)
                 {
                     $data = Vehicles::select( [
                         'vehicles.id',
+                        'vehicles.grn_id',
+                        'vehicles.gdn_id',
+                        'vehicles.inspection_date',
+                        'vehicles.so_id',
+                        'vehicles.reservation_end_date',
                         'warehouse.name as location',
                          DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
                         'vehicles.ppmmyyy',

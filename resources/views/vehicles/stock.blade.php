@@ -345,6 +345,7 @@
             <table id="dtBasicExample7" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
             <tr>
+                  <th>Status</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -590,7 +591,7 @@
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdndate' },
+                { data: 'gdndate', name: 'gdn.date' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
@@ -630,7 +631,7 @@
                 { data: 'so_number', name: 'so.so_number' },
                 { data: 'name', name: 'users.name' },
                 { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdndate' },
+                { data: 'gdndate', name: 'gdn.date' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
@@ -647,6 +648,29 @@
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' }
             ],
+            columnDefs: [
+        {
+            targets: 0,
+            render: function (data, type, row) {
+              console.log(row);
+                if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id == null) {
+                    return 'Incoming';
+                } else if (row.inspection_id == null && row.inspection_date == null && row.gdn_id == null && row.grn_id != null) {
+                    return 'Pending Inspection';
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.grn_id != null && (row.reservation_end_date == null || row.reservation_end_date < now)) {
+                    return 'Available Stock';
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id == null && row.reservation_end_date <= now && row.grn_id != null) {
+                    return 'Booked';
+                } else if (row.inspection_date != null && row.gdn_id == null && row.so_id != null && row.grn_id != null) {
+                    return 'Sold';
+                } else if (row.inspection_date != null && row.gdn_id != null && row.grn_id != null) {
+                    return 'Delivered';
+                } else {
+                    return ''; // Handle any other cases if needed
+                }
+            }
+        }
+    ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
         table7.on('draw', function () {
