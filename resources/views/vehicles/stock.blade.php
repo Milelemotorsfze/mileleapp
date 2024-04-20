@@ -624,6 +624,7 @@
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'allstock']) }}",
             columns: [
+              { data: 'id', name: 'vehicles.id' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
