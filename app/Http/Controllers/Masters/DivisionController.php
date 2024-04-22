@@ -15,12 +15,19 @@ use App\Models\HRM\Hiring\EmployeeHiringRequestHistory;
 use App\Models\HRM\Hiring\JobDescription;
 use App\Models\HRM\Hiring\InterviewSummaryReport;
 use App\Models\HRM\Employee\PassportRequest;
+use App\Models\HRM\Employee\PassportRequestHistory;
 use App\Models\HRM\Employee\PassportRelease;
+use App\Models\HRM\Employee\PassportReleaseHistory;
 use App\Models\HRM\Employee\Liability;
+use App\Models\HRM\Employee\LiabilityHistory;
 use App\Models\HRM\Employee\Leave;
+use App\Models\HRM\Employee\LeaveHistory;
 use App\Models\HRM\Employee\JoiningReport;
+use App\Models\HRM\Employee\JoiningReportHistory;
 use App\Models\HRM\Employee\OverTime;
+use App\Models\HRM\Employee\OverTimeHistory;
 use App\Models\HRM\Employee\Separation;
+use App\Models\HRM\Employee\SeparationHistory;
 use App\Models\Masters\MasterDepartment;
 use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 
@@ -83,7 +90,7 @@ class DivisionController extends Controller
                                 $hiringDivisionHeadData->updated_by = $authId;
                                 $hiringDivisionHeadData->update();
                                 $histryHiring = '';
-                                $histryHiring['hiring_request_id'] = $hiringDeptHeadData->id;
+                                $histryHiring['hiring_request_id'] = $hiringDivisionHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Employee hiring request send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
                                 $createHistryHiring = EmployeeHiringRequestHistory::create($histryHiring);
@@ -100,7 +107,7 @@ class DivisionController extends Controller
                                 $jdDeptHeadData->updated_by = $authId;
                                 $jdDeptHeadData->update();
                                 $historyJD = '';
-                                $historyJD['hiring_request_id'] = $request->hiring_request_id;
+                                $historyJD['hiring_request_id'] = $jdDeptHeadData->hiring_request_id;
                                 $historyJD['icon'] = 'icons8-send-30.png';
                                 $historyJD['message'] = 'Employee hiring job description send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
                                 $createHistoryJD = EmployeeHiringRequestHistory::create($historyJD);
@@ -116,6 +123,11 @@ class DivisionController extends Controller
                                 $interviewSummaryDivisionHeadData->division_head_id = $request->approval_handover_to;
                                 $interviewSummaryDivisionHeadData->updated_by = $authId;
                                 $interviewSummaryDivisionHeadData->update();
+                                $histryHiring = '';
+                                $histryHiring['hiring_request_id'] = $interviewSummaryDivisionHeadData->hiring_request_id;
+                                $histryHiring['icon'] = 'icons8-send-30.png';
+                                $histryHiring['message'] = 'Interview Summary Report send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
+                                $createHistryHiring = EmployeeHiringRequestHistory::create($histryHiring);
                             }
                         }
                         // Passport Submit
@@ -128,6 +140,11 @@ class DivisionController extends Controller
                                 $passportSubmitDeptHeadData->submit_department_head_id = $request->approval_handover_to;
                                 $passportSubmitDeptHeadData->updated_by = $authId;
                                 $passportSubmitDeptHeadData->update();
+                                $histryHiring = '';
+                                $histryHiring['passport_request_id'] = $passportSubmitDeptHeadData->id;
+                                $histryHiring['icon'] = 'icons8-send-30.png';
+                                $histryHiring['message'] = 'Passport Submit Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
+                                $createHistryHiring = PassportRequestHistory::create($histryHiring);
                             }
                         }
                         $passportSubmitDivisionHead = PassportRequest::where([
@@ -139,6 +156,11 @@ class DivisionController extends Controller
                                 $passportSubmitDivisionHeadData->submit_division_head_id = $request->approval_handover_to;
                                 $passportSubmitDivisionHeadData->updated_by = $authId;
                                 $passportSubmitDivisionHeadData->update();
+                                $histryHiring = '';
+                                $histryHiring['passport_request_id'] = $passportSubmitDivisionHeadData->id;
+                                $histryHiring['icon'] = 'icons8-send-30.png';
+                                $histryHiring['message'] = 'Passport Submit Request send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
+                                $createHistryHiring = PassportRequestHistory::create($histryHiring);
                             }
                         }
                         // Passport Release
@@ -151,6 +173,11 @@ class DivisionController extends Controller
                                 $passportReleaseDeptHeadData->release_department_head_id = $request->approval_handover_to;
                                 $passportReleaseDeptHeadData->updated_by = $authId;
                                 $passportReleaseDeptHeadData->update();
+                                $histryHiring = '';
+                                $histryHiring['passport_release_id'] = $passportReleaseDeptHeadData->id;
+                                $histryHiring['icon'] = 'icons8-send-30.png';
+                                $histryHiring['message'] = 'Passport Release Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
+                                $createHistryHiring = PassportReleaseHistory::create($histryHiring);
                             }
                         }
                         $passportReleaseDivisionHead = PassportRelease::where([
@@ -162,6 +189,11 @@ class DivisionController extends Controller
                                 $passportReleaseDivisionHeadData->release_division_head_id = $request->approval_handover_to;
                                 $passportReleaseDivisionHeadData->updated_by = $authId;
                                 $passportReleaseDivisionHeadData->update();
+                                $histryHiring = '';
+                                $histryHiring['passport_release_id'] = $passportReleaseDeptHeadData->id;
+                                $histryHiring['icon'] = 'icons8-send-30.png';
+                                $histryHiring['message'] = 'Passport Release Request send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
+                                $createHistryHiring = PassportReleaseHistory::create($histryHiring);
                             }
                         }
                         // Liability
@@ -174,6 +206,11 @@ class DivisionController extends Controller
                                 $liabilityDeptHeadData->department_head_id = $request->approval_handover_to;
                                 $liabilityDeptHeadData->updated_by = $authId;
                                 $liabilityDeptHeadData->update();
+                                $histryHiring = '';
+                                $histryHiring['liability_id'] = $liabilityDeptHeadData->id;
+                                $histryHiring['icon'] = 'icons8-send-30.png';
+                                $histryHiring['message'] = 'Liability Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
+                                $createHistryHiring = LiabilityHistory::create($histryHiring);
                             }
                         }
                         $liabilityDivisionHead = Liability::where([
@@ -185,6 +222,11 @@ class DivisionController extends Controller
                                 $liabilityDivisionHeadData->division_head_id = $request->approval_handover_to;
                                 $liabilityDivisionHeadData->updated_by = $authId;
                                 $liabilityDivisionHeadData->update();
+                                $histryHiring = '';
+                                $histryHiring['liability_id'] = $liabilityDeptHeadData->id;
+                                $histryHiring['icon'] = 'icons8-send-30.png';
+                                $histryHiring['message'] = 'Liability Request send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
+                                $createHistryHiring = LiabilityHistory::create($histryHiring);
                             }
                         }
                         // Leave
@@ -197,6 +239,11 @@ class DivisionController extends Controller
                                 $leaveDeptHeadData->department_head_id = $request->approval_handover_to;
                                 $leaveDeptHeadData->updated_by = $authId;
                                 $leaveDeptHeadData->update();
+                                $histryHiring = '';
+                                $histryHiring['leave_id'] = $leaveDeptHeadData->id;
+                                $histryHiring['icon'] = 'icons8-send-30.png';
+                                $histryHiring['message'] = 'Leave Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
+                                $createHistryHiring = LeaveHistory::create($histryHiring);
                             }
                         }
                         $leaveDivisionHead = Leave::where([
@@ -208,6 +255,11 @@ class DivisionController extends Controller
                                 $leaveDivisionHeadData->division_head_id = $request->approval_handover_to;
                                 $leaveDivisionHeadData->updated_by = $authId;
                                 $leaveDivisionHeadData->update();
+                                $histryHiring = '';
+                                $histryHiring['leave_id'] = $leaveDeptHeadData->id;
+                                $histryHiring['icon'] = 'icons8-send-30.png';
+                                $histryHiring['message'] = 'Leave Request send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
+                                $createHistryHiring = LeaveHistory::create($histryHiring);
                             }
                         }
                         // Joining Report
@@ -220,6 +272,11 @@ class DivisionController extends Controller
                                 $joiningDeptHeadData->department_head_id = $request->approval_handover_to;
                                 $joiningDeptHeadData->updated_by = $authId;
                                 $joiningDeptHeadData->update();
+                                $histryHiring = '';
+                                $histryHiring['joining_report_id'] = $joiningDeptHeadData->id;
+                                $histryHiring['icon'] = 'icons8-send-30.png';
+                                $histryHiring['message'] = 'Joining Report Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
+                                $createHistryHiring = JoiningReportHistory::create($histryHiring);
                             }
                         }
                         // Overtime Application
@@ -232,6 +289,11 @@ class DivisionController extends Controller
                                 $overtimeDeptHeadData->department_head_id = $request->approval_handover_to;
                                 $overtimeDeptHeadData->updated_by = $authId;
                                 $overtimeDeptHeadData->update();
+                                $histryHiring = '';
+                                $histryHiring['over_times_id'] = $overtimeDeptHeadData->id;
+                                $histryHiring['icon'] = 'icons8-send-30.png';
+                                $histryHiring['message'] = 'Overtime Application Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
+                                $createHistryHiring = OverTimeHistory::create($histryHiring);
                             }
                         }
                         $overtimeDivisionHead = OverTime::where([
@@ -243,6 +305,11 @@ class DivisionController extends Controller
                                 $overtimeDivisionHeadData->division_head_id = $request->approval_handover_to;
                                 $overtimeDivisionHeadData->updated_by = $authId;
                                 $overtimeDivisionHeadData->update();
+                                $histryHiring = '';
+                                $histryHiring['over_times_id'] = $overtimeDivisionHeadData->id;
+                                $histryHiring['icon'] = 'icons8-send-30.png';
+                                $histryHiring['message'] = 'Overtime Application Request send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
+                                $createHistryHiring = OverTimeHistory::create($histryHiring);
                             }
                         }
                         // Separation Employee Handover
@@ -255,6 +322,11 @@ class DivisionController extends Controller
                                 $separationDeptHeadData->department_head_id = $request->approval_handover_to;
                                 $separationDeptHeadData->updated_by = $authId;
                                 $separationDeptHeadData->update();
+                                $histryHiring = '';
+                                $histryHiring['separations_id'] = $separationDeptHeadData->id;
+                                $histryHiring['icon'] = 'icons8-send-30.png';
+                                $histryHiring['message'] = 'Separation Employee Handover Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
+                                $createHistryHiring = SeparationHistory::create($histryHiring);
                             }
                         }
                         // Master Department
