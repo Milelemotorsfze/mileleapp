@@ -23,13 +23,6 @@ use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 class JoiningReportController extends Controller
 {
     public function checkTempDateExist(Request $request) { 
-//         "transfer_from_date" => "2024-04-15"
-//   "joining_date" => "2024-04-17"
-//   "employee_id" => array:1 [
-//     0 => "10"
-//   ]
-//   "_token" => "lxWMqusVSB7JOK95DUnkJE5NIfRtOQ2IKWeK2TDd"
-// ]
         $transfer_from_date = [];
         $joining_date = [];
         $data = true;
@@ -39,15 +32,7 @@ class JoiningReportController extends Controller
             ->where('transfer_from_date','<=',$request->transfer_from_date)
             ->where('joining_date','>=',$request->transfer_from_date)
             ->where('joining_type','internal_transfer')
-            ->where('internal_transfer_type','temporary')
-            ;
-            // ->where([
-            //     ['employee_id','==',$request->employee_id[0]],
-            //     ['transfer_from_date','<=',$request->transfer_from_date],
-            //     ['joining_date','>=',$request->transfer_from_date],
-            //     ['joining_type','==','internal_transfer'],
-            //     ['internal_transfer_type','==','temporary'],
-            // ]);
+            ->where('internal_transfer_type','temporary');
             if(isset($request->id) && $request->id != 'new') { 
                 $transfer_from_date = $transfer_from_date->whereNot('id',$request->id);
             }
@@ -57,22 +42,12 @@ class JoiningReportController extends Controller
             ->where('transfer_from_date','<=',$request->joining_date)
             ->where('joining_date','>=',$request->joining_date)
             ->where('joining_type','internal_transfer')
-            ->where('internal_transfer_type','temporary')
-            ;
-
-            // ->where([
-            //     ['employee_id','==',$request->employee_id[0]],
-            //     ['transfer_from_date','<=',$request->joining_date],
-            //     ['joining_date','>=',$request->joining_date],
-            //     ['joining_type','==','internal_transfer'],
-            //     ['internal_transfer_type','==','temporary'],
-            // ]);
-            // if(isset($request->id) && $request->id != 'new') {
-            //     $joining_date = $joining_date->whereNot('id',$request->id);
-            // }
+            ->where('internal_transfer_type','temporary');
+            if(isset($request->id) && $request->id != 'new') {
+                $joining_date = $joining_date->whereNot('id',$request->id);
+            }
             $joining_date = $joining_date->get();
-        }    
-        // dd($transfer_from_date);
+        }   
         if(count($transfer_from_date) > 0 OR count($joining_date) > 0)  {
             $data = false;
         }
@@ -170,7 +145,7 @@ class JoiningReportController extends Controller
         })->with('designation','department')->get();
         $masterlocations = MasterOfficeLocation::orderBy('name', 'ASC')->where('status','active')->select('id','name','address')->get(); 
         $reportingTo = User::orderBy('name', 'ASC')->where('status','active')->where('status','active')->whereNotIn('id',[1,16])->get();
-        $masterDepartments = MasterDepartment::orderBy('name', 'ASC')->whereNot('name','Management')->get();
+        $masterDepartments = MasterDepartment::orderBy('name', 'ASC')->whereNot('name','Management')->with('departmentHead','division.divisionHead')->get();
         $employees = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->whereHas('empProfile');
         if($type == 'vacations_or_leave') {
             $employees = $employees->whereHas('approvedLeaves');
@@ -231,7 +206,9 @@ class JoiningReportController extends Controller
                     $emp = EmployeeProfile::where('user_id',$request->employee_id)->first();
                 }
                 if($emp) {
-                    $emp->employee_code = $request->employee_code;
+                    if($request->employee_code != '') {
+                        $emp->employee_code = $request->employee_code;
+                    }
                     if(isset($request->team_lead_or_reporting_manager)) {
                         $emp->team_lead_or_reporting_manager = $request->team_lead_or_reporting_manager;
                     }

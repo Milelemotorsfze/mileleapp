@@ -69,22 +69,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 						<div><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Transfer From Location') }}</strong></label></div>
 						<div><span id="transfer_from_location_name" value=""></span></div>
 					</div>
-					<div class="col-xxl-4 col-lg-4 col-md-4 radio-main-div" id="change_reporting_manager_div">
-						<span class="error">* </span>
-						<label for="type" class="col-form-label text-md-end">{{ __('Change Reporting Manager') }}</label>
-						<fieldset style="margin-top:5px;" class="radio-div-container">
-							<div class="row some-class">
-								<div class="col-xxl-6 col-lg-6 col-md-6">
-									<input type="radio" class="type" name="team_lead_or_reporting_manager" value="" id="department_head" />
-									<label for="department_head" id="department_head_label"></label>
-								</div>
-								<div class="col-xxl-6 col-lg-6 col-md-6">
-									<input type="radio" class="type" name="team_lead_or_reporting_manager" value="" id="division_head" />
-									<label for="division_head" id="division_head_label"></label>
-								</div>
-							</div>
-						</fieldset>
-					</div>
 				</div>
 				</br>
 				<div class="row">
@@ -116,6 +100,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 						<input id="joining_date" type="date" class="form-control widthinput @error('joining_date') is-invalid @enderror" name="joining_date"
 							placeholder="Joining Date" value="" autocomplete="joining_date" autofocus>
 					</div>
+					<div class="col-xxl-4 col-lg-4 col-md-4 radio-main-div" id="change_reporting_manager_div">
+						<span class="error">* </span>
+						<label for="type" class="col-form-label text-md-end">{{ __('Change Reporting Manager') }}</label>
+						<fieldset style="margin-top:5px;" class="radio-div-container">
+							<div class="row some-class">
+								<div class="col-xxl-6 col-lg-6 col-md-6">
+									<input type="radio" class="type" name="team_lead_or_reporting_manager" value="" id="department_head" />
+									<label for="department_head" id="department_head_label"></label>
+								</div>
+								<div class="col-xxl-6 col-lg-6 col-md-6" id="rep_div">
+									<input type="radio" class="type" name="team_lead_or_reporting_manager" value="" id="division_head" />
+									<label for="division_head" id="division_head_label"></label>
+								</div>
+							</div>
+						</fieldset>
+					</div>
 				</div>
 				<div class="row">
 					<div class="col-xxl-12 col-lg-12 col-md-12">
@@ -144,91 +144,116 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
 	var employees = {!! json_encode($employees) !!};
-	var oldEmpId ='';
+	var masterDeartments = {!! json_encode($masterDepartments) !!}
+	var oldEmpIdp ='';
 	$(document).ready(function () {
 	    $('#employee_code_div').hide();
-	$('#designation_div').hide();
-	$('#department_div').hide();
+		$('#designation_div').hide();
+		$('#department_div').hide();
 	    $('#transfer_from_department_name_div').hide();
-	$('#transfer_from_location_name_div').hide();
+		$('#transfer_from_location_name_div').hide();
 	    $('#change_reporting_manager_div').hide();
+		$('#rep_div').hide();
 	    $('#employee_id').select2({
 	        allowClear: true,
 	        maximumSelectionLength: 1,
 	        placeholder:"Choose Employee Name",
 	    });
-	$('#joining_location').select2({
+		$('#joining_location').select2({
 	        allowClear: true,
-	maximumSelectionLength: 1,
+			maximumSelectionLength: 1,
 	        placeholder:"Choose Joining Location",
 	    });	
 	    $('#transfer_to_department_id').select2({
 	        allowClear: true,
-	maximumSelectionLength: 1,
+			maximumSelectionLength: 1,
 	        placeholder:"Choose Transfer To Department",
-	    });	
-	$('.employee_id').change(function (e) {
-	var employeeId = $('#employee_id').val();
-	if(employeeId != '') {
-	if(employees.length > 0) {
-		for(var i=0; i<employees.length; i++) {						
-			if(employees[i].id == employeeId) {
-				$('#employee_code_div').show();
-	                        $('#designation_div').show();
-	                        $('#department_div').show();
-	                        $('#transfer_from_department_name_div').show();
-	                  $('#transfer_from_location_name_div').show();
-	                        $('#change_reporting_manager_div').show();
-	                        if(employees[i].emp_profile != null && employees[i].emp_profile.department != null && employees[i].emp_profile.department.department_head_id != null
-	                        && employees[i].emp_profile.department.department_head.name != null) {
-	                            document.getElementById('department_head').value=employees[i].emp_profile.department.department_head_id;  
-	                            document.getElementById('department_head_label').textContent=employees[i].emp_profile.department.department_head.name;  
-	                             
-	                        }
-	                        if(employees[i].emp_profile != null && employees[i].emp_profile.department != null 
-	                        && employees[i].emp_profile.department.division_id != null && employees[i].emp_profile.department.division.division_head_id != null &&
-	                        employees[i].emp_profile.department.division.division_head != null && employees[i].emp_profile.department.division.division_head.name != null) {
-	                            document.getElementById('division_head').value=employees[i].emp_profile.department.division.division_head_id;  
-	                            document.getElementById('division_head_label').textContent=employees[i].emp_profile.department.division.division_head.name;  
-	}
-				if(employees[i].emp_profile != null && employees[i].emp_profile.employee_code != null) {
-					document.getElementById('employee_code').textContent=employees[i].emp_profile.employee_code;                        
-				}
-				if(employees[i].emp_profile != null && employees[i].emp_profile.designation != null && employees[i].emp_profile.designation.name != null) {
-					document.getElementById('designation').textContent=employees[i].emp_profile.designation.name;
-				}
-				if(employees[i].emp_profile != null && employees[i].emp_profile.department != null && employees[i].emp_profile.department.name != null) {
-					document.getElementById('department').textContent=employees[i].emp_profile.department.name;  
-					document.getElementById('transfer_from_department_id').value=employees[i].emp_profile.department_id;  
-					document.getElementById('transfer_from_department_name').textContent=employees[i].emp_profile.department.name; 
-					oldEmpId = employees[i].emp_profile.department_id;
-					$('#tranfer_to_'+oldEmpId).prop('disabled', true);
-				}
-				if(employees[i].emp_profile != null && employees[i].emp_profile.work_location != null && employees[i].emp_profile.location.name != null) {
-					document.getElementById('transfer_from_location_id').value=employees[i].emp_profile.work_location;  
-					document.getElementById('transfer_from_location_name').textContent=employees[i].emp_profile.location.name;  
+	    });
+		$('#transfer_to_department_id').change(function (e) {
+			var transfer_to_department_id = $('#transfer_to_department_id').val();
+			if(transfer_to_department_id != '') {
+				if(masterDeartments.length > 0) {
+					for(var i=0; i<masterDeartments.length; i++) {	
+						$('#change_reporting_manager_div').show();
+						if(masterDeartments[i].id == transfer_to_department_id) {
+							if(masterDeartments[i].department_head != null && masterDeartments[i].department_head.name != null && masterDeartments[i].department_head_id != null) {
+								document.getElementById('department_head').value=masterDeartments[i].department_head_id;  
+							    document.getElementById('department_head_label').textContent=masterDeartments[i].department_head.name;  
+							}	
+							if(masterDeartments[i].department_head != null && masterDeartments[i].department_head_id != null && masterDeartments[i].division != null && masterDeartments[i].division.division_head_id != null && masterDeartments[i].division != null &&
+							masterDeartments[i].division.division_head != null && masterDeartments[i].division.division_head.name != null) {
+								if(masterDeartments[i].department_head_id != masterDeartments[i].division.division_head_id) {
+									$('#rep_div').show();
+									document.getElementById('division_head').value=masterDeartments[i].division.division_head_id;  
+									document.getElementById('division_head_label').textContent=masterDeartments[i].division.division_head.name;  
+								}
+								else {
+									$('#rep_div').hide();
+									document.getElementById('division_head').value='';  
+									document.getElementById('division_head_label').textContent=''; 
+								}
+							}
+						}
+					}
 				}
 			}
-		}
-	}               
-	}
-	else {
-	$('#employee_code_div').hide();
-	$('#designation_div').hide();
-	            $('#department_div').hide();
-	            $('#transfer_from_department_name_div').hide();
-	      $('#transfer_from_location_name_div').hide();
-	            $('#change_reporting_manager_div').hide();
-	document.getElementById('employee_code').textContent=''; 
-	document.getElementById('designation').textContent=''; 
-	document.getElementById('department').textContent='';   
-	document.getElementById('transfer_from_department_id').value='';  
-	document.getElementById('transfer_from_department_name').value=''; 
-	document.getElementById('transfer_from_location_id').value=''; 
-	document.getElementById('transfer_from_location_name').value='';   
-	$('#tranfer_to_'+oldEmpId).prop('disabled', false);
-	}			
-	});
+			else {
+				document.getElementById('department_head').value='';  
+				document.getElementById('department_head_label').textContent=''; 
+				document.getElementById('division_head').value='';  
+				document.getElementById('division_head_label').textContent=''; 
+				$('#change_reporting_manager_div').hide();
+				$('#rep_div').hide();
+			}
+		})
+		$('.employee_id').change(function (e) {
+			var employeeId = $('#employee_id').val();
+			if(employeeId != '') {
+				if(employees.length > 0) {
+					for(var i=0; i<employees.length; i++) {						
+						if(employees[i].id == employeeId) {
+							$('#employee_code_div').show();
+							$('#designation_div').show();
+							$('#department_div').show();
+							$('#transfer_from_department_name_div').show();
+							$('#transfer_from_location_name_div').show();
+							if(employees[i].emp_profile != null && employees[i].emp_profile.employee_code != null) {
+								document.getElementById('employee_code').textContent=employees[i].emp_profile.employee_code;                        
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.designation != null && employees[i].emp_profile.designation.name != null) {
+								document.getElementById('designation').textContent=employees[i].emp_profile.designation.name;
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.department != null && employees[i].emp_profile.department.name != null) {
+								document.getElementById('department').textContent=employees[i].emp_profile.department.name;  
+								document.getElementById('transfer_from_department_id').value=employees[i].emp_profile.department_id;  
+								document.getElementById('transfer_from_department_name').textContent=employees[i].emp_profile.department.name; 
+								oldEmpId = employees[i].emp_profile.department_id;
+								$('#tranfer_to_'+oldEmpId).prop('disabled', true);
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.work_location != null && employees[i].emp_profile.location.name != null) {
+								document.getElementById('transfer_from_location_id').value=employees[i].emp_profile.work_location;  
+								document.getElementById('transfer_from_location_name').textContent=employees[i].emp_profile.location.name;  
+							}
+						}
+					}
+				}               
+			}
+			else {
+				$('#employee_code_div').hide();
+				$('#designation_div').hide();
+				$('#department_div').hide();
+				$('#transfer_from_department_name_div').hide();
+				$('#transfer_from_location_name_div').hide();
+				document.getElementById('employee_code').textContent=''; 
+				document.getElementById('designation').textContent=''; 
+				document.getElementById('department').textContent='';   
+				document.getElementById('transfer_from_department_id').value='';  
+				document.getElementById('transfer_from_department_name').value=''; 
+				document.getElementById('transfer_from_location_id').value=''; 
+				document.getElementById('transfer_from_location_name').value='';   
+				$('#tranfer_to_'+oldEmpId).prop('disabled', false);
+			}			
+		});
 	});
 	jQuery.validator.setDefaults({
 	    errorClass: "is-invalid",

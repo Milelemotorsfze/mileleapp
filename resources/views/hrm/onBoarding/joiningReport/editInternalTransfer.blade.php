@@ -252,10 +252,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 			</div>
 			<div class="card-body">
 				<div class="row">
+					<input type="hidden" name="id" id="id" value="{{$data->id ?? ''}}">
 					<input type="hidden" name="joining_type" value="internal_transfer">
 					<input type="hidden" name="internal_transfer_type" value="temporary">
-					<input type="hidden" name="transfer_from_department_id" id="transfer_from_department_id" value="">
-					<input type="hidden" name="transfer_from_location_id" id="transfer_from_location_id" value="">
+					<input type="hidden" name="transfer_from_department_id" id="transfer_from_department_id" value="{{$data->transfer_from_department_id ?? ''}}">
+					<input type="hidden" name="transfer_from_location_id" id="transfer_from_location_id" value="{{$data->transfer_from_location_id ?? ''}}">
 					<input type="hidden" name="employee_code" id="employee_code" value="">
 					<div class="col-xxl-6 col-lg-6 col-md-6" id="transfer_from_department_name_div">
 						<div >
@@ -433,6 +434,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 		var transfer_from_date = $('#transfer_from_date').val(); 
 		var joining_date = $('#joining_date').val(); 
 		var employee_id = $("#employee_id").val();
+		var id = $("#id").val();
 		$.ajax({
 			type:"POST",
 			async: false,
@@ -440,6 +442,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 			data: {transfer_from_date: transfer_from_date,
 			joining_date: joining_date,
 			employee_id: employee_id,
+			id: id,
 			_token: '{{csrf_token()}}'},
 			success: function(data) {
 				result = (data == true) ? true : false;
@@ -485,7 +488,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 	                console.log("Error is here with length", element.val().length);
 	                error.addClass('select-error');
 	                error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
-	            } else {
+	            } 
+				else {
 	                console.log("No error");
 	            }
 	        }
