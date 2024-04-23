@@ -73,7 +73,7 @@ class DivisionController extends Controller
                                 $hiringDeptHeadData->department_head_id = $request->approval_handover_to;
                                 $hiringDeptHeadData->updated_by = $authId;
                                 $hiringDeptHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['hiring_request_id'] = $hiringDeptHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Employee hiring request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -89,7 +89,7 @@ class DivisionController extends Controller
                                 $hiringDivisionHeadData->division_head_id = $request->approval_handover_to;
                                 $hiringDivisionHeadData->updated_by = $authId;
                                 $hiringDivisionHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['hiring_request_id'] = $hiringDivisionHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Employee hiring request send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -106,7 +106,7 @@ class DivisionController extends Controller
                                 $jdDeptHeadData->department_head_id = $request->approval_handover_to;
                                 $jdDeptHeadData->updated_by = $authId;
                                 $jdDeptHeadData->update();
-                                $historyJD = '';
+                                $historyJD = [];
                                 $historyJD['hiring_request_id'] = $jdDeptHeadData->hiring_request_id;
                                 $historyJD['icon'] = 'icons8-send-30.png';
                                 $historyJD['message'] = 'Employee hiring job description send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -123,7 +123,7 @@ class DivisionController extends Controller
                                 $interviewSummaryDivisionHeadData->division_head_id = $request->approval_handover_to;
                                 $interviewSummaryDivisionHeadData->updated_by = $authId;
                                 $interviewSummaryDivisionHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['hiring_request_id'] = $interviewSummaryDivisionHeadData->hiring_request_id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Interview Summary Report send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -140,7 +140,7 @@ class DivisionController extends Controller
                                 $passportSubmitDeptHeadData->submit_department_head_id = $request->approval_handover_to;
                                 $passportSubmitDeptHeadData->updated_by = $authId;
                                 $passportSubmitDeptHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['passport_request_id'] = $passportSubmitDeptHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Passport Submit Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -156,7 +156,7 @@ class DivisionController extends Controller
                                 $passportSubmitDivisionHeadData->submit_division_head_id = $request->approval_handover_to;
                                 $passportSubmitDivisionHeadData->updated_by = $authId;
                                 $passportSubmitDivisionHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['passport_request_id'] = $passportSubmitDivisionHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Passport Submit Request send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -173,7 +173,7 @@ class DivisionController extends Controller
                                 $passportReleaseDeptHeadData->release_department_head_id = $request->approval_handover_to;
                                 $passportReleaseDeptHeadData->updated_by = $authId;
                                 $passportReleaseDeptHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['passport_release_id'] = $passportReleaseDeptHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Passport Release Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -189,7 +189,7 @@ class DivisionController extends Controller
                                 $passportReleaseDivisionHeadData->release_division_head_id = $request->approval_handover_to;
                                 $passportReleaseDivisionHeadData->updated_by = $authId;
                                 $passportReleaseDivisionHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['passport_release_id'] = $passportReleaseDeptHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Passport Release Request send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -206,7 +206,7 @@ class DivisionController extends Controller
                                 $liabilityDeptHeadData->department_head_id = $request->approval_handover_to;
                                 $liabilityDeptHeadData->updated_by = $authId;
                                 $liabilityDeptHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['liability_id'] = $liabilityDeptHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Liability Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -222,7 +222,7 @@ class DivisionController extends Controller
                                 $liabilityDivisionHeadData->division_head_id = $request->approval_handover_to;
                                 $liabilityDivisionHeadData->updated_by = $authId;
                                 $liabilityDivisionHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['liability_id'] = $liabilityDeptHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Liability Request send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -239,7 +239,7 @@ class DivisionController extends Controller
                                 $leaveDeptHeadData->department_head_id = $request->approval_handover_to;
                                 $leaveDeptHeadData->updated_by = $authId;
                                 $leaveDeptHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['leave_id'] = $leaveDeptHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Leave Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -255,7 +255,7 @@ class DivisionController extends Controller
                                 $leaveDivisionHeadData->division_head_id = $request->approval_handover_to;
                                 $leaveDivisionHeadData->updated_by = $authId;
                                 $leaveDivisionHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['leave_id'] = $leaveDeptHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Leave Request send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -272,7 +272,7 @@ class DivisionController extends Controller
                                 $joiningDeptHeadData->department_head_id = $request->approval_handover_to;
                                 $joiningDeptHeadData->updated_by = $authId;
                                 $joiningDeptHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['joining_report_id'] = $joiningDeptHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Joining Report Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -289,7 +289,7 @@ class DivisionController extends Controller
                                 $overtimeDeptHeadData->department_head_id = $request->approval_handover_to;
                                 $overtimeDeptHeadData->updated_by = $authId;
                                 $overtimeDeptHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['over_times_id'] = $overtimeDeptHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Overtime Application Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -305,7 +305,7 @@ class DivisionController extends Controller
                                 $overtimeDivisionHeadData->division_head_id = $request->approval_handover_to;
                                 $overtimeDivisionHeadData->updated_by = $authId;
                                 $overtimeDivisionHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['over_times_id'] = $overtimeDivisionHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Overtime Application Request send to Division Head ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -322,7 +322,7 @@ class DivisionController extends Controller
                                 $separationDeptHeadData->department_head_id = $request->approval_handover_to;
                                 $separationDeptHeadData->updated_by = $authId;
                                 $separationDeptHeadData->update();
-                                $histryHiring = '';
+                                $histryHiring = [];
                                 $histryHiring['separations_id'] = $separationDeptHeadData->id;
                                 $histryHiring['icon'] = 'icons8-send-30.png';
                                 $histryHiring['message'] = 'Separation Employee Handover Request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';

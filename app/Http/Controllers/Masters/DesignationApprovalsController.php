@@ -27,6 +27,7 @@ use App\Models\HRM\Employee\OverTime;
 use App\Models\HRM\Employee\OverTimeHistory;
 use App\Models\HRM\Employee\Separation;
 use App\Models\HRM\Employee\SeparationHistory;
+use App\Models\HRM\Hiring\InterviewSummaryReport;
 
 class DesignationApprovalsController extends Controller
 {
@@ -113,7 +114,7 @@ class DesignationApprovalsController extends Controller
                                     $liabilityDeptHeadData->finance_manager_id = $request->approval_by_id;
                                     $liabilityDeptHeadData->updated_by = $authId;
                                     $liabilityDeptHeadData->update();
-                                    $histryHiring = '';
+                                    $histryHiring = [];
                                     $histryHiring['liability_id'] = $liabilityDeptHeadData->id;
                                     $histryHiring['icon'] = 'icons8-send-30.png';
                                     $histryHiring['message'] = 'Liability Request send to Finance Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -134,7 +135,7 @@ class DesignationApprovalsController extends Controller
                                     $hiringDeptHeadData->hiring_manager_id = $request->approval_by_id;
                                     $hiringDeptHeadData->updated_by = $authId;
                                     $hiringDeptHeadData->update();
-                                    $histryHiring = '';
+                                    $histryHiring = [];
                                     $histryHiring['hiring_request_id'] = $hiringDeptHeadData->id;
                                     $histryHiring['icon'] = 'icons8-send-30.png';
                                     $histryHiring['message'] = 'Employee hiring request send to Hiring Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
@@ -155,7 +156,7 @@ class DesignationApprovalsController extends Controller
                                     $hiringDeptHeadData->hr_manager_id = $request->handover_to_id;
                                     $hiringDeptHeadData->updated_by = $authId;
                                     $hiringDeptHeadData->update();
-                                    $histryHiring = '';
+                                    $histryHiring = [];
                                     $histryHiring['hiring_request_id'] = $hiringDeptHeadData->id;
                                     $histryHiring['icon'] = 'icons8-send-30.png';
                                     $histryHiring['message'] = 'Employee hiring request send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
