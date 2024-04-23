@@ -16,6 +16,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('email:send-daily-activity')->dailyAt('18:00');
         $schedule->command('notifications:send')->everyMinute();
         $schedule->command('notificationspendingleads:send')->everyMinute();
+        $schedule->command('notificationspendingsignquotation:send')->everyMinute();
+        $schedule->command('notificationspendingpeospecting:send')->everyMinute();
     }
 
     /**
@@ -31,5 +33,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\ExportCSV::class,
         \App\Console\Commands\SendNotifications::class,
         \App\Console\Commands\SendNotificationspendingleads::class,
+        \App\Console\Commands\SendNotificationspendingsignquotation::class,
+        \App\Console\Commands\SendNotificationspendingpeospecting::class,
     ];
 }

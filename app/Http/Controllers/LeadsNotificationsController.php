@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\LeadsNotifications;
 use App\Models\UserActivities;
+use App\Models\Calls;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
-use App\Models\Calls;
+use App\Models\Prospecting;
 use Illuminate\Support\Facades\DB;
 
 
@@ -81,17 +82,36 @@ class LeadsNotificationsController extends Controller
     {
         //
     }
-    public function viewLead($call_id)
+    public function viewLead($call_id, Request $request)
     {
-        // Retrieve the lead using the call_id
-        $lead = Calls::where('id', $call_id)->first();
-        if (!$lead) {
-            // Lead not found, you can redirect or show an error message
-            return redirect()->route('leads.index')->with('error', 'Lead not found');
+        $additionalValue = $request->query('additional_param');
+        if($additionalValue == "Pending Lead")
+        {
+            $data = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
+            ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+            ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+            ->where('calls.status', 'New')
+            ->where('calls.id', $call_id)
+            ->first();
         }
+        else if($additionalValue == "Fellow Up")
+        {
 
-        // Assuming you have a view to display lead details
-        return view('leads.show', ['lead' => $lead]);
+        }
+        else if($additionalValue == "Quotation Fellow Up")
+        {
+
+        }
+        else if($additionalValue == "Processed Lead")
+        {
+
+        }
+        else
+        {
+
+        }
+        return view('dailyleads.notificationsviews', compact('data', 'additionalValue'));
     }
     public function updateStatus(Request $request)
 {
