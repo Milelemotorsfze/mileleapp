@@ -420,7 +420,7 @@ th.nowrap-td {
     <td style="font-size: 12px;">
         @php
         $userId = auth()->user()->id;
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-approval');
         @endphp
         @if ($hasPermission)
         @php
