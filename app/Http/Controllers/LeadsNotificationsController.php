@@ -87,7 +87,7 @@ class LeadsNotificationsController extends Controller
         $additionalValue = $request->query('additional_param');
         if($additionalValue == "Pending Lead")
         {
-            $data = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
+            $calls = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
             ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
             ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
             ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
@@ -97,21 +97,35 @@ class LeadsNotificationsController extends Controller
         }
         else if($additionalValue == "Fellow Up")
         {
-
+            $calls = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
+            ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+            ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+            ->join('fellow_up', 'calls.id', '=', 'fellow_up.calls_id')
+            ->where('calls.id', $call_id)
+            ->first();
         }
         else if($additionalValue == "Quotation Fellow Up")
         {
-
-        }
-        else if($additionalValue == "Processed Lead")
-        {
-
+            $calls = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
+            ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+            ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+            ->join('quotations', 'calls.id', '=', 'quotations.calls_id')
+            ->where('calls.id', $call_id)
+            ->first();
         }
         else
         {
-
+            $calls = Calls::join('lead_source', 'calls.source', '=', 'lead_source.id')
+            ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+            ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+            ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+            ->join('prospectings', 'calls.id', '=', 'prospectings.calls_id')
+            ->where('calls.id', $call_id)
+            ->first();
         }
-        return view('dailyleads.notificationsviews', compact('data', 'additionalValue'));
+        return view('dailyleads.notificationsviews', compact('calls', 'additionalValue', 'call_id'));
     }
     public function updateStatus(Request $request)
 {
