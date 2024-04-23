@@ -2,7 +2,7 @@
 @include('layouts.formstyle')
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','current-user-create-joining-report']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','current-user-create-joining-report','dept-emp-create-joining-report']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">

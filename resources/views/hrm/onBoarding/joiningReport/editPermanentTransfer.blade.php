@@ -2,11 +2,11 @@
 @include('layouts.formstyle')
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-joining-report']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-permanent-joining-report']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Create Permanent Internal Transfer Joining Report</h4>
+	<h4 class="card-title"> Edit Permanent Internal Transfer Joining Report</h4>
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee_joining_report.index','permanent') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
@@ -20,8 +20,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-j
 		</ul>
 	</div>
 	@endif
-	<form id="perIntTransjoiningReportForm" name="perIntTransjoiningReportForm" enctype="multipart/form-data" method="POST" action="{{route('joining_report.store')}}">
+	<form id="perIntTransjoiningReportForm" name="perIntTransjoiningReportForm" enctype="multipart/form-data" method="POST" action="{{route('joining_report.update',$data->id)}}">
 		@csrf
+        @method('PUT')
 		<div class="card">
 			<div class="card-body">
 				<div class="row">
@@ -31,22 +32,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-j
 							<label for="employee_id" class="col-form-label text-md-end">{{ __('Employee Name') }}</label>
 							<select name="employee_id" id="employee_id" multiple="true" class="employee_id form-control widthinput" onchange="" autofocus>
 								@foreach($employees as $employee)
-								<option value="{{$employee->id}}">{{$employee->name}}</option>
+								<option value="{{$employee->id}}" @if($employee->id == $data->employee_id) selected @endif>{{$employee->name}}</option>
 								@endforeach
 							</select>
 						</div>
 					</div>
 					<div class="col-xxl-3 col-lg-4 col-md-4" id="employee_code_div">
 						<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
-						<center><span id="employee_code"></span></center>
+						<center><span id="employee_code">{{$data->user->empProfile->employee_code ?? ''}}</span></center>
 					</div>
 					<div class="col-xxl-3 col-lg-4 col-md-4" id="designation_div">
 						<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
-						<center><span id="designation"></span></center>
+						<center><span id="designation">{{$data->user->empProfile->designation->name ?? ''}}</span></center>
 					</div>
 					<div class="col-xxl-3 col-lg-4 col-md-4" id="department_div">
 						<center><label for="department" class="col-form-label text-md-end"><strong>{{ __('Department') }}</strong></label></center>
-						<center><span id="department"></span></center>
+						<center><span id="department">{{$data->user->empProfile->department->name ?? ''}}</span></center>
 					</div>
 				</div>
 			</div>
@@ -59,15 +60,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-j
 				<div class="row">
 					<input type="hidden" name="joining_type" value="internal_transfer">
 					<input type="hidden" name="internal_transfer_type" value="permanent">
-					<input type="hidden" name="transfer_from_department_id" id="transfer_from_department_id" value="">
-					<input type="hidden" name="transfer_from_location_id" id="transfer_from_location_id" value="">
+					<input type="hidden" name="transfer_from_department_id" id="transfer_from_department_id" value="{{$data->transfer_from_department_id ?? ''}}">
+					<input type="hidden" name="transfer_from_location_id" id="transfer_from_location_id" value="{{$data->transfer_from_location_id ?? ''}}">
 					<div class="col-xxl-4 col-lg-4 col-md-4" id="transfer_from_department_name_div">
 						<div><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Transfer From Department') }}</strong></label></div>
-						<div><span id="transfer_from_department_name"></span></div>
+						<div><span id="transfer_from_department_name">{{$data->user->empProfile->department->name ?? ''}}</span></div>
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4" id="transfer_from_location_name_div">
 						<div><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Transfer From Location') }}</strong></label></div>
-						<div><span id="transfer_from_location_name" value=""></span></div>
+						<div><span id="transfer_from_location_name" value="">{{$data->user->empProfile->location->name ?? ''}}</span></div>
 					</div>
 				</div>
 				</br>
@@ -78,7 +79,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-j
 							<label for="transfer_to_department_id" class="col-form-label text-md-end">{{ __('Transfer To Department') }}</label>
 							<select name="transfer_to_department_id" id="transfer_to_department_id" multiple="true" class="form-control widthinput" onchange="" autofocus>
 								@foreach($masterDepartments as $department)
-								<option id="tranfer_to_{{$department->id}}" value="{{$department->id}}">{{$department->name}}</option>
+								<option id="tranfer_to_{{$department->id}}" value="{{$department->id}}" @if($department->id == $data->transfer_to_department_id) selected @endif>{{$department->name}}</option>
 								@endforeach
 							</select>
 						</div>
@@ -89,7 +90,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-j
 							<label for="joining_location" class="col-form-label text-md-end">{{ __('Transfer To Location') }}</label>
 							<select name="joining_location" id="joining_location" multiple="true" class="form-control widthinput" onchange="" autofocus>
 								@foreach($masterlocations as $location)
-								<option value="{{$location->id}}">{{$location->name}}</option>
+								<option value="{{$location->id}}" @if($location->id == $data->joining_location) selected @endif>{{$location->name}}</option>
 								@endforeach
 							</select>
 						</div>
@@ -98,7 +99,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-j
 						<span class="error">* </span>
 						<label for="joining_date" class="col-form-label text-md-end">{{ __('Joining Date') }}</label>
 						<input id="joining_date" type="date" class="form-control widthinput @error('joining_date') is-invalid @enderror" name="joining_date"
-							placeholder="Joining Date" value="" autocomplete="joining_date" autofocus>
+							placeholder="Joining Date" value="{{$data->joining_date ?? ''}}" autocomplete="joining_date" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4 radio-main-div" id="change_reporting_manager_div">
 						<span class="error">* </span>
@@ -106,12 +107,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-j
 						<fieldset style="margin-top:5px;" class="radio-div-container">
 							<div class="row some-class">
 								<div class="col-xxl-6 col-lg-6 col-md-6">
-									<input type="radio" class="type" name="team_lead_or_reporting_manager" value="" id="department_head" />
-									<label for="department_head" id="department_head_label"></label>
+									<input type="radio" class="type" name="team_lead_or_reporting_manager" value="{{$data->transferToDepartment->department_head_id ?? ''}}" id="department_head" @if($data->transferToDepartment->department_head_id == $data->new_reporting_manager) checked @endif/>
+									<label for="department_head" id="department_head_label">{{$data->transferToDepartment->departmentHead->name ?? ''}}</label>
 								</div>
 								<div class="col-xxl-6 col-lg-6 col-md-6" id="rep_div">
-									<input type="radio" class="type" name="team_lead_or_reporting_manager" value="" id="division_head" />
-									<label for="division_head" id="division_head_label"></label>
+									<input type="radio" class="type" name="team_lead_or_reporting_manager" value="{{$data->transferToDepartment->division->division_head_id ?? ''}}" id="division_head" @if($data->transferToDepartment->division->division_head_id == $data->new_reporting_manager) checked @endif/>
+									<label for="division_head" id="division_head_label">{{$data->transferToDepartment->division->divisionHead->name ?? ''}}</label>
 								</div>
 							</div>
 						</fieldset>
@@ -122,7 +123,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-j
 						<label for="additional_remarks" class="col-form-label text-md-end">{{ __('Remarks') }}</label>
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
-						<textarea rows="5" name="remarks" placeholder="Enter Remarks" class="form-control"></textarea>
+						<textarea rows="5" name="remarks" placeholder="Enter Remarks" class="form-control">{{$data->remarks ?? ''}}</textarea>
 					</div>
 				</div>
 			</div>
@@ -145,15 +146,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-j
 <script type="text/javascript">
 	var employees = {!! json_encode($employees) !!};
 	var masterDeartments = {!! json_encode($masterDepartments) !!}
-	var oldEmpIdp ='';
+    var data = {!! json_encode($data) !!}
+	var oldEmpId ='';
+    // var oldTeamLead = '';
 	$(document).ready(function () {
-	    $('#employee_code_div').hide();
-		$('#designation_div').hide();
-		$('#department_div').hide();
-	    $('#transfer_from_department_name_div').hide();
-		$('#transfer_from_location_name_div').hide();
-	    $('#change_reporting_manager_div').hide();
-		$('#rep_div').hide();
+        // oldTeamLead = 
+	    // $('#employee_code_div').hide();
+		// $('#designation_div').hide();
+		// $('#department_div').hide();
+	    // $('#transfer_from_department_name_div').hide();
+		// $('#transfer_from_location_name_div').hide();
+	    // $('#change_reporting_manager_div').hide();
+		// $('#rep_div').hide();
 	    $('#employee_id').select2({
 	        allowClear: true,
 	        maximumSelectionLength: 1,
@@ -179,13 +183,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-j
 							if(masterDeartments[i].department_head != null && masterDeartments[i].department_head.name != null && masterDeartments[i].department_head_id != null) {
 								document.getElementById('department_head').value=masterDeartments[i].department_head_id;  
 							    document.getElementById('department_head_label').textContent=masterDeartments[i].department_head.name;  
+                                if(masterDeartments[i].department_head_id == data.new_reporting_manager) {
+                                    $('#department_head').prop('checked', true);
+                                }
+                                else {
+                                    $('#department_head').prop('checked', false);
+                                }
 							}	
 							if(masterDeartments[i].department_head != null && masterDeartments[i].department_head_id != null && masterDeartments[i].division != null && masterDeartments[i].division.division_head_id != null && masterDeartments[i].division != null &&
 							masterDeartments[i].division.division_head != null && masterDeartments[i].division.division_head.name != null) {
 								if(masterDeartments[i].department_head_id != masterDeartments[i].division.division_head_id) {
 									$('#rep_div').show();
 									document.getElementById('division_head').value=masterDeartments[i].division.division_head_id;  
-									document.getElementById('division_head_label').textContent=masterDeartments[i].division.division_head.name;  
+									document.getElementById('division_head_label').textContent=masterDeartments[i].division.division_head.name; 
+                                    if(masterDeartments[i].division.division_head_id == data.new_reporting_manager) {
+                                        $('#division_head').prop('checked', true);
+                                    } 
+                                    else {
+                                        $('#division_head').prop('checked', false);
+                                    }
 								}
 								else {
 									$('#rep_div').hide();
@@ -244,7 +260,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-j
 				$('#department_div').hide();
 				$('#transfer_from_department_name_div').hide();
 				$('#transfer_from_location_name_div').hide();
-				document.getElementById('employee_code').textContent=''; 
+				document.getElementById('employee_code').textContent=""; 
 				document.getElementById('designation').textContent=''; 
 				document.getElementById('department').textContent='';   
 				document.getElementById('transfer_from_department_id').value='';  
