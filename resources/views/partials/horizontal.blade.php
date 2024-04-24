@@ -150,7 +150,7 @@
                                             @if ($hasPermission)
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('employee.index')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility"> Employees</span>
-                                                <div class="arrow-down"></div>
+                                                <!-- <div class="arrow-down"></div> -->
                                             </a>
                                             <!-- <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                                 @php
