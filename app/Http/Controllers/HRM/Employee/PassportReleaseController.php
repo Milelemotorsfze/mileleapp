@@ -97,9 +97,9 @@ class PassportReleaseController extends Controller
     }
     public function edit($id) {
         $data = PassportRelease::where('id',$id)->first();
-        $Users = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->get();
+        $Users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->whereHas('empProfile')->get();
         $masterEmployees = [];
-        $currentUser = User::where('status','active')->whereNotIn('id',[1,16])->where('id',$data->employee_id)->first();        
+        $currentUser = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->where('id',$data->employee_id)->first();        
         if($currentUser) {
             array_push($masterEmployees,$currentUser);  
         }
@@ -159,6 +159,9 @@ class PassportReleaseController extends Controller
             $update->release_action_by_department_head = $request->status;
             if($request->status == 'approved') {
                 $update->release_action_by_division_head = 'pending';
+                $employee1 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                $divisionHead1 = MasterDivisionWithHead::where('id',$employee1->department->division_id)->first();
+                $update->release_division_head_id = $divisionHead1->approval_handover_to;
                 $message = 'Employee passport release request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';
             }
         }
@@ -168,6 +171,8 @@ class PassportReleaseController extends Controller
             $update->release_action_by_division_head = $request->status;
             if($request->status == 'approved') {
                 $update->release_action_by_hr_manager = 'pending';
+                $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                $update->release_hr_manager_id = $HRManager->handover_to_id;
                 $message = 'Employee passport release request send to HR Manager ( '.$update->hrManager->name.' - '.$update->hrManager->email.' ) for approval';
             }
         }

@@ -97,10 +97,10 @@
                                 ,'edit-job-description','edit-current-user-job-description','view-pending-job-description-list','view-current-user-pending-job-description-list','view-approved-job-description-list','view-current-user-approved-job-description-list','view-rejected-job-description-list','view-current-user-rejected-job-description-list','view-job-description-details','view-current-user-job-description-details','view-job-description-approvals-details','view-current-user-job-description-approvals-details',
                                 'view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing','create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary','view-division-listing','view-current-user-division'
                                 ,'view-department-listing','view-current-user-department-lising','division-approval-listing','view-asset-allocation-request-listing'
-                                ,'view-joining-report-listing','current-user-view-joining-report-listing','view-passport-request-list','current-user-view-passport-request-list'
+                                ,'view-joining-report-listing','dept-emp-view-joining-report-listing','current-user-view-joining-report-listing','view-permanent-joining-report-listing','view-current-user-permanent-joining-report-listing','view-passport-request-list','current-user-view-passport-request-list'
                                 ,'view-liability-list','current-user-view-liability-list','view-leave-list','view-current-user-leave-list'
                                 ,'list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'
-                                ,'list-all-overtime','list-current-user-overtime']);
+                                ,'list-all-overtime','list-current-user-overtime','view-all-employee-listing']);
                                 @endphp
                                 @if ($hasPermission)
                                 <li class="nav-item dropdown">
@@ -141,6 +141,37 @@
                                                 <a href="{{ route('designation-approvals.index') }}" class="dropdown-item" data-key="t-login">Designation Approvals</a>
                                                 @endif
                                             </div>
+                                            @endif
+                                        </div>
+                                        <div class="dropdown">
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-listing']);
+                                            @endphp
+                                            @if ($hasPermission)
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('employee.index')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Employees</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <!-- <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-listing','view-current-user-division']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('division.index') }}" class="dropdown-item" data-key="t-login">Division Approvals</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-listing','view-current-user-department-lising']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('department.index') }}" class="dropdown-item" data-key="t-login">Department Approvals</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['division-approval-listing']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('designation-approvals.index') }}" class="dropdown-item" data-key="t-login">Designation Approvals</a>
+                                                @endif
+                                            </div> -->
                                             @endif
                                         </div>
                                         <div class="dropdown">
@@ -204,7 +235,7 @@
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing','dept-emp-view-joining-report-listing']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('employee_joining_report.index','new_employee') }}" class="dropdown-item" data-key="t-login">Joining Report</a>
@@ -269,7 +300,7 @@
                                         @endif
                                         <div class="dropdown">
                                             @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing','view-permanent-joining-report-listing','view-current-user-permanent-joining-report-listing','dept-emp-view-joining-report-listing']);
                                             @endphp
                                             @if ($hasPermission)
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
@@ -278,12 +309,22 @@
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                                 @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing']);
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing','dept-emp-view-joining-report-listing']);
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('employee_joining_report.index','new_employee') }}" class="dropdown-item" data-key="t-login">New Employee</a>
                                                 <a href="{{ route('employee_joining_report.index','temporary') }}" class="dropdown-item" data-key="t-login">Temporary Internal Transfer</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-permanent-joining-report-listing','view-current-user-permanent-joining-report-listing']);
+                                                @endphp
+                                                @if ($hasPermission)
                                                 <a href="{{ route('employee_joining_report.index','permanent') }}" class="dropdown-item" data-key="t-login">Permanent Internal Transfer</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-listing','current-user-view-joining-report-listing','dept-emp-view-joining-report-listing']);
+                                                @endphp
+                                                @if ($hasPermission)
                                                 <a href="{{ route('employee_joining_report.index','vacations_or_leave') }}" class="dropdown-item" data-key="t-login">Vacations Or Leave</a>
                                                 @endif
                                             </div>
@@ -1269,7 +1310,15 @@
                                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicles.viewall') }}" id="topnav-more" role="button">
                                         <i data-feather="server"></i>
                                         <span data-key="t-extra-pages">Stock Report</span>
+                                        <div class="arrow-down"></div>
                                     </a>
+                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                    <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.statuswise')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Status Wise</span>
+                                            </a>
+                                            </div>        
+                                            </div>
                                 </li>
                                 @endif
                                 @php
@@ -1377,6 +1426,15 @@
                         <div class="dropdown-divider"></div>
                         @endif
                         @endcanany
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('lead-notification');
+                        @endphp
+                        @if ($hasPermission)
+                        <a class="dropdown-item" href="{{ route('leadsnotifications.index') }}">
+                            <i class="fa fa-bullhorn" aria-hidden="true"></i> Notifications
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        @endif
                         @canany(['master-module-list', 'master-module-create', 'master-module-edit'])
                         @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-module-list', 'master-module-create', 'master-module-edit']);

@@ -15,6 +15,7 @@ use App\Models\ModelHasRoles;
 use App\Models\SalesPersonLaugauges;
 use Monarobase\CountryList\CountryListFacade;
 use App\Models\Brand;
+use App\Models\LeadsNotifications;
 use App\Models\Country;
 use App\Models\Language;
 use App\Models\LeadSource;
@@ -474,6 +475,13 @@ $sales_person_id = $lowest_lead_sales_person->model_id;
         $lastRecord = Calls::where('created_by', $data['created_by'])
                    ->orderBy('id', 'desc')
                    ->first();
+        $leads_notifications = New LeadsNotifications();
+        $leads_notifications->calls_id = $lastRecord->id;
+        $leads_notifications->remarks = "New Assign Lead";
+        $leads_notifications->status = "New";
+        $leads_notifications->user_id = $sales_person_id;
+        $leads_notifications->category = "New Assign Lead";
+        $leads_notifications->save();
         $table_id = $lastRecord->id;
         $modelLineIds = $request->input('model_line_ids');
 
@@ -933,6 +941,13 @@ return view('calls.resultbrand', compact('data'));
                 $call->status = "New";
                 $call->location = $row[3];
                 $call->save(); 
+                $leads_notifications = New LeadsNotifications();
+                $leads_notifications->calls_id =  $call->id;
+                $leads_notifications->remarks = "New Assign Lead";
+                $leads_notifications->status = "New";
+                $leads_notifications->user_id = $sales_person_id;
+                $leads_notifications->category = "New Assign Lead";
+                $leads_notifications->save();
                 if ($model_line_name !== null) {
                     $modelLine = MasterModelLines::where('model_line', $model_line_name)->first();
                     if ($modelLine) {

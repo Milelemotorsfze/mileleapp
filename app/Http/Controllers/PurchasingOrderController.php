@@ -52,7 +52,8 @@ class PurchasingOrderController extends Controller
             // add migrated user Ids
             $Ids = ['16'];
             $Ids[] = $userId;
-            $data = PurchasingOrder::with('purchasing_order_items')->whereIn('id', $demandPlanningPoIds)
+            $data = PurchasingOrder::with('purchasing_order_items')
+            // ->whereIn('id', $demandPlanningPoIds)
                                                 ->get();
         }else{
             $data = PurchasingOrder::with('purchasing_order_items')->orderBy('id', 'desc')->get();
@@ -66,11 +67,14 @@ class PurchasingOrderController extends Controller
             // add migrated user Ids
             $Ids = ['16'];
             $Ids[] = $userId;
-            $data = PurchasingOrder::with('purchasing_order_items')->whereIn('created_by', $Ids)
-                                                ->whereIn('id', $demandPlanningPoIds)
+            $data = PurchasingOrder::with('purchasing_order_items')
+                                                // ->whereIn('created_by', $Ids)
+                                                // ->whereIn('id', $demandPlanningPoIds)
                                                 ->get();
         }else{
-            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)->orderBy('id', 'desc')->get();
+            $data = PurchasingOrder::with('purchasing_order_items')
+            // ->where('created_by', $userId)->orWhere('created_by', 16)
+            ->orderBy('id', 'desc')->get();
         }
     }
         return view('warehouse.index', compact('data'));
@@ -98,10 +102,10 @@ class PurchasingOrderController extends Controller
         }
         else{
         $data = PurchasingOrder::with('purchasing_order_items')->where('purchasing_order.status', 'Approved')
-        ->where(function ($query) use ($userId) {
-            $query->where('purchasing_order.created_by', $userId)
-                ->orWhere('purchasing_order.created_by', 16);
-        })
+        // ->where(function ($query) use ($userId) {
+        //     $query->where('purchasing_order.created_by', $userId)
+        //         ->orWhere('purchasing_order.created_by', 16);
+        // })
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
@@ -139,10 +143,10 @@ class PurchasingOrderController extends Controller
     }
         else{
             $data = PurchasingOrder::with('purchasing_order_items')
-            ->where(function ($query) use ($userId) {
-                $query->where('purchasing_order.created_by', $userId)
-                    ->orWhere('purchasing_order.created_by', 16);
-            })
+            // ->where(function ($query) use ($userId) {
+            //     $query->where('purchasing_order.created_by', $userId)
+            //         ->orWhere('purchasing_order.created_by', 16);
+            // })
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('vehicles')
@@ -182,10 +186,10 @@ class PurchasingOrderController extends Controller
 else
 {
     $data = PurchasingOrder::with('purchasing_order_items')
-    ->where(function ($query) use ($userId) {
-        $query->where('purchasing_order.created_by', $userId)
-            ->orWhere('purchasing_order.created_by', 16);
-    })
+    // ->where(function ($query) use ($userId) {
+    //     $query->where('purchasing_order.created_by', $userId)
+    //         ->orWhere('purchasing_order.created_by', 16);
+    // })
     ->where('status', $status)
     ->whereNotExists(function ($query) {
         $query->select(DB::raw(1))
@@ -239,10 +243,10 @@ else
     else
     {
         $data = PurchasingOrder::with('purchasing_order_items')
-        ->where(function ($query) use ($userId) {
-            $query->where('purchasing_order.created_by', $userId)
-                ->orWhere('purchasing_order.created_by', 16);
-        })
+        // ->where(function ($query) use ($userId) {
+        //     $query->where('purchasing_order.created_by', $userId)
+        //         ->orWhere('purchasing_order.created_by', 16);
+        // })
         ->where('purchasing_order.status', $status)
         ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
         ->where('vehicles.payment_status', 'Payment Initiated')
@@ -268,10 +272,10 @@ else
     else
     {
         $data = PurchasingOrder::with('purchasing_order_items')
-        ->where(function ($query) use ($userId) {
-            $query->where('purchasing_order.created_by', $userId)
-                ->orWhere('purchasing_order.created_by', 16);
-        })
+        // ->where(function ($query) use ($userId) {
+        //     $query->where('purchasing_order.created_by', $userId)
+        //         ->orWhere('purchasing_order.created_by', 16);
+        // })
         ->where('purchasing_order.status', $status)
         ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
         ->where('vehicles.status', 'Request for Payment')
@@ -297,10 +301,10 @@ else
         else
         {
             $data = PurchasingOrder::with('purchasing_order_items')
-            ->where(function ($query) use ($userId) {
-                $query->where('purchasing_order.created_by', $userId)
-                    ->orWhere('purchasing_order.created_by', 16);
-            })
+            // ->where(function ($query) use ($userId) {
+            //     $query->where('purchasing_order.created_by', $userId)
+            //         ->orWhere('purchasing_order.created_by', 16);
+            // })
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where('vehicles.payment_status', 'Payment Initiated Request')
@@ -325,7 +329,8 @@ else
         }
         else
         {
-            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+            $data = PurchasingOrder::with('purchasing_order_items')
+            // ->where('created_by', $userId)->orWhere('created_by', 16)
             ->where('purchasing_order.status', $status)
             ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
             ->where('vehicles.payment_status', 'Payment Release Approved')
@@ -355,7 +360,8 @@ else
     }
     else
     {
-        $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+        $data = PurchasingOrder::with('purchasing_order_items')
+        // ->where('created_by', $userId)->orWhere('created_by', 16)
         ->where('status', $status)
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
@@ -390,7 +396,8 @@ $data = PurchasingOrder::with('purchasing_order_items')
 }
 else
 {
-    $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+    $data = PurchasingOrder::with('purchasing_order_items')
+    // ->where('created_by', $userId)->orWhere('created_by', 16)
     ->where('status', $status)
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
@@ -425,7 +432,8 @@ $data = PurchasingOrder::with('purchasing_order_items')
 }
 else
 {
-    $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->orWhere('created_by', 16)
+    $data = PurchasingOrder::with('purchasing_order_items')
+    // ->where('created_by', $userId)->orWhere('created_by', 16)
     ->where('status', $status)
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
@@ -489,7 +497,7 @@ public function getBrandsAndModelLines(Request $request)
         $po_type = $request->input('po_type');
         $vendors_id = $request->input('vendors_id');
         $purchasingOrder = new PurchasingOrder();
-        $purchasingOrder->po_date = $poDate;
+        $purchasingOrder->po_date = $poDate; 
         $purchasingOrder->vendors_id = $vendors_id;
         $purchasingOrder->po_type = $po_type;
         $purchasingOrder->payment_term_id = $request->input('payment_term_id');

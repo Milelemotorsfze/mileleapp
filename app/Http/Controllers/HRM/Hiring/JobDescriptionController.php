@@ -222,6 +222,8 @@ class JobDescriptionController extends Controller
                 $update->action_by_department_head = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_hr_manager = 'pending';
+                    $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                    $update->hr_manager_id = $HRManager->handover_to_id;
                     $message = 'Employee hiring request send to HR Manager ( '.$update->hrManagerName->name.' - '.$update->hrManagerName->email.' ) for approval';
                 }
             }

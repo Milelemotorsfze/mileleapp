@@ -62,50 +62,31 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-6 col-sm-12">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label"> Minimum QTY/ Passport </label>
-                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"  name="min_qty_per_passport" >
-                                </div>
-                            </div>
+
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Maximum QTY/ Passport </label>
-                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"  name="max_qty_per_passport" >
+                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"
+                                           placeholder="Maximum Quantity / Passport" name="max_qty_per_passport" >
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Minimum QTY/ Company </label>
-                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"  name="min_qty_for_company" >
+                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"
+                                           placeholder="Minimum Quantity / Company" name="min_qty_for_company" >
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> Maximum QTY/ Company </label>
-                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"  name="max_qty_for_company" >
+                                    <input type="number" class="form-control widthinput"  step="1" oninput="validity.valid||(value='');" min="1"
+                                           placeholder="Maximum Quantity / Company" name="max_qty_for_company" >
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <label for="choices-single-default" class="form-label"> Is LOI Can be Created for Only Company? </label>
                                 <select class="form-control widthinput" multiple name="is_only_company_allowed" id="is_only_company_allowed" autofocus>
-                                    <option value="{{ \App\Models\LoiCountryCriteria::YES }}">Yes</option>
-                                    <option value="{{ \App\Models\LoiCountryCriteria::NO }}"> No </option>
-                                    <option value="{{ \App\Models\LoiCountryCriteria::NONE }}" > None </option>
-                                </select>
-                            </div>
-
-                            <div class="col-lg-3 col-md-6 col-sm-12">
-                                <label for="choices-single-default" class="form-label">  Is able to Inflate Quantity ?</label>
-                                <select class="form-control widthinput" multiple name="is_inflate_qty" id="is_inflate_qty" autofocus>
-                                    <option value="{{ \App\Models\LoiCountryCriteria::YES }}">Yes</option>
-                                    <option value="{{ \App\Models\LoiCountryCriteria::NO }}"> No </option>
-                                    <option value="{{ \App\Models\LoiCountryCriteria::NONE }}" > None </option>
-                                </select>
-                            </div>
-                            <div class="col-lg-3 col-md-6 col-sm-12">
-                                <label for="choices-single-default" class="form-label">  Lead time is More  ?</label>
-                                <select class="form-control widthinput" multiple name="is_longer_lead_time" id="is_longer_lead_time" autofocus>
                                     <option value="{{ \App\Models\LoiCountryCriteria::YES }}">Yes</option>
                                     <option value="{{ \App\Models\LoiCountryCriteria::NO }}"> No </option>
                                     <option value="{{ \App\Models\LoiCountryCriteria::NONE }}" > None </option>

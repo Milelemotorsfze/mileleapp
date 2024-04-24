@@ -76,7 +76,7 @@
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label ">Customer</label>
+                        <label for="choices-single-default" class="form-label">Customer</label>
                         <select class="form-control widthinput @error('customer_id') is-invalid @enderror" name="customer_id" id="customer" >
                         </select>
                         @error('customer_id')
@@ -195,7 +195,11 @@
                 </div>
             </div>
             <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
-                <span id="country-comment"></span>
+                <span id="country-comment"></span><br>
+                <span class="error" id="max-individual-quantity-error"></span>
+                <span class="error" id="min-company-quantity-error"></span>
+                <span class="error" id="max-company-quantity-error"></span>
+                <span class="error" id="company-only-allowed-error"></span>
             </div>
             <div class="row">
                 <div class="card p-2" >
@@ -250,6 +254,7 @@
                                     <label class="form-label">Quantity</label>
                                     <input type="number" name="quantity[]" placeholder="Quantity"  maxlength="5" data-index="1" class="form-control widthinput quantities text-dark"
                                            step="1" oninput="validity.valid||(value='');" min="1" id="quantity-1">
+{{--                                    <span class="error quantity-error"></span>--}}
                                 </div>
                                 <div class="col-lg-1 col-md-6 col-sm-12">
                                     <label class="form-label">Inventory Qty</label>
@@ -388,15 +393,6 @@
             return this.valid();
         };
 
-        $('#submit-button').click(function (e) {
-            e.preventDefault();
-            if (formValid == true) {
-                if($("#form-create").valid()) {
-                    $('#form-create').unbind('submit').submit();
-                }
-
-            }
-        });
 
         $('#country').select2({
             placeholder : 'Select Country',
@@ -404,12 +400,15 @@
             maximumSelectionLength: 1
         }).on('change', function() {
             getCustomers();
-            checkCountryCriterias()
+            checkCountryCriterias();
+            // validationCheck();
         });
 
         $('#customer-type').change(function (){
             getCustomers();
             checkCountryCriterias();
+            // validationCheck();
+
         });
         $('#model-1').select2({
             placeholder: 'Select Model',
@@ -439,36 +438,86 @@
             getModels('all','dealer-change');
         });
 
-        function checkCountryCriterias() {
+        $('#customer-type').change(function () {
+            checkCountryCriterias();
+        });
 
+        $(document.body).on('input', ".quantities", function (e) {
+            checkCountryCriterias();
+        });
+
+        function checkCountryCriterias() {
             let url = '{{ route('loi-country-criteria.check') }}';
             var country = $('#country').val();
             var customer_type = $('#customer-type').val();
-
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "json",
-                data: {
-                    country_id: country,
-                    customer_type: customer_type
-                },
-                success:function (data) {
-                    if(data.comment) {
-                        $('#country-comment-div').attr('hidden', false);
-                        $('#country-comment').html(data.comment);
-                    }else{
-                        $('#country-comment-div').attr('hidden', true);
-                    }
-                    if(data.customer_type_error) {
-                        formValid = false;
-                        $('#customer-type-error').html(data.customer_type_error);
-                    }else{
-                        formValid = true;
-                        $('#customer-type-error').attr('hidden', true);
-                    }
+            let total_quantities = 0;
+            $(".quantities ").each(function(){
+                if($(this).val() > 0) {
+                    total_quantities += parseInt($(this).val());
                 }
+
             });
+
+            if(country.length > 0 && customer_type.length > 0 && total_quantities > 0) {
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        country_id: country,
+                        customer_type: customer_type,
+                        total_quantities:total_quantities
+                    },
+                    success:function (data) {
+                        console.log(data);
+                        if(data.comment) {
+                            $('#country-comment-div').attr('hidden', false);
+                            $('#country-comment').html(data.comment);
+                        }
+                        else{
+                            $('#country-comment-div').attr('hidden', true);
+                        }
+                        formValid = true;
+                        if(data.customer_type_error) {
+                            formValid = false;
+                            $('#customer-type-error').html(data.customer_type_error);
+                        }
+                        else{
+                            $('#customer-type-error').attr('hidden', true);
+                        }
+                        if (data.max_qty_per_passport_error) {
+                            formValid = false;
+                            // $('#quantity-error-div').attr('hidden', false);
+                            $('#max-individual-quantity-error').html(data.max_qty_per_passport_error);
+                        } else {
+                            // formValid = true;
+                            // $('#quantity-error-div').attr('hidden', true);
+                            $('#max-individual-quantity-error').html('');
+                        }
+                        if(data.min_qty_per_company_error) {
+                            formValid = false;
+                            $('#min-company-quantity-error').html(data.min_qty_per_company_error);
+                        }else{
+                            // formValid = true;
+                            $('#min-company-quantity-error').html('');
+                        }
+                        if(data.max_qty_per_company_error) {
+                            formValid = false;
+                            $('#max-company-quantity-error').html(data.max_qty_per_company_error);
+                        }else{
+                            // formValid = true;
+                            $('#max-company-quantity-error').html('');
+                        }
+                        if(data.company_only_allowed_error) {
+                            formValid = false;
+                            $('#company-only-allowed-error').html(data.company_only_allowed_error);
+                        }else{
+                            // formValid = true;
+                            $('#company-only-allowed-error').html('');
+                        }
+                    }
+                });
+            }
         }
         function getCustomers() {
             var country = $('#country').val();
@@ -602,6 +651,7 @@
                     <div class="col-lg-1 col-md-6 col-sm-12">
                         <input type="number" name="quantity[]" placeholder="Quantity" maxlength="5" class="form-control widthinput text-dark quantities"
                                step="1" oninput="validity.valid||(value='');" min="1" data-index="${index}" id="quantity-${index}">
+
                     </div>
                     <div class="col-lg-1 col-md-6 col-sm-12">
                         <input type="number" readonly id="inventory-quantity-${index}" data-index="${index}" value="" class="form-control widthinput inventory-qty" >
@@ -719,6 +769,7 @@
             hideModelYear(index, value);
 
         });
+
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
 
@@ -978,6 +1029,16 @@
                 $('#dealer').attr("disabled", false);
             }
        }
+        $('#submit-button').click(function (e) {
+            e.preventDefault();
+            if (formValid == true) {
+                if($("#form-create").valid()) {
+                    $('#form-create').unbind('submit').submit();
+                }
+            }else{
+                e.preventDefault();
+            }
+        });
 
     </script>
 @endpush

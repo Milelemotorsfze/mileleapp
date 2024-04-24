@@ -68,9 +68,9 @@
 							<label class="form-label font-size-13">To Be Replaced By :</label>
 						</div>
 						<div class="col-lg-9 col-md-9 col-sm-9">
-							<select class="form-control widthinput" name="to_be_replaced_by" id="to_be_replaced_by_{{$data->id}}">
+							<select class="form-control widthinput to_be_replaced_by" name="to_be_replaced_by" multiple id="to_be_replaced_by_{{$data->id}}" style="width:100%;">
 								@foreach($leavePersonReplacedBy as $employee)
-								<option value="{{$employee->id}}">{{$employee->name}}</option>
+								<option value="{{$employee->id}}" @if($employee->id == $data->employee_id) disabled @endif>{{$employee->name}}</option>
 								@endforeach
 							</select>
 						</div>
@@ -136,7 +136,7 @@
 									<label class="form-label font-size-13">Comments</label>
 								</div>
 								<div class="col-lg-12 col-md-12 col-sm-12">
-									<textarea rows="5" id="comment-{{$data->id}}" class="form-control" name="comment"></textarea>
+									<textarea rows="5" id="reject-comment-{{$data->id}}" class="form-control" name="comment"></textarea>
 								</div>
 							</div>
 						</div>
@@ -153,89 +153,102 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function () {
+		var countReportingManagerPendings = 0;
+		countReportingManagerPendings = ReportingManagerPendings.length;
+		if(countReportingManagerPendings > 0 ) {
+			for(var i=0; i<countReportingManagerPendings; i++) {
+				$('#to_be_replaced_by_'+ReportingManagerPendings[i].id).select2({
+					allowClear: true,
+					placeholder:"Choose To Be Replaced By Employee name",
+					dropdownParent: $('#approve-employee-leave-request-'+ReportingManagerPendings[i].id)
+				});
+			}
+		}
+		var comment = '';
 	    $('.status-reject-button').click(function (e) {
-	     var id = $(this).attr('data-id');
-	     var status = $(this).attr('data-status');
-	     approveOrRejectHiringrequest(id, status)
-	 })
-	 $('.status-approve-button').click(function (e) {
-	     var id = $(this).attr('data-id');
-	var status = $(this).attr('data-status');
-	if($("#current_approve_position_"+id).val() == 'Employee') {
-	var isChecked=$("#comment-check-"+id).is(":checked");
-	if(isChecked == true) {
-		removeAddonTypeError(id);
-		approveOrRejectHiringrequest(id, status)
-	}
-	else {
-		showAddonTypeError(id);
-	}
-	}
-	else {
-	approveOrRejectHiringrequest(id, status)
-	}
-	 })
-	function showAddonTypeError(id) {
-	document.getElementById("checkError_"+id).textContent='Please check the box';
-	document.getElementById("comment-check-"+id).classList.add("is-invalid");
-	document.getElementById("checkError_"+id).classList.add("paragraph-class");
-	}
-	function removeAddonTypeError(id) {
-	document.getElementById("checkError_"+id).textContent="";
-	document.getElementById("comment-check-"+id).classList.remove("is-invalid");
-	document.getElementById("checkError_"+id).classList.remove("paragraph-class");
-	}
-	    function approveOrRejectHiringrequest(id, status) {
-	var comment = $("#comment-"+id).val();
-	var current_approve_position = $("#current_approve_position_"+id).val();
-	if(current_approve_position == 'Employee') {
-	var isChecked = $("#comment-check-"+id).val();
-	if(isChecked == 'on') {
-		comment = "I do confirm that I will report back to duty on the due date as approved by the Management, otherwise the Company will consider me as an absentee as per the Law.";
-	}
-	}
-	var others = '';
-	if(current_approve_position == 'HR Manager') {
-	others = $("others_"+id).val();
-	}
-	var to_be_replaced_by = '';
-	if(current_approve_position == 'Reporting Manager') {
-	to_be_replaced_by = $("#to_be_replaced_by_"+id).val();
-	}
-	     let url = '{{ route('leaveRequest.action') }}'; 
-	     if(status == 'rejected') {
-	         var message = 'Reject';
-	     }else{
-	         var message = 'Approve';
-	     }
-	     var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee leave request ?',function (e) {
-	         if (e) {
-	             $.ajax({
-	                 type: "POST",
-	                 url: url,
-	                 dataType: "json",
-	                 data: {
-	                     id: id,
-	                     status: status,
-	                     comment: comment,
-				others: others,
-				current_approve_position: current_approve_position,
-				to_be_replaced_by: to_be_replaced_by,
-	                     _token: '{{ csrf_token() }}'
-	                 },
-	                 success: function (data) {
-				if(data == 'success') {
-					window.location.reload();
-					alertify.success(status + " Successfully")
+			var id = $(this).attr('data-id');
+			var status = $(this).attr('data-status');
+			comment = $("#reject-comment-"+id).val();
+			approveOrRejectLeaveRequest(id, status,comment)
+		})
+		$('.status-approve-button').click(function (e) {
+			var id = $(this).attr('data-id');
+			var status = $(this).attr('data-status');
+			comment = $("#comment-"+id).val();
+			if($("#current_approve_position_"+id).val() == 'Employee') {
+				var isChecked=$("#comment-check-"+id).is(":checked");
+				if(isChecked == true) {
+					removecheckedError(id);
+					approveOrRejectLeaveRequest(id, status,comment)
 				}
-				else if(data == 'error') {
-	
+				else {
+					showcheckedError(id);
 				}
-	                 }
-	             });
-	         }
-	
-	     }).set({title:"Confirmation"})
-	 }
+			}
+			else {
+				approveOrRejectLeaveRequest(id, status,comment)
+			}
+		})
+		function showcheckedError(id) {
+		document.getElementById("checkError_"+id).textContent='Please check the box';
+		document.getElementById("comment-check-"+id).classList.add("is-invalid");
+		document.getElementById("checkError_"+id).classList.add("paragraph-class");
+		}
+		function removecheckedError(id) {
+		document.getElementById("checkError_"+id).textContent="";
+		document.getElementById("comment-check-"+id).classList.remove("is-invalid");
+		document.getElementById("checkError_"+id).classList.remove("paragraph-class");
+		}
+		function approveOrRejectLeaveRequest(id, status,comment) { 
+			var current_approve_position = $("#current_approve_position_"+id).val(); 
+			if(current_approve_position == 'Employee') {
+				var isChecked = $("#comment-check-"+id).val();
+				if(isChecked == 'on' && status == 'approved') {
+					comment = "I do confirm that I will report back to duty on the due date as approved by the Management, otherwise the Company will consider me as an absentee as per the Law.";
+				}
+			}
+			var others = '';
+			if(current_approve_position == 'HR Manager') {
+				others = $("#others_"+id).val();
+			}
+			var to_be_replaced_by = '';
+			if(current_approve_position == 'Reporting Manager') {
+				to_be_replaced_by = $("#to_be_replaced_by_"+id).val();
+			}
+			let url = '{{ route('leaveRequest.action') }}'; 
+			if(status == 'rejected') {
+				var message = 'Reject';
+			}
+			else {
+				var message = 'Approve';
+			}
+			var confirm = alertify.confirm('Are you sure you want to '+ message +' this employee leave request ?',function (e) {
+				if (e) {
+					$.ajax({
+						type: "POST",
+						url: url,
+						dataType: "json",
+						data: {
+							id: id,
+							status: status,
+							comment: comment,
+							others: others,
+							current_approve_position: current_approve_position,
+							to_be_replaced_by: to_be_replaced_by,
+							_token: '{{ csrf_token() }}'
+						},
+						success: function (data) {
+							if(data == 'success') {
+								window.location.reload();
+								alertify.success(status + " Successfully")
+							}
+							else if(data == 'error') {
+				
+							}
+						}
+					});
+				}
+			}).set({title:"Confirmation"})
+		}
 	});
 </script>

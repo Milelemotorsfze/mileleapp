@@ -1,5 +1,20 @@
 @extends('layouts.table')
 <style>
+	tr {
+	border:1px solid #e9e9ef !important;
+	}
+	td {
+	padding-top:10px!important;
+	padding-bottom:10px!important;
+	padding-right:10px!important;
+	padding-left:10px!important;
+	}
+	th {
+	padding-top:10px!important;
+	padding-bottom:10px!important;
+	padding-right:10px!important;
+	padding-left:10px!important;
+	}
 	.texttransform {
 	text-transform: capitalize;
 	}
@@ -137,6 +152,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 								<span>{{$data->user->advance_or_loan_balance ?? ''}} AED</span>
 							</div>
+							<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+								<label for="choices-single-default" class="form-label"> Others :</label>
+							</div>
+							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+								<span>{{$data->others ?? ''}}</span>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -205,6 +226,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 							</div>
 							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 								<span>{{ $data->no_of_unpaid_days ?? '' }}</span>
+							</div>
+							<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+								<label for="choices-single-default" class="form-label"> To Be Replaced By :</label>
+							</div>
+							<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+								<span>{{$data->toBeReplacedBy->name ?? ''}}</span>
 							</div>
 						</div>
 					</div>
@@ -310,7 +337,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 											Comments :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
-											{{$data->comments_by_employee ?? ''}}
+										@if($data->employee_action_at != '' && ($data->action_by_employee == 'approved' OR $data->action_by_employee == 'rejected')) {{$data->comments_by_employee ?? ''}} @endif
 										</div>
 									</div>
 								</div>
@@ -347,17 +374,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 											{{ \Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s') }}
 											@endif
 										</div>
+										@if($data->action_by_hr_manager == 'approved')
 										<div class="col-lg-2 col-md-12 col-sm-12">
 											Others :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
 											{{$data->others ?? ''}}
 										</div>
+										@endif
 										<div class="col-lg-2 col-md-12 col-sm-12">
 											Comments :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
-											{{$data->comments_by_hr_manager ?? ''}}
+										@if($data->hr_manager_action_at != '') {{$data->comments_by_hr_manager ?? ''}} @endif
 										</div>
 									</div>
 								</div>
@@ -394,17 +423,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 											{{ \Carbon\Carbon::parse($data->department_head_action_at)->format('d M Y, H:i:s') }}
 											@endif
 										</div>
+										@if($data->action_by_department_head =='approved')
 										<div class="col-lg-2 col-md-12 col-sm-12">
 											To Be Replaced By :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
 											{{$data->toBeReplacedBy->name ?? ''}}
 										</div>
+										@endif
 										<div class="col-lg-2 col-md-12 col-sm-12">
 											Comments :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
-											{{$data->comments_by_department_head ?? ''}}
+										@if($data->department_head_action_at != '') {{$data->comments_by_department_head ?? ''}} @endif
 										</div>
 									</div>
 								</div>
@@ -445,12 +476,76 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details
 											Comments :
 										</div>
 										<div class="col-lg-10 col-md-12 col-sm-12">
-											{{$data->comments_by_division_head ?? ''}}
+										@if($data->division_head_action_at != '') {{$data->comments_by_division_head ?? ''}} @endif
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
+					</div>
+				</div>
+			</div>
+			<div class="card">
+				<div class="card-header">
+					<h4 class="card-title">Other Leave Informations</h4>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<table>
+							<thead>
+								<tr>
+									<th>Sl No</th>
+									<th>Request Date</th>
+									<th>Leave Type</th>
+									<th>Start Date</th>
+									<th>End Date</th>
+									<th>Total Days</th>
+									<th>Paid Days</th>
+									<th>Unpaid Days</th>
+									<th>Replaced By</th>
+									<th>Status</th>
+									<th>Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								<div hidden>{{$i=0;}}</div>
+								@foreach($all as $one)
+								<tr>
+									<td>{{ ++$i }}</td>
+									<td>
+										@if($one->created_at != '')
+										{{\Carbon\Carbon::parse($one->created_at)->format('d M Y') ?? ''}}
+										@endif
+									</td>
+									<td>{{ $one->leave_type ?? ''}} @if($one->type_of_leave_description != '') ( {{ $one->type_of_leave_description ?? ''}} ) @endif</td>
+									<td>
+										@if($one->leave_start_date != '')
+										{{\Carbon\Carbon::parse($one->leave_start_date)->format('d M Y') ?? ''}}
+										@endif
+									</td>
+									<td>
+										@if($one->leave_end_date != '')
+										{{\Carbon\Carbon::parse($one->leave_end_date)->format('d M Y') ?? ''}}
+										@endif
+									</td>
+									<td>{{ $one->total_no_of_days ?? ''}}</td>
+									<td>{{ $one->no_of_paid_days ?? ''}}</td>
+									<td>{{ $one->no_of_unpaid_days ?? ''}}</td>
+									<td>{{ $one->toBeReplacedBy->name ?? ''}}</td>
+									<td>{{ $one->status ?? ''}}</td>
+									<td>@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-leave-details','current-user-view-leave-details']);
+										@endphp
+										@if ($hasPermission) 
+										<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_leave.show',$one->id)}}">
+											<i class="fa fa-eye" aria-hidden="true"></i> 
+											</a>
+										
+										@endif</td>
+								</tr>
+								@endforeach
+							</tbody>
+						</table>
 					</div>
 				</div>
 			</div>

@@ -23,7 +23,7 @@
 </style>
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details','current-user-view-joining-report-details']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details','current-user-view-joining-report-details','view-permanent-joining-report-details','view-current-user-permanent-joining-report-details',]);
 @endphp
 @if ($hasPermission)
 <div class="card-header">

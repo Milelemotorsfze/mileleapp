@@ -11,7 +11,8 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        return view('hrm.employee_relation.dashboard');
+        $activeEmployees = EmployeeProfile::where('current_status','active')->where('type','employee')->orderBy('first_name','ASC')->get();
+        return view('hrm.employee.index',compact('activeEmployees'));
     }
 
     public function create()
