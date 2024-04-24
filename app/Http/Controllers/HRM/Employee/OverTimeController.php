@@ -316,6 +316,9 @@ class OverTimeController extends Controller
                 $update->action_by_department_head = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_division_head = 'pending';
+                    $employee1 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                $divisionHead1 = MasterDivisionWithHead::where('id',$employee1->department->division_id)->first();
+                $update->division_head_id = $divisionHead1->approval_handover_to;
                     $message = 'Employee OverTime Request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';
                 }
             }
@@ -325,6 +328,8 @@ class OverTimeController extends Controller
                 $update->action_by_division_head = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_hr_manager = 'pending';
+                    $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                    $update->hr_manager_id = $HRManager->handover_to_id;
                     $message = 'Employee OverTime Request send to HR Manager ( '.$update->hrManager->name.' - '.$update->hrManager->email.' ) for approval';
                 }
             }

@@ -139,6 +139,8 @@ class EmployeeLeaveController extends Controller
             $update->action_by_employee = $request->status;
             if($request->status == 'approved') {
                 $update->action_by_hr_manager = 'pending';
+                $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                $update->hr_manager_id = $HRManager->handover_to_id;
                 $message = 'Employee passport submit request send to HR Manager ( '.$update->hrManager->name.' - '.$update->hrManager->email.' ) for approval';
             }
         }
@@ -162,6 +164,9 @@ class EmployeeLeaveController extends Controller
             if($request->status == 'approved') {
                 $update->action_by_division_head = 'pending';
                 $update->to_be_replaced_by = $request->to_be_replaced_by[0];
+                $employee1 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                $divisionHead1 = MasterDivisionWithHead::where('id',$employee1->department->division_id)->first();
+                $update->division_head_id = $divisionHead1->approval_handover_to;
                 $message = 'Employee passport submit request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';
             }
             else if($request->status == 'rejected') {    

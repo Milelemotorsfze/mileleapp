@@ -145,6 +145,37 @@
                                         </div>
                                         <div class="dropdown">
                                             @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-listing','view-current-user-division','division-approval-listing','view-department-listing','view-current-user-department-lising']);
+                                            @endphp
+                                            @if ($hasPermission)
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('employee.index')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Employees</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <!-- <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-listing','view-current-user-division']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('division.index') }}" class="dropdown-item" data-key="t-login">Division Approvals</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-department-listing','view-current-user-department-lising']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('department.index') }}" class="dropdown-item" data-key="t-login">Department Approvals</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['division-approval-listing']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('designation-approvals.index') }}" class="dropdown-item" data-key="t-login">Designation Approvals</a>
+                                                @endif
+                                            </div> -->
+                                            @endif
+                                        </div>
+                                        <div class="dropdown">
+                                            @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hiring-request','edit-employee-hiring-request','edit-current-user-hiring-request','view-all-pending-hiring-request-listing',
                                             'view-all-approved-hiring-request-listing','view-all-closed-hiring-request-listing','view-all-on-hold-hiring-request-listing',
                                             'view-all-cancelled-hiring-request-listing','view-all-rejected-hiring-request-listing','view-pending-hiring-request-listing-of-current-user',

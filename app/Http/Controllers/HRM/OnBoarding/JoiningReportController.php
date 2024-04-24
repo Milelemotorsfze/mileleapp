@@ -543,6 +543,8 @@ class JoiningReportController extends Controller
                 $update->action_by_employee = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_hr_manager = 'pending';
+                    $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                $update->hr_manager_id = $HRManager->handover_to_id;
                     $message = 'Interview Summary Report send to HR Manager ( '.$update->hr->name.' - '.$update->hr->email.' ) for approval';
                 }else {
                     $update->status = 'rejected';
