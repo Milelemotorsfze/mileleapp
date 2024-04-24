@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('export:csv')->monthlyOn(date('t'), '00:00');
         $schedule->command('email:send-daily-activity')->dailyAt('18:00');
-        $schedule->command('leads:reassign')->hourly();
+        $schedule->command('leads:reassign')->hourly()->appendOutputTo(storage_path('logs/leads_reassign.log'));
     }
 
     /**
