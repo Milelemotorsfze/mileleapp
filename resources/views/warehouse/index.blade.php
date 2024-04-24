@@ -95,10 +95,7 @@ th.nowrap-td {
         @endphp
         @else
         @php
-        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->where(function($query) use ($userId) {
-        $query->where('created_by', $userId)
-              ->orWhere('created_by', 16);
-        })
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')
         ->count();
         @endphp
         @endif
@@ -129,10 +126,6 @@ th.nowrap-td {
         @php
         $userId = auth()->user()->id;
         $alreadyapproved = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-        $query->where('created_by', $userId)
-              ->orWhere('created_by', 16);
-    })
     ->where('purchasing_order.status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
@@ -181,11 +174,7 @@ th.nowrap-td {
     ->whereExists(function ($query) use ($userId) {
         $query->select(DB::raw(1))
             ->from('purchasing_order')
-            ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-            ->where(function ($query) use ($userId) {
-                $query->where('purchasing_order.created_by', $userId)
-                    ->orWhere('purchasing_order.created_by', 16);
-            });
+            ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id');
     })
     ->where(function ($query) {
         $query->where('status', 'Request for Payment')
@@ -227,10 +216,6 @@ th.nowrap-td {
         @else
         @php
     $completedPos = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-        $query->where('created_by', $userId)
-              ->orWhere('created_by', 16);
-    })
     ->where('purchasing_order.status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
@@ -303,10 +288,6 @@ th.nowrap-td {
         @else
         @php
         $pendingpaymentrelsa = DB::table('purchasing_order')
-        ->where(function ($query) use ($userId) {
-            $query->where('purchasing_order.created_by', $userId)
-                ->orWhere('purchasing_order.created_by', 16);
-        })
                 ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -360,10 +341,6 @@ th.nowrap-td {
         @else
         @php
         $pendingreleasereqs = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-            $query->where('purchasing_order.created_by', $userId)
-                ->orWhere('purchasing_order.created_by', 16);
-        })
     ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -407,10 +384,6 @@ th.nowrap-td {
         @else
         @php
     $pendingdebitaps = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-            $query->where('purchasing_order.created_by', $userId)
-                ->orWhere('purchasing_order.created_by', 16);
-        })
     ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -447,7 +420,7 @@ th.nowrap-td {
     <td style="font-size: 12px;">
         @php
         $userId = auth()->user()->id;
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-approval');
         @endphp
         @if ($hasPermission)
         @php
@@ -495,10 +468,6 @@ th.nowrap-td {
         @else
         @php
         $pendingints = DB::table('purchasing_order')
-        ->where(function ($query) use ($userId) {
-                $query->where('purchasing_order.created_by', $userId)
-                    ->orWhere('purchasing_order.created_by', 16);
-            })
             ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -554,10 +523,6 @@ th.nowrap-td {
 @else
 @php
 $pendingvendorfol = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-        $query->where('created_by', $userId)
-              ->orWhere('created_by', 16);
-    })
     ->where('status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
@@ -605,10 +570,6 @@ $pendingvendorfol = DB::table('purchasing_order')
 @else
 @php
 $pendingvendorfol = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-        $query->where('created_by', $userId)
-              ->orWhere('created_by', 16);
-    })
     ->where('status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
@@ -656,10 +617,6 @@ $pendingvendorfol = DB::table('purchasing_order')
 @else
 @php
 $pendingvendorfol = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-        $query->where('created_by', $userId)
-              ->orWhere('created_by', 16);
-    })
     ->where('status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))

@@ -14,6 +14,7 @@ use App\Models\Rejection;
 use App\Models\Closed;
 use App\Models\LeadSource;
 use App\Models\Brand;
+use App\Models\Fellowup;
 use App\Models\PreOrder;
 use App\Models\So;
 use App\Models\Prospecting;
@@ -85,6 +86,33 @@ class DailyleadsController extends Controller
                 ->groupby('pre_orders.id')
                 ->get();
                 return DataTables::of($preorders)->toJson();  
+            }
+            else if($status === "followup")
+            {
+                $fellowup = Fellowup::select([
+                    'calls.id',
+                    'fellow_up.time',
+                    \DB::raw("DATE_FORMAT(fellow_up.date, '%d %b %Y') as datefol"),
+                    'fellow_up.method',
+                    'calls.name',
+                    'calls.phone',
+                    'calls.email',
+                    'calls.remarks',
+                    'calls.type',
+                    'calls.location',
+                    'calls.language',
+                    'master_model_lines.model_line',
+                    'brands.brand_name',
+                    \DB::raw("DATE_FORMAT(calls.created_at, '%d %b %Y') as leaddate"),
+                    'fellow_up.sales_notes'
+                ])
+                ->leftJoin('calls', 'fellow_up.calls_id', '=', 'calls.id')
+                ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
+                ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+                ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                ->groupby('calls.id')
+                ->get();
+                return DataTables::of($fellowup)->toJson();  
             }
             else
             {
@@ -636,5 +664,49 @@ public function saveprospecting(Request $request)
     ->get();
     $demands = Salesdemand::where('calls_id', $calls_id)->get();
     return view('dailyleads.singleleadview', compact('calls', 'prospecting', 'quotations', 'demands', 'negotiations', 'closed', 'bookingDetails'));
-    }  
+    }
+    public function savefollowup(Request $request)
+	{
+        info($request->date);
+        $callsid = $request->callId;
+        $callupdate = Calls::find($callsid);
+        $callupdate->status = "Follow Up";
+        $callupdate->save();
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Change the Lead into Follow Up";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        $followup = new Fellowup();
+        $followup->date = $request->has('date') ? $request->date : '';
+        $followup->time = $request->has('time') ? $request->time : '';
+        $followup->method = $request->has('method') ? $request->method : '';
+        $followup->sales_notes = $request->has('salesNotes') ? $request->salesNotes : '';
+        $followup->calls_id = $callsid;
+        $followup->save();
+        return response()->json(['success' => true]);
+	}
+    public function savefollowupdate(Request $request)
+	{
+        info($request->date);
+        $callsid = $request->callId;
+        $callupdate = Calls::find($callsid);
+        $callupdate->status = "Follow Up";
+        $callupdate->save();
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Change the Lead into Follow Up";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        $followup = Fellowup::where('calls_id', $callsid)->first();
+        $followup->date = $request->has('date') ? $request->date : '';
+        $followup->time = $request->has('time') ? $request->time : '';
+        $followup->method = $request->has('method') ? $request->method : '';
+        $followup->sales_notes = $request->has('salesNotes') ? $request->salesNotes : '';
+        $followup->save();
+        return response()->json(['success' => true]);
+	} 
+    public function followupgetdata($id)
+    {
+        $data = Fellowup::where('calls_id', $id)->first();
+        return response()->json($data);
+    } 
 }

@@ -2,12 +2,12 @@
 @include('layouts.formstyle')
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','current-user-create-joining-report']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','current-user-create-joining-report','dept-emp-create-joining-report']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
 	<h4 class="card-title"> Create Temporary Internal Transfer Joining Report</h4>
-	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee-hiring-request.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee_joining_report.index','temporary') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
 	@if (count($errors) > 0)
@@ -146,128 +146,165 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 	var oldEmpId ='';
 	$(document).ready(function () {
 	    $('#employee_code_div').hide();
-	$('#designation_div').hide();
-	$('#department_div').hide();
-	$('#transfer_from_department_name_div').hide();
-	$('#transfer_from_location_name_div').hide();
+		$('#designation_div').hide();
+		$('#department_div').hide();
+		$('#transfer_from_department_name_div').hide();
+		$('#transfer_from_location_name_div').hide();
 	    $('#employee_id').select2({
 	        allowClear: true,
 	        maximumSelectionLength: 1,
 	        placeholder:"Choose Employee Name",
 	    });
-	$('#joining_location').select2({
-	        allowClear: true,
-	maximumSelectionLength: 1,
+		$('#joining_location').select2({
+	    	allowClear: true,
+			maximumSelectionLength: 1,
 	        placeholder:"Choose Joining Location",
 	    });
 	    $('#transfer_to_department_id').select2({
 	        allowClear: true,
-	maximumSelectionLength: 1,
+			maximumSelectionLength: 1,
 	        placeholder:"Choose Transfer To Department",
 	    });	
-	$('.employee_id').change(function (e) {
-	var employeeId = $('#employee_id').val();
-	if(employeeId != '') {
-	if(employees.length > 0) {
-		for(var i=0; i<employees.length; i++) {						
-			if(employees[i].id == employeeId) {
-				$('#employee_code_div').show();
-	                        $('#designation_div').show();
-	                        $('#department_div').show();
-				$('#transfer_from_department_name_div').show();
-				$('#transfer_from_location_name_div').show();
-				if(employees[i].emp_profile != null && employees[i].emp_profile.employee_code != null) {
-					document.getElementById('employee_code_name').textContent=employees[i].emp_profile.employee_code;     
-					document.getElementById('employee_code').value=employees[i].emp_profile.employee_code;                        
-				}
-				if(employees[i].emp_profile != null && employees[i].emp_profile.designation != null && employees[i].emp_profile.designation.name != null) {
-					document.getElementById('designation').textContent=employees[i].emp_profile.designation.name;
-				}
-				if(employees[i].emp_profile != null && employees[i].emp_profile.department != null && employees[i].emp_profile.department.name != null) {
-					document.getElementById('department').textContent=employees[i].emp_profile.department.name;  
-					document.getElementById('transfer_from_department_id').value=employees[i].emp_profile.department_id;  
-					document.getElementById('transfer_from_department_name').textContent=employees[i].emp_profile.department.name; 
-					oldEmpId = employees[i].emp_profile.department_id;
-				}
-				if(employees[i].emp_profile != null && employees[i].emp_profile.work_location != null && employees[i].emp_profile.location.name != null) {
-					document.getElementById('transfer_from_location_id').value=employees[i].emp_profile.work_location;  
-					document.getElementById('transfer_from_location_name').textContent=employees[i].emp_profile.location.name;  
-				}
+		$('.employee_id').change(function (e) {
+			var employeeId = $('#employee_id').val();
+			if(employeeId != '') {
+				if(employees.length > 0) {
+					for(var i=0; i<employees.length; i++) {						
+						if(employees[i].id == employeeId) {
+							$('#employee_code_div').show();
+							$('#designation_div').show();
+							$('#department_div').show();
+							$('#transfer_from_department_name_div').show();
+							$('#transfer_from_location_name_div').show();
+							if(employees[i].emp_profile != null && employees[i].emp_profile.employee_code != null) {
+								document.getElementById('employee_code_name').textContent=employees[i].emp_profile.employee_code;     
+								document.getElementById('employee_code').value=employees[i].emp_profile.employee_code;                        
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.designation != null && employees[i].emp_profile.designation.name != null) {
+								document.getElementById('designation').textContent=employees[i].emp_profile.designation.name;
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.department != null && employees[i].emp_profile.department.name != null) {
+								document.getElementById('department').textContent=employees[i].emp_profile.department.name;  
+								document.getElementById('transfer_from_department_id').value=employees[i].emp_profile.department_id;  
+								document.getElementById('transfer_from_department_name').textContent=employees[i].emp_profile.department.name; 
+								oldEmpId = employees[i].emp_profile.department_id;
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.work_location != null && employees[i].emp_profile.location.name != null) {
+								document.getElementById('transfer_from_location_id').value=employees[i].emp_profile.work_location;  
+								document.getElementById('transfer_from_location_name').textContent=employees[i].emp_profile.location.name;  
+							}
+						}
+					}
+				}               
 			}
-		}
-	}               
-	}
-	else {
-	$('#employee_code_div').hide();
-	$('#designation_div').hide();
-	            $('#department_div').hide();
-	$('#transfer_from_department_name_div').hide();
-	$('#transfer_from_location_name_div').hide();
-	document.getElementById('employee_code_name').textContent=''; 
-	document.getElementById('employee_code').textContent=''; 
-	document.getElementById('designation').textContent=''; 
-	document.getElementById('department').textContent='';   
-	document.getElementById('transfer_from_department_id').value='';  
-	document.getElementById('transfer_from_department_name').textContent=''; 
-	document.getElementById('transfer_from_location_id').value=''; 
-	document.getElementById('transfer_from_location_name').textContent='';   
-	}			
+			else {
+				$('#employee_code_div').hide();
+				$('#designation_div').hide();
+				$('#department_div').hide();
+				$('#transfer_from_department_name_div').hide();
+				$('#transfer_from_location_name_div').hide();
+				document.getElementById('employee_code_name').textContent=''; 
+				document.getElementById('employee_code').textContent=''; 
+				document.getElementById('designation').textContent=''; 
+				document.getElementById('department').textContent='';   
+				document.getElementById('transfer_from_department_id').value='';  
+				document.getElementById('transfer_from_department_name').textContent=''; 
+				document.getElementById('transfer_from_location_id').value=''; 
+				document.getElementById('transfer_from_location_name').textContent='';   
+			}			
+		});
 	});
-	});
-	jQuery.validator.setDefaults({
-	    errorClass: "is-invalid",
-	    errorElement: "p",     
-	});
-	jQuery.validator.addMethod("greaterStart", function (value, element, params) {
-	    var startDate = $('#transfer_from_date').val();
-	    var endDate = $('#joining_date').val();
-	
-	    if( startDate >= endDate) {
-	        return false;
-	    }else{
-	        return true;
-	    }
-	},'Must be greater than start date.');
-	jQuery.validator.addMethod("deptLoc", function (value, element, params) {
-	var fromDept = '';
+	// jQuery.validator.setDefaults({
+	//     errorClass: "is-invalid",
+	//     errorElement: "p",     
+	// });
+	// jQuery.validator.addMethod("greaterStart", function (value, element, params) {
+	//     var startDate = $('#transfer_from_date').val();
+	//     var endDate = $('#joining_date').val();
+	//     if( startDate >= endDate) {
+	//         return false;
+	//     }
+	// 	else {
+	//         return true;
+	//     }
+	// },'Must be greater than start date.');
+	$.validator.addMethod("deptLoc", function (value, element, params) {
+		var fromDept = '';
 	    var fromLoc = '';
-	var toDept = '';
+		var toDept = '';
 	    var toLoc = '';
 	    fromDept = $('#transfer_from_department_id').val();
 	    fromLoc = $('#transfer_from_location_id').val();
-	toDept = $('#transfer_to_department_id').val();
+		toDept = $('#transfer_to_department_id').val();
 	    toLoc = $('#joining_location').val();
 	    if(fromDept == toDept && fromLoc == toLoc) {
 	        return false;
-	    }else{
+	    }
+		else {
 	        return true;
 	    }
-	},"can't transfer to the same departmenta and location");
+		// return this.optional(element) || (fromDept != toDept || fromLoc != toLoc);
+	},"can't transfer to the same department and location");
+
+	// Adding a custom validation method named "endDateGreater"
+    $.validator.addMethod("endDateGreater", function(value, element) {
+        var startDate = $('#transfer_from_date').val();
+        var endDate = value;
+        var start = new Date(startDate);
+        var end = new Date(endDate);
+        // Check if end date is greater than start date
+        return this.optional(element) || end >= start;
+    }, "End date must be greater than or equal to start date.");
+
+	$.validator.addMethod("dateExist", function(value, element) {
+	    var result = false;
+		var transfer_from_date = $('#transfer_from_date').val(); 
+		var joining_date = $('#joining_date').val(); 
+		var employee_id = $("#employee_id").val();
+		$.ajax({
+			type:"POST",
+			async: false,
+			url: "{{route('temptransfer.checkTempDateExist')}}", // script to validate in server side
+			data: {transfer_from_date: transfer_from_date,
+			joining_date: joining_date,
+			employee_id: employee_id,
+			_token: '{{csrf_token()}}'},
+			success: function(data) {
+				result = (data == true) ? true : false;
+			}
+		});
+		return result; 
+	}, "This date range is already exist in the system, Please select another.");
+
 	$('#joiningReportForm').validate({ 
 	    rules: {
 	        employee_id: {
-	required: true,
-	},
-	joining_date: {
-	required: true,
-	greaterStart: true,
-	},
+				required: true,
+			},
+			joining_date: {
+				required: true,
+				date: true, 
+				endDateGreater: true, // Custom rule for comparing dates
+				dateExist: true,
+			},
 	        joining_location: {
 	            required: true,
-	deptLoc: true,
+				deptLoc: true,
 	        },
 	        transfer_from_date: {
 	            required: true,
+				date: true,
+				// dateExist: true,
 	        },
 	        transfer_to_department_id: {
 	            required: true,
 	        },
 	    },
-	errorPlacement: function ( error, element ) {
-	        error.addClass( "invalid-feedback font-size-13" );
-	
-	if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
-	            if (!element.val() || element.val().length === 0) {
+		errorPlacement: function ( error, element ) {
+			error.addClass( "invalid-feedback font-size-13" );
+			if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+				console.log(element.val().length);
+	            if (!element.val() || element.val().length === 0 || element.val().length > 0) {
 	                console.log("Error is here with length", element.val().length);
 	                error.addClass('select-error');
 	                error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
@@ -278,7 +315,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 	        else {
 	            error.insertAfter( element );
 	        }
-	    }
+		}
 	});
 </script>
 @endsection

@@ -7,7 +7,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 @if ($hasPermission)
 <div class="card-header">
 	<h4 class="card-title"> Edit New Employee Joining Report</h4>
-	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee-hiring-request.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee_joining_report.index','new_employee') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
 	@if (count($errors) > 0)
@@ -44,11 +44,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 					</div>
 					<div class="col-xxl-3 col-lg-4 col-md-4" id="designation_div">
 						<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
-						<center><span id="designation">{{$data->employee->designation->name ?? ''}}</span></center>
+						<center><span id="designation">{{$data->candidate->designation->name ?? ''}}</span></center>
 					</div>
 					<div class="col-xxl-3 col-lg-4 col-md-4" id="department_div">
 						<center><label for="department" class="col-form-label text-md-end"><strong>{{ __('Department') }}</strong></label></center>
-						<center><span id="department">{{$data->employee->department->name ?? ''}}</span></center>
+						<center><span id="department">{{$data->candidate->department->name ?? ''}}</span></center>
 					</div>
 				</div>
 			</div>
