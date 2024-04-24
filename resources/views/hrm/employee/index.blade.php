@@ -34,7 +34,7 @@
 @section('content')
 <div class="card-header">
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing']);
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-listing']);
 	@endphp
 	@if ($hasPermission)
 	<h4 class="card-title">
@@ -42,7 +42,7 @@
 	</h4>
 	@endif
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-interview-summary-report','requestedby-create-interview-summary','organizedby-create-interview-summary']);
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['']);
 	@endphp
 	@if ($hasPermission)
 	<a style="float: right;" class="btn btn-sm btn-success" href="">
@@ -74,7 +74,7 @@
 	@endif
 </div>
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-listing']);
 @endphp
 @if ($hasPermission)
 <div class="portfolio">
@@ -231,7 +231,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->countryMaster->nationality ?? $data->countryMaster->name ?? $data->countryMaster->iso_3166_code ?? ''}}</td>
 
 							<td>{{$data->company_number ?? ''}}</td>
-							<td>{{$data->contact_number ?? ''}}</td>
+							<td></td>
 							<td>{{$data->personal_email_address ?? ''}}</td>
 							<td>{{$data->user->email ?? ''}}</td>
 							<td>{{$data->name_of_father ?? ''}}</td>
@@ -262,7 +262,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<td>{{$data->passport_status_name ?? ''}}</td>
 							<td></td>
 							<td>{{$data->visaType->name ?? ''}}</td>
-							<td>{{$data->visa_number ?? ''}}</td>
+							<td></td>
 							<td>@if($data->visa_issue_date != ''){{\Carbon\Carbon::parse($data->visa_issue_date)->format('d M Y')}}@endif</td>
 							<td>@if($data->visa_expiry_date != ''){{\Carbon\Carbon::parse($data->visa_expiry_date)->format('d M Y')}}@endif</td>
 							<td>@if($data->reminder_date_for_visa_renewal != ''){{\Carbon\Carbon::parse($data->reminder_date_for_visa_renewal)->format('d M Y')}}@endif</td>
