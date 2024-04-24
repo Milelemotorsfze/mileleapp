@@ -100,7 +100,7 @@
                                 ,'view-joining-report-listing','dept-emp-view-joining-report-listing','current-user-view-joining-report-listing','view-permanent-joining-report-listing','view-current-user-permanent-joining-report-listing','view-passport-request-list','current-user-view-passport-request-list'
                                 ,'view-liability-list','current-user-view-liability-list','view-leave-list','view-current-user-leave-list'
                                 ,'list-all-increment','list-current-user-increment','view-birthday-po-list','view-ticket-listing','view-ticket-listing-of-current-user','view-all-list-insurance'
-                                ,'list-all-overtime','list-current-user-overtime']);
+                                ,'list-all-overtime','list-current-user-overtime','view-all-employee-listing']);
                                 @endphp
                                 @if ($hasPermission)
                                 <li class="nav-item dropdown">
@@ -145,7 +145,7 @@
                                         </div>
                                         <div class="dropdown">
                                             @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-division-listing','view-current-user-division','division-approval-listing','view-department-listing','view-current-user-department-lising']);
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-listing']);
                                             @endphp
                                             @if ($hasPermission)
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('employee.index')}}" id="topnav-utility" role="button">
