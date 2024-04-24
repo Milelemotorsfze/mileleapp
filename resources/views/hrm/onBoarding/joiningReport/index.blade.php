@@ -1,7 +1,7 @@
 @extends('layouts.table')
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','current-user-create-joining-report','edit-joining-report','current-user-edit-joining-report','view-joining-report-listing','current-user-view-joining-report-listing']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','dept-emp-create-joining-report','create-permanent-joining-report','current-user-create-joining-report','edit-joining-report','edit-permanent-joining-report','current-user-edit-joining-report','view-joining-report-listing','current-user-view-joining-report-listing','dept-emp-view-joining-report-listing']);
 @endphp
 @if ($hasPermission)                                           
 <div class="card-header">
@@ -9,7 +9,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 		@if($type == 'new_employee') New Employee @elseif($type == 'temporary') Temporary Internal Transfer @elseif($type == 'permanent') Permanent Internal Transfer @elseif($type == 'vacations_or_leave') Vacations Or Leave @endif Joining Report Info
 	</h4>
 	@php
-	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','current-user-create-joining-report']);
+	$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','dept-emp-create-joining-report','create-permanent-joining-report','current-user-create-joining-report']);
 	@endphp
 	@if ($hasPermission)
 	<a style="float: right;" class="btn btn-sm btn-success" href="{{route('create_joining_report.create',$type) }}">
@@ -43,7 +43,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 <div class="portfolio">
 	<ul class="nav nav-pills nav-fill" id="my-tab">
 		@php
-		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-report','current-user-edit-joining-report','view-joining-report-listing','current-user-view-joining-report-listing']);
+		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-report','edit-permanent-joining-report','current-user-edit-joining-report','view-joining-report-listing','current-user-view-joining-report-listing','dept-emp-view-joining-report-listing']);
 		@endphp
 		@if ($hasPermission)
 		<li class="nav-item">
@@ -162,7 +162,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
 										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details','current-user-view-joining-report-details']);
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details','view-permanent-joining-report-details','view-current-user-permanent-joining-report-details','current-user-view-joining-report-details']);
 										@endphp
 										@if ($hasPermission) 
 										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
@@ -172,7 +172,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 										@endif
 										@if($data->department_head_action_at == NULL)
 										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-report','current-user-edit-joining-report']);
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-report','edit-permanent-joining-report','current-user-edit-joining-report']);
 										@endphp
 										@if ($hasPermission) 
 										<li>
@@ -315,7 +315,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
 							<td>
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details','current-user-view-joining-report-details']);
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details','current-user-view-joining-report-details','view-permanent-joining-report-details','view-current-user-permanent-joining-report-details',]);
 								@endphp
 								@if ($hasPermission) 
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
@@ -427,7 +427,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<td>@if(isset($data) && isset($data->preparedBy)) {{ $data->preparedBy->name ?? '' }} @endif</td>
 							<td>
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details','current-user-view-joining-report-details']);
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details','current-user-view-joining-report-details','view-permanent-joining-report-details','view-current-user-permanent-joining-report-details',]);
 								@endphp
 								@if ($hasPermission) 
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">

@@ -465,6 +465,8 @@ class EmployeeHiringRequestController extends Controller
                 $update->action_by_department_head = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_hiring_manager = 'pending';
+                    $RecruitingManager = ApprovalByPositions::where('approved_by_position','Recruiting Manager')->first();
+                $update->recruiting_manager_id = $RecruitingManager->handover_to_id;
                     $message = 'Employee hiring request send to Recruiting Manager ( '.$update->hr_manager_name.' - '.$update->hr_manager_email.' ) for approval';
                 }
             }
@@ -474,6 +476,9 @@ class EmployeeHiringRequestController extends Controller
                 $update->action_by_hiring_manager = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_division_head = 'pending';
+                    $employee1 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                $divisionHead1 = MasterDivisionWithHead::where('id',$employee1->department->division_id)->first();
+                $update->division_head_id = $divisionHead1->approval_handover_to;
                     $message = 'Employee hiring request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';
                 }
             }
@@ -483,6 +488,8 @@ class EmployeeHiringRequestController extends Controller
                 $update->action_by_division_head = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_hr_manager = 'pending';
+                    $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                $update->hr_manager_id = $HRManager->handover_to_id;
                     $message = 'Employee hiring request send to HR Manager ( '.$update->hr_manager_name.' - '.$update->hr_manager_email.' ) for approval';
                 }
             }

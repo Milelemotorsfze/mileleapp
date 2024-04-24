@@ -492,6 +492,9 @@ class InterviewSummaryReportController extends Controller
                 $update->action_by_hr_manager = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_division_head = 'pending';
+                    $employee1 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                    $divisionHead1 = MasterDivisionWithHead::where('id',$employee1->department->division_id)->first();
+                    $update->division_head_id = $divisionHead1->approval_handover_to;
                     $message = 'Interview Summary Report send to Division Head ( '.$update->divisionHeadName->name.' - '.$update->divisionHeadName->email.' ) for approval';
                 }
             }
