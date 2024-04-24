@@ -231,7 +231,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td>{{$data->countryMaster->nationality ?? $data->countryMaster->name ?? $data->countryMaster->iso_3166_code ?? ''}}</td>
 
 							<td>{{$data->company_number ?? ''}}</td>
-							<td></td>
+							<td>{{$data->contact_number ?? ''}}</td>
 							<td>{{$data->personal_email_address ?? ''}}</td>
 							<td>{{$data->user->email ?? ''}}</td>
 							<td>{{$data->name_of_father ?? ''}}</td>
@@ -262,7 +262,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td>{{$data->passport_status_name ?? ''}}</td>
 							<td></td>
 							<td>{{$data->visaType->name ?? ''}}</td>
-							<td></td>
+							<td>{{$data->visa_number ?? ''}}</td>
 							<td>@if($data->visa_issue_date != ''){{\Carbon\Carbon::parse($data->visa_issue_date)->format('d M Y')}}@endif</td>
 							<td>@if($data->visa_expiry_date != ''){{\Carbon\Carbon::parse($data->visa_expiry_date)->format('d M Y')}}@endif</td>
 							<td>@if($data->reminder_date_for_visa_renewal != ''){{\Carbon\Carbon::parse($data->reminder_date_for_visa_renewal)->format('d M Y')}}@endif</td>
