@@ -214,6 +214,7 @@ input[type=number]::-webkit-outer-spin-button
                 <tr>
                   <th>Priority</th>
                   <th>Lead Date</th>
+                  <th>Remining Time</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
@@ -241,6 +242,7 @@ input[type=number]::-webkit-outer-spin-button
                     @endif
                 </td>
                     <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
+                    <td id="remaining-time-{{ $key }}" data-assign-time="{{ $calls->assign_time }}"></td>
                     <td>{{ $calls->type }}</td>
                     <td>{{ $calls->name }}</td>
                     <td>
@@ -2520,6 +2522,25 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
         $readMoreLink.text('Read More');
     }
 }
+</script>
+<script>
+function updateRemainingTime() {
+    document.querySelectorAll('[id^="remaining-time-"]').forEach(function(element) {
+        var assignTime = new Date(element.getAttribute('data-assign-time'));
+        assignTime.setHours(assignTime.getHours() + 24);
+        var currentTime = new Date();
+        var diff = assignTime - currentTime;
+        if (diff >= 0) {
+            var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            element.innerHTML = `<span style="background-color: green; color: white; padding: 3px 6px; border-radius: 4px;">${hours}:${minutes}:${seconds}</span>`;
+        } else {
+            element.innerHTML = '';
+        }
+    });
+}
+setInterval(updateRemainingTime, 1000);
 </script>
 @else
     @php
