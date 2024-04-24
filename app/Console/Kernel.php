@@ -15,6 +15,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('export:csv')->monthlyOn(date('t'), '00:00');
         $schedule->command('email:send-daily-activity')->dailyAt('18:00');
         $schedule->command('leads:reassign')->hourly();
+        $schedule->command('notifications:send')->everyMinute();
+        $schedule->command('notificationspendingleads:send')->everyMinute();
+        $schedule->command('notificationspendingsignquotation:send')->everyMinute();
+        $schedule->command('notificationspendingpeospecting:send')->everyMinute();
     }
 
     /**
