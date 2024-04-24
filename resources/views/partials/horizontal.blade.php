@@ -1,4 +1,13 @@
 <style>
+    .badge-notification {
+      top: 0;
+      right: 0;
+      transform: translate(50%, -10%);
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      padding: 0.3rem 0.6rem;
+    }
     .approval-count {
         color:white!important;
         background-color:#fd625e!important;
@@ -1432,6 +1441,13 @@
                         @if ($hasPermission)
                         <a class="dropdown-item" href="{{ route('leadsnotifications.index') }}">
                             <i class="fa fa-bullhorn" aria-hidden="true"></i> Notifications
+                            @php
+                            $notificationcount = DB::table('leads_notifications')
+                                ->where('user_id', Auth::user()->id)
+                                ->where('status', 'New')
+                                ->count();
+                            @endphp
+                            <span class="badge badge-danger row-badge2 badge-notification">{{$notificationcount}}</span>
                         </a>
                         <div class="dropdown-divider"></div>
                         @endif
