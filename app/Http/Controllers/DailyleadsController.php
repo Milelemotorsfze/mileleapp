@@ -83,6 +83,7 @@ class DailyleadsController extends Controller
                 ->leftJoin('countries', 'pre_orders_items.countries_id', '=', 'countries.id')
                 ->leftJoin('color_codes as color_codes_exterior', 'pre_orders_items.ex_colour', '=', 'color_codes_exterior.id')
                 ->leftJoin('color_codes as color_codes_interior', 'pre_orders_items.int_colour', '=', 'color_codes_interior.id')
+                ->where('quotations.created_by', $id)
                 ->groupby('pre_orders.id')
                 ->get();
                 return DataTables::of($preorders)->toJson();  
@@ -110,6 +111,7 @@ class DailyleadsController extends Controller
                 ->leftJoin('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
                 ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                ->where('calls.sales_person', $id)
                 ->groupby('calls.id')
                 ->get();
                 return DataTables::of($fellowup)->toJson();  
