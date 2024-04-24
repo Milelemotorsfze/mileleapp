@@ -461,6 +461,7 @@ $sales_person_id = $lowest_lead_sales_person->model_id;
             'type' => $request->input('type'),
             'sales_person' => $sales_person_id,
             'remarks' => $request->input('remarks'),
+            'assign_time' => Carbon::now(),
             'location' => $request->input('location'),
             'phone' => $request->input('phone'),
             'custom_brand_model' => $request->input('custom_brand_model'),
@@ -927,6 +928,7 @@ return view('calls.resultbrand', compact('data'));
                 $call->name = $row[0];
                 $call->phone = $row[1];
                 $call->email = $row[2];
+                $call->assign_time = Carbon::now();
                 $call->custom_brand_model = $row[9];
                 $call->remarks = $row[10];
                 $call->source = $lead_source_id;
