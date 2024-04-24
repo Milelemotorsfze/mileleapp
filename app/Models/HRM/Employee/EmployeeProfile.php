@@ -148,7 +148,6 @@ class EmployeeProfile extends Model
         'candidate_joining_type',
         'candidate_trial_joining_date',
         'passport_status_name',
-        'f',
         'employment_contract_name',
     ];
     public function getCandidateJoiningTypeAttribute() {
