@@ -55,6 +55,8 @@ class JoiningReportController extends Controller
     }
     public function index($type) {
         $authId = Auth::id();
+        $authUserDept = '';
+        $authUserDept = EmployeeProfile::where('user_id',$authId)->first();
         $pendings = JoiningReport::where(function ($query) {
             $query = $query->where('action_by_prepared_by',NULL)->orWhere('action_by_prepared_by','pending')->orWhere('action_by_prepared_by','approved');
         })->where(function ($query1) {
@@ -77,19 +79,15 @@ class JoiningReportController extends Controller
             $pendings = $pendings->where('employee_id',$authId)->latest();
         }
         else if(Auth::user()->hasPermissionForSelectedRole(['dept-emp-view-joining-report-listing'])) {
-            $pendings = $pendings->where(function ($query4) use($authId) {
-                // $query4->whereHas('user.empProfile', function($query7) use($authId) {
-
-                // });
-                $query4->whereHas('candidate' , function($query6) use($authId) {
-                    $query6->where('team_lead_or_reporting_manager',$authId);
+            $pendings = $pendings->where(function ($query4) use($authId,$authUserDept) {
+                $query4->whereHas('candidate' , function($query6) use($authId,$authUserDept) {
+                    $query6->where('department_id',$authUserDept->department_id);
                 })->orWhereHas('user.empProfile', function($query7) use($authId) {
                     $query7->where('team_lead_or_reporting_manager',$authId);
                 });
             })->latest();
         }
         $pendings = $pendings->get();
-        // dd($pendings);
         $approved = JoiningReport::where('action_by_department_head','approved');
         if(($type != NULL && $type == 'temporary') OR ($type != NULL && $type == 'permanent')) {
             $approved = $approved->where('joining_type','internal_transfer')->where('internal_transfer_type',$type);
@@ -104,9 +102,9 @@ class JoiningReportController extends Controller
             $approved = $approved->where('employee_id',$authId)->latest();
         }
         else if(Auth::user()->hasPermissionForSelectedRole(['dept-emp-view-joining-report-listing'])) {
-            $approved = $approved->where(function ($query5) use($authId){
-                $query5->whereHas('candidate' , function($query8) use($authId) {
-                    $query8->where('team_lead_or_reporting_manager',$authId);
+            $approved = $approved->where(function ($query5) use($authId,$authUserDept){
+                $query5->whereHas('candidate' , function($query8) use($authId,$authUserDept) {
+                    $query8->where('department_id',$authUserDept->department_id);
                 })->orWhereHas('user.empProfile', function($query9) use($authId) {
                     $query9->where('team_lead_or_reporting_manager',$authId);
                 });
@@ -130,9 +128,9 @@ class JoiningReportController extends Controller
             $rejected = $rejected->where('employee_id',$authId)->latest();
         }
         else if(Auth::user()->hasPermissionForSelectedRole(['dept-emp-view-joining-report-listing'])) {
-            $rejected = $rejected->where(function ($query10) use($authId){
-                $query10->whereHas('candidate' , function($query11) use($authId) {
-                    $query11->where('team_lead_or_reporting_manager',$authId);
+            $rejected = $rejected->where(function ($query10) use($authId,$authUserDept){
+                $query10->whereHas('candidate' , function($query11) use($authId,$authUserDept) {
+                    $query11->where('department_id',$authUserDept->department_id);
                 })->orWhereHas('user.empProfile', function($query12) use($authId) {
                     $query12->where('team_lead_or_reporting_manager',$authId);
                 });
@@ -143,6 +141,8 @@ class JoiningReportController extends Controller
     }
     public function create($type) { 
         $authId = Auth::id();
+        $authUserDept = '';
+        $authUserDept = EmployeeProfile::where('user_id',$authId)->first();
         $candidates = $masterlocations = $reportingTo = $masterDepartments = $employees = [];
         $candidates = EmployeeProfile::orderBy('first_name', 'ASC')->where([
             ['personal_information_verified_at','!=',NULL],
@@ -178,10 +178,10 @@ class JoiningReportController extends Controller
         //     $rejected = $rejected->where('employee_id',$authId)->latest();
         // }
         // else 
-        if(Auth::user()->hasPermissionForSelectedRole(['dept-emp-create-joining-report'])) {
-            $candidates = $candidates->where('team_lead_or_reporting_manager',$authId)->latest();
+        if(Auth::user()->hasPermissionForSelectedRole(['dept-emp-create-joining-report']) && isset($authUserDept) && $authUserDept->department_id) {
+            $candidates = $candidates->where('department_id',$authUserDept->department_id)->latest();
         }
-        $candidates = $candidates->with('designation','department')->get();
+        $candidates = $candidates->with('designation','department.departmentHead','department.division.divisionHead')->get();
         $masterlocations = MasterOfficeLocation::orderBy('name', 'ASC')->where('status','active')->select('id','name','address')->get(); 
         $reportingTo = User::orderBy('name', 'ASC')->where('status','active')->where('status','active')->whereNotIn('id',[1,16])->get();
         $masterDepartments = MasterDepartment::orderBy('name', 'ASC')->whereNot('name','Management')->with('departmentHead','division.divisionHead')->get();
@@ -460,6 +460,8 @@ class JoiningReportController extends Controller
     }
     public function edit($id) {
         $authId = Auth::id();
+        $authUserDept = '';
+        $authUserDept = EmployeeProfile::where('user_id',$authId)->first();
         $data = JoiningReport::where('id',$id)->with('candidate')->first();
         $candidates = EmployeeProfile::where([
             ['personal_information_verified_at','!=',NULL],
@@ -467,14 +469,14 @@ class JoiningReportController extends Controller
         ])->whereHas('interviewSummary', function($q) {
             $q->where('offer_letter_verified_at','!=',NULL);
         });
-        if(Auth::user()->hasPermissionForSelectedRole(['dept-emp-edit-joining-report'])) {
-        $candidates = $candidates->where('team_lead_or_reporting_manager',$authId)->latest();
+        if(Auth::user()->hasPermissionForSelectedRole(['dept-emp-edit-joining-report']) && $data->joining_type == 'new_employee') {
+        $candidates = $candidates->where('department_id',$authUserDept->department_id)->latest();
         }
-        $candidates = $candidates->with('designation','department')->get();
+        $candidates = $candidates->with('designation','department.departmentHead','department.division.divisionHead')->get();
         $masterlocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get(); 
         $reportingTo = User::orderBy('name','ASC')->whereNotIn('id',[1,16])->where('status','active')->get();
         $employees = User::orderBy('name','ASC');
-        if(Auth::user()->hasPermissionForSelectedRole(['dept-emp-edit-joining-report'])) {
+        if(Auth::user()->hasPermissionForSelectedRole(['dept-emp-edit-joining-report']) && $data->joining_type != 'new_employee') {
             $employees = $employees->where(function ($query4) use($authId){
                 $query4-whereHas('empProfile', function($query7) use($authId) {
                     $query7->where('team_lead_or_reporting_manager',$authId);
