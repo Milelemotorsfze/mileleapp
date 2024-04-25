@@ -2195,6 +2195,7 @@ $data = PurchasingOrder::with('purchasing_order_items')
         $query->select(DB::raw(1))
               ->from('vehicles')
               ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+              ->whereNull('deleted_at')
               ->whereNull('vin'); // Check for at least one VIN being null
     })
     ->groupBy('purchasing_order.id')
@@ -2209,6 +2210,7 @@ else
         $query->select(DB::raw(1))
               ->from('vehicles')
               ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+              ->whereNull('deleted_at')
               ->whereNull('vin'); // Check for at least one VIN being null
     })
     ->groupBy('purchasing_order.id')

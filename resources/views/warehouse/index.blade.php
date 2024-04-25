@@ -608,6 +608,7 @@ $pendingvendorfol = DB::table('purchasing_order')
             $query->select(DB::raw(1))
                   ->from('vehicles')
                   ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                  ->whereNull('deleted_at')
                   ->whereNull('vin'); // Check for at least one VIN being null
         })
     ->count();
@@ -620,6 +621,7 @@ $pendingvins = DB::table('purchasing_order')
             $query->select(DB::raw(1))
                   ->from('vehicles')
                   ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                  ->whereNull('deleted_at')
                   ->whereNull('vin'); // Check for at least one VIN being null
         })
     ->count();
