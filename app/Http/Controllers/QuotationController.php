@@ -405,7 +405,7 @@ class QuotationController extends Controller
         $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
             ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
-        $salesPersonDetail = EmployeeProfile::where('user_id', Auth::id())->first();
+        $salesPersonDetail = EmployeeProfile::where('user_id', $quotation->created_by)->first();
         $salespersonqu = User::find($quotation->created_by);
         $data = [];
         $data['sales_person'] = $salespersonqu->name;
@@ -942,7 +942,7 @@ class QuotationController extends Controller
         $shippingCertifications = QuotationItem::where('reference_type','App\Models\ShippingCertification')
             ->where('is_enable', true)
             ->where('quotation_id', $quotation->id)->get();
-        $salesPersonDetail = EmployeeProfile::where('user_id', Auth::id())->first();
+        $salesPersonDetail = EmployeeProfile::where('user_id', $quotation->created_by)->first();
         $salespersonqu = User::find($quotation->created_by);
         $data = [];
         $data['sales_person'] = $salespersonqu->name;
