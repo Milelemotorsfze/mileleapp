@@ -22,6 +22,8 @@ class Calls extends Model
         'created_by',
         'type',
         'region',
+        'strategies_id',
+        'priority',
         'custom_brand_model',
         'created_at',
         'customer_coming_type',
