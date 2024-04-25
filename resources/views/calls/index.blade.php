@@ -70,7 +70,7 @@
     }
     .badge-notification {
     position: absolute;
-    top: -5;
+    top: -7;
     right: 15;
     background-color: red;
     color: white;
