@@ -69,7 +69,7 @@ class CallsController extends Controller
     }
     public function inprocess()
     {
-        $data = Calls::where('status', 'Prospecting')->orwhere('status', 'New Demand')->orwhere('status', 'Quoted')->orwhere('status', 'Negotiation')->where('created_at', '>=', Carbon::now()->subMonths(6))->get();     
+        $data = Calls::where('status', 'Prospecting')->orwhere('status', 'New Demand')->orwhere('status', 'Quoted')->orwhere('status', 'Negotiation')->where('created_at', '>=', Carbon::now()->subMonths(2))->get();     
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open Call & Lead Inprocess Info";
         $useractivities->users_id = Auth::id();
