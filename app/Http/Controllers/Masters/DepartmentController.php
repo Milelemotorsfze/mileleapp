@@ -78,7 +78,7 @@ class DepartmentController extends Controller
                                 $jdDeptHeadData->department_head_id = $request->approval_by_id;
                                 $jdDeptHeadData->updated_by = $authId;
                                 $jdDeptHeadData->update();
-                                $historyJD = '';
+                                $historyJD = [];
                                 $historyJD['hiring_request_id'] = $request->hiring_request_id;
                                 $historyJD['icon'] = 'icons8-send-30.png';
                                 $historyJD['message'] = 'Employee hiring job description send to Team Lead / Reporting Manager ( '.$newApprovalPerson->name.' - '.$newApprovalPerson->email.' ) for approval';
