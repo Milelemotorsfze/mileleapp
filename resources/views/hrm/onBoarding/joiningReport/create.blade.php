@@ -97,9 +97,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<span class="error">* </span>
 							<label for="team_lead_or_reporting_manager" class="col-form-label text-md-end">{{ __('Choose Reporting Manager') }}</label>
 							<select name="team_lead_or_reporting_manager" id="team_lead_or_reporting_manager" multiple="true" class="form-control widthinput" onchange="" autofocus>
-								@foreach($reportingTo as $reportingToId)
+								<!-- @foreach($reportingTo as $reportingToId)
 								<option value="{{$reportingToId->id}}">{{$reportingToId->name}}</option>
-								@endforeach
+								@endforeach -->
 							</select>
 						</div>
 					</div>
@@ -183,7 +183,25 @@ $.ajaxSetup({
 						var alreadySelectedDate = $("#joining_date").val();
 					}
 				}
-				console.log(candidates[i].team_lead_or_reporting_manager);
+				var deptHeadId = candidates[i].department.department_head_id;
+				var deptHeadName = candidates[i].department.department_head.name;
+				var divHeadId = candidates[i].department.division.division_head_id;
+				var divHeadName = candidates[i].department.division.division_head.name;
+				if(deptHeadId != null && divHeadId != null && deptHeadId != divHeadId) {
+					var newData = [
+						{ id: deptHeadId, text: deptHeadName },
+						{ id: divHeadId, text: divHeadName }
+					];
+				}
+				else if(deptHeadId != null && divHeadId != null && deptHeadId == divHeadId) {
+					var newData = [
+						{ id: deptHeadId, text: deptHeadName }
+					];
+				}
+				newData.forEach(function(item) {
+					var newOption = new Option(item.text, item.id, false, false);
+					$('#team_lead_or_reporting_manager').append(newOption).trigger('change');
+				});
 				if(candidates[i].team_lead_or_reporting_manager != null) {
 					$("#team_lead_or_reporting_manager").select2().val(candidates[i].team_lead_or_reporting_manager).trigger("change");
 					$('#team_lead_or_reporting_manager').select2({
@@ -201,7 +219,6 @@ $.ajaxSetup({
 						placeholder:"Choose Joining Location",
 					});	
 				}
-				console.log(candidates[i].candidate_joining_type);
 			}
 		}
 	}               
@@ -209,10 +226,11 @@ $.ajaxSetup({
 	else {
 	$('#employee_code_div').hide();
 	$('#designation_div').hide();
-	            $('#department_div').hide();
+	$('#department_div').hide();
 	$('#permanent').prop('checked',false);
 	$('#trial_period').prop('checked',false);
 	$('#trial_period').attr("disabled",false);
+	$('#team_lead_or_reporting_manager').empty().trigger('change');
 	}			
 	});
 	});

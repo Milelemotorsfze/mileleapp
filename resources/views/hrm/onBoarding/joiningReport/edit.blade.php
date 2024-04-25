@@ -2,7 +2,7 @@
 @include('layouts.formstyle')
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-report','current-user-edit-joining-report']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-report','current-user-edit-joining-report','dept-emp-edit-joining-report']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
@@ -40,7 +40,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 					<div class="col-xxl-3 col-lg-4 col-md-4" id="employee_code_div">
 						<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
 						<input id="employee_code" type="text" class="form-control widthinput @error('employee_code') is-invalid @enderror" name="employee_code"
-							placeholder="Candidate Name" value="{{$candidate->employee_code}}" autocomplete="employee_code" autofocus>
+							placeholder="Candidate Name" value="{{$data->candidate->employee_code}}" autocomplete="employee_code" autofocus>
 					</div>
 					<div class="col-xxl-3 col-lg-4 col-md-4" id="designation_div">
 						<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
