@@ -230,8 +230,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td>{{$data->religionName->name ?? ''}}</td>
 							<td>{{$data->countryMaster->nationality ?? $data->countryMaster->name ?? $data->countryMaster->iso_3166_code ?? ''}}</td>
 
-							<td>{{$data->company_number ?? ''}}</td>
 							<td>{{$data->contact_number ?? ''}}</td>
+							<td>{{$data->company_number ?? ''}}</td>
 							<td>{{$data->personal_email_address ?? ''}}</td>
 							<td>{{$data->user->email ?? ''}}</td>
 							<td>{{$data->name_of_father ?? ''}}</td>

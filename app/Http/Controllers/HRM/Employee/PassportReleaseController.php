@@ -13,6 +13,7 @@ use App\Models\HRM\Employee\EmployeeProfile;
 use App\Models\User;
 use App\Models\Masters\PassportRequestPurpose;
 use App\Models\HRM\Approvals\ApprovalByPositions;
+use App\Models\Masters\MasterDivisionWithHead;
 
 class PassportReleaseController extends Controller
 {

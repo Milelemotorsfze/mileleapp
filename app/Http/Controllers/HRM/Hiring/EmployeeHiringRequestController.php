@@ -466,7 +466,7 @@ class EmployeeHiringRequestController extends Controller
                 if($request->status == 'approved') {
                     $update->action_by_hiring_manager = 'pending';
                     $RecruitingManager = ApprovalByPositions::where('approved_by_position','Recruiting Manager')->first();
-                $update->recruiting_manager_id = $RecruitingManager->handover_to_id;
+                $update->hiring_manager_id = $RecruitingManager->handover_to_id;
                     $message = 'Employee hiring request send to Recruiting Manager ( '.$update->hr_manager_name.' - '.$update->hr_manager_email.' ) for approval';
                 }
             }

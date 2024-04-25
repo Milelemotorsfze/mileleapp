@@ -180,6 +180,7 @@ class PassportRequestController extends Controller
         return view('hrm.passport.passport_request.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));
     }
     public function storeOrUpdate(Request $request, $id) {
+        $successMessage = '';
         $validator = Validator::make($request->all(), [
             'employee_id' => 'required',
         ]);
@@ -201,7 +202,7 @@ class PassportRequestController extends Controller
                 $divisionHead = MasterDivisionWithHead::where('id',$employee->department->division_id)->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $input = $request->all();
-                if($id == 'new') {
+                if($id == 'new') { 
                     $input['created_by'] = $authId;
                     if(isset($request->purposes_of_submit)) {
                         $input['submit_hr_manager_id'] = $HRManager->handover_to_id;                
@@ -249,7 +250,7 @@ class PassportRequestController extends Controller
                         }                                
                     }                                    
                 }
-                else {                    
+                else {                 
                     if(isset($request->purposes_of_submit)) {
                         $update = PassportRequest::find($id);
                         if($update) {
@@ -326,7 +327,7 @@ class PassportRequestController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                info($e);
+                dd($e);
                 $errorMsg ="Something went wrong! Contact your admin";
                 return view('hrm.notaccess',compact('errorMsg'));
             }
