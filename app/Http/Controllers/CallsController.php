@@ -270,13 +270,14 @@ class CallsController extends Controller
         $countries = CountryListFacade::getList('en');
         $Language = Language::get();
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
+        $strategy = Strategy::get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
         $sales_persons = ModelHasRoles::where('role_id', 7)->get();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Create New Lead";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return view('calls.create', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language'));
+        return view('calls.create', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language', 'strategy'));
     }
     /**
      * Store a newly created resource in storage.
@@ -453,6 +454,8 @@ $sales_person_id = $lowest_lead_sales_person->model_id;
         $date = Carbon::now();
         $date->setTimezone('Asia/Dubai');
         $formattedDate = $date->format('Y-m-d H:i:s');
+        $straigy = $request->input('strategy');
+        $strategies_id = Strategy::where('name',$straigy)->first();
         $dataValue = LeadSource::where('source_name', $request->input('milelemotors'))->value('id');
         $data = [
             'name' => $request->input('name'),
@@ -464,6 +467,8 @@ $sales_person_id = $lowest_lead_sales_person->model_id;
             'assign_time' => Carbon::now(),
             'location' => $request->input('location'),
             'phone' => $request->input('phone'),
+            'strategies_id' => $strategies_id->id,
+            'priority' => $request->input('priority'),
             'custom_brand_model' => $request->input('custom_brand_model'),
             'language' => $request->input('language'),
             'created_at' => $formattedDate,
