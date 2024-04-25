@@ -2190,6 +2190,7 @@ $userId = auth()->user()->id;
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
 if ($hasPermission){
 $data = PurchasingOrder::with('purchasing_order_items')
+    ->where('created_by', '!=', '16')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
               ->from('vehicles')
@@ -2202,6 +2203,7 @@ $data = PurchasingOrder::with('purchasing_order_items')
 else
 {
     $data = PurchasingOrder::with('purchasing_order_items')
+    ->where('created_by', '!=', '16')
     // ->where('created_by', $userId)->orWhere('created_by', 16)
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
