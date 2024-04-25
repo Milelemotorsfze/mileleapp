@@ -22,6 +22,7 @@ use Validator;
 use App\Models\HRM\Approvals\ApprovalByPositions;
 use App\Models\HRM\Employee\EmployeeProfile;
 use App\Http\Controllers\HRM\Hiring\CandidatePersonalInfoController;
+use App\Models\Masters\MasterDivisionWithHead;
 
 class InterviewSummaryReportController extends Controller
 {
@@ -297,7 +298,7 @@ class InterviewSummaryReportController extends Controller
             })->latest();
         }
         $docsUploaded = $docsUploaded->get();
-        $interviewersNames = User::where('status','active')->whereHas('empProfile')->whereNotIn('id',[1,16])->select('id','name')->get();
+        $interviewersNames = User::orderBy('name','ASC')->where('status','active')->whereHas('empProfile')->whereNotIn('id',[1,16])->select('id','name')->get();
         if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing','requestedby-view-interview-summary-listing','organizedby-view-interview-summary-listing'])) {
             return view('hrm.hiring.interview_summary_report.index',compact('shortlists','telephonics','firsts','seconds','thirds','forths','fifths','notSelected',
             'pendings','approved','selectedForJob','docsUploaded','rejected','interviewersNames'));
@@ -348,7 +349,7 @@ class InterviewSummaryReportController extends Controller
         $data = $data->first();
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterGender = MasterGender::whereIn('id',[1,2])->get();
-        $interviewersNames = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->select('id','name')->get();
+        $interviewersNames = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->select('id','name')->get();
         if($id == 'new') {
             return view('hrm.hiring.interview_summary_report.create',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
             'masterGender','interviewersNames','hiringrequests'));   
@@ -484,7 +485,7 @@ class InterviewSummaryReportController extends Controller
             $message = '';
             $update = InterviewSummaryReport::where('id',$request->id)->first();
             if($update && $update->status == 'pending') {
-
+                
             
             if($request->current_approve_position == 'HR Manager') {
                 $update->comments_by_hr_manager = $request->comment;
@@ -492,6 +493,9 @@ class InterviewSummaryReportController extends Controller
                 $update->action_by_hr_manager = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_division_head = 'pending';
+                    $employee1 = EmployeeProfile::where('user_id',$update->employeeHiringRequest->requested_by)->first();
+                    $divisionHead1 = MasterDivisionWithHead::where('id',$employee1->department->division_id)->first();
+                    $update->division_head_id = $divisionHead1->approval_handover_to;
                     $message = 'Interview Summary Report send to Division Head ( '.$update->divisionHeadName->name.' - '.$update->divisionHeadName->email.' ) for approval';
                 }
             }
@@ -531,7 +535,7 @@ class InterviewSummaryReportController extends Controller
         } 
         catch (\Exception $e) {
             DB::rollback();
-            info($e);
+            dd($e);
             $errorMsg ="Something went wrong! Contact your admin";
             return view('hrm.notaccess',compact('errorMsg'));
         }

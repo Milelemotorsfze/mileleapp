@@ -104,7 +104,7 @@ use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\PreOrderController;
 use App\Http\Controllers\PostingRecordsController;
 use App\Http\Controllers\MarketingPurchasingPaymentsController;
-
+use App\Http\Controllers\LeadsNotificationsController;
 
 
 /*
@@ -266,8 +266,14 @@ Route::get('/d', function () {
     // Masters
     // Master Division and head
     Route::resource('division', DivisionController::class);
+    Route::controller(DivisionController::class)->group(function(){
+        Route::post('master/division-unique-check', 'uniqueDivision')->name('master.uniqueDivision');
+    });
     // Master Department and head
     Route::resource('department', DepartmentController::class);
+    Route::controller(DepartmentController::class)->group(function(){
+        Route::post('master/department-unique-check', 'uniqueDepartment')->name('master.uniqueDepartment');
+    });
     // Designation Approvals
     Route::resource('designation-approvals', DesignationApprovalsController::class);
 
@@ -340,6 +346,8 @@ Route::get('/d', function () {
         Route::get('joining_report_approval_awaiting', 'approvalAwaiting')->name('joiningReport.approvalAwaiting');
         Route::get('employee_joining_report/{type}','index')->name('employee_joining_report.index');
         Route::get('create_joining_report/{type}','create')->name('create_joining_report.create');
+        Route::post('checkTempDateExist', 'checkTempDateExist')->name('temptransfer.checkTempDateExist');
+
     });
     Route::get('joining_report_employee_verification/{id}', [JoiningReportController::class, 'employeeVerification'])->name('employee_joining_report.verification');
     Route::post('employee_joining_report/verified', [JoiningReportController::class, 'employeeVerified'])->name('employee_joining_report.verified');
@@ -376,6 +384,7 @@ Route::get('/d', function () {
         Route::post('employee-leave/store-or-update/{id}', 'storeOrUpdate')->name('employee-leave.store-or-update');
         Route::post('leave_request_action', 'requestAction')->name('leaveRequest.action');
         Route::get('leave_approval_awaiting', 'approvalAwaiting')->name('leave.approvalAwaiting');
+        Route::post('checkLeaveDateAlreadyExist', 'checkLeaveDateAlreadyExist')->name('leave.checkLeaveDateAlreadyExist');
     });
 
     // Employee Birthday Gift PO
@@ -812,9 +821,16 @@ Route::get('/d', function () {
     //Pre Order
     Route::resource('preorder', PreOrderController::class);
     Route::get('/get-po-for-presale', [PreOrderController::class, 'getpoforpreorder']);
+    Route::post('/update-followup-info', [DailyleadsController::class, 'savefollowup'])->name('sales.savefollowup');
+    Route::post('/update-followup-info-update', [DailyleadsController::class, 'savefollowupdate'])->name('sales.savefollowupdate');
+    Route::get('/update-followup-info-data/{id}', [DailyleadsController::class, 'followupgetdata'])->name('sales.followupgetdata');
 
+    //Leads Notifications
+    Route::resource('leadsnotifications', LeadsNotificationsController::class);
+    Route::get('/leads/{call_id}', [LeadsNotificationsController::class, 'viewLead'])->name('view_lead');
+    Route::post('/update-notifications-status', [LeadsNotificationsController::class, 'updateStatus'])->name('update_notifications_status');
 
-
+    
 
 
 

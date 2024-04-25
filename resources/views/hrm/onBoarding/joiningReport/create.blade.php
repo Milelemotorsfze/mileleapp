@@ -2,12 +2,12 @@
 @include('layouts.formstyle')
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','current-user-create-joining-report']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-report','current-user-create-joining-report','dept-emp-create-joining-report']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
 	<h4 class="card-title"> Create New Employee Joining Report</h4>
-	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee-hiring-request.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee_joining_report.index','new_employee') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
 	@if (count($errors) > 0)
@@ -272,7 +272,7 @@ $.ajaxSetup({
 	            error.addClass('radio-error');
 	            error.insertAfter(element.closest('.radio-main-div').find('fieldset.radio-div-container').last());
 	        }
-	else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+			else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
 	            if (!element.val() || element.val().length === 0) {
 	                console.log("Error is here with length", element.val().length);
 	                error.addClass('select-error');

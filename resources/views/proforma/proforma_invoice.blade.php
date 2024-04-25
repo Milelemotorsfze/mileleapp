@@ -216,6 +216,29 @@
                 </tr>
             </table>
         </div>
+        @if(isset($multiplecp))
+    <div style="color: black">
+        <table style="border: none;">
+            <tr style="background-color: #bbbbbd;color: #000000;font-weight: bold">
+                <td colspan="10">Other Client Representative</td>
+            </tr>
+            <tr>
+            @foreach($multiplecp as $multiplecps)
+                <?php $quotationcpname = DB::table('agents')->where('id', $multiplecps->agents_id)->first(); ?>
+                <td style="font-weight: bold;"> CB Name :</td>
+                <td> {{ $quotationcpname->name ?? '' }} </td>
+            @endforeach
+            </tr>
+            <tr>
+            @foreach($multiplecp as $multiplecps)
+                <?php $quotationcpnum = DB::table('agents')->where('id', $multiplecps->agents_id)->first(); ?>
+                <td style="font-weight: bold;"> CB Number :</td>
+                <td> {{ $quotationcpnum->phone ?? '' }} </td>
+            @endforeach
+            </tr>
+        </table>
+    </div>
+@endif
         <table id="details">
             @if($vehicles->count() > 0  || $otherVehicles->count() || $vehicleWithBrands->count() > 0)
                 <tr style="font-size: 12px;background-color: #bbbbbd;">

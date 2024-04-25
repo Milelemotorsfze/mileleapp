@@ -15,6 +15,7 @@ use App\Models\ModelHasRoles;
 use App\Models\SalesPersonLaugauges;
 use Monarobase\CountryList\CountryListFacade;
 use App\Models\Brand;
+use App\Models\LeadsNotifications;
 use App\Models\Country;
 use App\Models\Language;
 use App\Models\LeadSource;
@@ -40,25 +41,22 @@ class CallsController extends Controller
     public function index()
     {
         $datahot = Calls::where('calls.status', 'New')
+        ->where('calls.priority', 'Hot')
         ->join('lead_source', 'calls.source', '=', 'lead_source.id')
-        ->where('lead_source.priority', 'High')
         ->orderBy('calls.created_at', 'desc')
         ->select('calls.*', 'lead_source.priority as lead_source_priority')
         ->get();
         $countdatahot = $datahot->count();
         $datanormal = Calls::where('calls.status', 'New')
+        ->where('calls.priority', 'Normal')
         ->join('lead_source', 'calls.source', '=', 'lead_source.id')
-        ->where('lead_source.priority', 'Normal')
         ->orderBy('calls.created_at', 'desc')
         ->select('calls.*', 'lead_source.priority as lead_source_priority')
         ->get();
         $countdatanormal = $datanormal->count();
         $datalow = Calls::where('calls.status', 'New')
+        ->where('calls.priority', 'Low')
     ->join('lead_source', 'calls.source', '=', 'lead_source.id')
-    ->where(function ($query) {
-        $query->where('lead_source.priority', 'Low')
-              ->orWhereNull('lead_source.priority');
-    })
     ->orderBy('calls.created_at', 'desc')
     ->select('calls.*', 'lead_source.priority as lead_source_priority')
     ->get();
@@ -71,7 +69,7 @@ class CallsController extends Controller
     }
     public function inprocess()
     {
-        $data = Calls::where('status', 'Prospecting')->orwhere('status', 'New Demand')->orwhere('status', 'Quoted')->orwhere('status', 'Negotiation')->get();     
+        $data = Calls::where('status', 'Prospecting')->orwhere('status', 'New Demand')->orwhere('status', 'Quoted')->orwhere('status', 'Negotiation')->where('created_at', '>=', Carbon::now()->subMonths(2))->get();     
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open Call & Lead Inprocess Info";
         $useractivities->users_id = Auth::id();
@@ -80,7 +78,7 @@ class CallsController extends Controller
     }
     public function converted()
     {
-        $data = Calls::where('status','Closed')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get();    
+        $data = Calls::where('status','Closed')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->where('created_at', '>=', Carbon::now()->subMonths(2))->get();    
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open Call & Lead Info";
         $useractivities->users_id = Auth::id();
@@ -89,7 +87,7 @@ class CallsController extends Controller
     }
     public function rejected()
     {
-        $data = Calls::where('status','Rejected')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
+        $data = Calls::where('status','Rejected')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->where('created_at', '>=', Carbon::now()->subMonths(2))->get(); 
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open Call & Lead Info";
         $useractivities->users_id = Auth::id();
@@ -272,13 +270,14 @@ class CallsController extends Controller
         $countries = CountryListFacade::getList('en');
         $Language = Language::get();
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
+        $strategy = Strategy::get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
         $sales_persons = ModelHasRoles::where('role_id', 7)->get();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Create New Lead";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        return view('calls.create', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language'));
+        return view('calls.create', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language', 'strategy'));
     }
     /**
      * Store a newly created resource in storage.
@@ -455,6 +454,8 @@ $sales_person_id = $lowest_lead_sales_person->model_id;
         $date = Carbon::now();
         $date->setTimezone('Asia/Dubai');
         $formattedDate = $date->format('Y-m-d H:i:s');
+        $straigy = $request->input('strategy');
+        $strategies_id = Strategy::where('name',$straigy)->first();
         $dataValue = LeadSource::where('source_name', $request->input('milelemotors'))->value('id');
         $data = [
             'name' => $request->input('name'),
@@ -463,8 +464,11 @@ $sales_person_id = $lowest_lead_sales_person->model_id;
             'type' => $request->input('type'),
             'sales_person' => $sales_person_id,
             'remarks' => $request->input('remarks'),
+            'assign_time' => Carbon::now(),
             'location' => $request->input('location'),
             'phone' => $request->input('phone'),
+            'strategies_id' => $strategies_id->id,
+            'priority' => $request->input('priority'),
             'custom_brand_model' => $request->input('custom_brand_model'),
             'language' => $request->input('language'),
             'created_at' => $formattedDate,
@@ -476,6 +480,13 @@ $sales_person_id = $lowest_lead_sales_person->model_id;
         $lastRecord = Calls::where('created_by', $data['created_by'])
                    ->orderBy('id', 'desc')
                    ->first();
+        $leads_notifications = New LeadsNotifications();
+        $leads_notifications->calls_id = $lastRecord->id;
+        $leads_notifications->remarks = "New Assign Lead";
+        $leads_notifications->status = "New";
+        $leads_notifications->user_id = $sales_person_id;
+        $leads_notifications->category = "New Assign Lead";
+        $leads_notifications->save();
         $table_id = $lastRecord->id;
         $modelLineIds = $request->input('model_line_ids');
 
@@ -688,6 +699,7 @@ return view('calls.resultbrand', compact('data'));
             $custom_brand_model = $row[9];
             $remarks = $row[10];
             $strategies = $row[11];
+            $priority = $row[12];
             $errorDescription = '';
             if ($sales_person == null) {
                 $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
@@ -921,10 +933,12 @@ return view('calls.resultbrand', compact('data'));
                 $call->name = $row[0];
                 $call->phone = $row[1];
                 $call->email = $row[2];
+                $call->assign_time = Carbon::now();
                 $call->custom_brand_model = $row[9];
                 $call->remarks = $row[10];
                 $call->source = $lead_source_id;
                 $call->strategies_id = $strategies_id;
+                $call->priority = $row[12];
                 $call->language = $row[6];
                 $call->sales_person = $sales_person_id;
                 $call->created_at = $formattedDate;
@@ -932,6 +946,13 @@ return view('calls.resultbrand', compact('data'));
                 $call->status = "New";
                 $call->location = $row[3];
                 $call->save(); 
+                $leads_notifications = New LeadsNotifications();
+                $leads_notifications->calls_id =  $call->id;
+                $leads_notifications->remarks = "New Assign Lead";
+                $leads_notifications->status = "New";
+                $leads_notifications->user_id = $sales_person_id;
+                $leads_notifications->category = "New Assign Lead";
+                $leads_notifications->save();
                 if ($model_line_name !== null) {
                     $modelLine = MasterModelLines::where('model_line', $model_line_name)->first();
                     if ($modelLine) {

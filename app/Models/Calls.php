@@ -22,6 +22,8 @@ class Calls extends Model
         'created_by',
         'type',
         'region',
+        'strategies_id',
+        'priority',
         'custom_brand_model',
         'created_at',
         'customer_coming_type',
@@ -38,7 +40,6 @@ class Calls extends Model
     //         ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
     //         ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id');
     // }
-
     public function salesperson()
     {
         return $this->belongsTo(User::class, 'sales_person', 'id');

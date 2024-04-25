@@ -43,11 +43,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 			</div>
 			<div class="card-body">
 				<div class="row">
+				<input type="hidden" id="current_id" value="{{$data->id ?? ''}}">
 					<div class="col-xxl-4 col-lg-4 col-md-4" id="other_leave_type">
 						<span class="error">* </span>
-						<label for="name" class="col-form-label text-md-end">{{ __('Department Name') }}</label>
+						<label for="name" class="col-form-label text-md-end">{{ __('Division Name') }}</label>
 						<input type="text" name="name" id="name"
-							class="form-control widthinput" placeholder="Enter Leave Type If Others"
+							class="form-control widthinput" placeholder="Enter Division Name"
 							aria-label="measurement" aria-describedby="basic-addon2" value="{{$data->name ?? ''}}">
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4 select-button-main-div">
@@ -97,14 +98,35 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 		$('#division_head_id').select2({
 	           allowClear: true,
 	           maximumSelectionLength: 1,
-	           placeholder:"Choose Employee Name",
+	           placeholder:"Choose Division Head Name",
 	       });
 		$('#approval_handover_to').select2({
 	           allowClear: true,
 	           maximumSelectionLength: 1,
-	           placeholder:"Choose Employee Name",
+	           placeholder:"Choose Division Head Approval Hand Over To",
 	       });
 	});	
+	jQuery.validator.addMethod("uniqueDivision", 
+	       function(value, element) {
+	           var result = false;
+			   var currentId = $("#current_id").val();
+	           $.ajax({
+	               type:"POST",
+	               async: false,
+	               url: "{{route('master.uniqueDivision')}}", // script to validate in server side
+	               data: {_token: '{{csrf_token()}}',name: value,currentId:currentId},
+	               success: function(data) {
+	                   result = (data == true) ? true : false;
+	               }
+	           });
+	           return result; 
+	       }, 
+	       "This Division Name is already taken! Try another."
+	   );
+	jQuery.validator.setDefaults({
+	    errorClass: "is-invalid",
+	    errorElement: "p",     
+	});
 	jQuery.validator.setDefaults({
 	       errorClass: "is-invalid",
 	       errorElement: "p",
@@ -128,6 +150,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-division']);
 	       rules: {           
 	           name: {
 	               required: true,
+				   uniqueDivision: true,
 	           },
 			division_head_id: {
 	               required: true,

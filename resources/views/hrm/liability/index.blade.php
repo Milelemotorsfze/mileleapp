@@ -93,8 +93,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
 							<td>
-								@if($data->company_joining_date != '')
-								{{\Carbon\Carbon::parse($data->company_joining_date)->format('d M Y')}}
+								@if($data->user->empProfile->company_joining_date != '')
+								{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
 								@endif
 							</td>
 							<td>{{ $data->user->empProfile->department->name ?? ''}}</td>
@@ -119,7 +119,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 										</li>
 										@endif
 										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-liability,current-user-edit-liability']);
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-liability','current-user-edit-liability']);
 										@endphp
 										@if ($hasPermission)  
 										<li>
@@ -205,8 +205,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
 							<td>
-								@if($data->company_joining_date != '')
-								{{\Carbon\Carbon::parse($data->company_joining_date)->format('d M Y')}}
+								@if($data->user->empProfile->company_joining_date != '')
+								{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
 								@endif
 							</td>
 							<td>{{ $data->user->empProfile->department->name ?? ''}}</td>
@@ -271,8 +271,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 							<td>{{ $data->user->empProfile->designation->name ?? ''}}</td>
 							<td>{{ $data->user->empProfile->passport_number ?? ''}}</td>
 							<td>
-								@if($data->company_joining_date != '')
-								{{\Carbon\Carbon::parse($data->company_joining_date)->format('d M Y')}}
+								@if($data->user->empProfile->company_joining_date != '')
+								{{\Carbon\Carbon::parse($data->user->empProfile->company_joining_date)->format('d M Y')}}
 								@endif
 							</td>
 							<td>{{ $data->user->empProfile->department->name ?? ''}}</td>

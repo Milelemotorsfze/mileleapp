@@ -11,6 +11,9 @@ use App\Models\Masters\MasterOfficeLocation;
 use App\Models\Masters\MasterDepartment;
 use App\Models\Masters\MasterMaritalStatus;
 use App\Models\Masters\MasterReligion;
+use App\Models\Masters\MasterGender;
+use App\Models\Masters\MasterVisaType;
+use App\Models\Masters\MasterSponcerships;
 use App\Models\HRM\Approvals\TeamLeadOrReportingManagerHandOverTo;
 use App\Models\HRM\Employee\EmployeeSpokenLanguage;
 use App\Models\Country;
@@ -144,6 +147,8 @@ class EmployeeProfile extends Model
     protected $appends = [
         'candidate_joining_type',
         'candidate_trial_joining_date',
+        'passport_status_name',
+        'employment_contract_name',
     ];
     public function getCandidateJoiningTypeAttribute() {
         $candidateJoiningType = 'any';
@@ -169,8 +174,50 @@ class EmployeeProfile extends Model
         }
         return $candidateJoiningType;
     }
+    public function getPassportStatusNameAttribute() {
+        $passportStatusName = '';
+        if($this->passport_status == 'with_milele') {
+            $passportStatusName = 'With Milele';
+        }
+        else if($this->passport_status == 'with_employee') {
+            $passportStatusName = 'With Employee';
+        }
+        return $passportStatusName;
+    }
+    public function getCurrentStatusNameAttribute() {
+        $currentStatusName = '';
+        if($this->current_status == 'active') {
+            $currentStatusName = 'Active';
+        }
+        else if($this->current_status == 'inactive') {
+            $currentStatusName = 'Inactive';
+        }
+        else if($this->current_status == 'onleave') {
+            $currentStatusName = 'On Leave';
+        }
+        return $currentStatusName;
+    }
+    public function getEmploymentContractNameAttribute() {
+        $employmentContractName = '';
+        if($this->employment_contract_type == 'limited_contract') {
+            $employmentContractName = 'Limited Contract';
+        }
+        else if($this->employment_contract_type == 'unlimited_contract') {
+            $employmentContractName = 'Unlimited Contract';
+        }
+        return $employmentContractName;
+    }
     public function user() {
         return $this->hasOne(User::class,'id','user_id');
+    }
+    public function sponsorshipName() {
+        return $this->hasOne(MasterSponcerships::class,'id','sponsorship');
+    }
+    public function visaType() {
+        return $this->hasOne(MasterVisaType::class, 'id','visa_type');
+    }
+    public function genderName() {
+        return $this->hasOne(MasterGender::class,'id','gender');
     }
     public function teamLeadOrReportingManager() {
         return $this->hasOne(User::class,'id','team_lead_or_reporting_manager');
@@ -204,6 +251,12 @@ class EmployeeProfile extends Model
     }
     public function spouseNationality() {
         return $this->hasOne(Country::class,'id','spouse_nationality');
+    }
+    public function countryMaster() {
+        return $this->hasOne(Country::class,'id','nationality');
+    }
+    public function visaIssueCountry() {
+        return $this->hasOne(Country::class,'id','visa_issueing_country');
     }
     public function candidateChildren() {
         return $this->hasMany(Children::class,'candidate_id','id');

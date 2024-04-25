@@ -44,7 +44,8 @@ class LetterOfIndentController extends Controller
 //            ->cursor();
         $partialApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
-            ->whereIn('status', [LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED,LetterOfIndent::LOI_STATUS_APPROVED])
+            ->whereIn('status', [LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED,
+                LetterOfIndent::LOI_STATUS_PFI_CREATED,LetterOfIndent::LOI_STATUS_APPROVED])
             ->get();
         foreach ($partialApprovedLOIs as $partialApprovedLOI) {
             $partialApprovedLOI->utilized_quantity = LetterOfIndentItem::where('letter_of_indent_id', $partialApprovedLOI->id)
@@ -124,7 +125,7 @@ class LetterOfIndentController extends Controller
      */
     public function store(Request $request)
     {
-
+//        return $request->all();
         $request->validate([
             'customer_id' => 'required',
             'category' => 'required',
