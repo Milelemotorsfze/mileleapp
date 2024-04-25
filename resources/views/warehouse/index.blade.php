@@ -603,6 +603,7 @@ $pendingvendorfol = DB::table('purchasing_order')
         @if ($hasPermission)
         @php
         $pendingvins= DB::table('purchasing_order')
+        ->where('created_by', '!=', '16')
     ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                   ->from('vehicles')
@@ -614,6 +615,7 @@ $pendingvendorfol = DB::table('purchasing_order')
 @else
 @php
 $pendingvins = DB::table('purchasing_order')
+->where('created_by', '!=', '16')
     ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                   ->from('vehicles')
