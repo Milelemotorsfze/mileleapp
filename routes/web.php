@@ -637,6 +637,7 @@ Route::get('/d', function () {
     Route::get('/purcahsing-order-filterpendingfellow/{status}', [PurchasingOrderController::class, 'filterpendingfellow'])->name('purchasing.filterpendingfellow');
     Route::get('/purcahsing-order-payment-initiation/{status}', [PurchasingOrderController::class, 'paymentinitiation'])->name('purchasing.paymentinitiation');
     Route::get('/purcahsing-order-payment-confirmation-incoming/{status}', [PurchasingOrderController::class, 'filterconfirmation'])->name('purchasing.filterconfirmation');
+    Route::get('/purcahsing-order-pending-vins/{status}', [PurchasingOrderController::class, 'pendingvins'])->name('purchasing.pendingvins');
     Route::post('/update-purchasing-allstatusrel', [PurchasingOrderController::class, 'purchasingallupdateStatusrel'])->name('purchasing.updateallStatusrel');
     Route::post('/update-purchasing-allpaymentreqss', [PurchasingOrderController::class, 'allpaymentreqss'])->name('purchasing.allpaymentreqss');
     Route::post('/update-purchasing-allpaymentreqssfin', [PurchasingOrderController::class, 'allpaymentreqssfin'])->name('purchasing.allpaymentreqssfin');

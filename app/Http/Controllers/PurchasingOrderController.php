@@ -2184,4 +2184,34 @@ public function allpaymentreqssfinpay(Request $request)
             $purchasingOrder->save();
             return response()->json(['message' => 'Purchase order details updated successfully'], 200);
         }
+        public function pendingvins($status)
+{
+$userId = auth()->user()->id;
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+if ($hasPermission){
+$data = PurchasingOrder::with('purchasing_order_items')
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+              ->from('vehicles')
+              ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+              ->whereNull('vin'); // Check for at least one VIN being null
+    })
+    ->groupBy('purchasing_order.id')
+    ->get();
+}
+else
+{
+    $data = PurchasingOrder::with('purchasing_order_items')
+    // ->where('created_by', $userId)->orWhere('created_by', 16)
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+              ->from('vehicles')
+              ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+              ->whereNull('vin'); // Check for at least one VIN being null
+    })
+    ->groupBy('purchasing_order.id')
+    ->get();
+}
+return view('warehouse.index', compact('data'));
+}
 }

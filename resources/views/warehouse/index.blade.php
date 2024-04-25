@@ -589,6 +589,46 @@ $pendingvendorfol = DB::table('purchasing_order')
         @endif
     </td>
 </tr>
+<tr onclick="window.location='{{ route('purchasing.pendingvins', ['status' => 'missingvins']) }}';">
+    <td style="font-size: 12px;">
+        <a href="{{ route('purchasing.pendingvins', ['status' => 'missingvins']) }}">
+        Missing Vin Numbers POs
+        </a>
+    </td>
+    <td style="font-size: 12px;">
+    @php
+    $userId = auth()->user()->id;
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        @endphp
+        @if ($hasPermission)
+        @php
+        $pendingvins= DB::table('purchasing_order')
+    ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                  ->from('vehicles')
+                  ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                  ->whereNull('vin'); // Check for at least one VIN being null
+        })
+    ->count();
+@endphp
+@else
+@php
+$pendingvins = DB::table('purchasing_order')
+    ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                  ->from('vehicles')
+                  ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                  ->whereNull('vin'); // Check for at least one VIN being null
+        })
+    ->count();
+@endphp
+@endif
+        @if ($pendingvins > 0)
+            {{ $pendingvins }}
+        @else
+            No records found
+        @endif
+    </td>
 <tr onclick="window.location='{{ route('purchasing.filterconfirmation', ['status' => 'Approved']) }}';">
     <td style="font-size: 12px;">
         <a href="{{ route('purchasing.filterconfirmation', ['status' => 'Approved']) }}">
@@ -635,6 +675,7 @@ $pendingvendorfol = DB::table('purchasing_order')
             No records found
         @endif
     </td>
+</tr>
 </tr>
 </tbody>
   </table>
