@@ -78,7 +78,7 @@ class CallsController extends Controller
     }
     public function converted()
     {
-        $data = Calls::where('status','Closed')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get();    
+        $data = Calls::where('status','Closed')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->where('created_at', '>=', Carbon::now()->subMonths(2))->get();    
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open Call & Lead Info";
         $useractivities->users_id = Auth::id();
@@ -87,7 +87,7 @@ class CallsController extends Controller
     }
     public function rejected()
     {
-        $data = Calls::where('status','Rejected')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
+        $data = Calls::where('status','Rejected')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->where('created_at', '>=', Carbon::now()->subMonths(2))->get(); 
         $useractivities =  New UserActivities();
         $useractivities->activity = "Open Call & Lead Info";
         $useractivities->users_id = Auth::id();
