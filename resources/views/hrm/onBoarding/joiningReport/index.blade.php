@@ -315,7 +315,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
 							<td>
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details','current-user-view-joining-report-details','view-permanent-joining-report-details','view-current-user-permanent-joining-report-details',]);
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['dept-emp-view-joining-report-details','view-joining-report-details','current-user-view-joining-report-details','view-permanent-joining-report-details','view-current-user-permanent-joining-report-details',]);
 								@endphp
 								@if ($hasPermission) 
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
@@ -427,7 +427,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<td>@if(isset($data) && isset($data->preparedBy)) {{ $data->preparedBy->name ?? '' }} @endif</td>
 							<td>
 								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-joining-report-details','current-user-view-joining-report-details','view-permanent-joining-report-details','view-current-user-permanent-joining-report-details',]);
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole(['dept-emp-view-joining-report-details','view-joining-report-details','current-user-view-joining-report-details','view-permanent-joining-report-details','view-current-user-permanent-joining-report-details',]);
 								@endphp
 								@if ($hasPermission) 
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
