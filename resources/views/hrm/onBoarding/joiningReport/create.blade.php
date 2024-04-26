@@ -256,10 +256,6 @@ $.ajaxSetup({
 	       }, 
 	       "This Employee Code is already taken! Try another."
 	   );
-	jQuery.validator.setDefaults({
-	    errorClass: "is-invalid",
-	    errorElement: "p",     
-	});
 	$('#newjoiningReportForm').validate({ 
 	    rules: {
 	        employee_id: {

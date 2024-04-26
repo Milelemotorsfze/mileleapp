@@ -312,6 +312,9 @@ class JoiningReportController extends Controller
                 if($request->joining_type == 'internal_transfer') {
                     $input['internal_transfer_type'] = $request->internal_transfer_type;
                 }
+                if($request->joining_type == 'new_employee' && $request->new_emp_joining_type == 'permanent') {
+                    $input['new_reporting_manager'] = $request->team_lead_or_reporting_manager;
+                }
                 $createJoinRep = JoiningReport::create($input);
                 if($request->joining_type == 'vacations_or_leave') {
                     if(count($request->choose_leaves) > 0) {
@@ -397,6 +400,12 @@ class JoiningReportController extends Controller
                         $createJoinRep->transfer_from_date = $request->transfer_from_date;
                         $createJoinRep->transfer_from_location_id = $request->transfer_from_location_id;
                         $createJoinRep->transfer_to_department_id = $request->transfer_to_department_id;
+                    }
+                    if(($request->joining_type == 'internal_transfer' && $request->internal_transfer_type == 'permanent') || $request->joining_type == 'new_employee' && $request->new_emp_joining_type == 'permanent') {
+                        $createJoinRep->new_reporting_manager = $request->team_lead_or_reporting_manager;
+                    }
+                    else{
+                        $createJoinRep->new_reporting_manager = NULL;
                     }
                     $createJoinRep->joining_date = $request->joining_date;
                     $createJoinRep->joining_location = $request->joining_location;
@@ -502,6 +511,7 @@ class JoiningReportController extends Controller
         DB::beginTransaction();
         try {
             $message = '';
+            $authId = Auth::id();
             $update = JoiningReport::where('id',$request->id)->first();
             if($update && $update->status == 'pending' && (
                 ($request->current_approve_position == 'Prepared by' && $update->action_by_prepared_by == 'pending') 
@@ -572,6 +582,25 @@ class JoiningReportController extends Controller
                     $update->status = 'approved';
                 }else {
                     $update->status = 'rejected';
+                }
+                if($update->joining_type == 'internal_transfer' && $update->internal_transfer_type == 'permanent') {
+                    $empUpdate = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                    if($empUpdate) {
+                        $empUpdate->department_id = $update->transfer_to_department_id;
+                        $empUpdate->team_lead_or_reporting_manager = $update->new_reporting_manager;
+                        $empUpdate->updated_by = $authId;
+                        $empUpdate->update();
+                    }
+                }
+                else if($update->joining_type == 'new_employee' && $update->new_emp_joining_type == 'permanent') {
+                    $empUpdate = EmployeeProfile::where('id',$update->candidate_id)->first();
+                    if($empUpdate) {
+                        $empUpdate->department_id = $update->transfer_to_department_id;
+                        $empUpdate->team_lead_or_reporting_manager = $update->new_reporting_manager;
+                        $empUpdate->type = 'employee';
+                        $empUpdate->updated_by = $authId;
+                        $empUpdate->update();
+                    }
                 }
             }
             $update->update();

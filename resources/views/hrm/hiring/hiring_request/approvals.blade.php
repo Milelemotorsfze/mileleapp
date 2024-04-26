@@ -79,7 +79,7 @@
 								@endif
 							</td>
 							<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
-							<td>
+							<td class="approvalBtnClass">
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i> View Details
 								</a>												
@@ -462,7 +462,7 @@
 								@endif
 							</td>
 							<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
-							<td>
+							<td class="approvalBtnClass">
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i> View Details
 								</a>
@@ -842,7 +842,7 @@
 								@endif
 							</td>
 							<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
-							<td>
+							<td class="approvalBtnClass">
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i> View Details
 								</a>
@@ -1197,7 +1197,7 @@
 								@endif
 							</td>
 							<td><label class="badge badge-soft-info">{{ $data->current_status ?? '' }}</label></td>
-							<td>
+							<td class="approvalBtnClass">
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee-hiring-request.show',$data->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i> View Details
 								</a>
