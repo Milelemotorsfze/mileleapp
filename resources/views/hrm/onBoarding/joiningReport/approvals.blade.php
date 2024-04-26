@@ -107,20 +107,20 @@
 							<td>{{ $data->reportingManager->name ?? '' }}</td>
 							<td>{{ $data->remarks ?? '' }}</td>
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
-							<td>
+							<td class="approvalBtnClass">
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
+								<i class="fa fa-eye" aria-hidden="true"></i> View Details
 								</a>
 								@if(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
 								@if(isset($data->is_auth_user_can_approve['can_approve']))
 								@if($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] != 'Employee')
 								<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 									data-bs-target="#approve-joining-report-{{$data->id}}">
-								<i class="fa fa-thumbs-up" aria-hidden="true"></i>
+								<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 								</button>
 								<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
 									data-bs-target="#reject-joining-report-{{$data->id}}">
-								<i class="fa fa-thumbs-down" aria-hidden="true"></i>
+								<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 								</button>
 								@elseif($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] == 'Employee' && $data->employee_id != NULL)	
 								<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
@@ -208,7 +208,7 @@
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
 							<td>
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
+								<i class="fa fa-eye" aria-hidden="true"></i> View Details
 								</a>
 							</td>
 						</tr>
@@ -283,7 +283,7 @@
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
 							<td>
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
+								<i class="fa fa-eye" aria-hidden="true"></i>  View Details
 								</a>
 							</td>
 						</tr>
@@ -378,29 +378,29 @@
 							<td>{{ $data->reportingManager->name ?? '' }}</td>
 							<td>{{ $data->remarks ?? '' }}</td>
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
-							<td>
+							<td class="approvalBtnClass">
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
+								<i class="fa fa-eye" aria-hidden="true"></i> View Details
 								</a>												
 								@if(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
 								@if(isset($data->is_auth_user_can_approve['can_approve']))
 								@if($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] != 'Employee')
 								<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 									data-bs-target="#approve-joining-report-{{$data->id}}">
-								<i class="fa fa-thumbs-up" aria-hidden="true"></i>
+								<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 								</button>
 								<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
 									data-bs-target="#reject-joining-report-{{$data->id}}">
-								<i class="fa fa-thumbs-down" aria-hidden="true"></i>
+								<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 								</button>
 								@elseif($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] == 'Employee' && $data->employee_id != NULL)	
 								<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 									data-bs-target="#approve-joining-report-{{$data->id}}">
-								<i class="fa fa-thumbs-up" aria-hidden="true"></i> 
+								<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 								</button>
 								<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
 									data-bs-target="#reject-joining-report-{{$data->id}}">
-								<i class="fa fa-thumbs-down" aria-hidden="true"></i> 
+								<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 								</button>
 								@endif
 								@endif
@@ -478,7 +478,7 @@
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
 							<td>
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
+								<i class="fa fa-eye" aria-hidden="true"></i> View Details
 								</a>
 							</td>
 						</tr>
@@ -552,7 +552,7 @@
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
 							<td>
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
+								<i class="fa fa-eye" aria-hidden="true"></i> View Details
 								</a>
 							</td>
 						</tr>
@@ -647,20 +647,20 @@
 							<td>{{ $data->reportingManager->name ?? '' }}</td>
 							<td>{{ $data->remarks ?? '' }}</td>
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
-							<td>
+							<td class="approvalBtnClass">
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
+								<i class="fa fa-eye" aria-hidden="true"></i>  View Details
 								</a>
 								@if(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
 								@if(isset($data->is_auth_user_can_approve['can_approve']))
 								@if($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] != 'Employee')
 								<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 									data-bs-target="#approve-joining-report-{{$data->id}}">
-								<i class="fa fa-thumbs-up" aria-hidden="true"></i>
+								<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 								</button>
 								<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
 									data-bs-target="#reject-joining-report-{{$data->id}}">
-								<i class="fa fa-thumbs-down" aria-hidden="true"></i>
+								<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 								</button>
 								@elseif($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] == 'Employee' && $data->employee_id != NULL)	
 								<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
@@ -747,7 +747,7 @@
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
 							<td>
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
+								<i class="fa fa-eye" aria-hidden="true"></i>  View Details
 								</a>
 							</td>
 						</tr>
@@ -821,7 +821,7 @@
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
 							<td>
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
+								<i class="fa fa-eye" aria-hidden="true"></i>  View Details
 								</a>
 							</td>
 						</tr>
@@ -916,20 +916,20 @@
 							<td>{{ $data->reportingManager->name ?? '' }}</td>
 							<td>{{ $data->remarks ?? '' }}</td>
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
-							<td>
+							<td class="approvalBtnClass">
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
+								<i class="fa fa-eye" aria-hidden="true"></i>  View Details
 								</a>
 								@if(isset($data->is_auth_user_can_approve) && $data->is_auth_user_can_approve != '')
 								@if(isset($data->is_auth_user_can_approve['can_approve']))
 								@if($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] != 'Employee')
 								<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 									data-bs-target="#approve-joining-report-{{$data->id}}">
-								<i class="fa fa-thumbs-up" aria-hidden="true"></i>
+								<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 								</button>
 								<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
 									data-bs-target="#reject-joining-report-{{$data->id}}">
-								<i class="fa fa-thumbs-down" aria-hidden="true"></i>
+								<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 								</button>
 								@elseif($data->is_auth_user_can_approve['can_approve'] == true && $data->is_auth_user_can_approve['current_approve_position'] == 'Employee' && $data->employee_id != NULL)	
 								<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
@@ -1016,7 +1016,7 @@
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
 							<td>
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
+								<i class="fa fa-eye" aria-hidden="true"></i>  View Details
 								</a>
 							</td>
 						</tr>
@@ -1090,7 +1090,7 @@
 							<td>{{ $data->preparedBy->name ?? '' }}</td>
 							<td>
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('joining_report.show',$data->id)}}">
-								<i class="fa fa-eye" aria-hidden="true"></i>
+								<i class="fa fa-eye" aria-hidden="true"></i>  View Details
 								</a>
 							</td>
 						</tr>
