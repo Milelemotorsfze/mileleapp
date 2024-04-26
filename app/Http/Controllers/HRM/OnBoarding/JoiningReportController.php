@@ -462,7 +462,7 @@ class JoiningReportController extends Controller
         $authId = Auth::id();
         $authUserDept = '';
         $authUserDept = EmployeeProfile::where('user_id',$authId)->first();
-        $data = JoiningReport::where('id',$id)->with('candidate')->first();
+        $data = JoiningReport::where('id',$id)->with('candidate.department.division.divisionHead','candidate.department.departmentHead')->first();
         $candidates = EmployeeProfile::where([
             ['personal_information_verified_at','!=',NULL],
             ['type','candidate'],

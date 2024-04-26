@@ -97,9 +97,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<span class="error">* </span>
 							<label for="team_lead_or_reporting_manager" class="col-form-label text-md-end">{{ __('Choose Reporting Manager') }}</label>
 							<select name="team_lead_or_reporting_manager" id="team_lead_or_reporting_manager" multiple="true" class="form-control widthinput" onchange="" autofocus>
-								<!-- @foreach($reportingTo as $reportingToId)
-								<option value="{{$reportingToId->id}}">{{$reportingToId->name}}</option>
-								@endforeach -->
 							</select>
 						</div>
 					</div>
@@ -204,12 +201,13 @@ $.ajaxSetup({
 				});
 				if(candidates[i].team_lead_or_reporting_manager != null) {
 					$("#team_lead_or_reporting_manager").select2().val(candidates[i].team_lead_or_reporting_manager).trigger("change");
-					$('#team_lead_or_reporting_manager').select2({
+					
+				}
+				$('#team_lead_or_reporting_manager').select2({
 						allowClear: true,
 						maximumSelectionLength: 1,
 						placeholder:"Choose Reporting Manager",
 					});	
-				}
 				if(candidates[i].work_location != null) {
 					$("#joining_location").select2().val(candidates[i].team_lead_or_reporting_manager).trigger("change");
 					$("#joining_location").val(candidates[i].work_location);
@@ -230,7 +228,13 @@ $.ajaxSetup({
 	$('#permanent').prop('checked',false);
 	$('#trial_period').prop('checked',false);
 	$('#trial_period').attr("disabled",false);
+	$('#team_lead_or_reporting_manager').select2({
+									allowClear: true,
+									maximumSelectionLength: 1,
+									placeholder:"Choose Reporting Manager",
+								});	
 	$('#team_lead_or_reporting_manager').empty().trigger('change');
+	
 	}			
 	});
 	});

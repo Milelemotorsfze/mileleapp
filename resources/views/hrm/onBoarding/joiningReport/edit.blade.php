@@ -98,9 +98,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 							<span class="error">* </span>
 							<label for="team_lead_or_reporting_manager" class="col-form-label text-md-end">{{ __('Choose Reporting Manager') }}</label>
 							<select name="team_lead_or_reporting_manager" id="team_lead_or_reporting_manager" multiple="true" class="form-control widthinput" onchange="" autofocus>
-							@foreach($reportingTo as $reportingToId)
-							<option value="{{$reportingToId->id}}" @if($reportingToId->id == $data->department_head_id) selected @endif >{{$reportingToId->name}}</option>
-							@endforeach
+							
+							<option value="{{$data->candidate->department->department_head_id ?? ''}}" @if($data->candidate->department->department_head_id == $data->department_head_id OR $data->candidate->department->approval_by_id == $data->department_head_id) selected @endif >{{$data->candidate->department->departmentHead->name ?? ''}}</option>
+							@if($data->candidate->department->department_head_id != $data->candidate->department->division->division_head_id)
+							<option value="{{$data->candidate->department->division->division_head_id ?? ''}}" @if($data->candidate->department->division->division_head_id == $data->department_head_id OR $data->candidate->department->division->approval_handover_to == $data->department_head_id) selected @endif >{{$data->candidate->department->division->divisionHead->name ?? ''}}</option>
+							@endif
 							</select>
 						</div>
 					</div>
@@ -140,7 +142,7 @@ $.ajaxSetup({
 <script type="text/javascript">
 	var candidates = {!! json_encode($candidates) !!};
 	var data = {!! json_encode($data) !!};
-	$(document).ready(function () {
+	$(document).ready(function () {console.log(data);
 	    $('#employee_id').select2({
 	        allowClear: true,
 	        maximumSelectionLength: 1,
@@ -175,6 +177,55 @@ $.ajaxSetup({
 							$('#department_div').show();
 							document.getElementById('designation').textContent=candidates[i].designation.name;
 							document.getElementById('department').textContent=candidates[i].department.name;
+							var deptHeadId = candidates[i].department.department_head_id;
+							var deptHeadName = candidates[i].department.department_head.name;
+							var divHeadId = candidates[i].department.division.division_head_id;
+							var divHeadName = candidates[i].department.division.division_head.name;
+							if(deptHeadId != null && divHeadId != null && deptHeadId != divHeadId) {
+								var newData = [
+									{ id: deptHeadId, text: deptHeadName },
+									{ id: divHeadId, text: divHeadName }
+								];
+							}
+							else if(deptHeadId != null && divHeadId != null && deptHeadId == divHeadId) {
+								var newData = [
+									{ id: deptHeadId, text: deptHeadName }
+								];
+							}
+							newData.forEach(function(item) {
+								var newOption = new Option(item.text, item.id, false, false);
+								$('#team_lead_or_reporting_manager').append(newOption).trigger('change');
+								// $('#team_lead_or_reporting_manager').select2({
+								// 	allowClear: true,
+								// 	maximumSelectionLength: 1,
+								// 	placeholder:"Choose Reporting Manager",
+								// });
+							});
+							if(candidates[i].team_lead_or_reporting_manager != null) {
+								$("#team_lead_or_reporting_manager").select2().val(candidates[i].team_lead_or_reporting_manager).trigger("change");
+								// $('#team_lead_or_reporting_manager').select2({
+								// 	allowClear: true,
+								// 	maximumSelectionLength: 1,
+								// 	placeholder:"Choose Reporting Manager",
+								// });	
+							}
+							else if(data.department_head_id == data.candidate.department.department_head_id){
+								$("#team_lead_or_reporting_manager").select2().val(data.candidate.department.department_head_id).trigger("change");
+							}
+							else if(data.department_head_id == data.candidate.department.approval_by_id) {
+								$("#team_lead_or_reporting_manager").select2().val(data.candidate.department.department_head_id).trigger("change");
+							}
+							else if(data.department_head_id == data.candidate.department.division.division_head_id) {
+								$("#team_lead_or_reporting_manager").select2().val(data.candidate.department.division.division_head_id).trigger("change");
+							}
+							else if(data.department_head_id == data.candidate.department.division.approval_handover_to) {
+								$("#team_lead_or_reporting_manager").select2().val(data.candidate.department.division.division_head_id).trigger("change");
+							}
+							$('#team_lead_or_reporting_manager').select2({
+									allowClear: true,
+									maximumSelectionLength: 1,
+									placeholder:"Choose Reporting Manager",
+								});
 						}
 					}
 				}               
@@ -183,6 +234,13 @@ $.ajaxSetup({
 				$('#employee_code_div').hide();
 				$('#designation_div').hide();
 				$('#department_div').hide();
+				$('#team_lead_or_reporting_manager').select2({
+					allowClear: true,
+					maximumSelectionLength: 1,
+					placeholder:"Choose Reporting Manager",
+				});	
+				$('#team_lead_or_reporting_manager').empty().trigger('change');
+				
 			}			
 		});
 	});
