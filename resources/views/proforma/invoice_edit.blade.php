@@ -237,7 +237,7 @@
         <div class="modal-body p-4">
           <div class="row">
             <div class="col-md-12 form-group">
-              <label for="name">CB Name:</label>
+              <label for="name">CR Name:</label>
               <select name="cb_name" id="cb_name_more" class="form-control form-control-xs">
               </select>
             </div>
@@ -589,7 +589,7 @@
             <div class="col-sm-4">
                 <div class="row mt-2">
                     <div class="col-sm-6">
-                        CB Name:
+                        CR Name:
                     </div>
                     <div class="col-sm-6">
                     <div class="input-group">
@@ -607,7 +607,7 @@
                 <input type="hidden" name="selected_cb_name" id="selected_cb_name" value="">
                 <div class="row mt-2">
                     <div class="col-sm-6">
-                        CB No:
+                        CR No:
                     </div>
                     <div class="col-sm-6">
                         <input type="text" name="cb_number" id="cb_number" class="form-control form-control-xs" placeholder="CB Number" readonly>

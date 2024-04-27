@@ -814,7 +814,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -848,7 +848,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -881,7 +881,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -919,7 +919,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -960,7 +960,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -1036,7 +1036,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -1079,7 +1079,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -1977,6 +1977,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" onclick="openModalfellowup(${data})">Update FollowUp</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
                                     <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
@@ -2097,8 +2098,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                 { data: 'email', name: 'email' },
                 { data: 'models_brands', name: 'models_brands' },
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
-                { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
+                { data: 'location', name: 'location' },
                 {
     data: 'remarks',
     name: 'remarks',

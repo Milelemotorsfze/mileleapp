@@ -84,6 +84,7 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
+        
         $agentsmuiltples = 0;
         $systemcode = $request->system_code_amount;
         $separatedValues = [];
@@ -106,6 +107,14 @@ class QuotationController extends Controller
         $aed_to_usd_rate = Setting::where('key', 'aed_to_usd_convertion_rate')->first();
         DB::beginTransaction();
         $call = Calls::find($request->calls_id);
+        if($request->shipping_method == "CNF")
+        {
+            $call->type = "Local";    
+        }
+        else
+        {
+            $call->type = "Export"; 
+        }
         $call->status = 'Quoted';
         $call->save();
         $call->company_name = $request->company_name;
