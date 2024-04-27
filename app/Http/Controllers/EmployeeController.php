@@ -12,7 +12,8 @@ class EmployeeController extends Controller
     public function index()
     {
         $activeEmployees = EmployeeProfile::where('current_status','active')->where('type','employee')->orderBy('first_name','ASC')->get();
-        return view('hrm.employee.index',compact('activeEmployees'));
+        $inactiveEmployees = EmployeeProfile::where('current_status','inactive')->where('type','employee')->orderBy('first_name','ASC')->get();
+        return view('hrm.employee.index',compact('activeEmployees','inactiveEmployees'));
     }
 
     public function create()

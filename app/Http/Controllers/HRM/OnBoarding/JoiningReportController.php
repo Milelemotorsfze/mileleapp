@@ -312,7 +312,7 @@ class JoiningReportController extends Controller
                 if($request->joining_type == 'internal_transfer') {
                     $input['internal_transfer_type'] = $request->internal_transfer_type;
                 }
-                if($request->joining_type == 'new_employee' && $request->new_emp_joining_type == 'permanent') {
+                if($request->joining_type == 'new_employee') {
                     $input['new_reporting_manager'] = $request->team_lead_or_reporting_manager;
                 }
                 $createJoinRep = JoiningReport::create($input);
@@ -401,7 +401,7 @@ class JoiningReportController extends Controller
                         $createJoinRep->transfer_from_location_id = $request->transfer_from_location_id;
                         $createJoinRep->transfer_to_department_id = $request->transfer_to_department_id;
                     }
-                    if(($request->joining_type == 'internal_transfer' && $request->internal_transfer_type == 'permanent') || $request->joining_type == 'new_employee' && $request->new_emp_joining_type == 'permanent') {
+                    if(($request->joining_type == 'internal_transfer' && $request->internal_transfer_type == 'permanent') || $request->joining_type == 'new_employee') {
                         $createJoinRep->new_reporting_manager = $request->team_lead_or_reporting_manager;
                     }
                     else{
@@ -568,6 +568,15 @@ class JoiningReportController extends Controller
                 $update->action_by_hr_manager = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_department_head = 'pending';
+                    if(($update->joining_type == 'new_employee') || ($update->joining_type == 'internal_transfer' && $update->internal_transfer_type == 'permanent')) {
+                        $leadOrMngr = TeamLeadOrReportingManagerHandOverTo::where('lead_or_manager_id',$update->new_reporting_manager)->first();
+                        $update->department_head_id = $leadOrMngr->approval_by_id;
+                    }
+                    else {
+                         $employee2 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                        $leadOrMngr = TeamLeadOrReportingManagerHandOverTo::where('lead_or_manager_id',$employee2->team_lead_or_reporting_manager)->first();
+                        $update->department_head_id = $leadOrMngr->approval_by_id;
+                    }
                     $message = 'Interview Summary Report send to Reporting Manager ( '.$update->reportingManager->name.' - '.$update->reportingManager->email.' ) for approval';
                 }else {
                     $update->status = 'rejected';
@@ -638,8 +647,8 @@ class JoiningReportController extends Controller
         if($id != NULL) {
             DB::beginTransaction();
             try {
-                $id = Crypt::decrypt($id);
-                $data = JoiningReport::where('id',$id)->first();
+                $id = Crypt::decrypt($id); 
+                $data = JoiningReport::where('id',$id)->first(); 
                 DB::commit();
                 return view('hrm.onBoarding.joiningReport.employeeVerification',compact('data'));
             } 
