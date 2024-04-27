@@ -3,6 +3,9 @@
 <html>
 <head>
     <style>
+        #customCell {
+    text-align: left !important;
+}
         /*@page { size: 700pt }*/
         .content{
             font-family: arial, sans-serif;
@@ -188,16 +191,16 @@
                 </tr>
                 <tr>
                     @if($quotationDetail->payment_terms)
-                    <td style="font-weight: bold;">Payment Terms :</td>
-                    <td>{{ $quotationDetail->payment_terms }}</td>
+                    <td style="font-weight: bold;">Payment Terms :     {{ $quotationDetail->payment_terms }}</td>
+                    <td></td>
                     @endif
                     @if($quotationDetail->representative_name)
-                    <td style="font-weight: bold;">Rep Name :</td>
-                    <td> {{ $quotationDetail->representative_name }}</td>
+                    <td style="font-weight: bold;">Rep Name      :     {{ $quotationDetail->representative_name }}</td>
+                    <td> </td>
                     @endif
                     @if($quotationDetail->cb_name)
-                    <td style="font-weight: bold;"> CB Name :</td>
-                    <td> {{ $quotationDetail->cb_name }} </td>
+                    <td style="font-weight: bold;">CR Name       :     {{ $quotationDetail->cb_name }}</td>
+                    <td style="text-align: left !important;">  </td>
                     @endif
                 </tr>
                 <tr>
@@ -206,12 +209,12 @@
                     <td></td>
                 @endif
                     @if($quotationDetail->representative_name)
-                    <td style="font-weight: bold;">Rep No. :</td>
-                    <td> {{ $quotationDetail->representative_number }}</td>
+                    <td style="font-weight: bold;">Rep No.       :     {{ $quotationDetail->representative_number }}</td>
+                    <td> </td>
                     @endif
                     @if($quotationDetail->cb_name)
-                    <td style="font-weight: bold;"> CB No :</td>
-                    <td> {{ $quotationDetail->cb_number }} </td>
+                    <td style="font-weight: bold;"> CR No        :     {{ $quotationDetail->cb_number }}</td>
+                    <td id="customCell"> </td>
                     @endif
                 </tr>
             </table>
@@ -225,14 +228,14 @@
             <tr>
             @foreach($multiplecp as $multiplecps)
                 <?php $quotationcpname = DB::table('agents')->where('id', $multiplecps->agents_id)->first(); ?>
-                <td style="font-weight: bold;"> CB Name :</td>
+                <td style="font-weight: bold;"> CR Name :</td>
                 <td> {{ $quotationcpname->name ?? '' }} </td>
             @endforeach
             </tr>
             <tr>
             @foreach($multiplecp as $multiplecps)
                 <?php $quotationcpnum = DB::table('agents')->where('id', $multiplecps->agents_id)->first(); ?>
-                <td style="font-weight: bold;"> CB Number :</td>
+                <td style="font-weight: bold;"> CR Number :</td>
                 <td> {{ $quotationcpnum->phone ?? '' }} </td>
             @endforeach
             </tr>
@@ -620,39 +623,37 @@
                 @endif
                 @endif
     <br>
+    
         @if($quotation->document_type == 'Proforma Invoice')
         @php
         $due_date = $quotationDetail->due_date;
         $formatted_due_date = date("j F Y", strtotime($due_date));
         @endphp
-            <p style="font-weight: bold">Payment Due Date:  {{$formatted_due_date}} </p>
+        <p style="font-weight: bolder">Payment Due Date:  {{$formatted_due_date}}</p>
         @endif
-        <p>I hereby acknowledge to honor the payment by the agreed due date.</p>
-         <p> In case of my failure to clear payment on time, I stand to lose the right to my payments and my order may be delayed or subject to cancellation.</p>
+        <p style="text-align: justify;">
+        I hereby acknowledge to honor the payment by the agreed due date.
+        In case of my failure to clear payment on time, I stand to lose the right to my payments and my order may be delayed or subject to cancellation.
         @if($quotation->shipping_method == 'CNF')
-        <p> Customs clearance, taxes, duty, value added taxes or any other charges related to the above mentioned goods are the sole responsibility of the client.</p>
+        Customs clearance, taxes, duty, value added taxes or any other charges related to the above mentioned goods are the sole responsibility of the client.
         @endif
-            <p>
             Any payments which are made to Milele Motors FZE are non refundable & the price will be changed based on the new market price, and seller has right to sell the cars
             without prior notice to buyer.
-        </p>
-        <p >
             Upon initiating any transaction with Milele Motors FZE, the buyer acknowledges and unconditionally agrees to our terms and conditions. It is expressly understood that any payment by the
             buyer, whether as advances, deposits, or other payments, is non-refundable under any circumstances. The buyer confirms the sale and recognizes its binding nature by making
             payments. Furthermore, any products or services procured are strictly non-exchangeable and non-returnable. Even without a physical signature, such a transfer signifies a binding and
             unilateral acceptance of these terms. Before making any transaction, the buyer has had the full opportunity to review these terms in detail, thereby affirming their understanding and
             acceptance.
-        </p>
+            </p>
         @if($quotation->shipping_method == 'EXW')
-
                <p style="font-weight: bolder"> Currency Exchange </p>
-                <p style="font-size: 12px;"> Bank Payments AED transfers at actuals. USD transfer at  {{ $aed_to_usd_rate->value }} and customer must remit $50 equivalent extra to cover for bank fees.</p>
-            <p style="font-size: 12px;"> Cash Payments AED at actuals, USD New Bills $100 at {{ $aed_to_usd_rate->value }}, all other bills at 3.60. </p>
+               Bank Payments AED transfers at actuals. USD transfer at  {{ $aed_to_usd_rate->value }} and customer must remit $50 equivalent extra to cover for bank fees.
+                Cash Payments AED at actuals, USD New Bills $100 at {{ $aed_to_usd_rate->value }}, all other bills at 3.60.
             @if($quotation->currency == 'EURO')
                 <p style="font-weight: bolder"> Currency Exchange </p>
-                <p style="font-size: 12px;"> Bank Payments AED transfers at actuals. EUR transfer at {{ $aed_to_eru_rate->value }} and customer must remit EUR 50 equivalent extra to cover for bank fees.</p>
-                <p style="font-size: 12px;"> Cash Payments AED at actuals, USD New Bills EUR 100 at {{ $aed_to_eru_rate->value }}, all other bills at
-                    {{ $aed_to_eru_rate }}. </p>
+Bank Payments AED transfers at actuals. EUR transfer at {{ $aed_to_eru_rate->value }} and customer must remit EUR 50 equivalent extra to cover for bank fees.
+Cash Payments AED at actuals, USD New Bills EUR 100 at {{ $aed_to_eru_rate->value }}, all other bills at
+                    {{ $aed_to_eru_rate }}.
             @endif
         @endif
         <div class="footer">

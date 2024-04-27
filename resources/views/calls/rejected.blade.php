@@ -108,7 +108,7 @@
                 <tr>
                 <th>Ser No</th>
                   <th>Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -241,7 +241,7 @@ $('#export-excel').on('click', function() {
         data.push(row);
     });
     var excelData = [
-        ['S.No', 'Date', 'Purchase Type', 'Customer Name', 'Customer Phone', 'Customer Email', 'Sales Person', 'Brands & Models', 'Custom Model & Brand', 'Source', 'Preferred Language', 'Destination', 'Remarks & Messages' , 'Reasons', 'Sales Notes']
+        ['S.No', 'Date', 'Selling Type', 'Customer Name', 'Customer Phone', 'Customer Email', 'Sales Person', 'Brands & Models', 'Custom Model & Brand', 'Source', 'Preferred Language', 'Destination', 'Remarks & Messages' , 'Reasons', 'Sales Notes']
     ];
     excelData = excelData.concat(data);
     var workbook = XLSX.utils.book_new();
