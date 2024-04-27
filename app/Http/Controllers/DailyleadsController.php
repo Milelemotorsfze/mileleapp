@@ -112,6 +112,8 @@ class DailyleadsController extends Controller
                 ->leftJoin('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'master_model_lines.brand_id', '=', 'brands.id')
                 ->where('calls.sales_person', $id)
+                ->orderBy('fellow_up.date')
+                ->orderBy('fellow_up.time')
                 ->groupby('calls.id')
                 ->get();
                 return DataTables::of($fellowup)->toJson();  
