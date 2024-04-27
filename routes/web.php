@@ -820,7 +820,7 @@ Route::get('/d', function () {
     Route::get('/leads/{call_id}', [LeadsNotificationsController::class, 'viewLead'])->name('view_lead');
     Route::post('/update-notifications-status', [LeadsNotificationsController::class, 'updateStatus'])->name('update_notifications_status');
 
-    
+    Route::post('/upload-quotation-file', [QuotationController::class, 'uploadingquotation'])->name('uploadingquotation.update');
 
 
 

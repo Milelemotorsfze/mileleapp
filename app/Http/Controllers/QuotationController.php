@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Addon;
+use Illuminate\Support\Facades\File;
 use App\Models\User;
 use App\Models\UserActivities;
 use App\Models\Clients;
@@ -1307,5 +1308,41 @@ public function getVehiclesvinsfirst(Request $request)
     ->whereNull('so_id')
     ->get();
     return response()->json(['vehicles' => $vehicles]);
+}
+// FileUploadController.php
+public function uploadingQuotation(Request $request)
+{
+    $request->validate([
+        'quotationFile' => 'required|file',
+        'callId' => 'required'
+    ]);
+
+    $file = $request->file('quotationFile');
+    $callId = $request->input('callId');
+
+    // Fetching the Quotation based on call ID
+    $quotation = Quotation::where('calls_id', $callId)->first();
+
+    if (!$quotation) {
+        return response()->json(['error' => 'Quotation not found'], 404);
+    }
+
+    $filename = 'Quotation_' . $quotation->id . '_' . date('Y_m_d') . '.pdf';
+    $directory = public_path('storage/quotation_files');
+
+    // Ensure the directory exists
+    if (!File::isDirectory($directory)) {
+        File::makeDirectory($directory, 0777, true, true);
+    }
+
+    // Move the uploaded file to the desired location with the new filename
+    $file->move($directory, $filename);
+
+    // Update the file path in the database
+    $quotation->file_path = 'quotation_files/' . $filename;
+    $quotation->signature_status = "Signed";
+    $quotation->save();
+
+    return response()->json(['success' => 'File has been uploaded and saved successfully.']);
 }
 }

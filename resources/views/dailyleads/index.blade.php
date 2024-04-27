@@ -703,6 +703,25 @@ input[type=number]::-webkit-outer-spin-button
 	        </div>
     </div>
   </div>
+  <div class="modal fade" id="uploadingquotation" tabindex="-1" aria-labelledby="uploadingquotationLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadingquotationLabel">Uploading Signed Quotation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <input type="hidden" name="callId" id="modalCallId">
+          <input type="file" name="quotationFile" required>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" onclick="uploadingQuotations()">Upload File</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
   <div class="modal fade" id="vinsModal" tabindex="-1" aria-labelledby="vinsModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -1102,6 +1121,32 @@ input[type=number]::-webkit-outer-spin-button
     </div>
   </div>
   <script>
+    function uploadingQuotations() {
+  var formData = new FormData();
+  var fileInput = document.querySelector('input[name="quotationFile"]');
+  var callId = document.getElementById('modalCallId').value;
+  formData.append('quotationFile', fileInput.files[0]);
+  formData.append('callId', callId);
+  $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+  $.ajax({
+    url: '/upload-quotation-file',
+    type: 'POST',
+    data: formData,
+    processData: false,  // tell jQuery not to process the data
+    contentType: false,  // tell jQuery not to set contentType
+    success: function (data) {
+      alert('File uploaded successfully.');
+      $('#uploadingquotation').modal('hide');
+    },
+    error: function (xhr, status, error) {
+      alert('Error: ' + error.message);
+    }
+  });
+}
       $(document).ready(function() {
             var url = '{{ asset('storage/quotation_files/') }}';
             var QuotationUrl = url + '/' + '{{request()->quotationFilePath}}';
@@ -1275,6 +1320,10 @@ function opensignaturelink(callId) {
       console.error('Error:', error);
     }
   });
+}
+function uploadingsignedquotation(callId) {
+  $('#modalCallId').val(callId); // Set the callId
+  $('#uploadingquotation').modal('show');
 }
 function copyLink() {
   var linkText = document.getElementById("linkInModal").textContent;
@@ -2227,6 +2276,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
             preorder = `<li><a class="dropdown-item" href="${preorderUrl}">Pre Order</a></li>`;
         } else {
             signedlink = `<li><a class="dropdown-item" href="#" onclick="opensignaturelink(${data})">Signature Link</a></li>`;
+            uploadedfile = `<li><a class="dropdown-item" href="#" onclick="uploadingsignedquotation(${data})">Upload Signed Quotation</a></li>`;
         }
         return `
             <div class="dropdown">
@@ -2240,6 +2290,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                     <li><a class="dropdown-item" href="#" onclick="openvins(${data})">VINs</a></li>
                     ${signedlink}
+                    ${uploadedfile}
                 </ul>
             </div>`;
     }
