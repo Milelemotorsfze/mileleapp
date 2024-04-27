@@ -157,7 +157,7 @@ input[type=number]::-webkit-outer-spin-button {
                     <datalist id="priorityList">
                     <option value="Normal" data-value="Normal">Normal</option>
                     <option value="Low" data-value="Low">Low</option>
-                    <option value="High" data-value="High">High</option>
+                    <option value="Hot" data-value="Hot">Hot</option>
                     </datalist>
                     </div>
                     </div>
