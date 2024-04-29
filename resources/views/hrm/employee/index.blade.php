@@ -139,13 +139,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td class="light">Home Country Address</td>
 
 							<td class="dark">Name</td>
-							<td class="dark">Reletion</td>
+							<td class="dark">Relation</td>
 							<td class="dark">Contact Number</td>
 							<td class="dark">Alternative Number</td>
 							<td class="dark">Email</td>
 
 							<td class="light">Name</td>
-							<td class="light">Reletion</td>
+							<td class="light">Relation</td>
 							<td class="light">Contact Number</td>
 							<td class="light">Alternative Number</td>
 							<td class="light">Email</td>
@@ -204,7 +204,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td class="dark">Ticket Allowance PO for Year</td>
 
 							<td class="light">Leaving Type</td>
-							<td class="light">Leaveing Reason</td>
+							<td class="light">Leaving Reason</td>
 							<td class="light">Notice Period to Serve</td>
 							<td class="light">Notice Period Duration</td>
 							<td class="light">Last Working Day</td>
@@ -369,13 +369,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td class="light">Home Country Address</td>
 
 							<td class="dark">Name</td>
-							<td class="dark">Reletion</td>
+							<td class="dark">Relation</td>
 							<td class="dark">Contact Number</td>
 							<td class="dark">Alternative Number</td>
 							<td class="dark">Email</td>
 
 							<td class="light">Name</td>
-							<td class="light">Reletion</td>
+							<td class="light">Relation</td>
 							<td class="light">Contact Number</td>
 							<td class="light">Alternative Number</td>
 							<td class="light">Email</td>
