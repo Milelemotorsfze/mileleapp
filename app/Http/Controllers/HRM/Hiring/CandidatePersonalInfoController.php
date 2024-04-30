@@ -123,12 +123,26 @@ class CandidatePersonalInfoController extends Controller
         else {
             DB::beginTransaction();
             try {
+                $offerNo = '';
+                $offerCode = '';
                 $data = InterviewSummaryReport::where('id',$request->id)->first();
                 if($data) {
                     $data->candidate_name = $request->candidate_name;
                     $data->email = $request->email;
                 }
                 $data->update();
+                $latestOfferLetterCode = EmployeeProfile::withTrashed()->orderBy('offer_letter_no', 'desc')->first();
+                $length = 5;
+                $offset = 5;
+                $prefix = "";
+                if($latestOfferLetterCode){
+                    $latestUUID =  $latestOfferLetterCode->offer_letter_no; 
+                    $newCode =  str_pad($latestUUID + 1, 5, 0, STR_PAD_LEFT);
+                    $offerNo =  $prefix.$newCode;
+                }else{
+                    $offerNo = $prefix.'00001';
+                }                      
+                $offerCode = 'MM/OL/'.$offerNo.'/'.Carbon::now()->format('Y');
                 $emp = EmployeeProfile::where('interview_summary_id',$request->id)->first();
                 if($emp) {
                     $emp->passport_number = $request->passport_number;
@@ -138,6 +152,10 @@ class CandidatePersonalInfoController extends Controller
                     $emp->other_allowances = $request->other_allowances;
                     $emp->total_salary = $request->total_salary;
                     $emp->designation_id = $request->designation_id;
+                    if($emp->offer_letter_no == NULL && $emp->offer_letter_code == NULL) {
+                        $emp->offer_letter_no = $offerNo;
+                        $emp->offer_letter_code = $offerCode;
+                    }
                     $emp->update();
                 }    
                 $inwords['basic_salary'] = $this->decimalNumberInWords($request->basic_salary);
