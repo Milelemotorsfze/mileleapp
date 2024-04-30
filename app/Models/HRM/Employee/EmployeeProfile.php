@@ -142,7 +142,8 @@ class EmployeeProfile extends Model
         'offer_signed_at',
         'offer_letter_hr_id',
         'offer_letter_fileName',
-        
+        'offer_letter_no',
+        'offer_letter_code',
     ];
     protected $appends = [
         'candidate_joining_type',
