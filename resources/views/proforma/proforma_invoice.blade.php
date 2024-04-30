@@ -258,7 +258,11 @@
                             <?php $shippingPerVehiclequantityPrice = $shippingChargeDistriAmount / $vehicle->quantity;
                             $vehicleUnitPrice = $vehicle->vehicle_unit_price + $shippingPerVehiclequantityPrice;
                             $totalAmount = $vehicleUnitPrice * $vehicle->quantity ?>
-                        <td><span style="font-weight: bold;font-size: 14px;" > {{ $key+1 }}. </span> {{ $vehicle->description }}</td>
+                            @php
+                            $varaints = DB::table('varaints')->where('id', $vehicle->reference_id)->first();
+                            $my = $varaints->my;
+                            @endphp
+                        <td><span style="font-weight: bold;font-size: 14px;" > {{ $key+1 }}. </span> {{ $vehicle->description }} , MY{{$my}}</td>
                         @if($quotationDetail->cb_name)
                         <td> {{$vehicle->system_code_currency ."". $vehicle->system_code_amount }}</td>
                         @endif
@@ -477,8 +481,8 @@
         
         <table style="color: black;width: 100%;">
     <tr>
-        <td style="font-weight: bold;text-align: left;vertical-align: top;width: 55%;">
-            <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+        <td style="font-weight: bold;text-align: left;vertical-align: top;width: 70%;">
+            <div style="border: 1px solid #ccc; padding: 3px; margin-bottom: 10px;">
                 <p>Note:- Third Party Payments will not be accepted.</p>
             @if($quotation->document_type == 'Proforma Invoice')
                 @if($quotationDetail->selected_bank == "rak-aed")
@@ -517,7 +521,7 @@
             </div>
             @endif
         </td>
-        <td style="vertical-align: top;width: 45%;">
+        <td style="vertical-align: top;width: 30%;">
     <table style="width: 100%;">
     @if($quotation->currency == "AED")
     <tr>

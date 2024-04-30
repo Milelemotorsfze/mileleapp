@@ -1107,7 +1107,7 @@
                                     <tr>
                                         <th>S.No:</th>
                                         <th>Code</th>
-                                        <th> Name</th>
+                                        <th>Name</th>
                                         <th>Description</th>
                                         <th>Price</th>
                                         <th style="width:30px;">Add Into Quotation</th>
@@ -2592,6 +2592,7 @@ $(document).ready(function () {
         var addon = "";
         var brand = "";
         var modelLine = "";
+        var modelyear = "";
         var modelNumber = "";
         var variant = "";
         var interiorColor = "";
