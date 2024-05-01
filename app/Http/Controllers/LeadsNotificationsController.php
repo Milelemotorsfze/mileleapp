@@ -111,7 +111,7 @@ class LeadsNotificationsController extends Controller
             ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
             ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
             ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-            ->join('quotations', 'calls.id', '=', 'quotations.calls_id')
+            ->leftjoin('quotations', 'calls.id', '=', 'quotations.calls_id')
             ->where('calls.id', $call_id)
             ->first();
         }
