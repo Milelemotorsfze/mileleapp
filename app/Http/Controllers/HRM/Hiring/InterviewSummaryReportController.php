@@ -839,17 +839,17 @@ class InterviewSummaryReportController extends Controller
         $divisionHeadPendings = InterviewSummaryReport::where([
             ['action_by_hr_manager','approved'],
             ['action_by_division_head','pending'],
-            ['hr_manager_id',$authId],
+            ['division_head_id',$authId],
             ])->latest()->get();
         $divisionHeadApproved = InterviewSummaryReport::where([
             ['action_by_hr_manager','approved'],
             ['action_by_division_head','approved'],
-            ['hr_manager_id',$authId],
+            ['division_head_id',$authId],
             ])->latest()->get();
         $divisionHeadRejected = InterviewSummaryReport::where([
             ['action_by_hr_manager','approved'],
             ['action_by_division_head','rejected'],                
-            ['hr_manager_id',$authId],
+            ['division_head_id',$authId],
             ])->latest()->get();
         return view('hrm.hiring.interview_summary_report.approvals',compact('page','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','HRManagerPendings','HRManagerApproved','HRManagerRejected',));
     }
