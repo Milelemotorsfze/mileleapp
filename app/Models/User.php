@@ -68,7 +68,9 @@ class User extends Authenticatable
             $q->where([
                 ['offer_letter_send_at','!=',NULL],
                 ['offer_letter_verified_at',NULL],
-            ]);
+            ])->whereHas('candidateDetails',function($query) {
+                $query->where('offer_sign','!=',NULL);
+            });
         })->get();
         $verified = EmployeeProfile::where([
             ['type','candidate'],
@@ -77,7 +79,9 @@ class User extends Authenticatable
             $q->where([
                 ['offer_letter_send_at','!=',NULL],
                 ['offer_letter_verified_at','!=',NULL],
-            ]);
+            ])->whereHas('candidateDetails',function($query) {
+                $query->where('offer_sign','!=',NULL);
+            });
         })->get();
         if(count($pending) > 0 OR count($verified) > 0) {
             $canShowOfferLetter = true;
@@ -229,40 +233,46 @@ class User extends Authenticatable
     }
     public function getVerifyOfferLettersAttribute() {
         $verifyOffers = 0;
-        $verifyOffers = InterviewSummaryReport::where([
-            ['status','approved'],
-            ['seleced_status','pending'],
-            ['offer_letter_send_at','!=',NULL],
-            ['offer_letter_verified_at',NULL],
-        ])
-            // where('status','approved')->where('seleced_status','pending')->where('offer_letter_send_at','!=',NULL)
-        ->whereHas('candidateDetails', function($q){
-            $q->where('documents_verified_at','!=', NULL)->where('offer_sign','!=',NULL);
-        })->latest()->count();
+        if(Auth::user()->hasPermissionForSelectedRole(['verify-offer-letter-signature'])) {
+            $verifyOffers = InterviewSummaryReport::where([
+                ['status','approved'],
+                ['seleced_status','pending'],
+                ['offer_letter_send_at','!=',NULL],
+                ['offer_letter_verified_at',NULL],
+            ])
+                // where('status','approved')->where('seleced_status','pending')->where('offer_letter_send_at','!=',NULL)
+            ->whereHas('candidateDetails', function($q){
+                $q->where('documents_verified_at','!=', NULL)->where('offer_sign','!=',NULL);
+            })->latest()->count();
+        }
         return $verifyOffers;
     }
     public function getCandidatePersonalInformationVarifyAttribute() {
         $pendingPersonalInfo = 0;
+        if(Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action'])) {
         $pendingPersonalInfo = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')
         ->whereHas('candidateDetails', function($q){
             $q->where('documents_verified_at','!=',NULL)->where('personal_information_verified_at',NULL)->where('personal_information_created_at','!=',NULL);
         })->latest()->count();
+    }
         return $pendingPersonalInfo;
     }
     public function getCanShowInfoAttribute() {
         $canShowInfo = false;
-        $pending = EmployeeProfile::where([
-            ['type','candidate'],
-            ['personal_information_verified_at',NULL],
-            ['personal_information_created_at','!=',NULL],
-        ])->get();
-        $verified = EmployeeProfile::where([
-            ['type','candidate'],
-            ['personal_information_verified_at','!=',NULL],
-            ['personal_information_created_at','!=',NULL],
-        ])->get();
-        if(count($pending) > 0 OR count($verified) > 0) {
-            $canShowInfo = true;
+        if(Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action'])) {
+            $pending = EmployeeProfile::where([
+                ['type','candidate'],
+                ['personal_information_verified_at',NULL],
+                ['personal_information_created_at','!=',NULL],
+            ])->get();
+            $verified = EmployeeProfile::where([
+                ['type','candidate'],
+                ['personal_information_verified_at','!=',NULL],
+                ['personal_information_created_at','!=',NULL],
+            ])->get();
+            if(count($pending) > 0 OR count($verified) > 0) {
+                $canShowInfo = true;
+            }
         }
         return $canShowInfo;
     }
