@@ -432,7 +432,7 @@
 											<div class="row">
 												<div class="col-xxl-12 col-lg-12 col-md-12">
 													<div class="row">
-														<div class="col-xxl-6 col-lg-6 col-md-6">
+														<div class="col-xxl-6 col-lg-6 col-md-6"><span class="error">* </span>
 															<label for="request_date" class="col-form-label text-md-end">{{ __('Signature') }} :</label>
 															<input type="text" name="signature" id="signature" value="" style="border:none;">
 														</div>

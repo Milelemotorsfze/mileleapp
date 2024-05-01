@@ -174,7 +174,6 @@ class PassportRequestController extends Controller
                 array_push($masterEmployees,$User);  
             }
         }
-        // dd($Users);
         $submissionPurpose = PassportRequestPurpose::orderBy('name','Asc')->where('type','submit')->get();
         $releasePurpose = PassportRequestPurpose::orderBy('name','Asc')->where('type','release')->get();
         return view('hrm.passport.passport_request.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));
