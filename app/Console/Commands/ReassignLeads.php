@@ -22,6 +22,7 @@ class ReassignLeads extends Command
             $lead->sales_person = $newSalesPersonId;
             $lead->assign_time = Carbon::now();
             $lead->save();
+
             $this->info("Lead {$lead->id} reassigned to sales person {$lead->sales_person}");
         }
     }
