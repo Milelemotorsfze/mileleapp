@@ -754,10 +754,12 @@ class CandidatePersonalInfoController extends Controller
         $pending = EmployeeProfile::where([
             ['type','candidate'],
             ['personal_information_verified_at',NULL],
+            ['personal_information_created_at','!=',NULL],
         ])->get();
         $verified = EmployeeProfile::where([
             ['type','candidate'],
             ['personal_information_verified_at','!=',NULL],
+            ['personal_information_created_at','!=',NULL],
         ])->get();
         return view('hrm.hiring.personal_info.verifyOrResend',compact('pending','verified'));
     }
@@ -768,7 +770,9 @@ class CandidatePersonalInfoController extends Controller
             ['documents_form_send_at','!=',NULL],
             ['documents_form_submit_at','!=',NULL],
             // ['documents_form_send_at','<','documents_form_submit_at']
-        ])->get();
+        ])
+        ->whereColumn('documents_form_send_at', '<', 'documents_form_submit_at')
+        ->get();
         $verified = EmployeeProfile::where([
             ['type','candidate'],
             ['documents_verified_at','!=',NULL],
