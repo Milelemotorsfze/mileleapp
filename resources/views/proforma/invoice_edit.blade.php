@@ -1758,8 +1758,6 @@ $(document).ready(function () {
             maximumSelectionLength: 1,
 
         }).on('select2:unselecting', function(e){
-            // before removing tag we check option element of tag and
-            // if it has property 'locked' we will create error to prevent all select2 functionality
             var shippingAddedCount = $('#is-shipping-charge-added').val();
             if(shippingAddedCount > 0) {
                 $("#to_shipping_port option:selected").attr("locked", true);
@@ -2437,6 +2435,8 @@ $(document).ready(function () {
             {
                 targets: -5,
                 render: function (data, type, row) {
+                    var agentId = row.systemcode;
+        if (agentId) {
                     var systemcode = row.systemcode ? row.systemcode : 1;
                     return '<div class="input-group"> ' +
                                 '<input type="number" min="0"  value="' + systemcode + '" step="1" class="system-code form-control"  name="system_code_amount[]"  id="system-code-amount-'+ row['index'] +'" />' +
@@ -2446,6 +2446,10 @@ $(document).ready(function () {
                                 '</select>' +
                                 '</div> ' +
                             '</div>';
+                        } else {
+            // If agent id is not selected, return empty string to hide the column
+            return '';
+             }
                 }
             },
             {
@@ -4224,6 +4228,7 @@ function updateSecondTable(RowId, savedVins) {
         row['model_description_id'] = existings.model_description_id;
         row['qty'] = existings.quantity;
         row['systemcode'] = existings.system_code_amount;
+        row['agents_id'] = existings.agents_id;
         row['edit_page'] = 'editpage';
         row['itemid'] = existings.id;
         var index = secondTable.data().length + 1;

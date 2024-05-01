@@ -754,7 +754,6 @@ class QuotationController extends Controller
                 }
                $commissionAED = $commissionAED + $amount;
             }
-           $commissionAED = $commissionAED + $amount;
            if(isset($request->vehiclesitemsid[$key])) {
             $quotationItem = QuotationItem::find($request->vehiclesitemsid[$key]);
             } else {
@@ -764,8 +763,11 @@ class QuotationController extends Controller
            $quotationItem->quantity = $request->quantities[$key];
            $quotationItem->description = $request->descriptions[$key];
            $quotationItem->total_amount = $request->total_amounts[$key];
+           if($request->agents_id)
+           {
            $quotationItem->system_code_amount = $separatedValues[$key];
            $quotationItem->system_code_currency = $request->system_code_currency[$key];
+           }
            $quotationItem->quotation_id = $qoutationid;
            $quotationItem->uuid = $request->uuids[$key];
            $quotationItem->is_addon = $request->is_addon[$key];
