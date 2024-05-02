@@ -841,7 +841,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					@php
 					$hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information']);
 					@endphp
-					@if ($hasPermission && $data->candidateDetails->documents_verified_at != NULL && $data->candidateDetails->personal_information_created_at != NULL && $data->candidateDetails->personal_information_verified_at == NULL)
+					@if ($hasPermission && $data->candidateDetails->documents_verified_at != NULL && $data->candidateDetails->personal_information_created_at != NULL && 
+					$data->candidateDetails->personal_information_verified_at == NULL && $data->candidateDetails->personal_information_created_at > $data->candidateDetails->personal_information_send_at)
 					<button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-personalinfo"  data-bs-toggle="modal"
 						data-bs-target="#verify-personal-info-form-{{$data->id}}" data-id="{{$data->id}}">
 					<i class="fa fa-check" aria-hidden="true"></i> Verified Personal information

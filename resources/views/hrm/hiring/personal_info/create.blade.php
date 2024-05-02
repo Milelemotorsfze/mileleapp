@@ -564,15 +564,24 @@
 			            }
 			        }
 			        if(candidate.pif_sign != '') {
-			            window.addEventListener("load", draw);
-			            function draw() {
-			                var ctx = document.querySelector('#signature_canvas').getContext('2d');
-			                var img1 = new Image();
-			                img1.onload = function() {
-			                    ctx.drawImage(img1, 40, 10);
-			                }
-			                img1.src = candidate.pif_sign; 
-			            }
+			            // window.addEventListener("load", draw);
+			            // function draw() {
+			            //     var ctx = document.querySelector('#signature_canvas').getContext('2d');
+			            //     var img1 = new Image();
+			            //     img1.onload = function() {
+			            //         ctx.drawImage(img1, 40, 10);
+			            //     }
+			            //     img1.src = candidate.pif_sign; 
+			            // }
+						var canvas = document.getElementById('signature_canvas');
+						var ctx = canvas.getContext('2d');
+						var image = new Image();
+
+						// Replace 'yourBase64String' with your actual base64 string.
+						image.onload = function() {
+							ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+						};
+						image.src = candidate.pif_sign;
 			        }
 			    }
 			    else {

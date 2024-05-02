@@ -20,6 +20,7 @@ use App\Models\HRM\Employee\Liability;
 use App\Models\HRM\Employee\Leave;
 use App\Models\HRM\Employee\OverTime;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
@@ -205,13 +206,16 @@ class User extends Authenticatable
     }
     public function getCandidateDocsVarifyAttribute() {
         $pendingdocsUploaded = 0;
-        if(Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents','send-candidate-documents-request-form'])) {
-            $pendingdocsUploaded = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')
-            ->whereHas('candidateDetails', function($q){
-                $q->where('documents_verified_at', NULL)->where('documents_form_send_at','!=',NULL)->where('documents_form_submit_at','!=',NULL)
-                ->whereColumn('documents_form_send_at', '<', 'documents_form_submit_at')
-                ;
-            })->latest()->count();
+        $user = User::find($this->id);
+        if($user) {
+            if(Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents','send-candidate-documents-request-form'])) {
+                $pendingdocsUploaded = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')
+                ->whereHas('candidateDetails', function($q){
+                    $q->where('documents_verified_at', NULL)->where('documents_form_send_at','!=',NULL)->where('documents_form_submit_at','!=',NULL)
+                    ->whereColumn('documents_form_send_at', '<', 'documents_form_submit_at')
+                    ;
+                })->latest()->count();
+            }
         }
         return $pendingdocsUploaded;
     }
@@ -252,9 +256,9 @@ class User extends Authenticatable
         if(Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action'])) {
         $pendingPersonalInfo = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')
         ->whereHas('candidateDetails', function($q){
-            $q->where('documents_verified_at','!=',NULL)->where('personal_information_verified_at',NULL)->where('personal_information_created_at','!=',NULL);
+            $q->where('documents_verified_at','!=',NULL)->where('personal_information_verified_at',NULL)->where('personal_information_created_at','!=',NULL)->whereColumn('personal_information_send_at', '<', 'personal_information_created_at');
         })->latest()->count();
-    }
+        }
         return $pendingPersonalInfo;
     }
     public function getCanShowInfoAttribute() {
@@ -264,13 +268,18 @@ class User extends Authenticatable
                 ['type','candidate'],
                 ['personal_information_verified_at',NULL],
                 ['personal_information_created_at','!=',NULL],
-            ])->get();
+            ])->whereColumn('personal_information_send_at', '<', 'personal_information_created_at')->get();
+            $resend = EmployeeProfile::where([
+                ['type','candidate'],
+                ['personal_information_verified_at',NULL],
+                ['personal_information_created_at','!=',NULL],
+            ])->whereColumn('personal_information_send_at', '>', 'personal_information_created_at')->get();
             $verified = EmployeeProfile::where([
                 ['type','candidate'],
                 ['personal_information_verified_at','!=',NULL],
                 ['personal_information_created_at','!=',NULL],
             ])->get();
-            if(count($pending) > 0 OR count($verified) > 0) {
+            if(count($pending) > 0 OR count($verified) > 0 OR count($resend) > 0) {
                 $canShowInfo = true;
             }
         }

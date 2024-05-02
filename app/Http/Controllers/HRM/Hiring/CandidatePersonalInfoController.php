@@ -217,6 +217,8 @@ class CandidatePersonalInfoController extends Controller
         return $inWords;
     }
     public function sendEmail(Request $request) {
+        $canSendOfferLetterLink = 'yes';
+        $canSendPersonalInfoLink = 'yes';
         $validator = Validator::make($request->all(), [
             'id' => 'required',
             'email' => 'required',
@@ -233,7 +235,15 @@ class CandidatePersonalInfoController extends Controller
                 }
                 $update->update();
                 $emp = EmployeeProfile::where('interview_summary_id',$request->id)->first();
-                if($emp && $emp->personal_information_verified_at == '' && $update->offer_letter_verified_at == '') {
+                if($emp && $emp->personal_information_verified_at == '' || $update->offer_letter_verified_at == '') {
+                    if($emp->personal_information_created_at != NULL && $emp->personal_information_send_at != NULL && 
+                    $emp->personal_information_send_at < $emp->personal_information_created_at) {
+                        $canSendPersonalInfoLink = 'no';
+                    }
+                    if($emp->personal_information_created_at != NULL && $emp->offer_signed_at != NULL && 
+                    $emp->offer_signed_at < $emp->personal_information_created_at) {
+                        $canSendOfferLetterLink = 'no';
+                    }
                     if($emp) {
                         $emp->personal_information_send_at = Carbon::now();
                         $emp->update();
@@ -246,6 +256,8 @@ class CandidatePersonalInfoController extends Controller
                     $data['email'] = $request->email;
                     $data['send_by'] = Auth::user()->name;
                     $data['name'] = 'Dear '.$update->candidate_name.' ,';
+                    $data['canSendOfferLetterLink'] = $canSendOfferLetterLink;
+                    $data['canSendPersonalInfoLink'] = $canSendPersonalInfoLink;
                     $template['from'] = 'no-reply@milele.com';
                     $template['from_name'] = 'Milele Matrix';
                     $subject = 'Milele - Candidate Personal Information Form';
@@ -751,17 +763,23 @@ class CandidatePersonalInfoController extends Controller
         }
     }
     public function getCandidatePersonalInfo() {
+
         $pending = EmployeeProfile::where([
             ['type','candidate'],
             ['personal_information_verified_at',NULL],
             ['personal_information_created_at','!=',NULL],
-        ])->get();
+        ])->whereColumn('personal_information_send_at', '<', 'personal_information_created_at')->get();
+        $resend = EmployeeProfile::where([
+            ['type','candidate'],
+            ['personal_information_verified_at',NULL],
+            ['personal_information_created_at','!=',NULL],
+        ])->whereColumn('personal_information_send_at', '>', 'personal_information_created_at')->get();
         $verified = EmployeeProfile::where([
             ['type','candidate'],
             ['personal_information_verified_at','!=',NULL],
             ['personal_information_created_at','!=',NULL],
         ])->get();
-        return view('hrm.hiring.personal_info.verifyOrResend',compact('pending','verified'));
+        return view('hrm.hiring.personal_info.verifyOrResend',compact('pending','resend','verified'));
     }
     public function getCandidateDocsInfo() {
         $pending = EmployeeProfile::where([
@@ -805,6 +823,8 @@ class CandidatePersonalInfoController extends Controller
         return view('hrm.hiring.offer_letter.verifyOrResend',compact('pending','verified'));
     }
     public function sendJobOfferLetter($id) {
+        $canSendOfferLetterLink = 'yes';
+        $canSendPersonalInfoLink = 'yes';
         if($id != NULL) {
             DB::beginTransaction();
             try {
@@ -815,6 +835,14 @@ class CandidatePersonalInfoController extends Controller
                 }
                 $update->update();
                 $emp = EmployeeProfile::where('interview_summary_id',$id)->first();
+                if($emp->personal_information_created_at != NULL && $emp->personal_information_send_at != NULL && 
+                $emp->personal_information_send_at < $emp->personal_information_created_at) {
+                    $canSendPersonalInfoLink = 'no';
+                }
+                if($emp->personal_information_created_at != NULL && $emp->offer_signed_at != NULL && 
+                $emp->offer_signed_at < $emp->personal_information_created_at) {
+                    $canSendOfferLetterLink = 'no';
+                }
                 if($emp) {
                     $emp->personal_information_send_at = Carbon::now();
                     $emp->update();
@@ -827,6 +855,8 @@ class CandidatePersonalInfoController extends Controller
                 $data['basic_salary'] = $emp->basic_salary;
                 $data['basic_salary_inwords'] = $this->decimalNumberInWords($emp->basic_salary);
                 $data['job_position'] = $update->employeeHiringRequest->questionnaire->designation->name;
+                $data['canSendOfferLetterLink'] = $canSendOfferLetterLink;
+                $data['canSendPersonalInfoLink'] = $canSendPersonalInfoLink;
                 $template['from'] = 'no-reply@milele.com';
                 $template['from_name'] = 'Milele Matrix';
                 $subject = 'Milele - Candidate Personal Information Form';
