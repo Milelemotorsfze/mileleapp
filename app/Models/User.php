@@ -206,8 +206,8 @@ class User extends Authenticatable
     }
     public function getCandidateDocsVarifyAttribute() {
         $pendingdocsUploaded = 0;
-        $user = User::find($this->id);
-        if($user) {
+        // $user = User::find($this->id);
+        // if($user) {
             if(Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents','send-candidate-documents-request-form'])) {
                 $pendingdocsUploaded = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')
                 ->whereHas('candidateDetails', function($q){
@@ -216,7 +216,7 @@ class User extends Authenticatable
                     ;
                 })->latest()->count();
             }
-        }
+        // }
         return $pendingdocsUploaded;
     }
     public function getCanShowDocsAttribute() {
@@ -557,7 +557,7 @@ class User extends Authenticatable
     public function hasPermissionForSelectedRole($permissionName) {
         $selectedRole = $this->selected_role;
         if(is_array($permissionName)) {
-            if(count($permissionName) > 0) {
+            if(count($permissionName) > 0 && $selectedRole) {
                 return DB::table('role_has_permissions')
                     ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
                     ->where('role_has_permissions.role_id', $selectedRole)
