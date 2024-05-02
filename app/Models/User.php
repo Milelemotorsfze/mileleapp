@@ -208,7 +208,7 @@ class User extends Authenticatable
         $pendingdocsUploaded = 0;
         // $user = User::find($this->id);
         // if($user) {
-            if(Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents','send-candidate-documents-request-form'])) {
+            if($this->hasPermissionForSelectedRole(['verify-candidates-documents','send-candidate-documents-request-form'])) {
                 $pendingdocsUploaded = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')
                 ->whereHas('candidateDetails', function($q){
                     $q->where('documents_verified_at', NULL)->where('documents_form_send_at','!=',NULL)->where('documents_form_submit_at','!=',NULL)
@@ -237,7 +237,7 @@ class User extends Authenticatable
     }
     public function getVerifyOfferLettersAttribute() {
         $verifyOffers = 0;
-        if(Auth::user()->hasPermissionForSelectedRole(['verify-offer-letter-signature'])) {
+        if($this->hasPermissionForSelectedRole(['verify-offer-letter-signature'])) {
             $verifyOffers = InterviewSummaryReport::where([
                 ['status','approved'],
                 ['seleced_status','pending'],
@@ -253,7 +253,7 @@ class User extends Authenticatable
     }
     public function getCandidatePersonalInformationVarifyAttribute() {
         $pendingPersonalInfo = 0;
-        if(Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action'])) {
+        if($this->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action'])) {
         $pendingPersonalInfo = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')
         ->whereHas('candidateDetails', function($q){
             $q->where('documents_verified_at','!=',NULL)->where('personal_information_verified_at',NULL)->where('personal_information_created_at','!=',NULL)->whereColumn('personal_information_send_at', '<', 'personal_information_created_at');
@@ -263,7 +263,7 @@ class User extends Authenticatable
     }
     public function getCanShowInfoAttribute() {
         $canShowInfo = false;
-        if(Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action'])) {
+        if($this->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action'])) {
             $pending = EmployeeProfile::where([
                 ['type','candidate'],
                 ['personal_information_verified_at',NULL],
