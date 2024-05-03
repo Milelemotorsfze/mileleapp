@@ -334,7 +334,7 @@ class InterviewSummaryReportController extends Controller
             })->latest();
         }
         $hiringrequests = $hiringrequests->get();
-        $data = EmployeeHiringRequest::where('id',$id);
+        $data = EmployeeHiringRequest::where('id',$currentInterviewReport->hiring_request_id);
         if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
             $data = $data->latest();
         }
@@ -359,7 +359,7 @@ class InterviewSummaryReportController extends Controller
             return view('hrm.notaccess',compact('errorMsg'));
         }
         else {
-            return view('hrm.hiring.interview_summary_report.create',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
+            return view('hrm.hiring.interview_summary_report.createOrEdit',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
             'masterGender','interviewersNames','hiringrequests'));
         }
     }
