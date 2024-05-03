@@ -727,7 +727,7 @@ $pendingvendorfol = DB::table('purchasing_order')
                 <div hidden>{{$i=0;}}
                 </div>
                 @foreach ($data as $purchasingOrder)
-                <tr data-id="{{ $purchasingOrder->id }}" class="clickable-row">
+                <tr data-id="{{ $purchasingOrder->id }}" data-url="{{ route('purchasing-order.show', $purchasingOrder->id) }}" class="clickable-row">
                 <td style="vertical-align: middle; text-align: center;">{{ $purchasingOrder->po_number }}</td>
                 <td style="vertical-align: middle; text-align: center;">{{ date('d-M-Y', strtotime($purchasingOrder->po_date)) }}</td>
                 <td style="vertical-align: middle; text-align: center;">
@@ -866,8 +866,8 @@ $(document).ready(function() {
     // Attach click event listener to all elements with the class 'clickable-row'
     document.querySelectorAll('.clickable-row').forEach(function(element) {
         element.addEventListener('click', function(e) {
-            // Define the URL to open
-            var url = '{{ route('purchasing-order.show', $purchasingOrder->id) }}'.replace('$purchasingOrder->id', this.getAttribute('data-id'));
+            // Fetch the URL from the data-url attribute
+            const url = this.getAttribute('data-url');
 
             // Check if Ctrl key is pressed or the right mouse button was used
             if (e.ctrlKey || e.button === 1) {
@@ -882,13 +882,14 @@ $(document).ready(function() {
         // Prevent the default context menu on right click
         element.addEventListener('contextmenu', function(e) {
             e.preventDefault();
-            // Define the URL as above (not repeating here for brevity)
-            var url = '{{ route('purchasing-order.show', $purchasingOrder->id) }}'.replace('$purchasingOrder->id', this.getAttribute('data-id'));
+            // Fetch the URL again for consistency
+            const url = this.getAttribute('data-url');
             // Open in a new tab on right click
             window.open(url, '_blank');
         });
     });
 });
+
 
 </script>
     </div>
