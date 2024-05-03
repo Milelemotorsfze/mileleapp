@@ -96,9 +96,9 @@ class User extends Authenticatable
         // if($passportRequest) {
         //     $passportWith = 'with_company';
         // }
-        if($this->empProfile->passport_status == 'with_milele') {
-            $passportWith = 'with_company';
-        }
+        // if($this->empProfile->passport_status != null && $this->empProfile->passport_status == 'with_milele') {
+        //     $passportWith = 'with_company';
+        // }
         return $passportWith;
     }
     public function getCanSubmitOrReleasePassportAttribute() {
