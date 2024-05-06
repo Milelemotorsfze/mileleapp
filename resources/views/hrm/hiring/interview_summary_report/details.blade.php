@@ -1221,7 +1221,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 	                        alertify.success(status + " Successfully")
 	                    }
 	                    else if(data == 'error') {
-	
+							window.location.reload();
+							alertify.error("Can't Verify, It was verified already..")
 	                    }
 	                }
 	            });
