@@ -665,9 +665,13 @@ class CandidatePersonalInfoController extends Controller
                     $candidate->documents_verified_at = Carbon::now();
                     $candidate->documents_verified_by = $authId;
                     $candidate->update();
+                    DB::commit();
+                    return response()->json('success');
                 }
-                DB::commit();
-                return response()->json('success');
+                else if($candidate && $candidate->documents_verified_at != '') {
+                    DB::commit();
+                    return response()->json('error');
+                }
             } 
             catch (\Exception $e) {
                 DB::rollback();
