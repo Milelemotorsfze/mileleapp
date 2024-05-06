@@ -2892,7 +2892,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-offer-letter']);
 										@endphp										
-										@if($data->candidateDetails->documents_verified_at != NULL && $data->offer_letter_send_at == NULL)
+										@if($hasPermission && $data->candidateDetails->documents_verified_at != NULL && $data->offer_letter_send_at == NULL)
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Send Offer Letter & Personal Info Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#send-offer-letter-{{$data->id}}">
