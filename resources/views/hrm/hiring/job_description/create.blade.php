@@ -87,6 +87,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-job-descript
 		</ul>
 	</div>
 	@endif
+	@if (Session::has('error'))
+	<div class="alert alert-danger" >
+		<button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+		{{ Session::get('error') }}
+	</div>
+	@endif
+	@if (Session::has('success'))
+	<div class="alert alert-success" id="success-alert">
+		<button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+		{{ Session::get('success') }}
+	</div>
+	@endif
 	<div class="row">
 		<p><span style="float:right;" class="error">* Required Field</span></p>
 	</div>
