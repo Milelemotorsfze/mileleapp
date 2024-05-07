@@ -2892,7 +2892,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-offer-letter']);
 										@endphp										
-										@if($data->candidateDetails->documents_verified_at != NULL && $data->offer_letter_send_at == NULL)
+										@if($hasPermission && $data->candidateDetails->documents_verified_at != NULL && $data->offer_letter_send_at == NULL)
 										<li>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Send Offer Letter & Personal Info Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 												data-bs-target="#send-offer-letter-{{$data->id}}">
@@ -2922,7 +2922,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 																		</div>
 																	</div>
 																	<div class="row">
-																		<input type="hidden" id="candidateId" name="candidateId" value="{{$data->id}}">
+																		<input type="hidden" id="candidateId_{{$data->id}}" name="candidateId" value="{{$data->id}}">
 																		<div class="col-xxl-6 col-lg-6 col-md-6 radio-main-div">
 																			<label for="candidate_name" class="form-label font-size-13">{{ __('Candidate Name') }}</label>
 																			<input name="candidate_name" id="candidate_name_{{$data->id}}" class="form-control" required
@@ -3395,9 +3395,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 			"value must be less than total salary"
 		);
 		jQuery.validator.addMethod("uniquePassport", 
-	       function(value, element) {
+	       function(value, element, param) {
 	           var result = false;
-			var candidateId = $("#candidateId").val();
+			var candidateId = $("#candidateId_"+param).val();
 	           $.ajax({
 	               type:"POST",
 	               async: false,
@@ -3536,7 +3536,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					passport_number: {
 	                       required: true,
 	                       validPassport:true,
-						uniquePassport: true,
+						uniquePassport: id,
 	                   },
 					"contact_number[main]": {
 	                       required: true,

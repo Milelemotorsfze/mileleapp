@@ -126,45 +126,51 @@ class CandidatePersonalInfoController extends Controller
                 $offerNo = '';
                 $offerCode = '';
                 $data = InterviewSummaryReport::where('id',$request->id)->first();
-                if($data) {
-                    $data->candidate_name = $request->candidate_name;
-                    $data->email = $request->email;
-                }
-                $data->update();
-                $latestOfferLetterCode = EmployeeProfile::withTrashed()->orderBy('offer_letter_no', 'desc')->first();
-                $length = 5;
-                $offset = 5;
-                $prefix = "";
-                if($latestOfferLetterCode){
-                    $latestUUID =  $latestOfferLetterCode->offer_letter_no; 
-                    $newCode =  str_pad($latestUUID + 1, 5, 0, STR_PAD_LEFT);
-                    $offerNo =  $prefix.$newCode;
-                }else{
-                    $offerNo = $prefix.'00001';
-                }                      
-                $offerCode = 'MM/OL/'.$offerNo.'/'.Carbon::now()->format('Y');
-                $emp = EmployeeProfile::where('interview_summary_id',$request->id)->first();
-                if($emp) {
-                    $emp->passport_number = $request->passport_number;
-                    $emp->contact_number = $request->contact_number['full'];
-                    $emp->probation_duration_in_months = $request->probation_duration_in_months;
-                    $emp->basic_salary = $request->basic_salary;
-                    $emp->other_allowances = $request->other_allowances;
-                    $emp->total_salary = $request->total_salary;
-                    $emp->designation_id = $request->designation_id;
-                    if($emp->offer_letter_no == NULL && $emp->offer_letter_code == NULL) {
-                        $emp->offer_letter_no = $offerNo;
-                        $emp->offer_letter_code = $offerCode;
+                if($data && $data->offer_letter_verified_at == '' && $data->offer_letter_send_at == '') {
+                    if($data && $data->offer_letter_verified_at == '' && $data->offer_letter_send_at == '') {
+                        $data->candidate_name = $request->candidate_name;
+                        $data->email = $request->email;
                     }
-                    $emp->update();
-                }    
-                $inwords['basic_salary'] = $this->decimalNumberInWords($request->basic_salary);
-                $inwords['other_allowances'] = $this->decimalNumberInWords($request->other_allowances);
-                $inwords['total_salary'] = $this->decimalNumberInWords($request->total_salary);
-                $hr = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
-                $data->isAuth = 1;
-                 DB::commit();
-                 return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr'));
+                    $data->update();
+                    $latestOfferLetterCode = EmployeeProfile::withTrashed()->orderBy('offer_letter_no', 'desc')->first();
+                    $length = 5;
+                    $offset = 5;
+                    $prefix = "";
+                    if($latestOfferLetterCode){
+                        $latestUUID =  $latestOfferLetterCode->offer_letter_no; 
+                        $newCode =  str_pad($latestUUID + 1, 5, 0, STR_PAD_LEFT);
+                        $offerNo =  $prefix.$newCode;
+                    }else{
+                        $offerNo = $prefix.'00001';
+                    }                      
+                    $offerCode = 'MM/OL/'.$offerNo.'/'.Carbon::now()->format('Y');
+                    $emp = EmployeeProfile::where('interview_summary_id',$request->id)->first();
+                    if($emp && $emp->interviewSummary->offer_letter_verified_at == '' && $emp->interviewSummary->offer_letter_send_at == '') {
+                        $emp->passport_number = $request->passport_number;
+                        $emp->contact_number = $request->contact_number['full'];
+                        $emp->probation_duration_in_months = $request->probation_duration_in_months;
+                        $emp->basic_salary = $request->basic_salary;
+                        $emp->other_allowances = $request->other_allowances;
+                        $emp->total_salary = $request->total_salary;
+                        $emp->designation_id = $request->designation_id;
+                        if($emp->offer_letter_no == NULL && $emp->offer_letter_code == NULL) {
+                            $emp->offer_letter_no = $offerNo;
+                            $emp->offer_letter_code = $offerCode;
+                        }
+                        $emp->update();
+                    }    
+                    $inwords['basic_salary'] = $this->decimalNumberInWords($request->basic_salary);
+                    $inwords['other_allowances'] = $this->decimalNumberInWords($request->other_allowances);
+                    $inwords['total_salary'] = $this->decimalNumberInWords($request->total_salary);
+                    $hr = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                    $data->isAuth = 1;
+                     DB::commit();
+                     return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr'));
+                }
+                else if($data && ($data->offer_letter_verified_at != '' OR $data->offer_letter_send_at != '')){
+                    $errorMsg ="Cannot generate! The offer letter for this candidate has already been generated.";
+                    return view('hrm.notaccess',compact('errorMsg'));
+                }
             } 
             catch (\Exception $e) {
                 DB::rollback();
