@@ -77,6 +77,11 @@
 			background-color: #aae1cb;
 			border-color: #95dabe;
 			}
+			.alert-error {
+				color: #b14542;
+				background-color: #fec0bf;
+				border-color: #feb1af;
+			}
 			.alert {
 			position: relative;
 			padding: .75rem 1.25rem;
@@ -90,6 +95,10 @@
 		@if(isset($success) && $success != '')
 		<div class="alert alert-success" id="success-alert">
 			{{$success ?? ''}}
+		</div>
+		@elseif(isset($error) && $error != '')
+		<div class="alert alert-error" id="error-alert">
+			{{$error ?? ''}}
 		</div>
 		@endif
 		<div class="book">
@@ -362,7 +371,8 @@
 			                            alertify.success(status + " Successfully")
 			                        }
 			                        else if(data == 'error') {
-			
+										window.location.reload();
+	                        			alertify.error("Can't verify! It has already been verified")
 			                        }
 			                    }
 			                });

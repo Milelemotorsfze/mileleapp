@@ -524,125 +524,122 @@ class CandidatePersonalInfoController extends Controller
                     $candidate->pif_sign = $request->signature;
                     $candidate->update();
                     $createEmp = EmployeeProfile::where('interview_summary_id',$request->id)->first();    
-                    if(!$createEmp OR ($createEmp && $createEmp->personal_information_verified_at == '')) {
-
-                                
-                    if(!$createEmp) {
-                        $input = $request->all(); 
-                        $input['residence_telephone_number'] = $request->residence_telephone_number['full'];
-                        $input['contact_number'] = $request->contact_number['full'];
-                        $input['type'] = 'candidate';
-                        $input['interview_summary_id'] = $request->id;
-                        $input['designation_id'] = $candidate->employeeHiringRequest->questionnaire->designation->id;
-                        $input['department_id'] = $candidate->employeeHiringRequest->questionnaire->department->id;
-                        $input['gender'] = $candidate->gender;
-                        $input['nationality'] = $candidate->nationality;
-                        $input['personal_information_created_at'] = Carbon::now();
-                        $createEmp = EmployeeProfile::create($input);                      
-                    }
-                    else { 
-                        $createEmp->first_name = $request->first_name;
-                        $createEmp->last_name = $request->last_name;
-                        $createEmp->name_of_father = $request->name_of_father;
-                        $createEmp->name_of_mother = $request->name_of_mother;
-                        $createEmp->marital_status = $request->marital_status;
-                        $createEmp->passport_number = $request->passport_number;
-                        $createEmp->passport_expiry_date = $request->passport_expiry_date;
-                        $createEmp->educational_qualification = $request->educational_qualification;
-                        $createEmp->year_of_completion = $request->year_of_completion;
-                        $createEmp->religion = $request->religion;
-                        $createEmp->dob = $request->dob;
-                        $createEmp->address_uae = $request->address_uae;
-                        $createEmp->personal_email_address = $request->personal_email_address;
-                        $createEmp->spouse_name = $request->spouse_name;
-                        $createEmp->spouse_passport_number = $request->spouse_passport_number;
-                        $createEmp->spouse_passport_expiry_date = $request->spouse_passport_expiry_date;
-                        $createEmp->spouse_dob = $request->spouse_dob;
-                        $createEmp->spouse_nationality = $request->spouse_nationality;
-                        $createEmp->residence_telephone_number = $request->residence_telephone_number['full'];
-                        $createEmp->contact_number = $request->contact_number['full'];
-                        $createEmp->personal_information_created_at = Carbon::now();
-                        $createEmp->department_id = $candidate->employeeHiringRequest->questionnaire->department->id;
-                        $createEmp->designation_id = $candidate->employeeHiringRequest->questionnaire->designation->id;
-                        $createEmp->update();
-                    }
-                    $oldLangs = EmployeeSpokenLanguage::where('candidate_id',$createEmp->id)->get();
-                    foreach($oldLangs as $oldLang) {
-                        $oldLang->delete();
-                    }
-                    if(isset($request->language_id)) {
-                        if(count($request->language_id) > 0) {
-                            $inputLang['candidate_id'] = $createEmp->id;
-                            foreach($request->language_id as $language_id) {
-                                $inputLang['language_id'] = $language_id;
-                                $createLang = EmployeeSpokenLanguage::create($inputLang);                            
-                            }
+                    if(!$createEmp OR ($createEmp && $createEmp->personal_information_verified_at == '')) {                             
+                        if(!$createEmp) {
+                            $input = $request->all(); 
+                            $input['residence_telephone_number'] = $request->residence_telephone_number['full'];
+                            $input['contact_number'] = $request->contact_number['full'];
+                            $input['type'] = 'candidate';
+                            $input['interview_summary_id'] = $request->id;
+                            $input['designation_id'] = $candidate->employeeHiringRequest->questionnaire->designation->id;
+                            $input['department_id'] = $candidate->employeeHiringRequest->questionnaire->department->id;
+                            $input['gender'] = $candidate->gender;
+                            $input['nationality'] = $candidate->nationality;
+                            $input['personal_information_created_at'] = Carbon::now();
+                            $createEmp = EmployeeProfile::create($input);                      
                         }
-                    }
-                    $oldChilds = Children::where('candidate_id',$createEmp->id)->get();
-                    foreach($oldChilds as $oldChild) {
-                        $oldChild->delete();
-                    }
-                    if(isset($request->child)) {
-                        if(count($request->child) > 0) {
-                            foreach($request->child as $child) {  
-                                $inputChild = [];  
-                                $inputChild['candidate_id'] = $createEmp->id;                      
-                                $inputChild['child_name'] = $child['child_name'];
-                                $inputChild['child_passport_number'] = $child['child_passport_number'];
-                                $inputChild['child_passport_expiry_date'] = $child['child_passport_expiry_date'];
-                                $inputChild['child_dob'] = $child['child_dob'];
-                                $inputChild['child_nationality'] = $child['child_nationality'];
-                                if($inputChild['child_name'] != NULL && $inputChild['child_dob'] != NULL && $inputChild['child_nationality'] != NULL) {
-                                    $createChild = Children::create($inputChild);                            
+                        else { 
+                            $createEmp->first_name = $request->first_name;
+                            $createEmp->last_name = $request->last_name;
+                            $createEmp->name_of_father = $request->name_of_father;
+                            $createEmp->name_of_mother = $request->name_of_mother;
+                            $createEmp->marital_status = $request->marital_status;
+                            $createEmp->passport_number = $request->passport_number;
+                            $createEmp->passport_expiry_date = $request->passport_expiry_date;
+                            $createEmp->educational_qualification = $request->educational_qualification;
+                            $createEmp->year_of_completion = $request->year_of_completion;
+                            $createEmp->religion = $request->religion;
+                            $createEmp->dob = $request->dob;
+                            $createEmp->address_uae = $request->address_uae;
+                            $createEmp->personal_email_address = $request->personal_email_address;
+                            $createEmp->spouse_name = $request->spouse_name;
+                            $createEmp->spouse_passport_number = $request->spouse_passport_number;
+                            $createEmp->spouse_passport_expiry_date = $request->spouse_passport_expiry_date;
+                            $createEmp->spouse_dob = $request->spouse_dob;
+                            $createEmp->spouse_nationality = $request->spouse_nationality;
+                            $createEmp->residence_telephone_number = $request->residence_telephone_number['full'];
+                            $createEmp->contact_number = $request->contact_number['full'];
+                            $createEmp->personal_information_created_at = Carbon::now();
+                            $createEmp->department_id = $candidate->employeeHiringRequest->questionnaire->department->id;
+                            $createEmp->designation_id = $candidate->employeeHiringRequest->questionnaire->designation->id;
+                            $createEmp->update();
+                        }
+                        $oldLangs = EmployeeSpokenLanguage::where('candidate_id',$createEmp->id)->get();
+                        foreach($oldLangs as $oldLang) {
+                            $oldLang->delete();
+                        }
+                        if(isset($request->language_id)) {
+                            if(count($request->language_id) > 0) {
+                                $inputLang['candidate_id'] = $createEmp->id;
+                                foreach($request->language_id as $language_id) {
+                                    $inputLang['language_id'] = $language_id;
+                                    $createLang = EmployeeSpokenLanguage::create($inputLang);                            
                                 }
                             }
                         }
-                    }
-                    $oldEcus = UAEEmergencyContact::where('candidate_id',$createEmp->id)->get();
-                    foreach($oldEcus as $oldEcu) {
-                        $oldEcu->delete();
-                    }
-                    if(isset($request->ecu)) {
-                        if(count($request->ecu) > 0) {
-                            foreach($request->ecu as $ecu) {  
-                                $inputEcu = [];  
-                                $inputEcu['candidate_id'] = $createEmp->id;                      
-                                $inputEcu['name'] = $ecu['name'];
-                                $inputEcu['relation'] = $ecu['relation'];
-                                $inputEcu['contact_number'] = $ecu['contact_number']['full'];
-                                $inputEcu['alternative_contact_number'] = $ecu['alternative_contact_number']['full'];
-                                $inputEcu['email_address'] = $ecu['email_address'];
-                                $createEcu = UAEEmergencyContact::create($inputEcu);                            
+                        $oldChilds = Children::where('candidate_id',$createEmp->id)->get();
+                        foreach($oldChilds as $oldChild) {
+                            $oldChild->delete();
+                        }
+                        if(isset($request->child)) {
+                            if(count($request->child) > 0) {
+                                foreach($request->child as $child) {  
+                                    $inputChild = [];  
+                                    $inputChild['candidate_id'] = $createEmp->id;                      
+                                    $inputChild['child_name'] = $child['child_name'];
+                                    $inputChild['child_passport_number'] = $child['child_passport_number'];
+                                    $inputChild['child_passport_expiry_date'] = $child['child_passport_expiry_date'];
+                                    $inputChild['child_dob'] = $child['child_dob'];
+                                    $inputChild['child_nationality'] = $child['child_nationality'];
+                                    if($inputChild['child_name'] != NULL && $inputChild['child_dob'] != NULL && $inputChild['child_nationality'] != NULL) {
+                                        $createChild = Children::create($inputChild);                            
+                                    }
+                                }
                             }
                         }
-                    }
-                    $oldEchs = HomeCountryEmergencyContact::where('candidate_id',$createEmp->id)->get();
-                    foreach($oldEchs as $oldEch) {
-                        $oldEch->delete();
-                    }
-                    if(isset($request->ech)) {
-                        if(count($request->ech) > 0) {
-                            foreach($request->ech as $ech) {  
-                                $inputEch = [];  
-                                $inputEch['candidate_id'] = $createEmp->id;                      
-                                $inputEch['name'] = $ech['name'];
-                                $inputEch['relation'] = $ech['relation'];
-                                $inputEch['contact_number'] = $ech['contact_number']['full'];
-                                $inputEch['alternative_contact_number'] = $ech['alternative_contact_number']['full'];
-                                $inputEch['email_address'] = $ech['email'];
-                                $inputEch['home_country_address'] = $ech['home_country_address'];
-                                $createEch = HomeCountryEmergencyContact::create($inputEch);                            
+                        $oldEcus = UAEEmergencyContact::where('candidate_id',$createEmp->id)->get();
+                        foreach($oldEcus as $oldEcu) {
+                            $oldEcu->delete();
+                        }
+                        if(isset($request->ecu)) {
+                            if(count($request->ecu) > 0) {
+                                foreach($request->ecu as $ecu) {  
+                                    $inputEcu = [];  
+                                    $inputEcu['candidate_id'] = $createEmp->id;                      
+                                    $inputEcu['name'] = $ecu['name'];
+                                    $inputEcu['relation'] = $ecu['relation'];
+                                    $inputEcu['contact_number'] = $ecu['contact_number']['full'];
+                                    $inputEcu['alternative_contact_number'] = $ecu['alternative_contact_number']['full'];
+                                    $inputEcu['email_address'] = $ecu['email_address'];
+                                    $createEcu = UAEEmergencyContact::create($inputEcu);                            
+                                }
                             }
                         }
+                        $oldEchs = HomeCountryEmergencyContact::where('candidate_id',$createEmp->id)->get();
+                        foreach($oldEchs as $oldEch) {
+                            $oldEch->delete();
+                        }
+                        if(isset($request->ech)) {
+                            if(count($request->ech) > 0) {
+                                foreach($request->ech as $ech) {  
+                                    $inputEch = [];  
+                                    $inputEch['candidate_id'] = $createEmp->id;                      
+                                    $inputEch['name'] = $ech['name'];
+                                    $inputEch['relation'] = $ech['relation'];
+                                    $inputEch['contact_number'] = $ech['contact_number']['full'];
+                                    $inputEch['alternative_contact_number'] = $ech['alternative_contact_number']['full'];
+                                    $inputEch['email_address'] = $ech['email'];
+                                    $inputEch['home_country_address'] = $ech['home_country_address'];
+                                    $createEch = HomeCountryEmergencyContact::create($inputEch);                            
+                                }
+                            }
+                        }
+                        $successMessage = 'Candidate Personal Information Form Submitted Successfully.';
+
+                    } 
+                    else {
+                        $successMessage = "can't update this candidate personal information ,because it is already verified ";
                     }
-                    $successMessage = 'Candidate Personal Information Form Submitted Successfully.';
-
-                } 
-                else {
-                    $successMessage = "can't update this candidate personal information ,because it is already verified ";
-
-                }
                 }               
            DB::commit();
            return view('hrm.hiring.personal_info.successPersonalinfo',compact('candidate','successMessage'));
@@ -699,42 +696,49 @@ class CandidatePersonalInfoController extends Controller
             try {
                 $authId = Auth::id();
                 $data = InterviewSummaryReport::where('id',$request->id)->first();
-                if($data) {
-                    $data->offer_letter_verified_at = Carbon::now();
-                    $data->offer_letter_verified_by = $authId;
-                    $data->update();
+                if($data && $data->offer_letter_verified_at == '') {
+
+                    if($data) {
+                        $data->offer_letter_verified_at = Carbon::now();
+                        $data->offer_letter_verified_by = $authId;
+                        $data->update();
+                    }
+                    $hr = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                    $emp = EmployeeProfile::where('interview_summary_id',$request->id)->first();
+                    $inwords['basic_salary'] = $this->decimalNumberInWords($emp->basic_salary);
+                    $inwords['other_allowances'] = $this->decimalNumberInWords($emp->other_allowances);
+                    $inwords['total_salary'] = $this->decimalNumberInWords($emp->total_salary);
+                    $data->isAuth = 2;
+                    $pdf = PDF::loadView('pdf.sample', compact('data','inwords','hr'));             
+                    $data['name'] = 'Dear '.$data->candidate_name.' ,';
+                    $template['from'] = 'no-reply@milele.com';
+                    $template['from_name'] = 'Milele Matrix';
+                    $subject = 'Milele - Candidate Job Offer Letter Document';
+                    $filename = 'OL_'.$data->id.date('Y_m_d').'.pdf';
+                    $directory = public_path('hrm/employee/offer_letter');
+                    \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+                    $pdf->save($directory . '/' . $filename);
+                    if($emp) {
+                        $emp->offer_letter_fileName = $filename;
+                        $emp->update();
+                    }
+                    $attachPath = $directory . '/' . $filename;
+                    Mail::send(
+                            "hrm.hiring.offer_letter.sendOfferLetterDocsEmail",
+                            ["data"=>$data] ,
+                            function($msg) use ($data,$template,$subject,$attachPath) {
+                                $msg->to($data['email'], $data['name'])
+                                    ->from($template['from'],$template['from_name'])
+                                    ->subject($subject)
+                                    ->attach($attachPath);
+                            }
+                        );         
+                    DB::commit();
+                    return response()->json('success');
                 }
-                $hr = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
-                $emp = EmployeeProfile::where('interview_summary_id',$request->id)->first();
-                $inwords['basic_salary'] = $this->decimalNumberInWords($emp->basic_salary);
-                $inwords['other_allowances'] = $this->decimalNumberInWords($emp->other_allowances);
-                $inwords['total_salary'] = $this->decimalNumberInWords($emp->total_salary);
-                $data->isAuth = 2;
-                $pdf = PDF::loadView('pdf.sample', compact('data','inwords','hr'));             
-                $data['name'] = 'Dear '.$data->candidate_name.' ,';
-                $template['from'] = 'no-reply@milele.com';
-                $template['from_name'] = 'Milele Matrix';
-                $subject = 'Milele - Candidate Job Offer Letter Document';
-                $filename = 'OL_'.$data->id.date('Y_m_d').'.pdf';
-                $directory = public_path('hrm/employee/offer_letter');
-                \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
-                $pdf->save($directory . '/' . $filename);
-                if($emp) {
-                    $emp->offer_letter_fileName = $filename;
-                    $emp->update();
+                else if($data && $data->offer_letter_verified_at != '') {
+                    return response()->json('error');
                 }
-                $attachPath = $directory . '/' . $filename;
-                Mail::send(
-                        "hrm.hiring.offer_letter.sendOfferLetterDocsEmail",
-                        ["data"=>$data] ,
-                        function($msg) use ($data,$template,$subject,$attachPath) {
-                            $msg->to($data['email'], $data['name'])
-                                ->from($template['from'],$template['from_name'])
-                                ->subject($subject)
-                                ->attach($attachPath);
-                        }
-                    );                DB::commit();
-                return response()->json('success');
             } 
             catch (\Exception $e) {
                 DB::rollback();
@@ -943,25 +947,33 @@ class CandidatePersonalInfoController extends Controller
         else {
             DB::beginTransaction();
             try {
-                DB::commit();
+                $success = '';
+                $error = '';
                 $hr = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $emp = EmployeeProfile::where('interview_summary_id',$request->id)->first();
-                $emp->offer_sign = $request->signature;
-                $emp->offer_signed_at = Carbon::now();
-                $emp->offer_letter_hr_id = $hr->handover_to_id;
-                $emp->save();
-                $data = InterviewSummaryReport::where('id',$request->id)->first();
-                $inwords['basic_salary'] = $this->decimalNumberInWords($emp->basic_salary);
-                $inwords['other_allowances'] = $this->decimalNumberInWords($emp->other_allowances);
-                $inwords['total_salary'] = $this->decimalNumberInWords($emp->total_salary);
-                $data->isAuth = 2;
-                $success = '';
-                $success = 'Signature sent successfully';
-                return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr','success'));
+                if($emp) {
+                    $data = InterviewSummaryReport::where('id',$request->id)->first();
+                    $inwords['basic_salary'] = $this->decimalNumberInWords($emp->basic_salary);
+                    $inwords['other_allowances'] = $this->decimalNumberInWords($emp->other_allowances);
+                    $inwords['total_salary'] = $this->decimalNumberInWords($emp->total_salary);
+                    $data->isAuth = 2;
+                }
+                if($emp->interviewSummary->offer_letter_verified_at == '') {
+                    $emp->offer_sign = $request->signature;
+                    $emp->offer_signed_at = Carbon::now();
+                    $emp->offer_letter_hr_id = $hr->handover_to_id;
+                    $emp->save();
+                    $success = 'Signature sent successfully';
+                }
+                else if($emp->interviewSummary->offer_letter_verified_at != '') {
+                    $error = "Can't submit signature! The signature has already been verified.";
+                }
+                DB::commit();
+                return view('hrm.hiring.offer_letter.offerLetter',compact('data','inwords','hr','success','error'));
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                info($e);
+                dd($e);
                 $errorMsg ="Something went wrong! Contact your admin";
                 return view('hrm.notaccess',compact('errorMsg'));
             }
