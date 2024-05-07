@@ -219,7 +219,7 @@ class SupplierInventoryController extends Controller
         $supplierInventory->engine_number = $request->engine_number;
         $supplierInventory->pord_month = $request->prod_month;
         $supplierInventory->color_code = $request->color_code;
-        $supplierInventory->po_arm = $request->po_arm;
+        // $supplierInventory->po_arm = $request->po_arm;
         $supplierInventory->delivery_note = $request->delivery_note;
         $supplierInventory->interior_color_code_id  = $interiorColorId;
         $supplierInventory->exterior_color_code_id  = $exteriorColorId;
@@ -335,7 +335,7 @@ class SupplierInventoryController extends Controller
                     $uploadFileContents[$i]['engine_number'] = $filedata[4];
                     $uploadFileContents[$i]['color_code'] = $colourcode;
                     $uploadFileContents[$i]['pord_month'] = $filedata[6];
-                    $uploadFileContents[$i]['po_arm'] = $filedata[7];
+                    // $uploadFileContents[$i]['po_arm'] = $filedata[7];
                     if(!empty($filedata[6])) {
                         if(strlen($filedata[6]) != 6){
                             return redirect()->back()->with('error', 'Invalid Production Month '.$filedata[6].', Production month length should be exactly 6!');
@@ -346,17 +346,17 @@ class SupplierInventoryController extends Controller
                             }
                         }
                     }
-                    if (!empty($filedata[8])) {
+                    if (!empty($filedata[7])) {
                         try {
-                            $filedata[8] = \Illuminate\Support\Carbon::parse($filedata[8])->format('Y-m-d');
+                            $filedata[7] = \Illuminate\Support\Carbon::parse($filedata[7])->format('Y-m-d');
                         } catch (\Exception $e) {
                             return redirect()->back()->with('error', 'Invalid date, Please enter valid ETA import date!') ;
                         }
                     }else {
-                        $filedata[8] = NULL;
+                        $filedata[7] = NULL;
                     }
-                    $uploadFileContents[$i]['eta_import'] = $filedata[8];
-                    $uploadFileContents[$i]['delivery_note'] = !empty($filedata[9]) ? $filedata[9] : NULL;
+                    $uploadFileContents[$i]['eta_import'] = $filedata[7];
+                    $uploadFileContents[$i]['delivery_note'] = !empty($filedata[8]) ? $filedata[8] : NULL;
                     $uploadFileContents[$i]['supplier_id'] = $supplier_id;
                     $uploadFileContents[$i]['whole_sales'] = $request->whole_sales;
                     $uploadFileContents[$i]['country'] = $country;
@@ -573,7 +573,7 @@ class SupplierInventoryController extends Controller
                                 $supplierInventory->engine_number = $uploadFileContent['engine_number'];
                                 $supplierInventory->color_code = $uploadFileContent['color_code'];
                                 $supplierInventory->pord_month = $uploadFileContent['pord_month'];
-                                $supplierInventory->po_arm = $uploadFileContent['po_arm'];
+                                // $supplierInventory->po_arm = $uploadFileContent['po_arm'];
                                 $supplierInventory->eta_import = $uploadFileContent['eta_import'];
                                 $supplierInventory->is_add_new = false;
                                 $supplierInventory->whole_sales = $uploadFileContent['whole_sales'];
@@ -605,7 +605,7 @@ class SupplierInventoryController extends Controller
                                 ->where('engine_number', $uploadFileContent['engine_number'])
                                 ->where('color_code', $uploadFileContent['color_code'])
                                 ->where('pord_month', $uploadFileContent['pord_month'])
-                                ->where('po_arm', $uploadFileContent['po_arm'])
+                                // ->where('po_arm', $uploadFileContent['po_arm'])
                                 ->whereNotIn('id', $noChangeRowIds)
                                 ->whereNotIn('id', $updatedRowsIds)
                                 ->whereNotIn('id', $newlyAddedRowIds)
@@ -675,7 +675,7 @@ class SupplierInventoryController extends Controller
                                             $SimilarRowWithNullChaisis = $isNullChaisis->where('engine_number', $uploadFileContent['engine_number'])
                                                 ->where('color_code', $uploadFileContent['color_code'])
                                                 ->where('pord_month', $uploadFileContent['pord_month'])
-                                                ->where('po_arm', $uploadFileContent['po_arm'])
+                                                // ->where('po_arm', $uploadFileContent['po_arm'])
                                                 ->where('eta_import', $uploadFileContent['eta_import'])
                                                 ->where('delivery_note', $uploadFileContent['delivery_note'])
                                                 ->first();
@@ -734,7 +734,7 @@ class SupplierInventoryController extends Controller
                                                         $rowWithoutUpdate->engine_number   = $uploadFileContent['engine_number'];
                                                         $rowWithoutUpdate->color_code      = $uploadFileContent['color_code'];
                                                         $rowWithoutUpdate->pord_month      = $uploadFileContent['pord_month'];
-                                                        $rowWithoutUpdate->po_arm          = $uploadFileContent['po_arm'];
+                                                        // $rowWithoutUpdate->po_arm          = $uploadFileContent['po_arm'];
                                                         $rowWithoutUpdate->eta_import      = $uploadFileContent['eta_import'];
                                                         $rowWithoutUpdate->delivery_note   = $uploadFileContent['delivery_note'];
                                                         $rowWithoutUpdate->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
@@ -769,7 +769,7 @@ class SupplierInventoryController extends Controller
                                                         $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                                                         $supplierInventory->color_code      = $uploadFileContent['color_code'];
                                                         $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
-                                                        $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                                                        // $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                                                         $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
                                                         $supplierInventory->is_add_new     	= false;
                                                         $supplierInventory->whole_sales	    = $uploadFileContent['whole_sales'];
@@ -813,7 +813,7 @@ class SupplierInventoryController extends Controller
                                                 $isChasisExist->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                                 $isChasisExist->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
                                                 $isChasisExist->pord_month      = $uploadFileContent['pord_month'];
-                                                $isChasisExist->po_arm          = $uploadFileContent['po_arm'];
+                                                // $isChasisExist->po_arm          = $uploadFileContent['po_arm'];
                                                 $isChasisExist->eta_import      = $uploadFileContent['eta_import'];
                                                 $isChasisExist->delivery_note   = $uploadFileContent['delivery_note'];
                                                 if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
@@ -841,7 +841,7 @@ class SupplierInventoryController extends Controller
                                                 $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                                                 $supplierInventory->color_code      = $uploadFileContent['color_code'];
                                                 $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
-                                                $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                                                // $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                                                 $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
                                                 $supplierInventory->is_add_new     	= false;
                                                 $supplierInventory->whole_sales	    = $uploadFileContent['whole_sales'];
@@ -872,8 +872,7 @@ class SupplierInventoryController extends Controller
 //                                        info($supplierInventories->get());
 //                                        $supplierInventories = $supplierInventories->where('engine_number', $uploadFileContent['engine_number'])
 //                                            ->where('color_code', $uploadFileContent['color_code'])
-//                                            ->where('pord_month', $uploadFileContent['pord_month'])
-//                                            ->where('po_arm', $uploadFileContent['po_arm'])
+//                                            ->where('pord_month', $uploadFileContent['pord_month'])                                      
 //                                            ->where('eta_import', $uploadFileContent['eta_import'])
 //                                            ->where('delivery_note', $deliveryNote)
 //                                            ->first();
@@ -898,7 +897,7 @@ class SupplierInventoryController extends Controller
                                         $supplierInventory->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
                                         $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
                                         $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
-                                        $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                                        // $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                                         $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
                                         $supplierInventory->delivery_note   = $uploadFileContent['delivery_note'];
                                         if($uploadFileContent['delivery_note'] && is_numeric($uploadFileContent['delivery_note'])) {
@@ -949,7 +948,7 @@ class SupplierInventoryController extends Controller
                                             $inventoryRow->engine_number   = $uploadFileContent['engine_number'];
                                             $inventoryRow->color_code      = $uploadFileContent['color_code'];
                                             $inventoryRow->pord_month      = $uploadFileContent['pord_month'];
-                                            $inventoryRow->po_arm          = $uploadFileContent['po_arm'];
+                                            // $inventoryRow->po_arm          = $uploadFileContent['po_arm'];
                                             $inventoryRow->eta_import      = $uploadFileContent['eta_import'];
                                             $inventoryRow->delivery_note   = $uploadFileContent['delivery_note'];
                                             $inventoryRow->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
@@ -1000,7 +999,7 @@ class SupplierInventoryController extends Controller
                                             $nullChasisRow->engine_number   = $uploadFileContent['engine_number'];
                                             $nullChasisRow->color_code      = $uploadFileContent['color_code'];
                                             $nullChasisRow->pord_month      = $uploadFileContent['pord_month'];
-                                            $nullChasisRow->po_arm          = $uploadFileContent['po_arm'];
+                                            // $nullChasisRow->po_arm          = $uploadFileContent['po_arm'];
                                             $nullChasisRow->eta_import      = $uploadFileContent['eta_import'];
                                             $nullChasisRow->delivery_note   = $uploadFileContent['delivery_note'];
                                             $nullChasisRow->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
@@ -1043,7 +1042,7 @@ class SupplierInventoryController extends Controller
                                                 $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                                                 $supplierInventory->color_code      = $uploadFileContent['color_code'];
                                                 $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
-                                                $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                                                // $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                                                 $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
                                                 $supplierInventory->is_add_new     	= false;
                                                 $supplierInventory->whole_sales	    = $uploadFileContent['whole_sales'];
@@ -1086,7 +1085,7 @@ class SupplierInventoryController extends Controller
                                             $nullChasisRow->engine_number   = $uploadFileContent['engine_number'];
                                             $nullChasisRow->color_code      = $uploadFileContent['color_code'];
                                             $nullChasisRow->pord_month      = $uploadFileContent['pord_month'];
-                                            $nullChasisRow->po_arm          = $uploadFileContent['po_arm'];
+                                            // $nullChasisRow->po_arm          = $uploadFileContent['po_arm'];
                                             $nullChasisRow->eta_import      = $uploadFileContent['eta_import'];
                                             $nullChasisRow->delivery_note   = $uploadFileContent['delivery_note'];
                                             $nullChasisRow->interior_color_code_id = $uploadFileContent['interior_color_code_id'];
@@ -1122,7 +1121,7 @@ class SupplierInventoryController extends Controller
                         $supplierInventoryHistory->engine_number   = $uploadFileContent['engine_number'];
                         $supplierInventoryHistory->color_code      = $uploadFileContent['color_code'];
                         $supplierInventoryHistory->pord_month      = $uploadFileContent['pord_month'];
-                        $supplierInventoryHistory->po_arm          = $uploadFileContent['po_arm'];
+                        // $supplierInventoryHistory->po_arm          = $uploadFileContent['po_arm'];
                         $supplierInventoryHistory->eta_import      = $uploadFileContent['eta_import'];
                         $supplierInventoryHistory->is_add_new      = !empty($request->is_add_new) ? true : false;
                         $supplierInventoryHistory->supplier_id     = $uploadFileContent['supplier_id'];
@@ -1175,7 +1174,7 @@ class SupplierInventoryController extends Controller
                                 ->where('engine_number', $deletedRow->engine_number)
                                 ->where('color_code', $deletedRow->color_code)
                                 ->where('pord_month', $deletedRow->pord_month)
-                                ->where('po_arm', $deletedRow->po_arm)
+                                // ->where('po_arm', $deletedRow->po_arm)
                                 ->where('eta_import', $deletedRow->eta_import)
                                 ->where('delivery_note', $deletedRow->delivery_note)
                                 ->first();
@@ -1243,7 +1242,7 @@ class SupplierInventoryController extends Controller
                             $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                             $supplierInventory->color_code      = $uploadFileContent['color_code'];
                             $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
-                            $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                            // $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                             $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
                             $supplierInventory->is_add_new     	= !empty($request->is_add_new) ? true : false;
                             $supplierInventory->supplier_id     = $uploadFileContent['supplier_id'];
@@ -1271,7 +1270,7 @@ class SupplierInventoryController extends Controller
                             $supplierInventoryHistory->engine_number   = $uploadFileContent['engine_number'];
                             $supplierInventoryHistory->color_code      = $uploadFileContent['color_code'];
                             $supplierInventoryHistory->pord_month      = $uploadFileContent['pord_month'];
-                            $supplierInventoryHistory->po_arm          = $uploadFileContent['po_arm'];
+                            // $supplierInventoryHistory->po_arm          = $uploadFileContent['po_arm'];
                             $supplierInventoryHistory->eta_import      = $uploadFileContent['eta_import'];
                             $supplierInventoryHistory->is_add_new      = !empty($request->is_add_new) ? true : false;
                             $supplierInventoryHistory->supplier_id     = $uploadFileContent['supplier_id'];
@@ -1629,7 +1628,7 @@ class SupplierInventoryController extends Controller
                     ->where('engine_number', $secondFileRowDetail['engine_number'])
                     ->where('color_code', $secondFileRowDetail['color_code'])
                     ->where('pord_month', $secondFileRowDetail['pord_month'])
-                    ->where('po_arm', $secondFileRowDetail['po_arm'])
+                    // ->where('po_arm', $secondFileRowDetail['po_arm'])
                     ->whereNotIn('id', $noChangeRowIds)
                     ->whereNotIn('id', $updatedRowsIds)
                     ->where('eta_import', $secondFileRowDetail['eta_import'])
@@ -1690,7 +1689,7 @@ class SupplierInventoryController extends Controller
                                 $SimilarRowWithNullChaisis = $isNullChaisis->where('engine_number', $secondFileRowDetail['engine_number'])
                                     ->where('color_code', $secondFileRowDetail['color_code'])
                                     ->where('pord_month', $secondFileRowDetail['pord_month'])
-                                    ->where('po_arm', $secondFileRowDetail['po_arm'])
+                                    // ->where('po_arm', $secondFileRowDetail['po_arm'])
                                     ->where('eta_import', $secondFileRowDetail['eta_import'])
                                     ->where('delivery_note', $secondFileRowDetail['delivery_note'])
                                     ->first();
@@ -1762,7 +1761,7 @@ class SupplierInventoryController extends Controller
                             $supplierInventories = $supplierInventories->where('engine_number', $secondFileRowDetail['engine_number'])
                                 ->where('color_code', $secondFileRowDetail['color_code'])
                                 ->where('pord_month', $secondFileRowDetail['pord_month'])
-                                ->where('po_arm', $secondFileRowDetail['po_arm'])
+                                // ->where('po_arm', $secondFileRowDetail['po_arm'])
                                 ->where('eta_import', $secondFileRowDetail['eta_import'])
                                 ->first();
 

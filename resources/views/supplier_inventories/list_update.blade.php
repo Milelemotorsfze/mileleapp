@@ -110,7 +110,7 @@
                     <th>LOI</th>
                     <th>PFI Number </th>
                     <th>PO Number</th>
-                    <th>PO AMS</th>
+                    <!-- <th>PO AMS</th> -->
                     @can('inventory-log-details')
                         @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('inventory-log-details');
@@ -186,8 +186,8 @@
                             <td>{{ $supplierInventory->letterOfIndentItem->uuid ?? '' }}</td>
                             <td> {{ $supplierInventory->pfi->pfi_reference_number ?? '' }} </td>
                             <td> {{ $supplierInventory->purchaseOrder->po_number ?? ''}} </td>
-                            <td data-field="po_arm" class="po_arm"  id="po_arm-editable-{{$supplierInventory->id}}"  contenteditable="true"
-                                data-id="{{$supplierInventory->id}}" >{{ $supplierInventory->po_arm }}</td>
+                            <!-- <td data-field="po_arm" class="po_arm"  id="po_arm-editable-{{$supplierInventory->id}}"  contenteditable="true"
+                                data-id="{{$supplierInventory->id}}" >{{ $supplierInventory->po_arm }}</td> -->
 
                             @can('inventory-log-details')
                                 @php
