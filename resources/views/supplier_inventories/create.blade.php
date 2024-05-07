@@ -124,12 +124,7 @@
                                 <span id="pord_month_error" class="error"></span>
                             </div>
                         </div>
-                        <div class="col-lg-3 col-md-4">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label text-muted"> PO Arm</label>
-                                <input type="text" name="po_arm" placeholder="Enter PO Arm" class="form-control widthinput">
-                            </div>
-                        </div>
+                    
                         <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted"> Delivery Note </label>

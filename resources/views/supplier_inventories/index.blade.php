@@ -142,7 +142,7 @@
                         </td>
                         <div class="modal fade" id="view-details-{{$supplierInventory->master_model_id}}"
                              tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-dialog modal-dialog-scrollable">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h1 class="modal-title fs-5" id="exampleModalLabel">Inventory Items</h1>
@@ -150,7 +150,7 @@
                                     </div>
                                     <div class="modal-body p-3">
                                         @if($supplierInventory->childRows->count() > 0)
-                                            <div class="row  d-none d-lg-block d-xl-block d-xxl-block">
+                                            <div class="row d-none d-lg-block d-xl-block d-xxl-block">
                                                 <div class="d-flex">
                                                     <div class="col-lg-12 col-md-12 col-sm-12">
                                                         <div class="row">
@@ -163,9 +163,7 @@
                                                             <div class="col-lg-4 col-md-12 col-sm-12">
                                                                 <label class="form-label">Color Code</label>
                                                             </div>
-                                                            <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                <label class="form-label">PO Arm</label>
-                                                            </div>
+                                                        
                                                         </div>
                                                     </div>
                                                 </div>
@@ -176,21 +174,18 @@
                                                         <div class="col-lg-12 col-md-12 col-sm-12">
                                                             <div class="row mt-3">
                                                                 <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
+                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Chasis</label>
                                                                     <input type="text" value="{{ $data->chasis ?? ''}}" readonly class="form-control" >
                                                                 </div>
                                                                 <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                    <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
+                                                                    <label  class="form-label d-lg-none d-xl-none d-xxl-none">Engine Number</label>
                                                                     <input type="text" value="{{ $data->engine_number ?? '' }}" readonly class="form-control">
                                                                 </div>
                                                                 <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
+                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Color Code</label>
                                                                     <input type="text" value="{{ $data->color_code ?? '' }}" readonly class="form-control">
                                                                 </div>
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
-                                                                    <input type="text" value="{{ $data->po_arm }}" readonly class="form-control">
-                                                                </div>
+                                                            
                                                             </div>
                                                         </div>
                                                     </div>
@@ -214,43 +209,7 @@
     </div>
         @endif
         @endcan
-    <script type="text/javascript">
-        $(document).ready(function () {
 
-        {{--$('#dtBasicSupplierInventory').on( 'click', 'tr', function () {--}}
-        {{--       let masterModelId = $(this).attr('data-id');--}}
-        {{--        let model = $(this).attr('data-model');--}}
-        {{--        alert(model);--}}
-        {{--        let sfx = $(this).attr('data-sfx');--}}
-        {{--        let key = $(this).attr('data-key');--}}
-        {{--       let url = '{{ route('supplier-inventories.get-child-rows') }}';--}}
-        {{--        $.ajax({--}}
-        {{--            type: "GET",--}}
-        {{--            url: url,--}}
-        {{--            dataType: "json",--}}
-        {{--            data: {--}}
-        {{--                master_model_id: masterModelId--}}
-        {{--            },--}}
-        {{--            success:function (data) {--}}
-        {{--                console.log(data);--}}
-        {{--                $('.row-add').empty();--}}
-        {{--                $i =0;--}}
-        {{--                jQuery.each(data, function(i,item){--}}
-
-        {{--                    $('#dtBasicSupplierInventory ').append('<table width="100%" ><tr><th>Chaisis </th>'+--}}
-        {{--                        '<th>Engine </th>' +--}}
-        {{--                        '<th>Colour Code </th>' +--}}
-        {{--                        '<th>Po Arm </th></tr><tdody><tr>' +--}}
-        {{--                        '<td>'+item.chasis +'</td><td>'+item.engine_number+'</td><td>'+item.color_code+'</td><td>'+item.po_arm+'</td></tbody></tr></table></br>');--}}
-
-        {{--                     //.appendTo('#records_table');--}}
-        {{--                });--}}
-        {{--            }--}}
-        {{--        });--}}
-        {{--    })--}}
-
-        });
-    </script>
 @endsection
 
 

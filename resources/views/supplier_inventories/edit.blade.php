@@ -8,7 +8,7 @@
             <div class="card-header">
                 <h4 class="card-title"> Update Supplier Inventory Record</h4>
                 <a  class="btn btn-sm btn-info float-end " href="{{ route('supplier-inventories.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
-                <a href="{{ url('inventory/sample_supplier_inventory.csv') }}" class="btn btn-primary btn-sm  float-end" style="margin-right: 5px" target="_blank">
+                <a href="{{ url('sample_inventory_file/sample_supplier_inventory.csv') }}" class="btn btn-primary btn-sm  float-end" style="margin-right: 5px" target="_blank">
                     <i class="fa fa-download" ></i> Sample Template</a>
             </div>
             <div class="card-body">
