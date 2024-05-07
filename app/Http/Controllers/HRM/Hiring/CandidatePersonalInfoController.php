@@ -839,48 +839,54 @@ class CandidatePersonalInfoController extends Controller
             DB::beginTransaction();
             try {
                 $update = InterviewSummaryReport::where('id',$id)->first();
-                if($update) {
-                    $update->offer_letter_send_at = Carbon::now();
-                    $update->offer_letter_send_by = Auth::id();
+                if($update && $update->offer_letter_send_at == '') {
+                    if($update) {
+                        $update->offer_letter_send_at = Carbon::now();
+                        $update->offer_letter_send_by = Auth::id();
+                    }
+                    $update->update();
+                    $emp = EmployeeProfile::where('interview_summary_id',$id)->first();
+                    if($emp->personal_information_created_at != NULL && $emp->personal_information_send_at != NULL && 
+                    $emp->personal_information_send_at < $emp->personal_information_created_at) {
+                        $canSendPersonalInfoLink = 'no';
+                    }
+                    if($emp->personal_information_created_at != NULL && $emp->offer_signed_at != NULL && 
+                    $emp->offer_signed_at < $emp->personal_information_created_at) {
+                        $canSendOfferLetterLink = 'no';
+                    }
+                    if($emp) {
+                        $emp->personal_information_send_at = Carbon::now();
+                        $emp->update();
+                    }               
+                    $data['comment'] = '';
+                    $data['id'] = Crypt::encrypt($update->id);
+                    $data['email'] = $update->email;
+                    $data['send_by'] = Auth::user()->name;
+                    $data['name'] = 'Dear '.$update->candidate_name.' ,';
+                    $data['basic_salary'] = $emp->basic_salary;
+                    $data['basic_salary_inwords'] = $this->decimalNumberInWords($emp->basic_salary);
+                    $data['job_position'] = $update->employeeHiringRequest->questionnaire->designation->name;
+                    $data['canSendOfferLetterLink'] = $canSendOfferLetterLink;
+                    $data['canSendPersonalInfoLink'] = $canSendPersonalInfoLink;
+                    $template['from'] = 'no-reply@milele.com';
+                    $template['from_name'] = 'Milele Matrix';
+                    $subject = 'Milele - Candidate Personal Information Form';
+                    Mail::send(
+                            "hrm.hiring.personal_info.email",
+                            ["data"=>$data] ,
+                            function($msg) use ($data,$template,$subject) {
+                                $msg->to($data['email'], $data['name'])
+                                    ->from($template['from'],$template['from_name'])
+                                    ->subject($subject);
+                            }
+                        );
+                    DB::commit();
+                    return redirect()->route('interview-summary-report.index')->with('success','Offer Letter and Personal Information Form successfully sent to candidate');     
                 }
-                $update->update();
-                $emp = EmployeeProfile::where('interview_summary_id',$id)->first();
-                if($emp->personal_information_created_at != NULL && $emp->personal_information_send_at != NULL && 
-                $emp->personal_information_send_at < $emp->personal_information_created_at) {
-                    $canSendPersonalInfoLink = 'no';
+                else if($update && $update->offer_letter_send_at != '') {
+                    DB::commit();
+                    return redirect()->route('interview-summary-report.index')->with('error',"Can't send! The offer letter for this candidate has already been sent.");     
                 }
-                if($emp->personal_information_created_at != NULL && $emp->offer_signed_at != NULL && 
-                $emp->offer_signed_at < $emp->personal_information_created_at) {
-                    $canSendOfferLetterLink = 'no';
-                }
-                if($emp) {
-                    $emp->personal_information_send_at = Carbon::now();
-                    $emp->update();
-                }               
-                $data['comment'] = '';
-                $data['id'] = Crypt::encrypt($update->id);
-                $data['email'] = $update->email;
-                $data['send_by'] = Auth::user()->name;
-                $data['name'] = 'Dear '.$update->candidate_name.' ,';
-                $data['basic_salary'] = $emp->basic_salary;
-                $data['basic_salary_inwords'] = $this->decimalNumberInWords($emp->basic_salary);
-                $data['job_position'] = $update->employeeHiringRequest->questionnaire->designation->name;
-                $data['canSendOfferLetterLink'] = $canSendOfferLetterLink;
-                $data['canSendPersonalInfoLink'] = $canSendPersonalInfoLink;
-                $template['from'] = 'no-reply@milele.com';
-                $template['from_name'] = 'Milele Matrix';
-                $subject = 'Milele - Candidate Personal Information Form';
-                Mail::send(
-                        "hrm.hiring.personal_info.email",
-                        ["data"=>$data] ,
-                        function($msg) use ($data,$template,$subject) {
-                            $msg->to($data['email'], $data['name'])
-                                ->from($template['from'],$template['from_name'])
-                                ->subject($subject);
-                        }
-                    );
-                DB::commit();
-                return redirect()->route('interview-summary-report.index')->with('success','Offer Letter and Personal Information Form Successfully Send To Candidate');
             } 
             catch (\Exception $e) {
                 DB::rollback();
@@ -892,6 +898,7 @@ class CandidatePersonalInfoController extends Controller
         else {
             return redirect()->back()->withInput()->withErrors($validator);
         }
+        
     }
     public function signJobOfferLetter( $id) {
         if($id != NULL) {

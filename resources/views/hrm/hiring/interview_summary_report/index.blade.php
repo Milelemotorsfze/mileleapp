@@ -3380,7 +3380,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 			}
 		}
 		jQuery.validator.addMethod("validPassport", function(value, element) {
-			return this.optional(element) || /^[A-PR-WYa-pr-wy][1-9]\d\s?\d{4}[1-9]$/i.test(value);
+			return this.optional(element) || /^[A-Za-z0-9]{6,9}$/.test(value);
 		}, "Passport number is not valid");   
 		jQuery.validator.addMethod("lettersonly", function(value, element) {
 			return this.optional(element) || /^[a-z ]+$/i.test(value);
