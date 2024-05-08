@@ -205,6 +205,7 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>GRN Report</th>
                 </tr>
               </thead>
               <tbody>
@@ -486,7 +487,14 @@
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' }
+                { data: 'location', name: 'warehouse.name' },
+                { 
+            data: 'id', 
+            name: 'id',
+            render: function(data, type, row) {
+                return `<button class="btn btn-info" onclick="generatePDF(${data})">Generate PDF</button>`;
+            }
+        }
             ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
@@ -711,5 +719,9 @@ function exportToExcel(tableId) {
       }
     }
   }
+  function generatePDF(vehicleId) {
+    var url = `/viewgrnreport/method?vehicle_id=${vehicleId}`;
+    window.open(url, '_blank');
+}
 </script>
 @endsection

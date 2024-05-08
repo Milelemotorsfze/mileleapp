@@ -7,6 +7,7 @@ use App\Models\VehicleApprovalRequests;
 use App\Models\Vehicles;
 use App\Models\PurchasingOrder;
 use App\Models\Varaint;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Brand;
 use App\Models\Grn;
 use App\Models\Gdn;
@@ -3039,5 +3040,15 @@ public function viewalls(Request $request)
             }
         }
         return view('vehicles.stock');
+    }
+    public function generategrnPDF(Request $request)
+    {
+    $vehicleId = $request->vehicle_id;
+    $vehicle = Vehicles::find($vehicleId);
+    if (!$vehicle) {
+        abort(404);
+    }
+    $pdf = PDF::loadView('Reports.Grn', ['vehicle' => $vehicle]);
+    return $pdf->stream('vehicle-details.pdf');
     }
     }
