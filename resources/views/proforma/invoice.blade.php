@@ -1620,7 +1620,6 @@ $(document).ready(function () {
         });
         $('#country').select2({
             placeholder: "Select Final Destination",
-            tags:true,
             maximumSelectionLength: 1,
 
         }).on('select2:unselecting', function(e){
@@ -1643,7 +1642,6 @@ $(document).ready(function () {
         });
         $('#shipping_port').select2({
             placeholder: "Select Port Of Discharge",
-            tags:true,
             maximumSelectionLength: 1,
 
         }).on('select2:unselecting', function(e){
@@ -1666,7 +1664,6 @@ $(document).ready(function () {
 
         $('#to_shipping_port').select2({
             placeholder: "Select Port Of Loading",
-            tags:true,
             maximumSelectionLength: 1,
 
         }).on('select2:unselecting', function(e){
