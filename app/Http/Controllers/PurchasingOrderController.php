@@ -53,10 +53,28 @@ class PurchasingOrderController extends Controller
             $Ids = ['16'];
             $Ids[] = $userId;
             $data = PurchasingOrder::with('purchasing_order_items')
-            // ->whereIn('id', $demandPlanningPoIds)
-                                                ->get();
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                      ->from('vehicles')
+                      ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                      ->where('vehicles.gdn_id', '=', null);
+            })
+            ->whereHas('vehicles', function ($query) {
+                $query->whereNotNull('id');
+            })
+            ->get();
         }else{
-            $data = PurchasingOrder::with('purchasing_order_items')->orderBy('id', 'desc')->get();
+            $data = PurchasingOrder::with('purchasing_order_items')
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+              ->from('vehicles')
+              ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+              ->where('vehicles.gdn_id', '=', null);
+    })
+    ->whereHas('vehicles', function ($query) {
+        $query->whereNotNull('id');
+    })
+    ->get();
         }
     }
     else
@@ -68,13 +86,28 @@ class PurchasingOrderController extends Controller
             $Ids = ['16'];
             $Ids[] = $userId;
             $data = PurchasingOrder::with('purchasing_order_items')
-                                                // ->whereIn('created_by', $Ids)
-                                                // ->whereIn('id', $demandPlanningPoIds)
-                                                ->get();
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                      ->from('vehicles')
+                      ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                      ->where('vehicles.gdn_id', '=', null);
+            })
+            ->whereHas('vehicles', function ($query) {
+                $query->whereNotNull('id');
+            })
+            ->get();
         }else{
             $data = PurchasingOrder::with('purchasing_order_items')
-            // ->where('created_by', $userId)->orWhere('created_by', 16)
-            ->orderBy('id', 'desc')->get();
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                      ->from('vehicles')
+                      ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                      ->where('vehicles.gdn_id', '=', null);
+            })
+            ->whereHas('vehicles', function ($query) {
+                $query->whereNotNull('id');
+            })
+            ->get();
         }
     }
         return view('warehouse.index', compact('data'));
