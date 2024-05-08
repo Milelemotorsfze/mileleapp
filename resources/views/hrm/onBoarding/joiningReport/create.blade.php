@@ -258,7 +258,7 @@ $.ajaxSetup({
 	   );
 	   jQuery.validator.addMethod("isExist", 
 	       function(value, element) {
-	           var result = false;
+	           var result = true;
 				var employeeId = $("#employee_id").val();
 				var joining_type = $("#joining_type").val();
 				var joining_date = $("#joining_date").val();
