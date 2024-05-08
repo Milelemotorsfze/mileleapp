@@ -788,4 +788,43 @@ class JoiningReportController extends Controller
         return view('hrm.onBoarding.joiningReport.approvals',compact('page','preparedByPendings','preparedByApproved','preparedByRejected','employeePendings',
         'employeeApproved','employeeRejected','HRManagerPendings','HRManagerApproved','HRManagerRejected','ReportingManagerPendings','ReportingManagerApproved','ReportingManagerRejected'));
     }
+    public function uniqueJoiningReport(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'joining_type' => 'required',
+            'employeeId' => 'required',
+            'new_emp_joining_type' => 'required',
+            'joining_date' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
+        else {
+            try {
+                $jr = JoiningReport::where([
+                    ['joining_type',$request->joining_type],
+                    ['candidate_id',$request->employeeId[0]],
+                ]);
+                if($request->new_emp_joining_type == 'trial_period') {
+                    $jr = $jr->whereIn('new_emp_joining_type',['trial_period','permanent'])->whereIn('status',['pending','approved']);
+                }
+                else if($request->new_emp_joining_type == 'permanent') {
+                    $jr = $jr->where(function($query) {
+                        $query->where('new_emp_joining_type','trial_period')->where('status','pending');
+                    })->orWhere(function($query1) {
+                        $query1->where('new_emp_joining_type','permanent')->whereIn('status',['pending','approved']);
+                    });
+                }
+                $jr = $jr->get();
+                if(count($jr) > 0) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+           } 
+           catch (\Exception $e) {
+               info($e);
+           }
+        }
+    }
 }

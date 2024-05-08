@@ -93,7 +93,7 @@
 												</div>
 											</div>
 											<br>
-											<input name="id" value="{{$candidate->id}}" hidden>
+											<input name="id" value="{{$candidate->id}}" id="candidateId" hidden>
 											<div class="card">
 												<div class="card-header">
 													<h4 class="card-title">
@@ -472,6 +472,13 @@
 		@include('partials/right-sidebar')
 		@include('partials/vendor-scripts')
 		@stack('scripts')
+		<script type="text/javascript">
+	$.ajaxSetup({
+	    headers: {
+	        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	    }
+	});
+</script>
 		<script src="{{ asset('libs/dropzone/min/dropzone.min.js') }}"></script>
 		<script src="{{ asset('js/app.js') }}"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
@@ -1253,6 +1260,24 @@
 			    console.log('Checking...');
 			    return this.optional(element) || signaturePad.isEmpty();
 			}, "Please provide your signature...");
+			jQuery.validator.addMethod("uniquePassport", 
+	       function(value, element) {
+	           var result = false;
+			var candidateId = $("#candidateId").val();
+	           $.ajax({
+	               type:"POST",
+	               async: false,
+	               url: "{{route('employee.uniquePassport')}}", // script to validate in server side
+	               data: {passportNumber: value,candidateId:candidateId},
+	               success: function(data) {
+	                   result = (data == true) ? true : false;
+	               }
+	           });
+	           // return true if username is exist in database
+	           return result; 
+	       }, 
+	       "This Password is already taken! Try another."
+	   );
 			$('#candidatepersonalInfoForm').validate({ 
 			    rules: {
 			        first_name: {
@@ -1277,6 +1302,7 @@
 			        passport_number: {
 			            required: true,
 			            validPassport:true,
+						uniquePassport: true,
 			        },
 			        passport_expiry_date: {
 			            required: true,
