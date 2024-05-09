@@ -219,7 +219,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->employee_code ?? ''}}</td>
-							<td>{{ $data->user->name ?? '' }}</td>
+							<td>{{ $data->user->name ?? $data->first_name.' '.$data->last_name ?? '' }}</td>
 							<td>{{ $data->designation->name ?? '' }}</td>
 							<td>{{ $data->department->name ?? '' }}</td>
 							<td>{{ $data->genderName->name ?? '' }}</td>
