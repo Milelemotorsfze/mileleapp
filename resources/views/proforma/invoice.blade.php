@@ -2371,8 +2371,8 @@ $(document).ready(function () {
                     if(row['button_type'] == 'Vehicle') {
                         var brand = row[1];
                         var modelDescription = row[3];
-                        var interiorColor = row[6];
-                        var exteriorColor = row[7];
+                        var interiorColor = row[7];
+                        var exteriorColor = row[6];
                         var combinedValue = brand + ', ' + modelDescription + ', ' + exteriorColor + ', ' + interiorColor;
 
                     }
