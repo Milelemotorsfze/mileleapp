@@ -449,7 +449,7 @@ class JoiningReportController extends Controller
             } 
             catch (\Exception $e) {
                 DB::rollback();
-                dd($e);
+                info($e);
                 $errorMsg ="Something went wrong! Contact your admin";
                 return view('hrm.notaccess',compact('errorMsg'));
             }
@@ -604,7 +604,33 @@ class JoiningReportController extends Controller
                 else if($update->joining_type == 'new_employee' && $update->new_emp_joining_type == 'permanent') {
                     $empUpdate = EmployeeProfile::where('id',$update->candidate_id)->first();
                     if($empUpdate) {
-                        $empUpdate->department_id = $update->transfer_to_department_id;
+                        $joinDate = JoiningReport::where([
+                            ['candidate_id','==',$update->candidate_id],
+                            ['joining_type','==',$update->joining_type],
+                            ['status','approved'],
+                        ])->orderBy('joining_date','DESC')->first();
+                        if($joinDate) {
+                            $empUpdate->company_joining_date = $joinDate->joining_date;
+                        }
+                        // if($empUpdate->user_id == '') {
+                        //     $createUser['name'] = $empUpdate->first_name.' '.$empUpdate->last_name;
+                        //     $createUser['created_by'] = $authId;
+                        //     $createUserData = User::create($createUser);
+                        //     $empUpdate->user_id = $createUserData->id;
+                        //     $getallJoin = JoiningReport::where([
+                        //         ['candidate_id','==',$update->candidate_id],
+                        //         ['joining_type','==',$update->joining_type],
+                        //     ])->get();
+                        //     if(count($getallJoin) > 0) {
+                        //         foreach($getallJoin as $getJoin) {
+                        //             $getJoin['employee_id'] = $createUserData->id;
+                        //             $getJoin['updated_by'] = $authId;
+                        //             $getJoin->update(); 
+                        //         }
+                        //     }
+                        // }
+                        $empUpdate->work_location = $update->joining_location;
+                        $empUpdate->department_id = $update->transfer_to_department_id ?? $update->candidate->interviewSummary->employeeHiringRequest->department_id ?? '';
                         $empUpdate->team_lead_or_reporting_manager = $update->new_reporting_manager;
                         $empUpdate->type = 'employee';
                         $empUpdate->updated_by = $authId;
@@ -804,6 +830,9 @@ class JoiningReportController extends Controller
                     ['joining_type',$request->joining_type],
                     ['candidate_id',$request->employeeId[0]],
                 ]);
+                if(isset($request->joining_report_id)) {
+                    $jr = $jr->whereNot('id',$request->joining_report_id);
+                }
                 if($request->new_emp_joining_type == 'trial_period') {
                     $jr = $jr->whereIn('new_emp_joining_type',['trial_period','permanent'])->whereIn('status',['pending','approved']);
                 }
