@@ -157,12 +157,7 @@
                         @enderror
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">So Number</label>
-                        <input type="text" class="form-control widthinput" name="so_number" placeholder="So Number">
-                    </div>
-                </div>
+            
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">Destination</label>
@@ -216,121 +211,7 @@
                 <span class="error" id="max-company-quantity-error"></span>
                 <span class="error" id="company-only-allowed-error"></span>
             </div>
-            <div class="row">
-                <div class="card p-2" >
-                    <div class="card-header">
-                        <h4 class="card-title">LOI Items</h4>
-                    </div>
-                    <div class="card-body">
-                        <div id="loi-items" >
-                            <div class="row Loi-items-row-div" id="row-1">
-                                <div class="col-lg-2 col-md-6 col-sm-12">
-                                    <label class="form-label">Model</label>
-                                    <select class="form-select widthinput text-dark models" multiple data-index="1" name="models[]" id="model-1" autofocus>
-                                        <option value="" >Select Model</option>
-                                        @foreach($models as $model)
-                                            <option value="{{ $model->model }}">{{ $model->model }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('model')
-                                    <span>
-                                <strong >{{ $message }}</strong>
-                            </span>
-                                    @enderror
-                                </div>
-                                <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                                    <label class="form-label">SFX</label>
-                                    <select class="form-select widthinput text-dark sfx" multiple  data-index="1" name="sfx[]" id="sfx-1" >
-                                        <option value="">Select SFX</option>
-                                    </select>
-                                    @error('sfx')
-                                    <div role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </div>
-                                    @enderror
-                                </div>
-                                <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                                    <label class="form-label">Model Year</label>
-                                    <select class="form-select widthinput text-dark model-years" multiple  data-index="1" name="model_year[]" id="model-year-1">
-                                        <option value="">Select Model Year</option>
-                                    </select>
-                                    @error('model_year')
-                                    <div role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </div>
-                                    @enderror
-                                </div>
-                                <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
-                                    <label class="form-label">LOI Description</label>
-                                    <input type="text" readonly placeholder="LOI Description"
-                                           class="form-control widthinput text-dark loi-descriptions"  data-index="1" id="loi-description-1">
-                                </div>
-                                <div class="col-lg-1 col-md-6 col-sm-12">
-                                    <label class="form-label">Quantity</label>
-                                    <input type="number" name="quantity[]" placeholder="Quantity"  maxlength="5" data-index="1" class="form-control widthinput quantities text-dark"
-                                           step="1" oninput="validity.valid||(value='');" min="1" id="quantity-1">
-{{--                                    <span class="error quantity-error"></span>--}}
-                                </div>
-                                <div class="col-lg-1 col-md-6 col-sm-12">
-                                    <label class="form-label">Inventory Qty</label>
-                                    <input type="number" readonly id="inventory-quantity-1" value="" data-index="1" class="form-control widthinput inventory-qty" >
-                                    <input type="hidden" name="master_model_ids[]" class="master-model-ids" id="master-model-id-1">
-                                </div>
-                                <div class="col-lg-1 col-md-6 col-sm-12">
-                                    <a class="btn btn-sm btn-danger removeButton" id="remove-btn-1" data-index="1" style="margin-top: 30px;" >  <i class="fas fa-trash-alt"></i> </a>
-                                </div>
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Dealer</label>
-                                <select class="form-control widthinput" name="dealers" id="dealer">
-                                    <option value="Trans Cars">Trans Cars</option>
-                                    <option value="Milele Motors">Milele Motors</option>
-                                </select>
-                                <input type="hidden" name="dealers" value="Trans Cars" id="dealer-input">
-                                @error('dealers')
-                                <span role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
-                            </div>
-                        </div>
-                    
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Destination</label>
-                                <input type="text" class="form-control widthinput" name="destination" placeholder="Destination" >
-                                @error('destination')
-                                <span role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Prefered Location</label>
-                                <input type="text" class="form-control widthinput" name="prefered_location" placeholder="Prefered Location" >
-                                @error('prefered_location')
-                                <span role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">LOI Document</label>
-                                <input type="file" name="files[]" id="file-upload" class="form-control widthinput text-dark" multiple
-                                    autofocus accept="application/pdf">
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label class="form-label">Signature </label>
-                                <input type="file" id="signature-upload" name="loi_signature" accept="image/*" class="form-control widthinput">
-                            </div>
-                        </div>
-                    </div>
+            
                     <div class="card" id="soNumberDiv" >
                         <div class="card-header">
                             <h4 class="card-title">
