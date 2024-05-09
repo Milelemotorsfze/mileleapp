@@ -15,6 +15,7 @@ use App\Models\LoiRestrictedCountry;
 use App\Models\MasterModel;
 use App\Models\ModelYearCalculationCategory;
 use App\Models\Supplier;
+use App\Models\LoiSoNumber;
 use App\Models\SupplierInventory;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -149,7 +150,6 @@ class LetterOfIndentController extends Controller
             $LOI->category = $request->category;
             $LOI->dealers = $request->dealers;
             $LOI->prefered_location = $request->prefered_location;
-            $LOI->so_number = $request->so_number;
             $LOI->destination = $request->destination;
             $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS_NEW;
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
@@ -214,6 +214,16 @@ class LetterOfIndentController extends Controller
                     $LOIItem->uuid = $code;
                     $LOIItem->quantity = $quantity;
                     $LOIItem->save();
+                }
+            }
+
+            if($request->so_number) {
+                $soNumbers = $request->so_number;
+                foreach($soNumbers as $soNumber) {
+                    $loiSoNumber = new LoiSoNumber();
+                    $loiSoNumber->letter_of_indent_id = $LOI->id;
+                    $loiSoNumber->so_number = $soNumber;
+                    $loiSoNumber->save();
                 }
             }
 
@@ -436,7 +446,6 @@ class LetterOfIndentController extends Controller
             $LOI->category = $request->category;
             $LOI->dealers = $request->dealers;
             $LOI->destination = $request->destination;
-            $LOI->so_number = $request->so_number;
             $LOI->prefered_location = $request->prefered_location;
             if($request->is_signature_removed == 1) {
                 $LOI->signature = NULL;
@@ -504,6 +513,18 @@ class LetterOfIndentController extends Controller
                     $LOIItem->save();
                 }
             }
+
+            if($request->so_number) {
+                $LOI->soNumbers()->delete();
+                $soNumbers = $request->so_number;
+                foreach($soNumbers as $soNumber) {
+                    $loiSoNumber = new LoiSoNumber();
+                    $loiSoNumber->letter_of_indent_id = $LOI->id;
+                    $loiSoNumber->so_number = $soNumber;
+                    $loiSoNumber->save();
+                }
+            }
+
             DB::commit();
 
             return redirect()->route('letter-of-indents.index')->with('success',"LOI Updated successfully");
