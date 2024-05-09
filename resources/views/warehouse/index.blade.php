@@ -716,7 +716,6 @@ $pendingvendorfol = DB::table('purchasing_order')
         <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
                 <thead class="bg-soft-secondary">
                 <tr>
-                <th style="display: none;">Created At</th>
                 <th style="vertical-align: middle; text-align: center;">PO Number</th>
                     <th style="vertical-align: middle; text-align: center;">PO Date</th>
                     <th style="vertical-align: middle; text-align: center;">Vendor Name</th>
@@ -728,7 +727,6 @@ $pendingvendorfol = DB::table('purchasing_order')
                 <div hidden>{{$i=0;}}
                 </div>
                 @foreach ($data as $purchasingOrder)
-                <td style="display: none;">{{ $purchasingOrder->created_at }}</td>
                 <tr data-id="{{ $purchasingOrder->id }}" data-url="{{ route('purchasing-order.show', $purchasingOrder->id) }}" class="clickable-row">
                 <td style="vertical-align: middle; text-align: center;">{{ $purchasingOrder->po_number }}</td>
                 <td style="vertical-align: middle; text-align: center;">{{ date('d-M-Y', strtotime($purchasingOrder->po_date)) }}</td>
@@ -796,8 +794,6 @@ $(document).ready(function() {
   $('.select2').select2();
   var dataTable = $('#dtBasicExample1').DataTable({
   pageLength: 10,
-  stateSave: true, // Save state between page reloads
-    order: [[1, 'desc']], // Adjust the index '0' to the column you want to sort i
   initComplete: function() {
     this.api().columns().every(function(d) {
       var column = this;
