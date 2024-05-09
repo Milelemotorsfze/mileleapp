@@ -632,6 +632,8 @@ class JoiningReportController extends Controller
                         $empUpdate->work_location = $update->joining_location;
                         $empUpdate->department_id = $update->transfer_to_department_id ?? $update->candidate->interviewSummary->employeeHiringRequest->department_id ?? '';
                         $empUpdate->team_lead_or_reporting_manager = $update->new_reporting_manager;
+                        $empUpdate->gender = $update->candidate->interviewSummary->gender ?? '';
+                        $empUpdate->nationality = $update->candidate->interviewSummary->nationality ?? '';
                         $empUpdate->type = 'employee';
                         $empUpdate->updated_by = $authId;
                         $empUpdate->update();

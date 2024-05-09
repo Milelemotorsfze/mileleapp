@@ -285,9 +285,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td>{{$data->teamLeadOrReportingManager->name ?? ''}}</td>
 							<td>{{$data->department->division->divisionHead->name ?? ''}}</td>
 
-							<td></td>
-							<td></td>
-							<td></td>
+							<td>{{$data->basic_salary .' AED' ?? ''}}</td>
+							<td>{{$data->other_allowances .' AED' ?? ''}}</td>
+							<td>{{$data->total_salary .' AED' ?? ''}}</td>
 							<td></td>
 							<td></td>
 							<td></td>
