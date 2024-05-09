@@ -17,190 +17,84 @@
             color: #FF0000;
         }
     </style>
-
-    <div class="card-header">
-        <h4 class="card-title">Edit LOI</h4>
-        <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
-    </div>
-    <div class="card-body">
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+    @can('LOI-edit')
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-edit');
+        @endphp
+        @if ($hasPermission)
+            <div class="card-header">
+                <h4 class="card-title">Edit LOI</h4>
+                <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
             </div>
-        @endif
-            @if (Session::has('error'))
-                <div class="alert alert-danger" >
-                    <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
-                    {{ Session::get('error') }}
-                </div>
-            @endif
-            @if (Session::has('success'))
-                <div class="alert alert-success" id="success-alert">
-                    <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
-                    {{ Session::get('success') }}
-                </div>
-            @endif
-        <form action="{{ route('letter-of-indents.update', $letterOfIndent->id) }}" method="POST" enctype="multipart/form-data" id="form-doc-upload">
-            @csrf
-            @method('PUT')
-            <div class="row">
-                <div class="col-lg-3 col-md-6">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label"> Country</label>
-                        <select class="form-control widthinput" autofocus multiple name="country" id="country" >
-                            <option disabled>Select Country</option>
-                            @foreach($countries as $country)
-                                <option value="{{$country->id}}" {{ $country->id == $letterOfIndent->customer->country_id ? 'selected' : '' }} > {{ $country->name }} </option>
+            <div class="card-body">
+                @if (count($errors) > 0)
+                    <div class="alert alert-danger">
+                        <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
                             @endforeach
-                        </select>
+                        </ul>
                     </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label text-muted">Customer Type</label>
-                        <select class="form-control widthinput" name="customer_type" id="customer-type">
-                            <option value="" disabled>Select Customer Type</option>
-                            <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}
-                                {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL == $letterOfIndent->customer->type ? 'selected' : ''}}>
-                                {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}
-                            </option>
-                            <option value={{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}
-                                {{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY == $letterOfIndent->customer->type ? 'selected' : ''}}>
-                                {{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}
-                            </option>
-                            <option value={{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}
-                                {{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT == $letterOfIndent->customer->type ? 'selected' : ''}} >
-                                {{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}
-                            </option>
-                            <option value={{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}
-                                {{ \App\Models\Customer::CUSTOMER_TYPE_NGO == $letterOfIndent->customer->type ? 'selected' : ''}} >
-                                {{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Customer</label>
-                        <select class="form-control widthinput" data-trigger name="customer_id" id="customer" >
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
-                        <select class="form-control widthinput" name="category" id="choices-single-default">
-                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}"
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST == $letterOfIndent->category ? 'selected' : ''}} >
-                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
-                            </option>
-                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED}}"
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED == $letterOfIndent->category ? 'selected' : ''}} >
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED }}
-                            </option>
-                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}"
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_REAL == $letterOfIndent->category ? 'selected' : ''}} >
-                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}
-                            </option>
-                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}"
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL == $letterOfIndent->category ? 'selected' : ''}} >
-                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}
-                            </option>
-                            <option value="{{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}"
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE == $letterOfIndent->category ? 'selected' : ''}} >
-                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
-                        <input type="date" class="form-control widthinput" id="basicpill-firstname-input" name="date"
-                               value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}"  max="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}" >
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Dealers</label>
-                        <select class="form-control widthinput" disabled  id="dealer" name="dealers" >
-                            <option value="Trans Cars" {{ 'Trans Cars' == $letterOfIndent->dealers ? 'selected' : '' }}>Trans Cars</option>
-                            <option value="Milele Motors" {{ 'Milele Motors' == $letterOfIndent->dealers ? 'selected' : '' }}>Milele Motors</option>
-                        </select>
-                        <input name="dealers" type="hidden" value="{{ $letterOfIndent->dealers }}" id="dealer-input" >
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">So Number</label>
-                        <input type="text" class="form-control widthinput" name="so_number" placeholder="So Number" value="{{ $letterOfIndent->so_number }}">
-                        @error('so_number')
-                        <span role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                        @enderror
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Destination</label>
-                        <input type="text" class="form-control widthinput" name="destination" placeholder="Destination" value="{{ $letterOfIndent->destination }}">
-                        @error('destination')
-                        <span role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                        @enderror
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Prefered Location</label>
-                        <input type="text" class="form-control widthinput" name="prefered_location" placeholder="Prefered Location" value="{{ $letterOfIndent->prefered_location }}" >
-                        @error('prefered_location')
-                        <span role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                        @enderror
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">LOI Document</label>
-                        <input type="file" name="files[]" class="form-control widthinput mb-3" multiple
-                               autofocus id="file-upload" accept="application/pdf">
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">Signature</label>
-                        <input type="file" id="signature" name="loi_signature" class="form-control widthinput" accept="image/*" >
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3" id="signature-preview">
-                        @if($letterOfIndent->signature)
-                            <iframe src="{{ url('/LOI-Signature/'.$letterOfIndent->signature) }}" ></iframe>
-                            <a href="#" class="btn btn-danger text-center mt-2 remove-signature-button"><i class="fa fa-trash"></i> </a>
-                        @endif
-                    </div>
-                </div>
-                @if($letterOfIndent->LOIDocuments->count() > 0)
-                    <label class="form-label fw-bold">LOI Document</label>
-                    @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
-                        <div class="col-lg-3 col-md-6 col-sm-12 " id="remove-doc-{{$letterOfIndentDocument->id}}">
-                            <iframe src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" style="height: 300px;"></iframe>
-                            <a href="#"  data-id="{{ $letterOfIndentDocument->id }}"
-                               class="btn btn-danger text-center mt-2 remove-doc-button"><i class="fa fa-trash"></i> </a>
-                        </div>
-                    @endforeach
                 @endif
+
+                    @if (Session::has('error'))
+                        <div class="alert alert-danger" >
+                            <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                            {{ Session::get('error') }}
+                        </div>
+                    @endif
+                    @if (Session::has('success'))
+                        <div class="alert alert-success" id="success-alert">
+                            <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                            {{ Session::get('success') }}
+                        </div>
+                    @endif
+                <form action="{{ route('letter-of-indents.update', $letterOfIndent->id) }}" method="POST" enctype="multipart/form-data" id="form-doc-upload">
+                    @csrf
+                    @method('PUT')
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label"> Country</label>
+                                <select class="form-control widthinput" autofocus multiple name="country" id="country" >
+                                    <option disabled>Select Country</option>
+                                    @foreach($countries as $country)
+                                        <option value="{{$country->id}}" {{ $country->id == $letterOfIndent->customer->country_id ? 'selected' : '' }} > {{ $country->name }} </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label text-muted">Customer Type</label>
+                                <select class="form-control widthinput" name="customer_type" id="customer-type">
+                                    <option value="" disabled>Select Customer Type</option>
+                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}
+                                        {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL == $letterOfIndent->customer->type ? 'selected' : ''}}>
+                                        {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}
+                                    </option>
+                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}
+                                        {{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY == $letterOfIndent->customer->type ? 'selected' : ''}}>
+                                        {{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}
+                                    </option>
+                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}
+                                        {{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT == $letterOfIndent->customer->type ? 'selected' : ''}} >
+                                        {{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}
+                                    </option>
+                                    <option value={{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}
+                                        {{ \App\Models\Customer::CUSTOMER_TYPE_NGO == $letterOfIndent->customer->type ? 'selected' : ''}} >
+                                        {{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Customer</label>
+                                <select class="form-control widthinput" data-trigger name="customer_id" id="customer" >
+                                </select>
+
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div id="file-preview">
                     </div>
@@ -221,92 +115,267 @@
                         <div class="row">
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <label class="form-label">Model</label>
-                            </div>
-                            <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                                <label class="form-label">SFX</label>
-                            </div>
-                            <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                                <label class="form-label">Model Year</label>
-                            </div>
-                            <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
-                                <label class="form-label">LOI Description</label>
-                            </div>
-                            <div class="col-lg-1 col-md-6 col-sm-12">
-                                <label class="form-label">Quantity</label>
-                            </div>
-                            <div class="col-lg-1 col-md-6 col-sm-12">
-                                <label class="form-label">Inventory Qty</label>
-                            </div>
-                        </div>
-                        <div id="loi-items" >
-                            @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
-                                <div class="row Loi-items-row-div" id="row-{{$key+1}}">
-                                    <div class="col-lg-2 col-md-6 col-sm-12">
-                                        <select class="form-select widthinput text-dark models" multiple data-index="{{$key+1}}" name="models[]" id="model-{{$key+1}}" autofocus>
-                                            <option value="" >Select Model</option>
-                                            @foreach($models as $model)
-                                                <option value="{{ $model->model }}" {{ $letterOfIndentItem->masterModel->model == $model->model ? 'selected' : '' }}>{{ $model->model }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('model')
-                                        <span>
-                                            <strong >{{ $message }}</strong>
-                                        </span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                                        <select class="form-select widthinput text-dark sfx" multiple  data-index="{{$key+1}}" name="sfx[]" id="sfx-{{$key+1}}" >
-                                            @foreach($letterOfIndentItem->sfxLists as $sfx)
-                                                <option value="{{ $sfx}}" {{$sfx == $letterOfIndentItem->masterModel->sfx ? 'selected' : ''}} >{{ $sfx }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('sfx')
-                                        <div role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
-                                        <select class="form-select widthinput text-dark model-years" multiple  data-index="{{$key+1}}" name="model_year[]" id="model-year-{{$key+1}}">
-                                            @foreach($letterOfIndentItem->modelYearLists as $modelYear)
-                                                <option value="{{ $modelYear }}" {{$modelYear == $letterOfIndentItem->masterModel->model_year ? 'selected' : ''}} >{{ $modelYear }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('model_year')
-                                        <div role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
-                                        <input type="text" readonly placeholder="LOI Description"
-                                               class="form-control widthinput text-dark loi-descriptions"
-                                               value="{{$letterOfIndentItem->loi_description}}" data-index="{{$key+1}}" id="loi-description-{{$key+1}}">
-                                    </div>
-                                    <div class="col-lg-1 col-md-6 col-sm-12">
-                                        <input type="number" name="quantity[]" placeholder="Quantity"  maxlength="5" value="{{$letterOfIndentItem->quantity}}" data-index="{{$key+1}}"
-                                               class="form-control widthinput quantities text-dark"
-                                               step="1" oninput="validity.valid||(value='');" min="0" id="quantity-{{$key+1}}">
-                                    </div>
-                                    <div class="col-lg-1 col-md-6 col-sm-12">
-                                        <input type="number" readonly id="inventory-quantity-{{$key+1}}" value="{{$letterOfIndentItem->inventory_quantity}}" data-index="{{$key+1}}" class="form-control widthinput inventory-qty" >
-                                        <input type="hidden" name="master_model_ids[]" class="master-model-ids" value="{{$letterOfIndentItem->master_model_id}}" id="master-model-id-{{$key+1}}">
-                                    </div>
-                                    <div class="col-lg-1 col-md-6 col-sm-12">
-                                        <a class="btn btn-sm btn-danger removeButton" id="remove-btn-{{$key+1}}" data-index="{{$key+1}}"  >  <i class="fas fa-trash-alt"></i> </a>
-                                    </div>
-                                </div>
-                            @endforeach
 
+                            </div>
                         </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="btn btn-info btn-sm add-row-btn float-end" >
-                                    <i class="fas fa-plus"></i> Add LOI Item
-                                </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
+                                <select class="form-control widthinput" name="category" id="choices-single-default">
+                                    <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}"
+                                        {{ \App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST == $letterOfIndent->category ? 'selected' : ''}} >
+                                        {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
+                                    </option>
+                                    <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED}}"
+                                        {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED == $letterOfIndent->category ? 'selected' : ''}} >
+                                        {{ \App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED }}
+                                    </option>
+                                    <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}"
+                                        {{ \App\Models\LetterOfIndent::LOI_CATEGORY_REAL == $letterOfIndent->category ? 'selected' : ''}} >
+                                        {{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}
+                                    </option>
+                                    <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}"
+                                        {{ \App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL == $letterOfIndent->category ? 'selected' : ''}} >
+                                        {{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}
+                                    </option>
+                                    <option value="{{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}"
+                                        {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE == $letterOfIndent->category ? 'selected' : ''}} >
+                                        {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
+                                <input type="date" class="form-control widthinput" id="basicpill-firstname-input" name="date"
+                                    value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}"  max="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}" >
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Dealers</label>
+                                <select class="form-control widthinput" disabled  id="dealer" name="dealers" >
+                                    <option value="Trans Cars" {{ 'Trans Cars' == $letterOfIndent->dealers ? 'selected' : '' }}>Trans Cars</option>
+                                    <option value="Milele Motors" {{ 'Milele Motors' == $letterOfIndent->dealers ? 'selected' : '' }}>Milele Motors</option>
+                                </select>
+                                <input name="dealers" type="hidden" value="{{ $letterOfIndent->dealers }}" id="dealer-input" >
+                            </div>
+                        </div>
+                        <!-- <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">So Number</label>
+                                <input type="text" class="form-control widthinput" name="so_number" placeholder="So Number" value="{{ $letterOfIndent->so_number }}">
+                                @error('so_number')
+                                <span role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div> -->
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Destination</label>
+                                <input type="text" class="form-control widthinput" name="destination" placeholder="Destination" value="{{ $letterOfIndent->destination }}">
+                                @error('destination')
+                                <span role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Prefered Location</label>
+                                <input type="text" class="form-control widthinput" name="prefered_location" placeholder="Prefered Location" value="{{ $letterOfIndent->prefered_location }}" >
+                                @error('prefered_location')
+                                <span role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">LOI Document</label>
+                                <input type="file" name="files[]" class="form-control widthinput mb-3" multiple
+                                    autofocus id="file-upload" accept="application/pdf">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label class="form-label">Signature</label>
+                                <input type="file" id="signature" name="loi_signature" class="form-control widthinput" accept="image/*" >
                             </div>
                         </div>
                     </div>
+
+                        <div class="card" id="soNumberDiv">
+                            <div class="card-header">
+                                <h4 class="card-title">
+                                    So Numbers
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row soNumberMain">
+                                    <div hidden>{{$i=0;}}</div>
+                                    @foreach($letterOfIndent->soNumbers as $soNumber)
+                                    <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
+                                    <div class="col-xxl-4 col-lg-6 col-md-12 soNumberApendHere" id="row-{{$i}}">
+                                        <div class="row mt-2">
+                                            <div class="col-xxl-9 col-lg-6 col-md-12">
+                                                <input id="so_number_{{$i}}" type="text" class="form-control widthinput so_number" name="so_number[{{$i}}]"
+                                                    placeholder="So Number" value="{{$soNumber->so_number}}"
+                                                    autocomplete="so_number" onkeyup="setPartNumber(this,{{$i}})">
+                                                <span id="soNumberError_{{$i}}" class="invalid-feedback soNumberError"></span>
+                                            </div>
+                                            <div class="col-xxl-3 col-lg-1 col-md-1">
+                                                <a class="btn btn-sm btn-danger removeSoNumber" data-index="{{$i}}" >
+                                                <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                                <div class="row">
+                                    <div class="col-xxl-12 col-lg-12 col-md-12" id="soNumberDivBr">
+                                        <a id="addSoNumberBtn" style="float: right;" class="btn btn-sm btn-info">
+                                        <i class="fa fa-plus" aria-hidden="true"></i> Add So Numbers</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3" id="signature-preview">
+                                @if($letterOfIndent->signature)
+                                    <iframe src="{{ url('/LOI-Signature/'.$letterOfIndent->signature) }}" ></iframe>
+                                    <a href="#" class="btn btn-danger text-center mt-2 remove-signature-button"><i class="fa fa-trash"></i> </a>
+                                @endif
+                            </div>
+                        </div>
+                        @if($letterOfIndent->LOIDocuments->count() > 0)
+                            <label class="form-label fw-bold">LOI Document</label>
+                            @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
+                                <div class="col-lg-3 col-md-6 col-sm-12 " id="remove-doc-{{$letterOfIndentDocument->id}}">
+                                    <iframe src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" style="height: 300px;"></iframe>
+                                    <a href="#"  data-id="{{ $letterOfIndentDocument->id }}"
+                                    class="btn btn-danger text-center mt-2 remove-doc-button"><i class="fa fa-trash"></i> </a>
+                                </div>
+                            @endforeach
+                        @endif
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div id="file-preview">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-2" >
+                            <div class="card-header">
+                                <h4 class="card-title">LOI Items</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-6 col-sm-12">
+                                        <label class="form-label">Model</label>
+                                    </div>
+                                    <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
+                                        <label class="form-label">SFX</label>
+                                    </div>
+                                    <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
+                                        <label class="form-label">Model Year</label>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+                                        <label class="form-label">LOI Description</label>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 col-sm-12">
+                                        <label class="form-label">Quantity</label>
+                                    </div>
+                                    <div class="col-lg-1 col-md-6 col-sm-12">
+                                        <label class="form-label">Inventory Qty</label>
+                                    </div>
+                                </div>
+                                <div id="loi-items" >
+                                    @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
+                                        <div class="row Loi-items-row-div" id="row-{{$key+1}}">
+                                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                                <select class="form-select widthinput text-dark models" multiple data-index="{{$key+1}}" name="models[]" id="model-{{$key+1}}" autofocus>
+                                                    <option value="" >Select Model</option>
+                                                    @foreach($models as $model)
+                                                        <option value="{{ $model->model }}" {{ $letterOfIndentItem->masterModel->model == $model->model ? 'selected' : '' }}>{{ $model->model }}</option>
+                                                    @endforeach
+                                                </select>
+                                                @error('model')
+                                                <span>
+                                                    <strong >{{ $message }}</strong>
+                                                </span>
+                                                @enderror
+                                            </div>
+                                            <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
+                                                <select class="form-select widthinput text-dark sfx" multiple  data-index="{{$key+1}}" name="sfx[]" id="sfx-{{$key+1}}" >
+                                                    @foreach($letterOfIndentItem->sfxLists as $sfx)
+                                                        <option value="{{ $sfx}}" {{$sfx == $letterOfIndentItem->masterModel->sfx ? 'selected' : ''}} >{{ $sfx }}</option>
+                                                    @endforeach
+                                                </select>
+                                                @error('sfx')
+                                                <div role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </div>
+                                                @enderror
+                                            </div>
+                                            <div class="col-lg-2 col-md-6 col-sm-12 mb-3">
+                                                <select class="form-select widthinput text-dark model-years" multiple  data-index="{{$key+1}}" name="model_year[]" id="model-year-{{$key+1}}">
+                                                    @foreach($letterOfIndentItem->modelYearLists as $modelYear)
+                                                        <option value="{{ $modelYear }}" {{$modelYear == $letterOfIndentItem->masterModel->model_year ? 'selected' : ''}} >{{ $modelYear }}</option>
+                                                    @endforeach
+                                                </select>
+                                                @error('model_year')
+                                                <div role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </div>
+                                                @enderror
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+                                                <input type="text" readonly placeholder="LOI Description"
+                                                    class="form-control widthinput text-dark loi-descriptions"
+                                                    value="{{$letterOfIndentItem->loi_description}}" data-index="{{$key+1}}" id="loi-description-{{$key+1}}">
+                                            </div>
+                                            <div class="col-lg-1 col-md-6 col-sm-12">
+                                                <input type="number" name="quantity[]" placeholder="Quantity"  maxlength="5" value="{{$letterOfIndentItem->quantity}}" data-index="{{$key+1}}"
+                                                    class="form-control widthinput quantities text-dark"
+                                                    step="1" oninput="validity.valid||(value='');" min="0" id="quantity-{{$key+1}}">
+                                            </div>
+                                            <div class="col-lg-1 col-md-6 col-sm-12">
+                                                <input type="number" readonly id="inventory-quantity-{{$key+1}}" value="{{$letterOfIndentItem->inventory_quantity}}" data-index="{{$key+1}}" class="form-control widthinput inventory-qty" >
+                                                <input type="hidden" name="master_model_ids[]" class="master-model-ids" value="{{$letterOfIndentItem->master_model_id}}" id="master-model-id-{{$key+1}}">
+                                            </div>
+                                            <div class="col-lg-1 col-md-6 col-sm-12">
+                                                <a class="btn btn-sm btn-danger removeButton" id="remove-btn-{{$key+1}}" data-index="{{$key+1}}"  >  <i class="fas fa-trash-alt"></i> </a>
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="btn btn-info btn-sm add-row-btn float-end" >
+                                            <i class="fas fa-plus"></i> Add LOI Item
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <input type="hidden" name="is_signature_removed" id="is_signature_removed" value="0">
+                    <select name="deletedIds[]" id="deleted-docs" hidden="hidden" multiple>
+                    </select>
+                    <input type="hidden" id="remaining-document-count" value="{{ $letterOfIndent->LOIDocuments->count() }}" >
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary float-end">Update</button>
+                    </div>
+
+
                 </div>
             <input type="hidden" name="is_signature_removed" id="is_signature_removed" value="0">
             <select name="deletedIds[]" id="deleted-docs" hidden="hidden" multiple>
@@ -316,8 +385,11 @@
                 <button type="submit" class="btn btn-primary float-end" id="submit-button">Update</button>
             </div>
 
-        </form>
-    </div>
+
+                </form>
+            </div>
+        @endif
+    @endcan
 @endsection
 @push('scripts')
     <script>
@@ -1098,6 +1170,49 @@
                 $('#dealer').attr("disabled", false);
             }
         }
+
+        $("#addSoNumberBtn").on("click", function ()
+	       {
+	           var index = $(".soNumberMain").find(".soNumberApendHere").length + 1;
+	           $(".soNumberMain").append(`
+	                               <div class="col-xxl-4 col-lg-6 col-md-12 soNumberApendHere" id="row-${index}">
+	                               <div class="row mt-2">
+	                               <div class="col-xxl-9 col-lg-6 col-md-12">
+	                                   <input id="so_number_${index}" type="text" class="form-control widthinput so_number" name="so_number[${index}]"
+	                                   placeholder="So Number" value="{{ old('so_number') }}"
+	                                   autocomplete="so_number" onkeyup="setPartNumber(this,${index})">
+	                                   <span id="soNumberError_${index}" class="invalid-feedback soNumberError"></span>
+	                               </div>
+	                               <div class="col-xxl-3 col-lg-1 col-md-1 add_del_btn_outer">
+	                                   <a class="btn btn-sm btn-danger removeSoNumber" data-index="${index}" >
+	                                       <i class="fas fa-trash-alt"></i>
+	                                   </a>
+	                               </div>
+	                               </div>
+	                               </div>
+	           `);
+	       });
+	       $(document.body).on('click', ".removeSoNumber", function (e)
+	       {
+	    
+            var indexNumber = $(this).attr('data-index');
+            var deletedValue = '';
+            deletedValue = $("#so_number_"+indexNumber).val();
+            $(this).closest('#row-'+indexNumber).remove();
+            $('.soNumberApendHere').each(function(i) {
+                var index = +i + +1;
+                $(this).attr('id','row-'+index);
+                $(this).find('.so_number').attr('name', 'so_number['+ index +']');
+                $(this).find('.so_number').attr('id', 'so_number_'+index);	                
+                $(this).find('.removeSoNumber').attr('data-index',index);
+                $(this).find('.soNumberError').attr('id', 'soNumberError_'+index);
+                if(deletedValue != '')
+                {
+                soNumberUniquecheck(deletedValue);
+                }
+            });
+	   });
+
         $('#submit-button').click(function (e) {
             e.preventDefault();
 
@@ -1109,6 +1224,7 @@
                 e.preventDefault();
             }
         });
+
     </script>
 @endpush
 
