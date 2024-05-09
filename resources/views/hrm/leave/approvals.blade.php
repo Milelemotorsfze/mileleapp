@@ -109,7 +109,7 @@
 							<td>{{ $data->address_while_on_leave ?? ''}}</td>
 							<td>{{ $data->alternative_home_contact_no ?? ''}}</td>
 							<td>{{ $data->alternative_personal_email ?? ''}}</td>
-							<td>
+							<td class="approvalBtnClass">
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_leave.show',$data->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
@@ -118,11 +118,11 @@
 								@if($data->is_auth_user_can_approve['can_approve'] == true)
 								<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 									data-bs-target="#approve-employee-leave-request-{{$data->id}}">
-								<i class="fa fa-thumbs-up" aria-hidden="true"></i> 
+								<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 								</button>
 								<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
 									data-bs-target="#reject-employee-leave-request-{{$data->id}}">
-								<i class="fa fa-thumbs-down" aria-hidden="true"></i> 
+								<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 								</button>
 								@endif
 								@endif
@@ -375,7 +375,7 @@
 							<td>{{ $data->address_while_on_leave ?? ''}}</td>
 							<td>{{ $data->alternative_home_contact_no ?? ''}}</td>
 							<td>{{ $data->alternative_personal_email ?? ''}}</td>
-							<td>
+							<td class="approvalBtnClass">
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_leave.show',$data->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
@@ -384,11 +384,11 @@
 								@if($data->is_auth_user_can_approve['can_approve'] == true)
 								<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 									data-bs-target="#approve-employee-leave-request-{{$data->id}}">
-								<i class="fa fa-thumbs-up" aria-hidden="true"></i> 
+								<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 								</button>
 								<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
 									data-bs-target="#reject-employee-leave-request-{{$data->id}}">
-								<i class="fa fa-thumbs-down" aria-hidden="true"></i> 
+								<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 								</button>
 								@endif
 								@endif
@@ -431,7 +431,7 @@
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($ReportingManagerApproved as $key => $data)
+						@foreach ($HRManagerApproved as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>@if($data->created_at != '')
@@ -507,7 +507,7 @@
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($ReportingManagerRejected as $key => $data)
+						@foreach ($HRManagerRejected as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>@if($data->created_at != '')
@@ -641,7 +641,7 @@
 							<td>{{ $data->address_while_on_leave ?? ''}}</td>
 							<td>{{ $data->alternative_home_contact_no ?? ''}}</td>
 							<td>{{ $data->alternative_personal_email ?? ''}}</td>
-							<td>
+							<td class="approvalBtnClass">
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_leave.show',$data->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>												
@@ -650,11 +650,11 @@
 								@if($data->is_auth_user_can_approve['can_approve'] == true )
 								<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 									data-bs-target="#approve-employee-leave-request-{{$data->id}}">
-								<i class="fa fa-thumbs-up" aria-hidden="true"></i> 
+								<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 								</button>
 								<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
 									data-bs-target="#reject-employee-leave-request-{{$data->id}}">
-								<i class="fa fa-thumbs-down" aria-hidden="true"></i> 
+								<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 								</button>
 								@endif
 								@endif
@@ -697,7 +697,7 @@
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($employeeApproved as $key => $data)
+						@foreach ($ReportingManagerApproved as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>@if($data->created_at != '')
@@ -773,7 +773,7 @@
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($employeeRejected as $key => $data)
+						@foreach ($ReportingManagerRejected as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>@if($data->created_at != '')
@@ -907,7 +907,7 @@
 							<td>{{ $data->address_while_on_leave ?? ''}}</td>
 							<td>{{ $data->alternative_home_contact_no ?? ''}}</td>
 							<td>{{ $data->alternative_personal_email ?? ''}}</td>
-							<td>
+							<td class="approvalBtnClass">
 								<a title="View Details" class="btn btn-sm btn-warning" href="{{route('employee_leave.show',$data->id)}}">
 								<i class="fa fa-eye" aria-hidden="true"></i>
 								</a>
@@ -916,11 +916,11 @@
 								@if($data->is_auth_user_can_approve['can_approve'] == true)
 								<button title="Approve" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 									data-bs-target="#approve-employee-leave-request-{{$data->id}}">
-								<i class="fa fa-thumbs-up" aria-hidden="true"></i> 
+								<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 								</button>
 								<button title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
 									data-bs-target="#reject-employee-leave-request-{{$data->id}}">
-								<i class="fa fa-thumbs-down" aria-hidden="true"></i> 
+								<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 								</button>
 								@endif
 								@endif
@@ -963,7 +963,7 @@
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($ReportingManagerApproved as $key => $data)
+						@foreach ($divisionHeadApproved as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>@if($data->created_at != '')
@@ -1039,7 +1039,7 @@
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($ReportingManagerRejected as $key => $data)
+						@foreach ($divisionHeadRejected as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>@if($data->created_at != '')
@@ -1090,3 +1090,8 @@
 @endif
 @endif
 @endsection
+@push('scripts')
+<script type="text/javascript">
+	var ReportingManagerPendings = {!! json_encode($ReportingManagerPendings) !!}
+</script>
+@endpush

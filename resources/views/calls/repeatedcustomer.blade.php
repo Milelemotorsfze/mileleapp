@@ -17,7 +17,7 @@
                 <tr>
                   <th>S.No</th>
                   <th>Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>

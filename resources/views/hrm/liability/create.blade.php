@@ -42,14 +42,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 			</div>
 			<div class="card-body">
 				<div class="row">
-					<div class="col-xxl-4 col-lg-4 col-md-4">
-						<span class="error">* </span>
-						<label for="employee_id" class="col-form-label text-md-end">{{ __('Employee Name') }}</label>
-						<select name="employee_id" id="employee_id" multiple="true" class="employee_id form-control widthinput" onchange="" autofocus>
-						@foreach($masterEmployees as $employee)
-						<option value="{{$employee->id}}" @if($data->employee_id == $employee->id) selected @endif>{{$employee->name}}</option>
-						@endforeach
-						</select>
+					<div class="col-xxl-4 col-lg-4 col-md-4 select-button-main-div">
+						<div class="dropdown-option-div">
+							<span class="error">* </span>
+							<label for="employee_id" class="col-form-label text-md-end">{{ __('Employee Name') }}</label>
+							<select name="employee_id" id="employee_id" multiple="true" class="employee_id form-control widthinput" onchange="" autofocus>
+							@foreach($masterEmployees as $employee)
+							<option value="{{$employee->id}}" @if($data->employee_id == $employee->id) selected @endif>{{$employee->name}}</option>
+							@endforeach
+							</select>
+						</div>
 					</div>
 					<div class="col-xxl-4 col-lg-4 col-md-4" id="passport_number_div">
 						<center><label for="passport_number" class="col-form-label text-md-end"><strong>{{ __('Passport Number') }}</strong></label></center>
@@ -80,10 +82,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 			</div>
 			<div class="card-body">
 				<div class="row">
-					<div class="col-xxl-6 col-lg-6 col-md-6">
+					<div class="col-xxl-3 col-lg-3 col-md-6 radio-main-div">
 						<span class="error">* </span>
 						<label for="type" class="col-form-label text-md-end">{{ __('Liability Type') }}</label>
-						<fieldset style="margin-top:5px;">
+						<fieldset style="margin-top:5px;" class="radio-div-container">
 							<div class="row some-class">
 								<div class="col-xxl-4 col-lg-4 col-md-4">
 									<input type="radio" class="type" name="type" value="loan" id="loan" @if($data->type == 'loan') checked @endif />
@@ -107,7 +109,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 							class="form-control widthinput" placeholder="Enter Liability Code"
 							aria-label="measurement" aria-describedby="basic-addon2" value="ELF/FINE/DEC_2023/0086">
 					</div> -->
-					<div class="col-xxl-4 col-lg-4 col-md-4">
+					<div class="col-xxl-3 col-lg-3 col-md-6">
 						<span class="error">* </span>
 						<label for="total_amount" class="col-form-label text-md-end">{{ __('Total Amount') }}</label>
 						<div class="input-group">
@@ -119,14 +121,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 							</div>
 						</div>
 					</div>
-					<div class="col-xxl-4 col-lg-4 col-md-4">
+					<div class="col-xxl-3 col-lg-3 col-md-6">
 						<span class="error">* </span>
 						<label for="no_of_installments" class="col-form-label text-md-end">{{ __('Number Of Installments') }}</label>
 						<input name="no_of_installments" id="no_of_installments" onkeyup="" type="number" class="form-control widthinput" 
 							onkeypress="return event.charCode >= 48" min="1" placeholder="Number Of Installments" aria-label="measurement" 
 							aria-describedby="basic-addon2" value="{{$data->no_of_installments ?? ''}}">
 					</div>
-					<div class="col-xxl-4 col-lg-4 col-md-4">
+					<div class="col-xxl-3 col-lg-3 col-md-6">
 						<span class="error">* </span>
 						<label for="amount_per_installment" class="col-form-label text-md-end">{{ __('Amount Per Installment') }}</label>
 						<div class="input-group">
@@ -179,7 +181,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 				document.getElementById('passport_number').textContent=oldData.user.emp_profile.passport_number;
 			}
 			if(oldData.user.emp_profile.company_joining_date != null) {
-				document.getElementById('joining_date').textContent=oldData.user.emp_profile.company_joining_date;
+				var userDate = oldData.user.emp_profile.company_joining_date; // Replace with your actual date
+				var date = new Date(userDate);
+				var day = date.getDate();
+				var month = date.toLocaleString("default", { month: "short" }); // Get abbreviated month
+				var year = date.getFullYear();
+				var formattedDate = day + " " + month + " " + year;
+				document.getElementById('joining_date').textContent=formattedDate;
 			}
 			if(oldData.user.emp_profile.designation != null) {
 				document.getElementById('designation').textContent=oldData.user.emp_profile.designation.name;
@@ -191,6 +199,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 				document.getElementById('location').textContent=oldData.user.emp_profile.location.name;
 			}
 		}
+		
+		
 	       $('#employee_id').select2({
 	           allowClear: true,
 	           maximumSelectionLength: 1,
@@ -217,7 +227,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 							document.getElementById('passport_number').textContent=data[i].emp_profile.passport_number;
 						}
 						if(data[i].emp_profile.company_joining_date != null) {
-							document.getElementById('joining_date').textContent=data[i].emp_profile.company_joining_date;
+							var userDate = data[i].emp_profile.company_joining_date; // Replace with your actual date
+							var date = new Date(userDate);
+							var day = date.getDate();
+							var month = date.toLocaleString("default", { month: "short" }); // Get abbreviated month
+							var year = date.getFullYear();
+							var formattedDate = day + " " + month + " " + year;
+							document.getElementById('joining_date').textContent=formattedDate;
 						}
 						if(data[i].emp_profile.designation != null) {
 							document.getElementById('designation').textContent=data[i].emp_profile.designation.name;
@@ -237,12 +253,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 	               $("#location_div").show();
 	           }          
 	       });
-		if(data.request_date) {
-			document.getElementById('request_date').value = data.request_date;
-		}
-		else {
-			document.getElementById('request_date').valueAsDate = new Date();
-		}
 		$("#department_id").val(data.department_id);
 		$("#location_id").val(data.location_id);
 		$("#requested_by").val(data.requested_by);
@@ -259,7 +269,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 			$("#replacement_for_employee_div").show();
 			$("#replacement_for_employee").val(data.replacement_for_employee);
 		}
-		$("#reason").val(data.reason);
+		$("#reason").textContent(data.reason);
 		
 		$('#location_id').select2({
 	           allowClear: true,
@@ -310,9 +320,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-liability',
 	           if ( element.prop( "type" ) === "checkbox" ) {
 	               error.insertAfter( element.parent( "label" ) );
 	           }
-	           else if (element.hasClass("select2-hidden-accessible")) {
-	               element = $("#select2-" + element.attr("id") + "-container").parent();
-	               error.insertAfter(element);
+	           else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+	               if (!element.val() || element.val().length === 0) {
+	                   console.log("Error is here with length", element.val().length);
+	                   error.addClass('select-error');
+	                   error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+	               } else {
+	                   console.log("No error");
+	               }
+	           }
+			   else if (element.is(':radio') && element.closest('.radio-main-div').length > 0) {
+	               error.addClass('radio-error');
+	               error.insertAfter(element.closest('.radio-main-div').find('fieldset.radio-div-container').last());
 	           }
 			else if (element.parent().hasClass('input-group')) {
 	               error.insertAfter(element.parent());

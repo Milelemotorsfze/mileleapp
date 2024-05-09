@@ -14,7 +14,7 @@ class LoiCountryCriteria extends Model
 
     const YES = 1;
     const NO = 2;
-    const NONE = NULL;
+    const NONE = '';
     public function country()
     {
         return $this->belongsTo(Country::class,'country_id','id');

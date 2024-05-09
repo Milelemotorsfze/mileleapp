@@ -144,6 +144,16 @@
 		<div class="card-body">
 			<div class="row">
 				<div class="col-lg-6 col-md-3 col-sm-6">
+					<label for="choices-single-default" class="form-label">Request Date :</label>
+				</div>
+				<div class="col-lg-6 col-md-9 col-sm-6">
+					<span>
+						@if($data->jobDescription->request_date != '')
+							{{\Carbon\Carbon::parse($data->jobDescription->request_date)->format('d M Y')}}
+						@endif	
+					</span>
+				</div>
+				<div class="col-lg-6 col-md-3 col-sm-6">
 					<label for="choices-single-default" class="form-label">Location :</label>
 				</div>
 				<div class="col-lg-6 col-md-9 col-sm-6">

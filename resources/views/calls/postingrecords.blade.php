@@ -74,7 +74,7 @@
             <thead class="bg-soft-secondary">
                 <tr>
                 <th>Brand</th>
-                <th>Model</th>
+                <th>Model lines</th>
                 <th>Varaints</th>
                 <th>Exterior Colour</th>
                 <th>Interior Colour</th>

@@ -140,6 +140,9 @@ class EmployeeLiabilityController extends Controller
                 $update->action_by_employee = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_department_head = 'pending';
+                    $employee2 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                    $leadOrMngr = TeamLeadOrReportingManagerHandOverTo::where('lead_or_manager_id',$employee2->team_lead_or_reporting_manager)->first();
+                    $update->department_head_id = $leadOrMngr->approval_by_id;
                     $message = 'Employee Liability Request send to Reporting Manager ( '.$update->reportingManager->name.' - '.$update->reportingManager->email.' ) for approval';
                 }
             }
@@ -149,6 +152,8 @@ class EmployeeLiabilityController extends Controller
                 $update->action_by_department_head = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_finance_manager = 'pending';
+                    $FinanceManager = ApprovalByPositions::where('approved_by_position','Finance Manager')->first();
+                $update->finance_manager_id = $FinanceManager->handover_to_id;
                     $message = 'Employee Liability Request send to Finance Manager ( '.$update->financeManager->name.' - '.$update->financeManager->email.' ) for approval';
                 }
             }
@@ -158,6 +163,8 @@ class EmployeeLiabilityController extends Controller
                 $update->action_by_finance_manager = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_hr_manager = 'pending';
+                    $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                    $update->hr_manager_id = $HRManager->handover_to_id;
                     $message = 'Employee Liability Request send to HR Manager ( '.$update->hrManager->name.' - '.$update->hrManager->email.' ) for approval';
                 }
             }
@@ -167,6 +174,9 @@ class EmployeeLiabilityController extends Controller
                 $update->action_by_hr_manager = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_division_head = 'pending';
+                    $employee1 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                $divisionHead1 = MasterDivisionWithHead::where('id',$employee1->department->division_id)->first();
+                $update->division_head_id = $divisionHead1->approval_handover_to;
                     $message = 'Employee Liability Request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';               
                 }
             }
@@ -254,7 +264,7 @@ class EmployeeLiabilityController extends Controller
             $previous = Liability::where('status',$data->status)->where('id', '<', $id)->max('id');
             $next = Liability::where('status',$data->status)->where('id', '>', $id)->min('id');
         }
-        $masterEmployees = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->with('empProfile.designation','empProfile.department','empProfile.location')->select('id','name')->get();
+        $masterEmployees = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->whereHas('empProfile')->with('empProfile.designation','empProfile.department','empProfile.location')->select('id','name')->get();
         return view('hrm.liability.create',compact('id','data','previous','next','masterEmployees'));
     }
     public function storeOrUpdate(Request $request, $id) { 

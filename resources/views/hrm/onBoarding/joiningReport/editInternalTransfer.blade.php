@@ -200,8 +200,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 @endphp
 @if ($hasPermission)
 <div class="card-header">
-	<h4 class="card-title"> Edit Internal Transfer Joining Report</h4>
-	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee-hiring-request.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+	<h4 class="card-title"> Edit Temporary Internal Transfer Joining Report</h4>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('employee_joining_report.index','temporary') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 </div>
 <div class="card-body">
 	@if (count($errors) > 0)
@@ -233,8 +233,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 					</div>
 					<div class="col-xxl-3 col-lg-4 col-md-4" id="employee_code_div">
 						<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
-						<input id="employee_code" type="text" class="form-control widthinput @error('employee_code') is-invalid @enderror" name="employee_code"
-							placeholder="Employee Code" value="{{ $data->user->empProfile->employee_code ?? ''}}" autocomplete="employee_code" autofocus>
+						<center><span id="employee_code">{{ $data->user->empProfile->employee_code ?? ''}}</span></center>
 					</div>
 					<div class="col-xxl-3 col-lg-4 col-md-4" id="designation_div">
 						<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
@@ -249,34 +248,48 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 		</div>
 		<div class="card">
 			<div class="card-header">
-				<h4 class="card-title">Internal Transfer Information</h4>
+				<h4 class="card-title">Temporary Internal Transfer Information</h4>
 			</div>
 			<div class="card-body">
 				<div class="row">
+					<input type="hidden" name="id" id="id" value="{{$data->id ?? ''}}">
 					<input type="hidden" name="joining_type" value="internal_transfer">
-					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
-						<div class="dropdown-option-div">
-							<span class="error">* </span>
-							<label for="transfer_from_department_id" class="col-form-label text-md-end">{{ __('Transfer From Department') }}</label>
-							<input type="hidden" name="transfer_from_department_id" id="transfer_from_department_id" value="{{$data->transfer_from_department_id ?? ''}}" class="form-control widthinput @error('transfer_from_department_id') is-invalid @enderror">
-							<input type="text" readonly name="transfer_from_department_name" id="transfer_from_department_name" value="{{$data->transferFromDepartment->name ?? ''}}" class="form-control widthinput @error('transfer_from_department_name') is-invalid @enderror">
+					<input type="hidden" name="internal_transfer_type" value="temporary">
+					<input type="hidden" name="transfer_from_department_id" id="transfer_from_department_id" value="{{$data->transfer_from_department_id ?? ''}}">
+					<input type="hidden" name="transfer_from_location_id" id="transfer_from_location_id" value="{{$data->transfer_from_location_id ?? ''}}">
+					<input type="hidden" name="employee_code" id="employee_code" value="">
+					<div class="col-xxl-6 col-lg-6 col-md-6" id="transfer_from_department_name_div">
+						<div >
+							<center><label for="transfer_from_department_id" class="col-form-label text-md-end">{{ __('Transfer From Department') }}</label></center>
+						</div>
+						<div>
+							<center><span id="transfer_from_department_name">{{$data->transferFromDepartment->name ?? ''}}</span></center>
 						</div>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-6 col-lg-6 col-md-6" id="transfer_from_location_name_div">
+						<div>
+							<center><label for="transfer_from_location_id" class="col-form-label text-md-end">{{ __('Transfer From Location') }}</label></center>
+						</div>
+						<div>
+							<center><span id="transfer_from_location_name">{{$data->transferFromLocation->name ?? ''}}</span></center>
+						</div>
+					</div>
+				</div>
+				</br>
+				<div class="row">
+					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="transfer_from_date" class="col-form-label text-md-end">{{ __('Transfer From Date') }}</label>
 						<input id="transfer_from_date" type="date" class="form-control widthinput @error('transfer_from_date') is-invalid @enderror" name="transfer_from_date"
 							placeholder="Transfer From Date" value="{{$data->transfer_from_date}}" autocomplete="transfer_from_date" autofocus>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
-						<div class="dropdown-option-div">
-							<span class="error">* </span>
-							<label for="transfer_from_location_id" class="col-form-label text-md-end">{{ __('Transfer From Location') }}</label>
-							<input type="hidden" name="transfer_from_location_id" id="transfer_from_location_id" value="{{$data->transfer_from_location_id ?? ''}}" class="form-control widthinput @error('transfer_from_location_id') is-invalid @enderror">
-							<input type="text" readonly name="transfer_from_location_name" id="transfer_from_location_name" value="{{$data->transferFromLocation->name ?? ''}}" class="form-control widthinput @error('transfer_from_location_name') is-invalid @enderror">
-						</div>
+					<div class="col-xxl-3 col-lg-6 col-md-6">
+						<span class="error">* </span>
+						<label for="joining_date" class="col-form-label text-md-end">{{ __('Transfer To Date') }}</label>
+						<input id="joining_date" type="date" class="form-control widthinput @error('joining_date') is-invalid @enderror" name="joining_date"
+							placeholder="Transfer From Date" value="{{$data->joining_date}}" autocomplete="joining_date" autofocus>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="transfer_to_department_id" class="col-form-label text-md-end">{{ __('Transfer To Department') }}</label>
@@ -287,13 +300,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 							</select>
 						</div>
 					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6">
-						<span class="error">* </span>
-						<label for="joining_date" class="col-form-label text-md-end">{{ __('Transfer To Date') }}</label>
-						<input id="joining_date" type="date" class="form-control widthinput @error('joining_date') is-invalid @enderror" name="joining_date"
-							placeholder="Transfer From Date" value="{{$data->joining_date}}" autocomplete="joining_date" autofocus>
-					</div>
-					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div">
+					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="joining_location" class="col-form-label text-md-end">{{ __('Transfer To Location') }}</label>
@@ -338,104 +345,158 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 	        maximumSelectionLength: 1,
 	        placeholder:"Choose Employee Name",
 	    });
-	$('#joining_location').select2({
+		$('#joining_location').select2({
 	        allowClear: true,
-	maximumSelectionLength: 1,
+			maximumSelectionLength: 1,
 	        placeholder:"Choose Employee Hiring Request UUID",
 	    });	
 	    $('#transfer_to_department_id').select2({
 	        allowClear: true,
-	maximumSelectionLength: 1,
+			maximumSelectionLength: 1,
 	        placeholder:"Choose Transfer To Department",
 	    });	
-	$('.employee_id').change(function (e) {
-	var employeeId = $('#employee_id').val();
-	if(employeeId != '') {
-	if(employees.length > 0) {
-		for(var i=0; i<employees.length; i++) {						
-			if(employees[i].id == employeeId) {
-	                        console.log(employees[i]);
-				$('#employee_code_div').show();
-	                        $('#designation_div').show();
-	                        $('#department_div').show();
-				if(employees[i].emp_profile != null && employees[i].emp_profile.employee_code != null) {
-					document.getElementById('employee_code').value=employees[i].emp_profile.employee_code;                        
-				}
-				if(employees[i].emp_profile != null && employees[i].emp_profile.designation != null && employees[i].emp_profile.designation.name != null) {
-					document.getElementById('designation').textContent=employees[i].emp_profile.designation.name;
-				}
-				if(employees[i].emp_profile != null && employees[i].emp_profile.department != null && employees[i].emp_profile.department.name != null) {
-					document.getElementById('department').textContent=employees[i].emp_profile.department.name;  
-					document.getElementById('transfer_from_department_id').value=employees[i].emp_profile.department_id;  
-					document.getElementById('transfer_from_department_name').value=employees[i].emp_profile.department.name;  
-				}
-				if(employees[i].emp_profile != null && employees[i].emp_profile.work_location != null && employees[i].emp_profile.location.name != null) {
-					document.getElementById('transfer_from_location_id').value=employees[i].emp_profile.work_location;  
-					document.getElementById('transfer_from_location_name').value=employees[i].emp_profile.location.name;  
-				}
+		$('.employee_id').change(function (e) {
+			var employeeId = $('#employee_id').val();
+			if(employeeId != '') {
+				if(employees.length > 0) {
+					for(var i=0; i<employees.length; i++) {						
+						if(employees[i].id == employeeId) {
+							$('#employee_code_div').show();
+							$('#designation_div').show();
+							$('#department_div').show();
+							$('#transfer_from_department_name_div').show();
+							$('#transfer_from_location_name_div').show();
+							if(employees[i].emp_profile != null && employees[i].emp_profile.employee_code != null) {
+								document.getElementById('employee_code').textContent=employees[i].emp_profile.employee_code;                        
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.designation != null && employees[i].emp_profile.designation.name != null) {
+								document.getElementById('designation').textContent=employees[i].emp_profile.designation.name;
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.department != null && employees[i].emp_profile.department.name != null) {
+								document.getElementById('department').textContent=employees[i].emp_profile.department.name;  
+								document.getElementById('transfer_from_department_id').value=employees[i].emp_profile.department_id;  
+								document.getElementById('transfer_from_department_name').textContent=employees[i].emp_profile.department.name;  
+							}
+							if(employees[i].emp_profile != null && employees[i].emp_profile.work_location != null && employees[i].emp_profile.location.name != null) {
+								document.getElementById('transfer_from_location_id').value=employees[i].emp_profile.work_location;  
+								document.getElementById('transfer_from_location_name').textContent=employees[i].emp_profile.location.name;  
+							}
+						}
+					}
+				}               
 			}
-		}
-	}               
-	}
-	else {
-	$('#employee_code_div').hide();
-	$('#designation_div').hide();
-	            $('#department_div').hide();
-	document.getElementById('transfer_from_department_id').value='';  
-	document.getElementById('transfer_from_department_name').value='';
-	document.getElementById('transfer_from_location_id').value='';  
-	document.getElementById('transfer_from_location_name').value='';
-	}			
+			else {
+				$('#employee_code_div').hide();
+				$('#designation_div').hide();
+				$('#department_div').hide();
+				$('#transfer_from_department_name_div').hide();
+				$('#transfer_from_location_name_div').hide();
+				document.getElementById('transfer_from_department_id').value='';  
+				document.getElementById('transfer_from_department_name').value='';
+				document.getElementById('transfer_from_location_id').value='';  
+				document.getElementById('transfer_from_location_name').value='';
+			}			
+		});
 	});
-	});
-	jQuery.validator.setDefaults({
-	    errorClass: "is-invalid",
-	    errorElement: "p",     
-	});
+	// jQuery.validator.setDefaults({
+	// 	errorClass: "is-invalid",
+	// 	errorElement: "p",     
+	// });
+	$.validator.addMethod("deptLoc", function (value, element, params) {
+		var fromDept = '';
+	    var fromLoc = '';
+		var toDept = '';
+	    var toLoc = '';
+	    fromDept = $('#transfer_from_department_id').val();
+	    fromLoc = $('#transfer_from_location_id').val();
+		toDept = $('#transfer_to_department_id').val();
+	    toLoc = $('#joining_location').val();
+	    if(fromDept == toDept && fromLoc == toLoc) {
+	        return false;
+	    }
+		else {
+	        return true;
+	    }
+	},"can't transfer to the same department and location");
+
+	// Adding a custom validation method named "endDateGreater"
+    $.validator.addMethod("endDateGreater", function(value, element) {
+        var startDate = $('#transfer_from_date').val();
+        var endDate = value;
+        var start = new Date(startDate);
+        var end = new Date(endDate);
+        // Check if end date is greater than start date
+        return this.optional(element) || end >= start;
+    }, "End date must be greater than or equal to start date.");
+
+	$.validator.addMethod("dateExist", function(value, element) {
+	    var result = false;
+		var transfer_from_date = $('#transfer_from_date').val(); 
+		var joining_date = $('#joining_date').val(); 
+		var employee_id = $("#employee_id").val();
+		var id = $("#id").val();
+		$.ajax({
+			type:"POST",
+			async: false,
+			url: "{{route('temptransfer.checkTempDateExist')}}", // script to validate in server side
+			data: {transfer_from_date: transfer_from_date,
+			joining_date: joining_date,
+			employee_id: employee_id,
+			id: id,
+			_token: '{{csrf_token()}}'},
+			success: function(data) {
+				result = (data == true) ? true : false;
+			}
+		});
+		return result; 
+	}, "This date is alredy exist in the system, Please select different date.");
+
 	$('#joiningReportForm').validate({ 
-	    rules: {
-	        employee_id: {
-	required: true,
-	},
-	joining_date: {
-	required: true,
-	},
-	        joining_location: {
-	            required: true,
-	        },
-	        transfer_from_department_id: {
-	            required: true,
-	        },
-	        transfer_from_date: {
-	            required: true,
-	        },
-	        transfer_from_location_id: {
-	            required: true,
-	        },
-	        transfer_to_department_id: {
-	            required: true,
-	        },
-	    },
-	errorPlacement: function ( error, element ) {
-	        error.addClass( "invalid-feedback font-size-13" );
-	
-	        if (element.is(':radio') && element.closest('.radio-main-div').length > 0) {
-	            error.addClass('radio-error');
-	            error.insertAfter(element.closest('.radio-main-div').find('fieldset.radio-div-container').last());
-	        }
-	else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+		rules: {
+			employee_id: {
+				required: true,
+			},
+			joining_date: {
+				required: true,
+				date: true, // Validates the start date format
+				endDateGreater: true, // Custom rule for comparing dates
+				dateExist: true,
+			},
+			joining_location: {
+				required: true,
+				deptLoc: true,
+			},
+			transfer_from_department_id: {
+				required: true,
+			},
+			transfer_from_date: {
+				required: true,
+				date: true, // Validates the end date format
+				dateExist: true,
+			},
+			transfer_from_location_id: {
+				required: true,
+			},
+			transfer_to_department_id: {
+				required: true,
+			},
+		},
+		errorPlacement: function ( error, element ) {
+			error.addClass( "invalid-feedback font-size-13" );
+			if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
 	            if (!element.val() || element.val().length === 0) {
 	                console.log("Error is here with length", element.val().length);
 	                error.addClass('select-error');
 	                error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
-	            } else {
+	            } 
+				else {
 	                console.log("No error");
 	            }
 	        }
 	        else {
 	            error.insertAfter( element );
 	        }
-	    }
+		}
 	});
 </script>
 @endsection

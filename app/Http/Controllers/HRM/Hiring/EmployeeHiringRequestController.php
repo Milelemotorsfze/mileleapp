@@ -22,6 +22,7 @@ use Exception;
 use Carbon\Carbon;
 use App\Http\Controllers\UserActivityController;
 use App\Http\Controllers\HRM\Hiring\CandidatePersonalInfoController;
+use App\Models\Masters\MasterDivisionWithHead;
 
 class EmployeeHiringRequestController extends Controller
 {
@@ -141,13 +142,13 @@ class EmployeeHiringRequestController extends Controller
                 $next =$next->min('id');
             }
         }
-        $masterdepartments = MasterDepartment::where('status','active')->select('id','name')->get();
+        $masterdepartments = MasterDepartment::orderBy('name', 'ASC')->whereNot('name','Management')->where('status','active')->select('id','name')->get();
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
-        $masterJobPositions = MasterJobPosition::select('id','name')->get();
-        $masterOfficeLocations = MasterOfficeLocation::where('status','active')->select('id','name','address')->get();
-        $requestedByUsers = User::where('status','active')->whereNotIn('id',['1','16'])->select('id','name')->get();
-        $reportingToUsers = User::where('status','active')->whereNotIn('id',['1','16'])->select('id','name')->get();
-        $replacementForEmployees = User::where('status','active')->whereNotIn('id',['1','16'])->select('id','name')->get();
+        $masterJobPositions = MasterJobPosition::orderBy('name', 'ASC')->select('id','name')->get();
+        $masterOfficeLocations = MasterOfficeLocation::orderBy('name', 'ASC')->where('status','active')->select('id','name','address')->get();
+        $requestedByUsers = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->select('id','name')->get();
+        $reportingToUsers = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',['1','16'])->select('id','name')->get();
+        $replacementForEmployees = User::orderBy('name', 'ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->select('id','name')->get();
         if(Auth::user()->hasPermissionForSelectedRole(['edit-employee-hiring-request'])) { 
             $user['id'] = '';
             $user['department'] = '';
@@ -200,7 +201,7 @@ class EmployeeHiringRequestController extends Controller
                     $leadHandover = TeamLeadOrReportingManagerHandOverTo::create($createHandOvr);
                 }
                 $teamLeadOrReportingManager = EmployeeProfile::where('user_id',$request->requested_by)->first();
-                $department = MasterDepartment::where('id',$request->department_id)->first();
+                $department = MasterDepartment::whereNot('name','Management')->where('id',$request->department_id)->first();
                 $hiringManager = ApprovalByPositions::where('approved_by_position','Recruiting Manager')->first();
                 $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
                 $input = $request->all();
@@ -465,6 +466,8 @@ class EmployeeHiringRequestController extends Controller
                 $update->action_by_department_head = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_hiring_manager = 'pending';
+                    $RecruitingManager = ApprovalByPositions::where('approved_by_position','Recruiting Manager')->first();
+                $update->hiring_manager_id = $RecruitingManager->handover_to_id;
                     $message = 'Employee hiring request send to Recruiting Manager ( '.$update->hr_manager_name.' - '.$update->hr_manager_email.' ) for approval';
                 }
             }
@@ -474,6 +477,9 @@ class EmployeeHiringRequestController extends Controller
                 $update->action_by_hiring_manager = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_division_head = 'pending';
+                    $employee1 = EmployeeProfile::where('user_id',$update->requested_by)->first();
+                $divisionHead1 = MasterDivisionWithHead::where('id',$employee1->department->division_id)->first();
+                $update->division_head_id = $divisionHead1->approval_handover_to;
                     $message = 'Employee hiring request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';
                 }
             }
@@ -483,6 +489,8 @@ class EmployeeHiringRequestController extends Controller
                 $update->action_by_division_head = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_hr_manager = 'pending';
+                    $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                $update->hr_manager_id = $HRManager->handover_to_id;
                     $message = 'Employee hiring request send to HR Manager ( '.$update->hr_manager_name.' - '.$update->hr_manager_email.' ) for approval';
                 }
             }

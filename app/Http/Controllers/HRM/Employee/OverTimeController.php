@@ -49,7 +49,7 @@ class OverTimeController extends Controller
         return view('hrm.overtime.index',compact('pendings','approved','rejected'));
     }
     public function create() {
-        $employees = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
+        $employees = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         return view('hrm.overtime.create',compact('employees'));
@@ -177,7 +177,7 @@ class OverTimeController extends Controller
     }   
     public function edit($id) {
         $data = OverTime::where('id', $id)->with('times','user.empProfile.department','user.empProfile.designation','user.empProfile.location')->first();
-        $employees = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
+        $employees = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereNot('is_management','yes')->whereHas('empProfile', function($q) {
             $q = $q->where('type','employee');
         })->with('empProfile.department','empProfile.designation','empProfile.location')->get();
         return view('hrm.overtime.edit',compact('data','employees'));
@@ -307,6 +307,9 @@ class OverTimeController extends Controller
                 $update->action_by_employee = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_department_head = 'pending';
+                    $employee2 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                    $leadOrMngr = TeamLeadOrReportingManagerHandOverTo::where('lead_or_manager_id',$employee2->team_lead_or_reporting_manager)->first();
+                    $update->department_head_id = $leadOrMngr->approval_by_id;
                     $message = 'Employee OverTime Request send to Reporting Manager ( '.$update->reportingManager->name.' - '.$update->reportingManager->email.' ) for approval';
                 }
             }
@@ -316,6 +319,9 @@ class OverTimeController extends Controller
                 $update->action_by_department_head = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_division_head = 'pending';
+                    $employee1 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                $divisionHead1 = MasterDivisionWithHead::where('id',$employee1->department->division_id)->first();
+                $update->division_head_id = $divisionHead1->approval_handover_to;
                     $message = 'Employee OverTime Request send to Division Head ( '.$update->divisionHead->name.' - '.$update->divisionHead->email.' ) for approval';
                 }
             }
@@ -325,6 +331,8 @@ class OverTimeController extends Controller
                 $update->action_by_division_head = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_hr_manager = 'pending';
+                    $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                    $update->hr_manager_id = $HRManager->handover_to_id;
                     $message = 'Employee OverTime Request send to HR Manager ( '.$update->hrManager->name.' - '.$update->hrManager->email.' ) for approval';
                 }
             }

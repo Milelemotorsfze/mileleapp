@@ -48,9 +48,9 @@ class EmployeeHiringQuestionnaireController extends Controller
         $masterVisaTypes = MasterVisaType::where('status','active')->select('id','name')->get();
         $masterNationality = Country::select('id','name','nationality')->get();
         $masterLanguages = Language::select('id','name')->get();
-        $interviewdByUsers = User::where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->select('id','name')->get();
+        $interviewdByUsers = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile')->select('id','name')->get();
         $masterRecuritmentSources = MasterRecuritmentSource::select('id','name')->get();
-        $masterDepartments = MasterDepartment::select('id','name')->get();
+        $masterDepartments = MasterDepartment::whereNot('name','Management')->select('id','name')->get();
         $masterExperienceLevels = MasterExperienceLevel::select('id','name','number_of_year_of_experience')->get();
         $masterSpecificIndustryExperiences = MasterSpecificIndustryExperience::select('id','name')->get();
         if($data) {
@@ -120,7 +120,7 @@ class EmployeeHiringQuestionnaireController extends Controller
                 $authId = Auth::id();
                 $input = $request->all();
                 $update = EmployeeHiringQuestionnaire::where('hiring_request_id',$id)->first();
-                if($update && $update->hiringRequest->status == 'approved' && $update->hiringRequest->final_status == 'open') {
+                if($update && $update->hiringRequest->status == 'approved' && $update->hiringRequest->final_status == 'open' && $request->questionnaire_id !='') {
                     $update->designation_type  = $request->designation_type ;
                     $update->designation_id  = $request->designation_id ;
                     $update->no_of_years_of_experience_in_specific_job_role  = $request->no_of_years_of_experience_in_specific_job_role ;
@@ -305,6 +305,13 @@ class EmployeeHiringQuestionnaireController extends Controller
                     (new UserActivityController)->createActivity($createHistory->message);
                     $successMessage = "New Employee Hiring Questionnaire Created Successfully";
                     $status = 'success';
+                }
+                else if($request->questionnaire_id == '') {
+                    $successMessage = "Can't create! Questionnaire for this hiring request already exist, Edit here..";
+                    $status = 'error';
+                    DB::commit();
+                return redirect()->route('employee-hiring-questionnaire.create-or-edit',$update->id)
+                                    ->with($status,$successMessage);
                 }
                 else {
                     $successMessage = "Can't update the data because it is already".$update->hiringRequest->final_status;

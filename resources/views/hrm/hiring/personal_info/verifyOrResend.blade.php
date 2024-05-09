@@ -38,6 +38,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-p
 			<a class="nav-link active" data-bs-toggle="pill" href="#data-candidate-info">Verification Awaiting</a>
 		</li>
 		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#resend-form-to-edit">Resend Form To Edit</a>
+		</li>
+		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#verified-candidate-info">Verified</a>
 		</li>
 	</ul>
@@ -67,6 +70,56 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-p
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
 						@foreach ($pending as $key => $data)
+						<tr data-id="1">
+							<td>{{ ++$i }}</td>
+							<td>{{ $data->first_name ?? '' }}</td>
+							<td>{{ $data->last_name ?? '' }}</td>
+							<td>{{ $data->name_of_father ?? '' }}</td>
+							<td>{{ $data->name_of_mother ?? '' }}</td>
+							<td>{{ $data->maritalStatus->name ?? '' }}</td>
+							<td>{{ $data->passport_number ?? '' }}</td>
+							<td>@if($data->passport_expiry_date != ''){{\Carbon\Carbon::parse($data->passport_expiry_date)->format('d M Y')}} @endif</td>
+							<td>{{ $data->educational_qualification ?? ''}}</td>
+							<td>{{ $data->year_of_completion ?? ''}}</td>
+							<td>{{ $data->religionName->name ?? ''}}</td>
+							<td>{{\Carbon\Carbon::parse($data->dob)->format('d M Y') ?? ''}}</td>
+							<td>
+								<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Candidate Details" class="btn btn-sm btn-primary" 
+									href="{{route('interview-summary-report.show', $data->interview_summary_id)}}">
+								<i class="fa fa-user" aria-hidden="true"></i> Candidate Details
+								</a>
+							</td>
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab-pane fade show" id="resend-form-to-edit">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table class="my-datatable table table-striped table-editable table-edits table">
+					<thead>
+						<tr>
+							<th>Sl No</th>
+							<th>First Name</th>
+							<th>Last Name</th>
+							<th>Father’s Full Name</th>
+							<th>Mother’s Full Name</th>
+							<th>Marital Status</th>
+							<th>Passport Number</th>
+							<th>Passport Expiry Date</th>
+							<th>Educational Qualification</th>
+							<th>Year of Completion</th>
+							<th>Religion</th>
+							<th>Date Of Birth</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($resend as $key => $data)
 						<tr data-id="1">
 							<td>{{ ++$i }}</td>
 							<td>{{ $data->first_name ?? '' }}</td>

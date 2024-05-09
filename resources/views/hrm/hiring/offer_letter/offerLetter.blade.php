@@ -77,6 +77,11 @@
 			background-color: #aae1cb;
 			border-color: #95dabe;
 			}
+			.alert-error {
+				color: #b14542;
+				background-color: #fec0bf;
+				border-color: #feb1af;
+			}
 			.alert {
 			position: relative;
 			padding: .75rem 1.25rem;
@@ -91,12 +96,16 @@
 		<div class="alert alert-success" id="success-alert">
 			{{$success ?? ''}}
 		</div>
+		@elseif(isset($error) && $error != '')
+		<div class="alert alert-error" id="error-alert">
+			{{$error ?? ''}}
+		</div>
 		@endif
 		<div class="book">
 			<div class="page">
 				<div class="subpage justify" style="font-style:Serif;" id="justify">
 					<h1 style="color:#034c84;">MILELE</h1>
-					<p>MM/OL/00214/@if($data->offer_letter_send_at != NULL){{Carbon\Carbon::parse($data->offer_letter_send_at)->format('Y')}}@else{{now()->format('Y')}}@endif</br>
+					<p>{{$data->candidateDetails->offer_letter_code ?? ''}}</br>
 						Date: @if($data->offer_letter_send_at != NULL){{Carbon\Carbon::parse($data->offer_letter_send_at)->format('F d,Y')}}@else{{now()->format('F d, Y')}}@endif</br></br>
 						<strong>@if($data->gender == 1) Mr. @elseif($data->gender == 2) Ms. @endif {{$data->candidate_name ?? ''}}</strong></br> 
 						Passport No: {{$data->candidateDetails->passport_number ?? ''}}</br>   
@@ -362,7 +371,8 @@
 			                            alertify.success(status + " Successfully")
 			                        }
 			                        else if(data == 'error') {
-			
+										window.location.reload();
+	                        			alertify.error("Can't verify! It has already been verified")
 			                        }
 			                    }
 			                });

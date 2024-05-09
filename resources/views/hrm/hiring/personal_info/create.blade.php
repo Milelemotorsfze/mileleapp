@@ -93,7 +93,7 @@
 												</div>
 											</div>
 											<br>
-											<input name="id" value="{{$candidate->id}}" hidden>
+											<input name="id" value="{{$candidate->id}}" id="candidateId" hidden>
 											<div class="card">
 												<div class="card-header">
 													<h4 class="card-title">
@@ -432,7 +432,7 @@
 											<div class="row">
 												<div class="col-xxl-12 col-lg-12 col-md-12">
 													<div class="row">
-														<div class="col-xxl-6 col-lg-6 col-md-6">
+														<div class="col-xxl-6 col-lg-6 col-md-6"><span class="error">* </span>
 															<label for="request_date" class="col-form-label text-md-end">{{ __('Signature') }} :</label>
 															<input type="text" name="signature" id="signature" value="" style="border:none;">
 														</div>
@@ -472,6 +472,13 @@
 		@include('partials/right-sidebar')
 		@include('partials/vendor-scripts')
 		@stack('scripts')
+		<script type="text/javascript">
+	$.ajaxSetup({
+	    headers: {
+	        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+	    }
+	});
+</script>
 		<script src="{{ asset('libs/dropzone/min/dropzone.min.js') }}"></script>
 		<script src="{{ asset('js/app.js') }}"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
@@ -564,15 +571,24 @@
 			            }
 			        }
 			        if(candidate.pif_sign != '') {
-			            window.addEventListener("load", draw);
-			            function draw() {
-			                var ctx = document.querySelector('#signature_canvas').getContext('2d');
-			                var img1 = new Image();
-			                img1.onload = function() {
-			                    ctx.drawImage(img1, 40, 10);
-			                }
-			                img1.src = candidate.pif_sign; 
-			            }
+			            // window.addEventListener("load", draw);
+			            // function draw() {
+			            //     var ctx = document.querySelector('#signature_canvas').getContext('2d');
+			            //     var img1 = new Image();
+			            //     img1.onload = function() {
+			            //         ctx.drawImage(img1, 40, 10);
+			            //     }
+			            //     img1.src = candidate.pif_sign; 
+			            // }
+						var canvas = document.getElementById('signature_canvas');
+						var ctx = canvas.getContext('2d');
+						var image = new Image();
+
+						// Replace 'yourBase64String' with your actual base64 string.
+						image.onload = function() {
+							ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+						};
+						image.src = candidate.pif_sign;
 			        }
 			    }
 			    else {
@@ -1244,6 +1260,24 @@
 			    console.log('Checking...');
 			    return this.optional(element) || signaturePad.isEmpty();
 			}, "Please provide your signature...");
+			jQuery.validator.addMethod("uniquePassport", 
+	       function(value, element) {
+	           var result = false;
+			var candidateId = $("#candidateId").val();
+	           $.ajax({
+	               type:"POST",
+	               async: false,
+	               url: "{{route('employee.uniquePassport')}}", // script to validate in server side
+	               data: {passportNumber: value,candidateId:candidateId},
+	               success: function(data) {
+	                   result = (data == true) ? true : false;
+	               }
+	           });
+	           // return true if username is exist in database
+	           return result; 
+	       }, 
+	       "This Password is already taken! Try another."
+	   );
 			$('#candidatepersonalInfoForm').validate({ 
 			    rules: {
 			        first_name: {
@@ -1268,6 +1302,7 @@
 			        passport_number: {
 			            required: true,
 			            validPassport:true,
+						uniquePassport: true,
 			        },
 			        passport_expiry_date: {
 			            required: true,

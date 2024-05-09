@@ -13,7 +13,9 @@
         {
             height:32px!important;
         }
-
+        .error {
+            color: #FF0000;
+        }
     </style>
     @can('LOI-edit')
         @php
@@ -35,6 +37,7 @@
                         </ul>
                     </div>
                 @endif
+
                     @if (Session::has('error'))
                         <div class="alert alert-danger" >
                             <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
@@ -91,6 +94,28 @@
                                 <label for="choices-single-default" class="form-label">Customer</label>
                                 <select class="form-control widthinput" data-trigger name="customer_id" id="customer" >
                                 </select>
+
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div id="file-preview">
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
+                <span id="country-comment"></span><br>
+                <span class="error" id="max-individual-quantity-error"></span>
+                <span class="error" id="min-company-quantity-error"></span>
+                <span class="error" id="max-company-quantity-error"></span>
+                <span class="error" id="company-only-allowed-error"></span>
+            </div>
+            <div class="card mt-2" >
+                    <div class="card-header">
+                        <h4 class="card-title">LOI Items</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                <label class="form-label">Model</label>
+
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
@@ -363,6 +388,17 @@
                         <button type="submit" class="btn btn-primary float-end">Update</button>
                     </div>
 
+
+                </div>
+            <input type="hidden" name="is_signature_removed" id="is_signature_removed" value="0">
+            <select name="deletedIds[]" id="deleted-docs" hidden="hidden" multiple>
+            </select>
+            <input type="hidden" id="remaining-document-count" value="{{ $letterOfIndent->LOIDocuments->count() }}" >
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-primary float-end" id="submit-button">Update</button>
+            </div>
+
+
                 </form>
             </div>
         @endif
@@ -370,6 +406,7 @@
 @endsection
 @push('scripts')
     <script>
+        let formValid = true;
         let deletedDocumetIds = [];
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
@@ -425,6 +462,7 @@
                 maximumSelectionLength: 1,
             }).on('change', function() {
                 getCustomers();
+                checkCountryCriterias();
             });
             $('#dealer').change(function () {
                 var value = $('#dealer').val();
@@ -440,6 +478,87 @@
             $('#is_signature_removed').val(1);
             $('#signature-preview').hide();
         });
+        $('#customer-type').change(function () {
+            checkCountryCriterias();
+        });
+
+        $(document.body).on('input', ".quantities", function (e) {
+            checkCountryCriterias();
+        });
+
+        function checkCountryCriterias() {
+            // console.log('reached');
+            let url = '{{ route('loi-country-criteria.check') }}';
+            var country = $('#country').val();
+            var customer_type = $('#customer-type').val();
+            let total_quantities = 0;
+            $(".quantities ").each(function(){
+                if($(this).val() > 0) {
+                    total_quantities += parseInt($(this).val());
+                }
+            });
+            if(country.length > 0 && customer_type.length > 0 && total_quantities > 0) {
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        country_id: country,
+                        customer_type: customer_type,
+                        total_quantities:total_quantities
+                    },
+                    success:function (data) {
+                        console.log(data);
+                        formValid = true;
+                        if(data.comment) {
+                            $('#country-comment-div').attr('hidden', false);
+                            $('#country-comment').html(data.comment);
+                        }
+                        else{
+                            $('#country-comment-div').attr('hidden', true);
+                        }
+                        if(data.customer_type_error) {
+                            formValid = false;
+                            $('#customer-type-error').html(data.customer_type_error);
+                        }
+                        else{
+
+                            $('#customer-type-error').attr('hidden', true);
+                        }
+                        if (data.max_qty_per_passport_error) {
+                            formValid = false;
+                            // $('#quantity-error-div').attr('hidden', false);
+                            $('#max-individual-quantity-error').html(data.max_qty_per_passport_error);
+                        } else {
+                            // formValid = true;
+                            // $('#quantity-error-div').attr('hidden', true);
+                            $('#max-individual-quantity-error').html('');
+                        }
+                        if(data.min_qty_per_company_error) {
+                            formValid = false;
+                            $('#min-company-quantity-error').html(data.min_qty_per_company_error);
+                        }else{
+                            // formValid = true;
+                            $('#min-company-quantity-error').html('');
+                        }
+                        if(data.max_qty_per_company_error) {
+                            formValid = false;
+                            $('#max-company-quantity-error').html(data.max_qty_per_company_error);
+                        }else{
+                            // formValid = true;
+                            $('#max-company-quantity-error').html('');
+                        }
+                        if(data.company_only_allowed_error) {
+                            formValid = false;
+                            $('#company-only-allowed-error').html(data.company_only_allowed_error);
+                        }else{
+                            // formValid = true;
+                            $('#company-only-allowed-error').html('');
+                        }
+                    }
+                });
+            }
+        }
 
             $('.remove-doc-button').click(function () {
                 let id = $(this).attr('data-id');
@@ -626,7 +745,7 @@
                         class="form-control widthinput text-dark loi-descriptions" data-index="${index}" id="loi-description-${index}" >
                     </div>
                     <div class="col-lg-1 col-md-6 col-sm-12">
-                        <input type="number" name="quantity[]" placeholder="Quantity" maxlength="5" value="1" class="form-control widthinput text-dark quantities"
+                        <input type="number" name="quantity[]" placeholder="Quantity" maxlength="5" value="" class="form-control widthinput text-dark quantities"
                                step="1" oninput="validity.valid||(value='');" min="0" data-index="${index}" id="quantity-${index}">
                     </div>
                     <div class="col-lg-1 col-md-6 col-sm-12">
@@ -1070,6 +1189,7 @@
                 $('#dealer').attr("disabled", false);
             }
         }
+
         $("#addSoNumberBtn").on("click", function ()
 	       {
 	           var index = $(".soNumberMain").find(".soNumberApendHere").length + 1;
@@ -1111,6 +1231,19 @@
                 }
             });
 	   });
+
+        $('#submit-button').click(function (e) {
+            e.preventDefault();
+
+            if (formValid == true) {
+                if($("#form-doc-upload").valid()) {
+                    $('#form-doc-upload').unbind('submit').submit();
+                }
+            }else{
+                e.preventDefault();
+            }
+        });
+
     </script>
 @endpush
 
