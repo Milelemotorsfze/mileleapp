@@ -171,6 +171,17 @@
                         </div>
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Sales Person</label>
+                                <select class="form-control widthinput" multiple name="sales_person_id" id="sales_person_id" autofocus>
+                                    <option ></option>
+                                    @foreach($salesPersons as $salesPerson)
+                                        <option value="{{ $salesPerson->id }}"> {{ $salesPerson->name }} </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">LOI Document</label>
                                 <input type="file" name="files[]" id="file-upload" class="form-control widthinput text-dark" multiple
                                     autofocus accept="application/pdf">
@@ -430,7 +441,11 @@
 
             }
         });
-
+        $('#sales_person_id').select2({
+            placeholder : 'Select Sales Person',
+            allowClear: true,
+            maximumSelectionLength: 1
+        });
         $('#country').select2({
             placeholder : 'Select Country',
             allowClear: true,
@@ -1049,7 +1064,6 @@
 	                $(this).attr('id','row-'+index);
 	                $(this).find('.so_number').attr('name', 'so_number['+ index +']');
 	                $(this).find('.so_number').attr('id', 'so_number_'+index);
-	        
 	                $(this).find('.removeSoNumber').attr('data-index',index);
 	                $(this).find('.soNumberError').attr('id', 'soNumberError_'+index);
 	                

@@ -89,7 +89,12 @@
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                 <td>{{ $letterOfIndent->category }}</td>
-                                <td>{{ $letterOfIndent->so_number }}</td>
+                                <td>
+                                    @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
+                                        {{ $LoiSoNumber->so_number }} 
+                                    @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
+                                    @endforeach
+                                </td>
                                 <td>{{ $letterOfIndent->destination }}</td>
                                 <td>{{ $letterOfIndent->prefered_location }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
@@ -260,7 +265,12 @@
                                                                     <dt class="form-label font-size-13 text-muted">So Number :</dt>
                                                                 </div>
                                                                 <div class="col-lg-8 col-md-12 col-sm-12">
-                                                                    <dl>{{ $letterOfIndent->so_number }} </dl>
+                                                                    <dl> 
+                                                                         @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
+                                                                        {{ $LoiSoNumber->so_number }} 
+                                                                        @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
+                                                                        @endforeach 
+                                                                </dl>
                                                                 </div>
                                                             </div>
                                                             <div class="row">
@@ -339,7 +349,12 @@
                                                             <dt class="form-label font-size-13 text-muted">So Number :</dt>
                                                         </div>
                                                         <div class="col-lg-8 col-md-12 col-sm-12">
-                                                            <dl>{{ $letterOfIndent->so_number }} </dl>
+                                                            <dl>
+                                                                @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
+                                                                    {{ $LoiSoNumber->so_number }} 
+                                                                @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
+                                                                @endforeach
+                                                             </dl>
                                                         </div>
                                                     </div>
                                                     <div class="row">
@@ -404,7 +419,12 @@
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                 <td>{{ $letterOfIndent->category }}</td>
-                                <td>{{ $letterOfIndent->so_number }}</td>
+                                <td> 
+                                    @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
+                                        {{ $LoiSoNumber->so_number }} 
+                                    @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
+                                    @endforeach
+                                </td>
                                 <td>{{ $letterOfIndent->destination }}</td>
                                 <td>{{ $letterOfIndent->prefered_location }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
@@ -556,7 +576,12 @@
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                 <td>{{ $letterOfIndent->category }}</td>
-                                <td>{{ $letterOfIndent->so_number }}</td>
+                                <td>
+                                    @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
+                                        {{ $LoiSoNumber->so_number }} 
+                                    @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
+                                    @endforeach
+                                </td>
                                 <td>{{ $letterOfIndent->destination }}</td>
                                 <td>{{ $letterOfIndent->prefered_location }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>

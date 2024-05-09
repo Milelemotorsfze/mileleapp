@@ -170,6 +170,19 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Sales Person</label>
+                                <select class="form-control widthinput" multiple name="sales_person_id" id="sales_person_id" autofocus>
+                                    <option ></option>
+                                    @foreach($salesPersons as $salesPerson)
+                                        <option value="{{ $salesPerson->id }}" {{ $salesPerson->id == $letterOfIndent->sales_person_id ? 'selected' : ''}}> 
+                                            {{ $salesPerson->name }}
+                                         </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">LOI Document</label>
@@ -399,6 +412,12 @@
             getCustomers();
             let dealer = '{{ $letterOfIndent->dealers }}';
             showSignatureRemoveButton(dealer)
+
+            $('#sales_person_id').select2({
+                placeholder : 'Select Sales Person',
+                allowClear: true,
+                maximumSelectionLength: 1
+            });
 
             $('#country').select2({
                 placeholder: 'Select Country',
