@@ -164,6 +164,13 @@ class JobDescriptionController extends Controller
                     (new UserActivityController)->createActivity('New Employee Hiring Job Description Created');
                     $successMessage = "New Employee Hiring Job Description Created Successfully";
                 }
+                else if($id == 'new' && isset($hiringRequest->jobDescription)) {
+                    $update = JobDescription::where('hiring_request_id',$request->hiring_request_id)->first();
+                    $successMessage = "Can't create! Job Description for this hiring request already exist, Edit here..";
+                    $status = 'error';
+                    DB::commit();
+                    return redirect()->route('employee-hiring-job-description.create-or-edit',[$update->id,$update->hiring_request_id])->with($status,$successMessage);
+                }
                 else if(($id == 'new' OR $id != 'new') && isset($hiringRequest->questionnaire) && isset($hiringRequest->jobDescription)) {
                     $update = JobDescription::where('hiring_request_id',$request->hiring_request_id);
                     if($id != 'new') {
@@ -222,6 +229,8 @@ class JobDescriptionController extends Controller
                 $update->action_by_department_head = $request->status;
                 if($request->status == 'approved') {
                     $update->action_by_hr_manager = 'pending';
+                    $HRManager = ApprovalByPositions::where('approved_by_position','HR Manager')->first();
+                    $update->hr_manager_id = $HRManager->handover_to_id;
                     $message = 'Employee hiring request send to HR Manager ( '.$update->hrManagerName->name.' - '.$update->hrManagerName->email.' ) for approval';
                 }
             }

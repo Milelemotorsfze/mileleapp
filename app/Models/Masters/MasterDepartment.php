@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Masters\MasterDivisionWithHead;
 
 class MasterDepartment extends Model
 {
@@ -26,13 +27,19 @@ class MasterDepartment extends Model
         'approval_by_email',
     ];
     public function getApprovalByNameAttribute() {
-        $approvalBy = User::find($this->approval_by_id);
-        $approvalByName = $approvalBy->name;
+        $approvalByName = '';
+        if($this->approval_by_id != null) {
+            $approvalBy = User::find($this->approval_by_id);
+            $approvalByName = $approvalBy->name;
+        }
         return $approvalByName;
     }
     public function getApprovalByEmailAttribute() {
-        $approvalByEmail = User::find($this->approval_by_id);
-        $approvalByEmailName = $approvalByEmail->email;
+        $approvalByEmailName = '';
+        if($this->approval_by_id != null) {
+            $approvalByEmail = User::find($this->approval_by_id);
+            $approvalByEmailName = $approvalByEmail->email;
+        }
         return $approvalByEmailName;
     }
     public function division() {

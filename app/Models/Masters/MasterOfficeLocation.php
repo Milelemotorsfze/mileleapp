@@ -11,6 +11,7 @@ class MasterOfficeLocation extends Model
     protected $table = "master_office_locations";
     protected $fillable = [
         'name',
+        'registered_company_name',
         'type',
         'address',
         'contact_number',
@@ -19,5 +20,6 @@ class MasterOfficeLocation extends Model
         'created_by',
         'updated_by',
         'deleted_by'
+        
     ];
 }

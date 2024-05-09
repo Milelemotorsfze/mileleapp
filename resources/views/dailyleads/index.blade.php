@@ -177,6 +177,9 @@ input[type=number]::-webkit-outer-spin-button
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
       </li>
       <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab9">FollowUp</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab2">Prospecting</a>
       </li>
       <!-- <li class="nav-item">
@@ -214,6 +217,7 @@ input[type=number]::-webkit-outer-spin-button
                 <tr>
                   <th>Priority</th>
                   <th>Lead Date</th>
+                  <th>Remining Time</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
@@ -230,7 +234,7 @@ input[type=number]::-webkit-outer-spin-button
                 @foreach ($pendingdata as $key => $calls)
                     <tr data-id="{{$calls->id}}">
                 <td>
-                    @if ($calls->priority == "High")
+                    @if ($calls->priority == "Hot")
                         <i class="fas fa-circle blink" style="color: red;"> Hot</i>
                     @elseif ($calls->priority == "Normal")
                         <i class="fas fa-circle" style="color: green;"> Normal</i>
@@ -241,6 +245,7 @@ input[type=number]::-webkit-outer-spin-button
                     @endif
                 </td>
                     <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
+                    <td id="remaining-time-{{ $key }}" data-assign-time="{{ $calls->assign_time }}"></td>
                     <td>{{ $calls->type }}</td>
                     <td>{{ $calls->name }}</td>
                     <td>
@@ -296,6 +301,7 @@ input[type=number]::-webkit-outer-spin-button
       <i class="fa fa-bars" aria-hidden="true"></i>
     </button>
     <ul class="dropdown-menu dropdown-menu-end">
+    <li><a class="dropdown-item" href="#" onclick="openModalfellowup('{{ $calls->id }}')">FollowUp</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Unique Inquiry / Demand</a></li>
       <!-- <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li> -->
@@ -322,6 +328,114 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
+      <div class="modal fade" id="openfellowupdatemodel" tabindex="-1" aria-labelledby="openfellowupdatemodelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="openfellowupdatemodelLabel">Follow Up (Update)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="date" class="form-label">Date:</label>
+            </div>
+            <div class="col-md-8">
+            <input type="date" class="form-control" id="date" value="{{ date('Y-m-d') }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="sales-notes" class="form-label">Time:</label>
+            </div>
+            <div class="col-md-8">
+            <input type="time" class="form-control" id="time" value="{{ date('H:i') }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="document-upload" class="form-label">Method:</label>
+            </div>
+            <div class="col-md-8">
+            <select class="form-select" id="method">
+            <option value="Email">Email</option>
+            <option value="Call">Call</option>
+            <option value="Direct">Direct</option>
+            <option value="SMS">SMS</option>
+            <option value="WhatsApp">WhatsApp</option>
+          </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="document-upload" class="form-label">Sales Notes:</label>
+            </div>
+            <div class="col-md-8">
+            <textarea class="form-control" id="sales-notesfoup"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="savefollowupdate()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<div class="modal fade" id="openfellowupmodel" tabindex="-1" aria-labelledby="openfellowupmodelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="openfellowupmodelLabel">Follow Up</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="date" class="form-label">Date:</label>
+            </div>
+            <div class="col-md-8">
+            <input type="date" class="form-control" id="dateup" value="{{ date('Y-m-d') }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="sales-notes" class="form-label">Time:</label>
+            </div>
+            <div class="col-md-8">
+            <input type="time" class="form-control" id="time" value="{{ date('H:i') }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="document-upload" class="form-label">Method:</label>
+            </div>
+            <div class="col-md-8">
+            <select class="form-select" id="method">
+            <option value="Email">Email</option>
+            <option value="Call">Call</option>
+            <option value="Direct">Direct</option>
+            <option value="SMS">SMS</option>
+            <option value="WhatsApp">WhatsApp</option>
+          </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="document-upload" class="form-label">Sales Notes:</label>
+            </div>
+            <div class="col-md-8">
+            <textarea class="form-control" id="sales-notesfo"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="savefollowup()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
       <div class="modal fade" id="prospectingmodel" tabindex="-1" aria-labelledby="prospectingmodelLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -591,6 +705,25 @@ input[type=number]::-webkit-outer-spin-button
 	        </div>
     </div>
   </div>
+  <div class="modal fade" id="uploadingquotation" tabindex="-1" aria-labelledby="uploadingquotationLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadingquotationLabel">Uploading Signed Quotation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <input type="hidden" name="callId" id="modalCallId">
+          <input type="file" name="quotationFile" required>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" onclick="uploadingQuotations()">Upload File</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
   <div class="modal fade" id="vinsModal" tabindex="-1" aria-labelledby="vinsModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -629,8 +762,17 @@ input[type=number]::-webkit-outer-spin-button
             <label for="reason" class="form-label">Reason:</label>
           </div>
           <div class="col-md-8">
-            <input type="text" class="form-control" id="reason-reject" value="">
-          </div>
+  <select class="form-control" id="reason-reject">
+    <option value="">Select Reason</option>
+    <option value="Brand not available">Brand not available</option>
+    <option value="Model not available">Model not available</option>
+    <option value="Variant not available">Variant not available</option>
+    <option value="Price Issue">Price Issue</option>
+    <option value="Not Interested">Not Interested</option>
+    <option value="Others">Others</option>
+  </select>
+  <input type="text" class="form-control" id="other-reason" style="display: none;" placeholder="Specify Other Reason">
+</div>
         </div>
         <div class="row mb-3">
           <div class="col-md-4">
@@ -693,7 +835,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -727,7 +869,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -760,7 +902,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -798,7 +940,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -839,7 +981,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -915,7 +1057,7 @@ input[type=number]::-webkit-outer-spin-button
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Lead Date</th>
-                  <th>Purchase Type</th>
+                  <th>Selling Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
@@ -945,10 +1087,68 @@ input[type=number]::-webkit-outer-spin-button
           </div>
         </div>
       </div>
+      <div class="tab-pane fade show" id="tab9">
+      <br>
+      <!-- <div class="row">
+  <div class="col-lg-1">
+    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+  </div>
+</div> -->
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="dtBasicExample9" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <thead class="bg-soft-secondary">
+                <tr>
+                  <th>Lead Date</th>
+                  <th>Selling Type</th>
+                  <th>Customer Name</th>
+                  <th>Customer Phone</th>
+                  <th>Customer Email</th>
+                  <th>Brands & Models</th>
+                  <th>Preferred Language</th>
+                  <th>Location</th>
+                  <th>Remarks & Messages</th>
+                  <th>Followup Date</th>
+                  <th>Followup Time</th>
+                  <th>Method</th>
+                  <th>Sales Notes</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+      </div>
       </div><!-- end tab-content-->
     </div>
   </div>
   <script>
+    function uploadingQuotations() {
+  var formData = new FormData();
+  var fileInput = document.querySelector('input[name="quotationFile"]');
+  var callId = document.getElementById('modalCallId').value;
+  formData.append('quotationFile', fileInput.files[0]);
+  formData.append('callId', callId);
+  $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+  $.ajax({
+    url: '/upload-quotation-file',
+    type: 'POST',
+    data: formData,
+    processData: false,  // tell jQuery not to process the data
+    contentType: false,  // tell jQuery not to set contentType
+    success: function (data) {
+      alert('File uploaded successfully.');
+      $('#uploadingquotation').modal('hide');
+    },
+    error: function (xhr, status, error) {
+      alert('Error: ' + error.message);
+    }
+  });
+}
       $(document).ready(function() {
             var url = '{{ asset('storage/quotation_files/') }}';
             var QuotationUrl = url + '/' + '{{request()->quotationFilePath}}';
@@ -1042,6 +1242,30 @@ function openModalp(callId) {
   $('#prospectingmodel').data('call-id', callId);
   $('#prospectingmodel').modal('show');
 }
+function openModalfellowup(callId) {
+  $('#openfellowupmodel').data('call-id', callId);
+  $('#openfellowupmodel').modal('show');
+}
+function openModalfellowupdate(callId) {
+  // Set the callId as a data attribute of the modal
+  $('#openfellowupdatemodel').data('call-id', callId);
+  $.ajax({
+        url: '/update-followup-info-data/' + callId,
+        type: 'GET',
+        success: function(data) {
+            $('#date').val(data.date);
+            $('#time').val(data.time);
+            $('#method').val(data.method);
+            $('#sales-notesfoup').val(data.sales_notes);
+            $('#openfellowupdatemodel').modal('show');
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+            // Handle error appropriately, e.g., show an error message
+        }
+    });
+}
+
 function openModald(callId) {
   $('#demandmodel').data('call-id', callId);
   $('#demandmodel').modal('show');
@@ -1099,6 +1323,10 @@ function opensignaturelink(callId) {
     }
   });
 }
+function uploadingsignedquotation(callId) {
+  $('#modalCallId').val(callId); // Set the callId
+  $('#uploadingquotation').modal('show');
+}
 function copyLink() {
   var linkText = document.getElementById("linkInModal").textContent;
   navigator.clipboard.writeText(linkText)
@@ -1130,7 +1358,7 @@ function openvins(callId) {
 }
 function reloadDataTable(sectionId) {
     let dataTableValue;
-    if (sectionId === 'dataTable2' || sectionId === 'dataTable3' || sectionId === 'dataTable4' || sectionId === 'dataTable5' || sectionId === 'dataTable6' || sectionId === 'dataTable7') {
+    if (sectionId === 'dataTable2' || sectionId === 'dataTable3' || sectionId === 'dataTable4' || sectionId === 'dataTable5' || sectionId === 'dataTable6' || sectionId === 'dataTable7'|| sectionId === 'dataTable9') {
         dataTableValue = eval(sectionId);
         if (dataTableValue) {
             dataTableValue.ajax.reload();
@@ -1141,6 +1369,105 @@ function reloadDataTable(sectionId) {
     } else {
         console.log(`Invalid section ID: ${sectionId}`);
     }
+}
+function savefollowupdate() {
+  var callId = $('#openfellowupdatemodel').data('call-id');
+  var date = document.getElementById('date').value;
+  console.log(date);
+  var time = document.getElementById('time').value;
+  var method = document.getElementById('method').value;
+  var salesNotes = document.getElementById('sales-notesfoup').value;
+  if (salesNotes === '') {
+    alert('Please Write the Sales Notes');
+    return;
+  }
+  if (date === '') {
+    alert('Please select a date');
+    return;
+  }
+  var formData = new FormData();
+  formData.append('callId', callId);
+  formData.append('date', date);
+  formData.append('salesNotes', salesNotes);
+  formData.append('method', method);
+  formData.append('time', time);
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '{{ route('sales.savefollowupdate') }}', true);
+  xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+        if (response.success) {
+var tableRow = document.querySelector('tr[data-id="' + callId + '"]');
+          if (tableRow) {
+            tableRow.remove();
+          }
+          alertify.success('FollowUp submitted successfully');
+          $('#openfellowupdatemodel').modal('hide');
+          reloadDataTable('dataTable9');
+        }
+         else {
+          console.error('Error saving FollowUp');
+          alert('Error saving FollowUp');
+        }
+      } else {
+        console.error('Request failed with status ' + xhr.status);
+        alert('Request failed. Please try again.');
+      }
+    }
+  };
+  xhr.send(formData);
+}
+function savefollowup() {
+  var callId = $('#openfellowupmodel').data('call-id');
+  var date = document.getElementById('dateup').value;
+  var time = document.getElementById('time').value;
+  var method = document.getElementById('method').value;
+  var salesNotes = document.getElementById('sales-notesfo').value;
+  if (salesNotes === '') {
+    alert('Please Write the Sales Notes');
+    return;
+  }
+  if (date === '') {
+    alert('Please select a date');
+    return;
+  }
+  var formData = new FormData();
+  formData.append('callId', callId);
+  formData.append('date', date);
+  formData.append('salesNotes', salesNotes);
+  formData.append('method', method);
+  formData.append('time', time);
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '{{ route('sales.savefollowup') }}', true);
+  xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+        if (response.success) {
+var tableRow = document.querySelector('tr[data-id="' + callId + '"]');
+          if (tableRow) {
+            tableRow.remove();
+          }
+          alertify.success('FollowUp submitted successfully');
+          $('#openfellowupmodel').modal('hide');
+          reloadDataTable('dataTable2');
+        }
+         else {
+          console.error('Error saving FollowUp');
+          alert('Error saving FollowUp');
+        }
+      } else {
+        console.error('Request failed with status ' + xhr.status);
+        alert('Request failed. Please try again.');
+      }
+    }
+  };
+  xhr.send(formData);
 }
 function saveprospecting() {
   var callId = $('#prospectingmodel').data('call-id');
@@ -1410,10 +1737,21 @@ function savenegotiation() {
   xhr.send(formData);
 }
 function saveRejection() {
+  var reason = document.getElementById('reason-reject').value;
   var callId = $('#rejectionModal').data('callId');
   var date = document.getElementById('date-input-reject').value;
   var reason = document.getElementById('reason-reject').value;
   var salesNotes = document.getElementById('salesnotes-reject').value;
+  if(reason == "")
+  {
+    alert('Please give the Reason');
+  }
+  else
+  {
+  if(reason == "Others")
+  {
+    var reason = document.getElementById('other-reason').value;
+  }
   var formData = new FormData();
   formData.append('callId', callId);
   formData.append('date', date);
@@ -1421,7 +1759,7 @@ function saveRejection() {
   formData.append('salesNotes', salesNotes);
   var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   var xhr = new XMLHttpRequest();
-  xhr.open('POST', '{{ route('sales.rejection') }}', true); // Replace '/profile/rejection' with the actual URL path to your server-side endpoint
+  xhr.open('POST', '{{ route('sales.rejection') }}', true);
   xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
@@ -1449,6 +1787,7 @@ function saveRejection() {
     }
   };
   xhr.send(formData);
+}
 }
 </script>
 <script>
@@ -1559,7 +1898,7 @@ function s2ab(s) {
 });
 </script>
 <script>
-let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
+let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
     $(document).ready(function () {
         dataTable2 = $('#dtBasicExample2').DataTable({
             processing: true,
@@ -1689,6 +2028,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" onclick="openModalfellowup(${data})">Update FollowUp</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
                                     <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
@@ -1809,8 +2149,8 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                 { data: 'email', name: 'email' },
                 { data: 'models_brands', name: 'models_brands' },
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
-                { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
+                { data: 'location', name: 'location' },
                 {
     data: 'remarks',
     name: 'remarks',
@@ -1938,6 +2278,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
             preorder = `<li><a class="dropdown-item" href="${preorderUrl}">Pre Order</a></li>`;
         } else {
             signedlink = `<li><a class="dropdown-item" href="#" onclick="opensignaturelink(${data})">Signature Link</a></li>`;
+            uploadedfile = `<li><a class="dropdown-item" href="#" onclick="uploadingsignedquotation(${data})">Upload Signed Quotation</a></li>`;
         }
         return `
             <div class="dropdown">
@@ -1951,6 +2292,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                     <li><a class="dropdown-item" href="#" onclick="openvins(${data})">VINs</a></li>
                     ${signedlink}
+                    ${uploadedfile}
                 </ul>
             </div>`;
     }
@@ -2505,6 +2847,48 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
         { data: 'status', name: 'status' },
     ]
     });
+    dataTable9 = $('#dtBasicExample9').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: "{{ route('dailyleads.index', ['status' => 'followup']) }}",
+    columns: [
+        { data: 'leaddate', name: 'leaddate' },
+        { data: 'type', name: 'calls.type' },
+        { data: 'name', name: 'calls.name' },
+        { data: 'phone', name: 'calls.phone' },
+        { data: 'email', name: 'calls.email' },
+        { data: 'model_line', name: 'master_model_lines.model_line' },
+        { data: 'language', name: 'calls.language' },
+        { data: 'location', name: 'calls.location' },
+        { data: 'remarks', name: 'calls.remarks' },
+        { data: 'datefol', name: 'datefol' },
+        { data: 'time', name: 'fellow_up.time' },
+        { data: 'method', name: 'fellow_up.method' },
+        { data: 'sales_notes', name: 'fellow_up.sales_notes' },
+        {
+                    data: 'id',
+                    name: 'id',
+                    searchable: false,
+                    render: function (data, type, row) {
+                      const bookingUrl = `{{ url('booking/create') }}/${data}`;
+                      const qoutationUrl = `{{ url('/proforma_invoice/') }}/${data}`;
+                        return `
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Options">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" onclick="openModalfellowupdate(${data})">Update FollowUp</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalp(${data})">Prospecting</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Unique Inquiry / Demand</a></li>
+                                    <li><a class="dropdown-item"href="${qoutationUrl}">Quotation</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                                </ul>
+                            </div>`;
+                  }
+                },
+    ]
+    });
     });
     function toggleRemarks(uniqueId) {
     const $truncatedText = $('#' + uniqueId + '_truncated');
@@ -2520,6 +2904,33 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
         $readMoreLink.text('Read More');
     }
 }
+document.getElementById('reason-reject').addEventListener('change', function() {
+  var otherReasonInput = document.getElementById('other-reason');
+  if (this.value === 'Others') {
+    otherReasonInput.style.display = 'block';
+  } else {
+    otherReasonInput.style.display = 'none';
+  }
+});
+</script>
+<script>
+function updateRemainingTime() {
+    document.querySelectorAll('[id^="remaining-time-"]').forEach(function(element) {
+        var assignTime = new Date(element.getAttribute('data-assign-time'));
+        assignTime.setHours(assignTime.getHours() + 24);
+        var currentTime = new Date();
+        var diff = assignTime - currentTime;
+        if (diff >= 0) {
+            var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            element.innerHTML = `<span style="background-color: green; color: white; padding: 3px 6px; border-radius: 4px;">${hours}:${minutes}:${seconds}</span>`;
+        } else {
+            element.innerHTML = '';
+        }
+    });
+}
+setInterval(updateRemainingTime, 1000);
 </script>
 @else
     @php

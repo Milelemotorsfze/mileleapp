@@ -95,10 +95,7 @@ th.nowrap-td {
         @endphp
         @else
         @php
-        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->where(function($query) use ($userId) {
-        $query->where('created_by', $userId)
-              ->orWhere('created_by', 16);
-        })
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')
         ->count();
         @endphp
         @endif
@@ -129,10 +126,6 @@ th.nowrap-td {
         @php
         $userId = auth()->user()->id;
         $alreadyapproved = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-        $query->where('created_by', $userId)
-              ->orWhere('created_by', 16);
-    })
     ->where('purchasing_order.status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
@@ -181,11 +174,7 @@ th.nowrap-td {
     ->whereExists(function ($query) use ($userId) {
         $query->select(DB::raw(1))
             ->from('purchasing_order')
-            ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id')
-            ->where(function ($query) use ($userId) {
-                $query->where('purchasing_order.created_by', $userId)
-                    ->orWhere('purchasing_order.created_by', 16);
-            });
+            ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id');
     })
     ->where(function ($query) {
         $query->where('status', 'Request for Payment')
@@ -227,10 +216,6 @@ th.nowrap-td {
         @else
         @php
     $completedPos = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-        $query->where('created_by', $userId)
-              ->orWhere('created_by', 16);
-    })
     ->where('purchasing_order.status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
@@ -303,10 +288,6 @@ th.nowrap-td {
         @else
         @php
         $pendingpaymentrelsa = DB::table('purchasing_order')
-        ->where(function ($query) use ($userId) {
-            $query->where('purchasing_order.created_by', $userId)
-                ->orWhere('purchasing_order.created_by', 16);
-        })
                 ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -360,10 +341,6 @@ th.nowrap-td {
         @else
         @php
         $pendingreleasereqs = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-            $query->where('purchasing_order.created_by', $userId)
-                ->orWhere('purchasing_order.created_by', 16);
-        })
     ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -407,10 +384,6 @@ th.nowrap-td {
         @else
         @php
     $pendingdebitaps = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-            $query->where('purchasing_order.created_by', $userId)
-                ->orWhere('purchasing_order.created_by', 16);
-        })
     ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -447,7 +420,7 @@ th.nowrap-td {
     <td style="font-size: 12px;">
         @php
         $userId = auth()->user()->id;
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-approval');
         @endphp
         @if ($hasPermission)
         @php
@@ -495,10 +468,6 @@ th.nowrap-td {
         @else
         @php
         $pendingints = DB::table('purchasing_order')
-        ->where(function ($query) use ($userId) {
-                $query->where('purchasing_order.created_by', $userId)
-                    ->orWhere('purchasing_order.created_by', 16);
-            })
             ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -554,10 +523,6 @@ th.nowrap-td {
 @else
 @php
 $pendingvendorfol = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-        $query->where('created_by', $userId)
-              ->orWhere('created_by', 16);
-    })
     ->where('status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
@@ -605,10 +570,6 @@ $pendingvendorfol = DB::table('purchasing_order')
 @else
 @php
 $pendingvendorfol = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-        $query->where('created_by', $userId)
-              ->orWhere('created_by', 16);
-    })
     ->where('status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
@@ -628,6 +589,50 @@ $pendingvendorfol = DB::table('purchasing_order')
         @endif
     </td>
 </tr>
+<tr onclick="window.location='{{ route('purchasing.pendingvins', ['status' => 'missingvins']) }}';">
+    <td style="font-size: 12px;">
+        <a href="{{ route('purchasing.pendingvins', ['status' => 'missingvins']) }}">
+        Missing Vin Numbers POs
+        </a>
+    </td>
+    <td style="font-size: 12px;">
+    @php
+    $userId = auth()->user()->id;
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        @endphp
+        @if ($hasPermission)
+        @php
+        $pendingvins= DB::table('purchasing_order')
+        ->where('created_by', '!=', '16')
+    ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                  ->from('vehicles')
+                  ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                  ->whereNull('deleted_at')
+                  ->whereNull('vin'); // Check for at least one VIN being null
+        })
+    ->count();
+@endphp
+@else
+@php
+$pendingvins = DB::table('purchasing_order')
+->where('created_by', '!=', '16')
+    ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                  ->from('vehicles')
+                  ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                  ->whereNull('deleted_at')
+                  ->whereNull('vin'); // Check for at least one VIN being null
+        })
+    ->count();
+@endphp
+@endif
+        @if ($pendingvins > 0)
+            {{ $pendingvins }}
+        @else
+            No records found
+        @endif
+    </td>
 <tr onclick="window.location='{{ route('purchasing.filterconfirmation', ['status' => 'Approved']) }}';">
     <td style="font-size: 12px;">
         <a href="{{ route('purchasing.filterconfirmation', ['status' => 'Approved']) }}">
@@ -656,10 +661,6 @@ $pendingvendorfol = DB::table('purchasing_order')
 @else
 @php
 $pendingvendorfol = DB::table('purchasing_order')
-    ->where(function ($query) use ($userId) {
-        $query->where('created_by', $userId)
-              ->orWhere('created_by', 16);
-    })
     ->where('status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
@@ -678,6 +679,7 @@ $pendingvendorfol = DB::table('purchasing_order')
             No records found
         @endif
     </td>
+</tr>
 </tr>
 </tbody>
   </table>
@@ -725,7 +727,7 @@ $pendingvendorfol = DB::table('purchasing_order')
                 <div hidden>{{$i=0;}}
                 </div>
                 @foreach ($data as $purchasingOrder)
-                <tr data-id="{{ $purchasingOrder->id }}" onclick="window.location.href = '{{ route('purchasing-order.show', $purchasingOrder->id) }}'">
+                <tr data-id="{{ $purchasingOrder->id }}" data-url="{{ route('purchasing-order.show', $purchasingOrder->id) }}" class="clickable-row">
                 <td style="vertical-align: middle; text-align: center;">{{ $purchasingOrder->po_number }}</td>
                 <td style="vertical-align: middle; text-align: center;">{{ date('d-M-Y', strtotime($purchasingOrder->po_date)) }}</td>
                 <td style="vertical-align: middle; text-align: center;">
@@ -860,6 +862,35 @@ $(document).ready(function() {
             }
         });
     }
+    document.addEventListener('DOMContentLoaded', function() {
+    // Attach click event listener to all elements with the class 'clickable-row'
+    document.querySelectorAll('.clickable-row').forEach(function(element) {
+        element.addEventListener('click', function(e) {
+            // Fetch the URL from the data-url attribute
+            const url = this.getAttribute('data-url');
+
+            // Check if Ctrl key is pressed or the right mouse button was used
+            if (e.ctrlKey || e.button === 1) {
+                // Open the link in a new tab
+                window.open(url, '_blank');
+            } else if (e.button === 0) { // Left click without Ctrl
+                // Navigate in the same tab
+                window.location.href = url;
+            }
+        });
+
+        // Prevent the default context menu on right click
+        element.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            // Fetch the URL again for consistency
+            const url = this.getAttribute('data-url');
+            // Open in a new tab on right click
+            window.open(url, '_blank');
+        });
+    });
+});
+
+
 </script>
     </div>
     @else

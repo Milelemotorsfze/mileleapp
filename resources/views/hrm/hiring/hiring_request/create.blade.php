@@ -193,7 +193,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-employee-hi
 		</div>
 		<div class="card">
 			<div class="card-header">
-				<h4 class="card-title">Detailed Explanation Of New Hiring</h4>
+				<h4 class="card-title"><span class="error">* </span>Detailed Explanation Of New Hiring</h4>
 			</div>
 			<div class="card-body">
 				<div class="row">

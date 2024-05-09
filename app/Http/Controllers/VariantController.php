@@ -149,7 +149,6 @@ $existingspecifications = Varaint::with('VariantItems')
         $model_line = MasterModelLines::where('id', $master_model_lines_id)->pluck('model_line')->first();
         $existingName = $existingspecifications->name;
         $parts = explode('_', $existingName);
-        
         if (count($parts) > 1) {
             $lastNumber = end($parts);
         
@@ -182,7 +181,7 @@ $existingspecifications = Varaint::with('VariantItems')
     ->where('fuel_type', $request->input('fuel_type'))
     ->where('engine', $request->input('engine'))
     ->where('steering', $request->input('steering'))
-    ->orderBy('name', 'desc')
+    ->orderByRaw("CAST(SUBSTRING_INDEX(name, '_', -1) AS UNSIGNED) DESC")
     ->first();
     $master_model_lines_id = $request->input('master_model_lines_id');
     $steering = $request->input('steering');
@@ -255,7 +254,7 @@ $existingspecifications = Varaint::with('VariantItems')
         ->where('fuel_type', $request->input('fuel_type'))
         ->where('engine', $request->input('engine'))
         ->where('steering', $request->input('steering'))
-        ->orderBy('name', 'desc')
+        ->orderByRaw("CAST(SUBSTRING_INDEX(name, '_', -1) AS UNSIGNED) DESC")
         ->first();
         $master_model_lines_id = $request->input('master_model_lines_id');
         $steering = $request->input('steering');

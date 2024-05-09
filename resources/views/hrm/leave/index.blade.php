@@ -162,7 +162,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 											<i class="fa fa-thumbs-up" aria-hidden="true"></i>  Approve 
 											</button>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-												data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#reject-employee-leave-request-{{$data->id}}">
 											<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 											</button>
 											@endif
@@ -174,7 +174,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 											<i class="fa fa-thumbs-up" aria-hidden="true"></i> Approve
 											</button>
 											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Reject" type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-												data-bs-target="#reject-employee-hiring-request-{{$data->id}}">
+												data-bs-target="#reject-employee-leave-request-{{$data->id}}">
 											<i class="fa fa-thumbs-down" aria-hidden="true"></i> Reject
 											</button>
 											@endif
@@ -366,6 +366,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-leave','cur
 @endsection
 @push('scripts')
 <script type="text/javascript">
+	var ReportingManagerPendings = {!! json_encode($pendings)!!}
 	function inputNumberAbs(currentPriceInput) {
 	    var id = currentPriceInput.id;
 	    var input = document.getElementById(id);
