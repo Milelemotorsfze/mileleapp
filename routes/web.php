@@ -347,7 +347,7 @@ Route::get('/d', function () {
         Route::get('employee_joining_report/{type}','index')->name('employee_joining_report.index');
         Route::get('create_joining_report/{type}','create')->name('create_joining_report.create');
         Route::post('checkTempDateExist', 'checkTempDateExist')->name('temptransfer.checkTempDateExist');
-
+        Route::post('candidate/joining-report-unique-check', 'uniqueJoiningReport')->name('candidate.uniqueJoiningReport');
     });
     Route::get('joining_report_employee_verification/{id}', [JoiningReportController::class, 'employeeVerification'])->name('employee_joining_report.verification');
     Route::post('employee_joining_report/verified', [JoiningReportController::class, 'employeeVerified'])->name('employee_joining_report.verified');
@@ -830,6 +830,8 @@ Route::get('/d', function () {
     Route::resource('leadsnotifications', LeadsNotificationsController::class);
     Route::get('/leads/{call_id}', [LeadsNotificationsController::class, 'viewLead'])->name('view_lead');
     Route::post('/update-notifications-status', [LeadsNotificationsController::class, 'updateStatus'])->name('update_notifications_status');
+    Route::get('/viewgrnreport/method', [VehiclesController::class, 'generategrnPDF']);
+
 
     Route::post('/upload-quotation-file', [QuotationController::class, 'uploadingquotation'])->name('uploadingquotation.update');
 

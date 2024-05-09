@@ -37,6 +37,7 @@
                         </ul>
                     </div>
                 @endif
+
                     @if (Session::has('error'))
                         <div class="alert alert-danger" >
                             <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
@@ -93,6 +94,28 @@
                                 <label for="choices-single-default" class="form-label">Customer</label>
                                 <select class="form-control widthinput" data-trigger name="customer_id" id="customer" >
                                 </select>
+
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div id="file-preview">
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
+                <span id="country-comment"></span><br>
+                <span class="error" id="max-individual-quantity-error"></span>
+                <span class="error" id="min-company-quantity-error"></span>
+                <span class="error" id="max-company-quantity-error"></span>
+                <span class="error" id="company-only-allowed-error"></span>
+            </div>
+            <div class="card mt-2" >
+                    <div class="card-header">
+                        <h4 class="card-title">LOI Items</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-2 col-md-6 col-sm-12">
+                                <label class="form-label">Model</label>
+
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
@@ -358,6 +381,17 @@
                     <div class="col-12 text-center">
                         <button type="submit" class="btn btn-primary float-end">Update</button>
                     </div>
+
+
+                </div>
+            <input type="hidden" name="is_signature_removed" id="is_signature_removed" value="0">
+            <select name="deletedIds[]" id="deleted-docs" hidden="hidden" multiple>
+            </select>
+            <input type="hidden" id="remaining-document-count" value="{{ $letterOfIndent->LOIDocuments->count() }}" >
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-primary float-end" id="submit-button">Update</button>
+            </div>
+
 
                 </form>
             </div>
@@ -1184,6 +1218,19 @@
                 }
             });
 	   });
+
+        $('#submit-button').click(function (e) {
+            e.preventDefault();
+
+            if (formValid == true) {
+                if($("#form-doc-upload").valid()) {
+                    $('#form-doc-upload').unbind('submit').submit();
+                }
+            }else{
+                e.preventDefault();
+            }
+        });
+
     </script>
 @endpush
 

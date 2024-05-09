@@ -36,13 +36,23 @@
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
+
                         </ul>
+
+                        </select>
                     </div>
-                @endif
-                @if (Session::has('error'))
-                    <div class="alert alert-danger" >
-                        <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
-                        {{ Session::get('error') }}
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label  text-muted">Customer Type</label>
+                        <select class="form-control widthinput" name="customer_type" id="customer-type">
+                            <option value="" disabled>Type</option>
+                            <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}</option>
+                            <option value={{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}>{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}</option>
+                            <option value={{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}>{{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}</option>
+                            <option value={{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}>{{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}</option>
+                        </select>
+                        <span id="customer-type-error" class="error"></span>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-12">
@@ -55,6 +65,70 @@
                             <strong>{{ $message }}</strong>
                         </span>
                         @enderror
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
+                        <input type="date" class="form-control widthinput" id="date" max="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}"  name="date">
+                        @error('date')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
+                        <select class="form-control widthinput" name="category" id="choices-single-default">
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}">
+                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_MANAGEMENT_REQUEST}}
+                            </option>
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED}}">
+                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_END_USER_CHANGED}}
+                            </option>
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}">
+                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}
+                            </option>
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}">
+                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}
+                            </option>
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE}}">
+                                {{ \App\Models\LetterOfIndent::LOI_CATEGORY_QUANTITY_INFLATE }}
+                            </option>
+                        </select>
+                        @error('category')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">Dealer</label>
+                        <select class="form-control widthinput" name="dealers" id="dealer">
+                            <option value="Trans Cars">Trans Cars</option>
+                            <option value="Milele Motors">Milele Motors</option>
+                        </select>
+                        <input type="hidden" name="dealers" value="Trans Cars" id="dealer-input">
+                        @error('dealers')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
+
+                    </div>
+                @endif
+                @if (Session::has('error'))
+                    <div class="alert alert-danger" >
+                        <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                        {{ Session::get('error') }}
+                    </div>
                 @endif
                 @if (Session::has('success'))
                     <div class="alert alert-success" id="success-alert">
@@ -142,76 +216,58 @@
                             </div>
                         </div>
 
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Dealer</label>
-                        <select class="form-control widthinput" name="dealers" id="dealer">
-                            <option value="Trans Cars">Trans Cars</option>
-                            <option value="Milele Motors">Milele Motors</option>
-                        </select>
-                        <input type="hidden" name="dealers" value="Trans Cars" id="dealer-input">
-                        @error('dealers')
-                        <span role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                        @enderror
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Dealer</label>
+                                <select class="form-control widthinput" name="dealers" id="dealer">
+                                    <option value="Trans Cars">Trans Cars</option>
+                                    <option value="Milele Motors">Milele Motors</option>
+                                </select>
+                                <input type="hidden" name="dealers" value="Trans Cars" id="dealer-input">
+                                @error('dealers')
+                                <span role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                    
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Destination</label>
+                                <input type="text" class="form-control widthinput" name="destination" placeholder="Destination" >
+                                @error('destination')
+                                <span role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Prefered Location</label>
+                                <input type="text" class="form-control widthinput" name="prefered_location" placeholder="Prefered Location" >
+                                @error('prefered_location')
+                                <span role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">LOI Document</label>
+                                <input type="file" name="files[]" id="file-upload" class="form-control widthinput text-dark" multiple
+                                    autofocus accept="application/pdf">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label class="form-label">Signature </label>
+                                <input type="file" id="signature-upload" name="loi_signature" accept="image/*" class="form-control widthinput">
+                            </div>
+                        </div>
                     </div>
-                </div>
-            
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Destination</label>
-                        <input type="text" class="form-control widthinput" name="destination" placeholder="Destination" >
-                        @error('destination')
-                        <span role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                        @enderror
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Prefered Location</label>
-                        <input type="text" class="form-control widthinput" name="prefered_location" placeholder="Prefered Location" >
-                        @error('prefered_location')
-                        <span role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                        @enderror
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">LOI Document</label>
-                        <input type="file" name="files[]" id="file-upload" class="form-control widthinput text-dark" multiple
-                               autofocus accept="application/pdf">
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label">Signature </label>
-                        <input type="file" id="signature-upload" name="loi_signature" accept="image/*" class="form-control widthinput">
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-4 col-md-12 col-sm-12">
-                    <div id="file-preview">
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-12 col-sm-12">
-                    <div id="signature-preview">
-                    </div>
-                </div>
-            </div>
-            <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
-                <span id="country-comment"></span><br>
-                <span class="error" id="max-individual-quantity-error"></span>
-                <span class="error" id="min-company-quantity-error"></span>
-                <span class="error" id="max-company-quantity-error"></span>
-                <span class="error" id="company-only-allowed-error"></span>
-            </div>
-            
                     <div class="card" id="soNumberDiv" >
                         <div class="card-header">
                             <h4 class="card-title">
@@ -254,8 +310,24 @@
                         </div>
                     </div>
 
+
                     <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
                         <span id="country-comment"></span>
+
+                </div>
+            </div>
+            <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
+                <span id="country-comment"></span><br>
+                <span class="error" id="max-individual-quantity-error"></span>
+                <span class="error" id="min-company-quantity-error"></span>
+                <span class="error" id="max-company-quantity-error"></span>
+                <span class="error" id="company-only-allowed-error"></span>
+            </div>
+            <div class="row">
+                <div class="card p-2" >
+                    <div class="card-header">
+                        <h4 class="card-title">LOI Items</h4>
+
                     </div>
                     <div class="row">
                         <div class="card p-2" >
@@ -327,6 +399,28 @@
                                             <i class="fas fa-plus"></i> Add LOI Item
                                         </div>
                                     </div>
+
+                                    @enderror
+                                </div>
+                                <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+                                    <label class="form-label">LOI Description</label>
+                                    <input type="text" readonly placeholder="LOI Description"
+                                           class="form-control widthinput text-dark loi-descriptions"  data-index="1" id="loi-description-1">
+                                </div>
+                                <div class="col-lg-1 col-md-6 col-sm-12">
+                                    <label class="form-label">Quantity</label>
+                                    <input type="number" name="quantity[]" placeholder="Quantity"  maxlength="5" data-index="1" class="form-control widthinput quantities text-dark"
+                                           step="1" oninput="validity.valid||(value='');" min="1" id="quantity-1">
+{{--                                    <span class="error quantity-error"></span>--}}
+                                </div>
+                                <div class="col-lg-1 col-md-6 col-sm-12">
+                                    <label class="form-label">Inventory Qty</label>
+                                    <input type="number" readonly id="inventory-quantity-1" value="" data-index="1" class="form-control widthinput inventory-qty" >
+                                    <input type="hidden" name="master_model_ids[]" class="master-model-ids" id="master-model-id-1">
+                                </div>
+                                <div class="col-lg-1 col-md-6 col-sm-12">
+                                    <a class="btn btn-sm btn-danger removeButton" id="remove-btn-1" data-index="1" style="margin-top: 30px;" >  <i class="fas fa-trash-alt"></i> </a>
+
                                 </div>
                             </div>
                         </div>

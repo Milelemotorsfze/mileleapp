@@ -523,7 +523,7 @@ class CandidatePersonalInfoController extends Controller
                 if($candidate && $request->signature) {
                     $candidate->pif_sign = $request->signature;
                     $candidate->update();
-                    $createEmp = EmployeeProfile::where('interview_summary_id',$request->id)->first();    
+                    $createEmp = EmployeeProfile::where('interview_summary_id',$request->id)->first();  
                     if(!$createEmp OR ($createEmp && $createEmp->personal_information_verified_at == '')) {                             
                         if(!$createEmp) {
                             $input = $request->all(); 
@@ -764,9 +764,13 @@ class CandidatePersonalInfoController extends Controller
                     $candidate->personal_information_verified_at = Carbon::now();
                     $candidate->personal_information_verified_by = $authId;
                     $candidate->update();
+                    DB::commit();
+                    return response()->json('success');
                 }
-                DB::commit();
-                return response()->json('success');
+                else if($candidate && $candidate->personal_information_verified_at != '') {
+                    DB::commit();
+                    return response()->json('error');
+                }
             } 
             catch (\Exception $e) {
                 DB::rollback();

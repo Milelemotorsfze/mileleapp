@@ -58,7 +58,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 			</div>
 			<div class="card-body">
 				<div class="row">
-					<input type="hidden" name="joining_type" value="new_employee">
+					<input type="hidden" name="joining_type" id="joining_type" value="new_employee">
 					<div class="col-xxl-3 col-lg-3 col-md-3 radio-main-div">
 						<span class="error">* </span>
 						<label for="type" class="col-form-label text-md-end">{{ __('Joining Type') }}</label>
@@ -256,19 +256,41 @@ $.ajaxSetup({
 	       }, 
 	       "This Employee Code is already taken! Try another."
 	   );
+	   jQuery.validator.addMethod("isExist", 
+	       function(value, element) {
+	           var result = true;
+				var employeeId = $("#employee_id").val();
+				var joining_type = $("#joining_type").val();
+				var joining_date = $("#joining_date").val();
+				if(value != null && employeeId != null && joining_type != null && joining_date != null) {
+					$.ajax({
+	               type:"POST",
+	               async: false,
+	               url: "{{route('candidate.uniqueJoiningReport')}}", // script to validate in server side
+	               data: {_token: '{{csrf_token()}}',joining_type: joining_type,employeeId:employeeId,new_emp_joining_type:value,joining_date:joining_date},
+	               success: function(data) {
+	                   result = (data == true) ? true : false;
+	               }
+	           });
+				}
+	           return result; 
+	       }, 
+	       "A joining report for this candidate already exists."
+	   );
 	$('#newjoiningReportForm').validate({ 
 	    rules: {
 	        employee_id: {
-	required: true,
-	},
-	joining_date: {
-	required: true,
-	},
+			required: true,
+			},
+			joining_date: {
+			required: true,
+			},
 	        joining_location: {
 	            required: true,
 	        },
 	        new_emp_joining_type: {
 	            required: true,
+				isExist: true,
 	        },
 	        joining_type: {
 	            required: true,
