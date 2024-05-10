@@ -553,11 +553,7 @@
 
             }
         });
-        $('#sales_person_id').select2({
-            placeholder : 'Select Sales Person',
-            allowClear: true,
-            maximumSelectionLength: 1
-        });
+
         $('#country').select2({
             placeholder : 'Select Country',
             allowClear: true,
