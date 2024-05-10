@@ -480,7 +480,7 @@ class User extends Authenticatable
         return $advanceOrLoanBalance;
     }
     public function getSelectedRoleAttribute() {
-        return $this->attributes['selected_role'] ?? $this->roles()->first()->name;
+        return $this->attributes['selected_role'] ?? $this->roles()->first()->name ?? '';
     }
     public function getOvertimeRequestApprovalAttribute() {
         $authId = $this->id;

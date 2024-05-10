@@ -976,7 +976,6 @@
                    let quantity = data.quantity;
                    let modelId = data.master_model_id;
                    var LOIDescription = data.loi_description;
-                   console.log("test");
                    console.log(LOIDescription);
                    $('#inventory-quantity-'+index).val(quantity);
                    $('#loi-description-'+index).val(LOIDescription);

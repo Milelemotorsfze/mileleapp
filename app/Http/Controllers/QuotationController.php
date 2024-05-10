@@ -1181,12 +1181,18 @@ public function addqaddone(Request $request)
             $x = 100;
             $pdf->Image($pngImagePath, $x, $signatureY, 50, 20);
         }
-        $outputPath = public_path('storage/quotation_files/' . basename($pdfPath)); 
+        $originalFileName = basename($pdfPath);
+        $newFileName = str_replace('.pdf', '_signed.pdf', $originalFileName);
+        $outputPath = public_path('storage/quotation_files/' . $newFileName);
         $pdf->Output($outputPath, 'F');
+    
         unlink($pngImagePath);
+    
+        // Update the database record
         $quotation = Quotation::find($quotationId);
         $quotation->signature_status = "Signed";
         $quotation->signature_link = null;
+        $quotation->file_path = 'quotation_files/' . $newFileName; // Update file_path in the database
         $quotation->save();
         return redirect()->back()->with('success', 'Thank you! Your signature has been successfully submitted.');
     }
@@ -1270,7 +1276,7 @@ public function directquotationtocustomer($id)
             'language' => $client->lauguage,
             'created_at' => $formattedDate,
             'created_by' => Auth::id(),
-            'status' => "New",
+            'status' => "Customer",
             'priority' => "High",
             'customer_coming_type' => "Direct From Sales",
         ];

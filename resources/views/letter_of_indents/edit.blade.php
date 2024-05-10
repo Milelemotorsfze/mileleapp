@@ -260,6 +260,13 @@
                         </div>
                     </div>
 
+            <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
+                <span id="country-comment"></span><br>
+                <span class="error" id="max-individual-quantity-error"></span>
+                <span class="error" id="min-company-quantity-error"></span>
+                <span class="error" id="max-company-quantity-error"></span>
+                <span class="error" id="company-only-allowed-error"></span>
+            </div>
                     <div class="card mt-2" >
                             <div class="card-header">
                                 <h4 class="card-title">LOI Items</h4>
