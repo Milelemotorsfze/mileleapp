@@ -13,9 +13,7 @@
         {
             height:32px!important;
         }
-        .error {
-            color: #FF0000;
-        }
+
     </style>
     @can('LOI-edit')
         @php
@@ -37,7 +35,6 @@
                         </ul>
                     </div>
                 @endif
-
                     @if (Session::has('error'))
                         <div class="alert alert-danger" >
                             <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
@@ -94,28 +91,6 @@
                                 <label for="choices-single-default" class="form-label">Customer</label>
                                 <select class="form-control widthinput" data-trigger name="customer_id" id="customer" >
                                 </select>
-
-                <div class="col-lg-3 col-md-6 col-sm-12">
-                    <div id="file-preview">
-                    </div>
-                </div>
-            </div>
-            <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
-                <span id="country-comment"></span><br>
-                <span class="error" id="max-individual-quantity-error"></span>
-                <span class="error" id="min-company-quantity-error"></span>
-                <span class="error" id="max-company-quantity-error"></span>
-                <span class="error" id="company-only-allowed-error"></span>
-            </div>
-            <div class="card mt-2" >
-                    <div class="card-header">
-                        <h4 class="card-title">LOI Items</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-2 col-md-6 col-sm-12">
-                                <label class="form-label">Model</label>
-
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
@@ -195,6 +170,19 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Sales Person</label>
+                                <select class="form-control widthinput" multiple name="sales_person_id" id="sales_person_id" autofocus>
+                                    <option ></option>
+                                    @foreach($salesPersons as $salesPerson)
+                                        <option value="{{ $salesPerson->id }}" {{ $salesPerson->id == $letterOfIndent->sales_person_id ? 'selected' : ''}}>
+                                            {{ $salesPerson->name }}
+                                         </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">LOI Document</label>
@@ -271,7 +259,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="card mt-2" >
                             <div class="card-header">
                                 <h4 class="card-title">LOI Items</h4>
@@ -375,17 +363,6 @@
                         <button type="submit" class="btn btn-primary float-end">Update</button>
                     </div>
 
-
-                </div>
-            <input type="hidden" name="is_signature_removed" id="is_signature_removed" value="0">
-            <select name="deletedIds[]" id="deleted-docs" hidden="hidden" multiple>
-            </select>
-            <input type="hidden" id="remaining-document-count" value="{{ $letterOfIndent->LOIDocuments->count() }}" >
-            <div class="col-12 text-center">
-                <button type="submit" class="btn btn-primary float-end" id="submit-button">Update</button>
-            </div>
-
-
                 </form>
             </div>
         @endif
@@ -436,6 +413,12 @@
             getCustomers();
             let dealer = '{{ $letterOfIndent->dealers }}';
             showSignatureRemoveButton(dealer)
+
+            $('#sales_person_id').select2({
+                placeholder : 'Select Sales Person',
+                allowClear: true,
+                maximumSelectionLength: 1
+            });
 
             $('#country').select2({
                 placeholder: 'Select Country',
@@ -489,7 +472,6 @@
                         total_quantities:total_quantities
                     },
                     success:function (data) {
-                        console.log(data);
                         formValid = true;
                         if(data.comment) {
                             $('#country-comment-div').attr('hidden', false);
@@ -1170,7 +1152,6 @@
                 $('#dealer').attr("disabled", false);
             }
         }
-
         $("#addSoNumberBtn").on("click", function ()
 	       {
 	           var index = $(".soNumberMain").find(".soNumberApendHere").length + 1;
@@ -1194,7 +1175,7 @@
 	       });
 	       $(document.body).on('click', ".removeSoNumber", function (e)
 	       {
-	    
+
             var indexNumber = $(this).attr('data-index');
             var deletedValue = '';
             deletedValue = $("#so_number_"+indexNumber).val();
@@ -1203,7 +1184,7 @@
                 var index = +i + +1;
                 $(this).attr('id','row-'+index);
                 $(this).find('.so_number').attr('name', 'so_number['+ index +']');
-                $(this).find('.so_number').attr('id', 'so_number_'+index);	                
+                $(this).find('.so_number').attr('id', 'so_number_'+index);
                 $(this).find('.removeSoNumber').attr('data-index',index);
                 $(this).find('.soNumberError').attr('id', 'soNumberError_'+index);
                 if(deletedValue != '')
@@ -1212,7 +1193,6 @@
                 }
             });
 	   });
-
         $('#submit-button').click(function (e) {
             e.preventDefault();
 
@@ -1224,7 +1204,6 @@
                 e.preventDefault();
             }
         });
-
     </script>
 @endpush
 
