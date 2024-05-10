@@ -558,7 +558,6 @@
             allowClear: true,
             maximumSelectionLength: 1
         });
-
         $('#country').select2({
             placeholder : 'Select Country',
             allowClear: true,
