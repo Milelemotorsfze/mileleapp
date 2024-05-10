@@ -217,6 +217,7 @@ input[type=number]::-webkit-outer-spin-button
                 <tr>
                   <th>Priority</th>
                   <th>Lead Date</th>
+                  <th>Remining Times</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
