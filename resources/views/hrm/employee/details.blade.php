@@ -14,10 +14,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 <div class="card-body">
 	<div class="portfolio">
 		<ul class="nav nav-pills nav-fill" id="my-tab">
-			<li class="nav-item">
-				<a class="nav-link active" data-bs-toggle="pill" href="#interview-summary-{{$data->id}}"> Interview Summary Report</a>
+            <li class="nav-item">
+				<a class="nav-link active" data-bs-toggle="pill" href="#personal-info-{{$data->id}}"> Personal & Contact Info</a>
 			</li>
-			@if(isset($data->candidateDetails) && $data->candidateDetails->documents_form_submit_at != NULL)
+            <!-- <li class="nav-item">
+				<a class="nav-link" data-bs-toggle="pill" href="#contact-info-{{$data->id}}"> Contact Info</a>
+			</li> -->
+			<li class="nav-item">
+				<a class="nav-link" data-bs-toggle="pill" href="#visa-info-{{$data->id}}"> Visa & Employment Info</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" data-bs-toggle="pill" href="#compensation-benefits-{{$data->id}}"> Compensation & Benefits</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" data-bs-toggle="pill" href="#interview-summary-{{$data->id}}"> Interview Summary Report</a>
+			</li>
+			@if(isset($data) && $data->documents_form_submit_at != NULL)
 			@php
 			$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
 			@endphp
@@ -30,18 +42,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 				<a class="nav-link" data-bs-toggle="pill" href="#job-offer-letter-{{$data->id}}"> Job Offer Letter</a>
 			</li>
 			@endif
-			@if($data->candidateDetails->personal_information_created_at != '')
-			<li class="nav-item">
-				<a class="nav-link" data-bs-toggle="pill" href="#personal-info-{{$data->id}}"> Personal Information</a>
-			</li>
-			@endif
+			
 			@endif
 			@endif
 		</ul>
 	</div>
 	</br>
 	<div class="tab-content">
-		<div class="tab-pane fade show active" id="interview-summary-{{$data->id}}">
+		<div class="tab-pane fade show" id="interview-summary-{{$data->id}}">
 			<div class="row">
 				<div class="col-xxl-6 col-lg-6 col-md-12">
 					<div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
@@ -55,7 +63,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<label for="choices-single-default" class="form-label"> Name  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidate_name ?? '' }}</span>
+										<span>{{ $data->candidate_name ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Current Status  :</label>
@@ -63,11 +71,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 										<span>
 										@if($data->candidate_current_status == 'Rejected')
-										<label class="badge badge-soft-danger">{{ $data->candidate_current_status ?? '' }}</label>
+										<label class="badge badge-soft-danger">{{ $data->candidate_current_status ?? 'NA' }}</label>
 										@elseif($data->candidate_current_status == 'Candidate Selected And Approved' OR $data->candidate_current_status == 'Candidate Selected And Hiring Request Closed')  
-										<label class="badge badge-soft-success">{{ $data->candidate_current_status ?? '' }}</label>  
+										<label class="badge badge-soft-success">{{ $data->candidate_current_status ?? 'NA' }}</label>  
 										@else
-										<label class="badge badge-soft-info">{{ $data->candidate_current_status ?? '' }}</label>
+										<label class="badge badge-soft-info">{{ $data->candidate_current_status ?? 'NA' }}</label>
 										@endif
 										</span>
 									</div>
@@ -75,13 +83,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<label for="choices-single-default" class="form-label"> Nationality  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->nationalities->name ?? '' }}</span>
+										<span>{{ $data->nationalities->name ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Gender  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->genderName->name ?? '' }}</span>
+										<span>{{ $data->genderName->name ?? 'NA' }}</span>
 									</div>
 								</div>
 							</div>
@@ -98,13 +106,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<label for="choices-single-default" class="form-label"> Dress  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span class="texttransform">{{ $data->rate_dress_appearance ?? '' }}</span>
+										<span class="texttransform">{{ $data->rate_dress_appearance ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Body Language  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span class="texttransform">{{ $data->rate_body_language_appearance ?? '' }}</span>
+										<span class="texttransform">{{ $data->rate_body_language_appearance ?? 'NA' }}</span>
 									</div>
 								</div>
 							</div>
@@ -125,6 +133,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<span class="texttransform">
 										@if($data->date_of_telephonic_interview != '')
 										{{\Carbon\Carbon::parse($data->date_of_telephonic_interview)->format('d M Y')}}
+										@else
+										NA
 										@endif
 										</span>
 									</div>
@@ -136,7 +146,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										@if(isset($data->telephonicInterviewers))
 										@if(count($data->telephonicInterviewers) > 0)
 										@foreach($data->telephonicInterviewers as $telephonicInterviewers)
-										{{ $telephonicInterviewers->interviewerName->name ?? '' }},</br>
+										{{ $telephonicInterviewers->interviewerName->name ?? 'NA' }},</br>
 										@endforeach
 										@endif
 										@endif
@@ -146,7 +156,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<label for="choices-single-default" class="form-label"> Interview Summary  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span class="texttransform">{{ $data->telephonic_interview ?? '' }}</span>
+										<span class="texttransform">{{ $data->telephonic_interview ?? 'NA' }}</span>
 									</div>
 								</div>
 							</div>
@@ -168,6 +178,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<span class="texttransform">
 										@if($data->date_of_first_round != '')
 										{{\Carbon\Carbon::parse($data->date_of_first_round)->format('d M Y')}}
+										@else
+										NA
 										@endif
 										</span>
 									</div>
@@ -179,7 +191,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										@if(isset($data->firstRoundInterviewers))
 										@if(count($data->firstRoundInterviewers) > 0)
 										@foreach($data->firstRoundInterviewers as $firstRoundInterviewers)
-										{{ $firstRoundInterviewers->interviewerName->name ?? '' }},</br>
+										{{ $firstRoundInterviewers->interviewerName->name ?? 'NA' }},</br>
 										@endforeach
 										@endif
 										@endif
@@ -189,7 +201,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<label for="choices-single-default" class="form-label"> Interview Summary  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span class="texttransform">{{ $data->first_round ?? '' }}</span>
+										<span class="texttransform">{{ $data->first_round ?? 'NA' }}</span>
 									</div>
 								</div>
 							</div>
@@ -211,6 +223,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<span class="texttransform">
 										@if($data->date_of_second_round != '')
 										{{\Carbon\Carbon::parse($data->date_of_second_round)->format('d M Y')}}
+										@else
+										NA
 										@endif
 										</span>
 									</div>
@@ -222,7 +236,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										@if(isset($data->secondRoundInterviewers))
 										@if(count($data->secondRoundInterviewers) > 0)
 										@foreach($data->secondRoundInterviewers as $secondRoundInterviewers)
-										{{ $secondRoundInterviewers->interviewerName->name ?? '' }},</br>
+										{{ $secondRoundInterviewers->interviewerName->name ?? 'NA' }},</br>
 										@endforeach
 										@endif
 										@endif
@@ -232,7 +246,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<label for="choices-single-default" class="form-label"> Interview Summary  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span class="texttransform">{{ $data->second_round ?? '' }}</span>
+										<span class="texttransform">{{ $data->second_round ?? 'NA' }}</span>
 									</div>
 								</div>
 							</div>
@@ -254,6 +268,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<span class="texttransform">
 										@if($data->date_of_third_round != '')
 										{{\Carbon\Carbon::parse($data->date_of_third_round)->format('d M Y')}}
+										@else
+										NA
 										@endif
 										</span>
 									</div>
@@ -265,7 +281,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										@if(isset($data->thirdRoundInterviewers))
 										@if(count($data->thirdRoundInterviewers) > 0)
 										@foreach($data->thirdRoundInterviewers as $thirdRoundInterviewers)
-										{{ $thirdRoundInterviewers->interviewerName->name ?? '' }},</br>
+										{{ $thirdRoundInterviewers->interviewerName->name ?? 'NA' }},</br>
 										@endforeach
 										@endif
 										@endif
@@ -275,7 +291,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<label for="choices-single-default" class="form-label"> Interview Summary  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span class="texttransform">{{ $data->third_round ?? '' }}</span>
+										<span class="texttransform">{{ $data->third_round ?? 'NA' }}</span>
 									</div>
 								</div>
 							</div>
@@ -297,6 +313,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<span class="texttransform">
 										@if($data->date_of_forth_round != '')
 										{{\Carbon\Carbon::parse($data->date_of_forth_round)->format('d M Y')}}
+										@else
+										NA
 										@endif
 										</span>
 									</div>
@@ -308,7 +326,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										@if(isset($data->forthRoundInterviewers))
 										@if(count($data->forthRoundInterviewers) > 0)
 										@foreach($data->forthRoundInterviewers as $forthRoundInterviewers)
-										{{ $forthRoundInterviewers->interviewerName->name ?? '' }},</br>
+										{{ $forthRoundInterviewers->interviewerName->name ?? 'NA' }},</br>
 										@endforeach
 										@endif
 										@endif
@@ -318,7 +336,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<label for="choices-single-default" class="form-label"> Interview Summary  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span class="texttransform">{{ $data->forth_round ?? '' }}</span>
+										<span class="texttransform">{{ $data->forth_round ?? 'NA' }}</span>
 									</div>
 								</div>
 							</div>
@@ -340,6 +358,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<span class="texttransform">
 										@if($data->date_of_fifth_round != '')
 										{{\Carbon\Carbon::parse($data->date_of_fifth_round)->format('d M Y')}}
+										@else
+										NA
 										@endif
 										</span>
 									</div>
@@ -351,7 +371,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										@if(isset($data->fifthRoundInterviewers))
 										@if(count($data->fifthRoundInterviewers) > 0)
 										@foreach($data->fifthRoundInterviewers as $fifthRoundInterviewers)
-										{{ $fifthRoundInterviewers->interviewerName->name ?? '' }},</br>
+										{{ $fifthRoundInterviewers->interviewerName->name ?? 'NA' }},</br>
 										@endforeach
 										@endif
 										@endif
@@ -361,7 +381,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<label for="choices-single-default" class="form-label"> Interview Summary  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span class="texttransform">{{ $data->fifth_round ?? '' }}</span>
+										<span class="texttransform">{{ $data->fifth_round ?? 'NA' }}</span>
 									</div>
 								</div>
 							</div>
@@ -388,7 +408,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-12 col-md-12 col-sm-6 col-12">
-										<span class="texttransform">{{ $data->final_evaluation_of_candidate ?? '' }}</span>
+										<span class="texttransform">{{ $data->final_evaluation_of_candidate ?? 'NA' }}</span>
 									</div>
 								</div>
 							</div>
@@ -442,7 +462,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 													Name :
 												</div>
 												<div class="col-lg-10 col-md-12 col-sm-12">
-													{{$data->hrManager->name ?? ''}}
+													{{$data->hrManager->name ?? 'NA'}}
 												</div>
 												<div class="col-lg-2 col-md-12 col-sm-12">
 													Status :
@@ -450,7 +470,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 												<div class="col-lg-10 col-md-12 col-sm-12">
 													<label class="badge texttransform @if($data->action_by_hr_manager =='pending') badge-soft-info 
 														@elseif($data->action_by_hr_manager =='approved') badge-soft-success 
-														@else badge-soft-danger @endif">{{$data->action_by_hr_manager ?? ''}}</label>
+														@else badge-soft-danger @endif">{{$data->action_by_hr_manager ?? 'NA'}}</label>
 												</div>
 												<div class="col-lg-2 col-md-12 col-sm-12">
 													Date & Time :
@@ -458,13 +478,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 												<div class="col-lg-10 col-md-12 col-sm-12">
 													@if($data->hr_manager_action_at != '')
 													{{ \Carbon\Carbon::parse($data->hr_manager_action_at)->format('d M Y, H:i:s') }}
+													@else
+													NA
 													@endif
 												</div>
 												<div class="col-lg-2 col-md-12 col-sm-12">
 													Comments :
 												</div>
 												<div class="col-lg-10 col-md-12 col-sm-12">
-													{{$data->comments_by_hr_manager ?? ''}}
+													{{$data->comments_by_hr_manager ?? 'NA'}}
 												</div>
 											</div>
 										</div>
@@ -483,7 +505,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 													Name :
 												</div>
 												<div class="col-lg-10 col-md-12 col-sm-12">
-													{{$data->divisionHeadName->name ?? ''}}
+													{{$data->divisionHeadName->name ?? 'NA'}}
 												</div>
 												<div class="col-lg-2 col-md-12 col-sm-12">
 													Status :
@@ -491,7 +513,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 												<div class="col-lg-10 col-md-12 col-sm-12">
 													<label class="badge texttransform @if($data->action_by_division_head =='pending') badge-soft-info 
 														@elseif($data->action_by_division_head =='approved') badge-soft-success 
-														@else badge-soft-danger @endif">{{$data->action_by_division_head ?? ''}}</label>
+														@else badge-soft-danger @endif">{{$data->action_by_division_head ?? 'NA'}}</label>
 												</div>
 												<div class="col-lg-2 col-md-12 col-sm-12">
 													Date & Time :
@@ -499,13 +521,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 												<div class="col-lg-10 col-md-12 col-sm-12">
 													@if($data->division_head_action_at != '')
 													{{ \Carbon\Carbon::parse($data->division_head_action_at)->format('d M Y, H:i:s') }}
+													@else 
+												NA
 													@endif
 												</div>
 												<div class="col-lg-2 col-md-12 col-sm-12">
 													Comments :
 												</div>
 												<div class="col-lg-10 col-md-12 col-sm-12">
-													{{$data->comments_by_division_head ?? ''}}
+													{{$data->comments_by_division_head ?? 'NA'}}
 												</div>
 											</div>
 										</div>
@@ -518,11 +542,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 				</div>
 			</div>
 		</div>
-		@if(isset($data->candidateDetails) && $data->candidateDetails->documents_form_submit_at != NULL)
-		@php
-		$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
-		@endphp 
-		@if ($hasPermission) 
 		<div class="row">
 			<div class="col-xxl-8 col-lg-8 col-md-8">	
 			</div>
@@ -589,8 +608,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							@php
 							$hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidates-documents']);
 							@endphp
-							@if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL && $data->candidateDetails->documents_form_send_at != NULL && $data->candidateDetails->documents_form_submit_at != NULL)
-							<!-- && $data->candidateDetails->documents_form_send_at < $data->candidateDetails->documents_form_submit_at -->
+							@if ($hasPermission && $data->documents_verified_at == NULL && $data->documents_form_send_at != NULL && $data->documents_form_submit_at != NULL)
+							<!-- && $data->documents_form_send_at < $data->documents_form_submit_at -->
 							<button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-docs"  data-bs-toggle="modal"
 								data-bs-target="#verify-docs-{{$data->id}}" data-id="{{$data->id}}">
 							<i class="fa fa-check" aria-hidden="true"></i> Verified Documents
@@ -599,7 +618,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							@php
 							$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-candidate-documents-request-form']);
 							@endphp
-							@if ($hasPermission && $data->candidateDetails->documents_verified_at == NULL)	            							
+							@if ($hasPermission && $data->documents_verified_at == NULL)	            							
 							<button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Resend Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
 								data-bs-target="#send-docs-form-{{$data->id}}">
 							<i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Docs Form
@@ -658,82 +677,82 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 					</div>
 					<div class="row">
 						<div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-							@if($data->candidateDetails->image_path)
+							@if($data->image_path)
 							<div class="row">
 								<div class="col-xxl-6 col-md-6 col-sm-12 text-center">
 									<h6 class="fw-bold text-center mb-1" style="float:left">Passport Size Photograph</h6>
 								</div>
 								<div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-									<a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" target="_blank">
+									<a href="{{ url('hrm/employee/photo/' . $data->image_path) }}" target="_blank">
 									<button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
 									</a>
-									<a href="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" download>
+									<a href="{{ url('hrm/employee/photo/' . $data->image_path) }}" download>
 									<button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
 									</a>
 								</div>
 							</div>
-							<iframe src="{{ url('hrm/employee/photo/' . $data->candidateDetails->image_path) }}" alt="Passport Size Photograph"></iframe>
+							<iframe src="{{ url('hrm/employee/photo/' . $data->image_path) }}" alt="Passport Size Photograph"></iframe>
 							@endif
 						</div>
 						<div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-							@if($data->candidateDetails->resume)
+							@if($data->resume)
 							<div class="row">
 								<div class="col-xxl-6 col-md-6 col-sm-12 text-center">
 									<h6 class="fw-bold text-center mb-1" style="float:left">Resume</h6>
 								</div>
 								<div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-									<a href="{{ url('hrm/employee/resume/' . $data->candidateDetails->resume) }}" target="_blank">
+									<a href="{{ url('hrm/employee/resume/' . $data->resume) }}" target="_blank">
 									<button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
 									</a>
-									<a href="{{ url('hrm/employee/resume/' . $data->candidateDetails->resume) }}" download>
+									<a href="{{ url('hrm/employee/resume/' . $data->resume) }}" download>
 									<button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
 									</a>
 								</div>
 							</div>
-							<iframe src="{{ url('hrm/employee/resume/' . $data->candidateDetails->resume) }}" alt="Resume"></iframe>
+							<iframe src="{{ url('hrm/employee/resume/' . $data->resume) }}" alt="Resume"></iframe>
 							@endif
 						</div>
 						<div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
-							@if($data->candidateDetails->visa)
+							@if($data->visa)
 							<div class="row">
 								<div class="col-xxl-6 col-md-6 col-sm-12 text-center">
 									<h6 class="fw-bold text-center mb-1" style="float:left">Visa</h6>
 								</div>
 								<div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-									<a href="{{ url('hrm/employee/visa/' . $data->candidateDetails->visa) }}" target="_blank">
+									<a href="{{ url('hrm/employee/visa/' . $data->visa) }}" target="_blank">
 									<button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
 									</a>
-									<a href="{{ url('hrm/employee/visa/' . $data->candidateDetails->visa) }}" download>
+									<a href="{{ url('hrm/employee/visa/' . $data->visa) }}" download>
 									<button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
 									</a>
 								</div>
 							</div>
-							<iframe src="{{ url('hrm/employee/visa/' . $data->candidateDetails->visa) }}" alt="Visa"></iframe>
+							<iframe src="{{ url('hrm/employee/visa/' . $data->visa) }}" alt="Visa"></iframe>
 							@endif
 						</div>
 						<div class="col-xxl-6 col-md-6 col-sm-12 text-center">
-							@if($data->candidateDetails->emirates_id_file)
+							@if($data->emirates_id_file)
 							<div class="row">
 								<div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
 									<h6 class="fw-bold text-center mb-1" style="float:left">Emirates ID</h6>
 								</div>
 								<div class="col-xxl-6 col-md-6 col-sm-12 text-center" >
-									<a href="{{ url('hrm/employee/emirates_id/' . $data->candidateDetails->emirates_id_file) }}" target="_blank">
+									<a href="{{ url('hrm/employee/emirates_id/' . $data->emirates_id_file) }}" target="_blank">
 									<button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
 									</a>
-									<a href="{{ url('hrm/employee/emirates_id/' . $data->candidateDetails->emirates_id_file) }}" download>
+									<a href="{{ url('hrm/employee/emirates_id/' . $data->emirates_id_file) }}" download>
 									<button class="btn btn-info m-1 btn-sm" style="float:right">Download</button>
 									</a>
 								</div>
 							</div>
-							<iframe src="{{ url('hrm/employee/emirates_id/' . $data->candidateDetails->emirates_id_file) }}" alt="Emirates ID"></iframe>
+							<iframe src="{{ url('hrm/employee/emirates_id/' . $data->emirates_id_file) }}" alt="Emirates ID"></iframe>
 							@endif
 						</div>
 					</div>
-					@if($data->candidateDetails->candidatePassport->count() > 0)
+					@if($data->candidatePassport->count() > 0)
 					<div class="row m-3">
 						<h6 class="fw-bold text-center mb-13">Passport (First & Second page)</h6>
-						@foreach($data->candidateDetails->candidatePassport as $document)
+						@foreach($data->candidatePassport as $document)
 						<div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
 							<a href="{{ url('hrm/employee/passport/' . $document->document_path) }}" target="_blank">
 							<button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
@@ -746,10 +765,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 						@endforeach
 					</div>
 					@endif
-					@if($data->candidateDetails->candidateNationalId->count() > 0)
+					@if($data->candidateNationalId->count() > 0)
 					<div class="row m-3">
 						<h6 class="fw-bold text-center mb-13">National ID (First & Second page)</h6>
-						@foreach($data->candidateDetails->candidateNationalId as $document)
+						@foreach($data->candidateNationalId as $document)
 						<div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
 							<a href="{{ url('hrm/employee/national_id/' . $document->document_path) }}" target="_blank">
 							<button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
@@ -762,10 +781,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 						@endforeach
 					</div>
 					@endif
-					@if($data->candidateDetails->candidateEduDocs->count() > 0)
+					@if($data->candidateEduDocs->count() > 0)
 					<div class="row m-3">
 						<h6 class="fw-bold text-center mb-13">Attested Educational Documents</h6>
-						@foreach($data->candidateDetails->candidateEduDocs as $document)
+						@foreach($data->candidateEduDocs as $document)
 						<div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
 							<a href="{{ url('hrm/employee/educational_docs/' . $document->document_path) }}" target="_blank">
 							<button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
@@ -778,10 +797,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 						@endforeach
 					</div>
 					@endif
-					@if($data->candidateDetails->candidateProDipCerti->count() > 0)
+					@if($data->candidateProDipCerti->count() > 0)
 					<div class="row m-3">
 						<h6 class="fw-bold text-center mb-13">Attested Professional Diplomas / Certificates</h6>
-						@foreach($data->candidateDetails->candidateProDipCerti as $document)
+						@foreach($data->candidateProDipCerti as $document)
 						<div class="col-xxl-6 col-md-6 col-sm-12 text-center mb-5">
 							<a href="{{ url('hrm/employee/professional_diploma_certificates/' . $document->document_path) }}" target="_blank">
 							<button class="btn btn-primary m-1 btn-sm" style="float:right">View</button>
@@ -805,7 +824,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 				<div class="card-body">
 					<div class="row">
 						<div class="col-xxl-12 col-lg-12 col-md-12">
-							@if($data->candidateDetails->offer_letter_fileName)
+							@if($data->offer_letter_fileName)
 							<div class="card">
 								<div class="card-header">
 									<div class="row">
@@ -814,7 +833,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										</div>
 										<div class="col-xxl-6 col-lg-6 col-md-12 col-sm-12 col-12">
 											<button style="float:right;" type="button" class="btn btn-sm btn-info mt-3 ">
-											<a href="{{ url('hrm/employee/offer_letter/' . $data->candidateDetails->offer_letter_fileName) }}" download class="text-white">
+											<a href="{{ url('hrm/employee/offer_letter/' . $data->offer_letter_fileName) }}" download class="text-white">
 											Download
 											</a>
 											</button>
@@ -823,41 +842,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 								</div>
 								<div class="card-body">
 									<div class="row">
-										<iframe src="{{ url('hrm/employee/offer_letter/' . $data->candidateDetails->offer_letter_fileName) }}" alt="Offer Letter" style="height:1000;"></iframe>
+										<iframe src="{{ url('hrm/employee/offer_letter/' . $data->offer_letter_fileName) }}" alt="Offer Letter" style="height:1000;"></iframe>
 									</div>
 								</div>
 							</div>
 							@else
-							@include('hrm.hiring.offer_letter.offerLetter')
+							@include('hrm.employee.offerLetter')
 							@endif
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="tab-pane fade show" id="personal-info-{{$data->id}}">
+		<div class="tab-pane fade show active" id="personal-info-{{$data->id}}">
 			<div class="row">
-				<div class="col-xxl-12 col-lg-12 col-md-12">
-					@php
-					$hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-candidate-personal-information']);
-					@endphp
-					@if ($hasPermission && $data->candidateDetails->documents_verified_at != NULL && $data->candidateDetails->personal_information_created_at != NULL && 
-					$data->candidateDetails->personal_information_verified_at == NULL && $data->candidateDetails->personal_information_created_at > $data->candidateDetails->personal_information_send_at)
-					<button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Verified" type="button" class="btn btn-info btn-sm btn-verify-personalinfo"  data-bs-toggle="modal"
-						data-bs-target="#verify-personal-info-form-{{$data->id}}" data-id="{{$data->id}}">
-					<i class="fa fa-check" aria-hidden="true"></i> Verified Personal information
-					</button>
-					@endif
-					@php
-					$hasPermission = Auth::user()->hasPermissionForSelectedRole(['send-personal-info-form-action']);
-					@endphp
-					@if ($hasPermission && $data->candidateDetails->documents_verified_at != NULL && $data->candidateDetails->personal_information_created_at != NULL && $data->candidateDetails->personal_information_verified_at == NULL)	            							
-					<button style="margin-top:2px; margin-right:2px; margin-bottom:2px; float:right" title="Resend Candidate Personal Information Form" type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
-						data-bs-target="#send-personal-info-form-{{$data->id}}">
-					<i class="fa fa-paper-plane" aria-hidden="true"></i> Resend Personal Info Form
-					</button>
-					@endif
-				</div>
 				<div class="col-xxl-6 col-lg-6 col-md-12">
 					<div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
 						<div class="card">
@@ -866,84 +864,138 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							</div>
 							<div class="card-body">
 								<div class="row">
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Employee Code  :</label>
+									</div>
+									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+										<span>{{ $data->employee_code ?? 'NA' }}</span>
+									</div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Employee Full Name  :</label>
+									</div>
+									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+										<span>{{ $data->first_name.' '.$data->last_name ?? 'NA' }}</span>
+									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> First Name  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->first_name ?? '' }}</span>
+										<span>{{ $data->first_name ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Last Name  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->last_name ?? '' }}</span>
+										<span>{{ $data->last_name ?? 'NA' }}</span>
 									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Father’s Full Name  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->name_of_father ?? '' }}</span>
-									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Mother’s Full Name  :</label>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Designation  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->name_of_mother ?? '' }}</span>
+										<span>{{ $data->designation->name ?? 'NA' }}</span>
 									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Marital Status  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->maritalStatus->name ?? '' }}</span>
-									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Passport Number  :</label>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Department  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->passport_number ?? '' }}</span>
+										<span>{{ $data->department->name ?? 'NA' }}</span>
 									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Passport Expiry Date  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>@if(isset($data) && isset($data->candidateDetails) && $data->candidateDetails->passport_expiry_date != ''){{\Carbon\Carbon::parse($data->candidateDetails->passport_expiry_date)->format('d M Y')}} @endif</span>
-									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Educational Qualification  :</label>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Gender  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->educational_qualification ?? '' }}</span>
-									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Year of Completion  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->year_of_completion ?? '' }}</span>
-									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Religion  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->religionName->name ?? '' }}</span>
+										<span>{{ $data->genderName->name ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Date Of Birth  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 										<span>
-										@if(isset($data) && isset($data->candidateDetails) && $data->candidateDetails->dob != '')
-										{{\Carbon\Carbon::parse($data->candidateDetails->dob)->format('d M Y') ?? ''}}
+										@if(isset($data) && isset($data) && $data->dob != '')
+										{{\Carbon\Carbon::parse($data->dob)->format('d M Y') ?? 'NA'}}
+										@else
+										NA
 										@endif
 										</span>
 									</div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Birthday Month  :</label>
+									</div>
+									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+										<span>
+										@if($data->dob != ''){{\Carbon\Carbon::parse($data->dob)->format('F')}} @else NA @endif
+										</span>
+									</div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Age  :</label>
+									</div>
+									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+										<span>
+										@if($data->dob != ''){{\Carbon\Carbon::parse($data->dob)->age}} @else NA @endif
+										</span>
+									</div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Marital Status  :</label>
+									</div>
+									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+										<span>{{ $data->maritalStatus->name ?? 'NA' }}</span>
+									</div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Religion  :</label>
+									</div>
+									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+										<span>{{ $data->religionName->name ?? 'NA' }}</span>
+									</div>
+                                    <div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Nationality  :</label>
+									</div>
+									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+										<span>{{$data->countryMaster->nationality ?? $data->countryMaster->name ?? $data->countryMaster->iso_3166_code ?? 'NA'}}</span>
+									</div>
+									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Father’s Full Name  :</label>
+									</div>
+									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+										<span>{{ $data->name_of_father ?? 'NA' }}</span>
+									</div>
+									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Mother’s Full Name  :</label>
+									</div>
+									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+										<span>{{ $data->name_of_mother ?? 'NA' }}</span>
+									</div>									
+									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Passport Number  :</label>
+									</div>
+									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+										<span>{{ $data->passport_number ?? 'NA' }}</span>
+									</div>
+									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Passport Expiry Date  :</label>
+									</div>
+									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+										<span>@if(isset($data) && isset($data) && $data->passport_expiry_date != ''){{\Carbon\Carbon::parse($data->passport_expiry_date)->format('d M Y')}} @else NA @endif</span>
+									</div>
+									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Educational Qualification  :</label>
+									</div>
+									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+										<span>{{ $data->educational_qualification ?? 'NA' }}</span>
+									</div>
+									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Year of Completion  :</label>
+									</div>
+									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+										<span>{{ $data->year_of_completion ?? 'NA' }}</span>
+									</div>                                   
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Spoken Languages  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 										<span>
-										@if(isset($data->candidateDetails->candidateLanguages))
-										@foreach($data->candidateDetails->candidateLanguages as $language)
-										{{ $language->language->name ?? '' }} ,
+										@if(isset($data->employeeLanguages))
+										@foreach($data->employeeLanguages as $language)
+										{{ $language->language->name ?? 'NA' }} ,
 										@endforeach
 										@endif
 										</span>
@@ -952,248 +1004,627 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							</div>
 						</div>
 					</div>
-					<div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-						<div class="card">
+					<div class="card">
+						<div class="card-header">
+							<h4 class="card-title">Dependents</h4>
+						</div>
+						<div class="card-body">
+							@if(isset($data) && isset($data) && (isset($data->spouse_name) OR isset($data->spouse_passport_number) OR 
+							isset($data->spouse_passport_expiry_date) OR isset($data->spouse_dob) OR isset($data->spouseNationality->name)))
+							<div class="row">
+								<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Spouse Name  :</label>
+								</div>
+								<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+									<span>{{ $data->spouse_name ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Spouse Passport Number  :</label>
+								</div>
+								<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+									<span>{{ $data->spouse_passport_number ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Spouse Passport Expiry Date  :</label>
+								</div>
+								<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+									<span>
+									@if(isset($data) && isset($data) && $data->spouse_passport_expiry_date != '')
+									{{\Carbon\Carbon::parse($data->spouse_passport_expiry_date)->format('d M Y') ?? 'NA'}}
+									@else
+									NA
+									@endif
+									</span>
+								</div>
+								<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Spouse Date Of Birth  :</label>
+								</div>
+								<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+									<span>
+									@if(isset($data) && isset($data) && $data->spouse_dob != '')
+									{{\Carbon\Carbon::parse($data->spouse_dob)->format('d M Y') ?? 'NA'}}
+									@else
+									NA
+									@endif
+									</span>
+								</div>
+								<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Spouse Nationality  :</label>
+								</div>
+								<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+									<span>{{ $data->spouseNationality->name ?? 'NA' }}</span>
+								</div>
+							</div>
+							@else
+							<div class="row">
+								<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+									<label for="choices-single-default" class="form-label">Spouse details not added in the system</label>
+								</div>
+							</div>
+							@endif
 							<div class="card-header">
-								<h4 class="card-title">Dependents</h4>
+								<h4 class="card-title">Children</h4>
 							</div>
-							<div class="card-body">
-								@if(isset($data) && isset($data->candidateDetails) && (isset($data->candidateDetails->spouse_name) OR isset($data->candidateDetails->spouse_passport_number) OR 
-								isset($data->candidateDetails->spouse_passport_expiry_date) OR isset($data->candidateDetails->spouse_dob) OR isset($data->candidateDetails->spouseNationality->name)))
-								<div class="row">
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Spouse Name  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->spouse_name ?? '' }}</span>
-									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Spouse Passport Number  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->spouse_passport_number ?? '' }}</span>
-									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Spouse Passport Expiry Date  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>
-										@if(isset($data) && isset($data->candidateDetails) && $data->candidateDetails->spouse_passport_expiry_date != '')
-										{{\Carbon\Carbon::parse($data->candidateDetails->spouse_passport_expiry_date)->format('d M Y') ?? ''}}
-										@endif
-										</span>
-									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Spouse Date Of Birth  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>
-										@if(isset($data) && isset($data->candidateDetails) && $data->candidateDetails->spouse_dob != '')
-										{{\Carbon\Carbon::parse($data->candidateDetails->spouse_dob)->format('d M Y') ?? ''}}
-										@endif
-										</span>
-									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Spouse Nationality  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->spouseNationality->name ?? '' }}</span>
-									</div>
+							</br>
+							@if(isset($data->employeeChildren) && count($data->employeeChildren) > 0)
+							@foreach($data->employeeChildren as $children)
+							<div class="row" style="border:1px solid #e9e9ef; margin-bottom:10px;">
+								<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Child Name  :</label>
 								</div>
-								@else
-								<div class="row">
-									<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-										<label for="choices-single-default" class="form-label">Spouse details not added in the system</label>
-									</div>
+								<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+									<span>{{ $children->child_name ?? 'NA' }}</span>
 								</div>
-								@endif
-								<div class="card-header">
-									<h4 class="card-title">Children</h4>
+								<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Child Passport Number  :</label>
 								</div>
-								</br>
-								@if(isset($data->candidateDetails->candidateChildren) && count($data->candidateDetails->candidateChildren) > 0)
-								@foreach($data->candidateDetails->candidateChildren as $children)
-								<div class="row" style="border:1px solid #e9e9ef; margin-bottom:10px;">
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Child Name  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $children->child_name ?? '' }}</span>
-									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Child Passport Number  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $children->child_passport_number ?? '' }}</span>
-									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Child Passport Expiry Date  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span> @if($children->child_passport_expiry_date != '') {{\Carbon\Carbon::parse($children->child_passport_expiry_date)->format('d M Y') }} @endif</span>
-									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Child Date Of Birth  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{\Carbon\Carbon::parse($children->child_dob)->format('d M Y') ?? ''}}</span>
-									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Child Nationality  :</label>
-									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $children->childNationality->name ?? '' }}</span>
-									</div>
+								<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+									<span>{{ $children->child_passport_number ?? 'NA' }}</span>
 								</div>
-								@endforeach
-								@else
-								<div class="row">
-									<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-										<label for="choices-single-default" class="form-label">Children details not added in the system</label>
-									</div>
+								<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Child Passport Expiry Date  :</label>
 								</div>
-								@endif
+								<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+									<span> @if($children->child_passport_expiry_date != '') {{\Carbon\Carbon::parse($children->child_passport_expiry_date)->format('d M Y') }} @else NA @endif</span>
+								</div>
+								<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Child Date Of Birth  :</label>
+								</div>
+								<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+									<span>{{\Carbon\Carbon::parse($children->child_dob)->format('d M Y') ?? 'NA'}}</span>
+								</div>
+								<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Child Nationality  :</label>
+								</div>
+								<div class="col-lg-7 col-md-7 col-sm-6 col-12">
+									<span>{{ $children->childNationality->name ?? 'NA' }}</span>
+								</div>
 							</div>
+							@endforeach
+							@else
+							<div class="row">
+								<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+									<label for="choices-single-default" class="form-label">Children details not added in the system</label>
+								</div>
+							</div>
+							@endif
 						</div>
 					</div>
 				</div>
 				<div class="col-xxl-6 col-lg-6 col-md-12">
-					<div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                	<div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
 						<div class="card">
 							<div class="card-header">
 								<h4 class="card-title">Address and Contact Details in UAE</h4>
 							</div>
 							<div class="card-body">
 								<div class="row">
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Company Phone Number  :</label>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+										<span>{{ $data->company_number ?? 'NA' }}</span>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Personal Phone Number  :</label>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+										<span>{{ $data->contact_number ?? 'NA' }}</span>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Residence Telephone Number  :</label>
 									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->residence_telephone_number ?? '' }}</span>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+										<span>{{ $data->residence_telephone_number ?? 'NA' }}</span>
 									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Company Email Address  :</label>
 									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->user->email ?? '' }}</span>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+										<span>{{ $data->user->email ?? 'NA' }}</span>
 									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Personal Email Address  :</label>
 									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->personal_email_address ?? '' }}</span>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+										<span>{{ $data->personal_email_address ?? 'NA' }}</span>
 									</div>
-									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Name Of Father  :</label>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+										<span>{{ $data->name_of_father ?? 'NA' }}</span>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+										<label for="choices-single-default" class="form-label"> Name Of Mother  :</label>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+										<span>{{ $data->name_of_mother ?? 'NA' }}</span>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Address in UAE  :</label>
 									</div>
-									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->address_uae ?? '' }}</span>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+										<span>{{ $data->candidateDetails->address_uae ?? 'NA' }}</span>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
 						<div class="card">
 							<div class="card-header">
 								<h4 class="card-title">Contact in case of Emergency (UAE)</h4>
 							</div>
 							<div class="card-body">
-								@if(isset($data->candidateDetails->emergencyContactUAE))
-								@foreach($data->candidateDetails->emergencyContactUAE as $contactUAE)                                          
+								@if(isset($data->empEmergencyContactUAE) && count($data->empEmergencyContactUAE) > 0)
+								@foreach($data->empEmergencyContactUAE as $contactUAE)                                          
 								<div class="row" style="border:1px solid #e9e9ef; margin-bottom:10px;">
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Name  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $contactUAE->name ?? '' }}</span>
+										<span>{{ $contactUAE->name ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Relation  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $contactUAE->relationName->name ?? '' }}</span>
+										<span>{{ $contactUAE->relationName->name ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Email  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $contactUAE->email_address ?? '' }}</span>
+										<span>{{ $contactUAE->email_address ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Contact Number  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $contactUAE->contact_number ?? '' }}</span>
+										<span>{{ $contactUAE->contact_number ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Alternative Contact Number  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $contactUAE->alternative_contact_number ?? '' }}</span>
+										<span>{{ $contactUAE->alternative_contact_number ?? 'NA' }}</span>
 									</div>
 								</div>
 								@endforeach
+                                @else
+                                <div class="row">
+									<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+										<label for="choices-single-default" class="form-label">Emergency contact details in UAE have not been added to the system</label>
+									</div>
+								</div>
 								@endif
 							</div>
 						</div>
-					</div>
-					<div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
 						<div class="card">
 							<div class="card-header">
 								<h4 class="card-title">Contact in case of Emergency (Home Country)</h4>
 							</div>
 							<div class="card-body">
-								@if(isset($data->candidateDetails->emergencyContactHomeCountry))
-								@foreach($data->candidateDetails->emergencyContactHomeCountry as $contactHomeCountry)                                          
+								@if(isset($data->empEmergencyContactHomeCountry) && count($data->empEmergencyContactHomeCountry) > 0)
+								@foreach($data->empEmergencyContactHomeCountry as $contactHomeCountry)                                          
 								<div class="row" style="border:1px solid #e9e9ef; margin-bottom:10px;">
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Name  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $contactHomeCountry->name ?? '' }}</span>
+										<span>{{ $contactHomeCountry->name ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Relation  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $contactHomeCountry->relationName->name ?? '' }}</span>
+										<span>{{ $contactHomeCountry->relationName->name ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Email  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $contactHomeCountry->email_address ?? '' }}</span>
+										<span>{{ $contactHomeCountry->email_address ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Contact Number  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $contactHomeCountry->contact_number ?? '' }}</span>
+										<span>{{ $contactHomeCountry->contact_number ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Alternative Contact Number  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $contactHomeCountry->alternative_contact_number ?? '' }}</span>
+										<span>{{ $contactHomeCountry->alternative_contact_number ?? 'NA' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Home Country Address  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $contactHomeCountry->home_country_address ?? '' }}</span>
+										<span>{{ $contactHomeCountry->home_country_address ?? 'NA' }}</span>
 									</div>
 								</div>
 								@endforeach
+                                @else
+                                <div class="row">
+									<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+										<label for="choices-single-default" class="form-label">Emergency contact details in Home Country have not been added to the system</label>
+									</div>
+								</div>
 								@endif
+							</div>
+						</div>
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tab-pane fade" id="visa-info-{{$data->id}}">
+			<div class="row">
+                <div class="col-xxl-6 col-lg-6 col-md-6">
+					<div class="card">
+						<div class="card-header">
+							<h4 class="card-title">Visa Information</h4>
+						</div>
+						<div class="card-body">
+							<div class="row">											
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> CEC / Person Code No.  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->cec_or_person_code_number ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Emirates ID  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->emirates_id ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Emirates ID Expiry  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Passport Number  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->passport_number ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Passport Issue Date  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->passport_issue_date != ''){{\Carbon\Carbon::parse($data->passport_issue_date)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Passport Expiry  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->passport_expiry_date != ''){{\Carbon\Carbon::parse($data->passport_expiry_date)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Passport Issued Place  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->passport_place_of_issue ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Passport Status  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->passport_status_name ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Passport Status Remarks  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>NA</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Visa Type  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->visaType->name ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Visa Number  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->visa_number ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Visa Issue Date  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->visa_issue_date != ''){{\Carbon\Carbon::parse($data->visa_issue_date)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Visa Expiry Date  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->visa_expiry_date != ''){{\Carbon\Carbon::parse($data->visa_expiry_date)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Reminder Date for Visa Renewal  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->reminder_date_for_visa_renewal != ''){{\Carbon\Carbon::parse($data->reminder_date_for_visa_renewal)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Visa Issuing Country  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{$data->visaIssueCountry->name ?? 'NA'}}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Sponsorship  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->sponsorshipName->name ?? 'NA' }}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+                </div>
+				<div class="col-xxl-6 col-lg-6 col-md-6">
+					<div class="card">
+						<div class="card-header">
+							<h4 class="card-title">Employment Information</h4>
+						</div>
+						<div class="card-body">
+							<div class="row">
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Company Joining Date  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->company_joining_date != ''){{\Carbon\Carbon::parse($data->company_joining_date)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Current Status  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{$data->current_status_name ?? ''}}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Status Date  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->status_date != ''){{\Carbon\Carbon::parse($data->status_date)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Pobation Duration  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{$data->probation_duration_in_months .' Months' ?? 'NA'}}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Probation Period Start Date  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->probation_period_start_date != ''){{\Carbon\Carbon::parse($data->probation_period_start_date)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Probation Period End Date  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->probation_period_end_date != ''){{\Carbon\Carbon::parse($data->probation_period_end_date)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Employment Contract Type  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->employment_contract_name ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Employment Contract Start Date  :</label>
+								</div>	
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->employment_contract_start_date != ''){{\Carbon\Carbon::parse($data->employment_contract_start_date)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Employment Contract End Date :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->employment_contract_end_date != ''){{\Carbon\Carbon::parse($data->employment_contract_end_date)->format('d M Y')}} @else 'NA' @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Employment Contract Probation Period  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{$data->employment_contract_probation_period_in_months.' Months' ?? 'NA'}}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Employment Contract Probation End Date  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->employment_contract_probation_end_date != ''){{\Carbon\Carbon::parse($data->employment_contract_probation_end_date)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Work Location  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{$data->location->name ?? 'NA'}}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Division  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{$data->department->division->name ?? 'NA'}}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Team Lead /Reporting Manager  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{$data->teamLeadOrReportingManager->name ?? 'NA'}}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Division Head  :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{$data->department->division->divisionHead->name ?? 'NA'}}</span>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		@endif
-		@endif
+		<div class="tab-pane fade" id="compensation-benefits-{{$data->id}}">
+			<div class="row">
+                <div class="col-xxl-6 col-lg-6 col-md-6">
+					<div class="card">
+						<div class="card-header">
+							<h4 class="card-title">Salary & Hike Information</h4>
+						</div>
+						<div class="card-body">
+							<div class="row">											
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Basic Salary :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{$data->basic_salary .' AED' ?? 'NA'}}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Other Allowances :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{$data->other_allowances .' AED' ?? 'NA'}}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Total Salary :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{$data->total_salary .' AED' ?? 'NA'}}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-header">
+							<h4 class="card-title">Insurance Policy Information</h4>
+						</div>
+						<div class="card-body">
+							<div class="row">											
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Insurance Policy No. :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->cec_or_person_code_number ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Insurance Card No. :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->emirates_id ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Insurance Policy Start Date :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Insurance Policy End Date :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}} @else NA @endif</span>
+								</div>
+							</div>
+						</div>
+					</div>
+                </div>
+				<div class="col-xxl-6 col-lg-6 col-md-6">
+				<div class="card">
+						<div class="card-header">
+							<h4 class="card-title">Ticket Allowance Information</h4>
+						</div>
+						<div class="card-body">
+							<div class="row">											
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Insurance Policy No. :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->cec_or_person_code_number ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Insurance Card No. :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->emirates_id ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Insurance Policy Start Date :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Insurance Policy End Date :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}} @else NA @endif</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-header">
+							<h4 class="card-title">Birthday Gift PO Information</h4>
+						</div>
+						<div class="card-body">
+							<div class="row">											
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Insurance Policy No. :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->cec_or_person_code_number ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Insurance Card No. :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->emirates_id ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Insurance Policy Start Date :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Insurance Policy End Date :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}} @else NA @endif</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 @push('scripts')

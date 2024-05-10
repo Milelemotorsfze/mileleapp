@@ -244,11 +244,20 @@ class EmployeeProfile extends Model
     public function candidateLanguages() {
         return $this->hasMany(EmployeeSpokenLanguage::class,'candidate_id','id');
     }
+    public function employeeLanguages() {
+        return $this->hasMany(EmployeeSpokenLanguage::class,'employee_id','user_id');
+    }
     public function emergencyContactUAE() {
         return $this->hasMany(UAEEmergencyContact::class,'candidate_id','id');
     }
+    public function empEmergencyContactUAE() {
+        return $this->hasMany(UAEEmergencyContact::class,'employee_id','user_id');
+    }
     public function emergencyContactHomeCountry() {
         return $this->hasMany(HomeCountryEmergencyContact::class,'candidate_id','id');
+    }
+    public function empEmergencyContactHomeCountry() {
+        return $this->hasMany(HomeCountryEmergencyContact::class,'employee_id','user_id');
     }
     public function spouseNationality() {
         return $this->hasOne(Country::class,'id','spouse_nationality');
@@ -261,6 +270,9 @@ class EmployeeProfile extends Model
     }
     public function candidateChildren() {
         return $this->hasMany(Children::class,'candidate_id','id');
+    }
+    public function employeeChildren() {
+        return $this->hasMany(Children::class,'employee_id','user_id');
     }
     public function candidatePassport() {
         return $this->hasMany(EmpDoc::class,'candidate_id','id')->where('document_name','passport');

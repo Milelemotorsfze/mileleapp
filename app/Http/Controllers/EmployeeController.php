@@ -66,4 +66,11 @@ class EmployeeController extends Controller
            }
         }
     }
+    public function show($id) {
+        $data = EmployeeProfile::where('id',$id)->with('empEmergencyContactUAE')->first();
+        // dd($data);
+        $previous = EmployeeProfile::where('id', '<', $id)->max('id');
+        $next = EmployeeProfile::where('id', '>', $id)->min('id');
+        return view('hrm.employee.show',compact('data','previous','next'));
+    }
 }
