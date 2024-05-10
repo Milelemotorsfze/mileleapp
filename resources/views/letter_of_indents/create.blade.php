@@ -445,7 +445,8 @@
                 if($("#form-create").valid()) {
                     $('#form-create').unbind('submit').submit();
                 }
-
+            }else{
+                e.preventDefault();
             }
         });
         $('#sales_person_id').select2({
@@ -975,6 +976,7 @@
                    let quantity = data.quantity;
                    let modelId = data.master_model_id;
                    var LOIDescription = data.loi_description;
+                   console.log("test");
                    console.log(LOIDescription);
                    $('#inventory-quantity-'+index).val(quantity);
                    $('#loi-description-'+index).val(LOIDescription);
