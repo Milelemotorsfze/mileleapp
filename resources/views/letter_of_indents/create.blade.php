@@ -146,7 +146,7 @@
                                 @enderror
                             </div>
                         </div>
-                    
+
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Destination</label>
@@ -171,6 +171,17 @@
                         </div>
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Sales Person</label>
+                                <select class="form-control widthinput" multiple name="sales_person_id" id="sales_person_id" autofocus>
+                                    <option ></option>
+                                    @foreach($salesPersons as $salesPerson)
+                                        <option value="{{ $salesPerson->id }}"> {{ $salesPerson->name }} </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">LOI Document</label>
                                 <input type="file" name="files[]" id="file-upload" class="form-control widthinput text-dark" multiple
                                     autofocus accept="application/pdf">
@@ -182,6 +193,13 @@
                                 <input type="file" id="signature-upload" name="loi_signature" accept="image/*" class="form-control widthinput">
                             </div>
                         </div>
+                    </div>
+                    <div class="alert alert-danger m-2" role="alert" hidden id="country-comment-div">
+                        <span id="country-comment"></span><br>
+                        <span class="error" id="max-individual-quantity-error"></span>
+                        <span class="error" id="min-company-quantity-error"></span>
+                        <span class="error" id="max-company-quantity-error"></span>
+                        <span class="error" id="company-only-allowed-error"></span>
                     </div>
                     <div class="card" id="soNumberDiv" >
                         <div class="card-header">
@@ -199,10 +217,10 @@
                                                 autocomplete="so_number" >
                                             <span id="soNumberError_1" class="invalid-feedback soNumberError"></span>
                                         </div>
-                                    
+
                                         <div class="col-lg-1 col-md-6 col-sm-12">
                                             <a class="btn btn-sm btn-danger removeSoNumber" data-index="1" >  <i class="fas fa-trash-alt"></i> </a>
-                                        </div>                                      
+                                        </div>
                                    </div>
                                 </div>
                             </div>
@@ -428,16 +446,25 @@
                     $('#form-create').unbind('submit').submit();
                 }
 
+
             }
         });
 
+
+            }
+        });
+        $('#sales_person_id').select2({
+            placeholder : 'Select Sales Person',
+            allowClear: true,
+            maximumSelectionLength: 1
+        });
         $('#country').select2({
             placeholder : 'Select Country',
             allowClear: true,
             maximumSelectionLength: 1
         }).on('change', function() {
             getCustomers();
-            checkCountryCriterias()
+            checkCountryCriterias();
         });
 
         $('#customer-type').change(function (){
@@ -477,6 +504,33 @@
             let url = '{{ route('loi-country-criteria.check') }}';
             var country = $('#country').val();
             var customer_type = $('#customer-type').val();
+            let total_quantities = 0;
+            $(".quantities ").each(function(){
+                if($(this).val() > 0) {
+                    total_quantities += parseInt($(this).val());
+                }
+            });
+
+            if(country.length > 0 && customer_type.length > 0 && total_quantities > 0) {
+
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        country_id: country,
+                        customer_type: customer_type,
+                        total_quantities:total_quantities
+                    },
+                    success:function (data) {
+                        console.log(data);
+                        if(data.comment) {
+                            $('#country-comment-div').attr('hidden', false);
+                            $('#country-comment').html(data.comment);
+                        }
+                        else{
+                            $('#country-comment-div').attr('hidden', true);
+                        }
 
             $.ajax({
                 type: "GET",
@@ -1049,10 +1103,9 @@
 	                $(this).attr('id','row-'+index);
 	                $(this).find('.so_number').attr('name', 'so_number['+ index +']');
 	                $(this).find('.so_number').attr('id', 'so_number_'+index);
-	        
 	                $(this).find('.removeSoNumber').attr('data-index',index);
 	                $(this).find('.soNumberError').attr('id', 'soNumberError_'+index);
-	                
+
 	            });
 	            // enableDropdown();
 	        // }
