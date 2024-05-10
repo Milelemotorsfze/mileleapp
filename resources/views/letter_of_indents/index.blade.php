@@ -97,12 +97,7 @@
                                         <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
                                         <td>{{ $letterOfIndent->dealers }}</td>
-                                        <td> 
-                                            @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
-                                                 {{ $LoiSoNumber->so_number }} 
-                                            @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
-                                            @endforeach
-                                         </td>
+                                        <td>{{ $letterOfIndent->so_number }}</td>
                                         <td>{{ $letterOfIndent->destination }}</td>
                                         <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
@@ -297,12 +292,7 @@
                                         <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
                                         <td>{{ $letterOfIndent->dealers }}</td>
-                                        <td>
-                                             @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
-                                                 {{ $LoiSoNumber->so_number }} 
-                                            @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
-                                            @endforeach
-                                        </td>
+                                        <td>{{ $letterOfIndent->so_number }}</td>
                                         <td>{{ $letterOfIndent->destination }}</td>
                                         <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
@@ -497,12 +487,7 @@
                                         <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
                                         <td>{{ $letterOfIndent->dealers }}</td>
-                                        <td>
-                                            @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
-                                                 {{ $LoiSoNumber->so_number }} 
-                                            @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
-                                            @endforeach
-                                        </td>
+                                        <td>{{ $letterOfIndent->so_number }}</td>
                                         <td>{{ $letterOfIndent->destination }}</td>
                                         <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
@@ -667,7 +652,172 @@
                         </div>
                     </div>
                 </div>
+{{--                <div class="tab-pane fade" id="milele-approved-LOI">--}}
+{{--                    <div class="card-body">--}}
+{{--                        <div class="table-responsive">--}}
+{{--                            <table id="milele-approved-LOI-table" class="table table-striped table-editable table-edits table table-condensed">--}}
+{{--                                <thead class="bg-soft-secondary">--}}
+{{--                                <tr>--}}
+{{--                                    <th>Date</th>--}}
+{{--                                    <th>Customer</th>--}}
+{{--                                    <th>Category</th>--}}
+{{--                                    <th>Dealer</th>--}}
+{{--                                    <th>So Number</th>--}}
+{{--                                    <th>Destination</th>--}}
+{{--                                    <th>Prefered Location</th>--}}
+{{--                                    <th> Status</th>--}}
+{{--                                    <th>LOI Pdf</th>--}}
+{{--                                    <th width="150px">Actions</th>--}}
+{{--                                </tr>--}}
+{{--                                </thead>--}}
+{{--                                <tbody>--}}
+{{--                                <div hidden>{{$i=0;}}--}}
+{{--                                </div>--}}
+{{--                                @foreach ($approvedLOIs as $key => $letterOfIndent)--}}
+{{--                                    <tr>--}}
+{{--                                        <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->customer->name ?? '' }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->category }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->dealers }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->so_number }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->status }}</td>--}}
+{{--                                        <td>--}}
+{{--                                            <select class="form-control" onchange="location = this.value;">--}}
+{{--                                                <option value="">Select Template</option>--}}
+{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">--}}
+{{--                                                    Trans Car Template</option>--}}
+{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>--}}
+{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>--}}
+{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>--}}
+{{--                                            </select>--}}
+{{--                                        </td>--}}
+{{--                                        <td>--}}
+{{--                                            @if($letterOfIndent->is_pfi_pending_for_loi == true)--}}
+{{--                                                <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">--}}
+{{--                                                    <button type="button" class="btn btn-info btn-sm" >Add PFI</button>--}}
+{{--                                                </a>--}}
+{{--                                            @endif--}}
+{{--        --}}{{--                                    <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">--}}
+{{--        --}}{{--                                        <button type="button" class="btn btn-primary btn-sm">LOI PDF</button>--}}
+{{--        --}}{{--                                    </a>--}}
+{{--                                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-approved-loi-items-{{$letterOfIndent->id}}">--}}
+{{--                                                View LOI Items--}}
+{{--                                            </button>--}}
+{{--                                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-approved-loi-docs-{{$letterOfIndent->id}}">--}}
+{{--                                                View LOI Docs--}}
+{{--                                            </button>--}}
+{{--                                        </td>--}}
+{{--                                        <div class="modal fade" id="view-approved-loi-items-{{$letterOfIndent->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">--}}
+{{--                                            <div class="modal-dialog modal-xl modal-dialog-scrollable">--}}
+{{--                                                <div class="modal-content">--}}
+{{--                                                    <div class="modal-header">--}}
+{{--                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">LOI Items</h1>--}}
+{{--                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="modal-body p-3">--}}
+{{--                                                        @if($letterOfIndent->letterOfIndentItems->count() > 0)--}}
+{{--                                                            <div class="row  d-none d-lg-block d-xl-block d-xxl-block">--}}
+{{--                                                                <div class="d-flex">--}}
+{{--                                                                    <div class="col-lg-12 col-md-12 col-sm-12">--}}
+{{--                                                                        <div class="row">--}}
+{{--                                                                            <div class="col-lg-3 col-md-12 col-sm-12">--}}
+{{--                                                                                <dt>Model</dt>--}}
+{{--                                                                            </div>--}}
+{{--                                                                            <div class="col-lg-1 col-md-12 col-sm-12">--}}
+{{--                                                                                <dt>SFX</dt>--}}
+{{--                                                                            </div>--}}
+{{--                                                                            <div class="col-lg-2 col-md-12 col-sm-12">--}}
+{{--                                                                                <dt>Model Year</dt>--}}
+{{--                                                                            </div>--}}
+{{--                                                                            <div class="col-lg-4 col-md-12 col-sm-12">--}}
+{{--                                                                                <dt>LOI Description</dt>--}}
+{{--                                                                            </div>--}}
+{{--                                                                            <div class="col-lg-2 col-md-12 col-sm-12">--}}
+{{--                                                                                <dt>Quantity</dt>--}}
+{{--                                                                            </div>--}}
+{{--                                                                        </div>--}}
+{{--                                                                    </div>--}}
+{{--                                                                </div>--}}
+{{--                                                            </div>--}}
+{{--                                                            @foreach($letterOfIndent->letterOfIndentItems as $value => $LOIItem)--}}
+{{--                                                                <div class="row">--}}
+{{--                                                                    <div class="d-flex">--}}
+{{--                                                                        <div class="col-lg-12 col-md-12 col-sm-12">--}}
+{{--                                                                            <hr>--}}
+{{--                                                                            <div class="row mt-3">--}}
+{{--                                                                                <div class="col-lg-3 col-md-12 col-sm-12">--}}
+{{--                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model</dt>--}}
+{{--                                                                                    <dl> {{ $LOIItem->masterModel->model ?? ''}} </dl>--}}
+{{--                                                                                </div>--}}
+{{--                                                                                <div class="col-lg-1 col-md-12 col-sm-12">--}}
+{{--                                                                                    <dt  class="d-lg-none d-xl-none d-xxl-none">SFX</dt>--}}
+{{--                                                                                    <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>--}}
+{{--                                                                                </div>--}}
+{{--                                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
+{{--                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Year</dt>--}}
+{{--                                                                                    <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>--}}
+{{--                                                                                </div>--}}
+{{--                                                                                <div class="col-lg-4 col-md-12 col-sm-12">--}}
+{{--                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">LOI Description</dt>--}}
+{{--                                                                                    <dl> {{ $LOIItem->loi_description ?? '' }} </dl>--}}
+{{--                                                                                </div>--}}
+{{--                                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
+{{--                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">Quantity</dt>--}}
+{{--                                                                                    <dl>{{ $LOIItem->quantity }}</dl>--}}
+{{--                                                                                </div>--}}
+{{--                                                                            </div>--}}
+{{--                                                                        </div>--}}
+{{--                                                                    </div>--}}
+{{--                                                                </div>--}}
+{{--                                                            @endforeach--}}
+{{--                                                        @else--}}
+{{--                                                            <span class="text-center"> No Data Available! </span>--}}
+{{--                                                        @endif--}}
 
+{{--                                                    </div>--}}
+{{--                                                    <div class="modal-footer">--}}
+{{--                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="modal fade" id="view-approved-loi-docs-{{$letterOfIndent->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">--}}
+{{--                                            <div class="modal-dialog modal-xl modal-dialog-scrollable">--}}
+{{--                                                <div class="modal-content">--}}
+{{--                                                    <div class="modal-header">--}}
+{{--                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>--}}
+{{--                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="modal-body">--}}
+{{--                                                        <div class="col-lg-12">--}}
+{{--                                                            <div class="row p-2">--}}
+{{--                                                                @foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument)--}}
+{{--                                                                    <div class="d-flex">--}}
+{{--                                                                        <div class="col-lg-12">--}}
+{{--                                                                            <div class="row p-2">--}}
+{{--                                                                                <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  width="400" height="600"></embed>--}}
+{{--                                                                            </div>--}}
+{{--                                                                        </div>--}}
+{{--                                                                    </div>--}}
+{{--                                                                @endforeach--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="modal-footer">--}}
+{{--                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </tr>--}}
+{{--                                @endforeach--}}
+{{--                                </tbody>--}}
+{{--                            </table>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
                 <div class="tab-pane fade" id="supplier-rejected-LOI">
                     <div class="card-body">
                         <div class="table-responsive">
@@ -695,12 +845,7 @@
                                         <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->category }}</td>
                                         <td>{{ $letterOfIndent->dealers }}</td>
-                                        <td>
-                                            @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
-                                                 {{ $LoiSoNumber->so_number }} 
-                                            @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
-                                            @endforeach
-                                        </td>
+                                        <td>{{ $letterOfIndent->so_number }}</td>
                                         <td>{{ $letterOfIndent->destination }}</td>
                                         <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>

@@ -12,7 +12,6 @@ use App\Models\Varaint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class LOIItemsController extends Controller
 {
@@ -148,7 +147,7 @@ class LOIItemsController extends Controller
             $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
 
         }
-        $LOI->loi_approval_date = Carbon::now()->format('Y-m-d');
+
         $LOI->save();
         return response(true);
 
