@@ -167,14 +167,12 @@ class LetterOfIndentController extends Controller
                $customerNameCode .= strtoupper(mb_substr($name, 0, 1));
             }
             $customerCode = str_pad($customerNameCode, 3, '0', STR_PAD_RIGHT);
-
             $yearCode = Carbon::now()->format('y');
 
             $customerTotalLoiCount = LetterOfIndent::where('customer_id', $request->customer_id)->count();
             $nextLoiCount = str_pad($customerTotalLoiCount + 1, 2, '0', STR_PAD_LEFT);
 
             $uuid = $countryName . $customerCode ."-".$yearCode . $nextLoiCount;
-
             $LOI->uuid = $uuid;
 
             if ($request->has('loi_signature'))
@@ -419,6 +417,7 @@ class LetterOfIndentController extends Controller
         $LOICountries = LoiCountryCriteria::where('status', LoiCountryCriteria::STATUS_ACTIVE)->where('is_loi_restricted', false)->pluck('country_id');
         $countries = Country::whereIn('id', $LOICountries)->get();
         $customers = Customer::all();
+        $possibleCustomers = Customer::where('country_id', $letterOfIndent->customer->country_id)->get();
         $salesPersons = User::where('status','active')->where('sales_rap', 'Yes')->get();
 
         if($letterOfIndent->dealers == 'Trans Cars') {
@@ -442,7 +441,7 @@ class LetterOfIndentController extends Controller
         }
 
         return view('letter_of_indents.edit', compact('countries','customers','letterOfIndent','models',
-                                'letterOfIndentItems','salesPersons'));
+                                'letterOfIndentItems','salesPersons','possibleCustomers'));
     }
 
     /**
@@ -469,6 +468,24 @@ class LetterOfIndentController extends Controller
             DB::beginTransaction();
 
             $LOI = LetterOfIndent::find($id);
+
+            $customer = Customer::find($request->customer_id);
+            $country = Country::find($request->country);
+            $countryName = strtoupper(substr($country->name, 0, 3));
+
+            $names = explode(" ", $customer->name);
+            $customerNameCode = "";
+            foreach ($names as $name) {
+                $customerNameCode .= strtoupper(mb_substr($name, 0, 1));
+            }
+            $customerCode = str_pad($customerNameCode, 3, '0', STR_PAD_RIGHT);
+            $yearCode = Carbon::now()->format('y');
+
+            $customerTotalLoiCount = LetterOfIndent::where('customer_id', $request->customer_id)->count();
+            $nextLoiCount = str_pad($customerTotalLoiCount + 1, 2, '0', STR_PAD_LEFT);
+
+            $uuid = $countryName . $customerCode ."-".$yearCode . $nextLoiCount;
+            $LOI->uuid = $uuid;
 
             $LOI->customer_id = $request->customer_id;
             $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);

@@ -81,7 +81,8 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label ">Customer</label>
-                                <select class="form-control widthinput @error('customer_id') is-invalid @enderror" name="customer_id" id="customer" >
+                                <select class="form-control widthinput @error('customer_id') is-invalid @enderror"
+                                        name="customer_id" id="customer" multiple>
                                 </select>
                                 @error('customer_id')
                                 <span role="alert">
@@ -453,6 +454,13 @@
             placeholder : 'Select Sales Person',
             allowClear: true,
             maximumSelectionLength: 1
+        });
+        $('#customer').select2({
+            placeholder : 'Select Customer',
+            allowClear: true,
+            maximumSelectionLength: 1
+        }).on('change', function() {
+            $('#customer-error').remove();
         });
         $('#country').select2({
             placeholder : 'Select Country',
