@@ -89,7 +89,11 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Customer</label>
-                                <select class="form-control widthinput" data-trigger name="customer_id" id="customer" >
+                                <select class="form-control widthinput" multiple name="customer_id" id="customer" >
+                                    @foreach($possibleCustomers as $customer)
+                                        <option value="{{ $letterOfIndent->customer_id }}"
+                                            {{ $letterOfIndent->customer_id == $customer->id ? 'selected' : '' }} > {{ $customer->name }} </option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -417,7 +421,6 @@
             }
         });
 
-            getCustomers();
             let dealer = '{{ $letterOfIndent->dealers }}';
             showSignatureRemoveButton(dealer)
 
@@ -434,6 +437,13 @@
             }).on('change', function() {
                 getCustomers();
                 checkCountryCriterias();
+            });
+            $('#customer').select2({
+                placeholder : 'Select Customer',
+                allowClear: true,
+                maximumSelectionLength: 1
+            }).on('change', function() {
+                $('#customer-error').remove();
             });
             $('#dealer').change(function () {
                 var value = $('#dealer').val();
