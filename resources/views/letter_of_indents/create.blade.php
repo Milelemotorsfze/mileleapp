@@ -446,6 +446,11 @@
                     $('#form-create').unbind('submit').submit();
                 }
 
+
+            }
+        });
+
+
             }
         });
         $('#sales_person_id').select2({
@@ -494,14 +499,6 @@
             getModels('all','dealer-change');
         });
 
-        $('#customer-type').change(function () {
-            checkCountryCriterias();
-        });
-
-        $(document.body).on('input', ".quantities", function (e) {
-            checkCountryCriterias();
-        });
-
         function checkCountryCriterias() {
 
             let url = '{{ route('loi-country-criteria.check') }}';
@@ -534,47 +531,31 @@
                         else{
                             $('#country-comment-div').attr('hidden', true);
                         }
-                        formValid = true;
-                        if(data.customer_type_error) {
-                            formValid = false;
-                            $('#customer-type-error').html(data.customer_type_error);
-                        }
-                        else{
-                            $('#customer-type-error').attr('hidden', true);
-                        }
-                        if (data.max_qty_per_passport_error) {
-                            formValid = false;
-                            // $('#quantity-error-div').attr('hidden', false);
-                            $('#max-individual-quantity-error').html(data.max_qty_per_passport_error);
-                        } else {
-                            // formValid = true;
-                            // $('#quantity-error-div').attr('hidden', true);
-                            $('#max-individual-quantity-error').html('');
-                        }
-                        if(data.min_qty_per_company_error) {
-                            formValid = false;
-                            $('#min-company-quantity-error').html(data.min_qty_per_company_error);
-                        }else{
-                            // formValid = true;
-                            $('#min-company-quantity-error').html('');
-                        }
-                        if(data.max_qty_per_company_error) {
-                            formValid = false;
-                            $('#max-company-quantity-error').html(data.max_qty_per_company_error);
-                        }else{
-                            // formValid = true;
-                            $('#max-company-quantity-error').html('');
-                        }
-                        if(data.company_only_allowed_error) {
-                            formValid = false;
-                            $('#company-only-allowed-error').html(data.company_only_allowed_error);
-                        }else{
-                            // formValid = true;
-                            $('#company-only-allowed-error').html('');
-                        }
+
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    country_id: country,
+                    customer_type: customer_type
+                },
+                success:function (data) {
+                    if(data.comment) {
+                        $('#country-comment-div').attr('hidden', false);
+                        $('#country-comment').html(data.comment);
+                    }else{
+                        $('#country-comment-div').attr('hidden', true);
                     }
-                });
-            }
+                    if(data.customer_type_error) {
+                        formValid = false;
+                        $('#customer-type-error').html(data.customer_type_error);
+                    }else{
+                        formValid = true;
+                        $('#customer-type-error').attr('hidden', true);
+                    }
+                }
+            });
         }
         function getCustomers() {
             var country = $('#country').val();
@@ -825,7 +806,6 @@
             hideModelYear(index, value);
 
         });
-
         $(document.body).on('select2:unselect', ".sfx", function (e) {
             let index = $(this).attr('data-index');
 

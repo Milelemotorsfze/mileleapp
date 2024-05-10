@@ -142,7 +142,7 @@ $.ajaxSetup({
 <script type="text/javascript">
 	var candidates = {!! json_encode($candidates) !!};
 	var data = {!! json_encode($data) !!};
-	$(document).ready(function () {console.log(data);
+	$(document).ready(function () {
 	    $('#employee_id').select2({
 	        allowClear: true,
 	        maximumSelectionLength: 1,
@@ -177,6 +177,7 @@ $.ajaxSetup({
 							$('#department_div').show();
 							document.getElementById('designation').textContent=candidates[i].designation.name;
 							document.getElementById('department').textContent=candidates[i].department.name;
+							document.getElementById('employee_code').value=candidates[i].employee_code;
 							var deptHeadId = candidates[i].department.department_head_id;
 							var deptHeadName = candidates[i].department.department_head.name;
 							var divHeadId = candidates[i].department.division.division_head_id;
@@ -231,6 +232,7 @@ $.ajaxSetup({
 				}               
 			}
 			else {
+				document.getElementById('employee_code').value='';
 				$('#employee_code_div').hide();
 				$('#designation_div').hide();
 				$('#department_div').hide();
@@ -266,6 +268,28 @@ $.ajaxSetup({
 	    errorClass: "is-invalid",
 	    errorElement: "p",     
 	});
+	jQuery.validator.addMethod("isExist", 
+	       function(value, element) {
+	           var result = true;
+				var employeeId = $("#employee_id").val();
+				var joining_type = $("#joining_type").val();
+				var joining_date = $("#joining_date").val();
+				var joining_report_id = data.id;
+				if(value != null && employeeId != null && joining_type != null && joining_date != null && joining_report_id != joining_report_id) {
+					$.ajax({
+	               type:"POST",
+	               async: false,
+	               url: "{{route('candidate.uniqueJoiningReport')}}", // script to validate in server side
+	               data: {_token: '{{csrf_token()}}',joining_type: joining_type,employeeId:employeeId,new_emp_joining_type:value,joining_date:joining_date,joining_report_id:joining_report_id},
+	               success: function(data) {
+	                   result = (data == true) ? true : false;
+	               }
+	           });
+				}
+	           return result; 
+	       }, 
+	       "A joining report for this candidate already exists."
+	   );
 	$('#joiningReportForm').validate({ 
 	    rules: {
 	        employee_id: {
@@ -279,6 +303,7 @@ $.ajaxSetup({
 	        },
 	        new_emp_joining_type: {
 	            required: true,
+				isExist: true,
 	        },
 	        joining_type: {
 	            required: true,
