@@ -547,6 +547,7 @@
                         if(data.customer_type_error) {
                             formValid = false;
                             $('#customer-type-error').html(data.customer_type_error);
+                            $('#customer-type-error').attr('hidden', false);
                         }
                         else{
                             $('#customer-type-error').attr('hidden', true);

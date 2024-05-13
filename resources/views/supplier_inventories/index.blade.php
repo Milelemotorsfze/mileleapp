@@ -110,6 +110,10 @@
                                     $colourcode = $color_code;
                                     $colourcodecount = strlen($colourcode);
                                     $extcolour = NULL;
+                                    if($colourcodecount > 5)
+                                    {
+                                    $extcolour = substr($colourcode, 0, -2);
+                                    }
                                     if($colourcodecount == 5)
                                     {
                                     $extcolour = substr($colourcode, 0, 3);
@@ -142,7 +146,7 @@
                         </td>
                         <div class="modal fade" id="view-details-{{$supplierInventory->master_model_id}}"
                              tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-scrollable">
+                            <div class="modal-dialog modal-dialog-scrollable modal-xl">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h1 class="modal-title fs-5" id="exampleModalLabel">Inventory Items</h1>
@@ -160,10 +164,12 @@
                                                             <div class="col-lg-3 col-md-12 col-sm-12">
                                                                 <label  class="form-label">Engine Number</label>
                                                             </div>
-                                                            <div class="col-lg-4 col-md-12 col-sm-12">
+                                                            <div class="col-lg-3 col-md-12 col-sm-12">
                                                                 <label class="form-label">Color Code</label>
                                                             </div>
-                                                        
+                                                            <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                <label class="form-label">Production Month</label>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -181,11 +187,14 @@
                                                                     <label  class="form-label d-lg-none d-xl-none d-xxl-none">Engine Number</label>
                                                                     <input type="text" value="{{ $data->engine_number ?? '' }}" readonly class="form-control">
                                                                 </div>
-                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                <div class="col-lg-3 col-md-12 col-sm-12">
                                                                     <label class="form-label d-lg-none d-xl-none d-xxl-none">Color Code</label>
                                                                     <input type="text" value="{{ $data->color_code ?? '' }}" readonly class="form-control">
                                                                 </div>
-                                                            
+                                                                <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Color Code</label>
+                                                                    <input type="text" value="{{ $data->production_month ?? '' }}" readonly class="form-control">
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>

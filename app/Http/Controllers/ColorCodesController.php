@@ -45,7 +45,8 @@ class ColorCodesController extends Controller
         ]);
         $name = $request->input('name');
         $belong_to = $request->input('belong_to');
-        $existingColour = ColorCode::where('name', $name)->where('belong_to', $belong_to)->first();
+        $existingColour = ColorCode::where('name', $name)->where('belong_to', $belong_to)
+            ->where('code', $request->input('code'))->first();
         if ($existingColour) {
             return redirect()->back()->with('error', 'Colour with the same name and Belong To already exists.');
         }
@@ -107,11 +108,12 @@ class ColorCodesController extends Controller
         $existingColour = ColorCode::where('name', $name)
             ->where('belong_to', $belong_to)
             ->where('id', '!=', $id)
+            ->where('code', $request->input('code'))
             ->first();
         if ($existingColour) {
             return redirect()->back()->with('error', 'Color with the same name and Belong To already exists.');
         }
-        $colourcodes = ColorCode::findOrFail($id);   
+        $colourcodes = ColorCode::findOrFail($id);
         $oldValues = $colourcodes->toArray();
         $colourcodes->name  = $name;
         $colourcodes->code = $request->input('code');
