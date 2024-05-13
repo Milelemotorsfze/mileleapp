@@ -61,19 +61,30 @@ class PortsController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $useractivities = new UserActivities();
-        $useractivities->activity = "Store New Port";
-        $useractivities->users_id = Auth::id();
-        $useractivities->save();
-        $ports = $request->input('port_name');
-        $country = $request->input('country');
-        $porting = New MasterShippingPorts();
-        $porting->name = $ports;
-        $porting->country_id = $country;  
-        $porting->save();
-        return redirect()->route('ports.index')->with('success', 'Port has been successfully added!');
+{
+    // Log the user activity
+    $useractivities = new UserActivities();
+    $useractivities->activity = "Store New Port";
+    $useractivities->users_id = Auth::id(); // Assuming you are using Laravel's default authentication
+    $useractivities->save();
+    // Get port name from the request
+    $portName = $request->input('port_name');
+    // Get country IDs from the request; assuming the name attribute of the select is 'country[]'
+    $countries = $request->input('country');
+
+    // Check if countries is an array and not empty
+    if (is_array($countries) && count($countries) > 0) {
+        foreach ($countries as $countryId) {
+            // Create a new MasterShippingPorts object for each country
+            $porting = new MasterShippingPorts();
+            $porting->name = $portName;
+            $porting->country_id = $countryId;
+            $porting->save();
+        }
     }
+    // Redirect to the ports index route with a success message
+    return redirect()->route('ports.index')->with('success', 'Port has been successfully added!');
+}
 
     /**
      * Display the specified resource.
