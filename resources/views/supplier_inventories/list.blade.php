@@ -79,6 +79,10 @@
                                             $colourcode = $color_code;
                                             $colourcodecount = strlen($colourcode);
                                             $extcolour = NULL;
+                                             if($colourcodecount > 5)
+                                            {
+                                            $extcolour = substr($colourcode, 0, -2);
+                                            }
                                             if($colourcodecount == 5)
                                             {
                                             $extcolour = substr($colourcode, 0, 3);

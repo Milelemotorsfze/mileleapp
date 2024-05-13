@@ -262,6 +262,8 @@
             });
 
             function validData(field,id) {
+                console.log(field);
+                console.log(id);
 
                 if(field == 'pord_month') {
                     let InputId = 'pord_month-editable-'+id;
@@ -335,19 +337,20 @@
                     let InputId = 'color_code-editable-'+id;
                     let colorCode = $('#'+InputId).text();
 
-                    if(colorCode.length > 5 ) {
-                        $msg = "Maximum length is 5";
+                    if(colorCode.length > 7 ) {
+                        $msg = "Maximum length is 7";
                         showValidationError(InputId,$msg);
 
-                    }else if(colorCode.length < 4) {
+                    }else if(colorCode.length < 4 && colorCode.length > 0) {
                         $msg = "Minimum length is 4";
                         showValidationError(InputId,$msg);
-                    }else{
-                        console.log("lenght is ok");
+                    } else{
+                        console.log("length is not ok");
                         removeValidationError(InputId);
                     }
 
-                    if(colorCode.length == 5 || colorCode.length == 4) {
+
+                    if(colorCode.length >= 4 && colorCode.length <= 7 ) {
                         $.ajax({
                             type:"GET",
                             url: url,
@@ -356,11 +359,13 @@
                             },
                             dataType : 'json',
                             success: function(data) {
+                                console.log(data);
                                 if(data == 0) {
                                     $msg = "This color code is not existing in our master Color Codes.";
                                     showValidationError(InputId, $msg);
                                 }else{
                                     console.log("colour code existing");
+                                    console.log(InputId);
                                     removeValidationError(InputId);
                                 }
                             }
@@ -372,7 +377,7 @@
 
                     if($.isNumeric(deliveryNote)) {
                         if(deliveryNote.length < 5) {
-                            $msg = "Delivey Note minimum length should be 5";
+                            $msg = "Delivery Note minimum length should be 5";
                             showValidationError(InputId,$msg);
                         }else {
                             removeValidationError(InputId);
@@ -444,10 +449,11 @@
             alertify.error($msg);
         }
         function removeValidationError(id){
-
+            console.log("error not found");
             feildValidInput = true;
             $('#'+id).attr('title', "");
             $('#'+id).css('color', 'black');
+            console.log(feildValidInput);
         }
     </script>
 @endpush
