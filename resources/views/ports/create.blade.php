@@ -20,14 +20,14 @@
                     <input type = "text" name = "port_name" class = "form-control" />
                 </div>
                 <div class="col-lg-4 col-md-6">
-                    <label for="to_port" class="form-label">Country</label>
-                    <select name="country" class="form-control" id="country">
-                    <option value="" disabled selected>Select To Country</option>
-                    @foreach($countries as $countries)
-                        <option value="{{ $countries->id }}">{{ $countries->name }}</option>
+                <label for="country" class="form-label">Country</label>
+                <select name="country[]" class="form-control" id="country" multiple>
+                    <option value="" disabled>Select Countries</option>
+                    @foreach($countries as $country)
+                        <option value="{{ $country->id }}">{{ $country->name }}</option>
                     @endforeach
-                    </select>
-                </div>
+                </select>
+            </div>
             </div>
             <br><br>
             <div class="col-lg-12 col-md-12">
