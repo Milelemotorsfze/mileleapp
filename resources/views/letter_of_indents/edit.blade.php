@@ -500,9 +500,9 @@
                         if(data.customer_type_error) {
                             formValid = false;
                             $('#customer-type-error').html(data.customer_type_error);
+                            $('#customer-type-error').attr('hidden', true);
                         }
                         else{
-
                             $('#customer-type-error').attr('hidden', true);
                         }
                         if (data.max_qty_per_passport_error) {
