@@ -110,7 +110,7 @@
                     <th>LOI</th>
                     <th>PFI Number </th>
                     <th>PO Number</th>
-                    <!-- <th>PO AMS</th> -->
+                    <th>Status</th>
                     @can('inventory-log-details')
                         @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('inventory-log-details');
@@ -186,8 +186,13 @@
                             <td>{{ $supplierInventory->letterOfIndentItem->uuid ?? '' }}</td>
                             <td> {{ $supplierInventory->pfi->pfi_reference_number ?? '' }} </td>
                             <td> {{ $supplierInventory->purchaseOrder->po_number ?? ''}} </td>
-                            <!-- <td data-field="po_arm" class="po_arm"  id="po_arm-editable-{{$supplierInventory->id}}"  contenteditable="true"
-                                data-id="{{$supplierInventory->id}}" >{{ $supplierInventory->po_arm }}</td> -->
+                          <td >
+                              <select class="upload_status" data-field="upload_status"
+                              data-id="{{ $supplierInventory->id }}"  id="upload_status-editable-{{$supplierInventory->id}}">
+                                  <option value="{{ \App\Models\SupplierInventory::UPLOAD_STATUS_ACTIVE }}" {{ $supplierInventory->upload_status == \App\Models\SupplierInventory::UPLOAD_STATUS_ACTIVE ? 'selected' : ''}} >{{ \App\Models\SupplierInventory::UPLOAD_STATUS_ACTIVE }} </option>
+                                  <option value="{{\App\Models\SupplierInventory::VEH_STATUS_DELETED}}" {{ $supplierInventory->upload_status == \App\Models\SupplierInventory::VEH_STATUS_DELETED ? 'selected' : ''}} >{{ \App\Models\SupplierInventory::UPLOAD_STATUS_INACTIVE }} </option>
+                              </select>
+                          </td>
 
                             @can('inventory-log-details')
                                 @php
@@ -241,6 +246,15 @@
             $('#dtBasicExample3 tbody td').on('change', '.eta-import', function () {
                 var id = $(this).data('id');
                 var field = $(this).data('field');
+                if(feildValidInput == true) {
+                    addUpdatedData(id, field);
+                }
+            });
+            $('#dtBasicExample3 tbody td').on('change', '.upload_status', function () {
+                var id = $(this).data('id');
+                var field = $(this).data('field');
+                console.log(id);
+                console.log(field);
                 if(feildValidInput == true) {
                     addUpdatedData(id, field);
                 }
@@ -403,7 +417,7 @@
                          console.log(cellId);
 
                          if(splitValue[1] == 'model_year' || splitValue[1] == 'supplier_id' ||  splitValue[1] == 'eta_import'
-                         || splitValue[1] == 'country' || splitValue[1] == 'whole_sales' ) {
+                         || splitValue[1] == 'country' || splitValue[1] == 'whole_sales' || splitValue[1] == 'upload_status' ) {
                              var cellValue = $('#'+ cellId).val();
                          }else{
                              var cellValue = $('#'+ cellId).text();
@@ -436,6 +450,7 @@
         });
         function addUpdatedData(id,field) {
             var arrayvalue = id + '-' + field;
+            console.log(arrayvalue);
 
             if ($.inArray(arrayvalue, updatedData) == -1) {
                 updatedData.push(arrayvalue);
