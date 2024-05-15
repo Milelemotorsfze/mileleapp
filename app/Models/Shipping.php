@@ -17,6 +17,8 @@ class Shipping extends Model
         'updated_at',
         'created_by',
         'to_port',
+        'sailing_date',
+        'ETA',
         'from_port',
         'shipping_medium_id',
         'suppliers_id',

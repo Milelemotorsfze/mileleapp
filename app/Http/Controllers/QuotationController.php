@@ -175,6 +175,7 @@ class QuotationController extends Controller
         $quotationDetail = new QuotationDetail();
         $quotationDetail->quotation_id  = $quotation->id;
         $quotationDetail->country_id  = $request->country_id;
+        $quotationDetail->delivery_country  = $request->countryofdischarge;
         $quotationDetail->incoterm  = $request->incoterm;
         $quotationDetail->shipping_port_id   = $request->from_shipping_port_id;
         $quotationDetail->to_shipping_port_id   = $request->to_shipping_port_id;
@@ -617,6 +618,7 @@ class QuotationController extends Controller
     if ($quotationDetail) {
     $quotationDetail->quotation_id  = $quotation->id;
         $quotationDetail->country_id  = $request->country_id;
+        $quotationDetail->delivery_country  = $request->countryofdischarge;
         $quotationDetail->incoterm  = $request->incoterm;
         $quotationDetail->shipping_port_id   = $request->from_shipping_port_id;
         $quotationDetail->to_shipping_port_id   = $request->to_shipping_port_id;
@@ -1106,10 +1108,11 @@ public function addqaddone(Request $request)
     public function getShippingCharges(Request $request) {
         info($request->from_shipping_port_id);
         info($request->to_shipping_port_id);
-        $shippingCharges = Shipping::with('shippingMedium')
+        $shippingCharges =Shipping::with('shippingMedium')
                             ->where('from_port', $request->from_shipping_port_id)
                             ->where('to_port', $request->to_shipping_port_id)
                             ->get();
+                            info($shippingCharges);               
         return $shippingCharges;
     }
     public function getvinsqoutation(Request $request)
