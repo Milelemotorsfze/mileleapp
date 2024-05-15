@@ -1455,7 +1455,6 @@ class SupplierInventoryController extends Controller
                 $inventory->$fieldName = $fieldValue;
                 $inventory->master_model_id = $masterModel->id;
             }else if($fieldName == 'color_code') {
-
                 if($fieldValue) {
                     $colourcode = $fieldValue;
                     $colourcodecount = strlen($fieldValue);
