@@ -1403,6 +1403,7 @@ class SupplierInventoryController extends Controller
         (new UserActivityController)->createActivity('Update the Supplier Inventories');
 
         $updatedDatas = $request->selectedUpdatedDatas;
+        info($request->all());
 
         DB::beginTransaction();
 
@@ -1419,7 +1420,6 @@ class SupplierInventoryController extends Controller
                     ->first();
                 $inventory->master_model_id = $masterModel->id;
             }else if($fieldName == 'eta_import') {
-
                 $inventory->$fieldName = Carbon::parse($fieldValue)->format('Y-m-d');
             }
             else if($fieldName == 'pord_month') {
@@ -1455,7 +1455,6 @@ class SupplierInventoryController extends Controller
                 $inventory->$fieldName = $fieldValue;
                 $inventory->master_model_id = $masterModel->id;
             }else if($fieldName == 'color_code') {
-
                 if($fieldValue) {
                     $colourcode = $fieldValue;
                     $colourcodecount = strlen($fieldValue);
