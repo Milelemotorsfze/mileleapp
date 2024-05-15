@@ -832,6 +832,8 @@ Route::get('/d', function () {
     Route::post('/update-notifications-status', [LeadsNotificationsController::class, 'updateStatus'])->name('update_notifications_status');
     Route::get('/viewgrnreport/method', [VehiclesController::class, 'generategrnPDF']);
 
+    Route::get('/countries/{id}/neighbors', [ProformaInvoiceController::class, 'getNeighbors']);
+
 
     
 
