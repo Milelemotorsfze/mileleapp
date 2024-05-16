@@ -6,6 +6,21 @@
 	display: block;
 	}
 	}
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+	.vertical-heading th {
+		font-size: 14px;
+	}
+    th, td {
+        border: 1px solid #e9e9ef;
+        padding: 8px;
+        text-align: left;
+    }
+	.texttransform {
+	text-transform: capitalize;
+	}
 </style>
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
@@ -27,8 +42,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 				<a class="nav-link" data-bs-toggle="pill" href="#compensation-benefits-{{$data->id}}"> Compensation & Benefits</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" data-bs-toggle="pill" href="#interview-summary-{{$data->id}}"> Interview Summary Report</a>
+				<a class="nav-link" data-bs-toggle="pill" href="#off-boarding-{{$data->id}}"> Off Boarding</a>
 			</li>
+			<!-- <li class="nav-item">
+				<a class="nav-link" data-bs-toggle="pill" href="#interview-summary-{{$data->id}}"> Interview Summary Report</a>
+			</li> -->
 			@if(isset($data) && $data->documents_form_submit_at != NULL)
 			@php
 			$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-details','requestedby-view-interview-summary','organizedby-view-interview-summary']);
@@ -1496,7 +1514,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
                 <div class="col-xxl-6 col-lg-6 col-md-6">
 					<div class="card">
 						<div class="card-header">
-							<h4 class="card-title">Salary & Hike Information</h4>
+							<h4 class="card-title">Salary & Increment Information</h4>
 						</div>
 						<div class="card-body">
 							<div class="row">											
@@ -1519,6 +1537,94 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<span>{{$data->total_salary .' AED' ?? 'NA'}}</span>
 								</div>
 							</div>
+							<div class="card-header">
+								<h4 class="card-title">Increments</h4>
+							</div>
+							</br>
+							@if(isset($data->increments) && count($data->increments) > 0) 
+							<div class="table-responsive">
+							<table class="vertical-heading">
+								<tr>
+									<th>Increment Effective Date:</th>
+									@for ($i = 0; $i < count($data->increments); $i++)
+										<td>
+											@if($data->increments[$i]->increament_effective_date != '')
+											{{\Carbon\Carbon::parse($data->increments[$i]->increament_effective_date)->format('d M Y') ?? ''}}
+											@else
+											NA
+											@endif
+										</td>
+									@endfor								
+								</tr>
+								<tr>
+									<th>Basic Salary(AED):</th>
+									@for ($i = 0; $i < count($data->increments); $i++)
+										<td>{{$data->increments[$i]->basic_salary ?? 'NA'}}</td>
+									@endfor	
+								</tr>
+								<tr>
+									<th>Other Allowances(AED):</th>
+									@for ($i = 0; $i < count($data->increments); $i++)
+										<td>{{$data->increments[$i]->other_allowances ?? 'NA'}}</td>
+									@endfor	
+								</tr>
+								<tr>
+									<th>Total Salary(AED):</th>
+									@for ($i = 0; $i < count($data->increments); $i++)
+										<td>{{$data->increments[$i]->total_salary ?? 'NA'}}</td>
+									@endfor	
+								</tr>
+								<tr>
+									<th>Increment Amount(AED):</th>
+									@for ($i = 0; $i < count($data->increments); $i++)
+										<td>{{$data->increments[$i]->increment_amount ?? 'NA'}}</td>
+									@endfor	
+								</tr>
+								<tr>
+									<th>Revised Basic Salary(AED):</th>
+									@for ($i = 0; $i < count($data->increments); $i++)
+										<td>{{$data->increments[$i]->revised_basic_salary ?? 'NA'}}</td>
+									@endfor	
+								</tr>
+								<tr>
+									<th>Revised Other Allowance(AED):</th>
+									@for ($i = 0; $i < count($data->increments); $i++)
+										<td>{{$data->increments[$i]->revised_other_allowance ?? 'NA'}}</td>
+									@endfor	
+								</tr>
+								<tr>
+									<th>Revised Total Salary(AED):</th>
+									@for ($i = 0; $i < count($data->increments); $i++)
+										<td>{{$data->increments[$i]->revised_total_salary ?? 'NA'}}</td>
+									@endfor	
+								</tr>
+								<tr>
+									<th>Request Date:</th>
+									@for ($i = 0; $i < count($data->increments); $i++)
+										<td>
+											@if($data->increments[$i]->created_at != '')
+											{{\Carbon\Carbon::parse($data->increments[$i]->created_at)->format('d M Y') ?? ''}}
+											@else
+											NA
+											@endif
+										</td>
+									@endfor	
+								</tr>
+								<tr>
+									<th>Created By:</th>
+									@for ($i = 0; $i < count($data->increments); $i++)
+										<td>{{$data->increments[$i]->createdBy->name ?? 'NA'}}</td>
+									@endfor	
+								</tr>
+							</table>
+							</div>
+							@else
+							<div class="row">
+								<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+									<label for="choices-single-default" class="form-label">There are no details about salary increments added in this system.</label>
+								</div>
+							</div>
+							@endif
 						</div>
 					</div>
 					<div class="card">
@@ -1526,32 +1632,76 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<h4 class="card-title">Insurance Policy Information</h4>
 						</div>
 						<div class="card-body">
-							<div class="row">											
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<label for="choices-single-default" class="form-label"> Insurance Policy No. :</label>
+							@if(isset($data->insurance) && count($data->insurance) > 0) 
+								<div class="table-responsive">
+								<table class="vertical-heading">
+									<tr>
+										<th>Insurance Policy Number:</th>
+										@for ($i = 0; $i < count($data->insurance); $i++)
+											<td>
+												{{$data->insurance[$i]->insurance_policy_number ?? 'NA'}}
+											</td>
+										@endfor								
+									</tr>
+									<tr>
+										<th>Insurance Card Number:</th>
+										@for ($i = 0; $i < count($data->insurance); $i++)
+											<td>
+												{{$data->insurance[$i]->insurance_card_number ?? 'NA'}}
+											</td>
+										@endfor	
+									</tr>
+									<tr>
+										<th>Insurance Policy Start Date:</th>
+										@for ($i = 0; $i < count($data->insurance); $i++)
+											<td>
+												@if($data->insurance[$i]->insurance_policy_start_date != '')
+												{{\Carbon\Carbon::parse($data->insurance[$i]->insurance_policy_start_date)->format('d M Y') ?? ''}}
+												@else
+												NA
+												@endif
+											</td>
+										@endfor	
+									</tr>
+									<tr>
+										<th>Insurance Policy End Date:</th>
+										@for ($i = 0; $i < count($data->insurance); $i++)
+											<td>
+												@if($data->insurance[$i]->created_at != '')
+												{{\Carbon\Carbon::parse($data->insurance[$i]->created_at)->format('d M Y') ?? ''}}
+												@else
+												NA
+												@endif
+											</td>
+										@endfor	
+									</tr>
+									<tr>
+										<th>Request Date:</th>
+										@for ($i = 0; $i < count($data->insurance); $i++)
+											<td>
+												@if($data->insurance[$i]->created_at != '')
+												{{\Carbon\Carbon::parse($data->insurance[$i]->created_at)->format('d M Y') ?? ''}}
+												@else
+												NA
+												@endif
+											</td>
+										@endfor	
+									</tr>
+									<tr>
+										<th>Created By:</th>
+										@for ($i = 0; $i < count($data->insurance); $i++)
+											<td>{{$data->insurance[$i]->createdBy->name ?? 'NA'}}</td>
+										@endfor	
+									</tr>
+								</table>
 								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<span>{{ $data->cec_or_person_code_number ?? 'NA' }}</span>
+							@else
+								<div class="row">
+									<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+										<label for="choices-single-default" class="form-label">There are no details about insurance policy added in this system.</label>
+									</div>
 								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<label for="choices-single-default" class="form-label"> Insurance Card No. :</label>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<span>{{ $data->emirates_id ?? 'NA' }}</span>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<label for="choices-single-default" class="form-label"> Insurance Policy Start Date :</label>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<span>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}} @else NA @endif</span>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<label for="choices-single-default" class="form-label"> Insurance Policy End Date :</label>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<span>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}} @else NA @endif</span>
-								</div>
-							</div>
+							@endif
 						</div>
 					</div>
                 </div>
@@ -1561,32 +1711,68 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<h4 class="card-title">Ticket Allowance Information</h4>
 						</div>
 						<div class="card-body">
-							<div class="row">											
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<label for="choices-single-default" class="form-label"> Insurance Policy No. :</label>
+							@if(isset($data->ticket) && count($data->ticket) > 0) 
+								<div class="table-responsive">
+								<table class="vertical-heading">
+									<tr>
+										<th>Ticket Allowance Eligibility Year:</th>
+										@for ($i = 0; $i < count($data->ticket); $i++)
+											<td>
+												{{$data->ticket[$i]->eligibility_year ?? 'NA'}}
+											</td>
+										@endfor								
+									</tr>
+									<tr>
+										<th>Ticket Allowance Eligibility Date:</th>
+										@for ($i = 0; $i < count($data->ticket); $i++)
+											<td>
+												@if($data->ticket[$i]->eligibility_date != '')
+												{{\Carbon\Carbon::parse($data->ticket[$i]->eligibility_date)->format('d M Y') ?? ''}}
+												@else
+												NA
+												@endif
+											</td>
+										@endfor	
+									</tr>
+									<tr>
+										<th>Ticket Allowance PO Year:</th>
+										@for ($i = 0; $i < count($data->ticket); $i++)
+											<td>{{$data->ticket[$i]->po_year ?? 'NA'}}</td>
+										@endfor	
+									</tr>
+									<tr>
+										<th>Ticket Allowance PO Number:</th>
+										@for ($i = 0; $i < count($data->ticket); $i++)
+											<td>{{$data->ticket[$i]->po_number ?? 'NA'}}</td>
+										@endfor	
+									</tr>
+									<tr>
+										<th>Request Date:</th>
+										@for ($i = 0; $i < count($data->ticket); $i++)
+											<td>
+												@if($data->ticket[$i]->created_at != '')
+												{{\Carbon\Carbon::parse($data->ticket[$i]->created_at)->format('d M Y') ?? ''}}
+												@else
+												NA
+												@endif
+											</td>
+										@endfor	
+									</tr>
+									<tr>
+										<th>Created By:</th>
+										@for ($i = 0; $i < count($data->ticket); $i++)
+											<td>{{$data->ticket[$i]->createdBy->name ?? 'NA'}}</td>
+										@endfor	
+									</tr>
+								</table>
 								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<span>{{ $data->cec_or_person_code_number ?? 'NA' }}</span>
+							@else
+								<div class="row">
+									<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+										<label for="choices-single-default" class="form-label">There are no details about ticket allowance added in this system.</label>
+									</div>
 								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<label for="choices-single-default" class="form-label"> Insurance Card No. :</label>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<span>{{ $data->emirates_id ?? 'NA' }}</span>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<label for="choices-single-default" class="form-label"> Insurance Policy Start Date :</label>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<span>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}} @else NA @endif</span>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<label for="choices-single-default" class="form-label"> Insurance Policy End Date :</label>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<span>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}} @else NA @endif</span>
-								</div>
-							</div>
+							@endif
 						</div>
 					</div>
 					<div class="card">
@@ -1594,35 +1780,118 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 							<h4 class="card-title">Birthday Gift PO Information</h4>
 						</div>
 						<div class="card-body">
-							<div class="row">											
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<label for="choices-single-default" class="form-label"> Insurance Policy No. :</label>
+							@if(isset($data->birthdayGift) && count($data->birthdayGift) > 0) 
+								<div class="table-responsive">
+								<table class="vertical-heading">
+									<tr>
+										<th>Birthday Gift PO For Year:</th>
+										@for ($i = 0; $i < count($data->birthdayGift); $i++)
+											<td>
+												{{$data->birthdayGift[$i]->po_year ?? 'NA'}}
+											</td>
+										@endfor								
+									</tr>
+									<tr>
+										<th>Birthday Gift PO Number:</th>
+										@for ($i = 0; $i < count($data->birthdayGift); $i++)
+											<td>
+												{{$data->birthdayGift[$i]->po_number ?? 'NA'}}
+											</td>
+										@endfor	
+									</tr>
+									<tr>
+										<th>Request Date:</th>
+										@for ($i = 0; $i < count($data->birthdayGift); $i++)
+											<td>
+												@if($data->birthdayGift[$i]->created_at != '')
+												{{\Carbon\Carbon::parse($data->birthdayGift[$i]->created_at)->format('d M Y') ?? ''}}
+												@else
+												NA
+												@endif
+											</td>
+										@endfor	
+									</tr>
+									<tr>
+										<th>Created By:</th>
+										@for ($i = 0; $i < count($data->birthdayGift); $i++)
+											<td>{{$data->birthdayGift[$i]->createdBy->name ?? 'NA'}}</td>
+										@endfor	
+									</tr>
+								</table>
 								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<span>{{ $data->cec_or_person_code_number ?? 'NA' }}</span>
+							@else
+								<div class="row">
+									<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+										<label for="choices-single-default" class="form-label">There are no details about birthday gift PO added in this system.</label>
+									</div>
 								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<label for="choices-single-default" class="form-label"> Insurance Card No. :</label>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<span>{{ $data->emirates_id ?? 'NA' }}</span>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<label for="choices-single-default" class="form-label"> Insurance Policy Start Date :</label>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<span>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}} @else NA @endif</span>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<label for="choices-single-default" class="form-label"> Insurance Policy End Date :</label>
-								</div>
-								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
-									<span>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}} @else NA @endif</span>
-								</div>
-							</div>
+							@endif
 						</div>
 					</div>
 				</div>
+			</div>
+		</div>
+		<div class="tab-pane fade" id="off-boarding-{{$data->id}}">
+			<div class="row">
+                <div class="col-xxl-12 col-lg-12 col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<h4 class="card-title">Off Boarding Information</h4>
+						</div>
+						<div class="card-body">
+							<div class="row">											
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Leaving Type :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span class="texttransform">{{ $data->leaving_type ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label">Leaving Reason :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->leaving_reason ?? 'NA' }}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Notice Period to Serve :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span class="texttransform">{{$data->notice_period_to_serve ?? 'NA'}}</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Notice Period Duration :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>{{ $data->notice_period_duration ?? 'NA' }} @if($data->notice_period_duration != '') Days @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Last Working Day :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->last_working_day != ''){{\Carbon\Carbon::parse($data->last_working_day)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Visa Cancellation Received Date :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->visa_cancellation_received_date != ''){{\Carbon\Carbon::parse($data->visa_cancellation_received_date)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Change Status Date/Exit UAE Date :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span>@if($data->change_status_or_exit_UAE_date != ''){{\Carbon\Carbon::parse($data->change_status_or_exit_UAE_date)->format('d M Y')}} @else NA @endif</span>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<label for="choices-single-default" class="form-label"> Insurance Cancellation Done :</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-12">
+									<span class="texttransform">{{ $data->insurance_cancellation_done ?? 'NA' }}</span>
+								</div>								
+							</div>
+						</div>
+					</div>
+                </div>
 			</div>
 		</div>
 	</div>

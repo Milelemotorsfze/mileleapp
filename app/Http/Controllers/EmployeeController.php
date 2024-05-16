@@ -39,7 +39,7 @@ class EmployeeController extends Controller
                 }
            } 
            catch (\Exception $e) {
-               dd($e);
+               info($e);
            }
         }
     }
@@ -67,7 +67,7 @@ class EmployeeController extends Controller
         }
     }
     public function show($id) {
-        $data = EmployeeProfile::where('id',$id)->with('empEmergencyContactUAE')->first();
+        $data = EmployeeProfile::where('id',$id)->first();
         // dd($data);
         $previous = EmployeeProfile::where('id', '<', $id)->max('id');
         $next = EmployeeProfile::where('id', '>', $id)->min('id');

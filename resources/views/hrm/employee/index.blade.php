@@ -80,31 +80,44 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 <div class="portfolio">
 	<ul class="nav nav-pills nav-fill" id="my-tab">
 		<li class="nav-item">
-			<a class="nav-link active" data-bs-toggle="pill" href="#shortlisted-for-interview">Active</a>
+			<a class="nav-link active" data-bs-toggle="pill" href="#active_personal_info">Personal Info</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="pill" href="#telephonic_interview">Inactive</a>
+			<a class="nav-link" data-bs-toggle="pill" href="#active_contact_info">Contact Info</a>
+		</li>
+        <li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#active_visa_info">Visa Info</a>
+		</li>
+        <li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#active_employment_info">Employment Info</a>
+		</li>
+        <li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#active_compensation_benefits">Compensation & Benefits</a>
+		</li>
+        <li class="nav-item">
+			<a class="nav-link" data-bs-toggle="pill" href="#active_off_boarding">Off Boarding</a>
 		</li>
 	</ul>
 </div>
 <div class="tab-content" id="selling-price-histories" >
-	<div class="tab-pane fade show active" id="shortlisted-for-interview">
+	<div class="tab-pane fade show active" id="active_personal_info">
 		<div class="card-body">
 			<div class="table-responsive">
 				<table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
 					<thead>
 						<tr>
                             <!-- <th>Sl No</th> -->
-							<th>Employee Code</th>
+							<th>Code</th>
 							<th>Name</th>
                             <th>Designation</th>
 							<th>Department</th>
-							<th>Company Number</th>
-							<th>Company Email</th>
-							<th>Work Location</th>
-                            <th>Division</th>
-							<th>Team Lead/Reporting Manager</th>
-                            <th>Division Head</th>
+                            <th>Gender</th>
+							<th>DOB</th>
+                            <th>Birthday Month</th>
+							<th>Age</th>
+                            <th>Marital Status</th>
+							<th>Religion</th>
+                            <th>Nationality</th>
                             <th>Action</th>
 						</tr>
 					</thead>
@@ -117,54 +130,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td>{{ $data->user->name ?? $data->first_name.' '.$data->last_name ?? '' }}</td>
 							<td>{{ $data->designation->name ?? '' }}</td>
 							<td>{{ $data->department->name ?? '' }}</td>
-							<td>{{$data->company_number ?? ''}}</td>
-							<td>{{$data->user->email ?? ''}}</td>
-                            <td>{{$data->location->name ?? ''}}</td>
-							<td>{{$data->department->division->name ?? ''}}</td>
-							<td>{{$data->teamLeadOrReportingManager->name ?? ''}}</td>
-							<td>{{$data->department->division->divisionHead->name ?? ''}}</td>
-                            <td>
-								<div class="dropdown">
-									<button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
-									<i class="fa fa-bars" aria-hidden="true"></i>
-									</button>
-									<ul class="dropdown-menu dropdown-menu-end">
-                                        @php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['insert-employee-company-email']);
-										@endphp
-										@if ($hasPermission)
-										<li>
-											<button style="width:100%; margin-top:2px; margin-bottom:2px;" title="Give System Access" type="button" 
-                                            class="btn btn-success btn-sm hiring-request-delete sm-mt-3" data-id="{{ $data->id }}" 
-                                            data-url="">
-											<i class="fa fa-plus"></i> System Access
-											</button>
-										</li>
-										@endif
-										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-details']);
-										@endphp
-										@if ($hasPermission)
-										<li><a style="width:100%; margin-top:2px; margin-bottom:2px;" title="View Details" class="btn btn-sm btn-warning" 
-                                        href="{{route('employee.show',$data->id)}}">
-											<i class="fa fa-eye" aria-hidden="true"></i> View Details
-											</a>
-										</li>
-										@endif
-										@php
-										$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-all-employee-details']);
-										@endphp
-										@if ($hasPermission)
-										<li>
-											<a style="width:100%; margin-top:2px; margin-bottom:2px;" title="Edit" class="btn btn-sm btn-info" 
-                                            href="{{route('employee.edit',$data->id)}}">
-											<i class="fa fa-edit" aria-hidden="true"></i> Edit
-											</a>
-										</li>
-										@endif
-									</ul>
-								</div>
-							</td>
+							<td>{{ $data->genderName->name ?? '' }}</td>
+							<td>@if($data->dob != ''){{\Carbon\Carbon::parse($data->dob)->format('d M Y')}}@endif</td>
+							<td>@if($data->dob != ''){{\Carbon\Carbon::parse($data->dob)->format('F')}}@endif	</td>
+							<td>@if($data->dob != ''){{\Carbon\Carbon::parse($data->dob)->age}}@endif</td>
+							<td>{{$data->maritalStatus->name ?? ''}}</td>
+							<td>{{$data->religionName->name ?? ''}}</td>
+							<td>{{$data->countryMaster->nationality ?? $data->countryMaster->name ?? $data->countryMaster->iso_3166_code ?? ''}}</td>
+                            @include('hrm.employee.action')
 						</tr>
 						@endforeach
 					</tbody>
@@ -172,16 +145,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 			</div>
 		</div>
 	</div>
-	<div class="tab-pane fade show" id="telephonic_interview">
+	<div class="tab-pane fade show" id="active_contact_info">
 		<div class="card-body">
 			<div class="table-responsive">
 			<table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
 					<thead>
 						<tr>
-							<th rowspan="2" class="light">Sl No</th>
-							<th colspan="11" class="dark">
-								<center>PERSONAL INFORMATION</center>
-							</th>
+							<th rowspan="2" class="light">Code</th>
+                            <th rowspan="2" class="dark">Name</th>
 							<th colspan="8" class="light">
 								<center>CONTACT INFORMATION</center>
 							</th>
@@ -191,28 +162,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<th colspan="6" class="light">
 								<center>EMERGENCY CONTACT IN HOME COUNTRY</center>
 							</th>
-							<th colspan="16" class="dark">
-								<center>VISA INFORMATION</center>
-							</th>
-							<th colspan="15" class="light">
-								<center>EMPLOYMENT INFORMATION</center>
-							</th>
-							<th colspan="17" class="dark"><center>COMPENSATION & BENEFITS</center></th>
-							<th colspan="8" class="light"><center>OFF BOARDING</center></th>
 						</tr>
 						<tr>
-							<td class="dark">Employee Code</td>
-							<td class="dark">Name</td>
-                            <td class="dark">Designation</td>
-							<td class="dark">Department</td>
-                            <td class="dark">Gender</td>
-							<td class="dark">DOB</td>
-                            <td class="dark">Birthday Month</td>
-							<td class="dark">Age</td>
-                            <td class="dark">Marital Status</td>
-							<td class="dark">Religion</td>
-                            <td class="dark">Nationality</td>
-
 							<td class="light">Company Number</td>
 							<td class="light">Personal Number</td>
 							<td class="light">Personal Email</td>
@@ -220,7 +171,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td class="light">Father's Name</td>
 							<td class="light">Mother's Name</td>
                             <td class="light">UAE Address</td>
-							<td class="light">Home Country Address</td>
+							<td class="light">Home Address</td>
 
 							<td class="dark">Name</td>
 							<td class="dark">Relation</td>
@@ -233,89 +184,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td class="light">Contact Number</td>
 							<td class="light">Alternative Number</td>
 							<td class="light">Email</td>
-							<td class="light">Home Country Address</td>
+							<td class="light">Home Address</td>
 
-							<td class="dark">CEC/Person Code No.</td>
-							<td class="dark">Emirates ID</td>
-                            <td class="dark">Emirates ID Expiry</td>
-							<td class="dark">Passport Number</td>
-                            <td class="dark">Passport Issue Date</td>
-							<td class="dark">Passport Expiry</td>
-                            <td class="dark">Passport Issued Place</td>
-							<td class="dark">Passport Status</td>
-                            <td class="dark">Passport Status Remarks</td>
-                            <td class="dark">Visa Type</td>
-                            <td class="dark">Visa Number</td>
-                            <td class="dark">Visa Issue Date</td>
-							<td class="dark">Visa Expiry Date</td>
-                            <td class="dark">Visa Renewal Reminder</td>
-                            <td class="dark">Visa Issuing Country</td>
-                            <td class="dark">Sponsorship</td>
-
-                            <td class="light">Joining Date</td>
-							<td class="light">Status</td>
-							<td class="light">Status Date</td>
-							<td class="light">Pobation Duration</td>
-							<td class="light">Probation Period Start</td>
-							<td class="light">Probation Period End</td>
-                            <td class="light">Employment Contract Type</td>
-							<td class="light">Employment Contract Start</td>
-                            <td class="light">Employment Contract End</td>
-							<td class="light">Contract Probation Period</td>
-							<!-- <td class="light">Contract Pobation Duration</td> -->
-							<td class="light">Contract Probation End</td>
-							<td class="light">Work Location</td>
-                            <td class="light">Division</td>
-							<td class="light">Team Lead/Reporting Manager</td>
-                            <td class="light">Division Head</td>
-
-							<td class="dark">Basic Salary</td>
-							<td class="dark">Other Allowances</td>
-                            <td class="dark">Total Salary</td>
-							<td class="dark">Increment Effective Date</td>
-                            <td class="dark">Increment Amount</td>
-							<td class="dark">Revised Basic Salary</td>
-                            <td class="dark">Revised Other Allowance</td>
-							<td class="dark">Revised Total Salary</td>
-                            <td class="dark">Insurance Policy No.</td>
-                            <td class="dark">Insurance Card No.</td>
-                            <td class="dark">Insurance Policy Start</td>
-                            <td class="dark">Insurance Policy End</td>
-							<td class="dark">Birthday Gift PO for Year</td>
-                            <td class="dark">Birthday Gift PO Number</td>
-                            <td class="dark">Ticket Allowance Eligibility Year</td>
-                            <td class="dark">Ticket Allowance Eligibility Date</td>
-							<td class="dark">Ticket Allowance PO for Year</td>
-
-							<td class="light">Leaving Type</td>
-							<td class="light">Leaveing Reason</td>
-							<td class="light">Notice Period to Serve</td>
-							<td class="light">Notice Period Duration</td>
-							<td class="light">Last Working Day</td>
-							<td class="light">Visa Cancellation Received Date</td>
-                            <td class="light">Change Status Date/Exit UAE Date</td>
-							<td class="light">Insurance Cancellation Done</td>
+							
 						</tr>
 					</thead>
 					<tbody>
 						<div hidden>{{$i=0;}}</div>
-						@foreach ($inactiveEmployees as $key => $data)
+						@foreach ($activeEmployees as $key => $data)
 						<tr data-id="1">
-							<td>{{ ++$i }}</td>
 							<td>{{ $data->employee_code ?? ''}}</td>
 							<td>{{ $data->user->name ?? '' }}</td>
-							<td>{{ $data->designation->name ?? '' }}</td>
-							<td>{{ $data->department->name ?? '' }}</td>
-							<td>{{ $data->genderName->name ?? '' }}</td>
-							<td>@if($data->dob != ''){{\Carbon\Carbon::parse($data->dob)->format('d M Y')}}@endif</td>
-							<td>@if($data->dob != ''){{\Carbon\Carbon::parse($data->dob)->format('F')}}@endif	</td>
-							<td>@if($data->dob != ''){{\Carbon\Carbon::parse($data->dob)->age}}@endif</td>
-							<td>{{$data->maritalStatus->name ?? ''}}</td>
-							<td>{{$data->religionName->name ?? ''}}</td>
-							<td>{{$data->countryMaster->nationality ?? $data->countryMaster->name ?? $data->countryMaster->iso_3166_code ?? ''}}</td>
-
+                            <td>{{$data->company_number ?? ''}}</td>
 							<td>{{$data->contact_number ?? ''}}</td>
-							<td>{{$data->company_number ?? ''}}</td>
+							
 							<td>{{$data->personal_email_address ?? ''}}</td>
 							<td>{{$data->user->email ?? ''}}</td>
 							<td>{{$data->name_of_father ?? ''}}</td>
@@ -334,8 +216,49 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td></td>
 							<td></td>
 							<td></td>
-							<td></td>
-							
+							<td></td>							
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+    <div class="tab-pane fade show" id="active_visa_info">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
+					<thead>
+						<tr>
+                            <!-- <th>Sl No</th> -->
+							<th>Code</th>
+							<th>Name</th>
+                            <th>CEC/Person Code No.</th>
+							<th>Emirates ID</th>
+                            <th>Emirates ID Expiry</th>
+							<th>Passport Number</th>
+                            <th>Passport Issue Date</th>
+							<th>Passport Expiry</th>
+                            <th>Passport Issued Place</th>
+							<th>Passport Status</th>
+                            <th>Passport Status Remarks</th>
+                            <th>Visa Type</th>
+                            <th>Visa Number</th>
+                            <th>Visa Issue Date</th>
+							<th>Visa Expiry Date</th>
+                            <th>Visa Renewal Reminder</th>
+                            <th>Visa Issuing Country</th>
+                            <th>Sponsorship</th>
+                            <th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($activeEmployees as $key => $data)
+						<tr data-id="1">
+							<!-- <td>{{ ++$i }}</td> -->
+							<td>{{ $data->employee_code ?? ''}}</td>
+							<td>{{ $data->user->name ?? $data->first_name.' '.$data->last_name ?? '' }}</td>
 							<td>{{$data->cec_or_person_code_number ?? ''}}</td>
 							<td>{{$data->emirates_id ?? ''}}</td>
 							<td>@if($data->emirates_expiry != ''){{\Carbon\Carbon::parse($data->emirates_expiry)->format('d M Y')}}@endif</td>
@@ -352,7 +275,49 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td>@if($data->reminder_date_for_visa_renewal != ''){{\Carbon\Carbon::parse($data->reminder_date_for_visa_renewal)->format('d M Y')}}@endif</td>
 							<td>@if($data->visa_issueing_country == 253) UAE @else {{$data->visaIssueCountry->name ?? ''}} @endif</td>
 							<td>{{$data->sponsorshipName->name ?? ''}}</td>
+                            <!-- @include('hrm.employee.action') -->
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+    <div class="tab-pane fade show" id="active_employment_info">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
+					<thead>
+						<tr>
+                            <!-- <th>Sl No</th> -->
+							<th>Code</th>
+							<th>Name</th>
+                            <th>Joining Date</th>
+							<th>Status</th>
+							<th>Status Date</th>
+							<th>Pobation Duration</th>
+							<th>Probation Period Start</th>
+							<th>Probation Period End</th>
+                            <th>Employment Contract Type</th>
+							<th>Employment Contract Start</th>
+                            <th>Employment Contract End</th>
+							<th>Contract Probation Period</th>
+							<th>Contract Probation End</th>
+							<th>Work Location</th>
+                            <th>Division</th>
+							<th>Team Lead/Reporting Manager</th>
+                            <th>Division Head</th>
 
+                            <th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($activeEmployees as $key => $data)
+						<tr data-id="1">
+							<!-- <td>{{ ++$i }}</td> -->
+							<td>{{ $data->employee_code ?? ''}}</td>
+							<td>{{ $data->user->name ?? $data->first_name.' '.$data->last_name ?? '' }}</td>
 							<td>@if($data->company_joining_date != ''){{\Carbon\Carbon::parse($data->company_joining_date)->format('d M Y')}}@endif</td>
 							<td>{{$data->current_status_name ?? ''}}</td>
 							<td>@if($data->status_date != ''){{\Carbon\Carbon::parse($data->status_date)->format('d M Y')}}@endif</td>
@@ -368,7 +333,53 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td>{{$data->department->division->name ?? ''}}</td>
 							<td>{{$data->teamLeadOrReportingManager->name ?? ''}}</td>
 							<td>{{$data->department->division->divisionHead->name ?? ''}}</td>
-
+                            <!-- @include('hrm.employee.action') -->
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+    <div class="tab-pane fade show" id="active_compensation_benefits">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
+					<thead>
+						<tr>
+                            <!-- <th>Sl No</th> -->
+							<th>Code</th>
+							<th>Name</th>
+                            <th>Basic Salary</th>
+							<th>Other Allowances</th>
+                            <th>Total Salary</th>
+							<th>Increment Effective Date</th>
+                            <th>Increment Amount</th>
+							<th>Revised Basic Salary</th>
+                            <th>Revised Other Allowance</th>
+							<th>Revised Total Salary</th>
+                            <th>Insurance Policy No.</th>
+                            <th>Insurance Card No.</th>
+                            <th>Insurance Policy Start</th>
+                            <th>Insurance Policy End</th>
+							<th>Birthday Gift PO for Year</th>
+                            <th>Birthday Gift PO Number</th>
+                            <th>Ticket Allowance Eligibility Year</th>
+                            <th>Ticket Allowance Eligibility Date</th>
+							<th>Ticket Allowance PO for Year</th>
+                            <th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($activeEmployees as $key => $data)
+						<tr data-id="1">
+							<!-- <td>{{ ++$i }}</td> -->
+							<td>{{ $data->employee_code ?? ''}}</td>
+							<td>{{ $data->user->name ?? $data->first_name.' '.$data->last_name ?? '' }}</td>
+							<td>{{$data->basic_salary .' AED' ?? ''}}</td>
+							<td>{{$data->other_allowances .' AED' ?? ''}}</td>
+							<td>{{$data->total_salary .' AED' ?? ''}}</td>
 							<td></td>
 							<td></td>
 							<td></td>
@@ -383,18 +394,50 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 							<td></td>
 							<td></td>
 							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
-							<td></td>
+							<!-- @include('hrm.employee.action') -->
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+    <div class="tab-pane fade show" id="active_off_boarding">
+		<div class="card-body">
+			<div class="table-responsive">
+				<table class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
+					<thead>
+						<tr>
+                            <!-- <th>Sl No</th> -->
+							<th>Code</th>
+							<th>Name</th>
+                            <td>Leaving Type</td>
+							<td>Leaveing Reason</td>
+							<td>Notice Period to Serve</td>
+							<td>Notice Period Duration</td>
+							<td>Last Working Day</td>
+							<td>Visa Cancellation Received Date</td>
+                            <td>Change Status Date/Exit UAE Date</td>
+							<td>Insurance Cancellation Done</td>
+                            <th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<div hidden>{{$i=0;}}</div>
+						@foreach ($activeEmployees as $key => $data)
+						<tr data-id="1">
+							<!-- <td>{{ ++$i }}</td> -->
+							<td>{{ $data->employee_code ?? ''}}</td>
+							<td>{{ $data->user->name ?? $data->first_name.' '.$data->last_name ?? '' }}</td>
+							<td class="texttransform">{{ $data->leaving_type ?? '' }}</td>
+							<td>{{ $data->leaving_reason ?? '' }}</td>
+							<td class="texttransform">{{$data->notice_period_to_serve ?? ''}}</td>
+							<td>{{ $data->notice_period_duration ?? '' }} @if($data->notice_period_duration != '') Days @endif</td>
+							<td>@if($data->last_working_day != ''){{\Carbon\Carbon::parse($data->last_working_day)->format('d M Y') ?? ''}}@endif</td>
+							<td>@if($data->visa_cancellation_received_date != ''){{\Carbon\Carbon::parse($data->visa_cancellation_received_date)->format('d M Y') ?? ''}}@endif</td>
+							<td>@if($data->change_status_or_exit_UAE_date != ''){{\Carbon\Carbon::parse($data->change_status_or_exit_UAE_date)->format('d M Y') ?? ''}}@endif</td>
+							<td class="texttransform">{{ $data->insurance_cancellation_done ?? '' }}</td>
+                           	<!-- @include('hrm.employee.action') -->
 						</tr>
 						@endforeach
 					</tbody>
@@ -418,6 +461,76 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-all-employee-
 	        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 	    }
 	});
+	jQuery.validator.setDefaults({
+	       errorClass: "is-invalid",
+	       errorElement: "p",
+	       errorPlacement: function ( error, element ) {
+	           error.addClass( "invalid-feedback font-size-13" );
+	           if ( element.prop( "type" ) === "tel" ) {
+	               if (!element.val() || element.val().length === 0) {
+	                   console.log("Error is here with length", element.val().length);
+	                   error.addClass('select-error');
+	                   error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+	               } else {
+	                   console.log("No error");
+	               }
+	           }
+	           else
+			 if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+	               if (!element.val() || element.val().length === 0) {
+	                   console.log("Error is here with length", element.val().length);
+	                   error.addClass('select-error');
+	                   error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+	               } else {
+	                   console.log("No error");
+	               }
+	           }
+			// else if (element.parent().hasClass('input-group')) {
+	           //     error.insertAfter(element.parent());
+	           // }
+	           else {
+	               error.insertAfter( element );
+	           }
+	       }
+	   });
+	   jQuery.validator.addMethod("uniqueEmail", 
+	       function(value, element) {
+	           var result = false;
+	           $.ajax({
+	               type:"POST",
+	               async: false,
+	               url: "{{route('user.uniqueEmail')}}", // script to validate in server side
+	               data: {email: value},
+	               success: function(data) {
+	                   result = (data == true) ? true : false;
+	               }
+	           });
+	           // return true if username is exist in database
+	           return result; 
+	       }, 
+	       "This Email is already taken! Try another."
+	   );
+	   $.validator.addMethod("domain", function(value, element) {
+    return this.optional(element) || /^.+@milele\.com$/.test(value);
+}, "Please enter an email address with the domain '@milele.com'");
+
+	$('.give-system-access-class').click(function (e) {
+	        var id = $(this).attr('data-id');
+	        var status = $(this).attr('data-status');
+			$('#form_'+id).validate({ 
+				rules: {
+					email: {
+						required: true,
+						email: true,
+						uniqueEmail : true,
+						domain: true
+					},
+					name: {
+						required:true,
+					}
+				},
+			});
+		})
 </script>
 
 @endpush
