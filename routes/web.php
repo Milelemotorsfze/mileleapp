@@ -165,6 +165,11 @@ Route::get('/d', function () {
     Route::get('users/makeActive/{id}', [UserController::class, 'makeActive'])->name('users.makeActive');
     Route::get('users/restore/{id}', [UserController::class, 'restore'])->name('users.restore');
     Route::get('users/destroy/{id}', [UserController::class,'delete'])->name('users.delete');
+    Route::controller(UserController::class)->group(function() {
+        Route::post('user/email-unique-check', 'uniqueEmail')->name('user.uniqueEmail');
+        Route::post('user/create-access-request', 'createAccessRequest')->name('user.createAccessRequest');  
+        Route::get('user/create-password-request/{id}','createLogin')->name('users.createLogin');
+    });
     // Role
     Route::resource('roles', RoleController::class);
     Route::get('roles/destroy/{id}', [RoleController::class,'delete'])->name('roles.delete');

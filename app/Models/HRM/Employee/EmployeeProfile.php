@@ -20,6 +20,9 @@ use App\Models\Country;
 use App\Models\EmpDoc;
 use App\Models\HRM\Hiring\InterviewSummaryReport;
 use App\Models\HRM\Employee\JoiningReport;
+use App\Models\HRM\Employee\Increment;
+use App\Models\HRM\Employee\TicketAllowance;
+use App\Models\HRM\Employee\BirthdayGift;
 class EmployeeProfile extends Model
 {
     use HasFactory, SoftDeletes;
@@ -295,5 +298,13 @@ class EmployeeProfile extends Model
     public function candidateJoiningReport() {
         return $this->hasMany(JoiningReport::class,'candidate_id','id');
     }
-    
+    public function increments() {
+        return $this->hasMany(Increment::class,'employee_id','user_id')->orderBy('increament_effective_date','DESC');
+    }
+    public function ticket() {
+        return $this->hasMany(TicketAllowance::class,'employee_id','user_id')->orderBy('eligibility_year','DESC');
+    }
+    public function insurance() {
+        return $this->hasMany(Insurance::class,'employee_id','user_id')->orderBy('insurance_policy_end_date','DESC');
+    }
 }
