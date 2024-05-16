@@ -148,7 +148,7 @@ class LOIItemsController extends Controller
             $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
 
         }
-        $LOI->loi_approval_date = Carbon::now()->format('Y-m-d');
+        $LOI->loi_approval_date = $request->loi_approval_date;
         $LOI->save();
         return response(true);
 

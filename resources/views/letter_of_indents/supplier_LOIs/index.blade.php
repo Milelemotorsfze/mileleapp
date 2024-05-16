@@ -13,6 +13,10 @@
         body.modal-open {
             overflow: hidden;
         }
+        .widthinput{
+            height:32px!important;
+
+        }
     </style>
 
     <div class="card-header">
@@ -289,9 +293,18 @@
                                                                     <dl>{{ $letterOfIndent->prefered_location }} </dl>
                                                                 </div>
                                                             </div>
+                                                            <div class="row">
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <dt class="form-label font-size-13 text-muted">Rejection Date :</dt>
+                                                                </div>
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                    <input type="date" name="loi_approval_date" id="rejection-date"
+                                                                           required class="form-control widthinput" >
+                                                                </div>
+                                                            </div>
                                                             <div class="row mt-2">
                                                                 <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">Reason :</label>
+                                                                    <dt class="form-label font-size-13 text-muted">Reason :</dt>
                                                                 </div>
                                                                 <div class="col-lg-8 col-md-12 col-sm-12">
                                                                     <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>
@@ -373,6 +386,15 @@
                                                             <dl>{{ $letterOfIndent->prefered_location }} </dl>
                                                         </div>
                                                     </div>
+                                                     <div class="row">
+                                                         <div class="col-lg-4 col-md-12 col-sm-12">
+                                                             <dt class="form-label font-size-13 text-muted">Approval Date :</dt>
+                                                         </div>
+                                                         <div class="col-lg-8 col-md-12 col-sm-12">
+                                                             <input type="date" name="loi_approval_date" id="approval-date"
+                                                                    required class="form-control widthinput">
+                                                         </div>
+                                                     </div>
                                                     <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
                                                     <input type="hidden" value="APPROVE" id="status-approve">
                                                 </div>
@@ -555,7 +577,7 @@
                         <thead class="bg-soft-secondary">
                         <tr>
                             <th>S.No:</th>
-                            <th>Date</th>
+                            <th>LOI Date</th>
                             <th>Customer</th>
                             <th>Category</th>
                             <th>So Number</th>
@@ -563,6 +585,7 @@
                             <th>Prefered Location</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
+                            <th>Rejected Date</th>
                             <th>Review</th>
                             <th>Actions</th>
                         </tr>
@@ -586,6 +609,7 @@
                                 <td>{{ $letterOfIndent->prefered_location }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
+                                <td> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->loi_approval_date)->format('d m Y') }}</td>
                                 <td>{{ $letterOfIndent->review }}</td>
                                 <td>
                                     <button type="button" class="btn btn-soft-violet btn-sm" data-bs-toggle="modal" title="View LOI Item Lists"
@@ -725,26 +749,22 @@
                 },
             });
 
-            // $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
-            //     localStorage.setItem('activeTab', $(e.target).attr('href'));
-            // });
-            //
-            // var activeTab = localStorage.getItem('activeTab');
-            // if (activeTab) {
-            //     $('#my-tab a[href="' + activeTab + '"]').tab('show');
-            // }
 
             $('.status-change-button-approve').click(function () {
                 var id = $('#id').val();
                 var status = $('#status-approve').val();
-                statusChange(id,status);
+                var date = document.getElementById("approval-date").value
+
+                statusChange(id,status,date);
             })
             $('.status-reject-button').click(function (e) {
                 var id = $('#id').val();
                 var status = $('#status-reject').val();
-                statusChange(id,status)
+                var date = document.getElementById("rejection-date").value
+                statusChange(id,status,date)
             })
-            function statusChange(id,status) {
+            function statusChange(id,status,date) {
+                console.log(date);
                 let url = '{{ route('letter-of-indents.supplier-approval') }}';
                 if(status == 'REJECTED') {
                         var message = 'Reject';
@@ -763,6 +783,7 @@
                             id: id,
                             status: status,
                             review:review,
+                            loi_approval_date:date,
                             _token: '{{ csrf_token() }}'
                         },
                         success: function (data) {
