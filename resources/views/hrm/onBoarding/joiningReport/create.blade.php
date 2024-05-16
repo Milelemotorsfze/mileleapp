@@ -58,7 +58,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 			</div>
 			<div class="card-body">
 				<div class="row">
-					<input type="hidden" name="joining_type" value="new_employee">
+					<input type="hidden" name="joining_type" id="joining_type" value="new_employee">
 					<div class="col-xxl-3 col-lg-3 col-md-3 radio-main-div">
 						<span class="error">* </span>
 						<label for="type" class="col-form-label text-md-end">{{ __('Joining Type') }}</label>
@@ -97,9 +97,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-joining-rep
 							<span class="error">* </span>
 							<label for="team_lead_or_reporting_manager" class="col-form-label text-md-end">{{ __('Choose Reporting Manager') }}</label>
 							<select name="team_lead_or_reporting_manager" id="team_lead_or_reporting_manager" multiple="true" class="form-control widthinput" onchange="" autofocus>
-								@foreach($reportingTo as $reportingToId)
-								<option value="{{$reportingToId->id}}">{{$reportingToId->name}}</option>
-								@endforeach
 							</select>
 						</div>
 					</div>
@@ -183,15 +180,34 @@ $.ajaxSetup({
 						var alreadySelectedDate = $("#joining_date").val();
 					}
 				}
-				console.log(candidates[i].team_lead_or_reporting_manager);
+				var deptHeadId = candidates[i].department.department_head_id;
+				var deptHeadName = candidates[i].department.department_head.name;
+				var divHeadId = candidates[i].department.division.division_head_id;
+				var divHeadName = candidates[i].department.division.division_head.name;
+				if(deptHeadId != null && divHeadId != null && deptHeadId != divHeadId) {
+					var newData = [
+						{ id: deptHeadId, text: deptHeadName },
+						{ id: divHeadId, text: divHeadName }
+					];
+				}
+				else if(deptHeadId != null && divHeadId != null && deptHeadId == divHeadId) {
+					var newData = [
+						{ id: deptHeadId, text: deptHeadName }
+					];
+				}
+				newData.forEach(function(item) {
+					var newOption = new Option(item.text, item.id, false, false);
+					$('#team_lead_or_reporting_manager').append(newOption).trigger('change');
+				});
 				if(candidates[i].team_lead_or_reporting_manager != null) {
 					$("#team_lead_or_reporting_manager").select2().val(candidates[i].team_lead_or_reporting_manager).trigger("change");
-					$('#team_lead_or_reporting_manager').select2({
+					
+				}
+				$('#team_lead_or_reporting_manager').select2({
 						allowClear: true,
 						maximumSelectionLength: 1,
 						placeholder:"Choose Reporting Manager",
 					});	
-				}
 				if(candidates[i].work_location != null) {
 					$("#joining_location").select2().val(candidates[i].team_lead_or_reporting_manager).trigger("change");
 					$("#joining_location").val(candidates[i].work_location);
@@ -201,7 +217,6 @@ $.ajaxSetup({
 						placeholder:"Choose Joining Location",
 					});	
 				}
-				console.log(candidates[i].candidate_joining_type);
 			}
 		}
 	}               
@@ -209,10 +224,17 @@ $.ajaxSetup({
 	else {
 	$('#employee_code_div').hide();
 	$('#designation_div').hide();
-	            $('#department_div').hide();
+	$('#department_div').hide();
 	$('#permanent').prop('checked',false);
 	$('#trial_period').prop('checked',false);
 	$('#trial_period').attr("disabled",false);
+	$('#team_lead_or_reporting_manager').select2({
+									allowClear: true,
+									maximumSelectionLength: 1,
+									placeholder:"Choose Reporting Manager",
+								});	
+	$('#team_lead_or_reporting_manager').empty().trigger('change');
+	
 	}			
 	});
 	});
@@ -234,23 +256,41 @@ $.ajaxSetup({
 	       }, 
 	       "This Employee Code is already taken! Try another."
 	   );
-	jQuery.validator.setDefaults({
-	    errorClass: "is-invalid",
-	    errorElement: "p",     
-	});
+	   jQuery.validator.addMethod("isExist", 
+	       function(value, element) {
+	           var result = true;
+				var employeeId = $("#employee_id").val();
+				var joining_type = $("#joining_type").val();
+				var joining_date = $("#joining_date").val();
+				if(value != null && employeeId != null && joining_type != null && joining_date != null) {
+					$.ajax({
+	               type:"POST",
+	               async: false,
+	               url: "{{route('candidate.uniqueJoiningReport')}}", // script to validate in server side
+	               data: {_token: '{{csrf_token()}}',joining_type: joining_type,employeeId:employeeId,new_emp_joining_type:value,joining_date:joining_date},
+	               success: function(data) {
+	                   result = (data == true) ? true : false;
+	               }
+	           });
+				}
+	           return result; 
+	       }, 
+	       "A joining report for this candidate already exists."
+	   );
 	$('#newjoiningReportForm').validate({ 
 	    rules: {
 	        employee_id: {
-	required: true,
-	},
-	joining_date: {
-	required: true,
-	},
+			required: true,
+			},
+			joining_date: {
+			required: true,
+			},
 	        joining_location: {
 	            required: true,
 	        },
 	        new_emp_joining_type: {
 	            required: true,
+				isExist: true,
 	        },
 	        joining_type: {
 	            required: true,

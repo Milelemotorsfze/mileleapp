@@ -22,7 +22,7 @@
                 <th>Date</th>
                 <th>Current Status</th>
                 <th>Priority</th>
-                <th>Purchase Type</th>
+                <th>Selling Type</th>
                 <th>Customer Name</th>
                 <th>Customer Phone</th>
                 <th>Customer Email</th>

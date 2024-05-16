@@ -37,7 +37,6 @@ class SupplierInventory extends Model
         'color_code',
         'color_name',
         'pord_month',
-        'po_arm',
         'status',
         'eta_import',
         'upload_status',

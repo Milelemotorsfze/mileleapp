@@ -75,6 +75,7 @@ class DemandPlanningPurchaseOrderController extends Controller
     public function store(Request $request)
     {
         //
+        info($request->all());
     }
 
     /**

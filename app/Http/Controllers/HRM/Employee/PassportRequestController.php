@@ -174,7 +174,6 @@ class PassportRequestController extends Controller
                 array_push($masterEmployees,$User);  
             }
         }
-        // dd($Users);
         $submissionPurpose = PassportRequestPurpose::orderBy('name','Asc')->where('type','submit')->get();
         $releasePurpose = PassportRequestPurpose::orderBy('name','Asc')->where('type','release')->get();
         return view('hrm.passport.passport_request.create',compact('id','data','previous','next','masterEmployees','submissionPurpose','releasePurpose'));
@@ -343,6 +342,9 @@ class PassportRequestController extends Controller
             $update->submit_action_by_employee = $request->status;
             if($request->status == 'approved') {
                 $update->submit_action_by_department_head = 'pending';
+                $employee2 = EmployeeProfile::where('user_id',$update->employee_id)->first();
+                $leadOrMngr = TeamLeadOrReportingManagerHandOverTo::where('lead_or_manager_id',$employee2->team_lead_or_reporting_manager)->first();
+                $update->submit_department_head_id = $leadOrMngr->approval_by_id;
                 $message = 'Employee passport submit request send to Reporting Manager ( '.$update->hrManager->name.' - '.$update->hrManager->email.' ) for approval';
             }
         }

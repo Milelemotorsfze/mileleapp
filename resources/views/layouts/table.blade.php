@@ -37,6 +37,12 @@
             .btn-dark-blue:hover{
                 color: #FFFFFF;
             }
+            .approvalBtnClass {
+    display: flex;
+}
+.approvalBtnClass button {
+	margin-left:2px!important;
+}
         </style>
     </head>
     <body data-layout="horizontal">

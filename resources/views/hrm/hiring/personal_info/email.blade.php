@@ -12,8 +12,12 @@
 <p>Please also complete, sign, and submit the attached "Personal Information Form" by using the following link. </p></br>
 <p>Wish you good luck.</p></br>
 @endif
+@if($data['canSendOfferLetterLink'] == 'yes')
 <p>Candidate Job Offer Letter link is - <a href="{{env('BASE_URL')}}/candidate-offer-letter/sign/{{ $data["id"] }}">Candidate Job Offer Letter</a></p></br>
+@endif
+@if($data['canSendPersonalInfoLink'] == 'yes')
 <p>Candidate Personal Information Form link is - <a href="{{env('BASE_URL')}}/candidate/personal_info/{{ $data["id"] }}">Candidate Personal Information Form</a></p></br>
+@endif
 @if($data["comment"])
 <p>{{$data["comment"]}}</p>
 @endif

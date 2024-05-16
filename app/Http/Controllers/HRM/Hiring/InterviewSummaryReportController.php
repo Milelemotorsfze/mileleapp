@@ -334,7 +334,7 @@ class InterviewSummaryReportController extends Controller
             })->latest();
         }
         $hiringrequests = $hiringrequests->get();
-        $data = EmployeeHiringRequest::where('id',$id);
+        $data = EmployeeHiringRequest::where('id',$currentInterviewReport->hiring_request_id);
         if(Auth::user()->hasPermissionForSelectedRole(['view-interview-summary-report-listing'])) {
             $data = $data->latest();
         }
@@ -359,7 +359,7 @@ class InterviewSummaryReportController extends Controller
             return view('hrm.notaccess',compact('errorMsg'));
         }
         else {
-            return view('hrm.hiring.interview_summary_report.create',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
+            return view('hrm.hiring.interview_summary_report.createOrEdit',compact('id','data','masterNationality','interviewSummaryId','currentInterviewReport',
             'masterGender','interviewersNames','hiringrequests'));
         }
     }
@@ -839,17 +839,17 @@ class InterviewSummaryReportController extends Controller
         $divisionHeadPendings = InterviewSummaryReport::where([
             ['action_by_hr_manager','approved'],
             ['action_by_division_head','pending'],
-            ['hr_manager_id',$authId],
+            ['division_head_id',$authId],
             ])->latest()->get();
         $divisionHeadApproved = InterviewSummaryReport::where([
             ['action_by_hr_manager','approved'],
             ['action_by_division_head','approved'],
-            ['hr_manager_id',$authId],
+            ['division_head_id',$authId],
             ])->latest()->get();
         $divisionHeadRejected = InterviewSummaryReport::where([
             ['action_by_hr_manager','approved'],
             ['action_by_division_head','rejected'],                
-            ['hr_manager_id',$authId],
+            ['division_head_id',$authId],
             ])->latest()->get();
         return view('hrm.hiring.interview_summary_report.approvals',compact('page','divisionHeadPendings','divisionHeadApproved','divisionHeadRejected','HRManagerPendings','HRManagerApproved','HRManagerRejected',));
     }

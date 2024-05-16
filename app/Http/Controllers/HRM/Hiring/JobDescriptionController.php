@@ -164,6 +164,13 @@ class JobDescriptionController extends Controller
                     (new UserActivityController)->createActivity('New Employee Hiring Job Description Created');
                     $successMessage = "New Employee Hiring Job Description Created Successfully";
                 }
+                else if($id == 'new' && isset($hiringRequest->jobDescription)) {
+                    $update = JobDescription::where('hiring_request_id',$request->hiring_request_id)->first();
+                    $successMessage = "Can't create! Job Description for this hiring request already exist, Edit here..";
+                    $status = 'error';
+                    DB::commit();
+                    return redirect()->route('employee-hiring-job-description.create-or-edit',[$update->id,$update->hiring_request_id])->with($status,$successMessage);
+                }
                 else if(($id == 'new' OR $id != 'new') && isset($hiringRequest->questionnaire) && isset($hiringRequest->jobDescription)) {
                     $update = JobDescription::where('hiring_request_id',$request->hiring_request_id);
                     if($id != 'new') {
