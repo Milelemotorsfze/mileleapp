@@ -141,27 +141,25 @@ class QuotationController extends Controller
         $quotation->shipping_method = $request->shipping_method;
         $quotation->save();
         $agentsId = $request->agents_id;
-        if (!isset($agentsId) || empty($agentsId)) {
-        } 
-        else {
-            $agentIdsArray = explode(',', $agentsId);
-            $agentsCount = count($agentIdsArray);
-            if ($agentsCount == 1) {
-                $agentId = $agentIdsArray[0];
-                $agentsId = $agentId;
+            if (!isset($agentsId) || empty($agentsId)) {
+                // Handle the case where no agent ID is provided or it's empty
             } 
             else {
-                $agentId = $agentIdsArray[0];
-                $agentsId = $agentId;
-                foreach ($agentIdsArray as $agentId) {
-                    $agentsin = 1;
-                    $multipleAgent = new MuitlpleAgents();
-                    $multipleAgent->agents_id = $agentId;
-                    $multipleAgent->quotations_id = $quotation->id;
-                    $multipleAgent->save();
+                $agentIdsArray = explode(',', $agentsId);
+                $agentsCount = count($agentIdsArray);
+                if ($agentsCount == 1) {
+                    $agentsId = $agentIdsArray[0];
+                } 
+                else {
+                    foreach ($agentIdsArray as $agentId) {
+                        $multipleAgent = new MuitlpleAgents();
+                        $multipleAgent->agents_id = $agentId;
+                        $multipleAgent->quotations_id = $quotation->id;
+                        $multipleAgent->save();
+                    }
+                    $agentsId = end($agentIdsArray);
                 }
             }
-        }
         $quotationDetail = new QuotationDetail();
         $quotationDetail->quotation_id  = $quotation->id;
         $quotationDetail->country_id  = $request->country_id;
@@ -439,7 +437,7 @@ class QuotationController extends Controller
             $shippingChargeDistriAmount = 0;
         }
         $quotationid = $quotation->id;
-        $multiplecp = MuitlpleAgents::where('quotations_id', $quotationid)->where('agents_id', $quotationDetail->agents_id)->get();
+        $multiplecp = MuitlpleAgents::where('quotations_id', $quotationid)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
         $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('multiplecp','quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','directlyAddedAddons','addonsTotalAmount',
         'otherVehicles','vehicleWithBrands','OtherAddons','shippingChargeDistriAmount'));
