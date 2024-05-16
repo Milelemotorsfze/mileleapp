@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
     use App\Models\EmpJob;
     use App\Models\Language;
     use App\Models\SalesPersonLaugauges;
+    use App\Models\Masters\MasterJobPosition;
+    use App\Models\Masters\MasterDepartment;
     use Illuminate\Http\Request;
     use App\Http\Controllers\Controller;
     use App\Models\User;
@@ -40,7 +42,9 @@ namespace App\Http\Controllers;
         {
             $roles = Role::all();
             $language = Language::pluck('name','name')->all();
-            return view('users.create',compact('roles', 'language'));
+            $jobposition =  MasterJobPosition::where('status', 'active')->get();
+            $departments =  MasterDepartment::where('status', 'active')->get();
+            return view('users.create',compact('roles', 'language', 'jobposition', 'departments'));
         }
         public function createLogin($id) {
             $user = User::findOrFail($id); 
