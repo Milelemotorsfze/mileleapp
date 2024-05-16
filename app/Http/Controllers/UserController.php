@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
     use App\Models\EmpJob;
     use App\Models\Language;
     use App\Models\SalesPersonLaugauges;
+    use App\Models\Masters\MasterJobPosition;
+    use App\Models\Masters\MasterDepartment;
     use Illuminate\Http\Request;
     use App\Http\Controllers\Controller;
     use App\Models\User;
@@ -27,13 +29,16 @@ namespace App\Http\Controllers;
             $data = User::orderBy('status','DESC')->whereIn('status',['new','active'])->get();
             $inactive_users = User::where('status','inactive')->get();
             $deleted_users = User::onlyTrashed()->get();
+           
             return view('users.index',compact('data','inactive_users','deleted_users'));
         }
         public function create()
         {
             $roles = Role::all();
             $language = Language::pluck('name','name')->all();
-            return view('users.create',compact('roles', 'language'));
+            $jobposition =  MasterJobPosition::where('status', 'active')->get();
+            $departments =  MasterDepartment::where('status', 'active')->get();
+            return view('users.create',compact('roles', 'language', 'jobposition', 'departments'));
         }
         public function store(Request $request)
         {
