@@ -19,6 +19,8 @@ use App\Models\HRM\Employee\PassportRelease;
 use App\Models\HRM\Employee\Liability;
 use App\Models\HRM\Employee\Leave;
 use App\Models\HRM\Employee\OverTime;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
@@ -67,7 +69,9 @@ class User extends Authenticatable
             $q->where([
                 ['offer_letter_send_at','!=',NULL],
                 ['offer_letter_verified_at',NULL],
-            ]);
+            ])->whereHas('candidateDetails',function($query) {
+                $query->where('offer_sign','!=',NULL);
+            });
         })->get();
         $verified = EmployeeProfile::where([
             ['type','candidate'],
@@ -76,7 +80,9 @@ class User extends Authenticatable
             $q->where([
                 ['offer_letter_send_at','!=',NULL],
                 ['offer_letter_verified_at','!=',NULL],
-            ]);
+            ])->whereHas('candidateDetails',function($query) {
+                $query->where('offer_sign','!=',NULL);
+            });
         })->get();
         if(count($pending) > 0 OR count($verified) > 0) {
             $canShowOfferLetter = true;
@@ -90,7 +96,7 @@ class User extends Authenticatable
         // if($passportRequest) {
         //     $passportWith = 'with_company';
         // }
-        if($this->empProfile->passport_status == 'with_milele') {
+        if(isset($this->empProfile) && $this->empProfile->passport_status == 'with_milele') {
             $passportWith = 'with_company';
         }
         return $passportWith;
@@ -200,12 +206,17 @@ class User extends Authenticatable
     }
     public function getCandidateDocsVarifyAttribute() {
         $pendingdocsUploaded = 0;
-        $pendingdocsUploaded = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')
-        ->whereHas('candidateDetails', function($q){
-            $q->where('documents_verified_at', NULL)->where('documents_form_send_at','!=',NULL)->where('documents_form_submit_at','!=',NULL)
-            // ->where('documents_form_send_at','<','documents_form_submit_at')
-            ;
-        })->latest()->count();
+        // $user = User::find($this->id);
+        // if($user) {
+            if($this->hasPermissionForSelectedRole(['verify-candidates-documents','send-candidate-documents-request-form'])) {
+                $pendingdocsUploaded = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')
+                ->whereHas('candidateDetails', function($q){
+                    $q->where('documents_verified_at', NULL)->where('documents_form_send_at','!=',NULL)->where('documents_form_submit_at','!=',NULL)
+                    ->whereColumn('documents_form_send_at', '<', 'documents_form_submit_at')
+                    ;
+                })->latest()->count();
+            }
+        // }
         return $pendingdocsUploaded;
     }
     public function getCanShowDocsAttribute() {
@@ -213,7 +224,8 @@ class User extends Authenticatable
         $pending = EmployeeProfile::where([
             ['type','candidate'],
             ['documents_verified_at',NULL],
-        ])->get();
+            ['documents_form_submit_at','!=',NULL],
+        ])->whereColumn('documents_form_send_at', '<', 'documents_form_submit_at')->get();
         $verified = EmployeeProfile::where([
             ['type','candidate'],
             ['documents_verified_at','!=',NULL],
@@ -225,38 +237,51 @@ class User extends Authenticatable
     }
     public function getVerifyOfferLettersAttribute() {
         $verifyOffers = 0;
-        $verifyOffers = InterviewSummaryReport::where([
-            ['status','approved'],
-            ['seleced_status','pending'],
-            ['offer_letter_send_at','!=',NULL],
-            ['offer_letter_verified_at',NULL],
-        ])
-            // where('status','approved')->where('seleced_status','pending')->where('offer_letter_send_at','!=',NULL)
-        ->whereHas('candidateDetails', function($q){
-            $q->where('documents_verified_at','!=', NULL)->where('offer_sign','!=',NULL);
-        })->latest()->count();
+        if($this->hasPermissionForSelectedRole(['verify-offer-letter-signature'])) {
+            $verifyOffers = InterviewSummaryReport::where([
+                ['status','approved'],
+                ['seleced_status','pending'],
+                ['offer_letter_send_at','!=',NULL],
+                ['offer_letter_verified_at',NULL],
+            ])
+                // where('status','approved')->where('seleced_status','pending')->where('offer_letter_send_at','!=',NULL)
+            ->whereHas('candidateDetails', function($q){
+                $q->where('documents_verified_at','!=', NULL)->where('offer_sign','!=',NULL);
+            })->latest()->count();
+        }
         return $verifyOffers;
     }
     public function getCandidatePersonalInformationVarifyAttribute() {
         $pendingPersonalInfo = 0;
+        if($this->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action'])) {
         $pendingPersonalInfo = InterviewSummaryReport::where('status','approved')->where('seleced_status','pending')
         ->whereHas('candidateDetails', function($q){
-            $q->where('documents_verified_at','!=',NULL)->where('personal_information_verified_at',NULL)->where('personal_information_created_at','!=',NULL);
+            $q->where('documents_verified_at','!=',NULL)->where('personal_information_verified_at',NULL)->where('personal_information_created_at','!=',NULL)->whereColumn('personal_information_send_at', '<', 'personal_information_created_at');
         })->latest()->count();
+        }
         return $pendingPersonalInfo;
     }
     public function getCanShowInfoAttribute() {
         $canShowInfo = false;
-        $pending = EmployeeProfile::where([
-            ['type','candidate'],
-            ['personal_information_verified_at',NULL],
-        ])->get();
-        $verified = EmployeeProfile::where([
-            ['type','candidate'],
-            ['personal_information_verified_at','!=',NULL],
-        ])->get();
-        if(count($pending) > 0 OR count($verified) > 0) {
-            $canShowInfo = true;
+        if($this->hasPermissionForSelectedRole(['verify-candidate-personal-information','send-personal-info-form-action'])) {
+            $pending = EmployeeProfile::where([
+                ['type','candidate'],
+                ['personal_information_verified_at',NULL],
+                ['personal_information_created_at','!=',NULL],
+            ])->whereColumn('personal_information_send_at', '<', 'personal_information_created_at')->get();
+            $resend = EmployeeProfile::where([
+                ['type','candidate'],
+                ['personal_information_verified_at',NULL],
+                ['personal_information_created_at','!=',NULL],
+            ])->whereColumn('personal_information_send_at', '>', 'personal_information_created_at')->get();
+            $verified = EmployeeProfile::where([
+                ['type','candidate'],
+                ['personal_information_verified_at','!=',NULL],
+                ['personal_information_created_at','!=',NULL],
+            ])->get();
+            if(count($pending) > 0 OR count($verified) > 0 OR count($resend) > 0) {
+                $canShowInfo = true;
+            }
         }
         return $canShowInfo;
     }
@@ -455,7 +480,7 @@ class User extends Authenticatable
         return $advanceOrLoanBalance;
     }
     public function getSelectedRoleAttribute() {
-        return $this->attributes['selected_role'] ?? $this->roles()->first()->name;
+        return $this->attributes['selected_role'] ?? $this->roles()->first()->name ?? '';
     }
     public function getOvertimeRequestApprovalAttribute() {
         $authId = $this->id;
@@ -511,17 +536,17 @@ class User extends Authenticatable
         $divisionHeadPendings = InterviewSummaryReport::where([
             ['action_by_hr_manager','approved'],
             ['action_by_division_head','pending'],
-            ['hr_manager_id',$this->id],
+            ['division_head_id',$this->id],
             ])->latest()->get();
         $divisionHeadApproved = InterviewSummaryReport::where([
             ['action_by_hr_manager','approved'],
             ['action_by_division_head','approved'],
-            ['hr_manager_id',$this->id],
+            ['division_head_id',$this->id],
             ])->latest()->get();
         $divisionHeadRejected = InterviewSummaryReport::where([
             ['action_by_hr_manager','approved'],
             ['action_by_division_head','rejected'],                
-            ['hr_manager_id',$this->id],
+            ['division_head_id',$this->id],
             ])->latest()->get();
         if(count($HRManagerPendings) > 0 OR count($HRManagerApproved) > 0 OR count($HRManagerRejected) > 0 OR count($divisionHeadPendings) > 0 OR 
         count($divisionHeadApproved) > 0 OR count($divisionHeadRejected) > 0) {
@@ -532,7 +557,7 @@ class User extends Authenticatable
     public function hasPermissionForSelectedRole($permissionName) {
         $selectedRole = $this->selected_role;
         if(is_array($permissionName)) {
-            if(count($permissionName) > 0) {
+            if(count($permissionName) > 0 && $selectedRole) {
                 return DB::table('role_has_permissions')
                     ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
                     ->where('role_has_permissions.role_id', $selectedRole)

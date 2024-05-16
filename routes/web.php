@@ -165,6 +165,11 @@ Route::get('/d', function () {
     Route::get('users/makeActive/{id}', [UserController::class, 'makeActive'])->name('users.makeActive');
     Route::get('users/restore/{id}', [UserController::class, 'restore'])->name('users.restore');
     Route::get('users/destroy/{id}', [UserController::class,'delete'])->name('users.delete');
+    Route::controller(UserController::class)->group(function() {
+        Route::post('user/email-unique-check', 'uniqueEmail')->name('user.uniqueEmail');
+        Route::post('user/create-access-request', 'createAccessRequest')->name('user.createAccessRequest');  
+        Route::get('user/create-password-request/{id}','createLogin')->name('users.createLogin');
+    });
     // Role
     Route::resource('roles', RoleController::class);
     Route::get('roles/destroy/{id}', [RoleController::class,'delete'])->name('roles.delete');
@@ -347,7 +352,7 @@ Route::get('/d', function () {
         Route::get('employee_joining_report/{type}','index')->name('employee_joining_report.index');
         Route::get('create_joining_report/{type}','create')->name('create_joining_report.create');
         Route::post('checkTempDateExist', 'checkTempDateExist')->name('temptransfer.checkTempDateExist');
-
+        Route::post('candidate/joining-report-unique-check', 'uniqueJoiningReport')->name('candidate.uniqueJoiningReport');
     });
     Route::get('joining_report_employee_verification/{id}', [JoiningReportController::class, 'employeeVerification'])->name('employee_joining_report.verification');
     Route::post('employee_joining_report/verified', [JoiningReportController::class, 'employeeVerified'])->name('employee_joining_report.verified');
@@ -835,7 +840,7 @@ Route::get('/d', function () {
     Route::get('/countries/{id}/neighbors', [ProformaInvoiceController::class, 'getNeighbors']);
 
 
-    
+    Route::post('/upload-quotation-file', [QuotationController::class, 'uploadingquotation'])->name('uploadingquotation.update');
 
 
 

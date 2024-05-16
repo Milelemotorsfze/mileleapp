@@ -95,9 +95,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-support-full-
                     </div>
                     <div class="col-lg-4 col-md-6">
                     <span class="error">* </span>
-                    <label for="basicpill-firstname-input" class="form-label">Shipping Type : </label>
+                    <label for="basicpill-firstname-input" class="form-label">Selling Type : </label>
                     <select class="form-control" id="shippingtype" name="type" required>
-                    <option value="" disabled selected>Select an Shipping Type</option>
+                    <option value="" disabled selected>Select an Selling Type</option>
                     <option value="Export" data-value="Export">Export</option>
                     <option value="Local" data-value="Local">Local</option>
                     <option value="Other" data-value="Other">Other</option>

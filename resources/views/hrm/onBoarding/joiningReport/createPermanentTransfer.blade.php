@@ -255,20 +255,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-j
 			}			
 		});
 	});
-	jQuery.validator.setDefaults({
-	    errorClass: "is-invalid",
-	    errorElement: "p",     
-	});
-	jQuery.validator.addMethod("greaterStart", function (value, element, params) {
-	    var startDate = $('#transfer_from_date').val();
-	    var endDate = $('#joining_date').val();
-	
-	    if( startDate >= endDate) {
-	        return false;
-	    }else{
-	        return true;
-	    }
-	},'Must be greater than start date.');
 	$('#perIntTransjoiningReportForm').validate({ 
 	    rules: {
 	        employee_id: {
@@ -276,7 +262,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-permanent-j
 	},
 	joining_date: {
 	required: true,
-	greaterStart: true,
 	},
 	        joining_location: {
 	            required: true,

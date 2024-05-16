@@ -22,15 +22,21 @@ namespace App\Http\Controllers;
     use Carbon\Carbon;
     use Illuminate\Support\Facades\Crypt;
     use App\Http\Controllers\UserActivityController;
+    use Validator;
+    use Exception;
+    use App\Models\HRM\Employee\EmployeeProfile;
     class UserController extends Controller
     {
         public function index(Request $request)
         {
-            $data = User::orderBy('status','DESC')->whereIn('status',['new','active'])->get();
+            $accessRequests = User::orderBy('id','DESC')->whereIn('status',['new','active'])->whereNot('id','16')
+            ->where(function($q){
+                $q->whereDoesntHave('roles')->orWhere('password','');
+            })->get();
+            $data = User::orderBy('status','DESC')->whereIn('status',['new','active'])->where('password','!=','')->whereHas('roles')->get();
             $inactive_users = User::where('status','inactive')->get();
             $deleted_users = User::onlyTrashed()->get();
-           
-            return view('users.index',compact('data','inactive_users','deleted_users'));
+            return view('users.index',compact('accessRequests','data','inactive_users','deleted_users'));
         }
         public function create()
         {
@@ -39,6 +45,12 @@ namespace App\Http\Controllers;
             $jobposition =  MasterJobPosition::where('status', 'active')->get();
             $departments =  MasterDepartment::where('status', 'active')->get();
             return view('users.create',compact('roles', 'language', 'jobposition', 'departments'));
+        }
+        public function createLogin($id) {
+            $user = User::findOrFail($id); 
+            $roles = Role::all();
+            $language = Language::pluck('name','name')->all();
+            return view('users.create',compact('user','roles', 'language'));
         }
         public function store(Request $request)
         {
@@ -184,4 +196,68 @@ namespace App\Http\Controllers;
         {
         return view('users.activity.dailyactivity', ['id' => $id, 'date' => $date]);
         }
+        public function uniqueEmail(Request $request) {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email',
+            ]);
+            if ($validator->fails()) {
+                return redirect()->back()->withInput()->withErrors($validator);
+            }
+            else {
+                try {
+                    $email = User::where('email',$request->email)->get();
+                    if(count($email) > 0) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                } 
+                catch (\Exception $e) {
+                   info($e);
+               }
+            }
         }
+        public function createAccessRequest(Request $request) {
+             // Define validation rules
+            $rules = [
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'id' => 'required',
+            ];
+
+            // Create a validator instance and use it to validate the request
+            $validator = Validator::make($request->all(), $rules);
+
+            // Check if validation fails
+            if ($validator->fails()) {
+                return redirect('register')
+                            ->withErrors($validator)
+                            ->withInput();
+            }
+
+            // If validation passes, proceed to store the data
+            DB::beginTransaction();
+            try {
+                // Creating a new user instance and saving it in the database
+                $user = new User([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                ]);
+
+                $user->save(); // Save the user
+                $empProfile = EmployeeProfile::findOrFail($request->id);
+                $empProfile->update([
+                    'user_id' => $user->id,
+                    'updated_by' => Auth::id(),
+                ]);
+                DB::commit();
+                // Optionally, redirect to a route with a success message
+                return redirect()->route('employee.index')->with('success', 'Milele Matrix Sign-Up Request Successfully Sent to Admin');
+            } catch (\Exception $e) {
+                DB::rollback();
+                // Handle the exception
+                return back()->with('error', 'An error occurred while saving the user: ' . $e->getMessage());
+            }
+        }
+    }

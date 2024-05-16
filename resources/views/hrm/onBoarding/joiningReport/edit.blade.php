@@ -2,7 +2,7 @@
 @include('layouts.formstyle')
 @section('content')
 @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-report','current-user-edit-joining-report']);
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-report','current-user-edit-joining-report','dept-emp-edit-joining-report']);
 @endphp
 @if ($hasPermission)
 <div class="card-header">
@@ -40,7 +40,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 					<div class="col-xxl-3 col-lg-4 col-md-4" id="employee_code_div">
 						<center><label for="employee_code" class="col-form-label text-md-end"><strong>{{ __('Employee Code') }}</strong></label></center>
 						<input id="employee_code" type="text" class="form-control widthinput @error('employee_code') is-invalid @enderror" name="employee_code"
-							placeholder="Candidate Name" value="{{$candidate->employee_code}}" autocomplete="employee_code" autofocus>
+							placeholder="Candidate Name" value="{{$data->candidate->employee_code}}" autocomplete="employee_code" autofocus>
 					</div>
 					<div class="col-xxl-3 col-lg-4 col-md-4" id="designation_div">
 						<center><label for="designation" class="col-form-label text-md-end"><strong>{{ __('Designation') }}</strong></label></center>
@@ -98,9 +98,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-joining-repor
 							<span class="error">* </span>
 							<label for="team_lead_or_reporting_manager" class="col-form-label text-md-end">{{ __('Choose Reporting Manager') }}</label>
 							<select name="team_lead_or_reporting_manager" id="team_lead_or_reporting_manager" multiple="true" class="form-control widthinput" onchange="" autofocus>
-							@foreach($reportingTo as $reportingToId)
-							<option value="{{$reportingToId->id}}" @if($reportingToId->id == $data->department_head_id) selected @endif >{{$reportingToId->name}}</option>
-							@endforeach
+							
+							<option value="{{$data->candidate->department->department_head_id ?? ''}}" @if($data->candidate->department->department_head_id == $data->department_head_id OR $data->candidate->department->approval_by_id == $data->department_head_id) selected @endif >{{$data->candidate->department->departmentHead->name ?? ''}}</option>
+							@if($data->candidate->department->department_head_id != $data->candidate->department->division->division_head_id)
+							<option value="{{$data->candidate->department->division->division_head_id ?? ''}}" @if($data->candidate->department->division->division_head_id == $data->department_head_id OR $data->candidate->department->division->approval_handover_to == $data->department_head_id) selected @endif >{{$data->candidate->department->division->divisionHead->name ?? ''}}</option>
+							@endif
 							</select>
 						</div>
 					</div>
@@ -175,14 +177,72 @@ $.ajaxSetup({
 							$('#department_div').show();
 							document.getElementById('designation').textContent=candidates[i].designation.name;
 							document.getElementById('department').textContent=candidates[i].department.name;
+							document.getElementById('employee_code').value=candidates[i].employee_code;
+							var deptHeadId = candidates[i].department.department_head_id;
+							var deptHeadName = candidates[i].department.department_head.name;
+							var divHeadId = candidates[i].department.division.division_head_id;
+							var divHeadName = candidates[i].department.division.division_head.name;
+							if(deptHeadId != null && divHeadId != null && deptHeadId != divHeadId) {
+								var newData = [
+									{ id: deptHeadId, text: deptHeadName },
+									{ id: divHeadId, text: divHeadName }
+								];
+							}
+							else if(deptHeadId != null && divHeadId != null && deptHeadId == divHeadId) {
+								var newData = [
+									{ id: deptHeadId, text: deptHeadName }
+								];
+							}
+							newData.forEach(function(item) {
+								var newOption = new Option(item.text, item.id, false, false);
+								$('#team_lead_or_reporting_manager').append(newOption).trigger('change');
+								// $('#team_lead_or_reporting_manager').select2({
+								// 	allowClear: true,
+								// 	maximumSelectionLength: 1,
+								// 	placeholder:"Choose Reporting Manager",
+								// });
+							});
+							if(candidates[i].team_lead_or_reporting_manager != null) {
+								$("#team_lead_or_reporting_manager").select2().val(candidates[i].team_lead_or_reporting_manager).trigger("change");
+								// $('#team_lead_or_reporting_manager').select2({
+								// 	allowClear: true,
+								// 	maximumSelectionLength: 1,
+								// 	placeholder:"Choose Reporting Manager",
+								// });	
+							}
+							else if(data.department_head_id == data.candidate.department.department_head_id){
+								$("#team_lead_or_reporting_manager").select2().val(data.candidate.department.department_head_id).trigger("change");
+							}
+							else if(data.department_head_id == data.candidate.department.approval_by_id) {
+								$("#team_lead_or_reporting_manager").select2().val(data.candidate.department.department_head_id).trigger("change");
+							}
+							else if(data.department_head_id == data.candidate.department.division.division_head_id) {
+								$("#team_lead_or_reporting_manager").select2().val(data.candidate.department.division.division_head_id).trigger("change");
+							}
+							else if(data.department_head_id == data.candidate.department.division.approval_handover_to) {
+								$("#team_lead_or_reporting_manager").select2().val(data.candidate.department.division.division_head_id).trigger("change");
+							}
+							$('#team_lead_or_reporting_manager').select2({
+									allowClear: true,
+									maximumSelectionLength: 1,
+									placeholder:"Choose Reporting Manager",
+								});
 						}
 					}
 				}               
 			}
 			else {
+				document.getElementById('employee_code').value='';
 				$('#employee_code_div').hide();
 				$('#designation_div').hide();
 				$('#department_div').hide();
+				$('#team_lead_or_reporting_manager').select2({
+					allowClear: true,
+					maximumSelectionLength: 1,
+					placeholder:"Choose Reporting Manager",
+				});	
+				$('#team_lead_or_reporting_manager').empty().trigger('change');
+				
 			}			
 		});
 	});
@@ -208,6 +268,28 @@ $.ajaxSetup({
 	    errorClass: "is-invalid",
 	    errorElement: "p",     
 	});
+	jQuery.validator.addMethod("isExist", 
+	       function(value, element) {
+	           var result = true;
+				var employeeId = $("#employee_id").val();
+				var joining_type = $("#joining_type").val();
+				var joining_date = $("#joining_date").val();
+				var joining_report_id = data.id;
+				if(value != null && employeeId != null && joining_type != null && joining_date != null && joining_report_id != joining_report_id) {
+					$.ajax({
+	               type:"POST",
+	               async: false,
+	               url: "{{route('candidate.uniqueJoiningReport')}}", // script to validate in server side
+	               data: {_token: '{{csrf_token()}}',joining_type: joining_type,employeeId:employeeId,new_emp_joining_type:value,joining_date:joining_date,joining_report_id:joining_report_id},
+	               success: function(data) {
+	                   result = (data == true) ? true : false;
+	               }
+	           });
+				}
+	           return result; 
+	       }, 
+	       "A joining report for this candidate already exists."
+	   );
 	$('#joiningReportForm').validate({ 
 	    rules: {
 	        employee_id: {
@@ -221,6 +303,7 @@ $.ajaxSetup({
 	        },
 	        new_emp_joining_type: {
 	            required: true,
+				isExist: true,
 	        },
 	        joining_type: {
 	            required: true,

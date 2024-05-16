@@ -105,15 +105,15 @@
 			<div class="page">
 				<div class="subpage justify" style="font-style:Serif;" id="justify">
 					<h1 style="color:#034c84;">MILELE</h1>
-					<p>{{$data->candidateDetails->offer_letter_code ?? ''}}</br>
+					<p>{{$data->offer_letter_code ?? ''}}</br>
 						Date: @if($data->offer_letter_send_at != NULL){{Carbon\Carbon::parse($data->offer_letter_send_at)->format('F d,Y')}}@else{{now()->format('F d, Y')}}@endif</br></br>
 						<strong>@if($data->gender == 1) Mr. @elseif($data->gender == 2) Ms. @endif {{$data->candidate_name ?? ''}}</strong></br> 
-						Passport No: {{$data->candidateDetails->passport_number ?? ''}}</br>   
-						Mob Phone: {{$data->candidateDetails->contact_number ?? ''}}</br></br>   
+						Passport No: {{$data->passport_number ?? ''}}</br>   
+						Mob Phone: {{$data->contact_number ?? ''}}</br></br>   
 						Sub: <strong>Employment Offer</strong></br></br> 
 						<strong>Dear {{$data->candidate_name ?? ''}},</strong></br></br> 
 						We refer to your application submitted, and the subsequent Interview you had with us, we are pleased to offer you employment with our 
-						Company, in the capacity of " <strong>{{$data->candidateDetails->designation->name ?? ''}}</strong> ".</br></br> 
+						Company, in the capacity of " <strong>{{$data->designation->name ?? ''}}</strong> ".</br></br> 
 						This employment offer is subject to the condition that we are able to obtain from the Ministry of Labor and Social Affairs and the 
 						Naturalization and Immigration administration at the Ministry of Interior an entry permit for your employment under our Sponsorship.</br></br> 
 						Your employment with us shall be pursuant to the following terms and conditions.</br></br> 
@@ -121,15 +121,15 @@
 						<tbody>
 							<tr>
 								<td class="bold"><strong>Basic Salary</strong></td>
-								<td class="normal">AED {{$data->candidateDetails->basic_salary}}/- p.m. ( {{$inwords['basic_salary'] ?? $data->inwords_basic_salary ?? ''}} Only )</td>
+								<td class="normal">AED {{$data->basic_salary}}/- p.m. ( {{$inwords['basic_salary'] ?? $data->inwords_basic_salary ?? ''}} Only )</td>
 							</tr>
 							<tr>
 								<td class="bold"><strong>Other Allowance</strong></td>
-								<td class="normal">AED {{$data->candidateDetails->other_allowances}}/- p.m. ( {{$inwords['other_allowances'] ?? $data->inwords_other_allowances ?? ''}} Only )</td>
+								<td class="normal">AED {{$data->other_allowances}}/- p.m. ( {{$inwords['other_allowances'] ?? $data->inwords_other_allowances ?? ''}} Only )</td>
 							</tr>
 							<tr>
 								<td class="bold"><strong>Total Salary</strong></td>
-								<td class="normal">AED {{$data->candidateDetails->total_salary}}/- p.m. ( {{$inwords['total_salary'] ?? $data->inwords_total_salary ?? ''}} Only )</td>
+								<td class="normal">AED {{$data->total_salary}}/- p.m. ( {{$inwords['total_salary'] ?? $data->inwords_total_salary ?? ''}} Only )</td>
 							</tr>
 							<tr>
 								<td class="bold"><strong>Place of Work</strong></td>
@@ -151,7 +151,7 @@
 							</tr>
 							<tr>
 								<td class="bold"><strong>Probation Period</strong></td>
-								<td class="normal">You will be on probation period for {{$data->candidateDetails->probation_duration_in_months}} months during which your services may be terminated with 14 days’ 
+								<td class="normal">You will be on probation period for {{$data->probation_duration_in_months}} months during which your services may be terminated with 14 days’ 
 									notice period by employer. During the probationary period, employee has the right to terminate the contract with 30 days’
 									notice. During the probation period, employees will not be entitled to leave and other permanent employee benefits.
 								</td>
@@ -207,7 +207,7 @@
 						<tbody>
 							<tr>
 								<td class="bold1">
-									<strong>{{$data->candidateDetails->offerLetterHr->name ?? $hr->handover_to_name ?? ''}}</strong></br></br>
+									<strong>{{$data->offerLetterHr->name ?? $hr->handover_to_name ?? ''}}</strong></br></br>
 									HR Manager</br></br>
 									@if($data->offer_letter_send_at == NULL && isset($data->isAuth) && $data->isAuth == 1)
 									<button type="button" style="border-radius:5px; padding-bottom:5px; color: #fff; background-color: #034c84; border-color: #034c84; padding-top:5px;">
@@ -228,7 +228,7 @@
 								<td class="bold1">
 								</td>
 								<td class="normal1">
-									@if($data->offer_letter_send_at != NULL && isset($data->isAuth) && $data->isAuth == 0 && $data->candidateDetails->offer_sign == '')
+									@if($data->offer_letter_send_at != NULL && isset($data->isAuth) && $data->isAuth == 0 && $data->offer_sign == '')
 									<form class="w3-container" action="{{route('offerletter.signed')}}" method="POST" id="candidatepersonalInfoForm"
 										name="DAFORM"  enctype="multipart/form-data" target="_self">
 										@csrf
@@ -261,13 +261,13 @@
 											</div>
 										</div>
 									</form>
-									@elseif($data->candidateDetails->offer_signed_at != NULL && isset($data->isAuth) && $data->isAuth == 2)
-									Date: {{Carbon\Carbon::parse($data->candidateDetails->offer_signed_at)->format('F d,Y')}}</br>
+									@elseif($data->offer_signed_at != NULL && isset($data->isAuth) && $data->isAuth == 2)
+									Date: {{Carbon\Carbon::parse($data->offer_signed_at)->format('F d,Y')}}</br>
 									<table>
 										<tbody>
 											<tr>
 												<td>Signature:</td>
-												<td><img src="{{$data->candidateDetails->offer_sign}}" style="width:35%; height:35%;" alt="Red dot" /></td>
+												<td><img src="{{$data->offer_sign}}" style="width:35%; height:35%;" alt="Red dot" /></td>
 											</tr>
 										</tbody>
 									</table>
@@ -275,7 +275,7 @@
 									@php
 									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['verify-offer-letter-signature']);
 									@endphp                    
-									@if($hasPermission && isset($data->canVerifySign) && $data->canVerifySign == true && $data->offer_letter_verified_at == NULL && $data->offer_letter_verified_by == NULL && $data->candidateDetails->offer_sign != NULL)
+									@if($hasPermission && isset($data->canVerifySign) && $data->canVerifySign == true && $data->offer_letter_verified_at == NULL && $data->offer_letter_verified_by == NULL && $data->offer_sign != NULL)
 									<table>
 										<tbody>
 											<tr>

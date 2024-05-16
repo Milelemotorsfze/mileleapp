@@ -45,7 +45,12 @@
                     <th>Parent Colour</th>
                     <!-- <th>Status</th> -->
                     <th>Created By</th>
-                    <th>Action</th>
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('colour-edit');
+                    @endphp
+                    @if ($hasPermission)
+                        <th>Action</th>
+                    @endif
                 </tr>
                 </thead>
                 <tbody>
@@ -77,15 +82,17 @@
                         $created_bys = $names->name;
                         @endphp
                         {{ $created_bys ?? '' }}</td>
-                        <td>
+
                         @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('colour-edit');
                             @endphp
                             @if ($hasPermission)
+                            <td>
                                 <a data-placement="top" href="{{ route('colourcode.edit', $colorcodes->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
                                 </a>
+                            </td>
                             @endif
-                        </td>
+
                     </tr>
                 @endforeach
                 </tbody>

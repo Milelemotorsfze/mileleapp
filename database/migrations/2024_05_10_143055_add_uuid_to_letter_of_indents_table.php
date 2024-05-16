@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('calls', function (Blueprint $table) {
-            $table->timestamp('assign_time')->nullable();
+        Schema::table('letter_of_indents', function (Blueprint $table) {
+            $table->string('uuid')->nullable()->unique()->after('id');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('calls', function (Blueprint $table) {
-            $table->dropColumn('assign_time');
+        Schema::table('letter_of_indents', function (Blueprint $table) {
+            $table->dropColumn('uuid');
         });
     }
 };

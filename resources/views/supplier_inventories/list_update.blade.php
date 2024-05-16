@@ -110,7 +110,7 @@
                     <th>LOI</th>
                     <th>PFI Number </th>
                     <th>PO Number</th>
-                    <th>PO AMS</th>
+                    <th>Status</th>
                     @can('inventory-log-details')
                         @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('inventory-log-details');
@@ -186,8 +186,13 @@
                             <td>{{ $supplierInventory->letterOfIndentItem->uuid ?? '' }}</td>
                             <td> {{ $supplierInventory->pfi->pfi_reference_number ?? '' }} </td>
                             <td> {{ $supplierInventory->purchaseOrder->po_number ?? ''}} </td>
-                            <td data-field="po_arm" class="po_arm"  id="po_arm-editable-{{$supplierInventory->id}}"  contenteditable="true"
-                                data-id="{{$supplierInventory->id}}" >{{ $supplierInventory->po_arm }}</td>
+                          <td >
+                              <select class="upload_status" data-field="upload_status"
+                              data-id="{{ $supplierInventory->id }}"  id="upload_status-editable-{{$supplierInventory->id}}">
+                                  <option value="{{ \App\Models\SupplierInventory::UPLOAD_STATUS_ACTIVE }}" {{ $supplierInventory->upload_status == \App\Models\SupplierInventory::UPLOAD_STATUS_ACTIVE ? 'selected' : ''}} >{{ \App\Models\SupplierInventory::UPLOAD_STATUS_ACTIVE }} </option>
+                                  <option value="{{\App\Models\SupplierInventory::VEH_STATUS_DELETED}}" {{ $supplierInventory->upload_status == \App\Models\SupplierInventory::VEH_STATUS_DELETED ? 'selected' : ''}} >{{ \App\Models\SupplierInventory::UPLOAD_STATUS_INACTIVE }} </option>
+                              </select>
+                          </td>
 
                             @can('inventory-log-details')
                                 @php
@@ -245,6 +250,15 @@
                     addUpdatedData(id, field);
                 }
             });
+            $('#dtBasicExample3 tbody td').on('change', '.upload_status', function () {
+                var id = $(this).data('id');
+                var field = $(this).data('field');
+                console.log(id);
+                console.log(field);
+                if(feildValidInput == true) {
+                    addUpdatedData(id, field);
+                }
+            });
             $('#dtBasicExample3 tbody td').on('change', '.country', function () {
                 var id = $(this).data('id');
                 var field = $(this).data('field');
@@ -262,6 +276,8 @@
             });
 
             function validData(field,id) {
+                console.log(field);
+                console.log(id);
 
                 if(field == 'pord_month') {
                     let InputId = 'pord_month-editable-'+id;
@@ -335,19 +351,20 @@
                     let InputId = 'color_code-editable-'+id;
                     let colorCode = $('#'+InputId).text();
 
-                    if(colorCode.length > 5 ) {
-                        $msg = "Maximum length is 5";
+                    if(colorCode.length > 7 ) {
+                        $msg = "Maximum length is 7";
                         showValidationError(InputId,$msg);
 
-                    }else if(colorCode.length < 4) {
+                    }else if(colorCode.length < 4 && colorCode.length > 0) {
                         $msg = "Minimum length is 4";
                         showValidationError(InputId,$msg);
-                    }else{
-                        console.log("lenght is ok");
+                    } else{
+                        console.log("length is not ok");
                         removeValidationError(InputId);
                     }
 
-                    if(colorCode.length == 5 || colorCode.length == 4) {
+
+                    if(colorCode.length >= 4 && colorCode.length <= 7 ) {
                         $.ajax({
                             type:"GET",
                             url: url,
@@ -356,11 +373,13 @@
                             },
                             dataType : 'json',
                             success: function(data) {
+                                console.log(data);
                                 if(data == 0) {
                                     $msg = "This color code is not existing in our master Color Codes.";
                                     showValidationError(InputId, $msg);
                                 }else{
                                     console.log("colour code existing");
+                                    console.log(InputId);
                                     removeValidationError(InputId);
                                 }
                             }
@@ -372,7 +391,7 @@
 
                     if($.isNumeric(deliveryNote)) {
                         if(deliveryNote.length < 5) {
-                            $msg = "Delivey Note minimum length should be 5";
+                            $msg = "Delivery Note minimum length should be 5";
                             showValidationError(InputId,$msg);
                         }else {
                             removeValidationError(InputId);
@@ -398,7 +417,7 @@
                          console.log(cellId);
 
                          if(splitValue[1] == 'model_year' || splitValue[1] == 'supplier_id' ||  splitValue[1] == 'eta_import'
-                         || splitValue[1] == 'country' || splitValue[1] == 'whole_sales' ) {
+                         || splitValue[1] == 'country' || splitValue[1] == 'whole_sales' || splitValue[1] == 'upload_status' ) {
                              var cellValue = $('#'+ cellId).val();
                          }else{
                              var cellValue = $('#'+ cellId).text();
@@ -431,6 +450,7 @@
         });
         function addUpdatedData(id,field) {
             var arrayvalue = id + '-' + field;
+            console.log(arrayvalue);
 
             if ($.inArray(arrayvalue, updatedData) == -1) {
                 updatedData.push(arrayvalue);
@@ -444,10 +464,11 @@
             alertify.error($msg);
         }
         function removeValidationError(id){
-
+            console.log("error not found");
             feildValidInput = true;
             $('#'+id).attr('title', "");
             $('#'+id).css('color', 'black');
+            console.log(feildValidInput);
         }
     </script>
 @endpush

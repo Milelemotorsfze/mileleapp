@@ -12,7 +12,8 @@ class EmployeeController extends Controller
     public function index()
     {
         $activeEmployees = EmployeeProfile::where('current_status','active')->where('type','employee')->orderBy('first_name','ASC')->get();
-        return view('hrm.employee.index',compact('activeEmployees'));
+        $inactiveEmployees = EmployeeProfile::where('current_status','inactive')->where('type','employee')->orderBy('first_name','ASC')->get();
+        return view('hrm.employee.index',compact('activeEmployees','inactiveEmployees'));
     }
 
     public function create()
@@ -38,7 +39,7 @@ class EmployeeController extends Controller
                 }
            } 
            catch (\Exception $e) {
-               dd($e);
+               info($e);
            }
         }
     }
@@ -64,5 +65,12 @@ class EmployeeController extends Controller
                dd($e);
            }
         }
+    }
+    public function show($id) {
+        $data = EmployeeProfile::where('id',$id)->first();
+        // dd($data);
+        $previous = EmployeeProfile::where('id', '<', $id)->max('id');
+        $next = EmployeeProfile::where('id', '>', $id)->min('id');
+        return view('hrm.employee.show',compact('data','previous','next'));
     }
 }

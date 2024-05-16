@@ -131,6 +131,10 @@ class JoiningReport extends Model
     public function reportingManager() {
         return $this->hasOne(User::class,'id','department_head_id');
     }
+    // for finding teamlead in edit new joining report
+    // public function teamLead() {
+    //     return $this->hasOne(User::class,'id','department_head_id');
+    // }
     public function preparedBy() {
         return $this->hasOne(User::class,'id','prepared_by_id');
     }

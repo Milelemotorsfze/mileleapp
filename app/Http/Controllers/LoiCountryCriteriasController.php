@@ -182,9 +182,8 @@ class LoiCountryCriteriasController extends Controller
     }
     public function CheckCountryCriteria(Request $request)
     {
-        info($request->all());
+//        info($request->all());
         $LoiCountryCriteria = LoiCountryCriteria::where('country_id', $request->country_id)->where('status', LoiCountryCriteria::STATUS_ACTIVE)->first();
-
         $data = [];
         if(!empty($LoiCountryCriteria->comment)) {
             $data['comment'] = $LoiCountryCriteria->comment;
@@ -193,6 +192,7 @@ class LoiCountryCriteriasController extends Controller
             if($LoiCountryCriteria->is_only_company_allowed == LoiCountryCriteria::YES ) {
                 if($request->customer_type !== \App\Models\Customer::CUSTOMER_TYPE_COMPANY ) {
                     $data['customer_type_error'] = 'Only Company Can allow to Create LOI for this Country.';
+                    $data['company_only_allowed_error'] = 'Company can Only Create LOI.';
                 }
             }
         }
@@ -208,20 +208,11 @@ class LoiCountryCriteriasController extends Controller
                 }
             }
             if($LoiCountryCriteria->max_qty_for_company > 0 && $request->customer_type == \App\Models\Customer::CUSTOMER_TYPE_COMPANY) {
-                info("customer is company");
-                info($LoiCountryCriteria->max_qty_for_company);
-                info($request->total_quantities);
-
                 if($LoiCountryCriteria->max_qty_for_company < $request->total_quantities) {
-                    info("Quantity should be less than");
                     $data['max_qty_per_company_error'] = 'Quantity should be less than '.$LoiCountryCriteria->max_qty_for_company;
                 }
             }
         }
-        if($LoiCountryCriteria->is_only_company_allowed == true) {
-            $data['company_only_allowed_error'] = 'Company can Only Create LOI.';
-        }
-
         return response()->json($data);
 
     }

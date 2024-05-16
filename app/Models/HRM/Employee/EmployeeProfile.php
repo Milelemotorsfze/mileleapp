@@ -20,6 +20,9 @@ use App\Models\Country;
 use App\Models\EmpDoc;
 use App\Models\HRM\Hiring\InterviewSummaryReport;
 use App\Models\HRM\Employee\JoiningReport;
+use App\Models\HRM\Employee\Increment;
+use App\Models\HRM\Employee\TicketAllowance;
+use App\Models\HRM\Employee\BirthdayGift;
 class EmployeeProfile extends Model
 {
     use HasFactory, SoftDeletes;
@@ -142,7 +145,8 @@ class EmployeeProfile extends Model
         'offer_signed_at',
         'offer_letter_hr_id',
         'offer_letter_fileName',
-        
+        'offer_letter_no',
+        'offer_letter_code',
     ];
     protected $appends = [
         'candidate_joining_type',
@@ -243,11 +247,20 @@ class EmployeeProfile extends Model
     public function candidateLanguages() {
         return $this->hasMany(EmployeeSpokenLanguage::class,'candidate_id','id');
     }
+    public function employeeLanguages() {
+        return $this->hasMany(EmployeeSpokenLanguage::class,'employee_id','user_id');
+    }
     public function emergencyContactUAE() {
         return $this->hasMany(UAEEmergencyContact::class,'candidate_id','id');
     }
+    public function empEmergencyContactUAE() {
+        return $this->hasMany(UAEEmergencyContact::class,'employee_id','user_id');
+    }
     public function emergencyContactHomeCountry() {
         return $this->hasMany(HomeCountryEmergencyContact::class,'candidate_id','id');
+    }
+    public function empEmergencyContactHomeCountry() {
+        return $this->hasMany(HomeCountryEmergencyContact::class,'employee_id','user_id');
     }
     public function spouseNationality() {
         return $this->hasOne(Country::class,'id','spouse_nationality');
@@ -260,6 +273,9 @@ class EmployeeProfile extends Model
     }
     public function candidateChildren() {
         return $this->hasMany(Children::class,'candidate_id','id');
+    }
+    public function employeeChildren() {
+        return $this->hasMany(Children::class,'employee_id','user_id');
     }
     public function candidatePassport() {
         return $this->hasMany(EmpDoc::class,'candidate_id','id')->where('document_name','passport');
@@ -282,5 +298,13 @@ class EmployeeProfile extends Model
     public function candidateJoiningReport() {
         return $this->hasMany(JoiningReport::class,'candidate_id','id');
     }
-    
+    public function increments() {
+        return $this->hasMany(Increment::class,'employee_id','user_id')->orderBy('increament_effective_date','DESC');
+    }
+    public function ticket() {
+        return $this->hasMany(TicketAllowance::class,'employee_id','user_id')->orderBy('eligibility_year','DESC');
+    }
+    public function insurance() {
+        return $this->hasMany(Insurance::class,'employee_id','user_id')->orderBy('insurance_policy_end_date','DESC');
+    }
 }
