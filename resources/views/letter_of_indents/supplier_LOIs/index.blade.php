@@ -300,6 +300,7 @@
                                                                 <div class="col-lg-8 col-md-12 col-sm-12">
                                                                     <input type="date" name="loi_approval_date" id="rejection-date"
                                                                            required class="form-control widthinput" >
+                                                                    <span id="loi-rejection-date-error" class="text-danger"> </span>
                                                                 </div>
                                                             </div>
                                                             <div class="row mt-2">
@@ -393,6 +394,7 @@
                                                          <div class="col-lg-8 col-md-12 col-sm-12">
                                                              <input type="date" name="loi_approval_date" id="approval-date"
                                                                     required class="form-control widthinput">
+                                                             <span id="loi-approval-date-error" class="text-danger"> </span>
                                                          </div>
                                                      </div>
                                                     <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
@@ -428,6 +430,7 @@
                             <th>Prefered Location</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
+                            <th>Approved Date</th>
                             <th>Actions</th>
 
                         </tr>
@@ -450,6 +453,7 @@
                                 <td>{{ $letterOfIndent->destination }}</td>
                                 <td>{{ $letterOfIndent->prefered_location }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
+                                <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->loi_approval_date)->format('d m Y') }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
                                     <button type="button" class="btn btn-soft-violet btn-sm" data-bs-toggle="modal" title="View LOI Item Lists"
@@ -748,23 +752,39 @@
                     },
                 },
             });
-
+                $('#approval-date').change(function () {
+                    $msg= "";
+                    removeLOIApprovalDateError($msg)
+                });
+                $('#rejection-date').change(function () {
+                    $msg= "";
+                    removeLOIRejectionDateError($msg)
+                });
 
             $('.status-change-button-approve').click(function () {
                 var id = $('#id').val();
                 var status = $('#status-approve').val();
                 var date = document.getElementById("approval-date").value
-
-                statusChange(id,status,date);
+                if(date.length > 0) {
+                    statusChange(id,status,date);
+                }else{
+                    $msg = "This field is required";
+                    showLOIApprovalDateError($msg)
+                }
             })
             $('.status-reject-button').click(function (e) {
                 var id = $('#id').val();
                 var status = $('#status-reject').val();
                 var date = document.getElementById("rejection-date").value
-                statusChange(id,status,date)
+                if(date.length > 0) {
+                    statusChange(id,status,date)
+                }else{
+                    $msg = "This field is required";
+                    showLOIRejectionDateError($msg)
+                }
             })
             function statusChange(id,status,date) {
-                console.log(date);
+
                 let url = '{{ route('letter-of-indents.supplier-approval') }}';
                 if(status == 'REJECTED') {
                         var message = 'Reject';
@@ -796,6 +816,30 @@
         }
         })
 
+            function showLOIApprovalDateError($msg)
+            {
+                document.getElementById("loi-approval-date-error").textContent=$msg;
+                document.getElementById("approval-date").classList.add("is-invalid");
+                document.getElementById("loi-approval-date-error").classList.add("paragraph-class");
+            }
+            function removeLOIApprovalDateError($msg)
+            {
+                document.getElementById("loi-approval-date-error").textContent="";
+                document.getElementById("approval-date").classList.remove("is-invalid");
+                document.getElementById("loi-approval-date-error").classList.remove("paragraph-class");
+            }
+            function showLOIRejectionDateError($msg)
+            {
+                document.getElementById("loi-rejection-date-error").textContent=$msg;
+                document.getElementById("rejection-date").classList.add("is-invalid");
+                document.getElementById("loi-rejection-date-error").classList.add("paragraph-class");
+            }
+            function removeLOIRejectionDateError($msg)
+            {
+                document.getElementById("loi-rejection-date-error").textContent="";
+                document.getElementById("rejection-date").classList.remove("is-invalid");
+                document.getElementById("loi-rejection-date-error").classList.remove("paragraph-class");
+            }
     </script>
 @endpush
 
