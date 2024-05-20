@@ -161,6 +161,7 @@ class QuotationController extends Controller
                     $agentsId = $agentIdsArray[0];
                 } 
                 else {
+                    $agentsin = 1;
                     foreach ($agentIdsArray as $agentId) {
                         $multipleAgent = new MuitlpleAgents();
                         $multipleAgent->agents_id = $agentId;
@@ -591,27 +592,29 @@ class QuotationController extends Controller
     $quotation->shipping_method = $request->shipping_method;
     $quotation->save();
     $agentsId = $request->agents_id;
+    $lastAgentId = null;
     if (!isset($agentsId) || empty($agentsId)) {
-    } 
-    else {
+        // Handle the case where $agentsId is not set or is empty.
+    } else {
         $agentIdsArray = explode(',', $agentsId);
         $agentsCount = count($agentIdsArray);
-        if ($agentsCount == 1) {
-            $agentId = $agentIdsArray[0];
-            $agentsId = $agentId;
-        } 
-        else {
-            $agentId = $agentIdsArray[0];
-            $agentsId = $agentId;
-            foreach ($agentIdsArray as $agentId) {
-                $agentsin = 1;
-                $multipleAgent = new MuitlpleAgents();
-                $multipleAgent->agents_id = $agentId;
-                $multipleAgent->quotations_id = $quotation->id;
-                $multipleAgent->save();
-            }
+        $existingAgentIds = [];
+    
+        foreach ($agentIdsArray as $agentId) {
+            $agentsin = 1;
+            $multipleAgent = MuitlpleAgents::updateOrCreate(
+                ['agents_id' => $agentId, 'quotations_id' => $quotation->id],
+                ['agents_id' => $agentId, 'quotations_id' => $quotation->id]
+            );
+            $multipleAgentId = $multipleAgent->id;
+            $existingAgentIds[] = $agentId;
+            $lastAgentId = $agentId;
         }
-    }
+        // Find and delete agents that are not in the $agentIdsArray
+        MuitlpleAgents::where('quotations_id', $quotation->id)
+            ->whereNotIn('agents_id', $existingAgentIds)
+            ->delete();
+    }        
     $quotationDetail = QuotationDetail::where('quotation_id', $qoutationid)->first();
     if ($quotationDetail) {
     $quotationDetail->quotation_id  = $quotation->id;
@@ -630,8 +633,12 @@ class QuotationController extends Controller
         if($agentsin == 1)
         {
             $quotationDetail->muitlple_agents_id = $multipleAgent->id;
+            $quotationDetail->agents_id = $lastAgentId;
         }
-        $quotationDetail->agents_id = $request->agents_id;
+        else
+        {
+            $quotationDetail->agents_id = $request->agents_id;
+        }
         $quotationDetail->advance_amount = $request->advance_amount;
         $quotationDetail->due_date = $request->due_date;
         $quotationDetail->selected_bank = $request->select_bank;
@@ -985,7 +992,9 @@ class QuotationController extends Controller
         }else{
             $shippingChargeDistriAmount = 0;
         }
-        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
+        $quotationid = $quotation->id;
+        $multiplecp = MuitlpleAgents::where('quotations_id', $quotationid)->where('agents_id', '!=', $quotationDetail->agents_id)->get();
+        $pdfFile = Pdf::loadView('proforma.proforma_invoice', compact('multiplecp','quotation','data','quotationDetail','aed_to_usd_rate','aed_to_eru_rate',
             'vehicles','addons', 'shippingCharges','shippingDocuments','otherDocuments','shippingCertifications','directlyAddedAddons','addonsTotalAmount',
         'otherVehicles','vehicleWithBrands','OtherAddons','shippingChargeDistriAmount'));
         $filename = 'quotation_'.$quotation->id.'.pdf';
@@ -1354,4 +1363,10 @@ public function uploadingQuotation(Request $request)
 
     return response()->json(['success' => 'File has been uploaded and saved successfully.']);
 }
+public function getAgentsByQuotationId($quotationId)
+    {
+        $quotationdetails = QuotationDetail::where('quotation_id' , $quotationId)->first();
+        $agents = MuitlpleAgents::with('agent')->where('quotations_id', $quotationId)->where('agents_id', '!=', $quotationdetails->agents_id)->get();
+        return response()->json($agents);
+    }
 }
