@@ -553,8 +553,8 @@
                 name: 'varaints.name',
                 render: function(data, type, row) {
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
-                }
-            },
+                    }
+                },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
@@ -566,8 +566,8 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' },
-              { data: 'po_number', name: 'purchasing_order.po_number' },
-              { data: 'po_date', name: 'purchasing_order.po_date' },
+                { data: 'po_number', name: 'purchasing_order.po_number' },
+                { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
                 { data: 'date', name: 'grn.date' },
                 { data: 'inspection_date', name: 'inspection_date' },

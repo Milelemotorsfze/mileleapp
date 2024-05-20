@@ -92,6 +92,20 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
+        'wordpress' => [
+            'driver' => 'mysql',
+            'host' => env('WP_DB_HOST', 'localhost'), // Use the IP address of the secondary cPanel account
+            'port' => env('WP_DB_PORT', '3306'),
+            'database' => env('WP_DB_DATABASE', 'milelepk_milelefze_pk'),
+            'username' => env('WP_DB_USERNAME', 'milelepk_milelefze_pk'),
+            'password' => env('WP_DB_PASSWORD', 'Milele@2024'),
+            'unix_socket' => env('WP_DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => 'wp_', // Typically WordPress tables have a 'wp_' prefix
+            'strict' => false,
+            'engine' => null,
+        ],
 
     ],
 
