@@ -107,13 +107,7 @@
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
             <thead class="bg-soft-secondary">
                 <tr>
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>Estimated Arrival</th>
-                  <th>SO</th>
-                  <th>SO Date</th>
-                  <th>Sales Person</th>
-                  <th>Brand</th>
+                <th>Brand</th>
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
@@ -128,6 +122,12 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>PO</th>
+                  <th>PO Date</th>
+                  <th>Estimated Arrival</th>
+                  <th>SO</th>
+                  <th>SO Date</th>
+                  <th>Sales Person</th>
                 </tr>
               </thead>
               <tbody>
@@ -145,14 +145,7 @@
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
             <tr>
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>SO</th>
-                  <th>SO Date</th>
-                  <th>Sales Person</th>
-                  <th>Brand</th>
+            <th>Brand</th>
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
@@ -167,6 +160,13 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>PO</th>
+                  <th>PO Date</th>
+                  <th>GRN</th>
+                  <th>GRN Date</th>
+                  <th>SO</th>
+                  <th>SO Date</th>
+                  <th>Sales Person</th>
                 </tr>
               </thead>
               <tbody>
@@ -184,13 +184,7 @@
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
             <tr>
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>Inspection Date</th>
-                  <th>Inspection Remarks</th>
-                  <th>Brand</th>
+            <th>Brand</th>
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
@@ -205,6 +199,12 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>PO</th>
+                  <th>PO Date</th>
+                  <th>GRN</th>
+                  <th>GRN Date</th>
+                  <th>Inspection Date</th>
+                  <th>Inspection Remarks</th>
                   <th>GRN Report</th>
                 </tr>
               </thead>
@@ -223,16 +223,7 @@
             <table id="dtBasicExample4" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
             <tr>
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>Inspection Date</th>
-                  <th>Inspection Remarks</th>
-                  <th>Reservation Start</th>
-                  <th>Reservation End</th>
-                  <th>Sales Person</th>
-                  <th>Brand</th>
+            <th>Brand</th>
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
@@ -247,6 +238,15 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>PO</th>
+                  <th>PO Date</th>
+                  <th>GRN</th>
+                  <th>GRN Date</th>
+                  <th>Inspection Date</th>
+                  <th>Inspection Remarks</th>
+                  <th>Reservation Start</th>
+                  <th>Reservation End</th>
+                  <th>Sales Person</th>
                 </tr>
               </thead>
               <tbody>
@@ -264,16 +264,7 @@
             <table id="dtBasicExample5" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
             <tr>
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>Inspection Date</th>
-                  <th>Inspection Remarks</th>
-                  <th>SO Date</th>
-                  <th>So Number</th>
-                  <th>Sales Person</th>
-                  <th>Brand</th>
+            <th>Brand</th>
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
@@ -288,6 +279,15 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>PO</th>
+                  <th>PO Date</th>
+                  <th>GRN</th>
+                  <th>GRN Date</th>
+                  <th>Inspection Date</th>
+                  <th>Inspection Remarks</th>
+                  <th>SO Date</th>
+                  <th>So Number</th>
+                  <th>Sales Person</th>
                 </tr>
               </thead>
               <tbody>
@@ -305,16 +305,7 @@
             <table id="dtBasicExample6" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
             <tr>
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>SO Date</th>
-                  <th>SO Number</th>
-                  <th>Sales Person</th>
-                  <th>GDN</th>
-                  <th>GDN Date</th>
-                  <th>Brand</th>
+            <th>Brand</th>
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
@@ -329,6 +320,15 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>PO</th>
+                  <th>PO Date</th>
+                  <th>GRN</th>
+                  <th>GRN Date</th>
+                  <th>SO Date</th>
+                  <th>SO Number</th>
+                  <th>Sales Person</th>
+                  <th>GDN</th>
+                  <th>GDN Date</th>
                 </tr>
               </thead>
               <tbody>
@@ -347,15 +347,6 @@
             <thead class="bg-soft-secondary">
             <tr>
                   <th>Status</th>
-                  <th>PO</th>
-                  <th>PO Date</th>
-                  <th>GRN</th>
-                  <th>GRN Date</th>
-                  <th>SO Date</th>
-                  <th>SO Number</th>
-                  <th>Sales Person</th>
-                  <th>GDN</th>
-                  <th>GDN Date</th>
                   <th>Brand</th>
                   <th>Model Line</th>
                   <th>Model Description</th>
@@ -371,6 +362,15 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>PO</th>
+                  <th>PO Date</th>
+                  <th>GRN</th>
+                  <th>GRN Date</th>
+                  <th>SO Date</th>
+                  <th>SO Number</th>
+                  <th>Sales Person</th>
+                  <th>GDN</th>
+                  <th>GDN Date</th>
                 </tr>
               </thead>
               <tbody>
@@ -379,6 +379,21 @@
           </div> 
         </div>  
       </div>
+      <div class="modal fade" id="variantview" tabindex="-1" aria-labelledby="variantviewLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="variantviewLabel">View Variants</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
       </div>
     </div>
   </div>
@@ -389,16 +404,16 @@
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Incoming']) }}",
             columns: [
-              { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'estimation_date', name: 'vehicles.estimation_date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'so_date', name: 'so.so_date' },
-                { data: 'name', name: 'users.name' },
-                { data: 'brand_name', name: 'brands.brand_name' },
+              { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'varaints.name' },
+                { 
+                data: 'variant', 
+                name: 'varaints.name',
+                render: function(data, type, row) {
+                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+                }
+            },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
@@ -409,7 +424,13 @@
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' }
+                { data: 'location', name: 'warehouse.name' },
+              { data: 'po_number', name: 'purchasing_order.po_number' },
+                { data: 'po_date', name: 'purchasing_order.po_date' },
+                { data: 'estimation_date', name: 'vehicles.estimation_date' },
+                { data: 'so_number', name: 'so.so_number' },
+                { data: 'so_date', name: 'so.so_date' },
+                { data: 'name', name: 'users.name' }
             ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             buttons: [
@@ -429,17 +450,16 @@
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Pending Inspection']) }}",
             columns: [
-              { data: 'po_number', name: 'purchasing_order.po_number' },
-              { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'so_date', name: 'so.so_date' },
-                { data: 'name', name: 'users.name' },
-                { data: 'brand_name', name: 'brands.brand_name' },
+              { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'varaints.name' },
+                { 
+                data: 'variant', 
+                name: 'varaints.name',
+                render: function(data, type, row) {
+                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+                }
+            },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
@@ -450,7 +470,14 @@
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' }
+                { data: 'location', name: 'warehouse.name' },
+              { data: 'po_number', name: 'purchasing_order.po_number' },
+              { data: 'po_date', name: 'purchasing_order.po_date' },
+                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'date', name: 'grn.date' },
+                { data: 'so_number', name: 'so.so_number' },
+                { data: 'so_date', name: 'so.so_date' },
+                { data: 'name', name: 'users.name' },
             ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
@@ -467,16 +494,16 @@
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Available Stock']) }}",
             columns: [
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'inspection_date', name: 'inspection_date' },
-                { data: 'grn_remark', name: 'vehicles.grn_remark' },
-                { data: 'brand_name', name: 'brands.brand_name' },
+              { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'varaints.name' },
+                { 
+                data: 'variant', 
+                name: 'varaints.name',
+                render: function(data, type, row) {
+                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+                }
+            },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
@@ -488,6 +515,13 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' },
+                { data: 'po_number', name: 'purchasing_order.po_number' },
+                { data: 'po_date', name: 'purchasing_order.po_date' },
+                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'date', name: 'grn.date' },
+                { data: 'inspection_date', name: 'inspection_date' },
+                { data: 'grn_remark', name: 'vehicles.grn_remark' },
+               
                 { 
             data: 'id', 
             name: 'id',
@@ -511,19 +545,16 @@
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Booked']) }}",
             columns: [
-              { data: 'po_number', name: 'purchasing_order.po_number' },
-              { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'inspection_date', name: 'inspection_date' },
-                { data: 'grn_remark', name: 'vehicles.grn_remark' },
-                { data: 'reservation_start_date', name: 'reservation_start_date' },
-                { data: 'reservation_end_date', name: 'reservation_end_date' },
-                { data: 'name', name: 'users.name' },
-                { data: 'brand_name', name: 'brands.brand_name' },
+              { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'varaints.name' },
+                { 
+                data: 'variant', 
+                name: 'varaints.name',
+                render: function(data, type, row) {
+                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+                }
+            },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
@@ -534,7 +565,16 @@
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' }
+                { data: 'location', name: 'warehouse.name' },
+              { data: 'po_number', name: 'purchasing_order.po_number' },
+              { data: 'po_date', name: 'purchasing_order.po_date' },
+                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'date', name: 'grn.date' },
+                { data: 'inspection_date', name: 'inspection_date' },
+                { data: 'grn_remark', name: 'vehicles.grn_remark' },
+                { data: 'reservation_start_date', name: 'reservation_start_date' },
+                { data: 'reservation_end_date', name: 'reservation_end_date' },
+                { data: 'name', name: 'users.name' },
             ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
@@ -551,19 +591,16 @@
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Sold']) }}",
             columns: [
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'inspection_date', name: 'inspection_date' },
-                { data: 'grn_remark', name: 'vehicles.grn_remark' },
-                { data: 'so_date', name: 'so.so_date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'name', name: 'users.name' },
-                { data: 'brand_name', name: 'brands.brand_name' },
+              { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'varaints.name' },
+                { 
+                data: 'variant', 
+                name: 'varaints.name',
+                render: function(data, type, row) {
+                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+                }
+            },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
@@ -574,7 +611,16 @@
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' }
+                { data: 'location', name: 'warehouse.name' },
+                { data: 'po_number', name: 'purchasing_order.po_number' },
+                { data: 'po_date', name: 'purchasing_order.po_date' },
+                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'date', name: 'grn.date' },
+                { data: 'inspection_date', name: 'inspection_date' },
+                { data: 'grn_remark', name: 'vehicles.grn_remark' },
+                { data: 'so_date', name: 'so.so_date' },
+                { data: 'so_number', name: 'so.so_number' },
+                { data: 'name', name: 'users.name' }
             ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
@@ -591,19 +637,16 @@
             serverSide: true,
             ajax: "{{ route('vehicles.statuswise', ['status' => 'Delivered']) }}",
             columns: [
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'so_date', name: 'so.so_date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'name', name: 'users.name' },
-                { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdn.date' },
-                { data: 'brand_name', name: 'brands.brand_name' },
+              { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'varaints.name' },
+                { 
+                data: 'variant', 
+                name: 'varaints.name',
+                render: function(data, type, row) {
+                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+                }
+            },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
@@ -614,7 +657,16 @@
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' }
+                { data: 'location', name: 'warehouse.name' },
+                { data: 'po_number', name: 'purchasing_order.po_number' },
+                { data: 'po_date', name: 'purchasing_order.po_date' },
+                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'date', name: 'grn.date' },
+                { data: 'so_date', name: 'so.so_date' },
+                { data: 'so_number', name: 'so.so_number' },
+                { data: 'name', name: 'users.name' },
+                { data: 'gdn_number', name: 'gdn.gdn_number' },
+                { data: 'gdndate', name: 'gdn.date' }
             ],
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         });
@@ -633,19 +685,16 @@
             ajax: "{{ route('vehicles.statuswise', ['status' => 'allstock']) }}",
             columns: [
               { data: 'id', name: 'vehicles.id' },
-                { data: 'po_number', name: 'purchasing_order.po_number' },
-                { data: 'po_date', name: 'purchasing_order.po_date' },
-                { data: 'grn_number', name: 'grn.grn_number' },
-                { data: 'date', name: 'grn.date' },
-                { data: 'so_date', name: 'so.so_date' },
-                { data: 'so_number', name: 'so.so_number' },
-                { data: 'name', name: 'users.name' },
-                { data: 'gdn_number', name: 'gdn.gdn_number' },
-                { data: 'gdndate', name: 'gdn.date' },
-                { data: 'brand_name', name: 'brands.brand_name' },
+              { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
                 { data: 'model_detail', name: 'varaints.model_detail' },
-                { data: 'variant', name: 'varaints.name' },
+                { 
+                data: 'variant', 
+                name: 'varaints.name',
+                render: function(data, type, row) {
+                    return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
+                }
+            },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
@@ -656,7 +705,16 @@
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
-                { data: 'location', name: 'warehouse.name' }
+                { data: 'location', name: 'warehouse.name' },
+                { data: 'po_number', name: 'purchasing_order.po_number' },
+                { data: 'po_date', name: 'purchasing_order.po_date' },
+                { data: 'grn_number', name: 'grn.grn_number' },
+                { data: 'date', name: 'grn.date' },
+                { data: 'so_date', name: 'so.so_date' },
+                { data: 'so_number', name: 'so.so_number' },
+                { data: 'name', name: 'users.name' },
+                { data: 'gdn_number', name: 'gdn.gdn_number' },
+                { data: 'gdndate', name: 'gdn.date' }, 
             ],
             columnDefs: [
         {
@@ -691,6 +749,22 @@
                 $('.row-badge7').hide();
             }
         });
+        $('#variantview').on('show.bs.modal', function () {
+        var scrollTop = $(window).scrollTop();
+        $('body').css({
+            position: 'fixed',
+            top: -scrollTop + 'px',
+            width: '100%'
+        }).data('scrollTop', scrollTop);
+    }).on('hidden.bs.modal', function () {
+        var scrollTop = $('body').data('scrollTop');
+        $('body').css({
+            position: '',
+            top: '',
+            width: ''
+        });
+        $(window).scrollTop(scrollTop);
+    });
 });
 function exportToExcel(tableId) {
     var table = document.getElementById(tableId);
@@ -722,6 +796,146 @@ function exportToExcel(tableId) {
   function generatePDF(vehicleId) {
     var url = `/viewgrnreport/method?vehicle_id=${vehicleId}`;
     window.open(url, '_blank');
+}
+function openModal(id) {
+    $.ajax({
+        url: '/variants_details/' + id,
+        type: 'GET',
+        success: function(response) {
+            $('#variantview .modal-body').empty();
+            var modalBody = $('#variantview .modal-body');
+            var variantDetailsTable = $('<table class="table table-bordered"></table>');
+            var variantDetailsBody = $('<tbody></tbody>');
+            if (response.modifiedVariants) {
+            variantDetailsBody.append('<tr><th>Attribute</th><th>Options</th><th>Modified Option</th></tr>');
+            if(response.variants.name != response.basevaraint.name)
+            {
+              variantDetailsBody.append('<tr><th>Name</th><td>' + response.basevaraint.name + '</td><td>' + response.variants.name + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Name</th><td>' + response.variants.name + '</td></tr>');
+            }
+            if(response.basevaraint.steering != response.variants.steering)
+            {
+            variantDetailsBody.append('<tr><th>Steering</th></td><td>'+ response.basevaraint.steering +'<td>' + response.variants.steering + '</td></tr>');
+            }
+            else {
+              variantDetailsBody.append('<tr><th>Steering</th></td><td>'+ response.basevaraint.steering +'<td></td></tr>');
+            }
+            if(response.basevaraint.engine != response.variants.engine)
+            {
+            variantDetailsBody.append('<tr><th>Engine</th></td><td>'+ response.basevaraint.engine +'<td>' + response.variants.engine + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Engine</th></td><td>'+ response.basevaraint.engine +'<td></td></tr>');
+            }
+            if(response.basevaraint.my != response.variants.my)
+            {
+            variantDetailsBody.append('<tr><th>Production Year</th></td><td>'+ response.basevaraint.my +'<td>' + response.variants.my + '</td></tr>');
+            }
+            else 
+            {
+            variantDetailsBody.append('<tr><th>Production Year</th></td><td>'+ response.basevaraint.my +'<td></td></tr>');
+            }
+            if(response.basevaraint.fuel_type != response.variants.fuel_type)
+            {
+            variantDetailsBody.append('<tr><th>Fuel Type</th></td><td>'+ response.basevaraint.fuel_type +'<td>' + response.variants.fuel_type + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Fuel Type</th></td><td>'+ response.basevaraint.fuel_type +'<td></td></tr>');
+            }
+            if(response.basevaraint.gearbox != response.variants.gearbox)
+            {
+            variantDetailsBody.append('<tr><th>Gear</th></td><td>'+ response.basevaraint.gearbox +'<td>' + response.variants.gearbox + '</td></tr>');
+            }
+            else 
+            {
+              variantDetailsBody.append('<tr><th>Gear</th></td><td>'+ response.basevaraint.gearbox +'<td></td></tr>');
+            }
+            if(response.basevaraint.drive_train != response.variants.drive_train)
+            {
+            variantDetailsBody.append('<tr><th>Drive Train</th></td><td>'+ response.basevaraint.drive_train +'<td>' + response.variants.drive_train + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Drive Train</th></td><td>'+ response.basevaraint.drive_train +'<td></td></tr>');
+            }
+            if(response.basevaraint.upholestry != response.variants.upholestry)
+            {
+            variantDetailsBody.append('<tr><th>Upholstery</th></td><td>'+ response.basevaraint.upholestry +'<td>' + response.variants.upholestry + '</td></tr>');
+            }
+            else
+            {
+              variantDetailsBody.append('<tr><th>Upholstery</th></td><td>'+ response.basevaraint.upholestry +'<td></td></tr>'); 
+            }
+            }
+            else 
+            {
+            variantDetailsBody.append('<tr><th>Attribute</th><th>Options</th></tr>');
+            variantDetailsBody.append('<tr><th>Name</th><td>' + response.variants.name + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Steering</th><td>' + response.variants.steering + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Engine</th><td>' + response.variants.engine + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Production Year</th><td>' + response.variants.my + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Fuel Type</th><td>' + response.variants.fuel_type + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Gear</th><td>' + response.variants.gearbox + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Drive Train</th><td>' + response.variants.drive_train + '</td></tr>');
+            variantDetailsBody.append('<tr><th>Upholstery</th><td>' + response.variants.upholestry + '</td></tr>');
+            }
+            variantDetailsTable.append(variantDetailsBody);
+            modalBody.append('<h5>Variant Details:</h5>');
+            modalBody.append(variantDetailsTable);
+              modalBody.append('<h5>Attributes Items:</h5>');
+              var variantItemsTable = $('<table class="table table-bordered"></table>');
+              if (response.modifiedVariants) {
+              var variantItemsHeader = $('<thead><tr><th>Attributes</th><th>Options</th><th>Modified Option</th></tr></thead>');
+              }
+              else{
+                var variantItemsHeader = $('<thead><tr><th>Attributes</th><th>Options</th></tr></thead>');
+              }
+              var variantItemsBody = $('<tbody></tbody>');
+              console.log(response.variantItems);
+              response.variantItems.forEach(function(variantItem) {
+                  var specificationName = variantItem.model_specification ? variantItem.model_specification.name : 'N/A';
+                  var optionName = variantItem.model_specification_option ? variantItem.model_specification_option.name : 'N/A';
+                  var modificationOption = '';
+                  if (response.modifiedVariants) {
+                      response.modifiedVariants.forEach(function(modifiedVariant) {
+                          if (modifiedVariant.modified_variant_items && modifiedVariant.modified_variant_items.name === specificationName) {
+                              modificationOption = modifiedVariant.addon ? modifiedVariant.addon.name : '';
+                          }
+                      });
+                      variantItemsBody.append('<tr><td>' + specificationName + '</td><td>' + optionName + '</td><td>' + modificationOption + '</td></tr>');
+                  }
+                  else{
+                    variantItemsBody.append('<tr><td>' + specificationName + '</td><td>' + optionName + '</td></tr>');
+                  }
+              });
+              variantItemsTable.append(variantItemsHeader);
+              variantItemsTable.append(variantItemsBody);
+              modalBody.append(variantItemsTable);
+            if (response.modifiedVariants) {
+                modalBody.append('<h5>Modified Attributes Items:</h5>');
+                var modifiedVariantTable = $('<table class="table table-bordered"></table>');
+                var modifiedVariantHeader = $('<thead><tr><th>Modified Attributes</th><th>Modified Option</th></tr></thead>');
+                var modifiedVariantBody = $('<tbody></tbody>');
+                response.modifiedVariants.forEach(function(modifiedVariant) {
+                  console.log(modifiedVariant);
+                    var modifiedVariantName = modifiedVariant.modified_variant_items ? modifiedVariant.modified_variant_items.name : 'N/A';
+                    var addonName = modifiedVariant.addon ? modifiedVariant.addon.name : 'N/A';
+                    modifiedVariantBody.append('<tr><td>' + modifiedVariantName + '</td><td>' + addonName + '</td></tr>');
+                });
+                modifiedVariantTable.append(modifiedVariantHeader);
+                modifiedVariantTable.append(modifiedVariantBody);
+                modalBody.append(modifiedVariantTable);
+            }
+            $('#variantview').modal('show');
+        },
+        error: function(xhr, status, error) {
+        }
+    });
 }
 </script>
 @endsection

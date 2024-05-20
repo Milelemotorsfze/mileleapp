@@ -1,6 +1,6 @@
 <style>
     .badge-notification {
-      top: 0;
+      top: -20;
       right: 0;
       transform: translate(50%, -10%);
       background-color: red;
