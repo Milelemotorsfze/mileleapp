@@ -5,6 +5,7 @@ use App\Models\ColorCode;
 use App\Events\DataUpdatedEvent;
 use App\Models\VehicleApprovalRequests;
 use App\Models\Vehicles;
+use App\Models\WordpressPost;
 use App\Models\PurchasingOrder;
 use App\Models\Varaint;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -3057,5 +3058,21 @@ public function viewalls(Request $request)
     }
     $pdf = PDF::loadView('Reports.Grn', ['vehicle' => $vehicle]);
     return $pdf->stream('vehicle-details.pdf');
+    }
+    public function fetchData()
+    {
+        try {
+            // Attempt to get data from the WordPress posts table
+            $posts = WordpressPost::limit(10)->get();
+            // Check if any posts are returned
+            if ($posts->isEmpty()) {
+                return response()->json(['status' => 'success', 'message' => 'Connected to the database but no posts found'], 200);
+            } else {
+                return response()->json(['status' => 'success', 'message' => 'Successfully connected to the database', 'data' => $posts], 200);
+            }
+        } catch (\Exception $e) {
+            // Catch any errors
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
     }
     }
