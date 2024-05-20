@@ -219,7 +219,7 @@
                 </tr>
             </table>
         </div>
-        @if(isset($multiplecp))
+        @if($multiplecp->isNotEmpty())
     <div style="color: black">
         <table style="border: none;">
             <tr style="background-color: #bbbbbd;color: #000000;font-weight: bold">
@@ -228,15 +228,13 @@
             <tr>
             @foreach($multiplecp as $multiplecps)
                 <?php $quotationcpname = DB::table('agents')->where('id', $multiplecps->agents_id)->first(); ?>
-                <td style="font-weight: bold;"> CR Name :</td>
-                <td> {{ $quotationcpname->name ?? '' }} </td>
+                <td style="font-weight: bold;"> CR Name    :      {{ $quotationcpname->name ?? '' }} </td>
             @endforeach
             </tr>
             <tr>
             @foreach($multiplecp as $multiplecps)
                 <?php $quotationcpnum = DB::table('agents')->where('id', $multiplecps->agents_id)->first(); ?>
-                <td style="font-weight: bold;"> CR Number :</td>
-                <td> {{ $quotationcpnum->phone ?? '' }} </td>
+                <td style="font-weight: bold;"> CR Number  :       {{ $quotationcpnum->phone ?? '' }} </td>
             @endforeach
             </tr>
         </table>
