@@ -94,7 +94,7 @@ return [
         ],
         'wordpress' => [
             'driver' => 'mysql',
-            'host' => env('WP_DB_HOST', 'localhost'), // Use the IP address of the secondary cPanel account
+            'host' => env('WP_DB_HOST', '127.0.0.1'), // Use the IP address of the secondary cPanel account
             'port' => env('WP_DB_PORT', '3306'),
             'database' => env('WP_DB_DATABASE', 'milelepk_milelefze_pk'),
             'username' => env('WP_DB_USERNAME', 'milelepk_milelefze_pk'),
@@ -102,7 +102,7 @@ return [
             'unix_socket' => env('WP_DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => 'wp_', // Typically WordPress tables have a 'wp_' prefix
+            'prefix' => '', // Typically WordPress tables have a 'wp_' prefix
             'strict' => false,
             'engine' => null,
         ],
