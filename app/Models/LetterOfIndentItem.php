@@ -45,9 +45,9 @@ class LetterOfIndentItem extends Model
         $LoiItem = LetterOfIndentItem::find($this->id);
 
         if($Loi->dealers == 'Trans Cars') {
-            $loiDescription = $LoiItem->masterModel->transcar_loi_description;
+            $loiDescription = $LoiItem->masterModel->transcar_loi_description ?? '';
         }else{
-            $loiDescription = $LoiItem->masterModel->milele_loi_description;
+            $loiDescription = $LoiItem->masterModel->milele_loi_description ?? '';
         }
 
         return $loiDescription;
