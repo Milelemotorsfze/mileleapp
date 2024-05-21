@@ -8,6 +8,15 @@
       border-radius: 50%;
       padding: 0.3rem 0.6rem;
     }
+    .badge-notificationing {
+      top: 0;
+      right: 0;
+      transform: translate(50%, -10%);
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      padding: 0.3rem 0.6rem;
+    }
     .approval-count {
         color:white!important;
         background-color:#fd625e!important;
@@ -1447,7 +1456,7 @@
                                 ->where('status', 'New')
                                 ->count();
                             @endphp
-                            <span class="badge badge-danger row-badge2 badge-notification">{{$notificationcount}}</span>
+                            <span class="badge badge-danger row-badge2 badge-notificationing">{{$notificationcount}}</span>
                         </a>
                         <div class="dropdown-divider"></div>
                         @endif
