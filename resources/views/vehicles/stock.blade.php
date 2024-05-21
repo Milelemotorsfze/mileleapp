@@ -162,6 +162,8 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>Territory</th>
+                  <th>Final Destination</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>Estimated Arrival</th>
@@ -200,6 +202,8 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>Territory</th>
+                  <th>Final Destination</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -239,6 +243,8 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>Territory</th>
+                  <th>Final Destination</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -278,6 +284,8 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>Territory</th>
+                  <th>Final Destination</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -319,6 +327,8 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>Territory</th>
+                  <th>Final Destination</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -360,6 +370,8 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>Territory</th>
+                  <th>Final Destination</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -402,6 +414,8 @@
                   <th>Upholstery</th>
                   <th>Production Year</th>
                   <th>Location</th>
+                  <th>Territory</th>
+                  <th>Final Destination</th>
                   <th>PO</th>
                   <th>PO Date</th>
                   <th>GRN</th>
@@ -467,7 +481,9 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' },
-              { data: 'po_number', name: 'purchasing_order.po_number' },
+                { data: 'territory', name: 'vehicles.territory' },
+                { data: 'fd', name: 'purchasing_order.fd' },
+                { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'estimation_date', name: 'vehicles.estimation_date' },
                 { data: 'so_number', name: 'so.so_number' },
@@ -515,6 +531,8 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' },
+                { data: 'territory', name: 'vehicles.territory' },
+                { data: 'fd', name: 'purchasing_order.fd' },
               { data: 'po_number', name: 'purchasing_order.po_number' },
               { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -561,6 +579,8 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' },
+                { data: 'territory', name: 'vehicles.territory' },
+                { data: 'fd', name: 'purchasing_order.fd' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -614,6 +634,8 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' },
+                { data: 'territory', name: 'vehicles.territory' },
+                { data: 'fd', name: 'purchasing_order.fd' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -662,6 +684,8 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' },
+                { data: 'territory', name: 'vehicles.territory' },
+                { data: 'fd', name: 'purchasing_order.fd' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -710,6 +734,8 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' },
+                { data: 'territory', name: 'vehicles.territory' },
+                { data: 'fd', name: 'purchasing_order.fd' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
@@ -760,6 +786,8 @@
                 { data: 'upholestry', name: 'varaints.upholestry' },
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'location', name: 'warehouse.name' },
+                { data: 'territory', name: 'vehicles.territory' },
+                { data: 'fd', name: 'purchasing_order.fd' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'po_date', name: 'purchasing_order.po_date' },
                 { data: 'grn_number', name: 'grn.grn_number' },
