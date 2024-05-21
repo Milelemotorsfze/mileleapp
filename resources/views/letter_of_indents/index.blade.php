@@ -518,15 +518,15 @@
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
                                             @endphp
                                             @if ($hasPermission)
-                                                @if($letterOfIndent->total_loi_quantity > $letterOfIndent->total_approved_quantity)
                                                 <td>
-                                                    <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
-                                                        <button type="button" class="btn btn-soft-green btn-sm" title="Update Utilization Quantity" >
-                                                            <i class="fa fa-edit"></i>
-                                                        </button>
-                                                    </a>
+                                                    @if($letterOfIndent->total_loi_quantity > $letterOfIndent->total_approved_quantity)
+                                                        <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
+                                                            <button type="button" class="btn btn-soft-green btn-sm" title="Update Utilization Quantity" >
+                                                                <i class="fa fa-edit"></i>
+                                                            </button>
+                                                        </a>
+                                                     @endif
                                                 </td>
-                                                 @endif
                                             @endif
                                         @endcan
 
@@ -691,8 +691,7 @@
                                     @endcan
                                     <th>Total Quantity</th>
                                     <th>Utilized Quantity</th>
-                                    <th width="100">LOI </th>
-
+                                    <th width="200">LOI </th>
                                     <th width="150px">Actions</th>
                                 </tr>
                                 </thead>

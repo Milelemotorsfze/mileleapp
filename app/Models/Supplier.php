@@ -76,6 +76,7 @@ class Supplier extends Model
     public const SUPPLIER_CATEGORY_OTHER = 'Other';
     public const SUPPLIER_SUB_CATEGORY_BULK = 'Bulk';
     public const SUPPLIER_SUB_CATEGORY_SMALL_SEGMENT = 'Small Segment';
+    public const MIGRATED_SUPPLIER_DUMMY_CONTACT_NUMBER = '+97112345';
 
     public function supplierAddons()
     {
