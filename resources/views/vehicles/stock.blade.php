@@ -59,6 +59,46 @@
      Stock Info
     </h4>
     <br>
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">Vehicle Pictures</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner" id="carouselImages">
+          </div>
+          <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="noImageModal" tabindex="-1" role="dialog" aria-labelledby="noImageModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="noImageModalLabel">No Images Available</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        No images are available on the website for this vehicle.
+      </div>
+      <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Incoming
@@ -414,7 +454,9 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
-                { data: 'vin', name: 'vehicles.vin' },
+            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+        }},
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
@@ -460,7 +502,9 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
-                { data: 'vin', name: 'vehicles.vin' },
+            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+        }},
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
@@ -504,7 +548,9 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
-                { data: 'vin', name: 'vehicles.vin' },
+            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+        }},
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
@@ -555,7 +601,9 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                     }
                 },
-                { data: 'vin', name: 'vehicles.vin' },
+                { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+        }},
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
@@ -601,7 +649,9 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
-                { data: 'vin', name: 'vehicles.vin' },
+            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+        }},
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
@@ -647,7 +697,9 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
-                { data: 'vin', name: 'vehicles.vin' },
+            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+        }},
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
@@ -695,7 +747,9 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
-                { data: 'vin', name: 'vehicles.vin' },
+            { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
+            return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
+        }},
                 { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
@@ -749,7 +803,8 @@
                 $('.row-badge7').hide();
             }
         });
-        $('#variantview').on('show.bs.modal', function () {
+        function handleModalShow(modalId) {
+    $(modalId).on('show.bs.modal', function () {
         var scrollTop = $(window).scrollTop();
         $('body').css({
             position: 'fixed',
@@ -765,6 +820,10 @@
         });
         $(window).scrollTop(scrollTop);
     });
+}
+handleModalShow('#imageModal');
+handleModalShow('#noImageModal');
+handleModalShow('#variantview'); // Already existing modal
 });
 function exportToExcel(tableId) {
     var table = document.getElementById(tableId);
@@ -935,6 +994,50 @@ function openModal(id) {
         },
         error: function(xhr, status, error) {
         }
+    });
+}
+function fetchVehicleData(vehicleId) {
+    $.ajax({
+        url: "{{ route('fetchData') }}",
+        method: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            vehicle_id: vehicleId
+        },
+        success: function(response) {
+            if (response.gallery) {
+                displayGallery(response.gallery);
+                $('#imageModal').modal('show');
+            } else {
+                alert('No post found');
+            }
+            console.log(response);
+        },
+        error: function(xhr) {
+            if (xhr.status === 404) {
+                showNoImagePopup();
+            } else {
+                console.error(xhr);
+            }
+        }
+    });
+}
+
+function showNoImagePopup() {
+    $('#noImageModal').modal('show');
+}
+
+function displayGallery(imageUrls) {
+    var carouselImages = document.getElementById("carouselImages");
+    carouselImages.innerHTML = "";
+    imageUrls.forEach(function(url, index) {
+        var div = document.createElement("div");
+        div.className = "carousel-item" + (index === 0 ? " active" : "");
+        var img = document.createElement("img");
+        img.className = "d-block w-100";
+        img.src = url;
+        div.appendChild(img);
+        carouselImages.appendChild(div);
     });
 }
 </script>

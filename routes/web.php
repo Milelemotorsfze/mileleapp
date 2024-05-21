@@ -842,7 +842,7 @@ Route::get('/d', function () {
 
     Route::post('/upload-quotation-file', [QuotationController::class, 'uploadingquotation'])->name('uploadingquotation.update');
     Route::get('/get-agents/{quotationId}', [QuotationController::class, 'getAgentsByQuotationId']);
-    Route::get('/fetchData', [VehiclesController::class, 'fetchData']);
+    Route::post('/fetchData', [VehiclesController::class, 'fetchData'])->name('fetchData');
 
 
 
