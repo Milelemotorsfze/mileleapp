@@ -3066,31 +3066,15 @@ public function viewalls(Request $request)
     $vehicleId = $request->input('vehicle_id');
     $vehicle = Vehicles::with('variant', 'exterior')->findOrFail($vehicleId);
     $variant = $vehicle->variant->name;
-    if($vehicle->ex_colour)
-    {
-    $exteriorColor = $vehicle->exterior->name;
-    $post = DB::connection('wordpress')->table('mm_posts')
-    ->join('mm_postmeta as variant_meta', 'mm_posts.ID', '=', 'variant_meta.post_id')
-    ->join('mm_postmeta as color_meta', 'mm_posts.ID', '=', 'color_meta.post_id')
-    ->where('variant_meta.meta_key', 'Car ID')
-    ->where('variant_meta.meta_value', $variant)
-    ->where('color_meta.meta_key', 'color')
-    ->where('color_meta.meta_value', $exteriorColor)
-    ->where('mm_posts.post_status', 'publish')
-    ->select('mm_posts.ID', 'mm_posts.post_title', 'mm_posts.post_name')
-    ->first();
+
+    $post = $this->fetchPost($variant, $vehicle->exterior ? $vehicle->exterior->name : null);
+
+    if (!$post) {
+        // Remove the first letter of the variant name and try again
+        $variant = substr($variant, 1);
+        $post = $this->fetchPost($variant, $vehicle->exterior ? $vehicle->exterior->name : null);
     }
-    else
-    {
-        $post = DB::connection('wordpress')->table('mm_posts')
-        ->join('mm_postmeta as variant_meta', 'mm_posts.ID', '=', 'variant_meta.post_id')
-        ->join('mm_postmeta as color_meta', 'mm_posts.ID', '=', 'color_meta.post_id')
-        ->where('variant_meta.meta_key', 'Car ID')
-        ->where('variant_meta.meta_value', $variant)
-        ->where('mm_posts.post_status', 'publish')
-        ->select('mm_posts.ID', 'mm_posts.post_title', 'mm_posts.post_name')
-        ->first();
-    }
+
     if ($post) {
         $galleryMeta = DB::connection('wordpress')->table('mm_postmeta')
             ->where('post_id', $post->ID)
@@ -3116,5 +3100,23 @@ public function viewalls(Request $request)
     } else {
         return response()->json(['message' => 'No post found'], 404);
     }
+}
+
+private function fetchPost($variant, $exteriorColor)
+{
+    $query = DB::connection('wordpress')->table('mm_posts')
+        ->join('mm_postmeta as variant_meta', 'mm_posts.ID', '=', 'variant_meta.post_id')
+        ->join('mm_postmeta as color_meta', 'mm_posts.ID', '=', 'color_meta.post_id')
+        ->where('variant_meta.meta_key', 'Car ID')
+        ->where('variant_meta.meta_value', $variant)
+        ->where('mm_posts.post_status', 'publish');
+
+    if ($exteriorColor) {
+        $query->where('color_meta.meta_key', 'color')
+            ->where('color_meta.meta_value', $exteriorColor);
+    }
+
+    return $query->select('mm_posts.ID', 'mm_posts.post_title', 'mm_posts.post_name')
+        ->first();
 }
     }
