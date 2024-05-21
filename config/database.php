@@ -92,6 +92,20 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
+        'wordpress' => [
+            'driver' => 'mysql',
+            'host' => env('WP_DB_HOST', '127.0.0.1'), // Use the IP address of the secondary cPanel account
+            'port' => env('WP_DB_PORT', '3306'),
+            'database' => env('WP_DB_DATABASE', 'milelemotorsfze_motors'),
+            'username' => env('WP_DB_USERNAME', 'milelemotorsfze_motors'),
+            'password' => env('WP_DB_PASSWORD', 'f_GvOj$iuBHk'),
+            'unix_socket' => env('WP_DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '', // Typically WordPress tables have a 'wp_' prefix
+            'strict' => false,
+            'engine' => null,
+        ],
     ],
 
     /*
