@@ -3065,8 +3065,7 @@ public function viewalls(Request $request)
 {
     $vehicleId = $request->input('vehicle_id');
     $vehicle = Vehicles::with('variant', 'exterior')->findOrFail($vehicleId);
-    $variant = $vehicle->variant->name;
-
+    $variant = str_replace(' ', '', $vehicle->variant->name);
     $post = $this->fetchPost($variant, $vehicle->exterior ? $vehicle->exterior->name : null);
 
     if (!$post) {
