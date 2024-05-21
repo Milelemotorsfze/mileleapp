@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 use App\Models\ColorCode;
+use Illuminate\Support\Facades\Log;
 use App\Events\DataUpdatedEvent;
 use App\Models\VehicleApprovalRequests;
 use App\Models\Vehicles;
 use App\Models\PurchasingOrder;
 use App\Models\Varaint;
 use App\Models\WordpressPost;
+use App\Models\WordpressPostMeta;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Brand;
 use App\Models\Grn;
@@ -3004,7 +3006,7 @@ public function viewalls(Request $request)
                         'warehouse.name as location',
                          DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
                         'vehicles.ppmmyyy',
-                        'vehicles.vin',
+                        'vehicles.vin as vin',
                         'vehicles.engine',
                         'brands.brand_name',
                         'varaints.name as variant',
@@ -3059,36 +3061,60 @@ public function viewalls(Request $request)
     $pdf = PDF::loadView('Reports.Grn', ['vehicle' => $vehicle]);
     return $pdf->stream('vehicle-details.pdf');
     }
-    public function fetchData()
+    public function fetchData(Request $request)
+{
+    $vehicleId = $request->input('vehicle_id');
+    $vehicle = Vehicles::with('variant', 'exterior')->findOrFail($vehicleId);
+    $variant = $vehicle->variant->name;
+    if($vehicle->ex_colour)
     {
-        $variant = $request->input('variant');
-        $exteriorColor = $request->input('exterior_color');
-
-        // Query the WordPress database to find the post
-        $post = DB::connection('wordpress')->table('wp_posts')
-            ->join('wp_postmeta as variant_meta', 'wp_posts.ID', '=', 'variant_meta.post_id')
-            ->join('wp_postmeta as color_meta', 'wp_posts.ID', '=', 'color_meta.post_id')
-            ->where('variant_meta.meta_key', 'Car ID')
-            ->where('variant_meta.meta_value', $variant)
-            ->where('color_meta.meta_key', 'Exterior Color')
-            ->where('color_meta.meta_value', $exteriorColor)
-            ->where('wp_posts.post_status', 'publish')
-            ->select('wp_posts.ID', 'wp_posts.post_title', 'wp_posts.post_name')
+    $exteriorColor = $vehicle->exterior->name;
+    $post = DB::connection('wordpress')->table('mm_posts')
+    ->join('mm_postmeta as variant_meta', 'mm_posts.ID', '=', 'variant_meta.post_id')
+    ->join('mm_postmeta as color_meta', 'mm_posts.ID', '=', 'color_meta.post_id')
+    ->where('variant_meta.meta_key', 'Car ID')
+    ->where('variant_meta.meta_value', $variant)
+    ->where('color_meta.meta_key', 'color')
+    ->where('color_meta.meta_value', $exteriorColor)
+    ->where('mm_posts.post_status', 'publish')
+    ->select('mm_posts.ID', 'mm_posts.post_title', 'mm_posts.post_name')
+    ->first();
+    }
+    else
+    {
+        $post = DB::connection('wordpress')->table('mm_posts')
+        ->join('mm_postmeta as variant_meta', 'mm_posts.ID', '=', 'variant_meta.post_id')
+        ->join('mm_postmeta as color_meta', 'mm_posts.ID', '=', 'color_meta.post_id')
+        ->where('variant_meta.meta_key', 'Car ID')
+        ->where('variant_meta.meta_value', $variant)
+        ->where('mm_posts.post_status', 'publish')
+        ->select('mm_posts.ID', 'mm_posts.post_title', 'mm_posts.post_name')
+        ->first();
+    }
+    if ($post) {
+        $galleryMeta = DB::connection('wordpress')->table('mm_postmeta')
+            ->where('post_id', $post->ID)
+            ->where('meta_key', 'gallery')
             ->first();
 
-        if ($post) {
-            $postLink = get_permalink($post->ID);
-            return response()->json(['link' => $postLink]);
-        } else {
-            return response()->json(['message' => 'No post found'], 404);
-        }
-    }
+        $galleryIds = unserialize($galleryMeta->meta_value);
 
-    // Helper function to generate permalink
-    protected function get_permalink($postId)
-    {
-        $post = WordpressPost::find($postId);
-        $link = home_url('/' . $post->post_name . '/');
-        return $link;
+        $imageUrls = [];
+        foreach ($galleryIds as $id) {
+            $imagePost = DB::connection('wordpress')->table('mm_posts')
+                ->where('ID', $id)
+                ->first();
+            
+            if ($imagePost) {
+                $imageUrls[] = $imagePost->guid;
+            }
+        }
+
+        return response()->json([
+            'gallery' => $imageUrls
+        ]);
+    } else {
+        return response()->json(['message' => 'No post found'], 404);
     }
+}
     }
