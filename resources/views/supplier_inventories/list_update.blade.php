@@ -105,6 +105,7 @@
                     <th>Interior Color</th>
                     <th>Exterior Color</th>
                     <th>ETA Import Date</th>
+                    <th>Aging</th>
                     <th>Production Month</th>
                     <th>DN Number</th>
                     <th>LOI</th>
@@ -178,6 +179,17 @@
                             <td class="eta-import">
                                 <input type="date" class="eta-import form-control" data-field="eta_import" id="eta_import-editable-{{$supplierInventory->id}}"
                                        data-id="{{$supplierInventory->id}}" value="{{ $supplierInventory->eta_import }}" >
+                            </td>
+                            <td>
+                                @if($supplierInventory->eta_import)
+                                    <?php
+                                    $etaImport = \Illuminate\Support\Carbon::createFromDate($supplierInventory->eta_import);
+                                    $now = \Illuminate\Support\Carbon::now();
+                                    ?>
+                                    {{ $etaImport->diffInDays($now) }}
+                                @else
+                                    0
+                                @endif
                             </td>
                             <td data-field="pord_month" class="pord_month"  id="pord_month-editable-{{$supplierInventory->id}}"  contenteditable="true"
                                 data-id="{{$supplierInventory->id}}" >{{$supplierInventory->pord_month}}</td>
