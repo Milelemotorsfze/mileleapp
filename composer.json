@@ -26,6 +26,7 @@
         "microsoft/azure-storage-blob": "^1.5",
         "microsoft/microsoft-graph": "^1.36",
         "monarobase/country-list": "^3.4",
+        "motze92/office365-mail": "^3.1",
         "nesbot/carbon": "^2.68",
         "php-http/curl-client": "^2.3",
         "phpoffice/phpspreadsheet": "^1.29",
