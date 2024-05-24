@@ -105,7 +105,7 @@ use App\Http\Controllers\PreOrderController;
 use App\Http\Controllers\PostingRecordsController;
 use App\Http\Controllers\MarketingPurchasingPaymentsController;
 use App\Http\Controllers\LeadsNotificationsController;
-
+use App\Http\Controllers\Auth\GoogleOAuthController;
 
 /*
 /*
@@ -118,6 +118,8 @@ use App\Http\Controllers\LeadsNotificationsController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/auth/google', [GoogleOAuthController::class, 'redirectToGoogle']);
+Route::get('/callback', [GoogleOAuthController::class, 'handleGoogleCallback']);
 Route::get('clientsignature/{uniqueNumber}/{quotationId}', [QuotationController::class, 'showBySignature'])->name('quotation.showBySignature');
 Route::post('/submit-signature', [QuotationController::class, 'submitSignature']);
 Route::match(['get', 'post'], '/whatsapp/receive', [WebhookController::class, 'sendMessage']);
