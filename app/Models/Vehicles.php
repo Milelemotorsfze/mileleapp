@@ -44,6 +44,7 @@ class Vehicles extends Model
         'reservation_end_date',
         'conversion',
         'inspection_date',
+        'procurement_vehicle_remarks',
 
     ];
     public function variant()
