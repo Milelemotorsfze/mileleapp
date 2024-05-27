@@ -277,7 +277,9 @@
                                 <tr style="color: #643702;">
                                     <td style="padding-left: 40px;"><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>
                                         {{ $addon->quotationItem->description ?? ''}}</td>
+                                        @if($quotationDetail->cb_name)
                                     <td> {{$addon->quotationItem->system_code_currency ."". $addon->quotationItem->system_code_amount }}</td>
+                                    @endif
                                     <td>{{ $addon->quotationItem->quantity ?? ''}}</td>
                                     <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->unit_price, 2) }}</td>
                                     <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->total_amount, 2) }}</td>
