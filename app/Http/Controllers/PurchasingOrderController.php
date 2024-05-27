@@ -264,6 +264,31 @@ else
         }
         return view('warehouse.index', compact('data'));
     }
+    public function filterpaymentrejectioned($status)
+    {
+        $userId = auth()->user()->id;
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        if ($hasPermission){
+            $data = PurchasingOrder::with('purchasing_order_items')
+            ->where('purchasing_order.status', $status)
+            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.payment_status', 'Payment Release Rejected')
+            ->select('purchasing_order.*')
+            ->groupBy('purchasing_order.id')
+            ->get();
+        }
+        else
+        {
+            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+            ->where('purchasing_order.status', $status)
+            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.payment_status', 'Payment Release Rejected')
+            ->select('purchasing_order.*')
+            ->groupBy('purchasing_order.id')
+            ->get();
+        }
+        return view('warehouse.index', compact('data'));
+    }
     public function filterpaymentrel($status)
     {
         $userId = auth()->user()->id;
@@ -2255,4 +2280,59 @@ else
 }
 return view('warehouse.index', compact('data'));
 }
+public function rerequestpayment(Request $request)
+{
+    $id = $request->input('orderId');
+    $status = $request->input('status');
+    $vehicles = DB::table('vehicles')
+    ->where('purchasing_order_id', $id)
+    ->where('status', 'Payment Requested')
+    ->where('payment_status', 'Payment Release Rejected')
+    ->get();
+    foreach ($vehicles as $vehicle) {
+        $status = 'Payment Requested';
+        $payment_status = 'Payment Initiated';
+        DB::table('vehicles')
+            ->where('id', $vehicle->id)
+            ->update(['status' => $status, 'payment_status' => $payment_status]);
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+                $vehicleslog = new Vehicleslog();
+                $vehicleslog->time = $currentDateTime->toTimeString();
+                $vehicleslog->date = $currentDateTime->toDateString();
+                $vehicleslog->status = 'Re Payment Initiated';
+                $vehicleslog->vehicles_id = $vehicle->id;
+                $vehicleslog->field = "Vehicle Status, Payment Status";
+                $vehicleslog->old_value = "Payment Re Initiate Request";
+                $vehicleslog->new_value = "Payment Release Rejected";
+                $vehicleslog->created_by = auth()->user()->id;
+                $vehicleslog->role = Auth::user()->selectedRole;
+                $vehicleslog->save();
+            }
+            return redirect()->back()->with('success', 'Payment Status Updated');
+       }
+       public function repaymentintiation($id)
+       {
+           $vehicle = Vehicles::find($id);
+           if ($vehicle) {
+               $vehicle->status = 'Payment Requested';
+               $vehicle->payment_status = 'Payment Initiated Request';
+               $vehicle->save();
+               $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+               $currentDateTime = Carbon::now($dubaiTimeZone);
+                   $vehicleslog = new Vehicleslog();
+                   $vehicleslog->time = $currentDateTime->toTimeString();
+                   $vehicleslog->date = $currentDateTime->toDateString();
+                   $vehicleslog->status = 'Payment Re Initiated Request';
+                   $vehicleslog->vehicles_id = $id;
+                   $vehicleslog->field = "Vehicle Status, Payment Status";
+                   $vehicleslog->old_value = "Payment Released Rejected";
+                   $vehicleslog->new_value = "Payment Re Initiated Request";
+                   $vehicleslog->created_by = auth()->user()->id;
+                   $vehicleslog->role = Auth::user()->selectedRole;
+                   $vehicleslog->save();
+               return redirect()->back()->with('success', 'Payment Initiated Request confirmed. Vehicle status updated.');
+           }
+           return redirect()->back()->with('error', 'Vehicle not found.');
+       }
 }

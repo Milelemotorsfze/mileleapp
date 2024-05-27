@@ -365,16 +365,16 @@
                             @endif
                         @endif
                         @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('re-payment-request');
                         @endphp
                         @if ($hasPermission)
                             @if ($purchasingOrder->status === 'Approved')
-                                @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('status', 'Request for Payment'))
+                                @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Release Rejected'))
                                     <div class="col-lg-2 col-md-3 col-sm-12">
-                                        <label for="choices-single-default" class="form-label"><strong>Payment Request Approval</strong></label>
+                                        <label for="choices-single-default" class="form-label"><strong>Re-Request for Payment</strong></label>
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-sm-12">
-                                        <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfin('Approved', {{ $purchasingOrder->id }})">Approved All</button>
+                                        <button id="approval-btn" class="btn btn-success" onclick="rerequestpayment('Approved', {{ $purchasingOrder->id }})">Re-Request All</button>
                                     </div>
                                 @endif
                             @endif
@@ -789,6 +789,18 @@
 											@if ($vehicles->status === 'Request for Payment')
 											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentintconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
 											Approved Payment
+											</a>
+											@endif
+											@endif
+											@endif
+                                            @php
+											$hasPermission = Auth::user()->hasPermissionForSelectedRole('re-payment-request');
+											@endphp
+											@if ($hasPermission)
+											@if ($purchasingOrder->status === 'Approved')
+											@if ($vehicles->payment_status === 'Payment Release Rejected')
+											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.repaymentintiation', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+											Re-Payment Request
 											</a>
 											@endif
 											@endif
@@ -1713,6 +1725,27 @@
             }
             function allpaymentintreqfinpay(status, orderId) {
                 let url = '{{ route('purchasing.allpaymentreqssfinpay') }}';
+                let data = { status: status, orderId: orderId };
+                console.log(data);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify(data),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Status update successful');
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        window.location.reload();
+                    });
+            }
+            function rerequestpayment(status, orderId) {
+                let url = '{{ route('purchasing.rerequestpayment') }}';
                 let data = { status: status, orderId: orderId };
                 console.log(data);
                 fetch(url, {
