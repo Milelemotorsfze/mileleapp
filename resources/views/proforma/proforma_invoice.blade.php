@@ -189,7 +189,7 @@
                     <td colspan="2">Payment Details</td>
                     @endif
                     @if ($quotationDetail->representative_name || $quotationDetail->cb_name )
-                    <td colspan="4">Client  Representative</td>
+                    <td colspan="4">CR</td>
                     @endif
                 </tr>
                 <tr>
