@@ -58,6 +58,9 @@
                                 PROFORMA INVOICE
                             @endif
                         </p>
+                        <p class="margin-0" style="text-align:right;font-size: 12px;">
+                        Milele Motors FZE
+                        </p>
                         <p class="margin-0" style="text-align:right;"> Office No-AF 07, Block A,Samari Retail </p>
                         <p class="margin-0"> Ras Al khor, United Arab Emirates </p>
                         <p class="margin-0"> Tel.: +97143235991 | Email: info@milele.com </p>

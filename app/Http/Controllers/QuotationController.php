@@ -458,7 +458,7 @@ class QuotationController extends Controller
         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
         $pdfFile->save($generatedPdfDirectory . '/' . $filename);
         $pdf = $this->pdfMerge($quotation->id);
-        $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d').'.pdf';
+        $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d_H_i_s').'.pdf';
         $pdf->Output($directory.'/'.$file,'F');
         $quotation->file_path = 'quotation_files/'.$file; 
         $quotation->save();
@@ -1003,7 +1003,7 @@ class QuotationController extends Controller
         \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
         $pdfFile->save($generatedPdfDirectory . '/' . $filename);
         $pdf = $this->pdfMerge($quotation->id);
-        $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d').'.pdf';
+        $file = 'Quotation_'.$quotation->id.'_'.date('Y_m_d_H_i_s').'.pdf';
         $pdf->Output($directory.'/'.$file,'F');
         $quotation->file_path = 'quotation_files/'.$file; 
         $quotation->save();
