@@ -2291,7 +2291,7 @@ public function rerequestpayment(Request $request)
     ->get();
     foreach ($vehicles as $vehicle) {
         $status = 'Payment Requested';
-        $payment_status = 'Payment Initiated';
+        $payment_status = 'Payment Initiated Request';
         DB::table('vehicles')
             ->where('id', $vehicle->id)
             ->update(['status' => $status, 'payment_status' => $payment_status]);
