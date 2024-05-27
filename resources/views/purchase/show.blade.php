@@ -412,11 +412,13 @@
                         <th style="font-size: 12px;">S.No</th>
                         <th style="font-size: 12px;">Status</th>
                         <th style="font-size: 12px;">Qty</th>
+                        <th style="font-size: 12px;">Departments</th>
                         </thead>
                         <tbody>
                         @php
-                            $vehiclesapprovedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->count();
-                            $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->count();
+                            $vehiclescancelcount = DB::table('vehicles')->whereNotNull('deleted_at')->count();
+                            $vehiclesapprovedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->whereNull('deleted_at')->count();
+                            $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->whereNull('deleted_at')->count();
                             $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where(function ($query) {$query->where('status', 'Not Approved')->orWhere('status', 'New Changes');})->whereNull('deleted_at')->count();
                             $vehiclescountpaymentreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Requested')->whereNull('deleted_at')->count();
                             $vehiclescountpaymentrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Rejected')->whereNull('deleted_at')->count();
@@ -438,56 +440,73 @@
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Vehicles Not Approved</td>
                             <td style="font-size: 12px;">{{ $vehiclescountnotapproved }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
                         </tr>
                         <tr> 
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;"> Vehicles Approved</td>
                             <td style="font-size: 12px;">{{ $vehiclesapprovedcount }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Vehicles Rejected</td>
                             <td style="font-size: 12px;">{{ $vehiclesrejectedcount }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Requested To Manager</td>
+                            <td style="font-size: 12px;">Vehicles Cancel</td>
+                            <td style="font-size: 12px;">{{ $vehiclescancelcount }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
+                            <td style="font-size: 12px;">Payment Requested</td>
                             <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Request To Finance</td>
+                            <td style="font-size: 12px;">Payment Request</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitail }}</td>
+                            <td style="font-size: 12px;">Finance</td>
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Payment Initiated By Finance</td>
+                            <td style="font-size: 12px;">Payment Initiated</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailrelreq }}</td>
+                            <td style="font-size: 12px;">CEO</td>
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Payment Released</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailrelapp }}</td>
+                            <td style="font-size: 12px;">Finance</td>
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Payment Released Rejected</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailrelrej }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Payment Completed - Acknowledged</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailpaycomp }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Vendor Confirmed</td>
                             <td style="font-size: 12px;">{{ $vendorpaymentconfirm }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
                         </tr>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Incoming Stock</td>
                             <td style="font-size: 12px;">{{ $vendorpaymentincoming }}</td>
+                            <td style="font-size: 12px;">Procurement</td>
                         </tr>
                         </tbody>
                     </table>
