@@ -409,6 +409,7 @@
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <table id="dtBasicExample90" class="table table-striped table-editable table-edits table table-bordered table-sm">
                         <thead class="bg-soft-secondary">
+                        <th style="font-size: 12px;">S.No</th>
                         <th style="font-size: 12px;">Status</th>
                         <th style="font-size: 12px;">Qty</th>
                         </thead>
@@ -416,63 +417,75 @@
                         @php
                             $vehiclesapprovedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->count();
                             $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->count();
-                            $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where(function ($query) {$query->where('status', 'Not Approved')->orWhere('status', 'New Changes');})->count();
-                            $vehiclescountpaymentreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Requested')->count();
-                            $vehiclescountpaymentrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Rejected')->count();
-                            $vehiclescountpaymentcom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Completed')->count();
-                            $vehiclescountpaymentincom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->count();
-                            $vehiclescountrequestpay = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Request for Payment')->count();
-                            $vehiclescountintitail = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated Request')->count();
-                            $vehiclescountintitailreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Rejected')->count();
-                            $vehiclescountintitailapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Approved')->count();
-                            $vehiclescountintitailrelreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated')->count();
-                            $vehiclescountintitailrelapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Approved')->count();
-                            $vehiclescountintitailrelrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Rejected')->count();
-                            $vehiclescountintitailpaycomp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Completed')->count();
-                            $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Vendor Confirmed')->count();
-                            $vendorpaymentincoming = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Incoming Stock')->count();
-                        @endphp
+                            $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where(function ($query) {$query->where('status', 'Not Approved')->orWhere('status', 'New Changes');})->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Requested')->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentcom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Completed')->whereNull('deleted_at')->count();
+                            $vehiclescountpaymentincom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->whereNull('deleted_at')->count();
+                            $vehiclescountrequestpay = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Request for Payment')->whereNull('deleted_at')->count();
+                            $vehiclescountintitail = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated Request')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Approved')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailrelreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailrelapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Approved')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailrelrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Rejected')->whereNull('deleted_at')->count();
+                            $vehiclescountintitailpaycomp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Completed')->whereNull('deleted_at')->count();
+                            $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Vendor Confirmed')->whereNull('deleted_at')->count();
+                            $vendorpaymentincoming = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Incoming Stock')->whereNull('deleted_at')->count();
+                            $serialNumber = 1;   
+                            @endphp
                         <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Vehicles Not Approved</td>
                             <td style="font-size: 12px;">{{ $vehiclescountnotapproved }}</td>
                         </tr>
-                        <tr>
+                        <tr> 
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;"> Vehicles Approved</td>
                             <td style="font-size: 12px;">{{ $vehiclesapprovedcount }}</td>
                         </tr>
                         <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Vehicles Rejected</td>
                             <td style="font-size: 12px;">{{ $vehiclesrejectedcount }}</td>
                         </tr>
                         <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Payment Requested To Manager</td>
                             <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
                         </tr>
                         <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Payment Request To Finance</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitail }}</td>
                         </tr>
                         <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Payment Initiated By Finance</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailrelreq }}</td>
                         </tr>
                         <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Payment Released</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailrelapp }}</td>
                         </tr>
                         <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Payment Released Rejected</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailrelrej }}</td>
                         </tr>
                         <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Payment Completed - Acknowledged</td>
                             <td style="font-size: 12px;">{{ $vehiclescountintitailpaycomp }}</td>
                         </tr>
                         <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Vendor Confirmed</td>
                             <td style="font-size: 12px;">{{ $vendorpaymentconfirm }}</td>
                         </tr>
                         <tr>
+                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Incoming Stock</td>
                             <td style="font-size: 12px;">{{ $vendorpaymentincoming }}</td>
                         </tr>
@@ -526,6 +539,7 @@
                                     <th>Payment Status</th>
                                 @endif
                                 <th id="action" style="vertical-align: middle; text-align: center;">Action</th>
+                                <th style="vertical-align: middle; text-align: center;">Remarks</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -858,6 +872,7 @@
                         </div>
 							</div>
                         </td>
+                        <td>{{ ucfirst(strtolower($vehicles->procurement_vehicle_remarks)) }}</td>
                         </tr>
                             @endforeach
                             </tbody>
