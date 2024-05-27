@@ -34,6 +34,41 @@
     }
 </style>
 @section('content')
+<!-- Modal -->
+<div class="modal fade" id="remarksModal" tabindex="-1" aria-labelledby="remarksModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="remarksModalLabel">Enter Remarks</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <textarea id="remarks" class="form-control" rows="3"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="submitRemarks">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="remarksrejModal" tabindex="-1" aria-labelledby="remarksrejModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="remarksrejModalLabel">Enter Remarks</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <textarea id="remarks" class="form-control" rows="3"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="submitRemarksrej">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
     <div class="card-header">
         <!-- @if ($previousId)
             <a class="btn btn-sm btn-info" href="{{ route('purchasing-order.show', $previousId) }}">
@@ -753,8 +788,8 @@
                         <a title="Payment Release Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleasesconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
                         Approved
                         </a>
-                        <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.paymentreleasesrejected', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
-                        Reject
+                        <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="#" onclick="openModal('{{ $vehicles->id }}');" style="margin-right: 10px;">
+                            Reject
                         </a>
                         </div>
                         @endif
@@ -1200,9 +1235,45 @@
             </div>
         </div>
         <script>
+    let vehicleId;
+
+    function openModal(id) {
+        console.log("wamm");
+        vehicleId = id;
+        $('#remarksrejModal').modal('show');
+    }
+    function submitRemarksrej() {
+        const remarks = document.getElementById('remarks').value;
+        if (remarks) {
+            const url = `vehicles/paymentreleasesrejected/${vehicleId}`;
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({
+                    remarks: remarks
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                $('#remarksModal').modal('hide');
+                alert('Remarks submitted successfully');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        } else {
+            alert('Please provide remarks.');
+        }
+    }
+</script>
+        <script>
             $(document).ready(function() {
-
-
                 $('.select2').select2();
 
                 // Table #dtBasicExample2
@@ -1358,41 +1429,31 @@
             });
         </script>
         <script>
-            // Get all editable fields
             const editableFields = document.querySelectorAll('.editable-field');
-            // Get the Edit button and Update Success button
             const editBtn = document.querySelector('.edit-btn');
             const updateBtn = document.querySelector('.update-btn');
-            // Add event listener to the Edit button
             editBtn.addEventListener('click', () => {
-                // Toggle the Edit and Update Success buttons
                 editBtn.style.display = 'none';
                 updateBtn.style.display = 'block';
-                // Enable editing for all editable fields and change their color
                 editableFields.forEach(field => {
                     field.contentEditable = true;
                     field.classList.add('editing');
-                    // Remove the "disabled" attribute from the select elements
                     const selectElement = field.querySelector('select');
                     if (selectElement) {
                         selectElement.removeAttribute('disabled');
                     }
-                    // Check if the field belongs to the "Estimation Date" column
                     const isEstimationDateColumn = field.classList.contains('estimation_date');
-                    // Check if the field contains a null value and is not in the "Estimation Date" column
                     const fieldValue = field.innerText.trim();
                     const isNullValue = fieldValue === '';
                     if (isNullValue && !isEstimationDateColumn) {
                         return;
                     }
-                    // Replace the non-editable field with an editable input field
                     if (isEstimationDateColumn) {
                         const inputField = document.createElement('input');
                         inputField.type = 'date';
                         inputField.name = 'oldestimated_arrival[]';
                         inputField.value = fieldValue;
                         inputField.classList.add('form-control');
-                        // Replace the field with the input field
                         field.innerHTML = '';
                         field.appendChild(inputField);
                     }
@@ -1402,9 +1463,8 @@
     checkDuplicateVIN(function(vinCheckResult) {
         console.log(vinCheckResult);
         if (vinCheckResult === false) {
-            return; // Do nothing if VIN check fails
+            return;
         } else {
-            // Proceed with update logic
             updateBtn.style.display = 'none';
             editBtn.style.display = 'block';
             editableFields.forEach(field => {
@@ -1445,10 +1505,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Handle the response from the controller if needed
                 console.log(data);
-
-                // Display the flash message on the page
                 const flashMessage = document.getElementById('flash-message');
                 flashMessage.textContent = 'Data updated successfully';
                 flashMessage.style.display = 'block';
@@ -1621,27 +1678,45 @@
                     });
             }
             function updateallStatusrel(status, orderId) {
+    if (status === 'Rejected') {
+        let remarksModal = new bootstrap.Modal(document.getElementById('remarksModal'));
+        remarksModal.show();
 
-                let url = '{{ route('purchasing.updateallStatusrel') }}';
-                let data = { status: status, orderId: orderId };
+        document.getElementById('submitRemarks').onclick = function() {
+            let remarks = document.getElementById('remarks').value;
 
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify(data),
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Status update successful');
-                        window.location.reload();
-                    })
-                    .catch(error => {
-                        window.location.reload();
-                    });
+            if (remarks.trim() === '') {
+                alert('Please enter remarks.');
+                return;
             }
+            postUpdateStatus(status, orderId, remarks);
+            remarksModal.hide();
+        };
+    } else {
+        postUpdateStatus(status, orderId);
+    }
+}
+function postUpdateStatus(status, orderId, remarks = '') {
+    let url = '{{ route('purchasing.updateallStatusrel') }}';
+    let data = { status: status, orderId: orderId, remarks: remarks };
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Status update successful');
+        window.location.reload();
+    })
+    .catch(error => {
+        window.location.reload();
+    });
+}
             function deletepo(id) {
                 let url = '{{ route('purchasing-order.deletes', ['id' => ':id']) }}';
                 url = url.replace(':id', id);

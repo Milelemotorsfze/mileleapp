@@ -1693,9 +1693,9 @@ public function paymentreleasesconfirm($id)
     $vehicle = Vehicles::find($id);
     if ($vehicle) {
         DB::beginTransaction();
-
         $vehicle->status = 'Payment Requested';
         $vehicle->payment_status = 'Payment Release Approved';
+        $vehicle->procurement_vehicle_remarks = null;
         $vehicle->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -1735,12 +1735,13 @@ public function paymentreleasesconfirm($id)
     }
     return redirect()->back()->with('error', 'Vehicle not found.');
 }
-public function paymentreleasesrejected($id)
+public function paymentreleasesrejected(Request $request, $id)
 {
     $vehicle = Vehicles::find($id);
     if ($vehicle) {
         $vehicle->status = 'Payment Rejected';
         $vehicle->payment_status = 'Payment Release Rejected';
+        $vehicle->procurement_vehicle_remarks = $request->input('remarks');
         $vehicle->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -1904,11 +1905,9 @@ public function purchasingallupdateStatus(Request $request)
 }
 public function purchasingallupdateStatusrel(Request $request)
 {
-    // dd($request->all());
-
     $id = $request->input('orderId');
     $status = $request->input('status');
-
+    $remarks = $request->input('remarks', null);
     $vehicles = DB::table('vehicles')
         ->where('payment_status', 'Payment Initiated')
         ->where('purchasing_order_id', $id)
@@ -1916,12 +1915,19 @@ public function purchasingallupdateStatusrel(Request $request)
     foreach ($vehicles as $vehicle) {
         if ($status == 'Approved') {
                 $paymentStatus = 'Payment Release Approved';
+                $updateData = ['payment_status' => $paymentStatus,
+                'procurement_vehicle_remarks' => null
+            ];
             } elseif ($status == 'Rejected') {
                 $paymentStatus = 'Payment Release Rejected';
+                $updateData = [
+                    'payment_status' => $paymentStatus,
+                    'procurement_vehicle_remarks' => $remarks
+                ];
             }
             DB::table('vehicles')
                 ->where('id', $vehicle->id)
-                ->update(['payment_status' => $paymentStatus]);
+                ->update($updateData);
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
             $currentDateTime = Carbon::now($dubaiTimeZone);
             $vehicleslog = new Vehicleslog();
@@ -1935,7 +1941,6 @@ public function purchasingallupdateStatusrel(Request $request)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
-
             if($vehicle->model_id) {
                 $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
                                     ->pluck('approved_loi_id');
