@@ -639,6 +639,7 @@ Route::get('/d', function () {
     Route::get('vehicles/paymentrelconfirmincoming/{id}', [PurchasingOrderController::class, 'paymentrelconfirmincoming'])->name('vehicles.paymentrelconfirmincoming');
 
     Route::get('/purcahsing-order-filter/{status}', [PurchasingOrderController::class, 'filter'])->name('purchasing.filter');
+    Route::get('/purcahsing-order-filter-cancel/{status}', [PurchasingOrderController::class, 'filtercancel'])->name('purchasing.filtercancel');
     Route::get('/purcahsing-order-filterpayment/{status}', [PurchasingOrderController::class, 'filterpayment'])->name('purchasing.filterpayment');
     Route::get('/purcahsing-order-filterpaymentrejectioned/{status}', [PurchasingOrderController::class, 'filterpaymentrejectioned'])->name('purchasing.filterpaymentrejectioned');
     Route::get('/purcahsing-order-filterpaymentrel/{status}', [PurchasingOrderController::class, 'filterpaymentrel'])->name('purchasing.filterpaymentrel');
@@ -850,6 +851,8 @@ Route::get('/d', function () {
     Route::post('/upload-quotation-file', [QuotationController::class, 'uploadingquotation'])->name('uploadingquotation.update');
     Route::get('/get-agents/{quotationId}', [QuotationController::class, 'getAgentsByQuotationId']);
     Route::post('/fetchData', [VehiclesController::class, 'fetchData'])->name('fetchData');
+    Route::post('purchasing_order/cancelpo/{id}', [PurchasingOrderController::class, 'cancelpo'])->name('purchasing_order.cancelpo');
+    Route::post('/update-purchasing-status-cancel', [PurchasingOrderController::class, 'purchasingupdateStatuscancel'])->name('purchasing.updateStatuscancel');
 
 
 

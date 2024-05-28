@@ -121,6 +121,11 @@ class PurchasingOrderController extends Controller
         $data = PurchasingOrder::with('purchasing_order_items')->where('status', $status)->get();
         return view('warehouse.index', compact('data'));
     }
+    public function filtercancel($status)
+    {
+        $data = PurchasingOrder::with('purchasing_order_items')->where('status', $status)->get();
+        return view('warehouse.index', compact('data'));
+    }
     public function filterapprovedonly($status)
     {
         $userId = auth()->user()->id;
@@ -164,6 +169,7 @@ class PurchasingOrderController extends Controller
             $query->select(DB::raw(1))
                 ->from('vehicles')
                 ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                ->where('purchasing_order.status', '<>', 'Cancelled')
                 ->where(function ($query) {
                     $query->where('status', 'Request for Payment')
                         ->orWhere(function ($query) {
@@ -188,6 +194,7 @@ class PurchasingOrderController extends Controller
                 $query->select(DB::raw(1))
                     ->from('vehicles')
                     ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('purchasing_order.status', '<>', 'Cancelled')
                     ->where(function ($query) {
                         $query->where('status', 'Request for Payment')
                             ->orWhere(function ($query) {
@@ -210,7 +217,7 @@ class PurchasingOrderController extends Controller
     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
     if ($hasPermission){
     $data = PurchasingOrder::with('purchasing_order_items')
-    ->where('status', $status)
+    ->where('status', 'Approved')
     ->whereNotExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
@@ -227,7 +234,7 @@ else
     //     $query->where('purchasing_order.created_by', $userId)
     //         ->orWhere('purchasing_order.created_by', 16);
     // })
-    ->where('status', $status)
+    ->where('status', 'Approved')
     ->whereNotExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
@@ -807,7 +814,6 @@ public function getBrandsAndModelLines(Request $request)
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
             'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments'));
     }
-
     public function edit($id)
     {
     $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -2344,4 +2350,81 @@ public function rerequestpayment(Request $request)
            }
            return redirect()->back()->with('error', 'Vehicle not found.');
        }
+       public function cancelpo(Request $request, $id)
+    {
+        $purchasingOrder = PurchasingOrder::find($id);
+        if ($purchasingOrder) {
+            $purchasingOrder->status = 'Cancel Request';
+            $purchasingOrder->remarks = $request->input('remarks');
+            $purchasingOrder->save();
+            $purchasinglog = new Purchasinglog();
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+            $purchasinglog = new Purchasinglog();
+            $purchasinglog->time = now()->toTimeString();
+            $purchasinglog->date = now()->toDateString();
+            $purchasinglog->status = 'PO Cancelled Request';
+            $purchasinglog->purchasing_order_id = $id;
+            $purchasinglog->created_by = auth()->user()->id;
+            $purchasinglog->role = Auth::user()->selectedRole;
+            $purchasinglog->save();
+            // Respond with a JSON object indicating success and redirect URL
+            return response()->json([
+                'success' => true,
+                'redirectUrl' => route('purchasing-order.index')
+            ]);
+        }
+        // Respond with an error if the purchasing order was not found
+        return response()->json([
+            'success' => false,
+            'message' => 'Purchasing order not found.'
+        ], 404);
+    }
+    public function purchasingupdateStatuscancel(Request $request)
+    {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Cancel Purchasing Order";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        $id = $request->input('orderId');
+        $status = $request->input('status');
+        $purchasingOrder = PurchasingOrder::find($id);
+        if($status == "Rejected")
+        {
+            $purchasingOrder->status = "Approved";
+            $purchasingOrder->save();
+        }
+        else
+        {
+            $purchasingOrder->status = "Cancelled";
+            $purchasingOrder->save();
+            $purchasinglog = new Purchasinglog();
+            $purchasinglog->time = now()->toTimeString();
+            $purchasinglog->date = now()->toDateString();
+            $purchasinglog->status = 'PO Cancelled';
+            $purchasinglog->role = Auth::user()->selectedRole;
+            $purchasinglog->purchasing_order_id = $id;
+            $purchasinglog->created_by = auth()->user()->id;
+            $purchasinglog->save();
+            $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
+            foreach ($vehicles as $vehicle) {
+                $vehicleslog = new Vehicleslog();
+                $vehicleslog->time = now()->toTimeString();
+                $vehicleslog->date = now()->toDateString();
+                $vehicleslog->status = 'Vehicle Cancel';
+                $vehicleslog->vehicles_id = $id;
+                $vehicleslog->field = "Status";
+                $vehicleslog->old_value = $vehicle->status;
+                $vehicleslog->new_value = 'Vehicle Cancel';
+                $vehicleslog->created_by = auth()->user()->id;
+                $vehicleslog->role = Auth::user()->selectedRole;
+                $vehicleslog->save();
+                $vehicle->delete();   
+            }
+        }
+        return response()->json([
+            'success' => true,
+            'redirectUrl' => route('purchasing-order.index')
+        ]);
+    }
 }
