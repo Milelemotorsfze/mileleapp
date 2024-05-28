@@ -25,6 +25,7 @@ use App\Http\Controllers\HRM\Employee\OverTimeController;
 use App\Http\Controllers\HRM\Employee\SeparationController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
+use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -414,6 +415,17 @@ Route::get('/d', function () {
     });
      // Employee Overtime Application
      Route::resource('separation-handover', SeparationController::class);
+
+    // Work Order Module
+    Route::resource('work-order', WorkOrderController::class)->only([
+        'index', 'show','store'
+    ]);
+    Route::controller(WorkOrderController::class)->group(function(){
+        Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
+        // Route::get('export-cnf-work-order-create', 'exportCnfWorkOrderCreate')->name('export-cnf.createWO');
+        // Route::get('local-sale-work-order-create', 'exportLocalSaleWorkOrderCreate')->name('local-sale.createWO');
+        // Route::get('lto-work-order-create', 'exportLtoWorkOrderCreate')->name('lto.createWO');
+    });
     // Demand & Planning Module
 
     // suppliers

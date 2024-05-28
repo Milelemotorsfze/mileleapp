@@ -755,6 +755,112 @@
                             </li>
                             @endif
 
+                            <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                        <i data-feather="file-text"></i>
+                                        <span data-key="t-extra-pages">Work Order</span>
+                                        <div class="arrow-down"></div>
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Create Work Order</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('work-order-create.create','export_exw')}}" class="dropdown-item" data-key="t-login">Export EXW</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-cnf-wo']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('work-order-create.create','export_cnf')}}" class="dropdown-item" data-key="t-login">Export CNF</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-local-sale-wo']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{route('work-order-create.create','local_sale')}}" class="dropdown-item" data-key="t-login">Local Sale</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-lto-wo']);
+                                                @endphp
+                                                <!-- @if ($hasPermission)
+                                                <a href="{{route('work-order-create.create','lto')}}" class="dropdown-item" data-key="t-login">LTO</a>
+                                                @endif -->
+                                            </div>
+                                        </div>
+                                        @endif
+
+                                        <!-- @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create','accessories-list','spare-parts-list','kit-list']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Addons</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <a href="{{ route('addon.create') }}" class="dropdown-item" data-key="t-login">Create Addon</a>
+                                                <a href="{{ route('kit.create') }}" class="dropdown-item" data-key="t-login">Create Kit</a>
+                                                @endif
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list','spare-parts-list','kit-list']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                <div class="dropdown">
+                                                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                        <span data-key="t-utility"> Addons Types</span>
+                                                        <div class="arrow-down"></div>
+                                                    </a>
+                                                    <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                        @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list']);
+                                                        @endphp
+                                                        @if ($hasPermission)
+                                                        <a href="{{route('addon.list','P')}}" class="dropdown-item" data-key="t-login">Accessories</a>
+                                                        @endif
+
+                                                        @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['spare-parts-list']);
+                                                        @endphp
+                                                        @if ($hasPermission)
+                                                        <a href="{{route('addon.list','SP')}}" class="dropdown-item" data-key="t-login">Spare Parts</a>
+                                                        @endif
+                                                        @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['kit-list']);
+                                                        @endphp
+                                                        @if ($hasPermission)
+                                                        <a href="{{route('addon.list','K')}}" class="dropdown-item" data-key="t-login">Kits</a>
+                                                        @endif
+                                                        @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list','spare-parts-list','kit-list']);
+                                                        @endphp
+                                                        @if ($hasPermission)
+                                                        <a href="{{route('addon.list','all')}}" class="dropdown-item" data-key="t-login">All</a>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @endif -->
+                                    </div>
+                                </li>
+
                                 @can('Calls-view')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
