@@ -39,7 +39,7 @@ class EmployeeController extends Controller
                 }
            } 
            catch (\Exception $e) {
-               dd($e);
+               info($e);
            }
         }
     }
@@ -65,5 +65,12 @@ class EmployeeController extends Controller
                dd($e);
            }
         }
+    }
+    public function show($id) {
+        $data = EmployeeProfile::where('id',$id)->first();
+        // dd($data);
+        $previous = EmployeeProfile::where('id', '<', $id)->max('id');
+        $next = EmployeeProfile::where('id', '>', $id)->min('id');
+        return view('hrm.employee.show',compact('data','previous','next'));
     }
 }

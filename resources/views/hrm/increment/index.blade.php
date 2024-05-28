@@ -96,10 +96,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-increment',
 							<td>{{ $data->total_salary ?? ''}}</td>
 							<td>
 								@if($data->increament_effective_date != '')
-								{{ \Carbon\Carbon::parse($data->increament_effective_date)->format('d M Y') ?? ''}}
-							</td>
-							@endif	
-							{{ $data->increament_effective_date ?? ''}}
+								{{ \Carbon\Carbon::parse($data->increament_effective_date)->format('d M Y') ?? ''}}							
+								@endif	
 							</td>
 							<td>{{ $data->increment_amount ?? ''}}</td>
 							<td>{{ $data->revised_basic_salary ?? ''}}</td>

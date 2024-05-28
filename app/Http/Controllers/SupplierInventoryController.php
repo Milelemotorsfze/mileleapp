@@ -107,6 +107,10 @@ class SupplierInventoryController extends Controller
     }
     public function create()
     {
+//        if(strcasecmp("WAITING","Waiting") == 0){
+//            return "same";
+//        }
+//        return "Differ";
         (new UserActivityController)->createActivity('Open Supplier Inventory Excel Upload Page.');
 
         $suppliers = Supplier::with('supplierTypes')

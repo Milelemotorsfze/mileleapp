@@ -1069,13 +1069,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<label for="choices-single-default" class="form-label"> Residence Telephone Number  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->residence_telephone_number ?? '' }}</span>
+										<span>{{ $data->residence_telephone_number ?? '' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
-										<label for="choices-single-default" class="form-label"> Mobile Number  :</label>
+										<label for="choices-single-default" class="form-label"> Company Email Address  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $data->candidateDetails->contact_number ?? '' }}</span>
+										<span>{{ $data->user->email ?? '' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Personal Email Address  :</label>
@@ -1126,14 +1126,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 										<span>{{ $contactUAE->contact_number ?? '' }}</span>
 									</div>
-									@if($contactUAE->alternative_contact_number != '')
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Alternative Contact Number  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 										<span>{{ $contactUAE->alternative_contact_number ?? '' }}</span>
 									</div>
-									@endif
 								</div>
 								@endforeach
 								@endif
@@ -1159,7 +1157,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 										<label for="choices-single-default" class="form-label"> Relation  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
-										<span>{{ $contactHomeCountry->contact_number ?? '' }}</span>
+										<span>{{ $contactHomeCountry->relationName->name ?? '' }}</span>
 									</div>
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Email  :</label>
@@ -1173,14 +1171,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-interview-sum
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 										<span>{{ $contactHomeCountry->contact_number ?? '' }}</span>
 									</div>
-									@if($contactHomeCountry->alternative_contact_number != '')
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Alternative Contact Number  :</label>
 									</div>
 									<div class="col-lg-7 col-md-7 col-sm-6 col-12">
 										<span>{{ $contactHomeCountry->alternative_contact_number ?? '' }}</span>
 									</div>
-									@endif
 									<div class="col-lg-5 col-md-5 col-sm-6 col-12">
 										<label for="choices-single-default" class="form-label"> Home Country Address  :</label>
 									</div>

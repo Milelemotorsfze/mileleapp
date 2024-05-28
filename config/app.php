@@ -182,6 +182,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Monarobase\CountryList\CountryListServiceProvider::class,
+        App\Providers\MailServiceProvider::class,
         /*
          * Package Service Providers...
          */

@@ -485,6 +485,49 @@ th.nowrap-td {
         @endif
     </td>
 </tr>
+<tr onclick="window.location='{{ route('purchasing.filterpaymentrejectioned', ['status' => 'Approved']) }}';">
+    <td style="font-size: 12px;">
+        <a href="{{ route('purchasing.filterpaymentrejectioned', ['status' => 'Approved']) }}">
+        Rejected Payment Releases
+        </a>
+    </td>
+    <td style="font-size: 12px;">
+        @php
+        $userId = auth()->user()->id;
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+    @endphp
+    @if ($hasPermission)
+    @php
+        $paymentreleasedrejection = DB::table('purchasing_order')
+            ->where('purchasing_order.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('vehicles.payment_status', 'Payment Release Rejected');
+            })
+            ->count();
+        @endphp
+        @else
+        @php
+        $paymentreleasedrejection = DB::table('purchasing_order')
+            ->where('purchasing_order.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('vehicles.payment_status', 'Payment Release Rejected');
+            })
+            ->count();
+        @endphp
+        @endif
+        @if ($paymentreleasedrejection > 0)
+            {{ $paymentreleasedrejection }}
+        @else
+            No records found
+        @endif
+    </td>
+</tr>
 </tbody>
   </table>
 </div>
