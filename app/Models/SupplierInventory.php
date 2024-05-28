@@ -25,7 +25,6 @@ class SupplierInventory extends Model
     public const DN_STATUS_RECEIVED = "RECEIVED";
     public const COUNTRY_BELGIUM = "Belgium";
 
-
     protected $appends = [
         'color_codes',
         'total_quantity',
