@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Agents extends Model
 {
     use HasFactory;
+    public function multipleAgents() {
+        return $this->hasMany(MultipleAgents::class, 'agents_id', 'id');
+    }
     public function commissions()
     {
         return $this->hasMany(AgentCommission::class, 'agents_id', 'id');

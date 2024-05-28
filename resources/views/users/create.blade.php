@@ -31,27 +31,24 @@
                 </div>
             </div>
             <div class="row mb-3">
-                <div class="col-md-4">
-                    <label for="designation" class="form-label">Designation</label>
-                    {!! Form::text('designation', null, array('placeholder' => 'Designation', 'class' => 'form-control')) !!}
-                </div>
-                <div class="col-md-4">
+            <div class="col-md-4">
                     <label for="department" class="form-label">Department</label>
                     <select name="department" id="department" class="form-select">
                         <option value="" selected disabled>Select Department</option>
-                        <option value="Admin">Admin</option>
-                        <option value="HR">HR</option>
-                        <option value="Logistics">Logistics</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Demand & Planning">Demand & Planning</option>
-                        <option value="IT">IT</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="Sales">Sales</option>
-                        <option value="QC">QC</option>
-                        <option value="Procurement">Procurement</option>
-                        <option value="Warehouse">Warehouse</option>
+                        @foreach($departments as $department)
+                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                        @endforeach
                     </select>
                 </div>
+                <div class="col-md-4">
+                <label for="designation" class="form-label">Designation</label>
+                    <select name="designation" id="designation" class="form-select">
+                        <option value="" selected disabled>Select Designation</option>
+                        @foreach($jobposition as $jobpositions)
+                            <option value="{{ $jobpositions->id }}">{{ $jobpositions->name }}</option>
+                        @endforeach
+                    </select>
+                                </div>
                 <div class="col-md-4">
         <label for="lauguages" class="form-label">Lauguages</label>
         <select name="lauguages[]" id="lauguages" class="form-select" multiple>
@@ -88,6 +85,8 @@
     $(document).ready(function () {
         $('#roles').select2();
         $('#lauguages').select2();
+        $('#department').select2();
+        $('#designation').select2();
     });
 </script>
 @endsection

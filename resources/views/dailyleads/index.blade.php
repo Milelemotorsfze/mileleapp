@@ -217,7 +217,7 @@ input[type=number]::-webkit-outer-spin-button
                 <tr>
                   <th>Priority</th>
                   <th>Lead Date</th>
-                  <th>Remining Time</th>
+                  <th>Remining Times</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
                   <th>Customer Phone</th>
@@ -234,7 +234,7 @@ input[type=number]::-webkit-outer-spin-button
                 @foreach ($pendingdata as $key => $calls)
                     <tr data-id="{{$calls->id}}">
                 <td>
-                    @if ($calls->priority == "Hot")
+                    @if ($calls->priority == "High")
                         <i class="fas fa-circle blink" style="color: red;"> Hot</i>
                     @elseif ($calls->priority == "Normal")
                         <i class="fas fa-circle" style="color: green;"> Normal</i>
@@ -2273,6 +2273,7 @@ let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7, dataTable9;
         let booking = '';
         let preorder = '';
         let signedlink = '';
+        let uploadedfile = '';
         if (row.signature_status === 'Signed') {
             salesOrderOption = `<li><a class="dropdown-item" href="${soUrl}">Sales Order</a></li>`;
             preorder = `<li><a class="dropdown-item" href="${preorderUrl}">Pre Order</a></li>`;
@@ -2914,23 +2915,41 @@ document.getElementById('reason-reject').addEventListener('change', function() {
 });
 </script>
 <script>
+
 function updateRemainingTime() {
+
     document.querySelectorAll('[id^="remaining-time-"]').forEach(function(element) {
+
         var assignTime = new Date(element.getAttribute('data-assign-time'));
+
         assignTime.setHours(assignTime.getHours() + 24);
+
         var currentTime = new Date();
+
         var diff = assignTime - currentTime;
+
         if (diff >= 0) {
+
             var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
             var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
             var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
             element.innerHTML = `<span style="background-color: green; color: white; padding: 3px 6px; border-radius: 4px;">${hours}:${minutes}:${seconds}</span>`;
+
         } else {
+
             element.innerHTML = '';
+
         }
+
     });
+
 }
+
 setInterval(updateRemainingTime, 1000);
+
 </script>
 @else
     @php

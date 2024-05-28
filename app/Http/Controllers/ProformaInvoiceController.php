@@ -508,4 +508,13 @@ class ProformaInvoiceController extends Controller {
             'sparePartsDesc','kitsDesc','shippings','certifications','countries','shippingPorts',
            'otherDocuments', 'shippingDocuments','aed_to_eru_rate','aed_to_usd_rate','usd_to_eru_rate', 'quotation_details', 'quotation_vins', 'quotation', 'quotationitems', 'existingItemsJson', 'callId', 'sales_persons'));
     }
+    public function getNeighbors($id)
+{
+    $neighbors = Country::findOrFail($id)
+                        ->neighbors()
+                        ->get()
+                        ->pluck('name', 'id');
+
+    return response()->json($neighbors);
+}
     }

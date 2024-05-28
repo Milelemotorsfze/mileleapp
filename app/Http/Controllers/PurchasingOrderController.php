@@ -264,6 +264,31 @@ else
         }
         return view('warehouse.index', compact('data'));
     }
+    public function filterpaymentrejectioned($status)
+    {
+        $userId = auth()->user()->id;
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        if ($hasPermission){
+            $data = PurchasingOrder::with('purchasing_order_items')
+            ->where('purchasing_order.status', $status)
+            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.payment_status', 'Payment Release Rejected')
+            ->select('purchasing_order.*')
+            ->groupBy('purchasing_order.id')
+            ->get();
+        }
+        else
+        {
+            $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
+            ->where('purchasing_order.status', $status)
+            ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where('vehicles.payment_status', 'Payment Release Rejected')
+            ->select('purchasing_order.*')
+            ->groupBy('purchasing_order.id')
+            ->get();
+        }
+        return view('warehouse.index', compact('data'));
+    }
     public function filterpaymentrel($status)
     {
         $userId = auth()->user()->id;
@@ -1668,9 +1693,9 @@ public function paymentreleasesconfirm($id)
     $vehicle = Vehicles::find($id);
     if ($vehicle) {
         DB::beginTransaction();
-
         $vehicle->status = 'Payment Requested';
         $vehicle->payment_status = 'Payment Release Approved';
+        $vehicle->procurement_vehicle_remarks = null;
         $vehicle->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -1710,12 +1735,15 @@ public function paymentreleasesconfirm($id)
     }
     return redirect()->back()->with('error', 'Vehicle not found.');
 }
-public function paymentreleasesrejected($id)
+public function paymentreleasesrejected(Request $request, $id)
 {
+
+    info($id);
     $vehicle = Vehicles::find($id);
     if ($vehicle) {
         $vehicle->status = 'Payment Rejected';
         $vehicle->payment_status = 'Payment Release Rejected';
+        $vehicle->procurement_vehicle_remarks = $request->input('remarks');
         $vehicle->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -1730,9 +1758,9 @@ public function paymentreleasesrejected($id)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
-        return redirect()->back()->with('success', 'Payment Payment Release Rejected confirmed. Vehicle status updated.');
+            return response()->json(['success' => 'Payment Release Rejected confirmed. Vehicle status updated.']);
     }
-    return redirect()->back()->with('error', 'Vehicle not found.');
+    return response()->json(['error' => 'Vehicle not found.'], 404);
 }
 public function paymentrelconfirmdebited($id)
 {
@@ -1879,11 +1907,9 @@ public function purchasingallupdateStatus(Request $request)
 }
 public function purchasingallupdateStatusrel(Request $request)
 {
-    // dd($request->all());
-
     $id = $request->input('orderId');
     $status = $request->input('status');
-
+    $remarks = $request->input('remarks', null);
     $vehicles = DB::table('vehicles')
         ->where('payment_status', 'Payment Initiated')
         ->where('purchasing_order_id', $id)
@@ -1891,12 +1917,19 @@ public function purchasingallupdateStatusrel(Request $request)
     foreach ($vehicles as $vehicle) {
         if ($status == 'Approved') {
                 $paymentStatus = 'Payment Release Approved';
+                $updateData = ['payment_status' => $paymentStatus,
+                'procurement_vehicle_remarks' => null
+            ];
             } elseif ($status == 'Rejected') {
                 $paymentStatus = 'Payment Release Rejected';
+                $updateData = [
+                    'payment_status' => $paymentStatus,
+                    'procurement_vehicle_remarks' => $remarks
+                ];
             }
             DB::table('vehicles')
                 ->where('id', $vehicle->id)
-                ->update(['payment_status' => $paymentStatus]);
+                ->update($updateData);
             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
             $currentDateTime = Carbon::now($dubaiTimeZone);
             $vehicleslog = new Vehicleslog();
@@ -1910,7 +1943,6 @@ public function purchasingallupdateStatusrel(Request $request)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
-
             if($vehicle->model_id) {
                 $approvedIds = LOIItemPurchaseOrder::where('purchase_order_id', $vehicle->purchasing_order_id)
                                     ->pluck('approved_loi_id');
@@ -2255,4 +2287,61 @@ else
 }
 return view('warehouse.index', compact('data'));
 }
+public function rerequestpayment(Request $request)
+{
+    $id = $request->input('orderId');
+    $status = $request->input('status');
+    $vehicles = DB::table('vehicles')
+    ->where('purchasing_order_id', $id)
+    ->where('status', 'Payment Requested')
+    ->orwhere('status', 'Payment Rejected')
+    ->where('payment_status', 'Payment Release Rejected')
+    ->get();
+    info($vehicles);
+    foreach ($vehicles as $vehicle) {
+        $status = 'Payment Requested';
+        $payment_status = 'Payment Initiated Request';
+        DB::table('vehicles')
+            ->where('id', $vehicle->id)
+            ->update(['status' => $status, 'payment_status' => $payment_status]);
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+                $vehicleslog = new Vehicleslog();
+                $vehicleslog->time = $currentDateTime->toTimeString();
+                $vehicleslog->date = $currentDateTime->toDateString();
+                $vehicleslog->status = 'Re Payment Initiated';
+                $vehicleslog->vehicles_id = $vehicle->id;
+                $vehicleslog->field = "Vehicle Status, Payment Status";
+                $vehicleslog->old_value = "Payment Re Initiate Request";
+                $vehicleslog->new_value = "Payment Release Rejected";
+                $vehicleslog->created_by = auth()->user()->id;
+                $vehicleslog->role = Auth::user()->selectedRole;
+                $vehicleslog->save();
+            }
+            return redirect()->back()->with('success', 'Payment Status Updated');
+       }
+       public function repaymentintiation($id)
+       {
+           $vehicle = Vehicles::find($id);
+           if ($vehicle) {
+               $vehicle->status = 'Payment Requested';
+               $vehicle->payment_status = 'Payment Initiated Request';
+               $vehicle->save();
+               $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+               $currentDateTime = Carbon::now($dubaiTimeZone);
+                   $vehicleslog = new Vehicleslog();
+                   $vehicleslog->time = $currentDateTime->toTimeString();
+                   $vehicleslog->date = $currentDateTime->toDateString();
+                   $vehicleslog->status = 'Payment Re Initiated Request';
+                   $vehicleslog->vehicles_id = $id;
+                   $vehicleslog->field = "Vehicle Status, Payment Status";
+                   $vehicleslog->old_value = "Payment Released Rejected";
+                   $vehicleslog->new_value = "Payment Re Initiated Request";
+                   $vehicleslog->created_by = auth()->user()->id;
+                   $vehicleslog->role = Auth::user()->selectedRole;
+                   $vehicleslog->save();
+               return redirect()->back()->with('success', 'Payment Initiated Request confirmed. Vehicle status updated.');
+           }
+           return redirect()->back()->with('error', 'Vehicle not found.');
+       }
 }
