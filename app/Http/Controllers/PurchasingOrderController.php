@@ -1737,6 +1737,8 @@ public function paymentreleasesconfirm($id)
 }
 public function paymentreleasesrejected(Request $request, $id)
 {
+
+    info($id);
     $vehicle = Vehicles::find($id);
     if ($vehicle) {
         $vehicle->status = 'Payment Rejected';
@@ -1756,9 +1758,9 @@ public function paymentreleasesrejected(Request $request, $id)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
-        return redirect()->back()->with('success', 'Payment Payment Release Rejected confirmed. Vehicle status updated.');
+            return response()->json(['success' => 'Payment Release Rejected confirmed. Vehicle status updated.']);
     }
-    return redirect()->back()->with('error', 'Vehicle not found.');
+    return response()->json(['error' => 'Vehicle not found.'], 404);
 }
 public function paymentrelconfirmdebited($id)
 {
@@ -2292,8 +2294,10 @@ public function rerequestpayment(Request $request)
     $vehicles = DB::table('vehicles')
     ->where('purchasing_order_id', $id)
     ->where('status', 'Payment Requested')
+    ->orwhere('status', 'Payment Rejected')
     ->where('payment_status', 'Payment Release Rejected')
     ->get();
+    info($vehicles);
     foreach ($vehicles as $vehicle) {
         $status = 'Payment Requested';
         $payment_status = 'Payment Initiated Request';
