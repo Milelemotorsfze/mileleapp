@@ -58,6 +58,9 @@
                                 PROFORMA INVOICE
                             @endif
                         </p>
+                        <p class="margin-0" style="text-align:right;font-size: 12px;">
+                        Milele Motors FZE
+                        </p>
                         <p class="margin-0" style="text-align:right;"> Office No-AF 07, Block A,Samari Retail </p>
                         <p class="margin-0"> Ras Al khor, United Arab Emirates </p>
                         <p class="margin-0"> Tel.: +97143235991 | Email: info@milele.com </p>
@@ -186,7 +189,7 @@
                     <td colspan="2">Payment Details</td>
                     @endif
                     @if ($quotationDetail->representative_name || $quotationDetail->cb_name )
-                    <td colspan="4">Client  Representative</td>
+                    <td colspan="4">CR</td>
                     @endif
                 </tr>
                 <tr>
@@ -219,7 +222,7 @@
                 </tr>
             </table>
         </div>
-        @if(isset($multiplecp))
+        @if($multiplecp->isNotEmpty())
     <div style="color: black">
         <table style="border: none;">
             <tr style="background-color: #bbbbbd;color: #000000;font-weight: bold">
@@ -228,15 +231,13 @@
             <tr>
             @foreach($multiplecp as $multiplecps)
                 <?php $quotationcpname = DB::table('agents')->where('id', $multiplecps->agents_id)->first(); ?>
-                <td style="font-weight: bold;"> CR Name :</td>
-                <td> {{ $quotationcpname->name ?? '' }} </td>
+                <td style="font-weight: bold;"> CR Name    :      {{ $quotationcpname->name ?? '' }} </td>
             @endforeach
             </tr>
             <tr>
             @foreach($multiplecp as $multiplecps)
                 <?php $quotationcpnum = DB::table('agents')->where('id', $multiplecps->agents_id)->first(); ?>
-                <td style="font-weight: bold;"> CR Number :</td>
-                <td> {{ $quotationcpnum->phone ?? '' }} </td>
+                <td style="font-weight: bold;"> CR Number  :       {{ $quotationcpnum->phone ?? '' }} </td>
             @endforeach
             </tr>
         </table>
@@ -276,7 +277,9 @@
                                 <tr style="color: #643702;">
                                     <td style="padding-left: 40px;"><span style="font-weight: bold;margin-right: 5px;" > {{ $key+1 }}. </span>
                                         {{ $addon->quotationItem->description ?? ''}}</td>
+                                        @if($quotationDetail->cb_name)
                                     <td> {{$addon->quotationItem->system_code_currency ."". $addon->quotationItem->system_code_amount }}</td>
+                                    @endif
                                     <td>{{ $addon->quotationItem->quantity ?? ''}}</td>
                                     <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->unit_price, 2) }}</td>
                                     <td>{{ $quotation->currency ." ". number_format($addon->quotationItem->total_amount, 2) }}</td>

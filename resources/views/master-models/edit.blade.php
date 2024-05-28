@@ -278,12 +278,6 @@
                 variant_id: {
                     required: true,
                 },
-                amount_uae: {
-                    required: true,
-                },
-                amount_belgium: {
-                    required: true,
-                },
             },
         });
         function showOrHideLoiDescription() {

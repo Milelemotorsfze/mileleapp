@@ -12,6 +12,12 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
+    public function register()
+    {
+        $this->app->singleton(GmailService::class, function ($app) {
+            return new GmailService();
+        });
+    }
     public function boot(): void
     {
         View::composer('partials.horizontal', function ($view) {

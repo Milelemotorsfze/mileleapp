@@ -358,11 +358,11 @@ input[type=number]::-webkit-outer-spin-button
             </div>
             <div class="col-md-8">
             <select class="form-select" id="method">
+            <option value="WhatsApp">WhatsApp</option>
             <option value="Email">Email</option>
             <option value="Call">Call</option>
             <option value="Direct">Direct</option>
             <option value="SMS">SMS</option>
-            <option value="WhatsApp">WhatsApp</option>
           </select>
             </div>
           </div>

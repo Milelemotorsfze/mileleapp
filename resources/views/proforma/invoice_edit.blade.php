@@ -1471,6 +1471,34 @@
     });
 });
 $(document).ready(function () {
+        function fetchAndDisplayAgents() {
+        var quotationId = "{{ $quotation_details->quotation_id ?? '' }}";
+        if (quotationId) {
+            $.ajax({
+                url: '/get-agents/' + quotationId,
+                method: 'GET',
+                success: function (data) {
+                    console.log(data);
+                    $('#selectedAgentsList').empty();
+                    data.forEach(function (item) {
+        var agent = item.agent;
+        if (agent) { 
+            var listItem = '<li class="list-group-item d-flex justify-content-between align-items-center">' +
+                agent.name + 
+                '<button type="button" class="btn btn-danger btn-sm removeAgentButton" data-agent-id="' + agent.id + '">Remove</button></li>';
+            $('#selectedAgentsList').append(listItem);
+        }
+    });
+                },
+                error: function () {
+                    console.error('Failed to fetch agents');
+                }
+            });
+        }
+    }
+    if ("{{ $quotation_details->muitlple_agents_id ?? '' }}" !== '') {
+        fetchAndDisplayAgents();
+    }
   fetchAgentData();
   function fetchAgentData() {
     $.ajax({
@@ -2454,8 +2482,8 @@ $('#shipping_port').select2();
             {
                 targets: -5,
                 render: function (data, type, row) {
-                    var agentId = row.systemcode;
-        if (agentId) {
+                    var agentId = row.systemcode ? row.systemcode : $("#agents_id").val() ? 1 : null;
+                if (agentId) {
                     var systemcode = row.systemcode ? row.systemcode : 1;
                     return '<div class="input-group"> ' +
                                 '<input type="number" min="0"  value="' + systemcode + '" step="1" class="system-code form-control"  name="system_code_amount[]"  id="system-code-amount-'+ row['index'] +'" />' +
@@ -4247,6 +4275,7 @@ function updateSecondTable(RowId, savedVins) {
         row['model_description_id'] = existings.model_description_id;
         row['qty'] = existings.quantity;
         row['systemcode'] = existings.system_code_amount;
+        console.log(existings.system_code_amount);
         row['agents_id'] = existings.agents_id;
         row['edit_page'] = 'editpage';
         row['itemid'] = existings.id;

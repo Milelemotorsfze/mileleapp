@@ -1,5 +1,14 @@
 <style>
     .badge-notification {
+      top: -20;
+      right: 0;
+      transform: translate(50%, -10%);
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      padding: 0.3rem 0.6rem;
+    }
+    .badge-notificationing {
       top: 0;
       right: 0;
       transform: translate(50%, -10%);
@@ -59,7 +68,29 @@
 }
     }
 </style>
+<script>
+        function checkSession() {
+            fetch('/session-status')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.authenticated) {
+                        window.location.href = '/login';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking session status:', error);
+                });
+        }
 
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                checkSession(); // Check session when the page becomes visible again
+            }
+        });
+
+        checkSession(); // Initial check immediately on page load
+        setInterval(checkSession, 15000); // Check every 15 seconds
+    </script>
 <div class="container">
     <div class="row topnav">
         <!-- <div class="topnav" style="overflow: unset;"> -->
@@ -1553,7 +1584,7 @@
                                 ->where('status', 'New')
                                 ->count();
                             @endphp
-                            <span class="badge badge-danger row-badge2 badge-notification">{{$notificationcount}}</span>
+                            <span class="badge badge-danger row-badge2 badge-notificationing">{{$notificationcount}}</span>
                         </a>
                         <div class="dropdown-divider"></div>
                         @endif

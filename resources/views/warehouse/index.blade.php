@@ -80,6 +80,7 @@ th.nowrap-td {
        <th style="font-size: 12px;">Approved Purchase Order</th>
        <th style="font-size: 12px;">In-Progress Purchase Order</th>
        <th style="font-size: 12px;">Closed Purchase Order</th>
+       <th style="font-size: 12px;">Cancel Purchase Order</th>
     </thead>
     <tbody>
         <tr>
@@ -153,7 +154,8 @@ th.nowrap-td {
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('purchasing_order')
-                ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id');
+                ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                ->where('purchasing_order.status', '<>', 'Cancelled');
         })
         ->where(function ($query) {
             $query->where('status', 'Request for Payment')
@@ -174,7 +176,8 @@ th.nowrap-td {
     ->whereExists(function ($query) use ($userId) {
         $query->select(DB::raw(1))
             ->from('purchasing_order')
-            ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id');
+            ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+            ->where('purchasing_order.status', '<>', 'Cancelled');
     })
     ->where(function ($query) {
         $query->where('status', 'Request for Payment')
@@ -205,6 +208,7 @@ th.nowrap-td {
         @php
     $completedPos = DB::table('purchasing_order')
     ->where('purchasing_order.status', 'Approved')
+    ->orwhere('purchasing_order.status', 'Cancelled')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
@@ -232,6 +236,28 @@ th.nowrap-td {
         0
     @endif
 </td>
+<td onclick="window.location='{{ route('purchasing.filtercancel', ['status' => 'Cancelled']) }}';">
+        @php
+        $pendongpoapproval = 0;
+        $userId = auth()->user()->id;
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        @endphp
+        @if ($hasPermission)
+        @php
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Cancelled')->count();
+        @endphp
+        @else
+        @php
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Cancelled')
+        ->count();
+        @endphp
+        @endif
+        @if ($pendongpoapproval > 0)
+            {{ $pendongpoapproval }}
+        @else
+            0
+        @endif
+    </td>
         </tr>
     </tbody>
   </table>
@@ -480,6 +506,49 @@ th.nowrap-td {
         @endif
         @if ($pendingints > 0)
             {{ $pendingints }}
+        @else
+            No records found
+        @endif
+    </td>
+</tr>
+<tr onclick="window.location='{{ route('purchasing.filterpaymentrejectioned', ['status' => 'Approved']) }}';">
+    <td style="font-size: 12px;">
+        <a href="{{ route('purchasing.filterpaymentrejectioned', ['status' => 'Approved']) }}">
+        Rejected Payment Releases
+        </a>
+    </td>
+    <td style="font-size: 12px;">
+        @php
+        $userId = auth()->user()->id;
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+    @endphp
+    @if ($hasPermission)
+    @php
+        $paymentreleasedrejection = DB::table('purchasing_order')
+            ->where('purchasing_order.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('vehicles.payment_status', 'Payment Release Rejected');
+            })
+            ->count();
+        @endphp
+        @else
+        @php
+        $paymentreleasedrejection = DB::table('purchasing_order')
+            ->where('purchasing_order.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('vehicles.payment_status', 'Payment Release Rejected');
+            })
+            ->count();
+        @endphp
+        @endif
+        @if ($paymentreleasedrejection > 0)
+            {{ $paymentreleasedrejection }}
         @else
             No records found
         @endif

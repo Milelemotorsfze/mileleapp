@@ -106,8 +106,8 @@ use App\Http\Controllers\PreOrderController;
 use App\Http\Controllers\PostingRecordsController;
 use App\Http\Controllers\MarketingPurchasingPaymentsController;
 use App\Http\Controllers\LeadsNotificationsController;
-
-
+use App\Http\Controllers\Auth\GoogleOAuthController;
+use App\Http\Controllers\SessionController;
 /*
 /*
 |--------------------------------------------------------------------------
@@ -119,6 +119,9 @@ use App\Http\Controllers\LeadsNotificationsController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/session-status', [SessionController::class, 'status']);
+Route::get('/auth/google', [GoogleOAuthController::class, 'redirectToGoogle']);
+Route::get('/callback', [GoogleOAuthController::class, 'handleGoogleCallback']);
 Route::get('clientsignature/{uniqueNumber}/{quotationId}', [QuotationController::class, 'showBySignature'])->name('quotation.showBySignature');
 Route::post('/submit-signature', [QuotationController::class, 'submitSignature']);
 Route::match(['get', 'post'], '/whatsapp/receive', [WebhookController::class, 'sendMessage']);
@@ -447,6 +450,8 @@ Route::get('/d', function () {
     Route::resource('loi-country-criterias', LoiCountryCriteriasController::class);
     Route::post('loi-country-criterias/active-inactive', [LoiCountryCriteriasController::class,'statusChange'])->name('loi-country-criterias.active-inactive');
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
+    Route::post('letter-of-indent/request-supplier-approval', [LetterOfIndentController::class, 'RequestSupplierApproval'])
+        ->name('letter-of-indent.request-supplier-approval');
 
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::post('letter-of-indent-item/approve', [LOIItemsController::class, 'approveLOIItem'])->name('approve-loi-items');
@@ -635,18 +640,21 @@ Route::get('/d', function () {
     Route::get('/vehicles/unrejecteds/{id}', [PurchasingOrderController::class, 'unrejecteds'])->name('vehicles.unrejecteds');
     Route::get('/vehicles/deletevehicles/{id}', [PurchasingOrderController::class, 'deletevehicles'])->name('vehicles.deletevehicles');
     Route::get('vehicles/paymentintconfirm/{id}', [PurchasingOrderController::class, 'paymentintconfirm'])->name('vehicles.paymentintconfirm');
+    Route::get('vehicles/repaymentintiation/{id}', [PurchasingOrderController::class, 'repaymentintiation'])->name('vehicles.repaymentintiation');
     Route::get('vehicles/paymentreleaserejected/{id}', [PurchasingOrderController::class, 'paymentreleaserejected'])->name('vehicles.paymentreleaserejected');
     Route::get('vehicles/paymentreleaseconfirm/{id}', [PurchasingOrderController::class, 'paymentreleaseconfirm'])->name('vehicles.paymentreleaseconfirm');
     Route::get('vehicles/paymentrelconfirm/{id}', [PurchasingOrderController::class, 'paymentrelconfirm'])->name('vehicles.paymentrelconfirm');
     Route::get('vehicles/paymentreleasesconfirm/{id}', [PurchasingOrderController::class, 'paymentreleasesconfirm'])->name('vehicles.paymentreleasesconfirm');
-    Route::get('vehicles/paymentreleasesrejected/{id}', [PurchasingOrderController::class, 'paymentreleasesrejected'])->name('vehicles.paymentreleasesrejected');
+    Route::post('vehicles/paymentreleasesrejected/{id}', [PurchasingOrderController::class, 'paymentreleasesrejected'])->name('vehicles.paymentreleasesrejected');
     Route::get('vehicles/paymentrelconfirmdebited/{id}', [PurchasingOrderController::class, 'paymentrelconfirmdebited'])->name('vehicles.paymentrelconfirmdebited');
     Route::post('/update-purchasing-allstatus', [PurchasingOrderController::class, 'purchasingallupdateStatus'])->name('purchasing.updateallStatus');
     Route::get('vehicles/paymentrelconfirmvendors/{id}', [PurchasingOrderController::class, 'paymentrelconfirmvendors'])->name('vehicles.paymentrelconfirmvendors');
     Route::get('vehicles/paymentrelconfirmincoming/{id}', [PurchasingOrderController::class, 'paymentrelconfirmincoming'])->name('vehicles.paymentrelconfirmincoming');
 
     Route::get('/purcahsing-order-filter/{status}', [PurchasingOrderController::class, 'filter'])->name('purchasing.filter');
+    Route::get('/purcahsing-order-filter-cancel/{status}', [PurchasingOrderController::class, 'filtercancel'])->name('purchasing.filtercancel');
     Route::get('/purcahsing-order-filterpayment/{status}', [PurchasingOrderController::class, 'filterpayment'])->name('purchasing.filterpayment');
+    Route::get('/purcahsing-order-filterpaymentrejectioned/{status}', [PurchasingOrderController::class, 'filterpaymentrejectioned'])->name('purchasing.filterpaymentrejectioned');
     Route::get('/purcahsing-order-filterpaymentrel/{status}', [PurchasingOrderController::class, 'filterpaymentrel'])->name('purchasing.filterpaymentrel');
     Route::get('/purcahsing-order-filterintentreq/{status}', [PurchasingOrderController::class, 'filterintentreq'])->name('purchasing.filterintentreq');
     Route::get('/purcahsing-order-filterpendingrelease/{status}', [PurchasingOrderController::class, 'filterpendingrelease'])->name('purchasing.filterpendingrelease');
@@ -659,6 +667,7 @@ Route::get('/d', function () {
     Route::post('/update-purchasing-allpaymentreqss', [PurchasingOrderController::class, 'allpaymentreqss'])->name('purchasing.allpaymentreqss');
     Route::post('/update-purchasing-allpaymentreqssfin', [PurchasingOrderController::class, 'allpaymentreqssfin'])->name('purchasing.allpaymentreqssfin');
     Route::post('/update-purchasing-allpaymentreqssfinpay', [PurchasingOrderController::class, 'allpaymentreqssfinpay'])->name('purchasing.allpaymentreqssfinpay');
+    Route::post('/update-purchasing-rerequestpayment', [PurchasingOrderController::class, 'rerequestpayment'])->name('purchasing.rerequestpayment');
     Route::post('/update-purchasing-allpaymentreqssfinpaycomp', [PurchasingOrderController::class, 'allpaymentreqssfinpaycomp'])->name('purchasing.allpaymentreqssfinpaycomp');
     Route::post('/update-purchasing-allpaymentintreqpocomp', [PurchasingOrderController::class, 'allpaymentintreqpocomp'])->name('purchasing.allpaymentintreqpocomp');
     Route::post('/update-purchasing-allpaymentintreqpocompin', [PurchasingOrderController::class, 'allpaymentintreqpocompin'])->name('purchasing.allpaymentintreqpocompin');
@@ -853,6 +862,10 @@ Route::get('/d', function () {
 
 
     Route::post('/upload-quotation-file', [QuotationController::class, 'uploadingquotation'])->name('uploadingquotation.update');
+    Route::get('/get-agents/{quotationId}', [QuotationController::class, 'getAgentsByQuotationId']);
+    Route::post('/fetchData', [VehiclesController::class, 'fetchData'])->name('fetchData');
+    Route::post('purchasing_order/cancelpo/{id}', [PurchasingOrderController::class, 'cancelpo'])->name('purchasing_order.cancelpo');
+    Route::post('/update-purchasing-status-cancel', [PurchasingOrderController::class, 'purchasingupdateStatuscancel'])->name('purchasing.updateStatuscancel');
 
 
 

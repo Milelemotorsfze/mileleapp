@@ -44,6 +44,7 @@ class Vehicles extends Model
         'reservation_end_date',
         'conversion',
         'inspection_date',
+        'procurement_vehicle_remarks',
 
     ];
     public function variant()
@@ -106,7 +107,7 @@ public function latestRemarkSales()
     }
     public function warehouse()
     {
-        return $this->belongsTo(Warehouse::class, 'documents_id');
+        return $this->belongsTo(Warehouse::class, 'latest_location');
     }
     public function warehouseLocation()
     {

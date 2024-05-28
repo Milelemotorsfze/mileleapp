@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 use App\Models\ColorCode;
+use Illuminate\Support\Facades\Log;
 use App\Events\DataUpdatedEvent;
 use App\Models\VehicleApprovalRequests;
 use App\Models\Vehicles;
 use App\Models\PurchasingOrder;
 use App\Models\Varaint;
+use App\Models\WordpressPost;
+use App\Models\WordpressPostMeta;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Brand;
 use App\Models\Grn;
@@ -2704,10 +2707,13 @@ public function viewalls(Request $request)
                         'vehicles.ppmmyyy',
                         'vehicles.estimation_date',
                         'vehicles.vin',
+                        'vehicles.territory',
                         'vehicles.engine',
                         'brands.brand_name',
                         'varaints.name as variant',
                         'varaints.model_detail',
+                        'purchasing_order.fd',
+                        'varaints.id as variant_id',
                         'varaints.detail',
                         'varaints.seat',
                         'varaints.upholestry',
@@ -2748,11 +2754,14 @@ public function viewalls(Request $request)
                         'vehicles.ppmmyyy',
                         'vehicles.estimation_date',
                         'vehicles.vin',
+                        'vehicles.territory',
                         'vehicles.engine',
                         'brands.brand_name',
                         'varaints.name as variant',
+                        'varaints.id as variant_id',
                         'varaints.model_detail',
                         'varaints.detail',
+                        'purchasing_order.fd',
                         'varaints.seat',
                         'varaints.upholestry',
                         'varaints.steering',
@@ -2795,11 +2804,14 @@ public function viewalls(Request $request)
                         'vehicles.vin',
                         DB::raw("DATE_FORMAT(vehicles.inspection_date, '%d-%b-%Y') as inspection_date"),
                         'vehicles.engine',
+                        'vehicles.territory',
                         'vehicles.grn_remark',
                         'brands.brand_name',
                         'varaints.name as variant',
                         'varaints.model_detail',
+                        'varaints.id as variant_id',
                         'varaints.detail',
+                        'purchasing_order.fd',
                         'varaints.seat',
                         'varaints.upholestry',
                         'varaints.steering',
@@ -2849,11 +2861,14 @@ public function viewalls(Request $request)
                         'vehicles.ppmmyyy',
                         'vehicles.estimation_date',
                         'vehicles.vin',
+                        'vehicles.territory',
                         'vehicles.grn_remark',
                         'vehicles.engine',
+                        'purchasing_order.fd',
                         'brands.brand_name',
                         'varaints.name as variant',
                         'varaints.model_detail',
+                        'varaints.id as variant_id',
                         'varaints.detail',
                         'varaints.seat',
                         'varaints.upholestry',
@@ -2898,10 +2913,13 @@ public function viewalls(Request $request)
                          DB::raw("DATE_FORMAT(vehicles.inspection_date, '%d-%b-%Y') as inspection_date"),
                          'vehicles.ppmmyyy',
                          'vehicles.vin',
+                         'vehicles.territory',
                          'vehicles.engine',
                          'vehicles.grn_remark',
                          'brands.brand_name',
+                         'purchasing_order.fd',
                          'varaints.name as variant',
+                         'varaints.id as variant_id',
                          'varaints.model_detail',
                          'varaints.detail',
                          'varaints.seat',
@@ -2945,11 +2963,14 @@ public function viewalls(Request $request)
                          DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
                         'vehicles.ppmmyyy',
                         'vehicles.vin',
+                        'vehicles.territory',
                         'vehicles.engine',
                         'brands.brand_name',
                         'varaints.name as variant',
+                        'varaints.id as variant_id',
                         'varaints.model_detail',
                         'varaints.detail',
+                        'purchasing_order.fd',
                         'varaints.seat',
                         'varaints.upholestry',
                         'varaints.steering',
@@ -2991,16 +3012,19 @@ public function viewalls(Request $request)
                         'vehicles.id',
                         'vehicles.grn_id',
                         'vehicles.gdn_id',
+                        'vehicles.territory',
                         'vehicles.inspection_date',
                         'vehicles.so_id',
                         'vehicles.reservation_end_date',
                         'warehouse.name as location',
                          DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
                         'vehicles.ppmmyyy',
-                        'vehicles.vin',
+                        'vehicles.vin as vin',
                         'vehicles.engine',
+                        'purchasing_order.fd',
                         'brands.brand_name',
                         'varaints.name as variant',
+                        'varaints.id as variant_id',
                         'varaints.model_detail',
                         'varaints.detail',
                         'varaints.seat',
@@ -3035,6 +3059,60 @@ public function viewalls(Request $request)
                     ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id');
                     $data = $data->groupBy('vehicles.id');  
                 }
+                else if($status === "dpvehicles")
+                {
+                    $data = Vehicles::select( [
+                        'vehicles.id',
+                        'vehicles.grn_id',
+                        'vehicles.gdn_id',
+                        'vehicles.territory',
+                        'vehicles.inspection_date',
+                        'vehicles.so_id',
+                        'vehicles.reservation_end_date',
+                        'warehouse.name as location',
+                         DB::raw("DATE_FORMAT(purchasing_order.po_date, '%d-%b-%Y') as po_date"),
+                        'vehicles.ppmmyyy',
+                        'vehicles.vin as vin',
+                        'vehicles.engine',
+                        'purchasing_order.fd',
+                        'brands.brand_name',
+                        'varaints.name as variant',
+                        'varaints.id as variant_id',
+                        'varaints.model_detail',
+                        'varaints.detail',
+                        'varaints.seat',
+                        'varaints.upholestry',
+                        'varaints.steering',
+                        'varaints.my',
+                        'varaints.fuel_type',
+                        'varaints.gearbox',
+                        'so.so_number',
+                        'master_model_lines.model_line',
+                        'int_color.name as interior_color',
+                        'ex_color.name as exterior_color',
+                        'purchasing_order.po_number',
+                        'grn.grn_number',
+                        'gdn.gdn_number',
+                        'users.name',
+                        DB::raw("DATE_FORMAT(so.so_date, '%d-%b-%Y') as so_date"),
+                        DB::raw("DATE_FORMAT(grn.date, '%d-%b-%Y') as date"),
+                        DB::raw("DATE_FORMAT(gdn.date, '%d-%b-%Y') as gdndate"),
+                    ])
+                    ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                    ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
+                    ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+                    ->leftJoin('gdn', 'vehicles.gdn_id', '=', 'gdn.id')
+                    ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
+                    ->leftJoin('users', 'so.sales_person_id', '=', 'users.id')
+                    ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+                    ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+                    ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                    ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                    ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                    ->leftJoin('inspection', 'vehicles.id', '=', 'inspection.vehicle_id')
+                    ->where('purchasing_order.is_demand_planning_po', '=', '1');
+                    $data = $data->groupBy('vehicles.id');  
+                }
             if ($data) {
                 return DataTables::of($data)->toJson();
             }
@@ -3051,4 +3129,61 @@ public function viewalls(Request $request)
     $pdf = PDF::loadView('Reports.Grn', ['vehicle' => $vehicle]);
     return $pdf->stream('vehicle-details.pdf');
     }
+    public function fetchData(Request $request)
+{
+    $vehicleId = $request->input('vehicle_id');
+    $vehicle = Vehicles::with('variant', 'exterior')->findOrFail($vehicleId);
+    $variant = str_replace(' ', '', $vehicle->variant->name);
+    $post = $this->fetchPost($variant, $vehicle->exterior ? $vehicle->exterior->name : null);
+
+    if (!$post) {
+        // Remove the first letter of the variant name and try again
+        $variant = substr($variant, 1);
+        $post = $this->fetchPost($variant, $vehicle->exterior ? $vehicle->exterior->name : null);
+    }
+
+    if ($post) {
+        $galleryMeta = DB::connection('wordpress')->table('mm_postmeta')
+            ->where('post_id', $post->ID)
+            ->where('meta_key', 'gallery')
+            ->first();
+
+        $galleryIds = unserialize($galleryMeta->meta_value);
+
+        $imageUrls = [];
+        foreach ($galleryIds as $id) {
+            $imagePost = DB::connection('wordpress')->table('mm_posts')
+                ->where('ID', $id)
+                ->first();
+            
+            if ($imagePost) {
+                $imageUrls[] = $imagePost->guid;
+            }
+        }
+
+        return response()->json([
+            'gallery' => $imageUrls
+        ]);
+    } else {
+        return response()->json(['message' => 'No post found'], 404);
+    }
+}
+
+private function fetchPost($variant, $exteriorColor)
+{
+    $query = DB::connection('wordpress')->table('mm_posts')
+        ->join('mm_postmeta as variant_meta', 'mm_posts.ID', '=', 'variant_meta.post_id')
+        ->join('mm_postmeta as color_meta', 'mm_posts.ID', '=', 'color_meta.post_id')
+        ->where('variant_meta.meta_key', 'Car ID')
+        ->where('variant_meta.meta_value', $variant)
+        ->where('mm_posts.post_status', 'publish');
+
+    if ($exteriorColor) {
+        $query->where('color_meta.meta_key', 'color')
+            ->where('color_meta.meta_value', $exteriorColor);
+    }
+
+    return $query->select('mm_posts.ID', 'mm_posts.post_title', 'mm_posts.post_name')
+        ->first();
+}
     }

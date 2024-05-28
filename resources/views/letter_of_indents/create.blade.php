@@ -1120,30 +1120,20 @@
 
         $(document.body).on('click', ".removeSoNumber", function (e)
 	    {
-	    //    var countRow = 0;
-	    //     var countRow = $(".soNumberMain").find(".soNumberApendHere").length;
-	    //     if(countRow > 1)
-	    //     {
-	            var indexNumber = $(this).attr('data-index');
-	            var deletedValue = '';
-	            deletedValue = $("#so_number_"+indexNumber).val();
-	            $(this).closest('#row-'+indexNumber).remove();
-	            $('.soNumberApendHere').each(function(i) {
-	                var index = +i + +1;
-	                $(this).attr('id','row-'+index);
-	                $(this).find('.so_number').attr('name', 'so_number['+ index +']');
-	                $(this).find('.so_number').attr('id', 'so_number_'+index);
-	                $(this).find('.removeSoNumber').attr('data-index',index);
-	                $(this).find('.soNumberError').attr('id', 'soNumberError_'+index);
+            var indexNumber = $(this).attr('data-index');
+            var deletedValue = '';
+            deletedValue = $("#so_number_"+indexNumber).val();
+            $(this).closest('#row-'+indexNumber).remove();
+            $('.soNumberApendHere').each(function(i) {
+                var index = +i + +1;
+                $(this).attr('id','row-'+index);
+                $(this).find('.so_number').attr('name', 'so_number['+ index +']');
+                $(this).find('.so_number').attr('id', 'so_number_'+index);
+                $(this).find('.removeSoNumber').attr('data-index',index);
+                $(this).find('.soNumberError').attr('id', 'soNumberError_'+index);
 
-	            });
-	            // enableDropdown();
-	        // }
-	        // else
-	        // {
-	        //     var confirm = alertify.confirm('You are not able to remove this row, Atleast one Part Number Required',function (e) {
-	        //    }).set({title:"Can't Remove Part Number"})
-	        // }
+            });
+
 	})
     </script>
 @endpush

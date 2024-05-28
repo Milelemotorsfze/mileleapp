@@ -40,10 +40,10 @@ class LetterOfIndentController extends Controller
             ->orderBy('id','DESC')
             ->where('status',LetterOfIndent::LOI_STATUS_NEW)
             ->cursor();
-//        $approvedLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
-//            ->orderBy('id','DESC')
-//            ->whereIn('status',[LetterOfIndent::LOI_STATUS_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED])
-//            ->cursor();
+        $approvalWaitingLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
+            ->orderBy('id','DESC')
+            ->where('status', LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL)
+            ->cursor();
         $partialApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
             ->whereIn('status', [LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED,LetterOfIndent::LOI_STATUS_APPROVED])
@@ -63,7 +63,7 @@ class LetterOfIndentController extends Controller
             ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED)
             ->cursor();
 
-        return view('letter_of_indents.index', compact('newLOIs',
+        return view('letter_of_indents.index', compact('newLOIs','approvalWaitingLOIs',
             'partialApprovedLOIs','supplierApprovedLOIs','rejectedLOIs'));
     }
     public function getSupplierLOI(Request $request)
@@ -78,7 +78,7 @@ class LetterOfIndentController extends Controller
 
         $approvalPendingLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
-            ->where('status', LetterOfIndent::LOI_STATUS_NEW);
+            ->where('submission_status', LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL);
 
         $approvedLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
@@ -583,7 +583,19 @@ class LetterOfIndentController extends Controller
             return redirect()->back()->with('error', "LOI with this customer and date and category is already exist.");
         }
     }
+    public function RequestSupplierApproval(Request $request)
+    {
+//       dd("test");
+        info($request->all());
+      $LOI = LetterOfIndent::find($request->id);
 
+      $LOI->submission_status = LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL;
+      $LOI->status = LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL;
+      $LOI->save();
+
+      return response(true);
+
+    }
     /**
      * Remove the specified resource from storage.
      */
