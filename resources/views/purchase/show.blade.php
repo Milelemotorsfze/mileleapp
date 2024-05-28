@@ -89,13 +89,40 @@
       </a>
       @endif -->
         <b>Purchase Order Number : {{$purchasingOrder->po_number}}</b>
+        <a class="btn btn-sm btn-info float-end" href="{{ route('purchasing-order.index') }}">
+    <i class="fa fa-arrow-left" aria-hidden="true"></i> Back
+</a>
+@if($purchasingOrder->status != "Cancel Request" && $purchasingOrder->status != "Cancelled")
+<a id="cancelButton" class="btn btn-sm btn-danger float-end me-4" href="{{ route('purchasing_order.cancelpo', ['id' => $purchasingOrder->id]) }}">
+    <i class="fa fa-times" aria-hidden="true"></i> PO Cancel
+</a>
+@endif
         <!-- @if ($nextId)
             <a class="btn btn-sm btn-info" href="{{ route('purchasing-order.show', $nextId) }}">
          <i class="fa fa-arrow-right" aria-hidden="true"></i>
       </a>
       @endif -->
-        <a  class="btn btn-sm btn-info float-end" href="{{ route('purchasing-order.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
+    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirm Cancellation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to cancel this PO?</p>
+        <div class="form-group">
+          <label for="remarkspo">Remarks:</label>
+          <textarea class="form-control" id="remarkspo" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="confirmCancel">Yes, Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
     @php
         $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
         $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
@@ -314,9 +341,20 @@
                             <span>{{$purchasingOrder->pol}} / {{$purchasingOrder->pod}} / {{$purchasingOrder->fd}}</span>
                         </div>
                     </div>
+                    @if($purchasingOrder->status === 'Cancel Request')
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>Cancel Remarks</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                            <span>{{$purchasingOrder->remarks}}</span>
+                        </div>
+                    </div>
+                    @else
                     <div class="row"></div>
                     <br>
                     <br>
+                    @endif
                     <div class="row">
                         <div class="col-lg-1 col-md-3 col-sm-12">
                             <label for="choices-single-default" class="form-label"><strong>PO Status</strong></label>
@@ -335,6 +373,10 @@
                                 <span id="status-badge" class="badge badge-soft-success float-middle badge-large">Approved</span>
                             @elseif ($purchasingOrder->status === 'Rejected')
                                 <span id="status-badge" class="badge badge-soft-danger float-middle badge-large">Rejected</span>
+                                @elseif ($purchasingOrder->status === 'Cancel Request')
+                                <span id="status-badge" class="badge badge-soft-danger float-middle badge-middle">Cancel Request</span>
+                                @elseif ($purchasingOrder->status === 'Cancelled')
+                                <span id="status-badge" class="badge badge-soft-danger float-middle badge-large">Cancelled</span>
                             @endif
                             @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-approval');
@@ -343,6 +385,9 @@
                                 @if ($purchasingOrder->status === 'Pending Approval')
                                     <button id="approval-btn" class="btn btn-success" onclick="updateStatus('Approved', {{ $purchasingOrder->id }})">Approve</button>
                                     <button id="rejection-btn" class="btn btn-danger" onclick="updateStatus('Rejected', {{ $purchasingOrder->id }})">Reject</button>
+                                    @elseif ($purchasingOrder->status === 'Cancel Request')
+                                    <button id="approvalrej-btn" class="btn btn-danger" onclick="updateStatusrej('Approved', {{ $purchasingOrder->id }})">Approve</button>
+                                    <button id="rejectionrej-btn" class="btn btn-success" onclick="updateStatusrej('Rejected', {{ $purchasingOrder->id }})">Reject</button>
                                 @endif
                             @endif
                         </div>
@@ -1162,8 +1207,8 @@
                                        ';
                                        $change_by = DB::table('users')->where('id', $previousLog->created_by)->first();
                                        $change_bys = $change_by->name;
-                                       $variant = DB::table('varaints')->where('id', $previousLog->variant)->first();
-                                       $variant_name = $variant->name;
+                                       $variant = $previousLog->variant ? DB::table('varaints')->where('id', $previousLog->variant)->first() : null;
+                                        $variant_name = $variant ? $variant->name: null;
                                        echo '
                                        <td>'. $previousLog->status .'</td>
                                        ';
@@ -1218,8 +1263,8 @@
                                     @php
                                         $change_by = DB::table('users')->where('id', $previousLog->created_by)->first();
                                         $change_bys = $change_by->name;
-                                        $variant = DB::table('varaints')->where('id', $previousLog->variant)->first();
-                                        $variant_name = $variant->name;
+                                        $variant = $previousLog->variant ? DB::table('varaints')->where('id', $previousLog->variant)->first() : null;
+                                        $variant_name = $variant ? $variant->name: null;
                                         $exColour = $previousLog->ex_colour ? DB::table('color_codes')->where('id', $previousLog->ex_colour)->first() : null;
                                         $ex_colours = $exColour ? $exColour->name : null;
                                         $intColour = $previousLog->int_colour ? DB::table('color_codes')->where('id', $previousLog->int_colour)->first() : null;
@@ -1659,6 +1704,27 @@
         </script>
         @endif
         <script>
+            function updateStatusrej(status, orderId) {
+                let url = '{{ route('purchasing.updateStatuscancel') }}';
+                let data = { status: status, orderId: orderId };
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify(data),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Status update successful');
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Error updating status:', error);
+                    });
+            }
             function updateStatus(status, orderId) {
                 let url = '{{ route('purchasing.updateStatus') }}';
                 let data = { status: status, orderId: orderId };
@@ -1996,7 +2062,6 @@ function postUpdateStatus(status, orderId, remarks = '') {
         if (allBlank) {
             console.log("All VIN values are blank");
             callback(1);
-            // Indicate all values are blank
         } else {
             var Po = "{{$purchasingOrder->id}}";
             $.ajaxSetup({
@@ -2011,14 +2076,14 @@ function postUpdateStatus(status, orderId, remarks = '') {
                 success: function(response) {
                     if (response === 'duplicate') {
                         alert('Duplicate VIN values found in the database. Please ensure all VIN values are unique.');
-                        callback(false); // Indicate duplicate values found
+                        callback(false);
                     } else {
-                        callback(1); // Indicate all values are unique
+                        callback(1);
                     }
                 },
                 error: function() {
                     alert('An error occurred while checking for VIN duplication. Please try again.');
-                    callback(false); // Indicate error occurred
+                    callback(false);
                 }
             });
         }
@@ -2028,27 +2093,25 @@ function postUpdateStatus(status, orderId, remarks = '') {
 $(document).ready(function() {
   $('.edit-basic-btn').on('click', function() {
     var purchaseId = $(this).data('purchase-id');
-    $('#purchaseId').val(purchaseId); // Set the value in the hidden input field
-    $('#editModal').modal('show'); // Show the modal
+    $('#purchaseId').val(purchaseId);
+    $('#editModal').modal('show');
   });
 });
 </script>
 <script>
 $(document).ready(function() {
     $('#form-update_basicdetails').submit(function(event) {
-        event.preventDefault(); // Prevent the default form submission
-        var formData = $(this).serialize(); // Serialize form data
+        event.preventDefault();
+        var formData = $(this).serialize();
         $.ajax({
             type: 'POST',
             url: $(this).attr('action'),
             data: formData,
             success: function(response) {
-                // Handle success response, maybe show a success message
                 alert('Purchase order details updated successfully!');
-                location.reload(); // Refresh the page
+                location.reload();
             },
             error: function(xhr, status, error) {
-                // Handle error response, maybe show an error message
                 console.error(xhr.responseText);
                 alert('An error occurred while updating purchase order details.');
             }
@@ -2056,5 +2119,42 @@ $(document).ready(function() {
     });
 });
 </script>
+<script>
+$(document).ready(function() {
+    var cancelUrl;
 
+    $('#cancelButton').click(function(event) {
+        event.preventDefault(); // Prevent the default action (navigation)
+        cancelUrl = $(this).attr('href'); // Store the URL to redirect to after confirmation
+        $('#confirmationModal').modal('show'); // Show the modal
+    });
+
+    $('#confirmCancel').click(function() {
+        var remarks = $('#remarkspo').val(); // Get the remarks from the textarea
+        if (!remarks) {
+            alert('Please provide remarks.');
+            return; // Do not proceed if remarks are empty
+        }
+
+        // Make an AJAX POST request with the remarks and purchasing order ID
+        $.ajax({
+            url: cancelUrl, // Use the stored URL
+            type: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token
+                remarks: remarks
+            },
+            success: function(response) {
+                $('#confirmationModal').modal('hide'); // Hide the modal
+                alert('Remarks submitted successfully');
+                window.location.href = window.location.href; // Redirect to the cancel URL
+            },
+            error: function(xhr) {
+                console.error('Error:', xhr);
+                alert('An error occurred. Please try again.');
+            }
+        });
+    });
+});
+</script>
 @endsection

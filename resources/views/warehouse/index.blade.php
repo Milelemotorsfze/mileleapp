@@ -80,6 +80,7 @@ th.nowrap-td {
        <th style="font-size: 12px;">Approved Purchase Order</th>
        <th style="font-size: 12px;">In-Progress Purchase Order</th>
        <th style="font-size: 12px;">Closed Purchase Order</th>
+       <th style="font-size: 12px;">Cancel Purchase Order</th>
     </thead>
     <tbody>
         <tr>
@@ -153,7 +154,8 @@ th.nowrap-td {
         ->whereExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('purchasing_order')
-                ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id');
+                ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                ->where('purchasing_order.status', '<>', 'Cancelled');
         })
         ->where(function ($query) {
             $query->where('status', 'Request for Payment')
@@ -174,7 +176,8 @@ th.nowrap-td {
     ->whereExists(function ($query) use ($userId) {
         $query->select(DB::raw(1))
             ->from('purchasing_order')
-            ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id');
+            ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+            ->where('purchasing_order.status', '<>', 'Cancelled');
     })
     ->where(function ($query) {
         $query->where('status', 'Request for Payment')
@@ -205,6 +208,7 @@ th.nowrap-td {
         @php
     $completedPos = DB::table('purchasing_order')
     ->where('purchasing_order.status', 'Approved')
+    ->orwhere('purchasing_order.status', 'Cancelled')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))
             ->from('vehicles')
@@ -232,6 +236,28 @@ th.nowrap-td {
         0
     @endif
 </td>
+<td onclick="window.location='{{ route('purchasing.filtercancel', ['status' => 'Cancelled']) }}';">
+        @php
+        $pendongpoapproval = 0;
+        $userId = auth()->user()->id;
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-all-department-pos');
+        @endphp
+        @if ($hasPermission)
+        @php
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Cancelled')->count();
+        @endphp
+        @else
+        @php
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Cancelled')
+        ->count();
+        @endphp
+        @endif
+        @if ($pendongpoapproval > 0)
+            {{ $pendongpoapproval }}
+        @else
+            0
+        @endif
+    </td>
         </tr>
     </tbody>
   </table>
