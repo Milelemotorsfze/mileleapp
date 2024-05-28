@@ -68,7 +68,29 @@
 }
     }
 </style>
+<script>
+        function checkSession() {
+            fetch('/session-status')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.authenticated) {
+                        window.location.href = '/login';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking session status:', error);
+                });
+        }
 
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                checkSession(); // Check session when the page becomes visible again
+            }
+        });
+
+        checkSession(); // Initial check immediately on page load
+        setInterval(checkSession, 15000); // Check every 15 seconds
+    </script>
 <div class="container">
     <div class="row topnav">
         <!-- <div class="topnav" style="overflow: unset;"> -->
