@@ -1,6 +1,10 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+    .btn-danger {
+    position: relative;
+    z-index: 10;
+}
     .editing {
         background-color: white !important;
         border: 1px solid black  !important;
@@ -52,22 +56,31 @@
     </div>
   </div>
 </div>
-<div class="modal fade" id="remarksrejModal" tabindex="-1" aria-labelledby="remarksrejModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="remarksrejModalLabel">Enter Remarks</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <textarea id="remarks" class="form-control" rows="3"></textarea>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="submitRemarksrej">Submit</button>
-      </div>
+<div id="remarksrejModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reject Payment Release</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="remarksRejForm">
+                    @csrf
+                    <input type="hidden" id="vehicleId" name="vehicleId">
+                    <div class="form-group">
+                        <label for="remarksrej">Remarks</label>
+                        <textarea id="remarksrej" name="remarks" class="form-control" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="submitRemarksrej" class="btn btn-primary">Submit Remarks</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
     <div class="card-header">
         <!-- @if ($previousId)
@@ -788,9 +801,7 @@
                         <a title="Payment Release Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleasesconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
                         Approved
                         </a>
-                        <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="#" onclick="openModal('{{ $vehicles->id }}');" style="margin-right: 10px;">
-                            Reject
-                        </a>
+                        <button data-placement="top" class="btn btn-sm btn-danger" onclick="return openModal('{{ $vehicles->id }}');" style="margin-right: 10px;">Reject</button>
                         </div>
                         @endif
                         @endif
@@ -804,7 +815,7 @@
 											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmincoming', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
 											Incoming Confirmed
 											</a>
-                      @endif
+                                            @endif
 											@endif
 											@endif
 											{{-- End For Vendor Confirm  --}}
@@ -1235,42 +1246,45 @@
             </div>
         </div>
         <script>
-    let vehicleId;
-
+            let targetUrl;
     function openModal(id) {
-        console.log("wamm");
-        vehicleId = id;
+        targetUrl = window.location.href; 
+        $('#vehicleId').val(id);
         $('#remarksrejModal').modal('show');
+        return false;  // Prevent default button behavior
     }
-    function submitRemarksrej() {
-        const remarks = document.getElementById('remarks').value;
+
+    $('#submitRemarksrej').click(function() {
+        var vehicleId = $('#vehicleId').val();
+        var remarks = $('#remarksrej').val();
+        var token = $('input[name="_token"]').val();
+        var url = '{{ route("vehicles.paymentreleasesrejected", ":id") }}';
+        url = url.replace(':id', vehicleId);
+
         if (remarks) {
-            const url = `vehicles/paymentreleasesrejected/${vehicleId}`;
-            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': token
-                },
-                body: JSON.stringify({
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    _token: token,
                     remarks: remarks
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                $('#remarksModal').modal('hide');
-                alert('Remarks submitted successfully');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                },
+                success: function(response) {
+                    // Handle the response here
+                    $('#remarksrejModal').modal('hide');
+                    alert('Remarks submitted successfully');
+                    // Redirect to the target URL after successful submission
+                    window.location.href = targetUrl;
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                    alert('An error occurred. Please try again.');
+                }
             });
         } else {
             alert('Please provide remarks.');
         }
-    }
+    });
 </script>
         <script>
             $(document).ready(function() {
@@ -1428,6 +1442,10 @@
                 });
             });
         </script>
+         @php
+       $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
+       @endphp
+       @if (!$hasPermission)
         <script>
             const editableFields = document.querySelectorAll('.editable-field');
             const editBtn = document.querySelector('.edit-btn');
@@ -1523,6 +1541,7 @@
     });
 });
         </script>
+        @endif
         <script>
             $(document).ready(function() {
                 $('#variants_id').on('input', function() {
@@ -1613,6 +1632,10 @@
                 });
             });
         </script>
+       @php
+       $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-release-approval');
+       @endphp
+       @if (!$hasPermission)
         <script>
             var input = document.getElementById('variants_id');
             var dataList = document.getElementById('variantslist');
@@ -1634,6 +1657,7 @@
                 }
             });
         </script>
+        @endif
         <script>
             function updateStatus(status, orderId) {
                 let url = '{{ route('purchasing.updateStatus') }}';
