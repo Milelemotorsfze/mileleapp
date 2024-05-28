@@ -248,7 +248,7 @@ class SupplierInventoryController extends Controller
         if ($request->file('file'))
         {
             $errors = [];
-            $numberOfFields = 9;
+            $numberOfFields = 10;
             $file = $request->file('file');
             $fileName = time().'.'.$file->getClientOriginalExtension();
             $destinationPath = "inventory";
