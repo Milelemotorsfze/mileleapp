@@ -95,7 +95,7 @@ class WorkOrderController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        dd('This functionality will coming soon');
     }
 
     /**
