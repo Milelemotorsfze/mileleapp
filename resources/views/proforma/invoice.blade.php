@@ -169,7 +169,8 @@
       @csrf
       <div class="modal-content">
         <div class="modal-header">
-        <h5 class="modal-title fs-5" id="adoncode">Add New Agent</h5>
+        <h5 class="modal-title fs-5 mb-1" id="adoncode">Add New Agent</h5>
+        <h6 class="modal-subtitle text-muted" id="adoncode">(Please avoid adding dummy or duplicate details)</h6>
           <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body p-4">
@@ -1445,6 +1446,12 @@ $(document).ready(function () {
 
     // Intercept form submission and handle it through AJAX
     $('#form-update2_492').submit(function (e) {
+        var name = $('#name').val().trim();
+        var phone = $('#phone').val().trim();
+    if (name === "" || phone === "") {
+        alert('Name and phone number cannot be blank.');
+        return false;
+    }
         e.preventDefault();
         var formData = new FormData($(this)[0]);
         $.ajax({
