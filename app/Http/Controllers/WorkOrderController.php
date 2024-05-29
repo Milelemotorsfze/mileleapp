@@ -19,9 +19,10 @@ class WorkOrderController extends Controller
 
         $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
         $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
-        $workOrders = WorkOrder::select('customer_name', 'customer_email', 'customer_company_number', 'customer_address')->distinct();
+        // $workOrders = WorkOrder::select('customer_name', 'customer_email', 'customer_company_number', 'customer_address')->distinct();
         
-        $customers = $dpCustomers->union($clients)->union($workOrders)->get();
+        $customers = $dpCustomers->union($clients)->get();
+        // ->union($workOrders)
         $customers = $customers->unique('customer_name');
        // Combine the queries ensuring each select has the same number of columns
 // Select and transform data from the Customer table
