@@ -754,8 +754,11 @@
                                 </div>
                             </li>
                             @endif
-
-                            <li class="nav-item dropdown">
+                            @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-wo','create-export-cnf-wo','create-local-sale-wo','create-lto-wo']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                         <i data-feather="file-text"></i>
                                         <span data-key="t-extra-pages">Work Order</span>
@@ -860,7 +863,7 @@
                                         @endif -->
                                     </div>
                                 </li>
-
+                                @endif
                                 @can('Calls-view')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
