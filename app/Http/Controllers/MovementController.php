@@ -116,20 +116,24 @@ class MovementController extends Controller
     $movementsReferenceId = MovementsReference::max('id') + 1;
     $purchasing_order = PurchasingOrder::where('status', 'Approved')
     ->whereHas('vehicles', function ($query) {
-        $query->whereNull('gdn_id');
+        $query->whereNull('gdn_id')
+              ->where('status', 'Incoming Stock');
     })
     ->get();
     $po = PurchasingOrder::where('status', 'Approved')
     ->whereDoesntHave('vehicles', function ($query) {
-        $query->whereNotNull('gdn_id');
+        $query->whereNotNull('gdn_id')
+        ->where('status', 'Incoming Stock');
     })
     ->pluck('po_number');
     $so_number = So::whereDoesntHave('vehicles', function ($query) {
-        $query->whereNotNull('gdn_id');
+        $query->whereNotNull('gdn_id')
+                ->where('status', 'Incoming Stock');
     })
     ->pluck('so_number');
     $so = So::whereHas('vehicles', function ($query) {
-        $query->whereNull('gdn_id');
+        $query->whereNull('gdn_id')
+              ->where('status', 'Incoming Stock');
     })
     ->get();
     $lastIdExists = MovementsReference::where('id', $movementsReferenceId - 1)->exists();
