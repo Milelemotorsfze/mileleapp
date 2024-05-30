@@ -186,7 +186,7 @@
                 <div class="col-lg-1 col-md-6">
                                 <div class="d-flex align-items-center">
                                     <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i>abcd</button>
+                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
                                 </div>
                                 </div>
                             </div>
