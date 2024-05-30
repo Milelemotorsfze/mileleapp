@@ -88,7 +88,7 @@
                                     <th>Prefered Location</th>
                                     <th> Status</th>
                                     <th>Supplier Approval</th>
-{{--                                    <th>LOI</th>--}}
+                                    <th>LOI</th>
                                     <th>Actions</th>
                                 </tr>
                                 </thead>
@@ -112,16 +112,7 @@
                                         <td>{{ $letterOfIndent->destination }}</td>
                                         <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
-{{--                                        <td>--}}
-{{--                                            <select class="form-control" onchange="location = this.value;">--}}
-{{--                                                <option value="">Select Template</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">--}}
-{{--                                                 Trans Car Template</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>--}}
-{{--                                            </select>--}}
-{{--                                        </td>--}}
+
                                         <td>
                                             @can('LOI-approve')
                                                 @php
@@ -132,6 +123,16 @@
                                                                 class="btn btn-warning btn-sm btn-request-supplier-approval" title="Send For Supplier Approval">Send Request</button>
                                                 @endif
                                             @endcan
+                                        </td>
+                                        <td>
+                                            <select class="form-control" onchange="location = this.value;">
+                                                <option value="">Select Template</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">
+                                                    Trans Car Template</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>
+                                            </select>
                                         </td>
                                         <td>
                                             @can('LOI-edit')
@@ -295,6 +296,7 @@
                                     <th>Destination</th>
                                     <th>Prefered Location</th>
                                     <th> Status</th>
+                                    <th>LOI</th>
                                     <th>Actions</th>
                                 </tr>
                                 </thead>
@@ -318,6 +320,16 @@
                                         <td>{{ $letterOfIndent->destination }}</td>
                                         <td>{{ $letterOfIndent->prefered_location }}</td>
                                         <td>{{ $letterOfIndent->status }}</td>
+                                        <td>
+                                            <select class="form-control" onchange="location = this.value;">
+                                                <option value="">Select Template</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">
+                                                    Trans Car Template</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>
+                                            </select>
+                                        </td>
                                         <td>
                                             @can('LOI-edit')
                                                 @php
@@ -488,7 +500,7 @@
                                              <th>Utilization Qty Update</th>
                                         @endif
                                     @endcan
-{{--                                    <th>LOI</th>--}}
+                                    <th>LOI</th>
                                     <th width="150px">Actions</th>
                                 </tr>
                                 </thead>
@@ -530,16 +542,16 @@
                                             @endif
                                         @endcan
 
-{{--                                        <td>--}}
-{{--                                            <select class="form-control" onchange="location = this.value;">--}}
-{{--                                                <option value="">Select Template</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">--}}
-{{--                                                    Trans Car Template</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>--}}
-{{--                                            </select>--}}
-{{--                                        </td>--}}
+                                        <td>
+                                            <select class="form-control" onchange="location = this.value;">
+                                                <option value="">Select Template</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">
+                                                    Trans Car Template</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>
+                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>
+                                            </select>
+                                        </td>
                                         <td>
 
                                             <button type="button" class="btn btn-soft-violet primary btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-supplier-approved-loi-items-{{$letterOfIndent->id}}">
