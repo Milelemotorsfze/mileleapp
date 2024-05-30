@@ -132,10 +132,10 @@ button:hover {
     font-weight: bold;
 }
 .card-header {
-	background-color:#dbecff!important;
+	background-color:#e6f1ff!important;
 }
 .card-body {
-	background-color:#f5f9ff!important;
+	background-color:#fafcff!important;
 }
 .no-border {
 	border:none!important;
@@ -423,7 +423,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							</div>
 						</div>
 					</div> -->
-					
+
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<label for="so_total_amount" class="col-form-label text-md-end">SO Total Amount:</label>
 						<div class="input-group">
@@ -833,111 +833,111 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			</div>
 		</div>
 	</form>
-</br>
-		<div class="card">
-			<div class="card-header">
-				<h4 class="card-title">
-					<center>Comments Section</center>
-				</h4>
-			</div>
-			<div class="card-body">
-				<div class="row">
-					<div class="col-xxl-1 col-lg-1 col-md-1">
-						<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
-					</div>
-					<div class="col-xxl-11 col-lg-11 col-md-11">
-						aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-					 </br> <span style="color:gray;">
-						Rejitha R Prasad
-						</span><span style="color:gray; float:right;">
-						30 May 2024, 18:00:00
-						</span>
-					</div>
-				</div>
-</br>
-				<div class="row">
-					<div class="col-xxl-1 col-lg-1 col-md-1">
-						<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
-					</div>
-					<div class="col-xxl-10 col-lg-10 col-md-10">
-					<textarea id="comment-input" placeholder="Write a comment..."></textarea>
-					</div>
-					<div class="col-xxl-1 col-lg-1 col-md-1">
-						<button onclick="postComment()">Post</button>
-						<!-- <a  title="Add VIN" onclick=addVIN() style="margin-top:38px; width:100%;"
-								class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>	 -->
-					</div>
-				</div>
-				<!-- <div class="comment-section">
-					<h2>Comments</h2>
-					<div class="comment-box">
-						<textarea id="comment-input" placeholder="Write a comment..."></textarea>
-						<button onclick="postComment()">Post</button>
-					</div>
-					<ul id="comment-list"></ul>
-				</div> -->
-			</div>
+	</br>
+	<div class="card">
+		<div class="card-header">
+			<h4 class="card-title">
+				<center>Comments Section</center>
+			</h4>
 		</div>
-        <br>
-        <div class="card mt-3">
-            <div class="card-header text-center">
-                <h4 class="card-title">Record History</h4>
-            </div>
-            <div class="card-body">
-                <div class="row m-0">
-                    <div class="col-xxl-2 col-lg-2 col-md-6 col-sm-12 mb-2" style="background-color: #dbecff" >
-                        <label class="col-form-label">Filter Region</label>
-                    </div>
-                    <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-                        <label class="col-form-label">User</label>
-                    </div>
-                    <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-                        <select name="user_id" id="user_id" multiple="true" class="form-control widthinput">
-                            <option>Jamin</option>
-                            <option>Arjun</option>
-                            <option>Helen</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-                        <label class="col-form-label">Field</label>
-                    </div>
-                    <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-                        <input type="text" class="form-control widthinput" placeholder="Field">
-                    </div>
-                    <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
-                        <label class="col-form-label">History Type</label>
-                    </div>
-                    <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
-                        <input type="text" class="form-control widthinput" placeholder="History Type">
-                    </div>
-                </div>
-                <div class="row mt-1">
-                    <div class="table-responsive">
-                        <table id="work-order-history-table" class="table table-striped table-editable table-edits table table-condensed" >
-                            <thead style="background-color: #dbecff">
-                            <tr>
-                                <th>Date</th>
-                                <th>User</th>
-                                <th>History Type</th>
-                                <th>Old Value</th>
-                                <th>New Value</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>{{\Illuminate\Support\Carbon::now()->format('d M Y') }}</td>
-                                <td> Jacob</td>
-                                <td>Test Type</td>
-                                <td>TEST</td>
-                                <td></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+		<div class="card-body">
+			<div class="row">
+				<div class="col-xxl-1 col-lg-1 col-md-1">
+					<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
+				</div>
+				<div class="col-xxl-11 col-lg-11 col-md-11">
+					aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+					</br> <span style="color:gray;">
+					Rejitha R Prasad
+					</span><span style="color:gray; float:right;">
+					30 May 2024, 18:00:00
+					</span>
+				</div>
+			</div>
+			</br>
+			<div class="row">
+				<div class="col-xxl-1 col-lg-1 col-md-1">
+					<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
+				</div>
+				<div class="col-xxl-10 col-lg-10 col-md-10">
+				<textarea id="comment-input" placeholder="Write a comment..."></textarea>
+				</div>
+				<div class="col-xxl-1 col-lg-1 col-md-1">
+					<button onclick="postComment()">Post</button>
+					<!-- <a  title="Add VIN" onclick=addVIN() style="margin-top:38px; width:100%;"
+							class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>	 -->
+				</div>
+			</div>
+			<!-- <div class="comment-section">
+				<h2>Comments</h2>
+				<div class="comment-box">
+					<textarea id="comment-input" placeholder="Write a comment..."></textarea>
+					<button onclick="postComment()">Post</button>
+				</div>
+				<ul id="comment-list"></ul>
+			</div> -->
+		</div>
+	</div>
+	<br>
+	<div class="card mt-3">
+		<div class="card-header text-center">
+			<h4 class="card-title">Record History</h4>
+		</div>
+		<div class="card-body">
+			<div class="row m-0">
+				<div class="col-xxl-2 col-lg-2 col-md-6 col-sm-12 mb-2" style="background-color: #e6f1ff" >
+					<label class="col-form-label">Filter Region</label>
+				</div>
+				<div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
+					<label class="col-form-label">User</label>
+				</div>
+				<div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
+					<select name="user_id" id="user_id" multiple="true" class="form-control widthinput">
+						<option>Jamin</option>
+						<option>Arjun</option>
+						<option>Helen</option>
+					</select>
+				</div>
+				<div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
+					<label class="col-form-label">Field</label>
+				</div>
+				<div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
+					<input type="text" class="form-control widthinput" placeholder="Field">
+				</div>
+				<div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
+					<label class="col-form-label">History Type</label>
+				</div>
+				<div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
+					<input type="text" class="form-control widthinput" placeholder="History Type">
+				</div>
+			</div>
+			<div class="row mt-1">
+				<div class="table-responsive">
+					<table id="work-order-history-table" class="table table-striped table-editable table-edits table table-condensed" >
+						<thead style="background-color: #e6f1ff">
+						<tr>
+							<th>Date</th>
+							<th>User</th>
+							<th>History Type</th>
+							<th>Old Value</th>
+							<th>New Value</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr>
+							<td>{{\Illuminate\Support\Carbon::now()->format('d M Y') }}</td>
+							<td> Jacob</td>
+							<td>Test Type</td>
+							<td>TEST</td>
+							<td></td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
 
-            </div>
-        </div>
+		</div>
+	</div>
 </div>
 <br>
 
