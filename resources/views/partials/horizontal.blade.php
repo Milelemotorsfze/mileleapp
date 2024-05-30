@@ -673,8 +673,8 @@
                                         </div>
                                     </div>
                                     @endif -->
-
-                                    @if(Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true)
+                                    <!-- CAN UNCOMMENT WHEN PASSPORT REQUEST MODULE GET USE -->
+                                    <!-- @if(Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true)
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                             <span data-key="t-utility"> Passport Request @if((Auth::user()->passport_submit_request_approval['count']) > 0 OR (Auth::user()->passport_release_request_approval['count']) > 0)
@@ -696,7 +696,7 @@
                                             @endif
                                         </div>
                                     </div>
-                                    @endif
+                                    @endif -->
 
                                     @if(Auth::user()->liability_request_approval['can'] == true OR Auth::user()->leave_request_approval['can'] == true OR Auth::user()->overtime_request_approval['can'] == true)
                                     <div class="dropdown">

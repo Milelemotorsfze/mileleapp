@@ -2,6 +2,9 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
+	.currencyClass {
+		padding-top:5px!important;
+	}
 	.table>:not(caption)>*>* {
     padding: .3rem .3rem!important;
     -webkit-box-shadow: inset 0 0 0 0px var(--bs-table-accent-bg)!important;
@@ -64,6 +67,80 @@
 			color: #fff; background: #fd625e; border: 1px solid #fd625e;
 			}
 
+
+			/* body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+} */
+
+.comment-section {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+}
+
+.comment-box {
+    display: flex;
+    flex-direction: column;
+}
+
+#comment-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px;
+    background: #007BFF;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+#comment-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.comment-item {
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+}
+
+.mention {
+    color: #007BFF;
+    font-weight: bold;
+}
+.card-header {
+	background-color:#dbecff!important;
+}
+.card-body {
+	background-color:#f5f9ff!important;
+}
+.no-border {
+	border:none!important;
+}
+
      .select2-container {
         width: 100% !important;
     }
@@ -90,8 +167,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		</ul>
 	</div>
 	@endif
+	<div class="col-xxl-12 col-lg-12 col-md-12">
+		<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+	</div>
 	<form id="WOForm" name="WOForm" action="{{route('work-order.store')}}" enctype="multipart/form-data" method="POST">
 		@csrf
+		<a  title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
+			<i class="fa fa-check" aria-hidden="true"></i> Finance Approval
+		</a>
+		<a  title="COE Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
+			<i class="fa fa-check" aria-hidden="true"></i> COE Office Approval
+		</a>
 		<div class="card">
 			<div class="card-header">
 				<h4 class="card-title">
@@ -100,7 +186,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			</div>
 			<div class="card-body">
 				<div class="row">
-                    <input type="hidden" name="type" value={{$type ?? ''}}>
+                    <input type="hidden" name="type" id="type" value={{$type ?? ''}}>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="date" class="col-form-label text-md-end">{{ __('Date') }}</label>
@@ -208,9 +294,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
                     <div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="freight_agent_contact_number" class="col-form-label text-md-end">{{ __('Freight Agent Contact Number') }}</label>
-						<input id="freight_agent_contact_number" type="text" class="form-control widthinput @error('freight_agent_contact_number') is-invalid @enderror"
-                         name="freight_agent_contact_number"
-							placeholder="Enter Freight Agent Contact Number" value="" autocomplete="freight_agent_contact_number" autofocus>
+						<input id="freight_agent_contact_number" type="tel" class="widthinput contact form-control @error('freight_agent_contact_number[full]')
+                                is-invalid @enderror" name="freight_agent_contact_number[main]" placeholder="Enter Freight Agent Contact Number" oninput="validationOnKeyUp(this)"
+                                value="" autocomplete="freight_agent_contact_number[full]" autofocus>
 					</div>
 					@endif
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
@@ -275,9 +361,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 								@endforeach
 							</select>
 						</div>
-					</div>
-
-
+					</div>					
                     <div class="col-xxl-4 col-lg-6 col-md-6" id="airway-bill-div">
 						<label for="airway_bill" class="col-form-label text-md-end">{{ __('Airway Bill') }}</label>
 						<input id="airway_bill" type="text" class="form-control widthinput @error('airway_bill') is-invalid @enderror"
@@ -290,13 +374,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
                          name="shipping_line"
 							placeholder="Enter Shipping Line" value="" autocomplete="shipping_line" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6" id="forwarder-import-code-div">
-						<label for="forwarder_import_code" class="col-form-label text-md-end">{{ __('Forwarder Import Code') }}</label>
-						<input id="forwarder_import_code" type="text" class="form-control widthinput @error('forwarder_import_code') is-invalid @enderror"
-                         name="forwarder_import_code"
-							placeholder="Enter Forwarder Import Code" value="" autocomplete="forwarder_import_code" autofocus>
-					</div>
-
+                    <div class="col-xxl-4 col-lg-6 col-md-6" id="forward-import-code-div">
+						<label for="forward_import_code" class="col-form-label text-md-end">{{ __('Forward Import Code') }}</label>
+						<input id="forward_import_code" type="text" class="form-control widthinput @error('forward_import_code') is-invalid @enderror"
+                         name="forward_import_code"
+							placeholder="Enter Forward Import Code" value="" autocomplete="forward_import_code" autofocus>
+					</div>					
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="trailer-number-plate-div">
 						<label for="trailer_number_plate" class="col-form-label text-md-end">{{ __('Trailer Number Plate') }}</label>
 						<input id="trailer_number_plate" type="text" class="form-control widthinput @error('trailer_number_plate') is-invalid @enderror"
@@ -315,7 +398,87 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							is-invalid @enderror" name="transporting_driver_contact_number[main]" placeholder="Enter Transporting Driver Contact Number" oninput="validationOnKeyUp(this)"
 							value="" autocomplete="transporting_driver_contact_number[full]" autofocus>
 					</div>
+					<div class="col-xxl-8 col-lg-6 col-md-6" id="airway-details-div">
+						<label for="airway_details" class="col-form-label text-md-end">{{ __('Airway Details') }}</label>
+						<input id="airway_details" type="text" class="widthinput contact form-control @error('airway_details')
+							is-invalid @enderror" name="airway_details" placeholder="Enter Airway Details" oninput="validationOnKeyUp(this)"
+							value="" autocomplete="airway_details" autofocus>
+					</div>
+					<div class="col-xxl-8 col-lg-6 col-md-6" id="transportation-company-details-div">
+						<label for="transportation_company_details" class="col-form-label text-md-end">{{ __('Transportation Company Details') }}</label>
+						<input id="transportation_company_details" type="text" class="widthinput contact form-control @error('transportation_company_details')
+							is-invalid @enderror" name="transportation_company_details" placeholder="Enter Transportation Company Details" oninput="validationOnKeyUp(this)"
+							value="" autocomplete="transportation_company_details" autofocus>
+					</div>
 					@endif
+				</div>
+				<hr>
+				<div class="row">
+					<!-- <div class="col-xxl-2 col-lg-2 col-md-2">
+						<label for="so_total_amount" class="col-form-label text-md-end"> SO Total Amount :</label>
+						<div class="input-group">
+							<input type="text" id="so_total_amount" name="so_total_amount" value="" class="form-control widthinput" placeholder="Enter SO Total Amount" onkeyup="setDepositBalance()">
+							<div class="input-group-append">
+								<span class="input-group-text widthinput" id="basic-addon2">AED</span>
+							</div>
+						</div>
+					</div> -->
+					
+					<div class="col-xxl-2 col-lg-2 col-md-2">
+						<label for="so_total_amount" class="col-form-label text-md-end">SO Total Amount:</label>
+						<div class="input-group">
+							<input type="text" id="so_total_amount" name="so_total_amount" value="" class="form-control widthinput" placeholder="Enter SO Total Amount" onkeyup="setDepositBalance()">
+							<div class="input-group-append">
+								<select id="currency" class="form-control widthinput currencyClass" onchange="updateCurrency()">
+									<option value="AED">AED</option>
+									<option value="USD">USD</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-xxl-2 col-lg-2 col-md-2">
+						<label for="so_vehicle_quantity" class="col-form-label text-md-end"> SO Vehicle Quantity :</label>
+						<input id="so_vehicle_quantity" type="number" class="form-control widthinput @error('so_vehicle_quantity') is-invalid @enderror" name="so_vehicle_quantity"
+							placeholder="Enter SO Vehicle Quantity" value="" autocomplete="so_vehicle_quantity" autofocus>
+					</div>
+					<div class="col-xxl-2 col-lg-2 col-md-2">
+						<label for="deposit_received_as" class="col-form-label text-md-end"> Deposit Received As :</label>
+						<fieldset style="margin-top:5px;" class="radio-div-container">
+							<div class="row some-class">
+								<div class="col-xxl-6 col-lg-6 col-md-6">
+									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="total_deposit" id="total_deposit" />
+									<label for="total_deposit">Total Deposit</label>
+								</div>
+								<div class="col-xxl-6 col-lg-6 col-md-6">
+									<input type="radio" class="deposit_received_as" name="deposit_received_as" value="custom_deposit" id="custom_deposit" />
+									<label for="custom_deposit">Custom Deposit</label>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+					<div class="col-xxl-3 col-lg-3 col-md-3" id="amount-received-div">
+						<label for="amount_received" class="col-form-label text-md-end">Amount Received :</label>
+						<div class="input-group">
+							<input type="text" value="" class="form-control widthinput" id="amount_received" name="amount_received" placeholder="Enter Total Deposit Received" onkeyup="setDepositBalance()">
+							<div class="input-group-append">
+								<span class="input-group-text widthinput" id="amount_received_currency">AED</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-xxl-3 col-lg-3 col-md-3" id="balance-amount-div">
+						<label for="balance_amount" class="col-form-label text-md-end">Balance Amount :</label>
+						<div class="input-group">
+							<input type="text" value="" class="form-control widthinput" id="balance_amount" placeholder="Enter Balance Amount" readonly>
+							<div class="input-group-append">
+								<span class="input-group-text widthinput" id="balance_amount_currency">AED</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-xxl-12 col-lg-12 col-md-12" id="deposit-aganist-vehicle-div">
+						<label for="amount_received" class="col-form-label text-md-end">Deposit Aganist Vehicle :</label>
+						<select name="deposit_aganist_vehicle" id="deposit_aganist_vehicle" multiple="true" class="form-control widthinput" autofocus>
+						</select>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -340,6 +503,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 								class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>
 					</div>
 				</div>
+				<!-- <div class="row">
+					<div class="col-xxl-5 col-lg-5 col-md-5">
+						<label for="addon" class="col-form-label text-md-end">{{ __('Addon') }}</label>
+						<select id="addon" name="addon" class="form-control widthinput" multiple="true">
+							<option value="p001">P001 - rear mirror</option>
+						</select>	
+					</div>
+					<div class="col-xxl-1 col-lg-1 col-md-1">
+					<input id="addon_quantity" type="number" class="form-control widthinput @error('addon_quantity') is-invalid @enderror" name="addon_quantity"
+							placeholder="Enter SO Vehicle Quantity" value="" autocomplete="addon_quantity" autofocus>
+					</div>
+					<div class="col-xxl-5 col-lg-5 col-md-5">
+						<label for="addon" class="col-form-label text-md-end">{{ __('Addon') }}</label>
+						<select id="addon" name="addon" class="form-control widthinput" multiple="true">
+							<option value="p001">P001 - rear mirror</option>
+						</select>	
+					</div>
+				</div> -->
 				</br>
 				<div class="row">
 					<div class="table-responsive">
@@ -644,10 +825,59 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				</div>
 			</div>
 		</div>
-		<div class="col-xxl-12 col-lg-12 col-md-12">
-			<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+		<div class="card  no-border">
+			<div class="card-body">
+				<div class="col-xxl-12 col-lg-12 col-md-12">
+					<button style="float:left;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
+				</div>
+			</div>
 		</div>
 	</form>
+</br>
+		<div class="card">
+			<div class="card-header">
+				<h4 class="card-title">
+					<center>Comments Section</center>
+				</h4>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-xxl-1 col-lg-1 col-md-1">
+						<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
+					</div>
+					<div class="col-xxl-11 col-lg-11 col-md-11">
+						aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+					 </br> <span style="color:gray;">
+						Rejitha R Prasad
+						</span><span style="color:gray; float:right;">
+						30 May 2024, 18:00:00
+						</span>
+					</div>
+				</div>
+</br>
+				<div class="row">
+					<div class="col-xxl-1 col-lg-1 col-md-1">
+						<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
+					</div>
+					<div class="col-xxl-10 col-lg-10 col-md-10">
+					<textarea id="comment-input" placeholder="Write a comment..."></textarea>
+					</div>
+					<div class="col-xxl-1 col-lg-1 col-md-1">
+						<button onclick="postComment()">Post</button>
+						<!-- <a  title="Add VIN" onclick=addVIN() style="margin-top:38px; width:100%;"
+								class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>	 -->
+					</div>
+				</div>
+				<!-- <div class="comment-section">
+					<h2>Comments</h2>
+					<div class="comment-box">
+						<textarea id="comment-input" placeholder="Write a comment..."></textarea>
+						<button onclick="postComment()">Post</button>
+					</div>
+					<ul id="comment-list"></ul>
+				</div> -->
+			</div>
+		</div>
         <br>
         <div class="card mt-3">
             <div class="card-header text-center">
@@ -727,8 +957,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
     $('#work-order-history-table').DataTable();
     var customers = {!! json_encode($customers) !!};
 	var vins = {!! json_encode($vins) !!}
+	var type = $("#type").val();
 	var addedVins = [];
-	$(document).ready(function () {
+	var selectedDepositReceivedValue = '';
+	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
+	$(document).ready(function () { console.log(type);
         hideDependentTransportType();
 		$("#boe-div").hide();
 		// SELECT 2 START
@@ -769,18 +1002,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				hiddenInput: "full",
 				utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
 			});
-			var freight_agent_contact_number = window.intlTelInput(document.querySelector("#freight_agent_contact_number"), {
-				separateDialCode: true,
-				preferredCountries:["ae"],
-				hiddenInput: "full",
-				utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-			});
-			var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
-				separateDialCode: true,
-				preferredCountries:["ae"],
-				hiddenInput: "full",
-				utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-			});
+			if(type == 'export_exw') {
+				var freight_agent_contact_number = window.intlTelInput(document.querySelector("#freight_agent_contact_number"), {
+					separateDialCode: true,
+					preferredCountries:["ae"],
+					hiddenInput: "full",
+					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+				});
+			}
 		// INTEL INPUT END
         $('.transport_type').click(function() {
             if($(this).val() == 'air') {
@@ -796,41 +1025,65 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$("#container-number-div").hide();
 				$("#trailer-number-plate-div").hide();
 				$("#transportation-company-div").hide();
-				$("#forwarder-import-code-div").hide();
+				$("#forward-import-code-div").hide();
                 $("#shippingline-div").hide();
                 $("#transporting-driver-contact-number-div").hide();
+				$("#airway-details-div").show();
+				$("#transportation-company-details-div").hide();
             }
             else if($(this).val() == 'sea') {
                 $("#airline-div").hide();
                 $("#airway-bill-div").hide();
                 $("#shippingline-div").show();
-                $("#forwarder-import-code-div").show();
+                $("#forward-import-code-div").show();
 				$("#brn-div").show();
 				$("#brn-file-div").show();
 				$("#container-number-div").show();
 				$("#trailer-number-plate-div").hide();
 				$("#transportation-company-div").hide();
 				$("#transporting-driver-contact-number-div").hide();
+				$("#airway-details-div").hide();
+				$("#transportation-company-details-div").hide();
             }
             else if($(this).val() == 'road') {
                 // hideDependentTransportType();
 				$("#airline-div").hide();
                 $("#airway-bill-div").hide();
                 $("#shippingline-div").hide();
-                $("#forwarder-import-code-div").hide();
+                $("#forward-import-code-div").hide();
 				$("#brn-div").hide();
 				$("#brn-file-div").hide();
 				$("#container-number-div").hide();
 				$("#trailer-number-plate-div").show();
 				$("#transportation-company-div").show();
-				$("#transporting-driver-contact-number-div").show();
+				$("#transporting-driver-contact-number-div").show();				
+				var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
+					separateDialCode: true,
+					preferredCountries:["ae"],
+					hiddenInput: "full",
+					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+				});	
+				$("#airway-details-div").hide();
+				$("#transportation-company-details-div").show();
             }
         });
         $('#customer_name').on('change', function() {
             var selectedCustomerName = $(this).val();
             setCustomerRelations(selectedCustomerName);
         });
-
+		$('.deposit_received_as').click(function() {
+			selectedDepositReceivedValue = $('input[name="deposit_received_as"]:checked').val();
+			if (selectedDepositReceivedValue == 'total_deposit') {
+				$("#amount-received-div").show();
+				$("#balance-amount-div").show();
+				$("#deposit-aganist-vehicle-div").hide();
+			} else if (selectedDepositReceivedValue == 'custom_deposit') {
+				$("#amount-received-div").show();
+				$("#balance-amount-div").show();
+				$("#deposit-aganist-vehicle-div").show();
+				setDepositAganistVehicleDropdownOptions();
+			}
+		});
 		// BOE DYNAMICALLY ADD AND REMOVE START
 		// Event listener to add new form fields
 		$("body").on("click", ".add_new_frm_field_btn", function () {
@@ -865,12 +1118,86 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 		// BOE DYNAMICALLY ADD AND REMOVE END
 	});
+	document.getElementById('comment-input').addEventListener('input', showMentions);
+
+function showMentions(event) {
+    const input = event.target.value;
+    const mentionList = document.getElementById('mentions-list');
+    const mentionTrigger = input.match(/@\w*$/);
+    
+    if (mentionTrigger) {
+        const mentionQuery = mentionTrigger[0].slice(1).toLowerCase();
+        const filteredMentions = mentions.filter(mention => mention.toLowerCase().includes(mentionQuery));
+        
+        mentionList.innerHTML = '';
+        filteredMentions.forEach(mention => {
+            const mentionItem = document.createElement('div');
+            mentionItem.textContent = mention;
+            mentionItem.addEventListener('click', () => selectMention(mention));
+            mentionList.appendChild(mentionItem);
+        });
+        
+        mentionList.style.display = 'block';
+    } else {
+        mentionList.style.display = 'none';
+    }
+}
+
+function selectMention(mention) {
+    const inputField = document.getElementById('comment-input');
+    const inputText = inputField.value;
+    const newText = inputText.replace(/@\w*$/, mention + ' ');
+    inputField.value = newText;
+    document.getElementById('mentions-list').style.display = 'none';
+    inputField.focus();
+}
+
+function postComment() {
+    const commentInput = document.getElementById('comment-input');
+    const commentText = commentInput.value;
+    
+    if (commentText.trim()) {
+        const commentList = document.getElementById('comment-list');
+        const commentItem = document.createElement('li');
+        commentItem.className = 'comment-item';
+        
+        const mentionRegex = /@\w+/g;
+        const formattedText = commentText.replace(mentionRegex, match => `<span class="mention">${match}</span>`);
+        
+        commentItem.innerHTML = formattedText;
+        commentList.appendChild(commentItem);
+        
+        commentInput.value = '';
+    }
+}
+	function setDepositAganistVehicleDropdownOptions() {
+    // Get the previously selected values
+    var previouslySelectedValues = $('#deposit_aganist_vehicle').val() || [];
+
+    // Empty the select element before adding new options
+    $('#deposit_aganist_vehicle').empty();
+
+    // Add new options to the select element
+    addedVins.forEach(function(vin) {
+        $('#deposit_aganist_vehicle').append(new Option(vin, vin));
+    });
+
+    // Initialize or reinitialize Select2
+    $('#deposit_aganist_vehicle').select2({
+        allowClear: true,
+        placeholder: "Choose Vehicle"
+    });
+
+    // Reselect previously selected values if they still exist
+    $('#deposit_aganist_vehicle').val(previouslySelectedValues.filter(function(value) {
+        return addedVins.includes(value);
+    })).trigger('change');
+}
 
 	// BOE DYNAMICALLY ADD AND REMOVE START
 	function addChild() {
-		var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
-		if (index <= addedVins.length) {
-			// console.log(addedVins);
+		var index = $(".form_field_outer").find(".form_field_outer_row").length + 1; 
+		if (index <= addedVins.length) { 
 			var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
 			var newRow = $(`
 				<div class="row form_field_outer_row" id="${index}">
@@ -1120,6 +1447,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		else {
 			$("#boe-div").hide();
 		}
+		if(selectedDepositReceivedValue == 'custom_deposit') {
+			setDepositAganistVehicleDropdownOptions();
+		}
 	}
 	document.addEventListener('DOMContentLoaded', function() {
 		const table = document.getElementById('myTable');
@@ -1196,285 +1526,305 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 		return cell;
 	}
-function hideDependentTransportType() {
-	$("#airline-div").hide();
-	$("#airway-bill-div").hide();
-	$("#shippingline-div").hide();
-	$("#forwarder-import-code-div").hide();
-	$("#brn-div").hide();
-	$("#brn-file-div").hide();
-	$("#container-number-div").hide();
-	$("#trailer-number-plate-div").hide();
-	$("#transportation-company-div").hide();
-	$("#transporting-driver-contact-number-div").hide();
-}
-function checkValue() {
-	var textInput = document.getElementById('textInput');
-	var Other = document.getElementById('Other');
-	var switchToDropdown = document.getElementById('switchToDropdown');
-	$('#customer_name').next('.select2-container').hide();
-	textInput.style.display = 'inline';
-	Other.style.display = 'none';
-	switchToDropdown.style.display = 'inline';
-	$('#customer_address').val('');
-}
-function switchToDropdown() {
-	var textInput = document.getElementById('textInput');
-	var Other = document.getElementById('Other');
-	var switchToDropdown = document.getElementById('switchToDropdown');
-	$('#customer_name').next('.select2-container').show();
-	textInput.style.display = 'none';
-	Other.style.display = 'inline';
-	switchToDropdown.style.display = 'none';
-	var selectedCustomerName = $('#customer_name').val();
-	if(selectedCustomerName.length > 0) {
-		setCustomerRelations(selectedCustomerName);
+	function hideDependentTransportType() {
+		$("#airline-div").hide();
+		$("#airway-bill-div").hide();
+		$("#shippingline-div").hide();
+		$("#forward-import-code-div").hide();
+		$("#brn-div").hide();
+		$("#brn-file-div").hide();
+		$("#container-number-div").hide();
+		$("#trailer-number-plate-div").hide();
+		$("#transportation-company-div").hide();
+		$("#transporting-driver-contact-number-div").hide();
+		$("#airway-details-div").hide();
+		$("#transportation-company-details-div").hide();
+		$("#amount-received-div").hide();
+		$("#balance-amount-div").hide();
+		$("#deposit-aganist-vehicle-div").hide();
 	}
-}
-function setCustomerRelations(selectedCustomerName) {
-	$('#customer_address').val('');
-	// document.getElementById('customer_email').value = '';
-	// document.getElementById('customer_company_number').value = '';
-	if(selectedCustomerName != '') {
-		for (var i = 0; i < customers.length; i++) {
-			if (customers[i].name == selectedCustomerName) {
-				if(customers[i].address != null) {
-					$('#customer_address').val(customers[i]?.address);
+	function checkValue() {
+		var textInput = document.getElementById('textInput');
+		var Other = document.getElementById('Other');
+		var switchToDropdown = document.getElementById('switchToDropdown');
+		$('#customer_name').next('.select2-container').hide();
+		textInput.style.display = 'inline';
+		Other.style.display = 'none';
+		switchToDropdown.style.display = 'inline';
+		$('#customer_address').val('');
+	}
+	function switchToDropdown() {
+		var textInput = document.getElementById('textInput');
+		var Other = document.getElementById('Other');
+		var switchToDropdown = document.getElementById('switchToDropdown');
+		$('#customer_name').next('.select2-container').show();
+		textInput.style.display = 'none';
+		Other.style.display = 'inline';
+		switchToDropdown.style.display = 'none';
+		var selectedCustomerName = $('#customer_name').val();
+		if(selectedCustomerName.length > 0) {
+			setCustomerRelations(selectedCustomerName);
+		}
+	}
+	function setCustomerRelations(selectedCustomerName) {
+		$('#customer_address').val('');
+		// document.getElementById('customer_email').value = '';
+		// document.getElementById('customer_company_number').value = '';
+		if(selectedCustomerName != '') {
+			for (var i = 0; i < customers.length; i++) {
+				if (customers[i].name == selectedCustomerName) {
+					if(customers[i].address != null) {
+						$('#customer_address').val(customers[i]?.address);
+					}
 				}
 			}
 		}
 	}
-}
-function setWo() {
-	var SONumber = $('#so_number').val();
-	// Step 1: Split the string to get the part after "SO-"
-	let parts = SONumber.split("SO-");
-	if (parts.length < 2) {
-		throw new Error("Invalid SO Number format");
-	}
-	// Step 2: Remove leading zeros from the part after "SO-"
-	let numberPart = parts[1].replace(/^0+/, '');
-	var WONumber = "WO-";
-	if(numberPart != '') {
-		WONumber = WONumber+numberPart;
-	}
-	document.getElementById('wo_number').value = WONumber;
-}
-
-// CLIENT SIDE VALIDATION START
-$.validator.addMethod("SONumberFormat", function(value, element) {
-	// Regular expression to match the format SO- followed by exactly 6 digits
-	return this.optional(element) || /^SO-\d{6}$/.test(value);
-}, "Please enter a valid order number in the format SO-######");
-// $.validator.addMethod("WONumberFormat", function(value, element) {
-// 	// Regular expression to match the format WO- followed by exactly 6 digits
-// 	return this.optional(element) || /^WO-\d{6}$/.test(value);
-// }, "Please enter a valid order number in the format WO-######");
-jQuery.validator.setDefaults({
-	errorClass: "is-invalid",
-	errorElement: "p",
-	errorPlacement: function ( error, element ) {
-		error.addClass( "invalid-feedback font-size-13" );
-		if ( element.prop( "type" ) === "checkbox" ) {
-			error.insertAfter( element.parent( "label" ) );
+	function setWo() {
+		var SONumber = $('#so_number').val();
+		// Step 1: Split the string to get the part after "SO-"
+		let parts = SONumber.split("SO-");
+		if (parts.length < 2) {
+			throw new Error("Invalid SO Number format");
 		}
-		else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
-			if (!element.val() || element.val().length === 0) {
-				console.log("Error is here with length", element.val().length);
-				error.addClass('select-error');
-				error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
-			} else {
-				console.log("No error");
+		// Step 2: Remove leading zeros from the part after "SO-"
+		let numberPart = parts[1].replace(/^0+/, '');
+		var WONumber = "WO-";
+		if(numberPart != '') {
+			WONumber = WONumber+numberPart;
+		}
+		document.getElementById('wo_number').value = WONumber;
+	}
+	function setDepositBalance() {
+		var totalAmount = $('#so_total_amount').val();
+		var amountReceived = $('#amount_received').val();
+		var balanceAmount = '';
+		if(totalAmount != '' && amountReceived != '') {
+			balanceAmount = Number(totalAmount) - Number(amountReceived);
+		}
+		document.getElementById('balance_amount').value = balanceAmount;
+	}
+	function updateCurrency() {
+		var currency = document.getElementById("currency").value;
+		var currencyText = document.querySelector("#currency option:checked").textContent;
+		// document.getElementById("currency-label").textContent = currencyText;
+		document.getElementById("amount_received_currency").textContent = currencyText;
+		document.getElementById("balance_amount_currency").textContent = currencyText;
+	}
+	// CLIENT SIDE VALIDATION START
+	$.validator.addMethod("SONumberFormat", function(value, element) {
+		// Regular expression to match the format SO- followed by exactly 6 digits
+		return this.optional(element) || /^SO-\d{6}$/.test(value);
+	}, "Please enter a valid order number in the format SO-######");
+	// $.validator.addMethod("WONumberFormat", function(value, element) {
+	// 	// Regular expression to match the format WO- followed by exactly 6 digits
+	// 	return this.optional(element) || /^WO-\d{6}$/.test(value);
+	// }, "Please enter a valid order number in the format WO-######");
+	jQuery.validator.setDefaults({
+		errorClass: "is-invalid",
+		errorElement: "p",
+		errorPlacement: function ( error, element ) {
+			error.addClass( "invalid-feedback font-size-13" );
+			if ( element.prop( "type" ) === "checkbox" ) {
+				error.insertAfter( element.parent( "label" ) );
+			}
+			else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+				if (!element.val() || element.val().length === 0) {
+					console.log("Error is here with length", element.val().length);
+					error.addClass('select-error');
+					error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+				} else {
+					console.log("No error");
+				}
+			}
+		else if (element.parent().hasClass('input-group')) {
+				error.insertAfter(element.parent());
+			}
+			else {
+				error.insertAfter( element );
 			}
 		}
-	else if (element.parent().hasClass('input-group')) {
-			error.insertAfter(element.parent());
-		}
-		else {
-			error.insertAfter( element );
-		}
-	}
-});
-$('#WOForm').validate({ // initialize the plugin
-	rules: {
-		type: {
-			required: true,
+	});
+	$('#WOForm').validate({ // initialize the plugin
+		rules: {
+			type: {
+				required: true,
+			},
+			date: {
+				required: true,
+				date: true,
+			},
+			so_number: {
+				required: true,
+				SONumberFormat: true
+			},
+			batch: {
+				required: true,
+			},
+			// wo_number: {
+			// 	required: true,
+			// 	WONumberFormat: true
+			// },
+			customer_name: {
+				// required: true,
+			},
+			customer_email: {
+				// required: true,
+				email: true,
+			},
+			customer_company_number: {
+				// required: true,
+				minlength: 5,
+				maxlength: 20,
+			},
+			customer_address: {
+				// required: true,
+				// money: true,
+				// greaterThanFirstValueValidate: "#salary_range_start_in_aed",
+			},
+			customer_representative_name: {
+				// required: true,
+			},
+			customer_representative_email: {
+				// required: true,
+				email: true,
+			},
+			customer_representative_contact: {
+				// required: true,
+				minlength: 5,
+				maxlength: 20,
+			},
+			freight_agent_name: {
+				// required: true,
+			},
+			freight_agent_email: {
+				// required: true,
+				email: true,
+			},
+			freight_agent_contact_number: {
+				// required: true,
+				minlength: 5,
+				maxlength: 20,
+			},
+			port_of_loading: {
+				// required: true,
+			},
+			port_of_discharge: {
+				// required: true,
+			},
+			final_destination: {
+				// required: true,
+			},
+			transport_type: {
+				// required: true,
+			},
+			airline: {
+				// required: true,
+			},
+			airway_bill: {
+				// required: true,
+			},
+			shipping_line: {
+				// required: true,
+			},
+			forward_import_code: {
+				// required: true,
+			},
+			brn: {
+				// required: true,
+			},
+			brn_file: {
+				// required: true,
+			},
+			container_number: {
+				// required: true,
+			},
+			// vin: {
+			// 	// required: true,
+			// },
+			// brand: {
+			// 	// required: true,
+			// },
+			// variant: {
+			// 	// required: true,
+			// },
+			// engine: {
+			// 	// required: true,
+			// },
+			// model_description: {
+			// 	// required: true,
+			// },
+			// model_year: {
+			// 	// required: true,
+			// },
+			// model_year: {
+			// 	// required: true,
+			// },
+			// steering: {
+			// 	// required: true,
+			// },
+			// exterior_colour: {
+			// 	// required: true,
+			// },
+			// interior_colour: {
+			// 	// required: true,
+			// },
+			// warehouse: {
+			// 	// required: true,
+			// },
+			// territory: {
+			// 	// required: true,
+			// },
+			// preferred_destination: {
+			// 	// required: true,
+			// },
+			// import_document_type: {
+			// 	// required: true,
+			// },
+			// ownership_name: {
+			// 	// required: true,
+			// },
+			// modification_or_jobs_to_perform_per_vin: {
+			// 	// required: true,
+			// },
+			// certification_per_vin: {
+			// 	// required: true,
+			// },
+			// special_request_or_remarks: {
+			// 	// required: true,
+			// },
+			delivery_location: {
+				// required: true,
+			},
+			delivery_contact_person: {
+				// required: true,
+			},
+			delivery_date: {
+				// required: true,
+			},
+			signed_pdf: {
+				// required: true,
+			},
+			signed_contract: {
+				// required: true,
+			},
+			payment_receipts: {
+				// required: true,
+			},
+			noc: {
+				// required: true,
+			},
+			enduser_trade_license: {
+				// required: true,
+			},
+			enduser_passport: {
+				// required: true,
+			},
+			enduser_contract: {
+				// required: true,
+			},
 		},
-		date: {
-			required: true,
-			date: true,
-		},
-		so_number: {
-			required: true,
-			SONumberFormat: true
-		},
-		batch: {
-			required: true,
-		},
-		// wo_number: {
-		// 	required: true,
-		// 	WONumberFormat: true
-		// },
-		customer_name: {
-			// required: true,
-		},
-		customer_email: {
-			// required: true,
-			email: true,
-		},
-		customer_company_number: {
-			// required: true,
-			minlength: 5,
-			maxlength: 20,
-		},
-		customer_address: {
-			// required: true,
-			// money: true,
-			// greaterThanFirstValueValidate: "#salary_range_start_in_aed",
-		},
-		customer_representative_name: {
-			// required: true,
-		},
-		customer_representative_email: {
-			// required: true,
-			email: true,
-		},
-		customer_representative_contact: {
-			// required: true,
-			minlength: 5,
-			maxlength: 20,
-		},
-		freight_agent_name: {
-			// required: true,
-		},
-		freight_agent_email: {
-			// required: true,
-			email: true,
-		},
-		freight_agent_contact_number: {
-			// required: true,
-			minlength: 5,
-			maxlength: 20,
-		},
-		port_of_loading: {
-			// required: true,
-		},
-		port_of_discharge: {
-			// required: true,
-		},
-		final_destination: {
-			// required: true,
-		},
-		transport_type: {
-			// required: true,
-		},
-		airline: {
-			// required: true,
-		},
-		airway_bill: {
-			// required: true,
-		},
-		shipping_line: {
-			// required: true,
-		},
-		forwarder_import_code: {
-			// required: true,
-		},
-		brn: {
-			// required: true,
-		},
-		brn_file: {
-			// required: true,
-		},
-		container_number: {
-			// required: true,
-		},
-		// vin: {
-		// 	// required: true,
-		// },
-		// brand: {
-		// 	// required: true,
-		// },
-		// variant: {
-		// 	// required: true,
-		// },
-		// engine: {
-		// 	// required: true,
-		// },
-		// model_description: {
-		// 	// required: true,
-		// },
-		// model_year: {
-		// 	// required: true,
-		// },
-		// model_year: {
-		// 	// required: true,
-		// },
-		// steering: {
-		// 	// required: true,
-		// },
-		// exterior_colour: {
-		// 	// required: true,
-		// },
-		// interior_colour: {
-		// 	// required: true,
-		// },
-		// warehouse: {
-		// 	// required: true,
-		// },
-		// territory: {
-		// 	// required: true,
-		// },
-		// preferred_destination: {
-		// 	// required: true,
-		// },
-		// import_document_type: {
-		// 	// required: true,
-		// },
-		// ownership_name: {
-		// 	// required: true,
-		// },
-		// modification_or_jobs_to_perform_per_vin: {
-		// 	// required: true,
-		// },
-		// certification_per_vin: {
-		// 	// required: true,
-		// },
-		// special_request_or_remarks: {
-		// 	// required: true,
-		// },
-		delivery_location: {
-			// required: true,
-		},
-		delivery_contact_person: {
-			// required: true,
-		},
-		delivery_date: {
-			// required: true,
-		},
-		signed_pdf: {
-			// required: true,
-		},
-		signed_contract: {
-			// required: true,
-		},
-		payment_receipts: {
-			// required: true,
-		},
-		noc: {
-			// required: true,
-		},
-		enduser_trade_license: {
-			// required: true,
-		},
-		enduser_passport: {
-			// required: true,
-		},
-		enduser_contract: {
-			// required: true,
-		},
-    },
-});
-// CLIENT SIDE VALIDATION END
+	});
+	// CLIENT SIDE VALIDATION END
 </script>
 @endsection
