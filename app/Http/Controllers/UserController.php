@@ -186,7 +186,7 @@ namespace App\Http\Controllers;
         }
         public function updateRole(Request $request, $roleId)
         {
-        $user = Auth::id();
+        $user = Auth::user();
         $user->selected_role = $roleId;
         $user->save();
         Session::put('selectedRole', $roleId);
