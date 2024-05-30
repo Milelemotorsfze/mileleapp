@@ -1,6 +1,20 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+  .text-container {
+        display: inline-block; /* Inline block to handle overflow */
+        max-width: 300px; /* Adjust this width as needed */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .read-more-btn {
+        color: blue;
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-decoration: underline;
+    }
     div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
@@ -161,6 +175,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -201,6 +216,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -242,6 +258,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -283,6 +300,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -326,6 +344,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -369,6 +388,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -413,6 +433,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -457,6 +478,7 @@
                   <th>Model Line</th>
                   <th>Model Description</th>
                   <th>Variant</th>
+                  <th>Variant Detail</th>
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>MY</th>
@@ -522,10 +544,30 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
+            {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
-        }},
-                { data: 'engine', name: 'vehicles.engine' },
+        }},        
+        { data: 'engine', name: 'vehicles.engine' },
                 { data: 'my', name: 'varaints.my' },
                 { data: 'steering', name: 'varaints.steering' },
                 { data: 'fuel_type', name: 'varaints.fuel_type' },
@@ -572,6 +614,26 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
+            {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
@@ -620,6 +682,26 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
+            {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
@@ -675,6 +757,26 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                     }
                 },
+                {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
                 { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
@@ -725,6 +827,26 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
+            {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
@@ -775,6 +897,26 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
+            {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
@@ -827,6 +969,26 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
+            {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
@@ -901,6 +1063,26 @@
                     return '<a href="#" onclick="openModal(' + row.variant_id + ')" style="text-decoration: underline;">' + data + '</a>';
                 }
             },
+            {
+                    data: 'variant_detail', // Updated to use the alias
+                    name: 'varaints.detail',
+                    render: function(data, type, row) {
+                        if (!data) {
+                            return ''; // Return an empty string if data is undefined or null
+                        }
+                        
+                        var words = data.split(' ');
+                        var firstFiveWords = words.slice(0, 5).join(' ') + '...';
+                        var fullText = data;
+
+                        return `
+                            <div class="text-container" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ${firstFiveWords}
+                            </div>
+                            <button class="read-more-btn" data-fulltext="${fullText}" onclick="showFullText(this)">Read More</button>
+                        `;
+                    }
+                },
             { data: 'vin', name: 'vehicles.vin', render: function(data, type, row) {
             return '<a href="#" onclick="fetchVehicleData(' + row.id + ')" style="text-decoration: underline;">' + (data ? data : '<i class="fas fa-image"></i>') + '</a>';
         }},
@@ -1196,5 +1378,11 @@ function displayGallery(imageUrls) {
         carouselImages.appendChild(div);
     });
 }
+</script>
+<script>
+    function showFullText(button) {
+        var fullText = button.getAttribute('data-fulltext');
+        alert(fullText);
+    }
 </script>
 @endsection
