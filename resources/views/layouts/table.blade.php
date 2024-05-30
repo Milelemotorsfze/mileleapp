@@ -141,7 +141,6 @@
                 "dom": 'frtip',
             });
 
-
             // $('#suppliersList').DataTable();
             // $('#suppliersList').on( 'click', '.modal-button', function () {
             //     var modalId = $(this).data('modal-id');

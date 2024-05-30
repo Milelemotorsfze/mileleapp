@@ -26,6 +26,9 @@
 		line-height: 1.5;
 		font-weight: 500;
 	} */
+    #work-order-history-table td, th{
+        font-size: 14px !important;
+    }
     #textInput {
         display: none;
     }
@@ -404,7 +407,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			</div>
 		</div>
 		<div class="card">
-
 			<div class="card-header">
 				<h4 class="card-title">
 					<center>Attachments</center>
@@ -646,7 +648,69 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			<button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
 		</div>
 	</form>
+        <br>
+        <div class="card mt-3">
+            <div class="card-header text-center">
+                <h4 class="card-title">Record History</h4>
+            </div>
+            <div class="card-body">
+                <div class="row m-0">
+                    <div class="col-xxl-2 col-lg-2 col-md-6 col-sm-12 mb-2" style="background-color: #dbecff" >
+                        <label class="col-form-label">Filter Region</label>
+                    </div>
+                    <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
+                        <label class="col-form-label">User</label>
+                    </div>
+                    <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
+                        <select name="user_id" id="user_id" multiple="true" class="form-control widthinput">
+                            <option>Jamin</option>
+                            <option>Arjun</option>
+                            <option>Helen</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
+                        <label class="col-form-label">Field</label>
+                    </div>
+                    <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
+                        <input type="text" class="form-control widthinput" placeholder="Field">
+                    </div>
+                    <div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
+                        <label class="col-form-label">History Type</label>
+                    </div>
+                    <div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
+                        <input type="text" class="form-control widthinput" placeholder="History Type">
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="table-responsive">
+                        <table id="work-order-history-table" class="table table-striped table-editable table-edits table table-condensed" >
+                            <thead style="background-color: #dbecff">
+                            <tr>
+                                <th>Date</th>
+                                <th>User</th>
+                                <th>History Type</th>
+                                <th>Old Value</th>
+                                <th>New Value</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>{{\Illuminate\Support\Carbon::now()->format('d M Y') }}</td>
+                                <td> Jacob</td>
+                                <td>Test Type</td>
+                                <td>TEST</td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
 </div>
+<br>
+
 <div class="overlay"></div>
 @else
 <div class="card-header">
@@ -655,9 +719,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	<a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back To Previous Page</a>
 </div>
 @endif
+<script src="{{ asset('libs/datatables.net/js/jquery.dataTables.min.js')}}"></script>
+<script src="{{ asset('libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
+    $('#work-order-history-table').DataTable();
     var customers = {!! json_encode($customers) !!};
 	var vins = {!! json_encode($vins) !!}
 	var addedVins = [];
@@ -682,6 +749,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				maximumSelectionLength: 1,
 				placeholder:"VIN",
 			});
+        $('#user_id').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder:"Select User",
+        });
 		// SELECT 2 END
 
 		// INTEL INPUT START
