@@ -6,6 +6,8 @@ use App\Models\WorkOrder;
 use App\Models\Customer;
 use App\Models\Clients;
 use App\Models\Vehicles;
+use App\Models\User;
+use App\Models\AddonDetails;
 use App\Models\Masters\MasterAirlines;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +18,7 @@ class WorkOrderController extends Controller
         // $type = 'export_exw';
         // $customers = Customer::orderBy('name','ASC')->get();
         // $clients = Clients::orderBy('name','ASC')->get();
+       
 
         $dpCustomers = Customer::select(DB::raw('name as customer_name'), DB::raw('NULL as customer_email'), DB::raw('NULL as customer_company_number'), DB::raw('address as customer_address'))->distinct();
         $clients = Clients::select(DB::raw('name as customer_name'), DB::raw('email as customer_email'),DB::raw('phone as customer_company_number'), DB::raw('NULL as customer_address'))->distinct();
@@ -70,9 +73,14 @@ class WorkOrderController extends Controller
 // });
 // dd($customers);
 // ->union($workOrders)
+        $users = User::orderBy('name','ASC')->where('status','active')->whereNotIn('id',[1,16])->whereHas('empProfile', function($q) {
+            $q = $q->where('type','employee');
+        })->get();
+        // $accSpaKits = AddonDetails::select('addon_code')->distinct();
+        
         $airlines = MasterAirlines::orderBy('name','ASC')->get();
         $vins = Vehicles::orderBy('vin','ASC')->whereNotNull('vin')->with('variant.master_model_lines.brand','interior','exterior','warehouseLocation','document')->get()->unique('vin');
-        return view('work_order.export_exw.create',compact('type','customers','airlines','vins'));
+        return view('work_order.export_exw.create',compact('type','customers','airlines','vins','users'));
     }
     /**
      * Display a listing of the resource.
@@ -128,5 +136,21 @@ class WorkOrderController extends Controller
     public function destroy(WorkOrder $workOrder)
     {
         //
+    }
+    public function fetchAddons(Request $request)
+    {
+        $vins = $request->input('vins');
+        // $vinDetails = Vehicles::whereIn('vin',$vins)->get();
+        // dd($vinDetails);
+        // $vinBrands = 
+        // $vinModelLines = 
+        // $vinModelDescriptions = 
+        if (isset($vins) && count($vins) > 0) {
+            // Fetch addons based on the selected VINs
+            $addons = AddonDetails::where('is_all_brands', 'yes')->get();
+            return response()->json($addons);
+        }
+
+        return response()->json([]);
     }
 }

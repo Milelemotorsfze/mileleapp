@@ -490,7 +490,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			</div>
 			<div class="card-body">
 				<div class="row">
-					<div class="col-xxl-11 col-lg-11 col-md-11">
+					<div class="col-xxl-12 col-lg-12 col-md-12">
 						<label for="vin_multiple" class="col-form-label text-md-end">{{ __('VIN') }}</label>
 						<select id="vin_multiple" name="vin_multiple" class="form-control widthinput" multiple="true">
 							@foreach($vins as $vin)
@@ -498,8 +498,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							@endforeach
 						</select>
 					</div>
-					<div class="col-xxl-1 col-lg-1 col-md-1">
-					<a  title="Add VIN" onclick=addVIN() style="margin-top:38px; width:100%;"
+				</div>
+				<div class="row">
+					<div class="col-xxl-12 col-lg-12 col-md-12 addon_outer" id="addon-dynamic-div">
+
+					</div>
+					<div class="col-xxl-12 col-lg-12 col-md-12">
+						<a  title="Add VIN" style="margin-top:38px;float:right;"
+								class="btn btn-sm btn-info modal-button add-addon-btn"><i class="fa fa-plus" aria-hidden="true"></i> Addon</a>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xxl-12 col-lg-12 col-md-12">
+					<a  title="Add VIN" onclick=addVIN() style="margin-top:38px; float:left;"
 								class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>
 					</div>
 				</div>
@@ -893,9 +904,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				</div>
 				<div class="col-md-3 col-xxl-2 col-lg-2 col-sm-12">
 					<select name="user_id" id="user_id" multiple="true" class="form-control widthinput">
-						<option>Jamin</option>
-						<option>Arjun</option>
-						<option>Helen</option>
+						@foreach($users as $user)
+						<option value="{{$user->id ?? ''}}">{{$user->name ?? ''}}</option>
+						@endforeach
 					</select>
 				</div>
 				<div class="col-md-3 col-xxl-1 col-lg-1 col-sm-12">
@@ -960,8 +971,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	var type = $("#type").val();
 	var addedVins = [];
 	var selectedDepositReceivedValue = '';
+	var onChangeSelectedVins = [];
 	const mentions = ["@Alice", "@Bob", "@Charlie"]; // Example list of mentions
-	$(document).ready(function () { console.log(type);
+	$(document).ready(function () { 
         hideDependentTransportType();
 		$("#boe-div").hide();
 		// SELECT 2 START
@@ -982,11 +994,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				maximumSelectionLength: 1,
 				placeholder:"VIN",
 			});
-        $('#user_id').select2({
-            allowClear: true,
-            maximumSelectionLength: 1,
-            placeholder:"Select User",
-        });
+			$('#user_id').select2({
+				allowClear: true,
+				maximumSelectionLength: 1,
+				placeholder:"Select User",
+			});
 		// SELECT 2 END
 
 		// INTEL INPUT START
@@ -1011,820 +1023,973 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				});
 			}
 		// INTEL INPUT END
-        $('.transport_type').click(function() {
-            if($(this).val() == 'air') {
-                $("#airline-div").show();
-                $('#airline').select2({
-					allowClear: true,
-					maximumSelectionLength: 1,
-					placeholder:"Choose Airline",
-				});
-                $("#airway-bill-div").show();
-				$("#brn-div").hide();
-				$("#brn-file-div").show();
-				$("#container-number-div").hide();
-				$("#trailer-number-plate-div").hide();
-				$("#transportation-company-div").hide();
-				$("#forward-import-code-div").hide();
-                $("#shippingline-div").hide();
-                $("#transporting-driver-contact-number-div").hide();
-				$("#airway-details-div").show();
-				$("#transportation-company-details-div").hide();
-            }
-            else if($(this).val() == 'sea') {
-                $("#airline-div").hide();
-                $("#airway-bill-div").hide();
-                $("#shippingline-div").show();
-                $("#forward-import-code-div").show();
-				$("#brn-div").show();
-				$("#brn-file-div").show();
-				$("#container-number-div").show();
-				$("#trailer-number-plate-div").hide();
-				$("#transportation-company-div").hide();
-				$("#transporting-driver-contact-number-div").hide();
-				$("#airway-details-div").hide();
-				$("#transportation-company-details-div").hide();
-            }
-            else if($(this).val() == 'road') {
-                // hideDependentTransportType();
-				$("#airline-div").hide();
-                $("#airway-bill-div").hide();
-                $("#shippingline-div").hide();
-                $("#forward-import-code-div").hide();
-				$("#brn-div").hide();
-				$("#brn-file-div").hide();
-				$("#container-number-div").hide();
-				$("#trailer-number-plate-div").show();
-				$("#transportation-company-div").show();
-				$("#transporting-driver-contact-number-div").show();				
-				var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
-					separateDialCode: true,
-					preferredCountries:["ae"],
-					hiddenInput: "full",
-					utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-				});	
-				$("#airway-details-div").hide();
-				$("#transportation-company-details-div").show();
-            }
-        });
-        $('#customer_name').on('change', function() {
-            var selectedCustomerName = $(this).val();
-            setCustomerRelations(selectedCustomerName);
-        });
-		$('.deposit_received_as').click(function() {
-			selectedDepositReceivedValue = $('input[name="deposit_received_as"]:checked').val();
-			if (selectedDepositReceivedValue == 'total_deposit') {
-				$("#amount-received-div").show();
-				$("#balance-amount-div").show();
-				$("#deposit-aganist-vehicle-div").hide();
-			} else if (selectedDepositReceivedValue == 'custom_deposit') {
-				$("#amount-received-div").show();
-				$("#balance-amount-div").show();
-				$("#deposit-aganist-vehicle-div").show();
-				setDepositAganistVehicleDropdownOptions();
-			}
-		});
+
+		// TRANSPORT TYPE ONCHANGE START
+			$('.transport_type').click(function() {
+				if($(this).val() == 'air') {
+					$("#airline-div").show();
+					$('#airline').select2({
+						allowClear: true,
+						maximumSelectionLength: 1,
+						placeholder:"Choose Airline",
+					});
+					$("#airway-bill-div").show();
+					$("#brn-div").hide();
+					$("#brn-file-div").show();
+					$("#container-number-div").hide();
+					$("#trailer-number-plate-div").hide();
+					$("#transportation-company-div").hide();
+					$("#forward-import-code-div").hide();
+					$("#shippingline-div").hide();
+					$("#transporting-driver-contact-number-div").hide();
+					$("#airway-details-div").show();
+					$("#transportation-company-details-div").hide();
+				}
+				else if($(this).val() == 'sea') {
+					$("#airline-div").hide();
+					$("#airway-bill-div").hide();
+					$("#shippingline-div").show();
+					$("#forward-import-code-div").show();
+					$("#brn-div").show();
+					$("#brn-file-div").show();
+					$("#container-number-div").show();
+					$("#trailer-number-plate-div").hide();
+					$("#transportation-company-div").hide();
+					$("#transporting-driver-contact-number-div").hide();
+					$("#airway-details-div").hide();
+					$("#transportation-company-details-div").hide();
+				}
+				else if($(this).val() == 'road') {
+					$("#airline-div").hide();
+					$("#airway-bill-div").hide();
+					$("#shippingline-div").hide();
+					$("#forward-import-code-div").hide();
+					$("#brn-div").hide();
+					$("#brn-file-div").hide();
+					$("#container-number-div").hide();
+					$("#trailer-number-plate-div").show();
+					$("#transportation-company-div").show();
+					$("#transporting-driver-contact-number-div").show();				
+					var transporting_driver_contact_number = window.intlTelInput(document.querySelector("#transporting_driver_contact_number"), {
+						separateDialCode: true,
+						preferredCountries:["ae"],
+						hiddenInput: "full",
+						utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+					});	
+					$("#airway-details-div").hide();
+					$("#transportation-company-details-div").show();
+				}
+			});
+		// TRANSPORT TYPE ONCHANGE END
+
+		// CUSTOMER NAME ONCHANGE START
+			$('#customer_name').on('change', function() {
+				var selectedCustomerName = $(this).val();
+				setCustomerRelations(selectedCustomerName);
+			});
+		// CUSTOMER NAME ONCHANGE END
+
+		// DEPOSIT RECEIVED AS ONCHANGE START
+			$('.deposit_received_as').click(function() {
+				selectedDepositReceivedValue = $('input[name="deposit_received_as"]:checked').val();
+				if (selectedDepositReceivedValue == 'total_deposit') {
+					$("#amount-received-div").show();
+					$("#balance-amount-div").show();
+					$("#deposit-aganist-vehicle-div").hide();
+				} else if (selectedDepositReceivedValue == 'custom_deposit') {
+					$("#amount-received-div").show();
+					$("#balance-amount-div").show();
+					$("#deposit-aganist-vehicle-div").show();
+					setDepositAganistVehicleDropdownOptions();
+				}
+			});
+		// DEPOSIT RECEIVED AS ONCHANGE END
+
 		// BOE DYNAMICALLY ADD AND REMOVE START
-		// Event listener to add new form fields
-		$("body").on("click", ".add_new_frm_field_btn", function () {
-			addChild();
-		});
+			// Event listener to add new form fields
+			$("body").on("click", ".add_new_frm_field_btn", function () {
+				addChild();
+			});
+			$("body").on("click", ".add-addon-btn", function () {
+				addAddon();
+			});
 
-		// Event listener to remove form fields and reset indexes
-		$("body").on("click", ".remove_node_btn_frm_field", function () {
-			var row = $(this).closest(".form_field_outer_row");
-			var selectElement = row.find('.dynamicselect2');
+			// Event listener to remove form fields and reset indexes
+			$("body").on("click", ".remove_node_btn_frm_field", function () {
+				var row = $(this).closest(".form_field_outer_row");
+				var selectElement = row.find('.dynamicselect2');
 
-			// Destroy Select2 instance before removing the row
-			if (selectElement.data('select2')) {
-				selectElement.select2('destroy');
-			}
+				// Destroy Select2 instance before removing the row
+				if (selectElement.data('select2')) {
+					selectElement.select2('destroy');
+				}
 
-			// Enable the VIN options before removing the row
-			var selectedVINs = selectElement.val();
-			if (selectedVINs) {
-				selectedVINs.forEach(function(vin) {
-					$('select option[value="' + vin + '"]').prop('disabled', false);
-				});
-			}
+				// Enable the VIN options before removing the row
+				var selectedVINs = selectElement.val();
+				if (selectedVINs) {
+					selectedVINs.forEach(function(vin) {
+						$('select option[value="' + vin + '"]').prop('disabled', false);
+					});
+				}
 
-			row.remove();
-			resetIndexes();
-		});
-		// Event listener to handle change event for .dynamicselect2
-		$("body").on("change", ".dynamicselect2", function () {
-			disableSelectedOptions();
-		});
+				row.remove();
+				resetIndexes();
+			});
+			$("body").on("click", ".remove_node_btn_frm_field_addon", function () { console.log('hhhhssasa');
+				var row = $(this).closest(".addon_input_outer_row");
+				row.remove();
+				resetRowIndexes();
+			});
+			// Event listener to handle change event for .dynamicselect2
+			$("body").on("change", ".dynamicselect2", function () {
+				disableSelectedOptions();
+			});
 
 		// BOE DYNAMICALLY ADD AND REMOVE END
+
+
+		// ON CHANGE OF VIN FETCH ITS RELATED ADDONS START
+			$('#vin_multiple').on('change', function() {
+				onChangeSelectedVins = $(this).val(); // Get selected VINs
+				var index = $(".addon_outer").find(".addon_input_outer_row").length + 1;
+				if (onChangeSelectedVins && onChangeSelectedVins.length > 0) {
+					if(index == 1) {
+						addAddon();
+					}
+					else {
+						resetAddonDropdown();
+					}
+					
+				} else {
+					// Clear addons dropdown if no VINs are selected
+					$('#addons').empty().trigger('change');
+				}
+			});
+		// ON CHANGE OF VIN FETCH ITS RELATED ADDONS END
 	});
-	document.getElementById('comment-input').addEventListener('input', showMentions);
 
-function showMentions(event) {
-    const input = event.target.value;
-    const mentionList = document.getElementById('mentions-list');
-    const mentionTrigger = input.match(/@\w*$/);
-    
-    if (mentionTrigger) {
-        const mentionQuery = mentionTrigger[0].slice(1).toLowerCase();
-        const filteredMentions = mentions.filter(mention => mention.toLowerCase().includes(mentionQuery));
-        
-        mentionList.innerHTML = '';
-        filteredMentions.forEach(mention => {
-            const mentionItem = document.createElement('div');
-            mentionItem.textContent = mention;
-            mentionItem.addEventListener('click', () => selectMention(mention));
-            mentionList.appendChild(mentionItem);
-        });
-        
-        mentionList.style.display = 'block';
-    } else {
-        mentionList.style.display = 'none';
-    }
-}
+	// SHOW MENTION IN COMMENTS SECTION START
+		document.getElementById('comment-input').addEventListener('input', showMentions);
 
-function selectMention(mention) {
-    const inputField = document.getElementById('comment-input');
-    const inputText = inputField.value;
-    const newText = inputText.replace(/@\w*$/, mention + ' ');
-    inputField.value = newText;
-    document.getElementById('mentions-list').style.display = 'none';
-    inputField.focus();
-}
+		function showMentions(event) {
+			const input = event.target.value;
+			const mentionList = document.getElementById('mentions-list');
+			const mentionTrigger = input.match(/@\w*$/);
+			
+			if (mentionTrigger) {
+				const mentionQuery = mentionTrigger[0].slice(1).toLowerCase();
+				const filteredMentions = mentions.filter(mention => mention.toLowerCase().includes(mentionQuery));
+				
+				mentionList.innerHTML = '';
+				filteredMentions.forEach(mention => {
+					const mentionItem = document.createElement('div');
+					mentionItem.textContent = mention;
+					mentionItem.addEventListener('click', () => selectMention(mention));
+					mentionList.appendChild(mentionItem);
+				});
+				
+				mentionList.style.display = 'block';
+			} else {
+				mentionList.style.display = 'none';
+			}
+		}
 
-function postComment() {
-    const commentInput = document.getElementById('comment-input');
-    const commentText = commentInput.value;
-    
-    if (commentText.trim()) {
-        const commentList = document.getElementById('comment-list');
-        const commentItem = document.createElement('li');
-        commentItem.className = 'comment-item';
-        
-        const mentionRegex = /@\w+/g;
-        const formattedText = commentText.replace(mentionRegex, match => `<span class="mention">${match}</span>`);
-        
-        commentItem.innerHTML = formattedText;
-        commentList.appendChild(commentItem);
-        
-        commentInput.value = '';
-    }
-}
-	function setDepositAganistVehicleDropdownOptions() {
-    // Get the previously selected values
-    var previouslySelectedValues = $('#deposit_aganist_vehicle').val() || [];
+		function selectMention(mention) {
+			const inputField = document.getElementById('comment-input');
+			const inputText = inputField.value;
+			const newText = inputText.replace(/@\w*$/, mention + ' ');
+			inputField.value = newText;
+			document.getElementById('mentions-list').style.display = 'none';
+			inputField.focus();
+		}
 
-    // Empty the select element before adding new options
-    $('#deposit_aganist_vehicle').empty();
+		function postComment() {
+			const commentInput = document.getElementById('comment-input');
+			const commentText = commentInput.value;
+			
+			if (commentText.trim()) {
+				const commentList = document.getElementById('comment-list');
+				const commentItem = document.createElement('li');
+				commentItem.className = 'comment-item';
+				
+				const mentionRegex = /@\w+/g;
+				const formattedText = commentText.replace(mentionRegex, match => `<span class="mention">${match}</span>`);
+				
+				commentItem.innerHTML = formattedText;
+				commentList.appendChild(commentItem);
+				
+				commentInput.value = '';
+			}
+		}
+	// SHOW MENTION IN COMMENTS SECTION END
 
-    // Add new options to the select element
-    addedVins.forEach(function(vin) {
-        $('#deposit_aganist_vehicle').append(new Option(vin, vin));
-    });
+	// ADDON DYNAMICALLY ADD AND REMOVE START
+		// Function to reset row indexes
+		function resetRowIndexes() {
+			$(".addon_outer .addon_input_outer_row").each(function(index) {
+				var newIndex = index + 1;
+				$(this).attr('id', `addon_row_${newIndex}`);
+				$(this).find('select').attr('id', `addons_${newIndex}`).data('index', newIndex);
+				$(this).find('input[type="number"]').attr('id', `addon_quantity_${newIndex}`);
+				$(this).find('textarea').attr('id', `addon_description_${newIndex}`);
+			});
+		}
 
-    // Initialize or reinitialize Select2
-    $('#deposit_aganist_vehicle').select2({
-        allowClear: true,
-        placeholder: "Choose Vehicle"
-    });
+		function resetAddonDropdown() {
+			$.ajax({
+				url: '{{ route('fetch-addons') }}',
+				type: 'POST',
+				data: {
+					vins: onChangeSelectedVins,
+					_token: '{{ csrf_token() }}'
+				},
+				dataType: 'json',
+				success: function(response) {
+					// Iterate over each dynamicselect2 element to update its options
+					$('.dynamicselect2').each(function() {
+						var $dropdown = $(this);
+						var currentVal = $dropdown.val(); // Store current selected values
 
-    // Reselect previously selected values if they still exist
-    $('#deposit_aganist_vehicle').val(previouslySelectedValues.filter(function(value) {
-        return addedVins.includes(value);
-    })).trigger('change');
-}
+						// Clear current options in addons dropdown
+						$dropdown.empty();
 
-	// BOE DYNAMICALLY ADD AND REMOVE START
-	function addChild() {
-		var index = $(".form_field_outer").find(".form_field_outer_row").length + 1; 
-		if (index <= addedVins.length) { 
-			var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
+						// Populate the addons dropdown with new options
+						if (response && response.length > 0) {
+							$("#addon-dynamic-div").show();
+							$.each(response, function(index, addon) {
+								$dropdown.append(
+									$('<option></option>').val(addon.id).text(addon.addon_code)
+								);
+							});
+						}
+
+						// Re-set the previously selected values
+						$dropdown.val(currentVal).trigger('change');
+					});
+				},
+				error: function(xhr, status, error) {
+					console.error("Error fetching add-ons:", error);
+				}
+			});
+		}
+
+		function addAddon() {
+			var index = $(".addon_outer").find(".addon_input_outer_row").length + 1;
 			var newRow = $(`
-				<div class="row form_field_outer_row" id="${index}">
-					<div class="col-xxl-11 col-lg-11 col-md-11">
-						<label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
-						<select name="boe[${index}][vin]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
-							${options}
-						</select>
-					</div>
-					<div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-						<a class="btn_round_big remove_node_btn_frm_field" title="Remove Row">
-							<i class="fas fa-trash-alt"></i>
-						</a>
+				<div class="row addon_input_outer_row" id="addon_row_${index}">
+					<div class="row">
+						<div class="col-xxl-2 col-lg-2 col-md-2">
+							<div class="row">
+								<div class="col-xxl-12 col-lg-12 col-md-12">
+									<label for="addons_${index}" class="col-form-label text-md-end">Addon :</label>
+									<select name="addons[]" id="addons_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
+										<!-- Add-on options will be dynamically populated -->
+									</select>
+								</div>
+								<div class="col-xxl-12 col-lg-12 col-md-12">
+									<label for="addon_quantity_${index}" class="col-form-label text-md-end">Quantity :</label>
+									<input type="number" name="addon_quantity[]" id="addon_quantity_${index}" class="form-control widthinput" placeholder="Enter Quantity">
+								</div>
+							</div>
+						</div>
+						<div class="col-xxl-9 col-lg-9 col-md-9">
+							<label for="addon_description_${index}" class="col-form-label text-md-end">Addon Description :</label>
+							<textarea name="addon_description[]" id="addon_description_${index}" rows="4" class="form-control" placeholder="Enter Addon Description"></textarea>
+						</div>
+						<div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer_addon">
+							<a class="btn_round_big remove_node_btn_frm_field_addon" title="Remove Row" style="margin-top:50%;">
+								<i class="fas fa-trash-alt"></i>
+							</a>
+						</div>
 					</div>
 				</div>
 			`);
-
+			
 			// Append the new row to the container
-			$(".form_field_outer").append(newRow);
+			$(".addon_outer").append(newRow);
 
 			// Initialize Select2 only on the newly added element
-			$(`#boe_vin_${index}`).select2({
+			$(`#addons_${index}`).select2({
 				allowClear: true,
-				placeholder: "Choose VIN Per BOE",
+				placeholder: "Choose Addon",
 			});
 
 			disableSelectedOptions();
-		} else {
-			alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
+			resetAddonDropdown();
 		}
-	}
+	// ADDON DYNAMICALLY ADD AND REMOVE END
 
-	function resetIndexes() {
-		// Loop through each .form_field_outer_row and reset the index
-		$(".form_field_outer").find(".form_field_outer_row").each(function(index, element) {
-			var newIndex = index + 1; // Index starts from 0, so add 1 to start from 1
-			$(element).attr('id', newIndex);
+	// BOE DYNAMICALLY ADD AND REMOVE START
+		function addChild() {
+			var index = $(".form_field_outer").find(".form_field_outer_row").length + 1; 
+			if (index <= addedVins.length) { 
+				var options = addedVins.map(vin => `<option value="${vin}">${vin}</option>`).join('');
+				var newRow = $(`
+					<div class="row form_field_outer_row" id="${index}">
+						<div class="col-xxl-11 col-lg-11 col-md-11">
+							<label for="boe_vin_${index}" class="col-form-label text-md-end">VIN per BOE: ${index}</label>
+							<select name="boe[${index}][vin]" id="boe_vin_${index}" class="form-control widthinput dynamicselect2" data-index="${index}" multiple="true">
+								${options}
+							</select>
+						</div>
+						<div class="col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+							<a class="btn_round_big remove_node_btn_frm_field" title="Remove Row">
+								<i class="fas fa-trash-alt"></i>
+							</a>
+						</div>
+					</div>
+				`);
 
-			// Update the label text, IDs, and names
-			$(element).find('label').attr('for', `boe_vin_${newIndex}`).text(`VIN per BOE: ${newIndex}`);
-			$(element).find('select')
-				.attr('id', `boe_vin_${newIndex}`)
-				.attr('name', `boe[${newIndex}][vin]`)
-				.data('index', newIndex);
+				// Append the new row to the container
+				$(".form_field_outer").append(newRow);
 
-			// Reinitialize Select2
-			$(`#boe_vin_${newIndex}`).select2({
-				allowClear: true,
-				placeholder: "Choose VIN Per BOE",
+				// Initialize Select2 only on the newly added element
+				$(`#boe_vin_${index}`).select2({
+					allowClear: true,
+					placeholder: "Choose VIN Per BOE",
+				});
+
+				disableSelectedOptions();
+			} else {
+				alert("Sorry! You cannot create a number of BOE which is more than the number of VIN.");
+			}
+		}
+
+		function resetIndexes() {
+			// Loop through each .form_field_outer_row and reset the index
+			$(".form_field_outer").find(".form_field_outer_row").each(function(index, element) {
+				var newIndex = index + 1; // Index starts from 0, so add 1 to start from 1
+				$(element).attr('id', newIndex);
+
+				// Update the label text, IDs, and names
+				$(element).find('label').attr('for', `boe_vin_${newIndex}`).text(`VIN per BOE: ${newIndex}`);
+				$(element).find('select')
+					.attr('id', `boe_vin_${newIndex}`)
+					.attr('name', `boe[${newIndex}][vin]`)
+					.data('index', newIndex);
+
+				// Reinitialize Select2
+				$(`#boe_vin_${newIndex}`).select2({
+					allowClear: true,
+					placeholder: "Choose VIN Per BOE",
+				});
 			});
-		});
 
-		disableSelectedOptions();
-	}
+			disableSelectedOptions();
+		}
 
-	function disableSelectedOptions() {
-		// Get all selected options
-		var selectedOptions = [];
-		$(".dynamicselect2").each(function() {
-			$(this).find('option:selected').each(function() {
-				selectedOptions.push($(this).val());
+		function disableSelectedOptions() {
+			// Get all selected options
+			var selectedOptions = [];
+			$(".dynamicselect2").each(function() {
+				$(this).find('option:selected').each(function() {
+					selectedOptions.push($(this).val());
+				});
 			});
-		});
 
-		// Disable the selected options in all .dynamicselect2 elements
-		$(".dynamicselect2").each(function() {
-			var $select = $(this);
-			$select.find('option').each(function() {
-				if (selectedOptions.includes($(this).val())) {
-					if (!$(this).is(':selected')) {
-						$(this).prop('disabled', true);
+			// Disable the selected options in all .dynamicselect2 elements
+			$(".dynamicselect2").each(function() {
+				var $select = $(this);
+				$select.find('option').each(function() {
+					if (selectedOptions.includes($(this).val())) {
+						if (!$(this).is(':selected')) {
+							$(this).prop('disabled', true);
+						}
+					} else {
+						$(this).prop('disabled', false);
 					}
-				} else {
-					$(this).prop('disabled', false);
-				}
-			});
+				});
 
-			// Refresh Select2 to apply changes
-			$select.select2();
-		});
-	}
+				// Refresh Select2 to apply changes
+				$select.select2();
+			});
+		}
 	// BOE DYNAMICALLY ADD AND REMOVE END
 
 	// ADD AND REMOVE VEHICLE TO WO START
-	function addVIN() {
-		var selectedVIN = $("#vin_multiple").val();
-		if (selectedVIN != '' && selectedVIN.length > 0) {
-			for (var j = 0; j < selectedVIN.length; j++) {
-				for (var i = 0; i < vins.length; i++) {
-					if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) {
-						// Get the table body element by ID
-						var tableBody = document.querySelector('#myTable tbody');
+		function addVIN() {
+			var selectedVIN = $("#vin_multiple").val();
+			if (selectedVIN != '' && selectedVIN.length > 0) {
+				for (var j = 0; j < selectedVIN.length; j++) {
+					for (var i = 0; i < vins.length; i++) {
+						if (vins[i].vin != null && vins[i].vin == selectedVIN[j]) {
+							// Get the table body element by ID
+							var tableBody = document.querySelector('#myTable tbody');
 
-						var firstRow = document.createElement('tr');
-						var secondRow = document.createElement('tr');
-						var thirdRow = document.createElement('tr');
+							var firstRow = document.createElement('tr');
+							var secondRow = document.createElement('tr');
+							var thirdRow = document.createElement('tr');
 
-						// First Row Elements
-						var removeIconCell = createCellWithRemoveButton();
-						var vinCell = createEditableCell(vins[i]?.vin ?? '', 'Enter VIN','vin');
-						vinCell.dataset.vin = vins[i]?.vin ?? ''; // Correctly setting the data-vin attribute
-						var brandCell = createEditableCell(vins[i]?.variant?.master_model_lines?.brand?.brand_name ?? '', 'Enter Brand','brand');
-						var variantCell = createEditableCell(vins[i]?.variant?.name ?? '', 'Enter Variant','variant');
-						var engineCell = createEditableCell(vins[i]?.engine ?? '', 'Enter Engine','engine');
-						var modelDescriptionCell = createEditableCell(vins[i]?.variant?.master_model_lines?.model_line ?? '', 'Enter Model Description','model_description');
-						var modelYearCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year','model_year');
-						var modelYearToMentionOnDocumentsCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year to mention on Documents','model_year_to_mention_on_documents');
-						var steeringCell = createEditableCell(vins[i]?.variant?.steering ?? '', 'Enter Steering','steering');
-						var exteriorCell = createEditableCell(vins[i]?.exterior?.name ?? '', 'Enter Exterior Colour','exterior_colour');
-						var interiorColorCell = createEditableCell(vins[i]?.interior?.name ?? '', 'Enter Interior Colour','interior_colour');
-						var warehouseCell = createEditableCell(vins[i]?.warehouse_location?.name ?? '', 'Enter Warehouse','warehouse');
-						var territoryCell = createEditableCell(vins[i]?.territory ?? '', 'Enter Territory','territory');
-						var preferredDestinationCell = createEditableCell('', 'Enter Preferred Destination','preferred_destination');
-						var importTypeCell = createEditableCell(vins[i]?.document?.import_type ?? '', 'Enter Import Document Type','import_document_type');
-						var ownershipCell = createEditableCell(vins[i]?.document?.ownership ?? '', 'Enter Ownership','ownership_name');
-						var CertificationPerVINCell = createEditableSelect2Cell(vins[i]?.vin);
+							// First Row Elements
+							var removeIconCell = createCellWithRemoveButton();
+							var vinCell = createEditableCell(vins[i]?.vin ?? '', 'Enter VIN','vin');
+							vinCell.dataset.vin = vins[i]?.vin ?? ''; // Correctly setting the data-vin attribute
+							var brandCell = createEditableCell(vins[i]?.variant?.master_model_lines?.brand?.brand_name ?? '', 'Enter Brand','brand');
+							var variantCell = createEditableCell(vins[i]?.variant?.name ?? '', 'Enter Variant','variant');
+							var engineCell = createEditableCell(vins[i]?.engine ?? '', 'Enter Engine','engine');
+							var modelDescriptionCell = createEditableCell(vins[i]?.variant?.master_model_lines?.model_line ?? '', 'Enter Model Description','model_description');
+							var modelYearCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year','model_year');
+							var modelYearToMentionOnDocumentsCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year to mention on Documents','model_year_to_mention_on_documents');
+							var steeringCell = createEditableCell(vins[i]?.variant?.steering ?? '', 'Enter Steering','steering');
+							var exteriorCell = createEditableCell(vins[i]?.exterior?.name ?? '', 'Enter Exterior Colour','exterior_colour');
+							var interiorColorCell = createEditableCell(vins[i]?.interior?.name ?? '', 'Enter Interior Colour','interior_colour');
+							var warehouseCell = createEditableCell(vins[i]?.warehouse_location?.name ?? '', 'Enter Warehouse','warehouse');
+							var territoryCell = createEditableCell(vins[i]?.territory ?? '', 'Enter Territory','territory');
+							var preferredDestinationCell = createEditableCell('', 'Enter Preferred Destination','preferred_destination');
+							var importTypeCell = createEditableCell(vins[i]?.document?.import_type ?? '', 'Enter Import Document Type','import_document_type');
+							var ownershipCell = createEditableCell(vins[i]?.document?.ownership ?? '', 'Enter Ownership','ownership_name');
+							var CertificationPerVINCell = createEditableSelect2Cell(vins[i]?.vin);
 
-						// Append cells to the first row
-						firstRow.appendChild(removeIconCell);
-						firstRow.appendChild(vinCell);
-						firstRow.appendChild(brandCell);
-						firstRow.appendChild(variantCell);
-						firstRow.appendChild(engineCell);
-						firstRow.appendChild(modelDescriptionCell);
-						firstRow.appendChild(modelYearCell);
-						firstRow.appendChild(modelYearToMentionOnDocumentsCell);
-						firstRow.appendChild(steeringCell);
-						firstRow.appendChild(exteriorCell);
-						firstRow.appendChild(interiorColorCell);
-						firstRow.appendChild(warehouseCell);
-						firstRow.appendChild(territoryCell);
-						firstRow.appendChild(preferredDestinationCell);
-						firstRow.appendChild(importTypeCell);
-						firstRow.appendChild(ownershipCell);
-						firstRow.appendChild(CertificationPerVINCell);
+							// Append cells to the first row
+							firstRow.appendChild(removeIconCell);
+							firstRow.appendChild(vinCell);
+							firstRow.appendChild(brandCell);
+							firstRow.appendChild(variantCell);
+							firstRow.appendChild(engineCell);
+							firstRow.appendChild(modelDescriptionCell);
+							firstRow.appendChild(modelYearCell);
+							firstRow.appendChild(modelYearToMentionOnDocumentsCell);
+							firstRow.appendChild(steeringCell);
+							firstRow.appendChild(exteriorCell);
+							firstRow.appendChild(interiorColorCell);
+							firstRow.appendChild(warehouseCell);
+							firstRow.appendChild(territoryCell);
+							firstRow.appendChild(preferredDestinationCell);
+							firstRow.appendChild(importTypeCell);
+							firstRow.appendChild(ownershipCell);
+							firstRow.appendChild(CertificationPerVINCell);
 
-						// Second Row Elements
-						var modificationLabelCell = document.createElement('td');
-						modificationLabelCell.colSpan = 2;
-						modificationLabelCell.textContent = 'Modification/Jobs';
+							// Second Row Elements
+							var modificationLabelCell = document.createElement('td');
+							modificationLabelCell.colSpan = 2;
+							modificationLabelCell.textContent = 'Modification/Jobs';
 
-						var modificationInputCell = document.createElement('td');
-						modificationInputCell.colSpan = 15;
-						var modificationInputElement = document.createElement('input');
-						modificationInputElement.type = 'text';
-						modificationInputElement.placeholder = 'Enter Modification Or Jobs to Perform Per VIN';
-						modificationInputElement.style.border = 'none';
-						modificationInputElement.style.width = '100%';
-						modificationInputCell.appendChild(modificationInputElement);
+							var modificationInputCell = document.createElement('td');
+							modificationInputCell.colSpan = 15;
+							var modificationInputElement = document.createElement('input');
+							modificationInputElement.type = 'text';
+							modificationInputElement.placeholder = 'Enter Modification Or Jobs to Perform Per VIN';
+							modificationInputElement.style.border = 'none';
+							modificationInputElement.style.width = '100%';
+							modificationInputCell.appendChild(modificationInputElement);
 
-						// Append cells to the second row
-						secondRow.appendChild(modificationLabelCell);
-						secondRow.appendChild(modificationInputCell);
+							// Append cells to the second row
+							secondRow.appendChild(modificationLabelCell);
+							secondRow.appendChild(modificationInputCell);
 
-						// Third Row Elements
-						var specialRequestLabelCell = document.createElement('td');
-						specialRequestLabelCell.colSpan = 2;
-						specialRequestLabelCell.textContent = 'Special Request/Remarks';
+							// Third Row Elements
+							var specialRequestLabelCell = document.createElement('td');
+							specialRequestLabelCell.colSpan = 2;
+							specialRequestLabelCell.textContent = 'Special Request/Remarks';
 
-						var specialRequestInputCell = document.createElement('td');
-						specialRequestInputCell.colSpan = 15;
-						var specialRequestInputElement = document.createElement('input');
-						specialRequestInputElement.type = 'text';
-						specialRequestInputElement.placeholder = 'Special Request or Remarks (Clean Car/ Inspec Damage/ Etc) Salesman Insight Colum Per VIN';
-						specialRequestInputElement.style.border = 'none';
-						specialRequestInputElement.style.width = '100%';
-						specialRequestInputCell.appendChild(specialRequestInputElement);
+							var specialRequestInputCell = document.createElement('td');
+							specialRequestInputCell.colSpan = 15;
+							var specialRequestInputElement = document.createElement('input');
+							specialRequestInputElement.type = 'text';
+							specialRequestInputElement.placeholder = 'Special Request or Remarks (Clean Car/ Inspec Damage/ Etc) Salesman Insight Colum Per VIN';
+							specialRequestInputElement.style.border = 'none';
+							specialRequestInputElement.style.width = '100%';
+							specialRequestInputCell.appendChild(specialRequestInputElement);
 
-						// Add bottom border style to the third row
-						thirdRow.style.borderBottom = '1px solid #b3b3b3';
+							// Add bottom border style to the third row
+							thirdRow.style.borderBottom = '1px solid #b3b3b3';
 
-						// Append cells to the third row
-						thirdRow.appendChild(specialRequestLabelCell);
-						thirdRow.appendChild(specialRequestInputCell);
+							// Append cells to the third row
+							thirdRow.appendChild(specialRequestLabelCell);
+							thirdRow.appendChild(specialRequestInputCell);
 
-						// Append rows to the table body
-						tableBody.appendChild(firstRow);
-						tableBody.appendChild(secondRow);
-						tableBody.appendChild(thirdRow);
+							// Append rows to the table body
+							tableBody.appendChild(firstRow);
+							tableBody.appendChild(secondRow);
+							tableBody.appendChild(thirdRow);
 
-						// Store the VIN in the first row's data attribute for easy retrieval on click
-						$(firstRow).data('vin', vins[i]?.vin ?? '');
-						// Store a reference to these rows in the remove button's data attribute
-						$(removeIconCell).find('.remove-row').data('rows', [firstRow, secondRow, thirdRow]);
+							// Store the VIN in the first row's data attribute for easy retrieval on click
+							$(firstRow).data('vin', vins[i]?.vin ?? '');
+							// Store a reference to these rows in the remove button's data attribute
+							$(removeIconCell).find('.remove-row').data('rows', [firstRow, secondRow, thirdRow]);
+						}
 					}
 				}
+				var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+				if(index > 0) {
+					// Append selectedVIN data as dropdown option for all dynamicselect2 class
+					$(".dynamicselect2").each(function() {
+						var selectElement = $(this);
+						selectedVIN.forEach(function(vin) {
+							if (selectElement.find(`option[value='${vin}']`).length === 0) {
+								selectElement.append(`<option value="${vin}">${vin}</option>`);
+							}
+						});
+					});
+				}
 			}
-			var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
-			if(index > 0) {
-				// Append selectedVIN data as dropdown option for all dynamicselect2 class
+			$('#vin_multiple').val(null).trigger('change');
+			$('#vin_multiple option').each(function() {
+				if (selectedVIN.includes($(this).val())) {
+					$(this).prop('disabled', true);
+				}
+			});
+			findAllVINs();
+		}
+		// Event delegation to handle remove button click for dynamically added rows
+		$('#myTable').on('click', '.remove-row', function() {
+
+			var vin = $(this).closest('tr').data('vin'); // Assuming each row has a data-vin attribute
+			if (vin) {
+				// Unselect and remove the VIN from all dynamicselect2 class elements
 				$(".dynamicselect2").each(function() {
 					var selectElement = $(this);
-					selectedVIN.forEach(function(vin) {
-						if (selectElement.find(`option[value='${vin}']`).length === 0) {
-							selectElement.append(`<option value="${vin}">${vin}</option>`);
-						}
+					selectElement.find(`option[value='${vin}']`).prop('selected', false).remove();
+					// Trigger change to update the Select2 UI
+					selectElement.trigger('change');
+				});
+				$('select option[value="'+ vin +'"]').prop('disabled', false);
+			}
+			var rows = $(this).data('rows');
+			if (rows) {
+				$(rows).each(function() {
+					$(this).remove();
+				});
+			}
+			findAllVINs();
+		});
+		function findAllVINs() {
+			addedVins = [];
+			$('#myTable tbody tr').each(function() {
+				var addedVin = $(this).data('vin');
+				if (addedVin) {
+					addedVins.push(addedVin);
+				}
+			});
+			if(addedVins.length > 1) {
+
+				$("#boe-div").show();
+				var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+				if(index == 1) {
+					addChild();
+				}
+			}
+			else {
+				$("#boe-div").hide();
+			}
+			if(selectedDepositReceivedValue == 'custom_deposit') {
+				setDepositAganistVehicleDropdownOptions();
+			}
+		}
+		document.addEventListener('DOMContentLoaded', function() {
+			const table = document.getElementById('myTable');
+
+			document.addEventListener('DOMContentLoaded', function() {
+				// Attach event listeners to all remove buttons
+				const removeButtons = document.querySelectorAll('.remove-btn');
+
+				removeButtons.forEach(button => {
+					button.addEventListener('click', function(event) {
+						// Find the row to be removed
+						const row = event.target.closest('tr');
+						// Remove the row
+						row.remove();
 					});
 				});
-			}
-		}
-		$('#vin_multiple').val(null).trigger('change');
-		$('#vin_multiple option').each(function() {
-			if (selectedVIN.includes($(this).val())) {
-				$(this).prop('disabled', true);
-			}
-		});
-		findAllVINs();
-	}
-	// Event delegation to handle remove button click for dynamically added rows
-	$('#myTable').on('click', '.remove-row', function() {
-
-		var vin = $(this).closest('tr').data('vin'); // Assuming each row has a data-vin attribute
-		if (vin) {
-			// Unselect and remove the VIN from all dynamicselect2 class elements
-			$(".dynamicselect2").each(function() {
-				var selectElement = $(this);
-				selectElement.find(`option[value='${vin}']`).prop('selected', false).remove();
-				// Trigger change to update the Select2 UI
-				selectElement.trigger('change');
-			});
-			$('select option[value="'+ vin +'"]').prop('disabled', false);
-		}
-		var rows = $(this).data('rows');
-		if (rows) {
-			$(rows).each(function() {
-				$(this).remove();
-			});
-		}
-		findAllVINs();
-	});
-	function findAllVINs() {
-		addedVins = [];
-		$('#myTable tbody tr').each(function() {
-			var addedVin = $(this).data('vin');
-			if (addedVin) {
-				addedVins.push(addedVin);
-			}
-		});
-		if(addedVins.length > 1) {
-
-			$("#boe-div").show();
-			var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
-			if(index == 1) {
-				addChild();
-			}
-		}
-		else {
-			$("#boe-div").hide();
-		}
-		if(selectedDepositReceivedValue == 'custom_deposit') {
-			setDepositAganistVehicleDropdownOptions();
-		}
-	}
-	document.addEventListener('DOMContentLoaded', function() {
-		const table = document.getElementById('myTable');
-
-		document.addEventListener('DOMContentLoaded', function() {
-			// Attach event listeners to all remove buttons
-			const removeButtons = document.querySelectorAll('.remove-btn');
-
-			removeButtons.forEach(button => {
-				button.addEventListener('click', function(event) {
-					// Find the row to be removed
-					const row = event.target.closest('tr');
-					// Remove the row
-					row.remove();
-				});
 			});
 		});
-	});
-	function createEditableCell(value, placeHolder,name) {
-		var cell = document.createElement('td');
-		var inputElement = document.createElement('input');
-		inputElement.type = 'text';
-		inputElement.placeholder = placeHolder;
-		inputElement.name = name;
-		inputElement.value = value;
-		inputElement.style.border = 'none';
-		// inputElement.style.width = '100%';
-		cell.appendChild(inputElement);
-		return cell;
-	}
-
-	function createCellWithRemoveButton() {
-		var cell = document.createElement('td');
-		var removeButton = document.createElement('a');
-		removeButton.className = 'btn_round remove-row';
-		removeButton.title = 'Remove Vehicle';
-		removeButton.textContent = 'x';
-		cell.appendChild(removeButton);
-		return cell;
-	}
-
-	function createEditableSelect2Cell(vin) {
-		var cell = document.createElement('td');
-		var selectElement = document.createElement('select');
-		selectElement.id = 'certification_per_vin_'+vin;
-		selectElement.name = 'certification_per_vin';
-		selectElement.className = 'form-control widthinput';
-		selectElement.multiple = true;
-		selectElement.style.width = '100%';
-
-		var options = [
-			'RTA Without Number Plate',
-			'RTA With Number Plate',
-			'Certificate Of Origin',
-			'Certificate Of Conformity',
-			'QISJ Inspection',
-			'EAA Inspection'
-		];
-
-		options.forEach(function(optionText) {
-			var option = document.createElement('option');
-			option.value = optionText;
-			option.textContent = optionText;
-			selectElement.appendChild(option);
-		});
-
-		cell.appendChild(selectElement);
-
-		$(selectElement).select2({
-			allowClear: true,
-			// maximumSelectionLength: 1, Certification Per VIN
-			placeholder: "Choose "
-		});
-
-		return cell;
-	}
-	function hideDependentTransportType() {
-		$("#airline-div").hide();
-		$("#airway-bill-div").hide();
-		$("#shippingline-div").hide();
-		$("#forward-import-code-div").hide();
-		$("#brn-div").hide();
-		$("#brn-file-div").hide();
-		$("#container-number-div").hide();
-		$("#trailer-number-plate-div").hide();
-		$("#transportation-company-div").hide();
-		$("#transporting-driver-contact-number-div").hide();
-		$("#airway-details-div").hide();
-		$("#transportation-company-details-div").hide();
-		$("#amount-received-div").hide();
-		$("#balance-amount-div").hide();
-		$("#deposit-aganist-vehicle-div").hide();
-	}
-	function checkValue() {
-		var textInput = document.getElementById('textInput');
-		var Other = document.getElementById('Other');
-		var switchToDropdown = document.getElementById('switchToDropdown');
-		$('#customer_name').next('.select2-container').hide();
-		textInput.style.display = 'inline';
-		Other.style.display = 'none';
-		switchToDropdown.style.display = 'inline';
-		$('#customer_address').val('');
-	}
-	function switchToDropdown() {
-		var textInput = document.getElementById('textInput');
-		var Other = document.getElementById('Other');
-		var switchToDropdown = document.getElementById('switchToDropdown');
-		$('#customer_name').next('.select2-container').show();
-		textInput.style.display = 'none';
-		Other.style.display = 'inline';
-		switchToDropdown.style.display = 'none';
-		var selectedCustomerName = $('#customer_name').val();
-		if(selectedCustomerName.length > 0) {
-			setCustomerRelations(selectedCustomerName);
+		function createEditableCell(value, placeHolder,name) {
+			var cell = document.createElement('td');
+			var inputElement = document.createElement('input');
+			inputElement.type = 'text';
+			inputElement.placeholder = placeHolder;
+			inputElement.name = name;
+			inputElement.value = value;
+			inputElement.style.border = 'none';
+			// inputElement.style.width = '100%';
+			cell.appendChild(inputElement);
+			return cell;
 		}
-	}
-	function setCustomerRelations(selectedCustomerName) {
-		$('#customer_address').val('');
-		// document.getElementById('customer_email').value = '';
-		// document.getElementById('customer_company_number').value = '';
-		if(selectedCustomerName != '') {
-			for (var i = 0; i < customers.length; i++) {
-				if (customers[i].name == selectedCustomerName) {
-					if(customers[i].address != null) {
-						$('#customer_address').val(customers[i]?.address);
+
+		function createCellWithRemoveButton() {
+			var cell = document.createElement('td');
+			var removeButton = document.createElement('a');
+			removeButton.className = 'btn_round remove-row';
+			removeButton.title = 'Remove Vehicle';
+			removeButton.textContent = 'x';
+			cell.appendChild(removeButton);
+			return cell;
+		}
+
+		function createEditableSelect2Cell(vin) {
+			var cell = document.createElement('td');
+			var selectElement = document.createElement('select');
+			selectElement.id = 'certification_per_vin_'+vin;
+			selectElement.name = 'certification_per_vin';
+			selectElement.className = 'form-control widthinput';
+			selectElement.multiple = true;
+			selectElement.style.width = '100%';
+
+			var options = [
+				'RTA Without Number Plate',
+				'RTA With Number Plate',
+				'Certificate Of Origin',
+				'Certificate Of Conformity',
+				'QISJ Inspection',
+				'EAA Inspection'
+			];
+
+			options.forEach(function(optionText) {
+				var option = document.createElement('option');
+				option.value = optionText;
+				option.textContent = optionText;
+				selectElement.appendChild(option);
+			});
+
+			cell.appendChild(selectElement);
+
+			$(selectElement).select2({
+				allowClear: true,
+				// maximumSelectionLength: 1, Certification Per VIN
+				placeholder: "Choose "
+			});
+
+			return cell;
+		}
+	// ADD AND REMOVE VEHICLE TO WO END
+
+	// HIDE FIELDS START
+		function hideDependentTransportType() {
+			$("#airline-div").hide();
+			$("#airway-bill-div").hide();
+			$("#shippingline-div").hide();
+			$("#forward-import-code-div").hide();
+			$("#brn-div").hide();
+			$("#brn-file-div").hide();
+			$("#container-number-div").hide();
+			$("#trailer-number-plate-div").hide();
+			$("#transportation-company-div").hide();
+			$("#transporting-driver-contact-number-div").hide();
+			$("#airway-details-div").hide();
+			$("#transportation-company-details-div").hide();
+			$("#amount-received-div").hide();
+			$("#balance-amount-div").hide();
+			$("#deposit-aganist-vehicle-div").hide();
+		}
+	// HIDE FIELDS END
+
+	// CUSTOMER DETAILS SECTION START
+		function checkValue() {
+			var textInput = document.getElementById('textInput');
+			var Other = document.getElementById('Other');
+			var switchToDropdown = document.getElementById('switchToDropdown');
+			$('#customer_name').next('.select2-container').hide();
+			textInput.style.display = 'inline';
+			Other.style.display = 'none';
+			switchToDropdown.style.display = 'inline';
+			$('#customer_address').val('');
+		}
+		function switchToDropdown() {
+			var textInput = document.getElementById('textInput');
+			var Other = document.getElementById('Other');
+			var switchToDropdown = document.getElementById('switchToDropdown');
+			$('#customer_name').next('.select2-container').show();
+			textInput.style.display = 'none';
+			Other.style.display = 'inline';
+			switchToDropdown.style.display = 'none';
+			var selectedCustomerName = $('#customer_name').val();
+			if(selectedCustomerName.length > 0) {
+				setCustomerRelations(selectedCustomerName);
+			}
+		}
+		function setCustomerRelations(selectedCustomerName) {
+			$('#customer_address').val('');
+			// document.getElementById('customer_email').value = '';
+			// document.getElementById('customer_company_number').value = '';
+			if(selectedCustomerName != '') {
+				for (var i = 0; i < customers.length; i++) {
+					if (customers[i].name == selectedCustomerName) {
+						if(customers[i].address != null) {
+							$('#customer_address').val(customers[i]?.address);
+						}
 					}
 				}
 			}
 		}
-	}
-	function setWo() {
-		var SONumber = $('#so_number').val();
-		// Step 1: Split the string to get the part after "SO-"
-		let parts = SONumber.split("SO-");
-		if (parts.length < 2) {
-			throw new Error("Invalid SO Number format");
-		}
-		// Step 2: Remove leading zeros from the part after "SO-"
-		let numberPart = parts[1].replace(/^0+/, '');
-		var WONumber = "WO-";
-		if(numberPart != '') {
-			WONumber = WONumber+numberPart;
-		}
-		document.getElementById('wo_number').value = WONumber;
-	}
-	function setDepositBalance() {
-		var totalAmount = $('#so_total_amount').val();
-		var amountReceived = $('#amount_received').val();
-		var balanceAmount = '';
-		if(totalAmount != '' && amountReceived != '') {
-			balanceAmount = Number(totalAmount) - Number(amountReceived);
-		}
-		document.getElementById('balance_amount').value = balanceAmount;
-	}
-	function updateCurrency() {
-		var currency = document.getElementById("currency").value;
-		var currencyText = document.querySelector("#currency option:checked").textContent;
-		// document.getElementById("currency-label").textContent = currencyText;
-		document.getElementById("amount_received_currency").textContent = currencyText;
-		document.getElementById("balance_amount_currency").textContent = currencyText;
-	}
-	// CLIENT SIDE VALIDATION START
-	$.validator.addMethod("SONumberFormat", function(value, element) {
-		// Regular expression to match the format SO- followed by exactly 6 digits
-		return this.optional(element) || /^SO-\d{6}$/.test(value);
-	}, "Please enter a valid order number in the format SO-######");
-	// $.validator.addMethod("WONumberFormat", function(value, element) {
-	// 	// Regular expression to match the format WO- followed by exactly 6 digits
-	// 	return this.optional(element) || /^WO-\d{6}$/.test(value);
-	// }, "Please enter a valid order number in the format WO-######");
-	jQuery.validator.setDefaults({
-		errorClass: "is-invalid",
-		errorElement: "p",
-		errorPlacement: function ( error, element ) {
-			error.addClass( "invalid-feedback font-size-13" );
-			if ( element.prop( "type" ) === "checkbox" ) {
-				error.insertAfter( element.parent( "label" ) );
+	// CUSTOMER DETAILS SECTION END
+
+	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER START
+		function setWo() {
+			var SONumber = $('#so_number').val();
+			// Step 1: Split the string to get the part after "SO-"
+			let parts = SONumber.split("SO-");
+			if (parts.length < 2) {
+				throw new Error("Invalid SO Number format");
 			}
-			else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
-				if (!element.val() || element.val().length === 0) {
-					console.log("Error is here with length", element.val().length);
-					error.addClass('select-error');
-					error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
-				} else {
-					console.log("No error");
+			// Step 2: Remove leading zeros from the part after "SO-"
+			let numberPart = parts[1].replace(/^0+/, '');
+			var WONumber = "WO-";
+			if(numberPart != '') {
+				WONumber = WONumber+numberPart;
+			}
+			document.getElementById('wo_number').value = WONumber;
+		}
+	// SET WORK ORDER NUMBER INPUT OF SALES ORDER NUMBER END
+
+	// SET DEPOSIT BALANCE START
+		function setDepositAganistVehicleDropdownOptions() {
+			// Get the previously selected values
+			var previouslySelectedValues = $('#deposit_aganist_vehicle').val() || [];
+
+			// Empty the select element before adding new options
+			$('#deposit_aganist_vehicle').empty();
+
+			// Add new options to the select element
+			addedVins.forEach(function(vin) {
+				$('#deposit_aganist_vehicle').append(new Option(vin, vin));
+			});
+
+			// Initialize or reinitialize Select2
+			$('#deposit_aganist_vehicle').select2({
+				allowClear: true,
+				placeholder: "Choose Vehicle"
+			});
+
+			// Reselect previously selected values if they still exist
+			$('#deposit_aganist_vehicle').val(previouslySelectedValues.filter(function(value) {
+				return addedVins.includes(value);
+			})).trigger('change');
+		}
+		function setDepositBalance() {
+			var totalAmount = $('#so_total_amount').val();
+			var amountReceived = $('#amount_received').val();
+			var balanceAmount = '';
+			if(totalAmount != '' && amountReceived != '') {
+				balanceAmount = Number(totalAmount) - Number(amountReceived);
+			}
+			document.getElementById('balance_amount').value = balanceAmount;
+		}
+	// SET DEPOSIT BALANCE END
+
+	// CURRENCY UPDATE START
+		function updateCurrency() {
+			var currency = document.getElementById("currency").value;
+			var currencyText = document.querySelector("#currency option:checked").textContent;
+			// document.getElementById("currency-label").textContent = currencyText;
+			document.getElementById("amount_received_currency").textContent = currencyText;
+			document.getElementById("balance_amount_currency").textContent = currencyText;
+		}
+	// CURRENCY UPDATE END
+
+	// CLIENT SIDE VALIDATION START
+		$.validator.addMethod("SONumberFormat", function(value, element) {
+			// Regular expression to match the format SO- followed by exactly 6 digits
+			return this.optional(element) || /^SO-\d{6}$/.test(value);
+		}, "Please enter a valid order number in the format SO-######");
+		// $.validator.addMethod("WONumberFormat", function(value, element) {
+		// 	// Regular expression to match the format WO- followed by exactly 6 digits
+		// 	return this.optional(element) || /^WO-\d{6}$/.test(value);
+		// }, "Please enter a valid order number in the format WO-######");
+		jQuery.validator.setDefaults({
+			errorClass: "is-invalid",
+			errorElement: "p",
+			errorPlacement: function ( error, element ) {
+				error.addClass( "invalid-feedback font-size-13" );
+				if ( element.prop( "type" ) === "checkbox" ) {
+					error.insertAfter( element.parent( "label" ) );
+				}
+				else if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+					if (!element.val() || element.val().length === 0) {
+						console.log("Error is here with length", element.val().length);
+						error.addClass('select-error');
+						error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+					} else {
+						console.log("No error");
+					}
+				}
+			else if (element.parent().hasClass('input-group')) {
+					error.insertAfter(element.parent());
+				}
+				else {
+					error.insertAfter( element );
 				}
 			}
-		else if (element.parent().hasClass('input-group')) {
-				error.insertAfter(element.parent());
-			}
-			else {
-				error.insertAfter( element );
-			}
-		}
-	});
-	$('#WOForm').validate({ // initialize the plugin
-		rules: {
-			type: {
-				required: true,
+		});
+		$('#WOForm').validate({ // initialize the plugin
+			rules: {
+				type: {
+					required: true,
+				},
+				date: {
+					required: true,
+					date: true,
+				},
+				so_number: {
+					required: true,
+					SONumberFormat: true
+				},
+				batch: {
+					required: true,
+				},
+				// wo_number: {
+				// 	required: true,
+				// 	WONumberFormat: true
+				// },
+				customer_name: {
+					// required: true,
+				},
+				customer_email: {
+					// required: true,
+					email: true,
+				},
+				customer_company_number: {
+					// required: true,
+					minlength: 5,
+					maxlength: 20,
+				},
+				customer_address: {
+					// required: true,
+					// money: true,
+					// greaterThanFirstValueValidate: "#salary_range_start_in_aed",
+				},
+				customer_representative_name: {
+					// required: true,
+				},
+				customer_representative_email: {
+					// required: true,
+					email: true,
+				},
+				customer_representative_contact: {
+					// required: true,
+					minlength: 5,
+					maxlength: 20,
+				},
+				freight_agent_name: {
+					// required: true,
+				},
+				freight_agent_email: {
+					// required: true,
+					email: true,
+				},
+				freight_agent_contact_number: {
+					// required: true,
+					minlength: 5,
+					maxlength: 20,
+				},
+				port_of_loading: {
+					// required: true,
+				},
+				port_of_discharge: {
+					// required: true,
+				},
+				final_destination: {
+					// required: true,
+				},
+				transport_type: {
+					// required: true,
+				},
+				airline: {
+					// required: true,
+				},
+				airway_bill: {
+					// required: true,
+				},
+				shipping_line: {
+					// required: true,
+				},
+				forward_import_code: {
+					// required: true,
+				},
+				brn: {
+					// required: true,
+				},
+				brn_file: {
+					// required: true,
+				},
+				container_number: {
+					// required: true,
+				},
+				// vin: {
+				// 	// required: true,
+				// },
+				// brand: {
+				// 	// required: true,
+				// },
+				// variant: {
+				// 	// required: true,
+				// },
+				// engine: {
+				// 	// required: true,
+				// },
+				// model_description: {
+				// 	// required: true,
+				// },
+				// model_year: {
+				// 	// required: true,
+				// },
+				// model_year: {
+				// 	// required: true,
+				// },
+				// steering: {
+				// 	// required: true,
+				// },
+				// exterior_colour: {
+				// 	// required: true,
+				// },
+				// interior_colour: {
+				// 	// required: true,
+				// },
+				// warehouse: {
+				// 	// required: true,
+				// },
+				// territory: {
+				// 	// required: true,
+				// },
+				// preferred_destination: {
+				// 	// required: true,
+				// },
+				// import_document_type: {
+				// 	// required: true,
+				// },
+				// ownership_name: {
+				// 	// required: true,
+				// },
+				// modification_or_jobs_to_perform_per_vin: {
+				// 	// required: true,
+				// },
+				// certification_per_vin: {
+				// 	// required: true,
+				// },
+				// special_request_or_remarks: {
+				// 	// required: true,
+				// },
+				delivery_location: {
+					// required: true,
+				},
+				delivery_contact_person: {
+					// required: true,
+				},
+				delivery_date: {
+					// required: true,
+				},
+				signed_pdf: {
+					// required: true,
+				},
+				signed_contract: {
+					// required: true,
+				},
+				payment_receipts: {
+					// required: true,
+				},
+				noc: {
+					// required: true,
+				},
+				enduser_trade_license: {
+					// required: true,
+				},
+				enduser_passport: {
+					// required: true,
+				},
+				enduser_contract: {
+					// required: true,
+				},
 			},
-			date: {
-				required: true,
-				date: true,
-			},
-			so_number: {
-				required: true,
-				SONumberFormat: true
-			},
-			batch: {
-				required: true,
-			},
-			// wo_number: {
-			// 	required: true,
-			// 	WONumberFormat: true
-			// },
-			customer_name: {
-				// required: true,
-			},
-			customer_email: {
-				// required: true,
-				email: true,
-			},
-			customer_company_number: {
-				// required: true,
-				minlength: 5,
-				maxlength: 20,
-			},
-			customer_address: {
-				// required: true,
-				// money: true,
-				// greaterThanFirstValueValidate: "#salary_range_start_in_aed",
-			},
-			customer_representative_name: {
-				// required: true,
-			},
-			customer_representative_email: {
-				// required: true,
-				email: true,
-			},
-			customer_representative_contact: {
-				// required: true,
-				minlength: 5,
-				maxlength: 20,
-			},
-			freight_agent_name: {
-				// required: true,
-			},
-			freight_agent_email: {
-				// required: true,
-				email: true,
-			},
-			freight_agent_contact_number: {
-				// required: true,
-				minlength: 5,
-				maxlength: 20,
-			},
-			port_of_loading: {
-				// required: true,
-			},
-			port_of_discharge: {
-				// required: true,
-			},
-			final_destination: {
-				// required: true,
-			},
-			transport_type: {
-				// required: true,
-			},
-			airline: {
-				// required: true,
-			},
-			airway_bill: {
-				// required: true,
-			},
-			shipping_line: {
-				// required: true,
-			},
-			forward_import_code: {
-				// required: true,
-			},
-			brn: {
-				// required: true,
-			},
-			brn_file: {
-				// required: true,
-			},
-			container_number: {
-				// required: true,
-			},
-			// vin: {
-			// 	// required: true,
-			// },
-			// brand: {
-			// 	// required: true,
-			// },
-			// variant: {
-			// 	// required: true,
-			// },
-			// engine: {
-			// 	// required: true,
-			// },
-			// model_description: {
-			// 	// required: true,
-			// },
-			// model_year: {
-			// 	// required: true,
-			// },
-			// model_year: {
-			// 	// required: true,
-			// },
-			// steering: {
-			// 	// required: true,
-			// },
-			// exterior_colour: {
-			// 	// required: true,
-			// },
-			// interior_colour: {
-			// 	// required: true,
-			// },
-			// warehouse: {
-			// 	// required: true,
-			// },
-			// territory: {
-			// 	// required: true,
-			// },
-			// preferred_destination: {
-			// 	// required: true,
-			// },
-			// import_document_type: {
-			// 	// required: true,
-			// },
-			// ownership_name: {
-			// 	// required: true,
-			// },
-			// modification_or_jobs_to_perform_per_vin: {
-			// 	// required: true,
-			// },
-			// certification_per_vin: {
-			// 	// required: true,
-			// },
-			// special_request_or_remarks: {
-			// 	// required: true,
-			// },
-			delivery_location: {
-				// required: true,
-			},
-			delivery_contact_person: {
-				// required: true,
-			},
-			delivery_date: {
-				// required: true,
-			},
-			signed_pdf: {
-				// required: true,
-			},
-			signed_contract: {
-				// required: true,
-			},
-			payment_receipts: {
-				// required: true,
-			},
-			noc: {
-				// required: true,
-			},
-			enduser_trade_license: {
-				// required: true,
-			},
-			enduser_passport: {
-				// required: true,
-			},
-			enduser_contract: {
-				// required: true,
-			},
-		},
-	});
+		});
 	// CLIENT SIDE VALIDATION END
 </script>
 @endsection
