@@ -422,6 +422,7 @@ Route::get('/d', function () {
     ]);
     Route::controller(WorkOrderController::class)->group(function(){
         Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
+        Route::post('/fetch-addons', [WorkOrderController::class, 'fetchAddons'])->name('fetch-addons');
         // Route::get('export-cnf-work-order-create', 'exportCnfWorkOrderCreate')->name('export-cnf.createWO');
         // Route::get('local-sale-work-order-create', 'exportLocalSaleWorkOrderCreate')->name('local-sale.createWO');
         // Route::get('lto-work-order-create', 'exportLtoWorkOrderCreate')->name('lto.createWO');
