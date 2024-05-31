@@ -92,10 +92,18 @@
         <a class="btn btn-sm btn-info float-end" href="{{ route('purchasing-order.index') }}">
     <i class="fa fa-arrow-left" aria-hidden="true"></i> Back
 </a>
+@php
+    $purchasedordergrn = DB::table('vehicles')
+    ->where('vehicles.purchasing_order_id', $purchasingOrder->id)
+    ->whereNotNull('vehicles.grn_id')
+    ->count();
+        @endphp      
+        @if($purchasedordergrn == 0)
 @if($purchasingOrder->status != "Cancel Request" && $purchasingOrder->status != "Cancelled")
 <a id="cancelButton" class="btn btn-sm btn-danger float-end me-4" href="{{ route('purchasing_order.cancelpo', ['id' => $purchasingOrder->id]) }}">
     <i class="fa fa-times" aria-hidden="true"></i> PO Cancel
 </a>
+@endif
 @endif
         <!-- @if ($nextId)
             <a class="btn btn-sm btn-info" href="{{ route('purchasing-order.show', $nextId) }}">
@@ -615,7 +623,7 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Vehicle's Details</h4>
+                    <h4 class="card-title">Active Vehicle's Details</h4>
                     <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
@@ -696,11 +704,18 @@
                             <td>{{ ucfirst(strtolower($vehicles->variant->brand->brand_name)) }}</td>
                             <td>{{ ucfirst(strtolower($vehicles->variant->master_model_lines->model_line)) }}</td>
                             <td>{{ ucfirst($vehicles->variant->name) }}</td>
-                            <td>
-                            <span class="full-text">{{ ucfirst(strtolower($vehicles->variant->detail)) }}</span>
-                            <span class="short-text"></span>
-                            <a href="#" class="read-more">Read more</a>
-                          </td>
+                            @php
+                        $words = explode(' ', ucfirst(strtolower($vehicles->variant->detail)));
+                        $shortDetail = implode(' ', array_slice($words, 0, 3));
+                        $remainingDetail = implode(' ', array_slice($words, 3));
+                        @endphp
+                        <td>
+                            <span class="short-detail">{{ $shortDetail }}</span>
+                            @if(count($words) > 5)
+                            <span class="remaining-detail" style="display:none;">{{ $remainingDetail }}</span>
+                            <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehicles->variant->detail)) }}">Read more</a>
+                            @endif
+                        </td>
                           <td>{{ ucfirst($vehicles->VehiclePurchasingCost->unit_price ?? '') }}</td>
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
@@ -1088,7 +1103,76 @@
 {{--                    @endif--}}
                 @endif
             @endcan
-
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Cancel Vehicle's Details</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" >
+                        <table id="dtBasicExample5" class="table table-striped table-editable table-edits table table-bordered">
+                            <thead class="bg-soft-secondary">
+                            <tr>  
+                            <th>Ref No</th>
+                            <th>Brand</th>
+                            <th>Model Line</th>
+                            <th>Variant</th>
+                            <th>Variants Detail</th>
+                            <th>Price</th>
+                            <th>Exterior Colour</th>
+                            <th>Interior Colour</th>
+                            <th>VIN Number</th>
+                            <th>Territory</th>
+                            <th>Estimated Arrival</th>
+                            <th>Payment Status</th>
+                            <th>Remarks</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($vehiclesdel as $vehiclesdel)
+                                <tr>
+                                <td>{{ $vehiclesdel->id }}</td>
+                                @can('view-vehicle-model-sfx')
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-vehicle-model-sfx');
+                                @endphp
+                                @if ($hasPermission)
+                                    <td>
+                                        @if($vehiclesdel->model_id)
+                                            {{ $vehiclesdel->masterModel->model ?? ''  }} - {{ $vehiclesdel->masterModel->sfx ?? '' }}
+                                        @endif
+                                    </td>
+                                @endif
+                            @endcan
+                            <td>{{ ucfirst(strtolower($vehiclesdel->variant->brand->brand_name)) }}</td>
+                            <td>{{ ucfirst(strtolower($vehiclesdel->variant->master_model_lines->model_line)) }}</td>
+                            <td>{{ ucfirst($vehiclesdel->variant->name) }}</td>
+                        @php
+                        $words = explode(' ', ucfirst(strtolower($vehiclesdel->variant->detail)));
+                        $shortDetail = implode(' ', array_slice($words, 0, 3));
+                        $remainingDetail = implode(' ', array_slice($words, 3));
+                        @endphp
+                        <td>
+                            <span class="short-detail">{{ $shortDetail }}</span>
+                            @if(count($words) > 5)
+                            <span class="remaining-detail" style="display:none;">{{ $remainingDetail }}</span>
+                            <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehiclesdel->variant->detail)) }}">Read more</a>
+                            @endif
+                        </td>
+                          <td>{{ ucfirst($vehiclesdel->VehiclePurchasingCost->unit_price ?? '') }}</td>
+                          <td>{{ ucfirst($vehiclesdel->exterior->name ?? '') }}</td>
+                          <td>{{ ucfirst($vehiclesdel->interior->name ?? '') }}</td>
+                          <td>{{ ucfirst($vehiclesdel->vin ?? '') }}</td>
+                          <td>{{ ucfirst($vehiclesdel->territory ?? '') }}</td>
+                          <td>{{ $vehiclesdel->estimation_date ? \Carbon\Carbon::parse($vehiclesdel->estimation_date)->format('d-M-Y') : '' }}</td>
+                          <td>{{ ucfirst(strtolower($vehiclesdel->payment_status)) ?? '' }}</td>
+                         <td>{{ ucfirst(strtolower($vehiclesdel->procurement_vehicle_remarks ?? '')) }}</td>
+                                </tr>
+                                @endforeach
+                    </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Vehicles Log Details</h4>
@@ -2161,6 +2245,16 @@ $(document).ready(function() {
                 console.error('Error:', xhr);
                 alert('An error occurred. Please try again.');
             }
+        });
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.read-more').forEach(function(element) {
+        element.addEventListener('click', function() {
+            var fullDetail = this.getAttribute('data-full-detail');
+            alert(fullDetail);
         });
     });
 });
