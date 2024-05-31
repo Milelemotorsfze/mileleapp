@@ -761,6 +761,7 @@ public function getBrandsAndModelLines(Request $request)
     $paymentterms = PaymentTerms::findorfail($purchasingOrder->payment_term_id);
     $payments = PaymentTerms::get();
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
+    $vehiclesdel = Vehicles::onlyTrashed()->where('purchasing_order_id', $id)->get();
     $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
     $vehicleslog = Vehicleslog::whereIn('vehicles_id', $vehicles->pluck('id'))->get();
     $purchasinglog = Purchasinglog::where('purchasing_order_id', $id)->get();
@@ -812,7 +813,7 @@ public function getBrandsAndModelLines(Request $request)
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel'));
     }
     public function edit($id)
     {
