@@ -2256,6 +2256,7 @@ public function allpaymentreqssfinpay(Request $request)
             $purchasingOrder->pol = $request->input('pol');
             $purchasingOrder->pod = $request->input('pod');
             $purchasingOrder->fd = $request->input('fd');
+            $purchasingOrder->status = "Pending Approval";
             $purchasingOrder->save();
             return response()->json(['message' => 'Purchase order details updated successfully'], 200);
         }
