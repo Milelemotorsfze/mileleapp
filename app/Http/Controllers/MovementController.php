@@ -112,7 +112,7 @@ class MovementController extends Controller
         })
         ->where('payment_status', '=', 'Incoming Stock')
         ->pluck('vin');       
-    $warehouses = Warehouse::select('id', 'name')->get();
+    $warehouses = Warehouse::select('id', 'name')->orderBy('name', 'asc')->get();
     $movementsReferenceId = MovementsReference::max('id') + 1;
     $purchasing_order = PurchasingOrder::where('status', 'Approved')
     ->whereHas('vehicles', function ($query) {
@@ -266,7 +266,7 @@ class MovementController extends Controller
         $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
         ->pluck('vin', 'varaints_id'); 
-        $warehouses = Warehouse::select('id', 'name')->get();
+        $warehouses = Warehouse::select('id', 'name')->orderBy('name', 'asc')->get();
         $movementreference = MovementsReference::get(); 
         return view('movement.index', compact('data', 'vehicles', 'warehouses', 'movementreference'));
     }    
