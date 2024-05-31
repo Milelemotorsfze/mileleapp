@@ -107,10 +107,6 @@ class SupplierInventoryController extends Controller
     }
     public function create()
     {
-//        if(strcasecmp("WAITING","Waiting") == 0){
-//            return "same";
-//        }
-//        return "Differ";
         (new UserActivityController)->createActivity('Open Supplier Inventory Excel Upload Page.');
 
         $suppliers = Supplier::with('supplierTypes')
@@ -148,10 +144,10 @@ class SupplierInventoryController extends Controller
     {
         $request->validate([
             'whole_sales' => 'required',
-            'supplier_id' =>' required',
-            'country' => 'required',
-            'model' => 'required',
-            'sfx' => 'required',
+            'supplier_id' => 'required',
+            'country'     => 'required',
+            'model'       => 'required',
+            'sfx'         => 'required',
         ]);
 
         if(!empty($request->prod_month)) {
@@ -172,24 +168,14 @@ class SupplierInventoryController extends Controller
         }
 
         $colourcode = $request->color_code;
+
+        $extColour = mb_substr($colourcode, 0, -2);
+        $intColour = mb_substr($colourcode,  -2);
+
         $interiorColorId = NULL;
         $exteriorColorId = NUll;
 
         if($colourcode) {
-            $colourcodecount = strlen($colourcode);
-
-            if ($colourcodecount > 5) {
-                $extColour = substr($colourcode, 0, -2);
-                $intColour = substr($colourcode,  -2);
-
-            }else if ($colourcodecount == 5) {
-                $extColour = substr($colourcode, 0, 3);
-                $intColour = substr($colourcode,  -2);
-            } else if ($colourcodecount == 4) {
-                $altercolourcode = "0" . $colourcode;
-                $extColour = substr($altercolourcode, 0, 3);
-                $intColour = substr($altercolourcode, -2);
-            }
             if($extColour) {
                 $extColourRow = ColorCode::where('code', $extColour)
                                         ->where('belong_to', ColorCode::EXTERIOR)
@@ -282,33 +268,7 @@ class SupplierInventoryController extends Controller
                 {
                     $supplier_id = $request->input('supplier_id');
                     $country = $request->input('country');
-//                    $colourcode = $filedata[5];
-//
-//                    if($colourcode) {
-//                        if(strlen($filedata[5]) < 4  || strlen($filedata[5]) > 7){
-//                            return redirect()->back()->with('error', 'Invalid Colour Code '.$filedata[5].', Color Code length should be 7 or 4!');
-//                        }
-//                        $colourcodecount = strlen($colourcode);
-//
-//                        if ($colourcodecount == 5) {
-//                            $extColour = substr($colourcode, 0, 3);
-//                            $intColour = substr($colourcode,  -2);
-//
-//                        }else if ($colourcodecount > 5) {
-//                            $extColour = substr($colourcode, 0, -2);
-//                            $intColour = substr($colourcode,  -2);
-//
-//                        }else if ($colourcodecount == 4) {
-//
-//                            $altercolourcode = "0" . $colourcode;
-//                            $extColour = substr($altercolourcode, 0, 3);
-//                            $intColour = substr($altercolourcode, -2);
-//                            $colourcode = $extColour.''.$intColour;
-//                        }
-//
 
-//                    }
-//                    $exteriorColorId =
                     $uploadFileContents[$i]['steering'] = $filedata[0];
                     $uploadFileContents[$i]['model'] = $filedata[1];
                     $uploadFileContents[$i]['sfx'] = $filedata[2];
@@ -317,7 +277,7 @@ class SupplierInventoryController extends Controller
                     $intColour = $filedata[5];
                     $extColour = $filedata[6];
 
-                    $uploadFileContents[$i]['color_code'] = $filedata[5].$filedata[6];
+                    $uploadFileContents[$i]['color_code'] = $filedata[6].$filedata[5];
                     $uploadFileContents[$i]['pord_month'] = $filedata[7];
                     // $uploadFileContents[$i]['po_arm'] = $filedata[7];
                     if(!empty($filedata[7])) {
@@ -476,13 +436,17 @@ class SupplierInventoryController extends Controller
                     $newModels[$j]['sfx'] = $uploadFileContent['sfx'];
                     $newModels[$j]['model_year'] =  $uploadFileContent['model_year'];
                 }
+                $DN_WAITING = strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_WAITING);
+                $DN_RECEIVED = strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED);
                 if(!empty($uploadFileContent['delivery_note']) ) {
                     if($country == SupplierInventory::COUNTRY_BELGIUM) {
-                        if ((strcasecmp($uploadFileContent['delivery_note'], 'Received') == 1) || (strcasecmp($uploadFileContent['delivery_note'], 'WAITING') == 1) ) {
-                            return redirect()->back()->with('error',$uploadFileContent['delivery_note']."Delivery note should be a Waiting or Received");
+                        if ($DN_WAITING != 0 ) {
+                            if ($DN_RECEIVED != 0) {
+                                return redirect()->back()->with('error', $uploadFileContent['delivery_note'] . " Delivery note should be a Waiting or Received");
+                            }
                         }
                     }else{
-                        if (strcasecmp($uploadFileContent['delivery_note'], 'Waiting') == 1 || !is_numeric($uploadFileContent['delivery_note'])) {
+                        if ($DN_WAITING !== 0 || !is_numeric($uploadFileContent['delivery_note'])) {
                             return redirect()->back()->with('error', "Delivery note should be a number or status should be Waiting");
                         }
                     }
@@ -1592,32 +1556,14 @@ class SupplierInventoryController extends Controller
             }else if($fieldName == 'color_code') {
                 if($fieldValue) {
                     $colourcode = $fieldValue;
-                    $colourcodecount = strlen($fieldValue);
-                    if ($colourcodecount > 5) {
-                        $extColour = substr($colourcode, 0, -2);
-                        $intColour = substr($colourcode,  -2);
-
-                    }
-                    if ($colourcodecount == 5) {
-                        $extColour = substr($colourcode, 0, 3);
-                        $intColour = substr($colourcode,  -2);
-
-                    }
-                    if ($colourcodecount == 4) {
-
-                        $altercolourcode = "0" . $colourcode;
-                        $extColour = substr($altercolourcode, 0, 3);
-                        $intColour = substr($altercolourcode, -2);
-                        $fieldValue = $extColour.''.$intColour;
-                    }
+                    $extColour = mb_substr($colourcode, 0, -2);
+                    $intColour = mb_substr($colourcode,  -2);
                     if($extColour) {
                         $extColourRow = ColorCode::where('code', $extColour)
                             ->where('belong_to', ColorCode::EXTERIOR)
                             ->first();
-                        $exteriorColor = "";
                         if ($extColourRow)
                         {
-                            $exteriorColor = $extColourRow->name;
                             $exteriorColorId = $extColourRow->id;
                         }
                     }
@@ -1625,10 +1571,8 @@ class SupplierInventoryController extends Controller
                         $intColourRow = ColorCode::where('code', $intColour)
                             ->where('belong_to', ColorCode::INTERIOR)
                             ->first();
-                        $interiorColor = "";
                         if ($intColourRow)
                         {
-                            $interiorColor = $intColourRow->name;
                             $interiorColorId = $intColourRow->id;
                         }
                     }
@@ -2100,7 +2044,6 @@ class SupplierInventoryController extends Controller
 
         return $supplierInventoryDates;
     }
-
     public function checkChasisUnique(Request $request) {
 
         $isChasisExist = SupplierInventory::where('chasis',  $request->chasis)
@@ -2162,26 +2105,10 @@ class SupplierInventoryController extends Controller
        return response($data);
     }
     public function isExistColorCode(Request $request) {
-        info($request->all());
         $colourcode = $request->color_code;
         $colourcodecount = strlen($colourcode);
-
-        if ($colourcodecount > 5) {
-            $extColour = substr($colourcode, 0, -2);
-            $intColour = substr($colourcode,  -2);
-        }
-        if ($colourcodecount == 5) {
-            $extColour = substr($colourcode, 0, 3);
-            $intColour = substr($colourcode,  -2);
-        }
-        if ($colourcodecount == 4) {
-            $altercolourcode = "0" . $colourcode;
-            $extColour = substr($altercolourcode, 0, 3);
-            $intColour = substr($altercolourcode, -2);
-        }
-
-        info($extColour);
-        info($intColour);
+        $extColour = mb_substr($colourcode, 0, -2);
+        $intColour = mb_substr($colourcode,  -2);
 
         $extColourRow = ColorCode::where('code', $extColour)
             ->where('belong_to', ColorCode::EXTERIOR)
@@ -2189,14 +2116,11 @@ class SupplierInventoryController extends Controller
         $intColourRow = ColorCode::where('code', $intColour)
             ->where('belong_to', ColorCode::INTERIOR)
             ->first();
-        info($extColourRow);
-        info($intColourRow);
 
         $data = 0;
        if($intColourRow && $extColourRow) {
            $data = 1;
        }
-        info($data);
        return response($data);
     }
     public function uniqueProductionMonth(Request $request) {
@@ -2249,5 +2173,30 @@ class SupplierInventoryController extends Controller
 
         return view('supplier_inventories.inventory_logs.index', compact('supplierInventoryLogs'));
     }
-
+    public function checkDeliveryNote(Request $request)
+    {
+        $DN_WAITING = strcasecmp($request->delivery_note, SupplierInventory::DN_STATUS_WAITING);
+        $DN_RECEIVED = strcasecmp($request->delivery_note, SupplierInventory::DN_STATUS_RECEIVED);
+        $isValidDeliveryNote = 1;
+        info($request->delivery_note);
+        info($request->country);
+        if($request->country == SupplierInventory::COUNTRY_BELGIUM ) {
+            if($DN_WAITING != 0) {
+                info("Dn waiting not matching");
+                if($DN_RECEIVED != 0 ) {
+                    info("DN recived not matching");
+                    $isValidDeliveryNote = 0;
+                }else{
+                    info("matching");
+                }
+            }
+        }else{
+            if($DN_WAITING != 0) {
+                if(!is_numeric($request->delivery_note)) {
+                    $isValidDeliveryNote = 0;
+                }
+            }
+        }
+        return response($isValidDeliveryNote);
+    }
 }

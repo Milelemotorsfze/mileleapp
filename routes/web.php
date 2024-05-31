@@ -171,7 +171,7 @@ Route::get('/d', function () {
     Route::get('users/destroy/{id}', [UserController::class,'delete'])->name('users.delete');
     Route::controller(UserController::class)->group(function() {
         Route::post('user/email-unique-check', 'uniqueEmail')->name('user.uniqueEmail');
-        Route::post('user/create-access-request', 'createAccessRequest')->name('user.createAccessRequest');  
+        Route::post('user/create-access-request', 'createAccessRequest')->name('user.createAccessRequest');
         Route::get('user/create-password-request/{id}','createLogin')->name('users.createLogin');
     });
     // Role
@@ -482,6 +482,7 @@ Route::get('/d', function () {
     Route::get('/isExistColorCode', [SupplierInventoryController::class,'isExistColorCode'])->name('supplier-inventories.isExistColorCode');
     Route::get('/unique-production-month', [SupplierInventoryController::class,'uniqueProductionMonth'])->name('supplier-inventories.uniqueProductionMonth');
     Route::get('inventory-logs/{id}', [SupplierInventoryController::class,'inventoryLogs'])->name('inventory-logs.lists');
+    Route::get('/check-delivery-note', [SupplierInventoryController::class,'checkDeliveryNote'])->name('supplier-inventories.check-delivery-note');
 
 
     //BL Module
