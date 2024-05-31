@@ -330,7 +330,7 @@
                             <label for="choices-single-default" class="form-label"><strong>Total Cost</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
-                            <span>{{ $purchasingOrder->totalcost }} - {{ $purchasingOrder->currency }}</span>
+                            <span>{{ isset($purchasingOrder->totalcost) ? number_format($purchasingOrder->totalcost, 0, '', ',') : '' }} - {{ $purchasingOrder->currency }}</span>
                         </div>
                     </div>
                     <div class="row">
@@ -651,7 +651,7 @@
                                 <th>Brand</th>
                                 <th>Model Line</th>
                                 <th>Variant</th>
-                                <th>Variants Detail</th>
+                                <th id="variants_detail">Variants Detail</th>
                                 <th>Price</th>
                                 <th style="vertical-align: middle;" id="int_color">Exterior Color</th>
                                 <th  style="vertical-align: middle;" id="ex_color">Interior Color</th>
@@ -716,7 +716,7 @@
                             <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehicles->variant->detail)) }}">Read more</a>
                             @endif
                         </td>
-                          <td>{{ ucfirst($vehicles->VehiclePurchasingCost->unit_price ?? '') }}</td>
+                        <td>{{ isset($vehicles->VehiclePurchasingCost->unit_price) ? number_format($vehicles->VehiclePurchasingCost->unit_price, 0, '', ',') : '' }}</td>
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                             @endphp
@@ -1158,7 +1158,7 @@
                             <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehiclesdel->variant->detail)) }}">Read more</a>
                             @endif
                         </td>
-                          <td>{{ ucfirst($vehiclesdel->VehiclePurchasingCost->unit_price ?? '') }}</td>
+                        <td>{{ isset($vehiclesdel->VehiclePurchasingCost->unit_price) ? number_format($vehiclesdel->VehiclePurchasingCost->unit_price, 0, '', ',') : '' }}</td>
                           <td>{{ ucfirst($vehiclesdel->exterior->name ?? '') }}</td>
                           <td>{{ ucfirst($vehiclesdel->interior->name ?? '') }}</td>
                           <td>{{ ucfirst($vehiclesdel->vin ?? '') }}</td>
@@ -1494,7 +1494,9 @@
                             if (columnName === "ex_color") {
                                 return;
                             }
-
+                            if (columnName === "variants_detail") {
+                                return;
+                            }
                             var selectWrapper = $('<div class="select-wrapper"></div>');
                             var select = $('<select class="form-control my-1" multiple></select>')
                                 .appendTo(selectWrapper)
