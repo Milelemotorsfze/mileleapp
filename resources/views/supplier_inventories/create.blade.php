@@ -111,10 +111,9 @@
                         </div>
                         <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label text-muted"> Colour Code</label>
+                                <label for="choices-single-default" class="form-label text-muted">Colour Code</label>
                                 <input type="text" name="color_code" placeholder="Enter Colour Code" oninput="checkColorCode()" id="color_code" class="form-control widthinput">
                                 <span id="color_code_error" class="error"></span>
-
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-4">
@@ -124,7 +123,7 @@
                                 <span id="pord_month_error" class="error"></span>
                             </div>
                         </div>
-                    
+
                         <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted"> Delivery Note </label>
@@ -170,7 +169,7 @@
                 },
                 color_code:{
                     minlength:4,
-                    maxlength:5
+                    maxlength:8
                 }
             },
         });

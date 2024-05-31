@@ -363,8 +363,8 @@
                     let InputId = 'color_code-editable-'+id;
                     let colorCode = $('#'+InputId).text();
 
-                    if(colorCode.length > 7 ) {
-                        $msg = "Maximum length is 7";
+                    if(colorCode.length > 10 ) {
+                        $msg = "Maximum length is 10";
                         showValidationError(InputId,$msg);
 
                     }else if(colorCode.length < 4 && colorCode.length > 0) {
@@ -375,8 +375,9 @@
                         removeValidationError(InputId);
                     }
 
-
-                    if(colorCode.length >= 4 && colorCode.length <= 7 ) {
+                    console.log(colorCode.length);
+                    if(colorCode.length >= 4 && colorCode.length <= 10 ) {
+                        console.log("yes");
                         $.ajax({
                             type:"GET",
                             url: url,
@@ -385,7 +386,7 @@
                             },
                             dataType : 'json',
                             success: function(data) {
-                                console.log(data);
+                              //  console.log(data);
                                 if(data == 0) {
                                     $msg = "This color code is not existing in our master Color Codes.";
                                     showValidationError(InputId, $msg);
@@ -469,7 +470,6 @@
             }
         }
         function showValidationError(id,$msg){
-
             feildValidInput = false;
             $('#'+id).attr('title', $msg);
             $('#'+id).css('color', 'red');
