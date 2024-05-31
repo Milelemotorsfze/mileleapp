@@ -24,6 +24,8 @@ class SupplierInventory extends Model
     public const DN_STATUS_WAITING = "WAITING";
     public const DN_STATUS_RECEIVED = "RECEIVED";
     public const COUNTRY_BELGIUM = "Belgium";
+    public const COUNTRY_UAE = "UAE";
+
 
     protected $appends = [
         'color_codes',

@@ -63,9 +63,9 @@
                         <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted"> Country</label>
-                                <select class="form-control widthinput" data-trigger name="country" id="choices-single-default">
-                                    <option value='UAE'>UAE</option>
-                                    <option value='Belgium'>Belgium</option>
+                                <select class="form-control widthinput" multiple="true" name="country" id="country">
+                                    <option value="UAE">UAE</option>
+                                    <option value="Belgium">Belgium</option>
                                 </select>
                             </div>
                         </div>
@@ -191,6 +191,15 @@
             CheckProductionMonth();
         });
 
+        $('#country').select2({
+            placeholder: 'Select Country',
+            allowClear: true,
+            maximumSelectionLength: 1
+        }).on('change', function() {
+            alert("okj");
+            deliveryNote();
+        });
+
         function getSfx() {
             let model = $('#model').val();
 
@@ -308,30 +317,57 @@
         }
         function deliveryNote(){
             let deliveryNote = $('#delivery_note').val();
+            let country = $('#country').val();
             let InputId = 'delivery_note_error';
-
-            if($.isNumeric(deliveryNote)) {
-                if(deliveryNote.length < 5) {
-                    $msg = "Delivey Note minimum length should be 5";
-                    showValidationError(InputId,$msg);
-                    feildValidInput == false;
-                }else {
-                    removeValidationError(InputId);
-                    feildValidInput == true;
-                }
-            }else{
-                if(deliveryNote != 'waiting' && deliveryNote != 'WAITING'){
-                    $msg = "Only Waiting status is allowed or any DN Number can add.";
-                    showValidationError(InputId,$msg);
-                    feildValidInput == false;
-                }else {
-                    removeValidationError(InputId);
-                    feildValidInput == true;
-
+            if(country == '{{ \App\Models\SupplierInventory::COUNTRY_UAE }}') {
+                if ($.isNumeric(deliveryNote)) {
+                    if (deliveryNote.length < 5) {
+                        $msg = "Delivery Note minimum length should be 5";
+                        showValidationError(InputId, $msg);
+                        feildValidInput == false;
+                    } else {
+                        removeValidationError(InputId);
+                        feildValidInput == true;
+                    }
                 }
             }
-        }
 
+            let url = '{{ route('supplier-inventories.check-delivery-note') }}';
+            console.log(country);
+            console.log(deliveryNote);
+            if(deliveryNote.length > 0) {
+                $.ajax({
+                    type:"GET",
+                    url: url,
+                    data: {
+                        country: country,
+                        delivery_note: deliveryNote
+                    },
+                    dataType : 'json',
+                    success: function(data) {
+                        console.log(data);
+                        if(data == 0) {
+                            if(country == '{{ \App\Models\SupplierInventory::COUNTRY_BELGIUM }}') {
+                                $msg = "Delivery note value will be Waiting or Received.";
+                            }else{
+                                $msg = "Delivery note will be Waiting or number";
+                            }
+                            showValidationError(InputId, $msg);
+                            feildValidInput == false;
+
+                        }else{
+                            removeValidationError(InputId);
+                            feildValidInput == true;
+
+                        }
+                    }
+                });
+            }else{
+                removeValidationError(InputId);
+                feildValidInput == true;
+            }
+
+        }
 
         function showValidationError(InputId,$msg){
           $('#'+InputId).html($msg);

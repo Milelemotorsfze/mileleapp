@@ -107,10 +107,6 @@ class SupplierInventoryController extends Controller
     }
     public function create()
     {
-//        if(strcasecmp("WAITING","Waiting") == 0){
-//            return "same";
-//        }
-//        return "Differ";
         (new UserActivityController)->createActivity('Open Supplier Inventory Excel Upload Page.');
 
         $suppliers = Supplier::with('supplierTypes')
@@ -440,13 +436,17 @@ class SupplierInventoryController extends Controller
                     $newModels[$j]['sfx'] = $uploadFileContent['sfx'];
                     $newModels[$j]['model_year'] =  $uploadFileContent['model_year'];
                 }
+                $DN_WAITING = strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_WAITING);
+                $DN_RECEIVED = strcasecmp($uploadFileContent['delivery_note'], SupplierInventory::DN_STATUS_RECEIVED);
                 if(!empty($uploadFileContent['delivery_note']) ) {
                     if($country == SupplierInventory::COUNTRY_BELGIUM) {
-                        if ((strcasecmp($uploadFileContent['delivery_note'], 'Received') == 1) || (strcasecmp($uploadFileContent['delivery_note'], 'WAITING') == 1) ) {
-                            return redirect()->back()->with('error',$uploadFileContent['delivery_note']."Delivery note should be a Waiting or Received");
+                        if ($DN_WAITING != 0 ) {
+                            if ($DN_RECEIVED != 0) {
+                                return redirect()->back()->with('error', $uploadFileContent['delivery_note'] . " Delivery note should be a Waiting or Received");
+                            }
                         }
                     }else{
-                        if (strcasecmp($uploadFileContent['delivery_note'], 'Waiting') == 1 || !is_numeric($uploadFileContent['delivery_note'])) {
+                        if ($DN_WAITING !== 0 || !is_numeric($uploadFileContent['delivery_note'])) {
                             return redirect()->back()->with('error', "Delivery note should be a number or status should be Waiting");
                         }
                     }
@@ -2044,7 +2044,6 @@ class SupplierInventoryController extends Controller
 
         return $supplierInventoryDates;
     }
-
     public function checkChasisUnique(Request $request) {
 
         $isChasisExist = SupplierInventory::where('chasis',  $request->chasis)
@@ -2174,5 +2173,30 @@ class SupplierInventoryController extends Controller
 
         return view('supplier_inventories.inventory_logs.index', compact('supplierInventoryLogs'));
     }
-
+    public function checkDeliveryNote(Request $request)
+    {
+        $DN_WAITING = strcasecmp($request->delivery_note, SupplierInventory::DN_STATUS_WAITING);
+        $DN_RECEIVED = strcasecmp($request->delivery_note, SupplierInventory::DN_STATUS_RECEIVED);
+        $isValidDeliveryNote = 1;
+        info($request->delivery_note);
+        info($request->country);
+        if($request->country == SupplierInventory::COUNTRY_BELGIUM ) {
+            if($DN_WAITING != 0) {
+                info("Dn waiting not matching");
+                if($DN_RECEIVED != 0 ) {
+                    info("DN recived not matching");
+                    $isValidDeliveryNote = 0;
+                }else{
+                    info("matching");
+                }
+            }
+        }else{
+            if($DN_WAITING != 0) {
+                if(!is_numeric($request->delivery_note)) {
+                    $isValidDeliveryNote = 0;
+                }
+            }
+        }
+        return response($isValidDeliveryNote);
+    }
 }

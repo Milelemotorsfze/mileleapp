@@ -107,7 +107,7 @@
                     <th>ETA Import Date</th>
                     <th>Aging</th>
                     <th>Production Month</th>
-                    <th>DN Number</th>
+                    <th>DN Number/Status</th>
                     <th>LOI</th>
                     <th>PFI Number </th>
                     <th>PO Number</th>
@@ -274,6 +274,11 @@
             $('#dtBasicExample3 tbody td').on('change', '.country', function () {
                 var id = $(this).data('id');
                 var field = $(this).data('field');
+                let country = $('#country-editable-'+id).val();
+                let deliveryNote = $('#delivery_note-editable-'+id).text();
+                if(deliveryNote.length > 0) {
+                    checkDeliveryNote(country,deliveryNote,id);
+                }
                 if(feildValidInput == true) {
                     addUpdatedData(id, field);
                 }
@@ -288,8 +293,6 @@
             });
 
             function validData(field,id) {
-                console.log(field);
-                console.log(id);
 
                 if(field == 'pord_month') {
                     let InputId = 'pord_month-editable-'+id;
@@ -399,25 +402,51 @@
                         });
                     }
                 }else if(field == 'delivery_note') {
+                    let country = $('#country-editable-'+id).val();
                     let InputId = 'delivery_note-editable-'+id;
                     let deliveryNote = $('#'+InputId).text();
-
-                    if($.isNumeric(deliveryNote)) {
-                        if(deliveryNote.length < 5) {
-                            $msg = "Delivery Note minimum length should be 5";
-                            showValidationError(InputId,$msg);
-                        }else {
-                            removeValidationError(InputId);
+                    if(country == '{{ \App\Models\SupplierInventory::COUNTRY_UAE }}') {
+                        if($.isNumeric(deliveryNote) ) {
+                            if(deliveryNote.length < 5) {
+                                $msg = "Delivery Note minimum length should be 5";
+                                showValidationError(InputId,$msg);
+                            }else {
+                                removeValidationError(InputId);
+                            }
                         }
-                    }else{
-                        if(deliveryNote != 'waiting' && deliveryNote != 'WAITING'){
-                            $msg = "Only Waiting status is allowed or any DN Number can update.";
-                            showValidationError(InputId,$msg);
-                        }else {
+                    }
+                    if(deliveryNote.length > 0) {
+                        checkDeliveryNote(country,deliveryNote,id);
+                    }
+                }
+            }
+
+            function checkDeliveryNote(country,deliveryNote,id){
+                let InputId = 'delivery_note-editable-'+id;
+                let url = '{{ route('supplier-inventories.check-delivery-note') }}';
+
+                $.ajax({
+                    type:"GET",
+                    url: url,
+                    data: {
+                        country: country,
+                        delivery_note: deliveryNote
+                    },
+                    dataType : 'json',
+                    success: function(data) {
+                        console.log(data);
+                        if(data == 0) {
+                            if(country == '{{ \App\Models\SupplierInventory::COUNTRY_BELGIUM }}') {
+                                $msg = "Delivery note value will be Waiting or Received.";
+                            }else{
+                                $msg = "Delivery note will be Waiting or number";
+                            }
+                            showValidationError(InputId, $msg);
+                        }else{
                             removeValidationError(InputId);
                         }
                     }
-                }
+                });
             }
 
              $('.update-inventory-btn').on('click', function () {
