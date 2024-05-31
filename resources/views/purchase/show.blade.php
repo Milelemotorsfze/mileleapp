@@ -133,8 +133,16 @@
                     @endphp
                     @if ($hasPermission)
                     <div class ="row">
-                    <div class="col-lg-9 col-md-6 col-sm-6">    
+                    <div class="col-lg-9 col-md-6 col-sm-6">
+    @php
+    $purchasedordergrn = DB::table('vehicles')
+    ->where('vehicles.purchasing_order_id', $purchasingOrder->id)
+    ->whereNotNull('vehicles.grn_id')
+    ->count();
+        @endphp      
+        @if($purchasedordergrn == 0)
                     <a href="#" class="btn btn-sm btn-primary float-end edit-basic-btn" data-purchase-id="{{ $purchasingOrder->id }}">Edit Basic Details</a>
+        @endif
                     <a href="#" class="btn btn-sm btn-success float-end update-basic-btn" style="display: none;">Update Basic Details</a>
                     </div>
                     </div>
