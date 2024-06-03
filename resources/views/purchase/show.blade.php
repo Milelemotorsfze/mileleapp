@@ -412,6 +412,21 @@
                             @endif
                         </div>
                         @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-request-approval');
+                        @endphp
+                        @if ($hasPermission)
+                            @if ($purchasingOrder->status === 'Approved')
+                                @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('status', 'Request for Payment'))
+                                    <div class="col-lg-2 col-md-3 col-sm-12">
+                                        <label for="choices-single-default" class="form-label"><strong>Forward Payment Request</strong></label>
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfin('Approved', {{ $purchasingOrder->id }})">Approval All</button>
+                                    </div>
+                                @endif
+                            @endif
+                            @endif
+                        @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('payment-initiated');
                         @endphp
                         @if ($hasPermission)
