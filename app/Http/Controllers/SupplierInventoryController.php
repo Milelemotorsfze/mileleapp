@@ -2178,16 +2178,10 @@ class SupplierInventoryController extends Controller
         $DN_WAITING = strcasecmp($request->delivery_note, SupplierInventory::DN_STATUS_WAITING);
         $DN_RECEIVED = strcasecmp($request->delivery_note, SupplierInventory::DN_STATUS_RECEIVED);
         $isValidDeliveryNote = 1;
-        info($request->delivery_note);
-        info($request->country);
-        if($request->country == SupplierInventory::COUNTRY_BELGIUM ) {
+        if($request->country[0] == SupplierInventory::COUNTRY_BELGIUM ) {
             if($DN_WAITING != 0) {
-                info("Dn waiting not matching");
                 if($DN_RECEIVED != 0 ) {
-                    info("DN recived not matching");
                     $isValidDeliveryNote = 0;
-                }else{
-                    info("matching");
                 }
             }
         }else{
