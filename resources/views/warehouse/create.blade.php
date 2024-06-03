@@ -302,6 +302,10 @@ $(document).ready(function() {
     }
     var qty = $('#QTY').val();
     var unitPrice = $('#unit_price').val(); // Get the unit price
+    if (!unitPrice || unitPrice.trim() === '') {
+        alert('Unit price cannot be null or blank');
+        return;
+    }
     var detail = variantOption.data('detail');
     var brand = variantOption.data('brands_id');
     var masterModelLine = variantOption.data('master_model_lines_id');

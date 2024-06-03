@@ -330,7 +330,11 @@
                             <label for="choices-single-default" class="form-label"><strong>Total Cost</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
-                            <span>{{ $purchasingOrder->totalcost }} - {{ $purchasingOrder->currency }}</span>
+                        @if (!is_null($purchasingOrder->totalcost) && !is_numeric($purchasingOrder->totalcost)) 
+                        <span>{{ isset($purchasingOrder->totalcost) ? number_format($purchasingOrder->totalcost, 0, '', ',') : '' }} - {{ $purchasingOrder->currency }}</span>
+                        @else    
+                        <span>{{ $purchasingOrder->totalcost }} - {{ $purchasingOrder->currency }}</span>
+                        @endif
                         </div>
                     </div>
                     <div class="row">
@@ -716,7 +720,11 @@
                             <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehicles->variant->detail)) }}">Read more</a>
                             @endif
                         </td>
+                        @if (!is_null($vehicles->VehiclePurchasingCost->unit_price) && !is_numeric($vehicles->VehiclePurchasingCost->unit_price))
+                        <td>{{ isset($vehicles->VehiclePurchasingCost->unit_price) ? number_format($vehicles->VehiclePurchasingCost->unit_price, 0, '', ',') : '' }}</td>
+                        @else
                         <td>{{ $vehicles->VehiclePurchasingCost->unit_price }}</td>
+                        @endif
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                             @endphp
@@ -1158,7 +1166,11 @@
                             <a href="javascript:void(0);" class="read-more" data-full-detail="{{ ucfirst(strtolower($vehiclesdel->variant->detail)) }}">Read more</a>
                             @endif
                         </td>
+                        @if (!is_null($vehiclesdel->VehiclePurchasingCost->unit_price) && !is_numeric($vehiclesdel->VehiclePurchasingCost->unit_price))
+                        <td>{{ isset($vehiclesdel->VehiclePurchasingCost->unit_price) ? number_format($vehiclesdel->VehiclePurchasingCost->unit_price, 0, '', ',') : '' }}</td>
+                        @else
                         <td>{{ $vehiclesdel->VehiclePurchasingCost->unit_price }}</td>
+                        @endif
                           <td>{{ ucfirst($vehiclesdel->exterior->name ?? '') }}</td>
                           <td>{{ ucfirst($vehiclesdel->interior->name ?? '') }}</td>
                           <td>{{ ucfirst($vehiclesdel->vin ?? '') }}</td>
