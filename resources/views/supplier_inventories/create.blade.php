@@ -196,7 +196,6 @@
             allowClear: true,
             maximumSelectionLength: 1
         }).on('change', function() {
-            alert("okj");
             deliveryNote();
         });
 
@@ -319,33 +318,37 @@
             let deliveryNote = $('#delivery_note').val();
             let country = $('#country').val();
             let InputId = 'delivery_note_error';
-            if(country == '{{ \App\Models\SupplierInventory::COUNTRY_UAE }}') {
-                if ($.isNumeric(deliveryNote)) {
-                    if (deliveryNote.length < 5) {
-                        $msg = "Delivery Note minimum length should be 5";
-                        showValidationError(InputId, $msg);
-                        feildValidInput == false;
-                    } else {
-                        removeValidationError(InputId);
-                        feildValidInput == true;
-                    }
-                }
-            }
+            {{--if(country == '{{ \App\Models\SupplierInventory::COUNTRY_UAE }}') {--}}
+            {{--    console.log("ok country");--}}
+            {{--    if ($.isNumeric(deliveryNote)) {--}}
+            {{--        console.log("numeric");--}}
+            {{--        cosnole.log(deliveryNote.length);--}}
+            {{--        if (deliveryNote.length < 5) {--}}
+            {{--            console.log("ok");--}}
+            {{--            $msg = "Delivery Note minimum length should be 5";--}}
+            {{--            showValidationError(InputId, $msg);--}}
+            {{--            feildValidInput == false;--}}
+            {{--        } else {--}}
+            {{--            removeValidationError(InputId);--}}
+            {{--            feildValidInput == true;--}}
+            {{--        }--}}
+            {{--    }--}}
+            {{--}--}}
 
             let url = '{{ route('supplier-inventories.check-delivery-note') }}';
-            console.log(country);
-            console.log(deliveryNote);
-            if(deliveryNote.length > 0) {
+
+            if(deliveryNote.length > 0 && country.length > 0) {
                 $.ajax({
                     type:"GET",
                     url: url,
                     data: {
                         country: country,
-                        delivery_note: deliveryNote
+                        delivery_note: deliveryNote,
+                        data_from: 'CREATE'
+
                     },
                     dataType : 'json',
                     success: function(data) {
-                        console.log(data);
                         if(data == 0) {
                             if(country == '{{ \App\Models\SupplierInventory::COUNTRY_BELGIUM }}') {
                                 $msg = "Delivery note value will be Waiting or Received.";
@@ -354,11 +357,9 @@
                             }
                             showValidationError(InputId, $msg);
                             feildValidInput == false;
-
                         }else{
                             removeValidationError(InputId);
                             feildValidInput == true;
-
                         }
                     }
                 });
@@ -366,7 +367,6 @@
                 removeValidationError(InputId);
                 feildValidInput == true;
             }
-
         }
 
         function showValidationError(InputId,$msg){

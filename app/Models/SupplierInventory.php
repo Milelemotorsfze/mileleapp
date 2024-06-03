@@ -73,6 +73,10 @@ class SupplierInventory extends Model
     {
         return $this->belongsTo(PurchasingOrder::class,'purchase_order_id','id');
     }
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class,'updated_by','id');
+    }
     public function getTotalQuantityAttribute()
     {
         $masterModel = MasterModel::find($this->master_model_id);

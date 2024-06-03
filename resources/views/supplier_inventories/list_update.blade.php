@@ -111,6 +111,7 @@
                     <th>LOI</th>
                     <th>PFI Number </th>
                     <th>PO Number</th>
+                    <th>updated By</th>
                     <th>Status</th>
                     @can('inventory-log-details')
                         @php
@@ -198,6 +199,8 @@
                             <td>{{ $supplierInventory->letterOfIndentItem->uuid ?? '' }}</td>
                             <td> {{ $supplierInventory->pfi->pfi_reference_number ?? '' }} </td>
                             <td> {{ $supplierInventory->purchaseOrder->po_number ?? ''}} </td>
+                            <td>{{ $supplierInventory->updatedBy->name ?? '' }}</td>
+
                           <td >
                               <select class="upload_status" data-field="upload_status"
                               data-id="{{ $supplierInventory->id }}"  id="upload_status-editable-{{$supplierInventory->id}}">
@@ -297,7 +300,6 @@
                 if(field == 'pord_month') {
                     let InputId = 'pord_month-editable-'+id;
                     let value = $('#'+InputId).text();
-
                     if($.isNumeric(value) == true){
                         feildValidInput = true;
                         removeValidationError(InputId);
@@ -305,9 +307,7 @@
                         if(value.length != 6) {
                             $msg = "Characters length should be 6";
                             showValidationError(InputId,$msg);
-
                         }else {
-
                             let url = '{{ route('supplier-inventories.checkProductionMonth') }}';
                             $.ajax({
                                 type:"GET",
@@ -430,11 +430,11 @@
                     url: url,
                     data: {
                         country: country,
-                        delivery_note: deliveryNote
+                        delivery_note: deliveryNote,
+                        data_from: 'LIST'
                     },
                     dataType : 'json',
                     success: function(data) {
-                        console.log(data);
                         if(data == 0) {
                             if(country == '{{ \App\Models\SupplierInventory::COUNTRY_BELGIUM }}') {
                                 $msg = "Delivery note value will be Waiting or Received.";
