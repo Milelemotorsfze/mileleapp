@@ -149,6 +149,7 @@ class SupplierInventoryController extends Controller
             'model'       => 'required',
             'sfx'         => 'required',
         ]);
+        (new UserActivityController)->createActivity('Supplier Inventory Created.');
 
         if(!empty($request->prod_month)) {
             $productionMonth = substr($request->prod_month,  -2);
@@ -189,7 +190,6 @@ class SupplierInventoryController extends Controller
                 $intColourRow = ColorCode::where('code', $intColour)
                                     ->where('belong_to', ColorCode::INTERIOR)
                                     ->first();
-
                 if ($intColourRow)
                 {
                     $interiorColorId = $intColourRow->id;
@@ -216,6 +216,19 @@ class SupplierInventoryController extends Controller
         $supplierInventory->upload_status = SupplierInventory::UPLOAD_STATUS_ACTIVE;
         $supplierInventory->date_of_entry = Carbon::now()->format('Y-m-d');
         $supplierInventory->master_model_id = $masterModel->id ?? '';
+
+        if ($request->delivery_note) {
+            if($request->country == SupplierInventory::COUNTRY_BELGIUM ) {
+                if(strcasecmp($request->delivery_note, SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                    $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                }
+            }else{
+                if(is_numeric($request->delivery_note)) {
+                    $supplierInventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                }
+            }
+        }
+        $supplierInventory->updated_by = Auth::id();
         $supplierInventory->save();
 
         $action = "Inventory Item Added";
@@ -592,6 +605,7 @@ class SupplierInventoryController extends Controller
                                         }
                                     }
                                 }
+                                $supplierInventory->updated_by = Auth::id();
                                 $supplierInventory->save();
 
                                 $action = "Inventory Item Added";
@@ -755,6 +769,7 @@ class SupplierInventoryController extends Controller
                                                                 }
                                                             }
                                                         }
+                                                        $rowWithoutUpdate->updated_by = Auth::id();
                                                         $rowWithoutUpdate->save();
 
                                                         $action = "Row updated by inventory Excel upload";
@@ -804,6 +819,7 @@ class SupplierInventoryController extends Controller
                                                                 }
                                                             }
                                                         }
+                                                        $supplierInventory->updated_by = Auth::id();
                                                         $supplierInventory->save();
 
                                                         $action = "Inventory Item Added";
@@ -848,6 +864,7 @@ class SupplierInventoryController extends Controller
                                                         }
                                                     }
                                                 }
+                                                $isChasisExist->updated_by = Auth::id();
                                                 $isChasisExist->save();
 
                                                 $action = "Row updated by inventory Excel upload";
@@ -892,6 +909,7 @@ class SupplierInventoryController extends Controller
                                                         }
                                                     }
                                                 }
+                                                $supplierInventory->updated_by = Auth::id();
                                                 $supplierInventory->save();
 
                                                 $action = "Inventory Item Added";
@@ -948,6 +966,7 @@ class SupplierInventoryController extends Controller
                                                 }
                                             }
                                         }
+                                        $supplierInventory->updated_by = Auth::id();
                                         $supplierInventory->save();
 
                                         $action = "Row updated by inventory Excel upload";
@@ -1009,6 +1028,7 @@ class SupplierInventoryController extends Controller
                                                     }
                                                 }
                                             }
+                                            $inventoryRow->updated_by = Auth::id();
                                             $inventoryRow->save();
 
                                             $action = "Row updated by inventory Excel upload";
@@ -1068,6 +1088,7 @@ class SupplierInventoryController extends Controller
                                                     }
                                                 }
                                             }
+                                            $nullChasisRow->updated_by = Auth::id();
                                             $nullChasisRow->save();
 
                                             $action = "Row updated by inventory Excel upload";
@@ -1125,6 +1146,7 @@ class SupplierInventoryController extends Controller
                                                         }
                                                     }
                                                 }
+                                                $supplierInventory->updated_by = Auth::id();
                                                 $supplierInventory->save();
 
                                                 $action = "Inventory Item Added";
@@ -1170,6 +1192,7 @@ class SupplierInventoryController extends Controller
                                                     }
                                                 }
                                             }
+                                            $nullChasisRow->updated_by = Auth::id();
                                             $nullChasisRow->save();
 
                                             $action = "Row updated by inventory Excel upload";
@@ -1221,7 +1244,7 @@ class SupplierInventoryController extends Controller
                                 }
                             }
                         }
-
+                        $supplierInventoryHistory->updated_by = Auth::id();
                         $supplierInventoryHistory->save();
                     }
                     // to find deleted rows
@@ -1350,6 +1373,7 @@ class SupplierInventoryController extends Controller
                                     }
                                 }
                             }
+                            $supplierInventory->updated_by = Auth::id();
                             $supplierInventory->save();
 
                             $action = "Inventory Item Added";
@@ -1386,6 +1410,7 @@ class SupplierInventoryController extends Controller
                                     }
                                 }
                             }
+                            $supplierInventoryHistory->updated_by = Auth::id();
                             $supplierInventoryHistory->save();
                         }
                     }
@@ -1398,7 +1423,6 @@ class SupplierInventoryController extends Controller
                 }
             }
         }
-
     }
     public function LOIItemIdMapping(Request $request) {
 
@@ -1580,20 +1604,31 @@ class SupplierInventoryController extends Controller
                     $inventory->interior_color_code_id = $interiorColorId;
                     $inventory->exterior_color_code_id = $exteriorColorId;
                 }
-            }else if($fieldName == 'delivery_note' ) {
+            }else if($fieldName == 'delivery_note') {
                 $inventory->$fieldName = $fieldValue;
-                if ($fieldValue && is_numeric($fieldValue)) {
-                    $inventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                if ($fieldValue) {
+                    info("delivery note found ");
+                    if($inventory->country == SupplierInventory::COUNTRY_BELGIUM ) {
+                        info("country belgium");
+                        if(strcasecmp($fieldValue, SupplierInventory::DN_STATUS_RECEIVED) == 0) {
+                            $inventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                        }
+                    }else{
+                        info("country UAE");
+                        if(is_numeric($fieldValue)) {
+                            $inventory->veh_status = SupplierInventory::STATUS_DELIVERY_CONFIRMED;
+                        }
+                    }
                 }
             }
             else{
-
                $inventory->$fieldName = $fieldValue;
             }
 
             $action = str_replace('_', ' ', $fieldName) ." updated";
             (new SupplierInventoryController)->inventoryLog($action, $inventory->id);
 
+            $inventory->updated_by = Auth::id();
             $inventory->save();
         }
         DB::commit();
@@ -2178,7 +2213,12 @@ class SupplierInventoryController extends Controller
         $DN_WAITING = strcasecmp($request->delivery_note, SupplierInventory::DN_STATUS_WAITING);
         $DN_RECEIVED = strcasecmp($request->delivery_note, SupplierInventory::DN_STATUS_RECEIVED);
         $isValidDeliveryNote = 1;
-        if($request->country[0] == SupplierInventory::COUNTRY_BELGIUM ) {
+        if($request->data_from == 'CREATE') {
+            $country = $request->country[0];
+        }else{
+            $country = $request->country;
+        }
+        if($country == SupplierInventory::COUNTRY_BELGIUM ) {
             if($DN_WAITING != 0) {
                 if($DN_RECEIVED != 0 ) {
                     $isValidDeliveryNote = 0;

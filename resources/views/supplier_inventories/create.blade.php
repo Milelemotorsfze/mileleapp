@@ -343,7 +343,9 @@
                     url: url,
                     data: {
                         country: country,
-                        delivery_note: deliveryNote
+                        delivery_note: deliveryNote,
+                        data_from: 'CREATE'
+
                     },
                     dataType : 'json',
                     success: function(data) {
