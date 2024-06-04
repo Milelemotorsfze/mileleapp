@@ -84,8 +84,9 @@
                                     <th>Category</th>
                                     <th>Dealers</th>
                                     <th>So Number</th>
-                                    <th>Destination</th>
-                                    <th>Prefered Location</th>
+                                    <th>Country</th>
+{{--                                    <th>Destination</th>--}}
+{{--                                    <th>Prefered Location</th>--}}
                                     <th> Status</th>
                                     <th>Supplier Approval</th>
                                     <th>LOI</th>
@@ -109,10 +110,10 @@
                                             @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                          </td>
-                                        <td>{{ $letterOfIndent->destination }}</td>
-                                        <td>{{ $letterOfIndent->prefered_location }}</td>
+                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
-
                                         <td>
                                             @can('LOI-approve')
                                                 @php
@@ -149,7 +150,7 @@
                                             <button type="button" class="btn btn-soft-violet btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View LOI Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                                 @can('LOI-delete')
@@ -243,7 +244,7 @@
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Customer Documents</h1>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
@@ -293,8 +294,9 @@
                                     <th>Category</th>
                                     <th>Dealers</th>
                                     <th>So Number</th>
-                                    <th>Destination</th>
-                                    <th>Prefered Location</th>
+                                    <th>Country</th>
+{{--                                    <th>Destination</th>--}}
+{{--                                    <th>Prefered Location</th>--}}
                                     <th> Status</th>
                                     <th>LOI</th>
                                     <th>Actions</th>
@@ -317,8 +319,9 @@
                                                 @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                         </td>
-                                        <td>{{ $letterOfIndent->destination }}</td>
-                                        <td>{{ $letterOfIndent->prefered_location }}</td>
+                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <td>
                                             <select class="form-control" onchange="location = this.value;">
@@ -345,7 +348,7 @@
                                             <button type="button" class="btn btn-soft-violet btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View LOI Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                             @can('LOI-delete')
@@ -439,7 +442,7 @@
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Customer Documents</h1>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
@@ -489,8 +492,9 @@
                                     <th>Category</th>
                                     <th>Dealers</th>
                                     <th>So Number</th>
-                                    <th>Destination</th>
-                                    <th>Prefered Location</th>
+                                    <th>Country</th>
+{{--                                    <th>Destination</th>--}}
+{{--                                    <th>Prefered Location</th>--}}
                                     <th> Status</th>
                                     @can('LOI-approve')
                                         @php
@@ -521,8 +525,9 @@
                                             @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                         </td>
-                                        <td>{{ $letterOfIndent->destination }}</td>
-                                        <td>{{ $letterOfIndent->prefered_location }}</td>
+                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
 
                                         @can('LOI-approve')
@@ -541,7 +546,6 @@
                                                 </td>
                                             @endif
                                         @endcan
-
                                         <td>
                                             <select class="form-control" onchange="location = this.value;">
                                                 <option value="">Select Template</option>
@@ -557,7 +561,7 @@
                                             <button type="button" class="btn btn-soft-violet primary btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-supplier-approved-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View LOI Documents" data-bs-toggle="modal" data-bs-target="#view-supplier-approved-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-supplier-approved-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                         </td>
@@ -640,7 +644,7 @@
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable" >
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Customer Documents</h1>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
@@ -690,8 +694,9 @@
                                     <th>Category</th>
                                     <th>Dealer</th>
                                     <th>So Number</th>
-                                    <th>Destination</th>
-                                    <th>Prefered Location</th>
+                                    <th>Country</th>
+{{--                                    <th>Destination</th>--}}
+{{--                                    <th>Prefered Location</th>--}}
                                     <th>Status</th>
                                     @can('LOI-approve')
                                         @php
@@ -724,8 +729,9 @@
                                             @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                         </td>
-                                        <td>{{ $letterOfIndent->destination }}</td>
-                                        <td>{{ $letterOfIndent->prefered_location }}</td>
+                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
 
                                         @can('LOI-approve')
@@ -769,7 +775,7 @@
                                             <button type="button" title="View LOI Items list" class="btn btn-soft-violet btn-sm" data-bs-toggle="modal" data-bs-target="#view-partial-approved-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" title="View LOI Documents" class="btn btn-dark-blue btn-sm" data-bs-toggle="modal" data-bs-target="#view-partial-approved-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" title="View Customer Documents" class="btn btn-dark-blue btn-sm" data-bs-toggle="modal" data-bs-target="#view-partial-approved-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                         </td>
@@ -851,7 +857,7 @@
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Customer Documents</h1>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
@@ -901,8 +907,9 @@
                                     <th>Category</th>
                                     <th>Dealer</th>
                                     <th>So Number</th>
-                                    <th>Destination</th>
-                                    <th>Prefered Location</th>
+                                    <th>Country</th>
+{{--                                    <th>Destination</th>--}}
+{{--                                    <th>Prefered Location</th>--}}
                                     <th>Status</th>
                                     <th>Review</th>
                                     <th width="100px">Actions</th>
@@ -925,15 +932,16 @@
                                             @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                         </td>
-                                        <td>{{ $letterOfIndent->destination }}</td>
-                                        <td>{{ $letterOfIndent->prefered_location }}</td>
+                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <th>{{ $letterOfIndent->review }}</th>
                                         <td>
                                             <button type="button" class="btn btn-soft-violet btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-rejected-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" title="View LOI Documents" class="btn btn-dark-blue btn-sm" data-bs-toggle="modal" data-bs-target="#view-rejected-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" title="View Customer Documents" class="btn btn-dark-blue btn-sm" data-bs-toggle="modal" data-bs-target="#view-rejected-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                         </td>
@@ -1015,7 +1023,7 @@
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Customer Documents</h1>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">

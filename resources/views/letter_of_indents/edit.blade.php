@@ -152,28 +152,28 @@
                                 @enderror
                             </div>
                         </div> -->
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Destination</label>
-                                <input type="text" class="form-control widthinput" name="destination" placeholder="Destination" value="{{ $letterOfIndent->destination }}">
-                                @error('destination')
-                                <span role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Prefered Location</label>
-                                <input type="text" class="form-control widthinput" name="prefered_location" placeholder="Prefered Location" value="{{ $letterOfIndent->prefered_location }}" >
-                                @error('prefered_location')
-                                <span role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
-                            </div>
-                        </div>
+{{--                        <div class="col-lg-3 col-md-6 col-sm-12">--}}
+{{--                            <div class="mb-3">--}}
+{{--                                <label for="choices-single-default" class="form-label">Destination</label>--}}
+{{--                                <input type="text" class="form-control widthinput" name="destination" placeholder="Destination" value="{{ $letterOfIndent->destination }}">--}}
+{{--                                @error('destination')--}}
+{{--                                <span role="alert">--}}
+{{--                                    <strong>{{ $message }}</strong>--}}
+{{--                                </span>--}}
+{{--                                @enderror--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                        <div class="col-lg-3 col-md-6 col-sm-12">--}}
+{{--                            <div class="mb-3">--}}
+{{--                                <label for="choices-single-default" class="form-label">Prefered Location</label>--}}
+{{--                                <input type="text" class="form-control widthinput" name="prefered_location" placeholder="Prefered Location" value="{{ $letterOfIndent->prefered_location }}" >--}}
+{{--                                @error('prefered_location')--}}
+{{--                                <span role="alert">--}}
+{{--                                    <strong>{{ $message }}</strong>--}}
+{{--                                </span>--}}
+{{--                                @enderror--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Sales Person</label>
@@ -189,7 +189,7 @@
                         </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">LOI Document</label>
+                                <label for="choices-single-default" class="form-label">Customer Document</label>
                                 <input type="file" name="files[]" class="form-control widthinput mb-3" multiple
                                     autofocus id="file-upload" accept="application/pdf">
                             </div>
@@ -249,7 +249,7 @@
                             </div>
                         </div>
                         @if($letterOfIndent->LOIDocuments->count() > 0)
-                            <label class="form-label fw-bold">LOI Document</label>
+                            <label class="form-label fw-bold">Customer Document</label>
                             @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
                                 <div class="col-lg-3 col-md-6 col-sm-12 " id="remove-doc-{{$letterOfIndentDocument->id}}">
                                     <iframe src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" style="height: 300px;"></iframe>
@@ -604,7 +604,6 @@
                 });
             }
 
-
         jQuery.validator.addMethod('file', function(value, element) {
             let remainingCount = $('#remaining-document-count').val();
             if(remainingCount != 0) {
@@ -612,7 +611,13 @@
             }else{
                 return false;
             }
-        },'This feild is required');
+        },'This field is required');
+
+        $('#file-upload').change(function () {
+            if($('#file-upload')[0].files.length !== 0) {
+                $('#remaining-document-count').val(1);
+            }
+        });
 
         $("#form-doc-upload").validate({
             ignore: [],

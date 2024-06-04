@@ -64,7 +64,7 @@
                 <div style="list-style-type: none;">
                     @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
                         <li>{{$key + 1}}.&nbsp;
-                            <span class="fw-bold">Model Name:</span>
+                            <span class="fw-bold">Model Description:</span>
                             @if($letterOfIndentItem->LOI->dealers == 'Trans Cars')
                                 {{ $letterOfIndentItem->masterModel->transcar_loi_description ?? '' }}
                             @else
@@ -72,16 +72,6 @@
                             @endif
                         </li>
                         <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Type: </span> Brand New</li>
-                        <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Drive: </span>
-                            @if($letterOfIndentItem->masterModel->steering == 'LHD')
-                                Left Hand Drive
-                            @elseif($letterOfIndentItem->masterModel->steering == 'RHD')
-                                Right Hand Drive
-                            @endif
-
-                        </li>
-                        <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fw-bold">Engine: </span>
-                        {{ $letterOfIndentItem->masterModel->variant->engine ?? ''}}</li>
                         <li style="margin-bottom: 10px;">&nbsp;&nbsp;&nbsp;&nbsp&nbsp;<span class="fw-bold">Quantity: </span>
                             {{ $letterOfIndentItem->quantity ?? '' }}
                         </li>
