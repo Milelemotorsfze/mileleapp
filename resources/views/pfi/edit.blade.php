@@ -55,14 +55,6 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
-                                            Dealers :
-                                        </div>
-                                        <div class="col-sm-6 col-md-6 col-lg-6">
-                                            {{ $letterOfIndent->dealers }}
-                                        </div>
-                                    </div>
-                                    <div class="row">
                                         <div class="col-sm-3 col-md-6 col-lg-3 fw-bold">
                                             So Number :
                                         </div>
@@ -77,10 +69,10 @@
                                 <div class="col-sm-12 col-xxl-4 col-lg-4 col-md-6">
                                     <div class="row mt-2">
                                         <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
-                                            Perefered Location :
+                                            Country :
                                         </div>
                                         <div class="col-sm-6">
-                                            {{ $letterOfIndent->prefered_location }}
+                                            {{ $letterOfIndent->customer->country->name ?? '' }}
                                         </div>
                                     </div>
 
@@ -103,13 +95,21 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">
-                                            Destination :
+                                        <div class="col-sm-6 col-md-6 col-lg-3 fw-bold">
+                                            Dealers :
                                         </div>
-                                        <div class="col-sm-6">
-                                            {{ $letterOfIndent->destination }}
+                                        <div class="col-sm-6 col-md-6 col-lg-6">
+                                            {{ $letterOfIndent->dealers }}
                                         </div>
                                     </div>
+{{--                                    <div class="row">--}}
+{{--                                        <div class="col-sm-6 col-md-6 col-lg-4 fw-bold">--}}
+{{--                                            Destination :--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-sm-6">--}}
+{{--                                            {{ $letterOfIndent->destination }}--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
                                 </div>
                             </div>
                         </div>

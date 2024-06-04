@@ -148,28 +148,28 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Destination</label>
-                                <input type="text" class="form-control widthinput" name="destination" placeholder="Destination" >
-                                @error('destination')
-                                <span role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Prefered Location</label>
-                                <input type="text" class="form-control widthinput" name="prefered_location" placeholder="Prefered Location" >
-                                @error('prefered_location')
-                                <span role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
-                            </div>
-                        </div>
+{{--                        <div class="col-lg-3 col-md-6 col-sm-12">--}}
+{{--                            <div class="mb-3">--}}
+{{--                                <label for="choices-single-default" class="form-label">Destination</label>--}}
+{{--                                <input type="text" class="form-control widthinput" name="destination" placeholder="Destination" >--}}
+{{--                                @error('destination')--}}
+{{--                                <span role="alert">--}}
+{{--                                    <strong>{{ $message }}</strong>--}}
+{{--                                </span>--}}
+{{--                                @enderror--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                        <div class="col-lg-3 col-md-6 col-sm-12">--}}
+{{--                            <div class="mb-3">--}}
+{{--                                <label for="choices-single-default" class="form-label">Prefered Location</label>--}}
+{{--                                <input type="text" class="form-control widthinput" name="prefered_location" placeholder="Prefered Location" >--}}
+{{--                                @error('prefered_location')--}}
+{{--                                <span role="alert">--}}
+{{--                                    <strong>{{ $message }}</strong>--}}
+{{--                                </span>--}}
+{{--                                @enderror--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Sales Person</label>

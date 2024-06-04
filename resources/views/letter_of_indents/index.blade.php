@@ -84,8 +84,9 @@
                                     <th>Category</th>
                                     <th>Dealers</th>
                                     <th>So Number</th>
-                                    <th>Destination</th>
-                                    <th>Prefered Location</th>
+                                    <th>Country</th>
+{{--                                    <th>Destination</th>--}}
+{{--                                    <th>Prefered Location</th>--}}
                                     <th> Status</th>
                                     <th>Supplier Approval</th>
                                     <th>LOI</th>
@@ -109,10 +110,10 @@
                                             @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                          </td>
-                                        <td>{{ $letterOfIndent->destination }}</td>
-                                        <td>{{ $letterOfIndent->prefered_location }}</td>
+                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
-
                                         <td>
                                             @can('LOI-approve')
                                                 @php
@@ -293,8 +294,9 @@
                                     <th>Category</th>
                                     <th>Dealers</th>
                                     <th>So Number</th>
-                                    <th>Destination</th>
-                                    <th>Prefered Location</th>
+                                    <th>Country</th>
+{{--                                    <th>Destination</th>--}}
+{{--                                    <th>Prefered Location</th>--}}
                                     <th> Status</th>
                                     <th>LOI</th>
                                     <th>Actions</th>
@@ -317,8 +319,9 @@
                                                 @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                         </td>
-                                        <td>{{ $letterOfIndent->destination }}</td>
-                                        <td>{{ $letterOfIndent->prefered_location }}</td>
+                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <td>
                                             <select class="form-control" onchange="location = this.value;">
@@ -489,8 +492,9 @@
                                     <th>Category</th>
                                     <th>Dealers</th>
                                     <th>So Number</th>
-                                    <th>Destination</th>
-                                    <th>Prefered Location</th>
+                                    <th>Country</th>
+{{--                                    <th>Destination</th>--}}
+{{--                                    <th>Prefered Location</th>--}}
                                     <th> Status</th>
                                     @can('LOI-approve')
                                         @php
@@ -521,8 +525,9 @@
                                             @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                         </td>
-                                        <td>{{ $letterOfIndent->destination }}</td>
-                                        <td>{{ $letterOfIndent->prefered_location }}</td>
+                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
 
                                         @can('LOI-approve')
@@ -541,7 +546,6 @@
                                                 </td>
                                             @endif
                                         @endcan
-
                                         <td>
                                             <select class="form-control" onchange="location = this.value;">
                                                 <option value="">Select Template</option>
@@ -690,8 +694,9 @@
                                     <th>Category</th>
                                     <th>Dealer</th>
                                     <th>So Number</th>
-                                    <th>Destination</th>
-                                    <th>Prefered Location</th>
+                                    <th>Country</th>
+{{--                                    <th>Destination</th>--}}
+{{--                                    <th>Prefered Location</th>--}}
                                     <th>Status</th>
                                     @can('LOI-approve')
                                         @php
@@ -724,8 +729,9 @@
                                             @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                         </td>
-                                        <td>{{ $letterOfIndent->destination }}</td>
-                                        <td>{{ $letterOfIndent->prefered_location }}</td>
+                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
 
                                         @can('LOI-approve')
@@ -901,8 +907,9 @@
                                     <th>Category</th>
                                     <th>Dealer</th>
                                     <th>So Number</th>
-                                    <th>Destination</th>
-                                    <th>Prefered Location</th>
+                                    <th>Country</th>
+{{--                                    <th>Destination</th>--}}
+{{--                                    <th>Prefered Location</th>--}}
                                     <th>Status</th>
                                     <th>Review</th>
                                     <th width="100px">Actions</th>
@@ -925,8 +932,9 @@
                                             @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
                                             @endforeach
                                         </td>
-                                        <td>{{ $letterOfIndent->destination }}</td>
-                                        <td>{{ $letterOfIndent->prefered_location }}</td>
+                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
+{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
+{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <th>{{ $letterOfIndent->review }}</th>
                                         <td>

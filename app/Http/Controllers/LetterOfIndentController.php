@@ -150,8 +150,8 @@ class LetterOfIndentController extends Controller
             $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
             $LOI->category = $request->category;
             $LOI->dealers = $request->dealers;
-            $LOI->prefered_location = $request->prefered_location;
-            $LOI->destination = $request->destination;
+//            $LOI->prefered_location = $request->prefered_location;
+//            $LOI->destination = $request->destination;
             $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS_NEW;
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
             $LOI->created_by = Auth::id();
@@ -491,8 +491,8 @@ class LetterOfIndentController extends Controller
             $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
             $LOI->category = $request->category;
             $LOI->dealers = $request->dealers;
-            $LOI->destination = $request->destination;
-            $LOI->prefered_location = $request->prefered_location;
+//            $LOI->destination = $request->destination;
+//            $LOI->prefered_location = $request->prefered_location;
             $LOI->sales_person_id = $request->sales_person_id;
             if($request->is_signature_removed == 1) {
                 $LOI->signature = NULL;
@@ -586,7 +586,7 @@ class LetterOfIndentController extends Controller
     public function RequestSupplierApproval(Request $request)
     {
 //       dd("test");
-        info($request->all());
+//        info($request->all());
       $LOI = LetterOfIndent::find($request->id);
 
       $LOI->submission_status = LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL;
