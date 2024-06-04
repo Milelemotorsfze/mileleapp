@@ -189,7 +189,7 @@
                         </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">LOI Document</label>
+                                <label for="choices-single-default" class="form-label">Customer Document</label>
                                 <input type="file" name="files[]" class="form-control widthinput mb-3" multiple
                                     autofocus id="file-upload" accept="application/pdf">
                             </div>
@@ -249,7 +249,7 @@
                             </div>
                         </div>
                         @if($letterOfIndent->LOIDocuments->count() > 0)
-                            <label class="form-label fw-bold">LOI Document</label>
+                            <label class="form-label fw-bold">Customer Document</label>
                             @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
                                 <div class="col-lg-3 col-md-6 col-sm-12 " id="remove-doc-{{$letterOfIndentDocument->id}}">
                                     <iframe src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" style="height: 300px;"></iframe>

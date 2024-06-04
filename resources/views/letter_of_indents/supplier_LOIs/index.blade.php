@@ -299,7 +299,7 @@
                                                                 </div>
                                                                 <div class="col-lg-8 col-md-12 col-sm-12">
                                                                     <input type="date" name="loi_approval_date" id="rejection-date"
-                                                                           required class="form-control widthinput" >
+                                                                           required class="form-control widthinput" max="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}" >
                                                                     <span id="loi-rejection-date-error" class="text-danger"> </span>
                                                                 </div>
                                                             </div>

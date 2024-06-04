@@ -150,7 +150,7 @@
                                             <button type="button" class="btn btn-soft-violet btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View LOI Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                                 @can('LOI-delete')
@@ -244,7 +244,7 @@
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Customer Documents</h1>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
@@ -348,7 +348,7 @@
                                             <button type="button" class="btn btn-soft-violet btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View LOI Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                             @can('LOI-delete')
@@ -442,7 +442,7 @@
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Customer Documents</h1>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
@@ -561,7 +561,7 @@
                                             <button type="button" class="btn btn-soft-violet primary btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-supplier-approved-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View LOI Documents" data-bs-toggle="modal" data-bs-target="#view-supplier-approved-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-supplier-approved-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                         </td>
@@ -644,7 +644,7 @@
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable" >
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Customer Documents</h1>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
@@ -775,7 +775,7 @@
                                             <button type="button" title="View LOI Items list" class="btn btn-soft-violet btn-sm" data-bs-toggle="modal" data-bs-target="#view-partial-approved-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" title="View LOI Documents" class="btn btn-dark-blue btn-sm" data-bs-toggle="modal" data-bs-target="#view-partial-approved-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" title="View Customer Documents" class="btn btn-dark-blue btn-sm" data-bs-toggle="modal" data-bs-target="#view-partial-approved-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                         </td>
@@ -857,7 +857,7 @@
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Customer Documents</h1>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
@@ -941,7 +941,7 @@
                                             <button type="button" class="btn btn-soft-violet btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-rejected-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" title="View LOI Documents" class="btn btn-dark-blue btn-sm" data-bs-toggle="modal" data-bs-target="#view-rejected-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" title="View Customer Documents" class="btn btn-dark-blue btn-sm" data-bs-toggle="modal" data-bs-target="#view-rejected-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                         </td>
@@ -1023,7 +1023,7 @@
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Customer Documents</h1>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">

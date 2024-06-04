@@ -292,7 +292,6 @@ class LetterOfIndentController extends Controller
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
-
             }
             return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         }else if($request->type == 'MILELE_CAR'){
@@ -387,19 +386,6 @@ class LetterOfIndentController extends Controller
         }
         return $pdf;
     }
-    // public function approve(Request $request)
-    // {
-
-    //     $letterOfIndent = LetterOfIndent::find($request->id);
-    //     $letterOfIndent->status = $request->status;
-
-    //     if($request->status = LetterOfIndent::LOI_STATUS_REJECTED) {
-    //         $letterOfIndent->review = $request->review;
-    //     }
-    //     $letterOfIndent->loi_approval_date = Carbon::now()->format('d M Y');
-    //     $letterOfIndent->save();
-    //     return response($letterOfIndent, 200);
-    // }
     /**
      * Display the specified resource.
      */

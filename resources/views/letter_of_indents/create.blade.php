@@ -183,7 +183,7 @@
                         </div>
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">LOI Document</label>
+                                <label for="choices-single-default" class="form-label">Customer Document</label>
                                 <input type="file" name="files[]" id="file-upload" class="form-control widthinput text-dark" multiple
                                     autofocus accept="application/pdf">
                             </div>
