@@ -234,6 +234,7 @@ class MovementController extends Controller
             Vehicles::where('vin', $vin[$index])->update(['latest_location' => $to[$index]]);
         }
     }
+    if($newvin){
     foreach ($newvin as $index => $value) {
         if ($value !== null && $value !== '' && isset($vin[$index])) {
             $vehicle = Vehicles::where('vin', $vin[$index])->first();
@@ -261,7 +262,8 @@ class MovementController extends Controller
                 $updatevin->save();
             }
         }
-    }    
+    }
+}    
         $data = Movement::get();
         $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
@@ -332,8 +334,13 @@ class MovementController extends Controller
     $movement = Movement::where('vin', $vin)->pluck('to')->last();
     $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
     if (empty($warehouseName)) {
-        $warehouseName = 1;
-    }
+        if($vehicle->latest_location){
+        $warehouseName = Warehouse::where('id', $vehicle->latest_location)->pluck('id')->first();
+        }
+        else{
+           $warehouseName = 1;
+        }
+        }
     return response()->json([
         'variant' => $variant,
         'brand' => $brand,
@@ -454,11 +461,23 @@ public function grnfilepost(Request $request)
                 $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
                 $warehouseNames = Warehouse::where('id', $movement)->pluck('name')->first();
                 if (empty($warehouseName)) {
-                 $warehouseName = 1;
+                 if($vehicle->latest_location){
+                 $warehouseName = Warehouse::where('id', $vehicle->latest_location)->pluck('id')->first();
+                 }
+                 else{
+                    $warehouseName = 1;
+                 }
                  }
                  if (empty($warehouseNames)) {
+                 if($vehicle->latest_location)
+                 {
+                    $warehouseNames = Warehouse::where('id', $vehicle->latest_location)->pluck('name')->first();
+                 }
+                else
+                {
                     $warehouseNames = "Supplier";
-                    }
+                }
+                }
                  $vehicleDetails[$key]['variant'] = $variant;
                  $vehicleDetails[$key]['modelLine'] = $modelLine;
                  $vehicleDetails[$key]['brand'] = $brand;
@@ -494,11 +513,23 @@ public function grnfilepost(Request $request)
                 $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
                 $warehouseNames = Warehouse::where('id', $movement)->pluck('name')->first();
                 if (empty($warehouseName)) {
-                 $warehouseName = 1;
-                 }
-                 if (empty($warehouseNames)) {
-                    $warehouseNames = "Supplier";
+                    if($vehicle->latest_location){
+                    $warehouseName = Warehouse::where('id', $vehicle->latest_location)->pluck('id')->first();
                     }
+                    else{
+                       $warehouseName = 1;
+                    }
+                    }
+                    if (empty($warehouseNames)) {
+                    if($vehicle->latest_location)
+                    {
+                       $warehouseNames = Warehouse::where('id', $vehicle->latest_location)->pluck('name')->first();
+                    }
+                   else
+                   {
+                       $warehouseNames = "Supplier";
+                   }
+                   }
                  $vehicleDetails[$key]['variant'] = $variant;
                  $vehicleDetails[$key]['modelLine'] = $modelLine;
                  $vehicleDetails[$key]['brand'] = $brand;
