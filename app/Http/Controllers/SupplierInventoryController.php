@@ -1826,7 +1826,6 @@ class SupplierInventoryController extends Controller
 
                                 }else{
                                     info("null chasis smilar data not exist => check if any similar model sfx row without having any update yet.");
-
                                     info($updatedRowsIds);
 
                                     $rowWithoutUpdate = SupplierInventoryHistory::whereIn('id', $isNullChaisisIds)

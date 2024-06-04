@@ -67,7 +67,10 @@
                                             So Number :
                                         </div>
                                         <div class="col-sm-6 col-md-6 col-lg-6">
-                                            {{ $letterOfIndent->so_number }}
+                                            @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
+                                                {{ $LoiSoNumber->so_number }}
+                                                @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
+                                            @endforeach
                                         </div>
                                     </div>
                                 </div>
@@ -577,7 +580,7 @@
             let supplier = $(this).val();
             let MMC = $(this).find('option:selected').attr("data-is-MMC");
             let letter_of_indent_id = $('#letter_of_indent_id').val();
-        
+
             if(MMC == 1) {
                 $('.mmc-items-div').attr('hidden', false);
             }else{

@@ -67,7 +67,10 @@
                                             So Number :
                                         </div>
                                         <div class="col-sm-6 col-md-6 col-lg-6">
-                                            {{ $letterOfIndent->so_number }}
+                                            @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
+                                                {{ $LoiSoNumber->so_number }}
+                                                @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
+                                            @endforeach
                                         </div>
                                     </div>
                                 </div>

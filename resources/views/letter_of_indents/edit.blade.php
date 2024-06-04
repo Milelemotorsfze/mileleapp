@@ -604,7 +604,6 @@
                 });
             }
 
-
         jQuery.validator.addMethod('file', function(value, element) {
             let remainingCount = $('#remaining-document-count').val();
             if(remainingCount != 0) {
@@ -612,7 +611,13 @@
             }else{
                 return false;
             }
-        },'This feild is required');
+        },'This field is required');
+
+        $('#file-upload').change(function () {
+            if($('#file-upload')[0].files.length !== 0) {
+                $('#remaining-document-count').val(1);
+            }
+        });
 
         $("#form-doc-upload").validate({
             ignore: [],
