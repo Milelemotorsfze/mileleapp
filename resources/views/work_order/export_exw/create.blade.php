@@ -2,13 +2,16 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
+	/* .border-top {
+		border-top: 1px solid #b3b3b3!important;
+	} */
 	.currencyClass {
 		padding-top:5px!important;
 	}
 	.table>:not(caption)>*>* {
-    padding: .3rem .3rem!important;
-    -webkit-box-shadow: inset 0 0 0 0px var(--bs-table-accent-bg)!important;
-}
+		padding: .3rem .3rem!important;
+		-webkit-box-shadow: inset 0 0 0 0px var(--bs-table-accent-bg)!important;
+	}
 	table {
         border-collapse: collapse;
         width: 100%;
@@ -41,6 +44,22 @@
     /* label{
         font-size:12px!important;
     } */
+	.addon_btn_round {
+		width: 20px!important;
+		height: 14px!important;
+		display: inline-block;
+		/* border-radius: 50%; */
+		text-align: center;
+		line-height: 10px!important;
+		margin-left: 0px!important;
+		margin-top: 0px!important;
+		border: 1px solid #ccc;
+		color:#fff;
+		background-color: #4ba6ef;
+		border-radius:5px;
+		cursor: pointer;
+		padding-top:1px!important;
+	}
 	.btn_round
 	{
 	width: 20px!important;
@@ -1258,7 +1277,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							$("#addon-dynamic-div").show();
 							$.each(response, function(index, addon) {
 								$dropdown.append(
-									$('<option></option>').val(addon.id).text(addon.addon_code)
+									$('<option></option>').val(addon.addon_code+" - Test Addon Name").text(addon.addon_code+" - Test Addon Name")
 								);
 							});
 						}
@@ -1417,6 +1436,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							var tableBody = document.querySelector('#myTable tbody');
 
 							var firstRow = document.createElement('tr');
+							firstRow.style.borderTop = '2px solid #a6a6a6';
 							var secondRow = document.createElement('tr');
 							var thirdRow = document.createElement('tr');
 
@@ -1458,10 +1478,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							firstRow.appendChild(importTypeCell);
 							firstRow.appendChild(ownershipCell);
 							firstRow.appendChild(CertificationPerVINCell);
+							// firstRow.style.borderTop = '1px solid #b3b3b3';
 
 							// Second Row Elements
+							var emptyLabelCell = document.createElement('td');
+							emptyLabelCell.colSpan = 1;
+							emptyLabelCell.textContent = '';
+
 							var modificationLabelCell = document.createElement('td');
-							modificationLabelCell.colSpan = 2;
+							modificationLabelCell.colSpan = 1;
 							modificationLabelCell.textContent = 'Modification/Jobs';
 
 							var modificationInputCell = document.createElement('td');
@@ -1474,12 +1499,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							modificationInputCell.appendChild(modificationInputElement);
 
 							// Append cells to the second row
+							secondRow.appendChild(emptyLabelCell);
 							secondRow.appendChild(modificationLabelCell);
 							secondRow.appendChild(modificationInputCell);
 
 							// Third Row Elements
+							var createAddon = createAddonCell();
 							var specialRequestLabelCell = document.createElement('td');
-							specialRequestLabelCell.colSpan = 2;
+							specialRequestLabelCell.colSpan = 1
 							specialRequestLabelCell.textContent = 'Special Request/Remarks';
 
 							var specialRequestInputCell = document.createElement('td');
@@ -1491,10 +1518,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							specialRequestInputElement.style.width = '100%';
 							specialRequestInputCell.appendChild(specialRequestInputElement);
 
-							// Add bottom border style to the third row
-							thirdRow.style.borderBottom = '1px solid #b3b3b3';
-
 							// Append cells to the third row
+							thirdRow.appendChild(createAddon);
 							thirdRow.appendChild(specialRequestLabelCell);
 							thirdRow.appendChild(specialRequestInputCell);
 
@@ -1507,6 +1532,45 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							$(firstRow).data('vin', vins[i]?.vin ?? '');
 							// Store a reference to these rows in the remove button's data attribute
 							$(removeIconCell).find('.remove-row').data('rows', [firstRow, secondRow, thirdRow]);
+							// Gather data from all dynamically added addon input fields
+							$('.addon_input_outer_row').each(function() {
+								var addonId = $(this).attr('id').split('_')[2];
+								var addonValue = $(`#addons_${addonId}`).val();
+								var addonQuantity = $(`#addon_quantity_${addonId}`).val();
+								var addonDescription = $(`#addon_description_${addonId}`).val();
+
+								var removeAddonCell = createAddonRemoveButton();
+								// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
+								var addonRow = document.createElement('tr');
+
+								// Addon Row Label
+								var serviceBreakdownLabelCell = document.createElement('td');
+								serviceBreakdownLabelCell.colSpan = 1;
+								serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
+								// Addon Row Elements
+								var addonValueCell = document.createElement('td');
+								addonValueCell.colSpan = 2;
+								addonValueCell.textContent = addonValue;
+
+								var addonQuantityCell = document.createElement('td');
+								addonQuantityCell.colSpan = 1;
+								addonQuantityCell.innerHTML = '<div class="input-group"><div class="input-group-append"><span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span></div><input style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity" placeholder="Addon Quantity"></div>';
+
+								var addonDescriptionCell = document.createElement('td');
+								addonDescriptionCell.colSpan = 14;
+								addonDescriptionCell.innerHTML = '<div class="input-group"><input style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description" placeholder="Enter Addon Description"></div>';
+
+								// Append cells to the addon row
+								addonRow.appendChild(removeAddonCell);
+								addonRow.appendChild(serviceBreakdownLabelCell);
+								addonRow.appendChild(addonValueCell);
+								addonRow.appendChild(addonQuantityCell);
+								addonRow.appendChild(addonDescriptionCell);
+
+								// Append the addon row after the third row
+								thirdRow.insertAdjacentElement('afterend', addonRow);
+								thirdRow = addonRow; // Update thirdRow to ensure the next addonRow is inserted correctly
+							});
 						}
 					}
 				}
@@ -1530,6 +1594,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 			});
 			findAllVINs();
+			$('.addon_input_outer_row').each(function() {
+				$(this).remove();
+			});
 		}
 		// Event delegation to handle remove button click for dynamically added rows
 		$('#myTable').on('click', '.remove-row', function() {
@@ -1616,6 +1683,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			return cell;
 		}
 
+		function createAddonRemoveButton() {
+			var cell = document.createElement('td');
+			var removeButton = document.createElement('a');
+			removeButton.className = 'btn_round remove-addon-row';
+			removeButton.title = 'Remove Addon';
+			removeButton.textContent = '-';
+			cell.appendChild(removeButton);
+			return cell;
+		}
+		function createAddonCell() {
+			var cell = document.createElement('td');
+			var addButton = document.createElement('a');
+			addButton.className = 'addon_btn_round create-addon-row';
+			addButton.title = 'Create Addon';
+			addButton.textContent = '+';
+			cell.appendChild(addButton);
+			return cell;
+		}
 		function createEditableSelect2Cell(vin) {
 			var cell = document.createElement('td');
 			var selectElement = document.createElement('select');
