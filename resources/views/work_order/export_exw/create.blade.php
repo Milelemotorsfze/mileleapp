@@ -53,7 +53,23 @@
 		line-height: 10px!important;
 		margin-left: 0px!important;
 		margin-top: 0px!important;
-		border: 1px solid #ccc;
+		border: 1px solid #2ab57d;
+		color:#fff;
+		background-color: #2ab57d;
+		border-radius:5px;
+		cursor: pointer;
+		padding-top:1px!important;
+	}
+	.addon_remove_btn_round {
+		width: 20px!important;
+		height: 14px!important;
+		display: inline-block;
+		/* border-radius: 50%; */
+		text-align: center;
+		line-height: 10px!important;
+		margin-left: 0px!important;
+		margin-top: 0px!important;
+		border: 1px solid #4ba6ef;
 		color:#fff;
 		background-color: #4ba6ef;
 		border-radius:5px;
@@ -1154,7 +1170,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				row.remove();
 				resetIndexes();
 			});
-			$("body").on("click", ".remove_node_btn_frm_field_addon", function () { console.log('hhhhssasa');
+			$("body").on("click", ".remove_node_btn_frm_field_addon", function () {
 				var row = $(this).closest(".addon_input_outer_row");
 				row.remove();
 				resetRowIndexes();
@@ -1439,6 +1455,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							firstRow.style.borderTop = '2px solid #a6a6a6';
 							var secondRow = document.createElement('tr');
 							var thirdRow = document.createElement('tr');
+							var lastRow = document.createElement('tr');
 
 							// First Row Elements
 							var removeIconCell = createCellWithRemoveButton();
@@ -1504,7 +1521,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							secondRow.appendChild(modificationInputCell);
 
 							// Third Row Elements
-							var createAddon = createAddonCell();
+							var emptyLabelThirdRowCell = document.createElement('td');
+							emptyLabelThirdRowCell.colSpan = 1;
+							emptyLabelThirdRowCell.textContent = '';
+
 							var specialRequestLabelCell = document.createElement('td');
 							specialRequestLabelCell.colSpan = 1
 							specialRequestLabelCell.textContent = 'Special Request/Remarks';
@@ -1518,10 +1538,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							specialRequestInputElement.style.width = '100%';
 							specialRequestInputCell.appendChild(specialRequestInputElement);
 
+
 							// Append cells to the third row
-							thirdRow.appendChild(createAddon);
+							thirdRow.appendChild(emptyLabelThirdRowCell);
 							thirdRow.appendChild(specialRequestLabelCell);
 							thirdRow.appendChild(specialRequestInputCell);
+
+							// Last Row Elements
+							var createAddon = createAddonCell();
+							createAddon.colSpan = 17;
+							// Append cells to the last row
+							lastRow.appendChild(createAddon);
 
 							// Append rows to the table body
 							tableBody.appendChild(firstRow);
@@ -1530,8 +1557,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 							// Store the VIN in the first row's data attribute for easy retrieval on click
 							$(firstRow).data('vin', vins[i]?.vin ?? '');
-							// Store a reference to these rows in the remove button's data attribute
-							$(removeIconCell).find('.remove-row').data('rows', [firstRow, secondRow, thirdRow]);
+
+							// Store the vin in the third row's data attribute for easy retrieval on click
+							$(thirdRow).data('vin', vins[i]?.vin ?? '');
+
+							var allVehicleRows = [firstRow, secondRow, thirdRow];
 							// Gather data from all dynamically added addon input fields
 							$('.addon_input_outer_row').each(function() {
 								var addonId = $(this).attr('id').split('_')[2];
@@ -1566,11 +1596,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 								addonRow.appendChild(addonValueCell);
 								addonRow.appendChild(addonQuantityCell);
 								addonRow.appendChild(addonDescriptionCell);
-
+								// Insert the new row into the array
+								allVehicleRows.push(addonRow);
 								// Append the addon row after the third row
 								thirdRow.insertAdjacentElement('afterend', addonRow);
 								thirdRow = addonRow; // Update thirdRow to ensure the next addonRow is inserted correctly
 							});
+							tableBody.appendChild(lastRow);
+							allVehicleRows.push(lastRow);
+							$(removeIconCell).find('.remove-row').data('rows', allVehicleRows);
 						}
 					}
 				}
@@ -1613,12 +1647,96 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				$('select option[value="'+ vin +'"]').prop('disabled', false);
 			}
 			var rows = $(this).data('rows');
+			// console.log(rows);
 			if (rows) {
 				$(rows).each(function() {
 					$(this).remove();
 				});
 			}
 			findAllVINs();
+		});
+		// Event delegation to handle remove button click for remove addons row from vehicle table section
+		$('#myTable').on('click', '.remove-addon-row', function() {
+			var addon = $(this).closest('tr'); // Assuming each row has a data-vin attribute
+			addon.remove();
+			// console.log(addon);
+			// if (vin) {
+			// 	// Unselect and remove the VIN from all dynamicselect2 class elements
+			// 	$(".dynamicselect2").each(function() {
+			// 		var selectElement = $(this);
+			// 		selectElement.find(`option[value='${vin}']`).prop('selected', false).remove();
+			// 		// Trigger change to update the Select2 UI
+			// 		selectElement.trigger('change');
+			// 	});
+			// 	$('select option[value="'+ vin +'"]').prop('disabled', false);
+			// }
+			// var rows = $(this).data('rows');
+			// if (rows) {
+			// 	$(rows).each(function() {
+			// 		$(this).remove();
+			// 	});
+			// }
+			// findAllVINs();
+		});
+		// Event delegation to handle add addon for vehicle in the vehicle line level
+		$('#myTable').on('click', '.create-addon-row', function() {
+			// console.log(this);
+			var addonId = '';
+			var addonValue = 'This is an addon value';
+			var addonQuantity = '';
+			var addonDescription = '';
+
+			// var addonId = $(this).attr('id').split('_')[2]; console.log(addonId);
+			// var addonValue = $(`#addons_${addonId}`).val();
+
+			var removeAddonCell = createAddonRemoveButton();
+			// Add addonValue, addonQuantity, addonDescription as a row after thirdRow
+			var addonRow = document.createElement('tr');
+
+			// Addon Row Label
+			var serviceBreakdownLabelCell = document.createElement('td');
+			serviceBreakdownLabelCell.colSpan = 1;
+			serviceBreakdownLabelCell.textContent = 'Service Breakdown'; 
+			// Addon Row Elements
+			// var addonValueCell = document.createElement('td');
+			// addonValueCell.colSpan = 2;
+			// addonValueCell.textContent = addonValue;
+
+			var addonValueCell = document.createElement('td');
+			addonValueCell.colSpan = 2;
+			// addonValueCell.textContent = addonValue;
+			addonValueCell.innerHTML = '<select name="addons[]" id="addons_" class="form-control widthinput dynamicselectaddon" data-index="" multiple="true"><option>P000 test addon</option><option>P001 test addon</option></select>';
+
+			var addonQuantityCell = document.createElement('td');
+			addonQuantityCell.colSpan = 1;
+			addonQuantityCell.innerHTML = '<div class="input-group"><div class="input-group-append"><span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span></div><input style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity" placeholder="Addon Quantity"></div>';
+
+			var addonDescriptionCell = document.createElement('td');
+			addonDescriptionCell.colSpan = 14;
+			addonDescriptionCell.innerHTML = '<div class="input-group"><input style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description" placeholder="Enter Addon Description"></div>';
+
+			// Append cells to the addon row
+			addonRow.appendChild(removeAddonCell);
+			addonRow.appendChild(serviceBreakdownLabelCell);
+			addonRow.appendChild(addonValueCell);
+			addonRow.appendChild(addonQuantityCell);
+			addonRow.appendChild(addonDescriptionCell);
+
+			// WRITE CODE TO APPEND THE ADDON ROW AFTER THE LAST ADDON OF THE ROW VIN OR BEFORE THE ADD ADDON BUTTON
+
+
+			// Append the addon row after the third row
+			// this.insertBefore(addonRow);
+			// console.log($(this).closest('tr').element);
+			var parentElement = this.parentElement.parentElement;
+			// console.log(parentElement);
+			parentElement.insertAdjacentElement('beforebegin', addonRow);
+			// addonButtonRow = addonRow; // Update thirdRow to ensure the next addonRow is inserted correctly
+			$(`.dynamicselectaddon`).select2({
+				allowClear: true,
+				maximumSelectionLength: 1,
+				placeholder: "Choose Addon",
+			});
 		});
 		function findAllVINs() {
 			addedVins = [];
@@ -1686,7 +1804,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		function createAddonRemoveButton() {
 			var cell = document.createElement('td');
 			var removeButton = document.createElement('a');
-			removeButton.className = 'btn_round remove-addon-row';
+			removeButton.className = 'addon_remove_btn_round remove-addon-row';
 			removeButton.title = 'Remove Addon';
 			removeButton.textContent = '-';
 			cell.appendChild(removeButton);
