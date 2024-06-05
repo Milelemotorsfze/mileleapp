@@ -5,6 +5,13 @@
             position: absolute;
             min-height: 500px;
         }
+        .widthinput{
+            height:32px!important;
+
+        }
+        body.modal-open {
+            overflow: hidden;
+        }
     </style>
     @can('LOI-list')
         @php
@@ -57,14 +64,11 @@
                         <a class="nav-link " data-bs-toggle="pill" href="#waiting-for-approval-LOI">Waiting For Approval</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="pill" href="#supplier-approved-LOI">Supplier Approved LOI</a>
+                        <a class="nav-link" data-bs-toggle="pill" href="#supplier-approved-LOI">Supplier Response LOI</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#milele-partial-approved-LOI"> Utilization Initiated LOI</a>
                     </li>
-{{--                    <li class="nav-item">--}}
-{{--                        <a class="nav-link" data-bs-toggle="pill" href="#milele-approved-LOI">Fully Utilized LOI</a>--}}
-{{--                    </li>--}}
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#supplier-rejected-LOI">Supplier Rejected LOI</a>
                     </li>
@@ -274,6 +278,7 @@
                                                 </div>
                                             </div>
                                         </div>
+
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -299,6 +304,7 @@
 {{--                                    <th>Prefered Location</th>--}}
                                     <th> Status</th>
                                     <th>LOI</th>
+                                    <th>Approve/Reject</th>
                                     <th>Actions</th>
                                 </tr>
                                 </thead>
@@ -334,6 +340,20 @@
                                             </select>
                                         </td>
                                         <td>
+                                            @can('loi-supplier-approve')
+                                                @php
+                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                    <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
+                                                            data-bs-target="#approve-LOI-{{ $letterOfIndent->id }}" > Approve </button>
+
+                                                    <button type="button" class="btn btn-danger modal-button btn-sm" data-bs-toggle="modal"
+                                                            data-bs-target="#reject-LOI-{{$letterOfIndent->id}}"> Reject </button>
+                                                @endif
+                                            @endcan
+                                        </td>
+                                        <td>
                                             @can('LOI-edit')
                                                 @php
                                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-edit');
@@ -363,7 +383,170 @@
                                                 @endif
                                             @endcan
                                         </td>
-
+                                        <div class="modal fade" id="reject-LOI-{{$letterOfIndent->id}}" data-bs-backdrop="static"
+                                             tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-scrollable">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Reject LOI </h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body p-3">
+                                                        <div class="col-lg-12">
+                                                            <div class="row">
+                                                                <div class="col-12">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                            <dt class="form-label font-size-13 text-muted">Customer :</dt>
+                                                                        </div>
+                                                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                            <dl> {{  $letterOfIndent->customer->name }}</dl>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                            <dt class="form-label font-size-13 text-muted">Category :</dt>
+                                                                        </div>
+                                                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                            <dl>{{ $letterOfIndent->category }} </dl>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row ">
+                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                            <dt class="form-label font-size-13 text-muted">LOI Date :</dt>
+                                                                        </div>
+                                                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                            <dl> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }} </dl>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                            <dt class="form-label font-size-13 text-muted">So Number :</dt>
+                                                                        </div>
+                                                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                            <dl>
+                                                                                @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
+                                                                                    {{ $LoiSoNumber->so_number }}
+                                                                                    @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
+                                                                                @endforeach
+                                                                            </dl>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                            <dt class="form-label font-size-13 text-muted">Country :</dt>
+                                                                        </div>
+                                                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                            <dl>{{ $letterOfIndent->customer->country->name ?? '' }} </dl>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                            <dt class="form-label font-size-13 text-muted">Rejection Date :</dt>
+                                                                        </div>
+                                                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                            <input type="date" name="loi_approval_date" id="rejection-date"
+                                                                                   required class="form-control widthinput" max="{{ \Illuminate\Support\Carbon::today()->format('Y-m-d') }}" >
+                                                                            <span id="loi-rejection-date-error" class="text-danger"> </span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mt-2">
+                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                            <dt class="form-label font-size-13 text-muted">Reason :</dt>
+                                                                        </div>
+                                                                        <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                            <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                    <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
+                                                                    <input type="hidden" value="REJECTED" id="status-reject">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="button" class="btn btn-primary status-reject-button">Submit</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal fade" id="approve-LOI-{{$letterOfIndent->id}}" data-bs-backdrop="static"
+                                             tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-scrollable">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Approve LOI </h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body p-3">
+                                                        <div class="col-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <dt class="form-label font-size-13 text-muted">Customer :</dt>
+                                                                </div>
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                    <dl> {{  $letterOfIndent->customer->name }}</dl>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <dt class="form-label font-size-13 text-muted">Category :</dt>
+                                                                </div>
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                    <dl>{{ $letterOfIndent->category }} </dl>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row ">
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <dt class="form-label font-size-13 text-muted">LOI Date :</dt>
+                                                                </div>
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                    <dl> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }} </dl>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <dt class="form-label font-size-13 text-muted">So Number :</dt>
+                                                                </div>
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                    <dl>
+                                                                        @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
+                                                                            {{ $LoiSoNumber->so_number }}
+                                                                            @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
+                                                                        @endforeach
+                                                                    </dl>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <dt class="form-label font-size-13 text-muted">Country :</dt>
+                                                                </div>
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                    <dl>{{ $letterOfIndent->customer->country->name ?? '' }} </dl>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                    <dt class="form-label font-size-13 text-muted">Approval Date :</dt>
+                                                                </div>
+                                                                <div class="col-lg-8 col-md-12 col-sm-12">
+                                                                    <input type="date" name="loi_approval_date" id="approval-date"
+                                                                           required class="form-control widthinput">
+                                                                    <span id="loi-approval-date-error" class="text-danger"> </span>
+                                                                </div>
+                                                            </div>
+                                                            <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
+                                                            <input type="hidden" value="APPROVE" id="status-approve">
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="button" class="btn btn-primary status-change-button-approve">Submit</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="modal fade" id="view-loi-items-{{$letterOfIndent->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                                                 <div class="modal-content">
@@ -1063,30 +1246,96 @@
             </div>
         @endif
     @endcan
-   <script type="text/javascript">
-       $('.btn-request-supplier-approval').on('click',function(){
-           let id = $(this).attr('data-id');
-           let url =  $(this).attr('data-url');
-           console.log(url);
-           console.log(id);
-           var confirm = alertify.confirm('Are you sure you want to send this LOI for supplier Approval?',function (e) {
-               if (e) {
-                   $.ajax({
-                       type: "POST",
-                       url: url,
-                       dataType: "json",
-                       data: {
-                           id: id,
-                           _token: '{{ csrf_token() }}'
-                       },
-                       success:function (data) {
-                           location.reload();
-                           alertify.success('Approval Request Send Successfully.');
-                       }
-                   });
-               }
-           }).set({title:"Delete Item"})
-       });
+@endsection
+@push('scripts')
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#approval-date').change(function () {
+                $msg = "";
+                removeLOIApprovalDateError($msg)
+            });
+            $('#rejection-date').change(function () {
+                $msg = "";
+                removeLOIRejectionDateError($msg)
+            });
+            $('.status-change-button-approve').click(function () {
+                var id = $('#id').val();
+                var status = $('#status-approve').val();
+                var date = document.getElementById("approval-date").value
+                if (date.length > 0) {
+                    statusChange(id, status, date);
+                } else {
+                    $msg = "This field is required";
+                    showLOIApprovalDateError($msg)
+                }
+            })
+            $('.status-reject-button').click(function (e) {
+                var id = $('#id').val();
+                var status = $('#status-reject').val();
+                var date = document.getElementById("rejection-date").value
+                if (date.length > 0) {
+                    statusChange(id, status, date)
+                } else {
+                    $msg = "This field is required";
+                    showLOIRejectionDateError($msg)
+                }
+            })
+
+            function statusChange(id, status, date) {
+                let url = '{{ route('letter-of-indents.supplier-approval') }}';
+                if (status == 'REJECTED') {
+                    var message = 'Reject';
+                    var review = $('#review').val();
+                } else {
+                    var message = 'Approve';
+                    var review = '';
+                }
+                var confirm = alertify.confirm('Are you sure you want to ' + message + ' this item ?', function (e) {
+                    if (e) {
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            dataType: "json",
+                            data: {
+                                id: id,
+                                status: status,
+                                review: review,
+                                loi_approval_date: date,
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function (data) {
+                                window.location.reload();
+                                alertify.success(status + " Successfully");
+                            }
+                        });
+                    }
+                }).set({title: "Status Change"})
+            }
+        });
+
+        $('.btn-request-supplier-approval').on('click',function(){
+            let id = $(this).attr('data-id');
+            let url =  $(this).attr('data-url');
+            console.log(url);
+            console.log(id);
+            var confirm = alertify.confirm('Are you sure you want to send this LOI for supplier Approval?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            id: id,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            location.reload();
+                            alertify.success('Approval Request Send Successfully.');
+                        }
+                    });
+                }
+            }).set({title:"Delete Item"})
+        });
 
         $('.loi-button-delete').on('click',function(){
             let id = $(this).attr('data-id');
@@ -1110,9 +1359,35 @@
                 }
             }).set({title:"Delete Item"})
         });
-   </script>
 
-@endsection
+        function showLOIApprovalDateError($msg)
+        {
+            console.log("element error function");
+            document.getElementById("loi-approval-date-error").textContent=$msg;
+            document.getElementById("approval-date").classList.add("is-invalid");
+            document.getElementById("loi-approval-date-error").classList.add("paragraph-class");
+        }
+        function removeLOIApprovalDateError($msg)
+        {
+            document.getElementById("loi-approval-date-error").textContent="";
+            document.getElementById("approval-date").classList.remove("is-invalid");
+            document.getElementById("loi-approval-date-error").classList.remove("paragraph-class");
+        }
+        function showLOIRejectionDateError($msg)
+        {
+            console.log("rejection error");
+            document.getElementById("loi-rejection-date-error").textContent=$msg;
+            document.getElementById("rejection-date").classList.add("is-invalid");
+            document.getElementById("loi-rejection-date-error").classList.add("paragraph-class");
+        }
+        function removeLOIRejectionDateError($msg)
+        {
+            document.getElementById("loi-rejection-date-error").textContent="";
+            document.getElementById("rejection-date").classList.remove("is-invalid");
+            document.getElementById("loi-rejection-date-error").classList.remove("paragraph-class");
+        }
+    </script>
+@endpush
 
 
 

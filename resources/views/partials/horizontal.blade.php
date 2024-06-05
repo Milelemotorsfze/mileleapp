@@ -998,14 +998,6 @@
                                                 <a href="{{route('letter-of-indents.index')}}" class="dropdown-item" data-key="t-login">LOI Lists</a>
                                                 @endif
                                                 @endcan
-                                                @can('loi-supplier-approve')
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
-                                                @endphp
-                                                @if ($hasPermission)
-                                                <a href="{{route('letter-of-indents.get-suppliers-LOIs')}}" class="dropdown-item" data-key="t-login">Supplier Approval </a>
-                                                @endif
-                                                @endcan
                                             </div>
                                         </div>
                                         @endif
@@ -1335,7 +1327,7 @@
                                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.statuswise')}}" id="topnav-utility" role="button">
                                                 <span data-key="t-utility">Status Wise</span>
                                             </a>
-                                            </div>        
+                                            </div>
                                             </div>
                                 </li>
                                 @endif

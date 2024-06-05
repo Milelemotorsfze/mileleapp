@@ -66,47 +66,6 @@ class LetterOfIndentController extends Controller
         return view('letter_of_indents.index', compact('newLOIs','approvalWaitingLOIs',
             'partialApprovedLOIs','supplierApprovedLOIs','rejectedLOIs'));
     }
-    public function getSupplierLOI(Request $request)
-    {
-        $supplierId = null;
-        $suppliers = Supplier::with('supplierTypes')
-            ->whereHas('supplierTypes', function ($query) {
-                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
-            })
-            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
-            ->get();
-
-        $approvalPendingLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
-            ->orderBy('id','DESC')
-            ->where('submission_status', LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL);
-
-        $approvedLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
-            ->orderBy('id','DESC')
-//            ->where('status',LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
-            ->where('submission_status',LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED);
-
-        $rejectedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
-            ->orderBy('id','DESC')
-            ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED)
-            ->where('submission_status',LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED);
-
-        if ($request->supplier_id)
-        {
-            $supplierId = $request->supplier_id;
-            $approvalPendingLOIs = $approvalPendingLOIs->where('supplier_id', $request->supplier_id);
-            $approvedLOIs =  $approvedLOIs->where('supplier_id', $request->supplier_id);
-            $rejectedLOIs = LetterOfIndent::orderBy('id','DESC')
-                ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED)
-                ->where('supplier_id', $request->supplier_id);
-        }
-
-        $approvalPendingLOIs = $approvalPendingLOIs->get();
-        $approvedLOIs = $approvedLOIs->get();
-        $rejectedLOIs = $rejectedLOIs->get();
-
-        return view('letter_of_indents.supplier_LOIs.index', compact('approvedLOIs',
-            'approvalPendingLOIs','rejectedLOIs','suppliers','supplierId'));
-    }
     /**
      * Show the form for creating a new resource.
      */
