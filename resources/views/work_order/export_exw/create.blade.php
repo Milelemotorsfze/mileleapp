@@ -1680,7 +1680,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		});
 		// Event delegation to handle add addon for vehicle in the vehicle line level
 		$('#myTable').on('click', '.create-addon-row', function() {
-			// console.log(this);
 			var addonId = '';
 			var addonValue = 'This is an addon value';
 			var addonQuantity = '';
@@ -1724,14 +1723,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 			// WRITE CODE TO APPEND THE ADDON ROW AFTER THE LAST ADDON OF THE ROW VIN OR BEFORE THE ADD ADDON BUTTON
 
+			 var parentElementRemove = $(this).closest('tr');
+				var firstRemoveRowButton = parentElementRemove.prevAll('tr').has('.remove-row').first();
 
-			// Append the addon row after the third row
-			// this.insertBefore(addonRow);
-			// console.log($(this).closest('tr').element);
-			var parentElement = this.parentElement.parentElement;
-			// console.log(parentElement);
+				if (firstRemoveRowButton.length) {
+					firstRemoveRowButton.after(addonRow);
+
+					// Push addonRow element into data-rows array of firstRemoveRowButton element
+					var rowsData = firstRemoveRowButton.find('.remove-row').data('rows') || [];
+					rowsData.push(addonRow);
+					firstRemoveRowButton.find('.remove-row').data('rows', rowsData);
+				} 
+				else {
+					parentElementRemove.after(addonRow);
+				}
+				var parentElement = this.parentElement.parentElement;
 			parentElement.insertAdjacentElement('beforebegin', addonRow);
-			// addonButtonRow = addonRow; // Update thirdRow to ensure the next addonRow is inserted correctly
 			$(`.dynamicselectaddon`).select2({
 				allowClear: true,
 				maximumSelectionLength: 1,
