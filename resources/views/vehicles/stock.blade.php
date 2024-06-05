@@ -1166,28 +1166,29 @@ function exportToExcel(tableId) {
     var rows = table.rows;
     var csvContent = "";
     for (var i = 0; i < rows.length; i++) {
-      var row = rows[i];
-      for (var j = 0; j < row.cells.length; j++) {
-        csvContent += row.cells[j].innerText + ",";
-      }
-      csvContent += "\n";
+        var row = rows[i];
+        for (var j = 0; j < row.cells.length; j++) {
+            var cellText = row.cells[j].innerText || row.cells[j].textContent;
+            csvContent += '"' + cellText.replace(/"/g, '""') + '",';
+        }
+        csvContent += "\n";
     }
     var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     if (navigator.msSaveBlob) { // IE 10+
-      navigator.msSaveBlob(blob, 'export.csv');
+        navigator.msSaveBlob(blob, 'export.csv');
     } else {
-      var link = document.createElement("a");
-      if (link.download !== undefined) {
-        var url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", "export.csv");
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+        var link = document.createElement("a");
+        if (link.download !== undefined) {
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "export.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     }
-  }
+}
   function generatePDF(vehicleId) {
     var url = `/viewgrnreport/method?vehicle_id=${vehicleId}`;
     window.open(url, '_blank');
