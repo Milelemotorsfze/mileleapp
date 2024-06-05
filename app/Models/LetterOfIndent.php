@@ -53,7 +53,7 @@ class LetterOfIndent extends Model
     }
     public function LOITemplates()
     {
-        return $this->hasMany(LoiTemplate::class);
+        return $this->hasMany(LoiTemplate::class,'letter_of_indent_id','id');
     }
     public function getTotalLoiQuantityAttribute() {
         $letterOfIndentItemQty = LetterOfIndentItem::where('letter_of_indent_id', $this->id)
