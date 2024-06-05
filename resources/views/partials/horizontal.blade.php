@@ -917,7 +917,6 @@
                                 </li>
                                 @endif
                                 @endcan -->
-                                @can('part-input-incident')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('part-input-incident');
                                 @endphp
@@ -929,8 +928,6 @@
                                     </a>
                                 </li>
                                 @endif
-                                @endcan
-                                @can('inspection-edit')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-edit');
                                 @endphp
@@ -942,8 +939,6 @@
                                     </a>
                                 </li>
                                 @endif
-                                @endcan
-
                                 @can('demand-list')
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-list');
