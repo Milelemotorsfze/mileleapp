@@ -68,8 +68,8 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label  text-muted">Customer Type</label>
-                                <select class="form-control widthinput" name="customer_type" id="customer-type">
-                                    <option value="" disabled>Type</option>
+                                <select class="form-control widthinput" multiple name="customer_type" id="customer-type">
+{{--                                    <option value="" disabled>Type</option>--}}
                                     <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}</option>
                                     <option value={{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}>{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}</option>
                                     <option value={{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}>{{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}</option>
@@ -148,28 +148,6 @@
                             </div>
                         </div>
 
-{{--                        <div class="col-lg-3 col-md-6 col-sm-12">--}}
-{{--                            <div class="mb-3">--}}
-{{--                                <label for="choices-single-default" class="form-label">Destination</label>--}}
-{{--                                <input type="text" class="form-control widthinput" name="destination" placeholder="Destination" >--}}
-{{--                                @error('destination')--}}
-{{--                                <span role="alert">--}}
-{{--                                    <strong>{{ $message }}</strong>--}}
-{{--                                </span>--}}
-{{--                                @enderror--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-lg-3 col-md-6 col-sm-12">--}}
-{{--                            <div class="mb-3">--}}
-{{--                                <label for="choices-single-default" class="form-label">Prefered Location</label>--}}
-{{--                                <input type="text" class="form-control widthinput" name="prefered_location" placeholder="Prefered Location" >--}}
-{{--                                @error('prefered_location')--}}
-{{--                                <span role="alert">--}}
-{{--                                    <strong>{{ $message }}</strong>--}}
-{{--                                </span>--}}
-{{--                                @enderror--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Sales Person</label>
@@ -178,6 +156,18 @@
                                     @foreach($salesPersons as $salesPerson)
                                         <option value="{{ $salesPerson->id }}"> {{ $salesPerson->name }} </option>
                                     @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label class="form-label">Template Type </label>
+                                <select class="form-control widthinput" multiple name="template_type[]" id="template-type">
+                                    <option value="trans_cars">Trans Cars</option>
+                                    <option value="milele_cars" disabled>Milele Cars</option>
+                                    <option value="individual">Individual</option>
+                                    <option value="business">Business</option>
+
                                 </select>
                             </div>
                         </div>
@@ -408,6 +398,9 @@
                     required:true,
                     extension: "pdf"
                 },
+                template_type:{
+                    required:true
+                },
                 loi_signature: {
                     required:function(element) {
                         return $("#dealer").val() == 'Milele Motors'
@@ -450,6 +443,12 @@
                 e.preventDefault();
             }
         });
+        $('#template-type').select2({
+            placeholder : 'Select Template Type',
+            allowClear: true,
+        }).on('change', function() {
+            $('#template-type-error').remove();
+        });
         $('#sales_person_id').select2({
             placeholder : 'Select Sales Person',
             allowClear: true,
@@ -461,6 +460,11 @@
             maximumSelectionLength: 1
         }).on('change', function() {
             $('#customer-error').remove();
+        });
+        $('#customer-type').select2({
+            placeholder : 'Select Customer Type',
+            allowClear: true,
+            maximumSelectionLength: 1
         });
         $('#country').select2({
             placeholder : 'Select Country',
@@ -474,6 +478,16 @@
         $('#customer-type').change(function (){
             getCustomers();
             checkCountryCriterias();
+            let customerType = $('#customer-type').val();
+
+            if(customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}') {
+                $('#template-type option[value=business]').prop('disabled',true);
+            }else if(customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}') {
+                $('#template-type option[value=individual]').prop('disabled',true);
+            }else{
+                $('#template-type option[value=individual]').prop('disabled',false);
+                $('#template-type option[value=business]').prop('disabled',false);
+            }
         });
         $('#model-1').select2({
             placeholder: 'Select Model',
@@ -501,6 +515,14 @@
             var value = $('#dealer').val();
             $('#dealer-input').val(value);
             getModels('all','dealer-change');
+            if(value == 'Trans Cars') {
+                $('#template-type option[value=milele_cars]').prop('disabled',true);
+                $('#template-type option[value=trans_cars]').prop('disabled',false);
+
+            }else if(value == 'Milele Motors') {
+                $('#template-type option[value=trans_cars]').prop('disabled',true);
+                $('#template-type option[value=milele_cars]').prop('disabled',false);
+            }
         });
 
         $('#customer-type').change(function () {
@@ -524,7 +546,6 @@
             });
 
             if(country.length > 0 && customer_type.length > 0 && total_quantities > 0) {
-
                 $.ajax({
                     type: "GET",
                     url: url,
