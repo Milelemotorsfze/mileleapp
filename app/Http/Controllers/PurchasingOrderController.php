@@ -1307,7 +1307,7 @@ public function purchasingupdateStatus(Request $request)
     {
         $vehicle = Vehicles::findOrFail($id);
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
-        if ($vehicle->status == 'Approved' || $vehicle->status == 'Request for Payment' || $vehicle->status == 'Payment In-Process') {
+        if ($vehicle->status == 'Approved' || $vehicle->status == 'Request for Payment' || $vehicle->status == 'Payment In-Process'|| $vehicle->status == 'Payment Requested') {
             if($hasPermission)
             {
                 $purchasinglog = new Purchasinglog();
@@ -1374,6 +1374,9 @@ public function purchasingupdateStatus(Request $request)
             {
             $vehicle->status = 'Request for Cancel';
             $vehicle->save();
+            $purchasedorders = PurchasingOrder::find($vehicle->purchasing_order_id);
+            $purchasedorders->status = 'Pending Approval';
+            $purchasedorders->save();
             }
         }
         else

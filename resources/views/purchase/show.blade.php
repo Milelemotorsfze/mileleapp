@@ -534,16 +534,7 @@
                             @endif
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-12">
-                    <table id="dtBasicExample90" class="table table-striped table-editable table-edits table table-bordered table-sm">
-                        <thead class="bg-soft-secondary">
-                        <th style="font-size: 12px;">S.No</th>
-                        <th style="font-size: 12px;">Status</th>
-                        <th style="font-size: 12px;">Qty</th>
-                        <th style="font-size: 12px;">Departments</th>
-                        </thead>
-                        <tbody>
-                        @php
+                @php
                             $vehiclescancelcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->whereNotNull('deleted_at')->count();
                             $vehiclesapprovedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->whereNull('deleted_at')->count();
                             $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->whereNull('deleted_at')->count();
@@ -564,6 +555,15 @@
                             $vendorpaymentincoming = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Incoming Stock')->whereNull('deleted_at')->count();
                             $serialNumber = 1;   
                             @endphp
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <table id="dtBasicExample90" class="table table-striped table-editable table-edits table table-bordered table-sm">
+                        <thead class="bg-soft-secondary">
+                        <th style="font-size: 12px;">S.No</th>
+                        <th style="font-size: 12px;">Status</th>
+                        <th style="font-size: 12px;">Qty</th>
+                        <th style="font-size: 12px;">Pending With Department</th>
+                        </thead>
+                        <tbody>
                         <tr>
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Vehicles Not Approved</td>
@@ -580,12 +580,6 @@
                             <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
                             <td style="font-size: 12px;">Vehicles Rejected</td>
                             <td style="font-size: 12px;">{{ $vehiclesrejectedcount }}</td>
-                            <td style="font-size: 12px;">Procurement</td>
-                        </tr>
-                        <tr>
-                            <td style="font-size: 12px;">{{ $serialNumber++ }}</td>
-                            <td style="font-size: 12px;">Vehicles Cancel</td>
-                            <td style="font-size: 12px;">{{ $vehiclescancelcount }}</td>
                             <td style="font-size: 12px;">Procurement</td>
                         </tr>
                         <tr>
@@ -635,6 +629,18 @@
                             <td style="font-size: 12px;">Incoming Stock</td>
                             <td style="font-size: 12px;">{{ $vendorpaymentincoming }}</td>
                             <td style="font-size: 12px;">Procurement</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <table id="dtBasicExample94" class="table table-striped table-editable table-edits table table-bordered table-sm" style="background-color: red; color: white;">
+                        <thead class="bg-soft-secondary" style="background-color: darkred;">
+                        <th style="font-size: 12px;">Status</th>
+                        <th style="font-size: 12px;">Qty</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td style="font-size: 12px;">Vehicles Cancel</td>
+                            <td style="font-size: 12px;">{{ $vehiclescancelcount }}</td>
                         </tr>
                         </tbody>
                     </table>
@@ -867,7 +873,6 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-approval');
                         @endphp
                         @if ($hasPermission)
-                        @if ($vehicles->payment_status === '')
                         @if($vehicles->status == 'Request for Cancel')
                         <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.approvedcancel', $vehicles->id) }}" onclick="return confirmApprovedcancel();"style="white-space: nowrap;">
                             Approved Cancel
@@ -880,7 +885,6 @@
                         <a title="UnReject" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.unrejecteds', $vehicles->id) }}" onclick="return confirmunRejected();" style="white-space: nowrap;">
                             Un-Reject
                         </a>
-                        @endif
                         @endif
                         @endif
                         @php
