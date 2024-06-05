@@ -2,6 +2,19 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <style>
+	.comment {
+            margin-bottom: 20px;
+        }
+        .reply {
+            margin-left: 30px; /* Indent replies by 40px */
+            margin-top: 10px;
+        }
+        .reply-button {
+            margin-top: 10px;
+        }
+        .replies {
+            margin-left: 30px; /* Indent nested replies by 40px */
+        }
 	/* .border-top {
 		border-top: 1px solid #b3b3b3!important;
 	} */
@@ -101,7 +114,16 @@
 	.btn_round_big:hover {
 			color: #fff; background: #fd625e; border: 1px solid #fd625e;
 			}
-
+			/* .comment {
+            margin-bottom: 20px;
+        }
+        .reply {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        .reply-button {
+            margin-top: 10px;
+        } */
 
 			/* body {
     font-family: Arial, sans-serif;
@@ -114,7 +136,7 @@
     height: 100vh;
 } */
 
-.comment-section {
+/* .comment-section {
     background: #fff;
     padding: 20px;
     border-radius: 5px;
@@ -142,7 +164,7 @@ button {
     border-radius: 5px;
     color: white;
     cursor: pointer;
-}
+}  
 
 button:hover {
     background: #0056b3;
@@ -165,7 +187,7 @@ button:hover {
 .mention {
     color: #007BFF;
     font-weight: bold;
-}
+} */
 .card-header {
 	background-color:#e6f1ff!important;
 }
@@ -880,7 +902,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		</div>
 	</form>
 	</br>
-	<div class="card">
+	<!-- <div class="card">
 		<div class="card-header">
 			<h4 class="card-title">
 				<center>Comments Section</center>
@@ -910,20 +932,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				</div>
 				<div class="col-xxl-1 col-lg-1 col-md-1">
 					<button onclick="postComment()">Post</button>
-					<!-- <a  title="Add VIN" onclick=addVIN() style="margin-top:38px; width:100%;"
-							class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>	 -->
 				</div>
 			</div>
-			<!-- <div class="comment-section">
-				<h2>Comments</h2>
-				<div class="comment-box">
-					<textarea id="comment-input" placeholder="Write a comment..."></textarea>
-					<button onclick="postComment()">Post</button>
-				</div>
-				<ul id="comment-list"></ul>
-			</div> -->
 		</div>
-	</div>
+	</div> -->
+	<div class="card">
+		<div class="card-header">
+			<h4 class="card-title">
+				<center>Comments Section</center>
+			</h4>
+		</div>
+		<div class="card-body">
+			<div class="row" id="comments-section">
+				<!-- Comments will be dynamically inserted here -->
+			</div>
+			<div class="form-group">
+				<label for="new-comment">Add a comment:</label>
+				<textarea class="form-control" id="new-comment" rows="3"></textarea>
+				<button class="btn btn-sm btn-primary mt-2" onclick="addComment()">Add Comment</button>
+			</div>
+		</div>
+    </div>
 	<br>
 	<div class="card mt-3">
 		<div class="card-header text-center">
@@ -1000,6 +1029,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
+	// Declare commentIdCounter only once
+	let commentIdCounter = 0;
     $('#work-order-history-table').DataTable();
     var customers = {!! json_encode($customers) !!};
 	var vins = {!! json_encode($vins) !!}
@@ -1203,60 +1234,96 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		// ON CHANGE OF VIN FETCH ITS RELATED ADDONS END
 	});
 
-	// SHOW MENTION IN COMMENTS SECTION START
-		document.getElementById('comment-input').addEventListener('input', showMentions);
+	function addComment(parentId = null) {
+            const commentText = parentId ? $(`#reply-input-${parentId}`).val() : $('#new-comment').val();
+            if (commentText.trim() === '') return;
 
-		function showMentions(event) {
-			const input = event.target.value;
-			const mentionList = document.getElementById('mentions-list');
-			const mentionTrigger = input.match(/@\w*$/);
+            const commentId = commentIdCounter++;
+            const commentHtml = `
+                <div class="comment mt-2" id="comment-${commentId}">
+						<div class="col-xxl-1 col-lg-1 col-md-1" style="width:3.33333%;">
+							<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
+						</div>
+						<div class="col-xxl-11 col-lg-11 col-md-11">${commentText}</br>
+							<span style="color:gray;">Rejitha R Prasad</span>
+							<span style="color:gray;"> - 30 May 2024, 18:00:00</span></br>
+							<button class="btn btn-secondary btn-sm reply-button" onclick="showReplyForm(${commentId})">Reply</button></br>
+							<div class="reply-form" id="reply-form-${commentId}" style="display: none;">
+								<textarea class="form-control reply" id="reply-input-${commentId}" rows="2" placeholder="Write a reply..."></textarea>
+								<button class="btn btn-sm btn-info mt-2" onclick="addComment(${commentId})">Send Reply</button>
+							</div>
+                    		<div class="replies" id="replies-${commentId}"></div>
+						</div>
+                </div>
+            `;
+
+            if (parentId === null) {
+                $('#comments-section').append(commentHtml);
+                $('#new-comment').val('');
+            } else {
+                $(`#replies-${parentId}`).append(commentHtml);
+                $(`#reply-input-${parentId}`).val('');
+                $(`#reply-form-${parentId}`).hide();
+            }
+        }
+
+        function showReplyForm(commentId) {
+            $(`#reply-form-${commentId}`).toggle();
+        }
+	// // SHOW MENTION IN COMMENTS SECTION START
+	// 	document.getElementById('comment-input').addEventListener('input', showMentions);
+
+	// 	function showMentions(event) {
+	// 		const input = event.target.value;
+	// 		const mentionList = document.getElementById('mentions-list');
+	// 		const mentionTrigger = input.match(/@\w*$/);
 			
-			if (mentionTrigger) {
-				const mentionQuery = mentionTrigger[0].slice(1).toLowerCase();
-				const filteredMentions = mentions.filter(mention => mention.toLowerCase().includes(mentionQuery));
+	// 		if (mentionTrigger) {
+	// 			const mentionQuery = mentionTrigger[0].slice(1).toLowerCase();
+	// 			const filteredMentions = mentions.filter(mention => mention.toLowerCase().includes(mentionQuery));
 				
-				mentionList.innerHTML = '';
-				filteredMentions.forEach(mention => {
-					const mentionItem = document.createElement('div');
-					mentionItem.textContent = mention;
-					mentionItem.addEventListener('click', () => selectMention(mention));
-					mentionList.appendChild(mentionItem);
-				});
+	// 			mentionList.innerHTML = '';
+	// 			filteredMentions.forEach(mention => {
+	// 				const mentionItem = document.createElement('div');
+	// 				mentionItem.textContent = mention;
+	// 				mentionItem.addEventListener('click', () => selectMention(mention));
+	// 				mentionList.appendChild(mentionItem);
+	// 			});
 				
-				mentionList.style.display = 'block';
-			} else {
-				mentionList.style.display = 'none';
-			}
-		}
+	// 			mentionList.style.display = 'block';
+	// 		} else {
+	// 			mentionList.style.display = 'none';
+	// 		}
+	// 	}
 
-		function selectMention(mention) {
-			const inputField = document.getElementById('comment-input');
-			const inputText = inputField.value;
-			const newText = inputText.replace(/@\w*$/, mention + ' ');
-			inputField.value = newText;
-			document.getElementById('mentions-list').style.display = 'none';
-			inputField.focus();
-		}
+	// 	function selectMention(mention) {
+	// 		const inputField = document.getElementById('comment-input');
+	// 		const inputText = inputField.value;
+	// 		const newText = inputText.replace(/@\w*$/, mention + ' ');
+	// 		inputField.value = newText;
+	// 		document.getElementById('mentions-list').style.display = 'none';
+	// 		inputField.focus();
+	// 	}
 
-		function postComment() {
-			const commentInput = document.getElementById('comment-input');
-			const commentText = commentInput.value;
+	// 	function postComment() {
+	// 		const commentInput = document.getElementById('comment-input');
+	// 		const commentText = commentInput.value;
 			
-			if (commentText.trim()) {
-				const commentList = document.getElementById('comment-list');
-				const commentItem = document.createElement('li');
-				commentItem.className = 'comment-item';
+	// 		if (commentText.trim()) {
+	// 			const commentList = document.getElementById('comment-list');
+	// 			const commentItem = document.createElement('li');
+	// 			commentItem.className = 'comment-item';
 				
-				const mentionRegex = /@\w+/g;
-				const formattedText = commentText.replace(mentionRegex, match => `<span class="mention">${match}</span>`);
+	// 			const mentionRegex = /@\w+/g;
+	// 			const formattedText = commentText.replace(mentionRegex, match => `<span class="mention">${match}</span>`);
 				
-				commentItem.innerHTML = formattedText;
-				commentList.appendChild(commentItem);
+	// 			commentItem.innerHTML = formattedText;
+	// 			commentList.appendChild(commentItem);
 				
-				commentInput.value = '';
-			}
-		}
-	// SHOW MENTION IN COMMENTS SECTION END
+	// 			commentInput.value = '';
+	// 		}
+	// 	}
+	// // SHOW MENTION IN COMMENTS SECTION END
 
 	// ADDON DYNAMICALLY ADD AND REMOVE START
 		// Function to reset row indexes
@@ -2202,4 +2269,5 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		});
 	// CLIENT SIDE VALIDATION END
 </script>
+
 @endsection
