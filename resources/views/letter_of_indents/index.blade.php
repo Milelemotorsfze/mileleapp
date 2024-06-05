@@ -64,13 +64,10 @@
                         <a class="nav-link " data-bs-toggle="pill" href="#waiting-for-approval-LOI">Waiting For Approval</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="pill" href="#supplier-approved-LOI">Supplier Response LOI</a>
+                        <a class="nav-link" data-bs-toggle="pill" href="#supplier-response-LOI">Supplier Response LOI</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="pill" href="#milele-partial-approved-LOI"> Utilization Initiated LOI</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="pill" href="#supplier-rejected-LOI">Supplier Rejected LOI</a>
                     </li>
                 </ul>
             </div>
@@ -662,31 +659,22 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="supplier-approved-LOI">
+                <div class="tab-pane fade" id="supplier-response-LOI">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="supplier-approved-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
+                            <table id="supplier-response-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
                                 <thead class="bg-soft-secondary">
                                 <tr>
                                     <th>S.NO:</th>
                                     <th>LOI Number</th>
-                                    <th>Date</th>
+                                    <th>LOI Date</th>
                                     <th>Customer</th>
                                     <th>Category</th>
                                     <th>Dealers</th>
                                     <th>So Number</th>
                                     <th>Country</th>
-{{--                                    <th>Destination</th>--}}
-{{--                                    <th>Prefered Location</th>--}}
-                                    <th> Status</th>
-                                    @can('LOI-approve')
-                                        @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
-                                        @endphp
-                                        @if ($hasPermission)
-                                             <th>Utilization Qty Update</th>
-                                        @endif
-                                    @endcan
+                                    <th>Approval Status</th>
+                                    <th>Approved / Rejected Date</th>
                                     <th>LOI</th>
                                     <th width="150px">Actions</th>
                                 </tr>
@@ -709,26 +697,9 @@
                                             @endforeach
                                         </td>
                                         <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
-{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
-{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
-                                        <td>{{ $letterOfIndent->status }}</td>
+                                        <td>{{ $letterOfIndent->submission_status }}</td>
+                                        <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->loi_approval_date)->format('Y-m-d')  }}</td>
 
-                                        @can('LOI-approve')
-                                            @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
-                                            @endphp
-                                            @if ($hasPermission)
-                                                <td>
-                                                    @if($letterOfIndent->total_loi_quantity > $letterOfIndent->total_approved_quantity)
-                                                        <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
-                                                            <button type="button" class="btn btn-soft-green btn-sm" title="Update Utilization Quantity" >
-                                                                <i class="fa fa-edit"></i>
-                                                            </button>
-                                                        </a>
-                                                     @endif
-                                                </td>
-                                            @endif
-                                        @endcan
                                         <td>
                                             <select class="form-control" onchange="location = this.value;">
                                                 <option value="">Select Template</option>
@@ -740,15 +711,14 @@
                                             </select>
                                         </td>
                                         <td>
-
-                                            <button type="button" class="btn btn-soft-violet primary btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-supplier-approved-loi-items-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-soft-violet primary btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-supplier-response-loi-items-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-list"></i>
                                             </button>
-                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-supplier-approved-loi-docs-{{$letterOfIndent->id}}">
+                                            <button type="button" class="btn btn-dark-blue btn-sm" title="View Customer Documents" data-bs-toggle="modal" data-bs-target="#view-supplier-response-loi-docs-{{$letterOfIndent->id}}">
                                                 <i class="fa fa-file-pdf"></i>
                                             </button>
                                         </td>
-                                        <div class="modal fade" id="view-supplier-approved-loi-items-{{$letterOfIndent->id}}"
+                                        <div class="modal fade" id="view-supplier-response-loi-items-{{$letterOfIndent->id}}"
                                              tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable ">
                                                 <div class="modal-content">
@@ -823,7 +793,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="modal tall fade" id="view-supplier-approved-loi-docs-{{$letterOfIndent->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal tall fade" id="view-supplier-response-loi-docs-{{$letterOfIndent->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable" >
                                                 <div class="modal-content">
                                                     <div class="modal-header">
@@ -1059,172 +1029,6 @@
                                                                     <div class="col-lg-12 m-5">
                                                                         <label class="form-label fw-bold">Signature</label>
                                                                             <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" width="100px;" height="100px">
-                                                                    </div>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="supplier-rejected-LOI">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table id="supplier-rejected-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
-                                <thead class="bg-soft-secondary">
-                                <tr>
-                                    <th>S.NO:</th>
-                                    <th>LOI Number</th>
-                                    <th>Date</th>
-                                    <th>Customer</th>
-                                    <th>Category</th>
-                                    <th>Dealer</th>
-                                    <th>So Number</th>
-                                    <th>Country</th>
-{{--                                    <th>Destination</th>--}}
-{{--                                    <th>Prefered Location</th>--}}
-                                    <th>Status</th>
-                                    <th>Review</th>
-                                    <th width="100px">Actions</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <div hidden>{{$i=0;}}
-                                </div>
-                                @foreach ($rejectedLOIs as $key => $letterOfIndent)
-                                    <tr>
-                                        <td> {{ ++$i }}</td>
-                                        <td> {{ $letterOfIndent->uuid }}</td>
-                                        <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
-                                        <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
-                                        <td>{{ $letterOfIndent->category }}</td>
-                                        <td>{{ $letterOfIndent->dealers }}</td>
-                                        <td>
-                                            @foreach($letterOfIndent->soNumbers as $key => $LoiSoNumber)
-                                                 {{ $LoiSoNumber->so_number }}
-                                            @if(($key + 1) !== $letterOfIndent->soNumbers->count()) , @endif
-                                            @endforeach
-                                        </td>
-                                        <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
-{{--                                        <td>{{ $letterOfIndent->destination }}</td>--}}
-{{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
-                                        <td>{{ $letterOfIndent->status }}</td>
-                                        <th>{{ $letterOfIndent->review }}</th>
-                                        <td>
-                                            <button type="button" class="btn btn-soft-violet btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-rejected-loi-items-{{$letterOfIndent->id}}">
-                                                <i class="fa fa-list"></i>
-                                            </button>
-                                            <button type="button" title="View Customer Documents" class="btn btn-dark-blue btn-sm" data-bs-toggle="modal" data-bs-target="#view-rejected-loi-docs-{{$letterOfIndent->id}}">
-                                                <i class="fa fa-file-pdf"></i>
-                                            </button>
-                                        </td>
-                                        <div class="modal fade" id="view-rejected-loi-items-{{$letterOfIndent->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">LOI Items</h1>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body p-3">
-                                                        @if($letterOfIndent->letterOfIndentItems->count() > 0)
-                                                            <div class="row  d-none d-lg-block d-xl-block d-xxl-block">
-                                                                <div class="d-flex">
-                                                                    <div class="col-lg-12 col-md-12 col-sm-12">
-                                                                        <div class="row">
-                                                                            <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                <dt>Model</dt>
-                                                                            </div>
-                                                                            <div class="col-lg-1 col-md-12 col-sm-12">
-                                                                                <dt>SFX</dt>
-                                                                            </div>
-                                                                            <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <dt>Model Year</dt>
-                                                                            </div>
-                                                                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                                <dt>LOI Description</dt>
-                                                                            </div>
-                                                                            <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                <dt>Quantity</dt>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            @foreach($letterOfIndent->letterOfIndentItems as $value => $LOIItem)
-                                                                <div class="row">
-                                                                    <div class="d-flex">
-                                                                        <div class="col-lg-12 col-md-12 col-sm-12">
-                                                                            <hr>
-                                                                            <div class="row mt-3">
-                                                                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">Model</dt>
-                                                                                    <dl> {{ $LOIItem->masterModel->model ?? ''}} </dl>
-                                                                                </div>
-                                                                                <div class="col-lg-1 col-md-12 col-sm-12">
-                                                                                    <dt  class="d-lg-none d-xl-none d-xxl-none">SFX</dt>
-                                                                                    <dl> {{ $LOIItem->masterModel->sfx ?? '' }} </dl>
-                                                                                </div>
-                                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none ">Model Year</dt>
-                                                                                    <dl> {{ $LOIItem->masterModel->model_year ?? '' }} </dl>
-                                                                                </div>
-                                                                                <div class="col-lg-4 col-md-12 col-sm-12">
-                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">LOI Description</dt>
-                                                                                    <dl> {{ $LOIItem->loi_description ?? '' }} </dl>
-                                                                                </div>
-                                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                                    <dt class="d-lg-none d-xl-none d-xxl-none">Quantity</dt>
-                                                                                    <dl>{{ $LOIItem->quantity }}</dl>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            @endforeach
-                                                        @else
-                                                            <span class="text-center"> No Data Available! </span>
-                                                        @endif
-
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="modal fade" id="view-rejected-loi-docs-{{$letterOfIndent->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h1 class="modal-title fs-5" id="exampleModalLabel"> Customer Documents</h1>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="col-lg-12">
-                                                            <div class="row p-2">
-                                                                @foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument)
-                                                                    <div class="d-flex">
-                                                                        <div class="col-lg-12">
-                                                                            <div class="row p-2">
-                                                                                <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  width="400" height="600"></embed>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                @endforeach
-                                                                @if($letterOfIndent->signature)
-                                                                    <div class="col-lg-12 m-5">
-                                                                        <label class="form-label fw-bold">Signature</label>
-                                                                        <img src="{{ url('LOI-Signature/'.$letterOfIndent->signature) }}" width="100px;" height="100px">
                                                                     </div>
                                                                 @endif
                                                             </div>

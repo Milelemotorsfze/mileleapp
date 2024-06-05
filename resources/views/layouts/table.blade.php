@@ -90,7 +90,7 @@
             $('#dtBasicExample8').DataTable();
             $('#new-LOI-table').DataTable();
             $('#waiting-for-approval-LOI-table').DataTable();
-            $('#supplier-approved-LOI-table').DataTable();
+            $('#supplier-response-LOI-table').DataTable();
             $('#milele-approved-LOI-table').DataTable();
             $('#supplier-rejected-LOI-table').DataTable();
             $('#milele-partial-approved-LOI-table').DataTable();
