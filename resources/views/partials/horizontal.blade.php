@@ -672,7 +672,10 @@
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve','approve-addon-new-selling-price','supplier-price-action','verify-candidate-personal-information','send-personal-info-form-action']);
                             @endphp
-                            @if ($hasPermission OR Auth::user()->leave_request_approval['can'] == true OR Auth::user()->liability_request_approval['can'] == true OR Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can'] == true OR Auth::user()->candidate_docs_varify OR Auth::user()->candidate_personal_information_varify > 0 OR Auth::user()->joining_report_approval['count'])
+                            <!-- UNCOMMENT BELOW LINE WHEN HR MODULE GO LIVE -->
+                            <!-- OR Auth::user()->passport_submit_request_approval['can'] == true OR Auth::user()->passport_release_request_approval['can'] == true  -->
+                            @if ($hasPermission OR Auth::user()->leave_request_approval['can'] == true OR Auth::user()->liability_request_approval['can'] == true 
+                            OR Auth::user()->hiring_request_approval['can'] == true OR Auth::user()->job_description_approval['can'] == true OR Auth::user()->candidate_docs_varify OR Auth::user()->candidate_personal_information_varify > 0 OR Auth::user()->joining_report_approval['count'])
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                     <i data-feather="grid"></i>
