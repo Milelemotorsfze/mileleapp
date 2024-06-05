@@ -1030,7 +1030,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <script type="text/javascript">
 	// Declare commentIdCounter only once
-	let commentIdCounter = 0;
+	let commentIdCounter = 1;
     $('#work-order-history-table').DataTable();
     var customers = {!! json_encode($customers) !!};
 	var vins = {!! json_encode($vins) !!}
