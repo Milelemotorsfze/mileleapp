@@ -635,7 +635,7 @@ Route::get('/d', function () {
     Route::resource('warehouse', WarehouseController::class);
     Route::post('/update-warehouse-remarks', [WarehouseController::class, 'updatewarehouseremarks'])->name('warehouse.updatewarehouseremarks');
     Route::get('vehicles/payment-confirm/{id}', [PurchasingOrderController::class, 'confirmPayment'])->name('vehicles.paymentconfirm');
-    Route::get('/vehicles/cancel/{id}', [PurchasingOrderController::class, 'cancel'])->name('vehicles.cancel');
+    Route::post('purchasing_order/cancel/{id}', [PurchasingOrderController::class, 'cancel'])->name('vehicles.cancel');
     Route::get('/vehicles/rejecteds/{id}', [PurchasingOrderController::class, 'rejecteds'])->name('vehicles.rejecteds');
     Route::get('/vehicles/approvedcancel/{id}', [PurchasingOrderController::class, 'approvedcancel'])->name('vehicles.approvedcancel');
     Route::get('/vehicles/unrejecteds/{id}', [PurchasingOrderController::class, 'unrejecteds'])->name('vehicles.unrejecteds');
