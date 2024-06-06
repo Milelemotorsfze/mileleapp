@@ -8,11 +8,13 @@ use App\Models\LOIItemPurchaseOrder;
 use App\Models\MasterModel;
 use App\Models\PFI;
 use App\Models\PurchasingOrder;
+use App\Models\MasterShippingPorts;
 use App\Models\PurchasingOrderItems;
 use App\Models\SupplierInventory;
 use Illuminate\Http\Request;
 use App\Models\Varaint;
 use App\Models\Brand;
+use App\Models\Country;
 use App\Models\MasterModelLines;
 use App\Models\Supplier;
 use App\Models\Vehicles;
@@ -522,6 +524,8 @@ return view('warehouse.index', compact('data'));
      */
     public function create()
 {
+    $countries = Country::get();
+    $ports = MasterShippingPorts::with('country')->get();
     $useractivities =  New UserActivities();
         $useractivities->activity = "Creating Purchasing Order";
         $useractivities->users_id = Auth::id();
@@ -534,7 +538,7 @@ return view('warehouse.index', compact('data'));
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
         ->get();
     $payments = PaymentTerms::get();
-    return view('warehouse.create', compact('variants', 'vendors', 'payments'));
+    return view('warehouse.create', compact('variants', 'vendors', 'payments','countries','ports'));
 }
 public function getBrandsAndModelLines(Request $request)
 {
@@ -749,6 +753,8 @@ public function getBrandsAndModelLines(Request $request)
      */
     public function show($id)
     {
+        $countries = Country::get();
+        $ports = MasterShippingPorts::with('country')->get();
         $useractivities =  New UserActivities();
         $useractivities->activity = "Show The Purchasing Order";
         $useractivities->users_id = Auth::id();
@@ -757,7 +763,7 @@ public function getBrandsAndModelLines(Request $request)
         ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
         ->get();
-    $purchasingOrder = PurchasingOrder::findOrFail($id);
+    $purchasingOrder = PurchasingOrder::with(['polPort', 'podPort', 'fdCountry'])->findOrFail($id);
     $paymentterms = PaymentTerms::findorfail($purchasingOrder->payment_term_id);
     $payments = PaymentTerms::get();
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
@@ -813,7 +819,7 @@ public function getBrandsAndModelLines(Request $request)
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog',
-            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel'));
+            'purchasinglog','paymentterms','pfiVehicleVariants','variantCount','vendors', 'payments','vehiclesdel','countries','ports'));
     }
     public function edit($id)
     {

@@ -231,15 +231,30 @@ input[type=number]::-webkit-outer-spin-button {
           </div>
           <div class="col-lg-3 col-md-6">
               <label for="Incoterm" class="form-label">Port of Loading:</label>
-              <input type="text" id="pol" name="pol" class="form-control" placeholder="Port of Loading">
+              <select name="pol" class="form-control" id="pol">
+              <option value="">Select the Port of Loading</option>
+                    @foreach ($ports as $port)
+                    <option value="{{ $port->id }}">{{ $port->name }} - {{ $port->country->name }}</option>
+                    @endforeach
+                </select>
           </div>
           <div class="col-lg-3 col-md-6">
               <label for="Incoterm" class="form-label">Port of Discharge:</label>
-              <input type="text" id="pod" name="pod" class="form-control" placeholder="Port of Discharge">
+              <select name="pod" class="form-control" id="pod">
+              <option value="">Select the Port of Discharge</option>
+                    @foreach ($ports as $port)
+                    <option value="{{ $port->id }}">{{ $port->name }} - {{ $port->country->name }}</option>
+                    @endforeach
+                </select>
           </div>
           <div class="col-lg-3 col-md-6">
               <label for="Incoterm" class="form-label">Preferred Destination:</label>
-              <input type="text" id="fd" name="fd" class="form-control" placeholder="Preferred Destination">
+              <select name="fd" class="form-control" id="fd">
+              <option value="">Select the Preferred Destination</option>
+                    @foreach ($countries as $country)
+                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                    @endforeach
+                </select>
           </div>
             <div class="col-lg-3 col-md-6 mt-3">
                 <input type="checkbox" id="is_demand_planning_po" name="is_demand_planning_po" class="form-check-inline mr-1" >
@@ -483,5 +498,12 @@ $(document).ready(function() {
       checkDuplicateVIN();
     });
   });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#fd').select2();
+        $('#pol').select2();
+        $('#pod').select2();
+    });
 </script>
 @endpush
