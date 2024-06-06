@@ -86,7 +86,7 @@ class LetterOfIndentController extends Controller
      */
     public function store(Request $request)
     {
-//        dd($request->all());
+
         $request->validate([
             'customer_id' => 'required',
             'category' => 'required',
@@ -218,7 +218,7 @@ class LetterOfIndentController extends Controller
 
             DB::commit();
 
-            return redirect()->route('letter-of-indents.index')->with('success',"LOI Created successfully");
+            return redirect()->route('letter-of-indents.generate-loi',['id' => $LOI->id,'type' => $request->template_type[0] ]);
 
         }else{
 
@@ -238,7 +238,7 @@ class LetterOfIndentController extends Controller
         $letterOfIndent = LetterOfIndent::where('id',$request->id)->first();
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->get();
 
-        if ($request->type == 'TRANS_CAR') {
+        if ($request->type == 'trans_cars') {
             $height = $request->height;
             $width = $request->width;
 
@@ -258,7 +258,7 @@ class LetterOfIndentController extends Controller
                 }
             }
             return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
-        }else if($request->type == 'MILELE_CAR'){
+        }else if($request->type == 'milele_cars'){
             if($request->download == 1) {
                 $height = $request->height;
                 $width = $request->width;
@@ -279,7 +279,7 @@ class LetterOfIndentController extends Controller
 
             }
             return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
-        } else if($request->type == 'BUSINESS'){
+        } else if($request->type == 'business'){
             if($request->download == 1) {
                 $height = $request->height;
                 $width = $request->width;
@@ -391,6 +391,7 @@ class LetterOfIndentController extends Controller
             }
         }
         $LOITemplates = LoiTemplate::where('letter_of_indent_id', $id)->pluck('template_type')->toArray();
+
         return view('letter_of_indents.edit', compact('countries','customers','letterOfIndent','models',
                                 'letterOfIndentItems','salesPersons','possibleCustomers','LOITemplates'));
     }
@@ -532,10 +533,9 @@ class LetterOfIndentController extends Controller
                 }
             }
 
-
             DB::commit();
 
-            return redirect()->route('letter-of-indents.index')->with('success',"LOI Updated successfully");
+            return redirect()->route('letter-of-indents.generate-loi',['id' => $LOI->id,'type' => $request->template_type[0]]);
 
         }else{
             return redirect()->back()->with('error', "LOI with this customer and date and category is already exist.");

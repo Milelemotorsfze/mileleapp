@@ -479,7 +479,7 @@
             getCustomers();
             checkCountryCriterias();
             let customerType = $('#customer-type').val();
-
+            $('#template-type').val('').trigger('change');
             if(customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}') {
                 $('#template-type option[value=business]').prop('disabled',true);
             }else if(customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}') {
@@ -515,6 +515,7 @@
             var value = $('#dealer').val();
             $('#dealer-input').val(value);
             getModels('all','dealer-change');
+            $('#template-type').val('').trigger('change');
             if(value == 'Trans Cars') {
                 $('#template-type option[value=milele_cars]').prop('disabled',true);
                 $('#template-type option[value=trans_cars]').prop('disabled',false);

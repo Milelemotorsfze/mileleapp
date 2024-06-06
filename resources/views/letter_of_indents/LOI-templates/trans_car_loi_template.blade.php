@@ -43,7 +43,7 @@
             <input type="hidden" name="height" id="total-height" value="">
             <input type="hidden" name="width" id="width" value="">
             <input type="hidden" name="id" value="{{ $letterOfIndent->id }}">
-            <input type="hidden" name="type" value="TRANS_CAR">
+            <input type="hidden" name="type" value="trans_cars">
 
             <input type="hidden" name="download" value="1">
         <div class="text-end mt-3">
@@ -155,8 +155,8 @@
                 </div>
                 <p id="test"></p>
         </div>
-
     </div>
+
 </div>
     <script type="text/javascript">
         var height = document.getElementById('full-page').offsetHeight;

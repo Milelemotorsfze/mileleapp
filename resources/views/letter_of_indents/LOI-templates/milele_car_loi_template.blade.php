@@ -15,6 +15,7 @@
         .overlay-image {
             position: absolute;
             z-index: 1;
+            opacity: 1.8;
         }
         #so-details td {
             border: none;
@@ -55,7 +56,7 @@
                     <input type="hidden" name="height" id="total-height" value="">
                     <input type="hidden" name="width" id="width" value="">
                     <input type="hidden" name="id" value="{{ $letterOfIndent->id }}">
-                    <input type="hidden" name="type" value="MILELE_CAR">
+                    <input type="hidden" name="type" value="milele_cars">
                     <input type="hidden" name="download" value="1">
 
                     <div class="text-end mb-3">
@@ -108,11 +109,15 @@
                             <tr>
                                 <td>
                                     <span style="margin-right: 50px;padding-right: 50px"> To </span>
+                                    <span  style="list-style: none;" >
+                                        <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->customer->name ?? '' }}</span>
+                                       <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->customer->country->name ?? '' }} </span>
+                                    </span>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <span style="margin-right: 55px;padding-right: 60px"> </span>
+                                    <span style="margin-right: 55px;padding-right: 30px"> </span>
                                     <span style="background-color: black;font-size: 35px;color: black">zxdfdsiediri</span>
                                 </td>
                             </tr>
@@ -138,22 +143,26 @@
                             @endforeach
                             <tr>
                                 <td></td>
-                                <td>CNF - SHIPMENT AND TRANSPORTATION</td>
+                                <td>CNF - SHIPMENT AND TRANSPORTATION
+                                    <img class="overlay-image" src="{{ url('milele_seal.png') }}" style="width: 170px; height: 140px;"></img>
+                                </td>
                                 <td  style="background-color: black;color: black"></td>
                                 <td  style="background-color: black;color: black"></td>
                             </tr>
                             <?php
-                            if($letterOfIndentItems->count() >= 2) {
-                                $count = 0;
+                            if($letterOfIndentItems->count() >= 5) {
+                                $count = 5;
                             }else
                             {
-                                $count = 4;
+                                $count = 10;
                             }
                             ?>
                             @for($i=0;$i<$count;$i++)
                                 <tr>
                                     <td></td>
-                                    <td></td>
+                                    <td>
+
+                                    </td>
                                     <td  style="background-color: black;color: black"></td>
                                     <td  style="background-color: black;color: black"></td>
                                 </tr>
@@ -177,7 +186,7 @@
                                     <span>
                                          {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}
                                     </span>
-                                    <img class="overlay-image" src="{{ url('milele_seal.png') }}" style="width: 170px; height: 140px;"></img>
+{{--                                    <img class="overlay-image" src="{{ url('milele_seal.png') }}" style="width: 170px; height: 140px;"></img>--}}
                                 </td>
 {{--                                <td style="border: none">--}}
 {{--                                  --}}
@@ -228,7 +237,7 @@
         $('#total-height').val(imageHeight - 80);
         $('#width').val(imageWidth);
         $('.overlay-image').css('left', imageWidth+'px');
-        $('.overlay-image').css('top', imageHeight+'px' )
+        // $('.overlay-image').css('top', imageHeight+'px' )
 
     </script>
 @endsection

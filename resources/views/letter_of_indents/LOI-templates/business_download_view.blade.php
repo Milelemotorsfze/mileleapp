@@ -39,7 +39,7 @@
         <p>  <span style="font-weight: bold">Address: </span>  Dubai, UAE</p>
         <p>Dear Sir/Madam,</p>
 
-        <p>I am writing on behalf of {{ $letterOfIndent->customer->company_name ?? '' }}  to formally convey our intent to procure automobile(s) from Milele Motors.
+        <p>I am writing on behalf of {{ $letterOfIndent->customer->name ?? '' }}  to formally convey our intent to procure automobile(s) from Milele Motors.
             Please find our company's automotive requirements listed with specifications below.</p>
         <table>
             <tr>
@@ -76,7 +76,7 @@
             steps necessary to conclude this transaction professionally and in accordance with the law.
         </p>
         <p style="margin-bottom:0px;">Sincerely,</p>
-        <p> {{ $letterOfIndent->customer->company_name ?? '' }} </p>
+        <p> {{ $letterOfIndent->customer->name ?? '' }} </p>
         @if($letterOfIndent->signature)
             <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
         @endif
