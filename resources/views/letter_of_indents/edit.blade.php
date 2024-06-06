@@ -158,11 +158,14 @@
                             <div class="mb-3">
                                 <label class="form-label">Template Type </label>
                                 <select class="form-control widthinput" multiple name="template_type[]" id="template-type">
-                                    <option value="trans_cars" {{ in_array('trans_cars',$LOITemplates) ? 'selected' : 'disabled' }}>Trans Cars</option>
-                                    <option value="milele_cars" disabled {{ in_array('milele_cars',$LOITemplates) ? 'selected' : 'disabled' }}>Milele Cars</option>
-                                    <option value="individual" {{ in_array('individual',$LOITemplates) ? 'selected' : 'disabled' }}>Individual</option>
-                                    <option value="business" {{ in_array('business',$LOITemplates) ? 'selected' : 'disabled' }}>Business</option>
-
+                                    <option value="trans_cars" {{ in_array('trans_cars', $LOITemplates) ? 'selected' : '' }}
+                                        {{ $letterOfIndent->dealers == 'Milele Motors' ? 'disabled' : '' }}>Trans Cars</option>
+                                    <option value="milele_cars"  {{ in_array('milele_cars',$LOITemplates) ? 'selected' : '' }}
+                                        {{ $letterOfIndent->dealers == 'Trans Cars' ? 'disabled' : '' }}>Milele Cars</option>
+                                    <option value="individual" {{ in_array('individual',$LOITemplates) ? 'selected' : '' }}
+                                        {{ $letterOfIndent->customer->type == 'Company' ? 'disabled' : '' }}>Individual</option>
+                                    <option value="business" {{ in_array('business',$LOITemplates) ? 'selected' : '' }}
+                                        {{ $letterOfIndent->customer->type == 'Individual' ? 'disabled' : '' }}>Business</option>
                                 </select>
                             </div>
                         </div>
@@ -409,6 +412,7 @@
             }).on('change', function() {
                 $('#template-type-error').remove();
             });
+
             $('#sales_person_id').select2({
                 placeholder : 'Select Sales Person',
                 allowClear: true,
@@ -441,6 +445,7 @@
                 getModels('all','dealer-change');
                 var confirm = alertify.confirm('You want to choose LOI template again if you are changing the Dealer?',function (e) {
                     if (e) {
+                        $('#template-type').val('').trigger('change');
                         if (value == 'Trans Cars') {
                             $('#template-type option[value=milele_cars]').prop('disabled', true);
                             $('#template-type option[value=trans_cars]').prop('disabled', false);
@@ -457,7 +462,7 @@
             $('#customer-type').change(function () {
                 getCustomers();
                 let customerType = $('#customer-type').val();
-                var confirm = alertify.confirm('You want to choose LOI template again if you are changing the Customer Type?',function (e) {
+                var confirm = alertify.confirm('You want to choose LOI template again if you are changing the Customer Type!',function (e) {
                     if (e) {
                         $('#template-type').val('').trigger('change');
                         if (customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}') {

@@ -57,7 +57,6 @@
                 </li>
             @endforeach
         </div>
-        <br>
         <p>
             I understand that this Letter of Intent is not legally binding and merely expresses my genuine interest in
             purchasing your vehicle under the specified terms. A formal Purchase Agreement will be prepared once this letter is accepted. Furthermore,
@@ -66,7 +65,9 @@
         </p>
         <p style="margin-bottom: 5px;">Sincerely,</p>
         <p> {{ ucfirst($letterOfIndent->customer->name ?? '') }} </p>
-        <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
+        @if($letterOfIndent->signature)
+            <img src="{{ public_path('LOI-Signature/'.$letterOfIndent->signature) }}" style="height: 70px;width: 150px">
+        @endif
 
     </div>
 </div>

@@ -22,8 +22,8 @@
         .overlay-image {
             position: absolute;
             {{--top: {{ $height }}px;--}}
-            left: {{ $width }}px;
-            bottom: 50px;
+            {{--left: {{ $width }}px;--}}
+            /*bottom: 50px;*/
             z-index: 1;
         }
         #so-details td {
@@ -54,6 +54,7 @@
         }.
          #fullpage{height: 0;}
     </style>
+
 
 </head>
 <body>
@@ -105,18 +106,15 @@
             <tr>
                 <td>
                     <span style="margin-right: 50px;padding-right: 50px"> To </span>
-{{--                    <span>--}}
-{{--                             @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)--}}
-{{--                            {{ $letterOfIndent->customer->name }}--}}
-{{--                        @else--}}
-{{--                            {{ $letterOfIndent->customer->company ?? ''}}--}}
-{{--                        @endif--}}
-{{--                        </span>--}}
+                    <span  style="list-style: none;" >
+                        <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->customer->name ?? '' }}</span>
+                       <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->customer->country->name ?? '' }} </span>
+                    </span>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <span style="margin-right: 55px;padding-right: 60px"> </span>
+                    <span style="margin-right: 55px;padding-right: 30px"> </span>
                     <span style="background-color: black;font-size: 35px;color: black">zxdfdsiediri</span>
                 </td>
             </tr>
@@ -142,23 +140,28 @@
             @endforeach
             <tr>
                 <td></td>
-                <td>CNF - SHIPMENT AND TRANSPORTATION</td>
+                <td>CNF - SHIPMENT AND TRANSPORTATION
+                 <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 140px; height: 130px;"></img>
+
+                </td>
                 <td class="hide" style="border: none"></td>
                 <td class="hide" style="border: none"></td>
             </tr>
             <?php
-            if($letterOfIndentItems->count() >= 2) {
-                $count = 0;
-            }else
-            {
-                $count = 4;
-            }
+//            if($letterOfIndentItems->count() >= 5) {
+//                $count = 8;
+//            }else
+//            {
+                $count = 6;
+//            }
             ?>
 
             @for($i=0;$i<$count;$i++)
                 <tr>
                     <td></td>
-                    <td></td>
+                    <td>
+{{--                        <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 140px; height: 130px;"></img>--}}
+                    </td>
                     <td class="hide" style="border: none"></td>
                     <td class="hide" style="border: none"></td>
                 </tr>
@@ -181,7 +184,7 @@
             <tr style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF" id="date-div">
                 <td colspan="2" style="border: none;font-size: 14px;">Date :
                 <span style="margin-left: 3px"> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}</span>
-                    <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 140px; height: 130px;"></img>
+{{--                    <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 140px; height: 130px;"></img>--}}
                 </td>
 {{--                <td style="border: none">--}}
 

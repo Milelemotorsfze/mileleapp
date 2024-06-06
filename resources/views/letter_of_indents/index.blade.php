@@ -128,16 +128,10 @@
                                         </td>
                                         <td>
                                             @foreach($letterOfIndent->LOITemplates as $LOITemplate)
-                                               {{ ucwords( str_replace('_', ' ', $LOITemplate->template_type) )}}
+                                            <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => $LOITemplate->template_type ]) }}">
+                                                {{ ucwords( str_replace('_', ' ', $LOITemplate->template_type) )}}
+                                            </a>
                                             @endforeach
-{{--                                            <select class="form-control" onchange="location = this.value;">--}}
-{{--                                                <option value="">Select Template</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">--}}
-{{--                                                    Trans Car Template</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>--}}
-{{--                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>--}}
-{{--                                            </select>--}}
                                         </td>
                                         <td>
                                             @can('LOI-edit')
