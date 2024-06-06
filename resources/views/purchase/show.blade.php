@@ -136,6 +136,26 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="confirmationvehModal" tabindex="-1" role="dialog" aria-labelledby="confirmationvehModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationvehModalLabel">Confirm Cancellation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to cancel this Vehicle?</p>
+        <div class="form-group">
+          <label for="remarkspo">Remarks:</label>
+          <textarea class="form-control" id="remarksveh" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="confirmvehCancel">Yes, Send Cancel Request</button>
+      </div>
+    </div>
+  </div>
+</div>
     @php
         $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
         $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
@@ -900,11 +920,11 @@
                         @endphp
                         @if ($hasPermission)
                         @if($vehicles->status == 'Request for Cancel')
-                        <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.approvedcancel', $vehicles->id) }}" onclick="return confirmApprovedcancel();"style="white-space: nowrap;">
+                        <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.approvedcancel', ['id' => $vehicles->id]) }}" style="white-space: nowrap;">
                             Approved Cancel
                         </a>
                         @elseif ($vehicles->status != 'Rejected' && $vehicles->status != 'Request for Payment')
-                        <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmRejected();"style="white-space: nowrap;">
+                        <a id = 'cancelButtonveh' title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" style="white-space: nowrap;">
                             Reject / Cancel
                         </a>
                         @elseif ($vehicles->status == 'Rejected')
@@ -1043,7 +1063,7 @@
 								@if ($hasPermission)
 								@if ($purchasingOrder->status === 'Approved'  || $purchasingOrder->status === 'Pending Approval' && $vehicles->payment_status === '')
                                 @if($vehicles->status !== "Request for Cancel")
-								<a title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmCancel();" style="white-space: nowrap;">
+								<a id = 'cancelButtonveh' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" style="white-space: nowrap;">
 									Cancel
 								</a>
                                 @endif
@@ -1982,15 +2002,41 @@ function postUpdateStatus(status, orderId, remarks = '') {
             }
 
         </script>
-        <script>
-            function confirmCancel() {
-                var confirmDialog = confirm("Are you sure you want to cancel this Vehicles?");
-                if (confirmDialog) {
-                    return true;
-                } else {
-                    return false;
-                }
+  <script>
+ $(document).ready(function() {
+    var cancelUrl;
+    $('#cancelButtonveh').click(function(event) {
+                event.preventDefault(); // Prevent the default action (navigation)
+        cancelUrl = $(this).attr('href'); // Store the URL to redirect to after confirmation
+        $('#confirmationvehModal').modal('show'); // Show the modal
+            });
+			$('#confirmvehCancel').click(function() {
+        var remarks = $('#remarksveh').val(); // Get the remarks from the textarea
+        if (!remarks) {
+            alert('Please provide remarks.');
+            return; // Do not proceed if remarks are empty
+        }
+
+        // Make an AJAX POST request with the remarks and purchasing order ID
+        $.ajax({
+            url: cancelUrl, // Use the stored URL
+            type: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token
+                remarks: remarks
+            },
+            success: function(response) {
+                $('#confirmationvehModal').modal('hide'); // Hide the modal
+                alert('Remarks submitted successfully');
+                window.location.href = window.location.href; // Redirect to the cancel URL
+            },
+            error: function(xhr) {
+                console.error('Error:', xhr);
+                alert('An error occurred. Please try again.');
             }
+        });
+    });
+           });
         </script>
         <script>
             function confirmPayment() {

@@ -1309,7 +1309,7 @@ public function purchasingupdateStatus(Request $request)
         }
         return redirect()->back()->with('error', 'Vehicle not found.');
     }
-    public function cancel($id)
+    public function cancel(Request $request, $id)
     {
         $vehicle = Vehicles::findOrFail($id);
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
@@ -1374,11 +1374,14 @@ public function purchasingupdateStatus(Request $request)
                     }
 
                 }
+            $vehicle->procurement_vehicle_remarks = $request->input('remarks');
+            $vehicle->save();
             $vehicle->delete();
             }
             else
             {
             $vehicle->status = 'Request for Cancel';
+            $vehicle->procurement_vehicle_remarks = $request->input('remarks');
             $vehicle->save();
             $purchasedorders = PurchasingOrder::find($vehicle->purchasing_order_id);
             $purchasedorders->status = 'Pending Approval';
@@ -1445,6 +1448,8 @@ public function purchasingupdateStatus(Request $request)
                 }
 
             }
+        $vehicle->procurement_vehicle_remarks = $request->input('remarks');
+        $vehicle->save();
         $vehicle->delete();
         }
         return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
