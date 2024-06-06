@@ -93,6 +93,10 @@
     <i class="fa fa-arrow-left" aria-hidden="true"></i> Back
 </a>
 @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                    @endphp
+                    @if ($hasPermission)
+@php
     $purchasedordergrn = DB::table('vehicles')
     ->where('vehicles.purchasing_order_id', $purchasingOrder->id)
     ->whereNotNull('vehicles.grn_id')
@@ -103,6 +107,7 @@
 <a id="cancelButton" class="btn btn-sm btn-danger float-end me-4" href="{{ route('purchasing_order.cancelpo', ['id' => $purchasingOrder->id]) }}">
     <i class="fa fa-times" aria-hidden="true"></i> PO Cancel
 </a>
+@endif
 @endif
 @endif
         <!-- @if ($nextId)
