@@ -797,7 +797,7 @@
                             @endphp
                             @if ($hasPermission)
                             @if($vehicles->grn_id === null)
-							              @if ($vehicles->status != 'cancel')
+							@if ($vehicles->status != 'cancel')
                             <td class="editable-field ex_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                 <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
@@ -856,7 +856,36 @@
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                             @endif
-							              @endif
+                            @else
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                    <option value="">Exterior Color</option>
+                                    @foreach ($exColours as $id => $exColour)
+                                        @if ($id == $vehicles->ex_colour)
+                                            <option value="{{ $id }}" selected>{{ $exColour }}</option>
+                                        @else
+                                            <option value="{{ $id }}">{{ $exColour }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                    <option value="">Interior Color</option>
+                                    @foreach ($intColours as $id => $intColour)
+                                        @if ($id == $vehicles->int_colour)
+                                            <option value="{{ $id }}" selected>{{ $intColour }}</option>
+                                        @else
+                                            <option value="{{ $id }}">{{ $intColour }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+							@endif
                             @endif
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'po-approval']);
@@ -919,11 +948,11 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-approval');
                         @endphp
                         @if ($hasPermission)
-                        @if($vehicles->status == 'Request for Cancel')
+                        @if($vehicles->status == 'Request for Cancel' && is_null($vehicles->grn_id))
                         <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.approvedcancel', ['id' => $vehicles->id]) }}" style="white-space: nowrap;">
                             Approved Cancel
                         </a>
-                        @elseif ($vehicles->status != 'Rejected' && $vehicles->status != 'Request for Payment')
+                        @elseif ($vehicles->status != 'Rejected' && $vehicles->status != 'Request for Payment' && is_null($vehicles->grn_id))
                         <a id = 'cancelButtonveh' title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" style="white-space: nowrap;">
                             Reject / Cancel
                         </a>
@@ -1062,12 +1091,12 @@
 								@endphp
 								@if ($hasPermission)
 								@if ($purchasingOrder->status === 'Approved'  || $purchasingOrder->status === 'Pending Approval' && $vehicles->payment_status === '')
-                                @if($vehicles->status !== "Request for Cancel")
+                                @if($vehicles->status !== "Request for Cancel" && is_null($vehicles->grn_id))
 								<a id = 'cancelButtonveh' title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" style="white-space: nowrap;">
 									Cancel
 								</a>
                                 @endif
-								@elseif ($vehicles->status === 'Pending Approval')
+								@elseif ($vehicles->status === 'Pending Approval' && is_null($vehicles->grn_id))
 								<a title="Delete" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.deletevehicles', $vehicles->id) }}" onclick="return confirmDelete();" style="white-space: nowrap;">
 									Delete
 								</a>
