@@ -93,7 +93,7 @@
     <i class="fa fa-arrow-left" aria-hidden="true"></i> Back
 </a>
 @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('po-cancel');
                     @endphp
                     @if ($hasPermission)
 @php
