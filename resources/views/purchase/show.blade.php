@@ -247,19 +247,40 @@
             <label for="Incoterm" class="form-label">Port of Loading:</label>
             </div>
             <div class="col-md-8 p-3">
-              <input type="text" id="pol" name="pol" class="form-control" placeholder="Port of Loading" value="{{$purchasingOrder->pol}}">
+            <select name="pol" class="form-control" id="pol">
+                <option value="">Select the Port of Loading</option>
+                @foreach ($ports as $port)
+                    <option value="{{ $port->id }}" {{ $port->id == $purchasingOrder->pol ? 'selected' : '' }}>
+                        {{ $port->name }} - {{ $port->country->name }}
+                    </option>
+                @endforeach
+            </select>
             </div>
             <div class="col-md-4 p-3">
             <label for="Incoterm" class="form-label">Port of Discharge:</label>
             </div>
             <div class="col-md-8 p-3">
-              <input type="text" id="pod" name="pod" class="form-control" placeholder="Port of Discharge" value="{{$purchasingOrder->pod}}">
+            <select name="pod" class="form-control" id="pod">
+                <option value="">Select the Port of Loading</option>
+                @foreach ($ports as $port)
+                    <option value="{{ $port->id }}" {{ $port->id == $purchasingOrder->pod ? 'selected' : '' }}>
+                        {{ $port->name }} - {{ $port->country->name }}
+                    </option>
+                @endforeach
+            </select>
             </div>
             <div class="col-md-4 p-3">
             <label for="Incoterm" class="form-label">Preferred Destination:</label>
             </div>
             <div class="col-md-8 p-3">
-              <input type="text" id="fd" name="fd" class="form-control" placeholder="Preferred Destination" value="{{$purchasingOrder->fd}}">
+            <select name="fd" class="form-control" id="fd">
+            <option value="">Select the Preferred Destination</option>
+            @foreach ($countries as $country)
+                <option value="{{ $country->id }}" {{ $country->id == $purchasingOrder->fd ? 'selected' : '' }}>
+                    {{ $country->name }}
+                </option>
+            @endforeach
+        </select>
             </div>
         </div>
     </div>
@@ -355,10 +376,10 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-2 col-md-3 col-sm-12">
-                            <label for="choices-single-default" class="form-label"><strong>POL / POD / FD</strong></label>
+                            <label for="choices-single-default" class="form-label"><strong>POL / POD / PD</strong></label>
                         </div>
                         <div class="col-lg-6 col-md-9 col-sm-12">
-                            <span>{{$purchasingOrder->pol}} / {{$purchasingOrder->pod}} / {{$purchasingOrder->fd}}</span>
+                        <span> {{ $purchasingOrder->polPort->name ?? '' }} / {{ $purchasingOrder->podPort->name ?? '' }} / {{ $purchasingOrder->fdCountry->name ?? '' }}</span>
                         </div>
                     </div>
                     @if($purchasingOrder->status === 'Cancel Request')
