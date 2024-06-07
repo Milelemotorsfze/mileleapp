@@ -248,6 +248,7 @@
                 <option value="EUR" {{ $purchasingOrder->currency === 'EUR' ? 'selected' : '' }}>EUR</option>
                 <option value="GBP" {{ $purchasingOrder->currency === 'GBP' ? 'selected' : '' }}>GBP</option>
                 <option value="JPY" {{ $purchasingOrder->currency === 'JPY' ? 'selected' : '' }}>JPY</option>
+                <option value="CAD" {{ $purchasingOrder->currency === 'CAD' ? 'selected' : '' }}>CAD</option>
             </select>
             </div>
             <div class="col-md-4 p-3">

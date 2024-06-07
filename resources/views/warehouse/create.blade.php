@@ -129,6 +129,7 @@ input[type=number]::-webkit-outer-spin-button {
                                     <option value="EUR">EUR</option>
                                     <option value="GBP">GBP</option>
                                     <option value="JPY">JPY</option>
+                                    <option value="CAD">CAD</option>
             </select>
         </div>
         <div class="col-lg-2 col-md-6">
