@@ -42,10 +42,14 @@
             background-color: #000000;
             padding: 10px;
         }
+        .border-outline {
+            border: 1px solid #0f0f0f;
+            padding: 10px !important;
+        }
         @media only screen and (min-device-width: 1200px)
             {
             .container{
-                max-width: 1000px; !important;
+                max-width: 850px; !important;
             }
         }
     </style>
@@ -59,14 +63,14 @@
                     <input type="hidden" name="type" value="milele_cars">
                     <input type="hidden" name="download" value="1">
 
-                    <div class="text-end mb-3">
+                    <div class="text-end mb-3" style="margin-right: 20px;">
                         <a  class="btn  btn-info float-end " style="margin-left: 10px;" href="{{ url()->previous() }}" >
                             <i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
-                            <button type="submit" class="btn btn-primary "> Download <i class="fa fa-download"></i></button>
+                        <button type="submit" class="btn btn-primary "> Download <i class="fa fa-download"></i></button>
                         </button>
                     </div>
                 </form>
-                <div class="container">
+                <div class="container border-outline">
                     <div class="header">
                         <table>
                             <tr>
@@ -150,7 +154,7 @@
                                 <td  style="background-color: black;color: black"></td>
                             </tr>
                             <?php
-                            if($letterOfIndentItems->count() >= 5) {
+                            if($letterOfIndentItems->count() >= 7) {
                                 $count = 5;
                             }else
                             {
@@ -216,6 +220,14 @@
                             <p style="font-weight: bold">THANK YOU FOR YOUR BUSINESS</p>
                         </div>
                     </div>
+                    @if($letterOfIndent->LOIDocuments->count() > 0)
+                        <h5 class="fw-bold text-center">Customer Document</h5>
+                    @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
+                            <div class="mt-3"  id="remove-doc-{{$letterOfIndentDocument->id}}">
+                                <iframe src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" height="500px;" ></iframe>
+                            </div>
+                        @endforeach
+                    @endif
                 </div>
             </div>
         </div>
