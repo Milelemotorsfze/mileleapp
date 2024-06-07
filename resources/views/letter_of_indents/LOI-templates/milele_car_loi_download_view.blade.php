@@ -21,8 +21,8 @@
         }
         .overlay-image {
             position: absolute;
-            {{--top: {{ $height }}px;--}}
-            {{--left: {{ $width }}px;--}}
+            top: {{ $height }}px;
+            left: {{ $width }}px;
             /*bottom: 50px;*/
             z-index: 1;
         }
@@ -140,41 +140,29 @@
             @endforeach
             <tr>
                 <td></td>
-                <td>CNF - SHIPMENT AND TRANSPORTATION
-                 <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 140px; height: 130px;"></img>
-
-                </td>
+                <td>CNF - SHIPMENT AND TRANSPORTATION</td>
                 <td class="hide" style="border: none"></td>
                 <td class="hide" style="border: none"></td>
             </tr>
-            <?php
-//            if($letterOfIndentItems->count() >= 5) {
-//                $count = 8;
-//            }else
-//            {
-                $count = 6;
-//            }
-            ?>
 
-            @for($i=0;$i<$count;$i++)
-                <tr>
-                    <td></td>
-                    <td>
-{{--                        <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 140px; height: 130px;"></img>--}}
-                    </td>
-                    <td class="hide" style="border: none"></td>
-                    <td class="hide" style="border: none"></td>
-                </tr>
-            @endfor
+{{--            @if($letterOfIndentItems->count() <= 5)--}}
+{{--                <?php--}}
+{{--                $count = 6;--}}
+{{--                ?>--}}
+{{--                @for($i=0;$i<$count;$i++)--}}
+{{--                    <tr>--}}
+{{--                        <td></td>--}}
+{{--                        <td></td>--}}
+{{--                        <td class="hide" style="border: none"></td>--}}
+{{--                        <td class="hide" style="border: none"></td>--}}
+{{--                    </tr>--}}
+{{--                @endfor--}}
+{{--            @endif--}}
 
             <tr style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
                 <td colspan="2" style="border: none;font-size: 14px">Name :
                     <span style="margin-left: 3px" >
-                             @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)
-                            {{ $letterOfIndent->customer->name }}
-                        @else
-                            {{ $letterOfIndent->customer->company ?? ''}}
-                        @endif
+                            {{ $letterOfIndent->customer->name ?? ''}}
                         </span>
                 </td>
 
@@ -184,7 +172,7 @@
             <tr style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF" id="date-div">
                 <td colspan="2" style="border: none;font-size: 14px;">Date :
                 <span style="margin-left: 3px"> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}</span>
-{{--                    <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 140px; height: 130px;"></img>--}}
+                    <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 140px; height: 130px;"></img>
                 </td>
 {{--                <td style="border: none">--}}
 

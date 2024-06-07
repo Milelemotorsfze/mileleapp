@@ -159,9 +159,7 @@
                     </div>
                     <p id="test"></p>
             </div>
-
             </div>
-
             @if($letterOfIndent->LOIDocuments->count() > 0)
                 <h5 class="fw-bold text-center">Customer Document</h5>
             @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
