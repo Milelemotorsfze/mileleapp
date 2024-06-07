@@ -172,13 +172,7 @@
                                 {{--                            @endfor--}}
                                 <tr id="footer-table" style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
                                     <td colspan="2" style="border: none;">Name:
-                                        <span style="margin-left: 10px">
-                                         @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)
-                                                {{ $letterOfIndent->customer->name }}
-                                            @else
-                                                {{ $letterOfIndent->customer->company ?? ''}}
-                                            @endif
-                                    </span>
+                                        <span style="margin-left: 10px"> {{ $letterOfIndent->customer->name ?? '' }} </span>
                                     </td>
 
                                     <td style="border: none;text-align: end">SUBTOTAL</td>
