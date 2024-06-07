@@ -2939,7 +2939,6 @@ $('#shipping_port').select2();
     $('#search-button').on('click', function() {
         var modelLineId = $('#model_line').val();
         var brandId = $('#brand').val();
-
         var variantId = $('#variant').val();
         var interiorColorId = $('#interior_color').val();
         var exteriorColorId = $('#exterior_color').val();
