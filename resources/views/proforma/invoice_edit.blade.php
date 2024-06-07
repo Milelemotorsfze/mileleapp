@@ -1420,6 +1420,11 @@
         var selectedAgentName = $(this).find(':selected').text();
         $('#agents_id').val(selectedAgentId);
         $('#selected_cb_name').val(selectedAgentName);
+        if (selectedAgentId) {
+                        $('.system-code').removeAttr('disabled');
+                    } else {
+                        $('.system-code').attr('disabled', 'disabled');
+                    }
     });
     fetchAgentData();
     function fetchAgentData() {
@@ -2483,20 +2488,17 @@ $('#shipping_port').select2();
                 targets: -5,
                 render: function (data, type, row) {
                     var agentId = row.systemcode ? row.systemcode : $("#agents_id").val() ? 1 : null;
-                if (agentId) {
+                    var disabledAttr = agentId ? '' : 'disabled';
                     var systemcode = row.systemcode ? row.systemcode : 1;
+
                     return '<div class="input-group"> ' +
-                                '<input type="number" min="0"  value="' + systemcode + '" step="1" class="system-code form-control"  name="system_code_amount[]"  id="system-code-amount-'+ row['index'] +'" />' +
-                                '<div class="input-group-append"> ' +
-                                    '<select class="form-control system-code-currency" name="system_code_currency[]"  id="system-code-currency-'+ row['index'] +'">' +
-                                        '<option value="A">A</option><option value="U">U</option>' +
-                                '</select>' +
-                                '</div> ' +
-                            '</div>';
-                        } else {
-            // If agent id is not selected, return empty string to hide the column
-            return '';
-             }
+                               '<input type="number" min="0" value="' + systemcode + '" step="1" class="system-code form-control" name="system_code_amount[]" id="system-code-amount-'+ row['index'] +'" ' + disabledAttr + ' />' +
+                               '<div class="input-group-append"> ' +
+                                   '<select class="form-control system-code-currency" name="system_code_currency[]" id="system-code-currency-'+ row['index'] +'">' +
+                                       '<option value="A">A</option><option value="U">U</option>' +
+                                   '</select>' +
+                               '</div> ' +
+                           '</div>';
                 }
             },
             {

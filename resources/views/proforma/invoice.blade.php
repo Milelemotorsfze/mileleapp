@@ -1406,10 +1406,16 @@
     }
 $(document).ready(function () {
     $('#cb_name').change(function () {
+        console.log("pouch");
         var selectedAgentId = $(this).val();
         var selectedAgentName = $(this).find(':selected').text();
         $('#agents_id').val(selectedAgentId);
         $('#selected_cb_name').val(selectedAgentName);
+        if (selectedAgentId) {
+                        $('.system-code').removeAttr('disabled');
+                    } else {
+                        $('.system-code').attr('disabled', 'disabled');
+                    }
     });
     fetchAgentData();
     function fetchAgentData() {
@@ -2363,26 +2369,21 @@ $('#shipping_port').select2();
                 }
             },
             {
-    targets: -5,
-    data: null,
-    render: function (data, type, row) {
-        // Check if agent id is selected
-        var agentId = $("#agents_id").val();
-        if (agentId) {
-            return '<div class="input-group"> ' +
-                        '<input type="text" min="0"  value="1" step="1" class="system-code form-control"  name="system_code_amount[]"  id="system-code-amount-'+ row['index'] +'" />' +
-                        '<div class="input-group-append"> ' +
-                            '<select class="form-control system-code-currency" name="system_code_currency[]"  id="system-code-currency-'+ row['index'] +'">' +
-                                '<option value="A">A</option><option value="U">U</option>' +
-                            '</select>' +
-                        '</div> ' +
-                    '</div>';
-        } else {
-            // If agent id is not selected, return empty string to hide the column
-            return '';
-             }
-            }
-        },
+                targets: -5,
+                data: null,
+                render: function (data, type, row) {
+                    var agentId = $("#agents_id").val();
+                    var disabledAttr = agentId ? '' : 'disabled';
+                    return '<div class="input-group"> ' +
+                               '<input type="text" min="0" value="1" step="1" class="system-code form-control" name="system_code_amount[]" id="system-code-amount-'+ row['index'] +'" ' + disabledAttr + ' />' +
+                               '<div class="input-group-append"> ' +
+                                   '<select class="form-control system-code-currency" name="system_code_currency[]" id="system-code-currency-'+ row['index'] +'">' +
+                                       '<option value="A">A</option><option value="U">U</option>' +
+                                   '</select>' +
+                               '</div> ' +
+                           '</div>';
+                }
+            },
             {
                 targets: -3,
                 data: null,
