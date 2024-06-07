@@ -324,14 +324,11 @@
 {{--                                        <td>{{ $letterOfIndent->prefered_location }}</td>--}}
                                         <td>{{ $letterOfIndent->status }}</td>
                                         <td>
-                                            <select class="form-control" onchange="location = this.value;">
-                                                <option value="">Select Template</option>
-                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">
-                                                    Trans Car Template</option>
-                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>
-                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>
-                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>
-                                            </select>
+                                            @foreach($letterOfIndent->LOITemplates as $LOITemplate)
+                                                <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => $LOITemplate->template_type ]) }}">
+                                                    {{ ucwords( str_replace('_', ' ', $LOITemplate->template_type) )}}
+                                                </a>
+                                            @endforeach
                                         </td>
                                         <td>
                                             @can('loi-supplier-approve')
@@ -673,6 +670,7 @@
                                     <th>Approval Status</th>
                                     <th>Approved / Rejected Date</th>
                                     <th>LOI</th>
+                                    <th>PFI</th>
                                     <th width="150px">Actions</th>
                                 </tr>
                                 </thead>
@@ -696,17 +694,19 @@
                                         <td>{{ $letterOfIndent->customer->country->name ?? '' }}</td>
                                         <td>{{ $letterOfIndent->submission_status }}</td>
                                         <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->loi_approval_date)->format('Y-m-d')  }}</td>
-
                                         <td>
-
-                                            <select class="form-control" onchange="location = this.value;">
-                                                <option value="">Select Template</option>
-                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">
-                                                    Trans Car Template</option>
-                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>
-                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>
-                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>
-                                            </select>
+                                            @foreach($letterOfIndent->LOITemplates as $LOITemplate)
+                                                <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => $LOITemplate->template_type ]) }}">
+                                                    {{ ucwords( str_replace('_', ' ', $LOITemplate->template_type) )}}
+                                                </a>
+                                            @endforeach
+                                        </td>
+                                        <td>
+                                            @if($letterOfIndent->is_pfi_pending_for_loi == true)
+                                                <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
+                                                    <button type="button"  class="btn btn-soft-blue btn-sm">Add PFI</button>
+                                                </a>
+                                            @endif
                                         </td>
                                         <td>
                                             <button type="button" class="btn btn-soft-violet primary btn-sm" title="View LOI Item Lists" data-bs-toggle="modal" data-bs-target="#view-supplier-response-loi-items-{{$letterOfIndent->id}}">
@@ -905,14 +905,11 @@
                                         <td> {{ $letterOfIndent->total_quantity }} </td>
                                         <td> {{ $letterOfIndent->utilized_quantity }} </td>
                                         <td>
-                                            <select class="form-control" onchange="location = this.value;">
-                                                <option value="">Select Template</option>
-                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">
-                                                    Trans Car Template</option>
-                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>
-                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>
-                                                <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>
-                                            </select>
+                                            @foreach($letterOfIndent->LOITemplates as $LOITemplate)
+                                                <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => $LOITemplate->template_type ]) }}">
+                                                    {{ ucwords( str_replace('_', ' ', $LOITemplate->template_type) )}}
+                                                </a>
+                                            @endforeach
                                         </td>
                                         <td>
                                             @if($letterOfIndent->is_pfi_pending_for_loi == true)

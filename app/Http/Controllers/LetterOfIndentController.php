@@ -25,6 +25,7 @@ use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Intervention\Image\Facades\Image;
 use Maatwebsite\Excel\Facades\Excel;
 use Monarobase\CountryList\CountryListFacade;
 use setasign\Fpdi\Fpdi;
