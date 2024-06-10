@@ -418,10 +418,11 @@ Route::get('/d', function () {
 
     // Work Order Module
     Route::resource('work-order', WorkOrderController::class)->only([
-        'index', 'show','store'
+        'show','store'
     ]);
     Route::controller(WorkOrderController::class)->group(function(){
         Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
+        Route::get('work-order-info/{type}', 'index')->name('work-order.index');
         Route::post('/fetch-addons', [WorkOrderController::class, 'fetchAddons'])->name('fetch-addons');
         // Route::get('export-cnf-work-order-create', 'exportCnfWorkOrderCreate')->name('export-cnf.createWO');
         // Route::get('local-sale-work-order-create', 'exportLocalSaleWorkOrderCreate')->name('local-sale.createWO');
