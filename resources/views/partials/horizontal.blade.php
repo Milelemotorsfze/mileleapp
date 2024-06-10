@@ -1458,6 +1458,11 @@
                                                 <span data-key="t-utility">Status Wise</span>
                                             </a>
                                             </div>
+                                            <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vehicles.currentstatus')}}" id="topnav-utility" role="button">
+                                                <span data-key="t-vehicles">Vehicle Current Status</span>
+                                            </a>
+                                            </div>        
                                             </div>
                                 </li>
                                 @endif

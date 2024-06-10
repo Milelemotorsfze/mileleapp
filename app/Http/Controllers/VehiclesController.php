@@ -3187,5 +3187,65 @@ private function fetchPost($variant, $exteriorColor)
 
     return $query->select('mm_posts.ID', 'mm_posts.post_title', 'mm_posts.post_name')
         ->first();
-}
+    }
+        public function currentstatus ()
+        {
+            return view('vehicles.currentstatus');
+        }
+        public function statussreach(Request $request)
+        {
+            $searchQuery = $request->input('search');
+            $vehicles = Vehicles::where('vin', 'LIKE', "%{$searchQuery}%")->get();
+        $data = [];
+        foreach ($vehicles as $vehicle) {
+            if ($vehicle->grn_id) {
+                $status = "GRN ID: {$vehicle->grn_id}";
+                $previous_status = 'N/A';
+                $next_stage = 'N/A';
+            } 
+            else {
+                $status = $vehicle->status;
+                switch ($status) {
+                    case 'Approved':
+                        $previous_status = 'Pending Approval From Vehicle Procurement Manager';
+                        $current_status = 'Vehicle is Approved For Initiated Payement';
+                        $next_stage = 'Initiated Payment By Vehicle Procurement Executive';
+                        break;
+                    case 'Not Approved':
+                        $previous_status = 'Created PO By Vehicle Procurement Executive';
+                        $current_status = 'Vehicle is Not Approved By the Vehicle Procurement Manager';
+                        $next_stage = 'Approved Vehicle By Procurement Manager';
+                        break;
+                    case 'Request for Payment':
+                        $previous_status = 'Initiated Payment By Vehicle Procurement Executive';
+                        $next_stage = '';
+                        break;
+                    case 'Initiated Payment':
+                            $previous_status = 'Approved';
+                            $next_stage = 'Payment Completed';
+                            break;
+                    case 'Initiated Payment':
+                            $previous_status = 'Approved';
+                            $next_stage = 'Payment Completed';
+                            break;
+                    case 'Initiated Payment':
+                                $previous_status = 'Approved';
+                                $next_stage = 'Payment Completed';
+                                break;
+                    default:
+                        $previous_status = 'N/A';
+                        $next_stage = 'N/A';
+                        break;
+                }
+            }
+
+            $data[] = [
+                'previous_status' => $previous_status,
+                'current_status' => $status,
+                'next_stage' => $next_stage
+            ];
+        }
+
+        return response()->json(['data' => $data]);
+        }
     }
