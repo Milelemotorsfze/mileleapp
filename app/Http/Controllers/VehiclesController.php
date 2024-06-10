@@ -3241,10 +3241,10 @@ private function fetchPost($variant, $exteriorColor)
                     $current_status = 'Request to CEO Office for Payment Release';
                     $next_stage = 'CEO Office Payment Released';
                 }
-                if ($vehicle->status == 'Incoming Stock' && $vehicle->payment_status == NULL) {
+                if ($vehicle->status == 'Incoming Stock' && $vehicle->grn_id == NULL) {
                     $previous_status = 'Vehicle Procurement Executive Will Confirm Vendor Received Payment and Vehicle is Incoming';
-                    $current_status = 'Incoming Vehicles';
-                    $next_stage = 'GRN';
+                    $current_status = 'Incoming Vehicles / Pending GRN';
+                    $next_stage = 'GRN Done';
                 }
                 if ($vehicle->grn_id != NULL && $vehicle->inspection_date == null) {
                     $previous_status = 'GRN Done';
