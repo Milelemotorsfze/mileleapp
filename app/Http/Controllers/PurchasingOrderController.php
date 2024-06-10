@@ -586,6 +586,15 @@ public function getBrandsAndModelLines(Request $request)
         $purchasingOrder->status = "Pending Approval";
         $purchasingOrder->created_by = auth()->user()->id;
         $purchasingOrder->is_demand_planning_po = $request->is_demand_planning_po ? true : false;
+        if ($request->hasFile('uploadPL')) {
+            $fileNameWithExt = $request->file('uploadPL')->getClientOriginalName();
+            $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+            $extension = $request->file('uploadPL')->getClientOriginalExtension();
+            $fileNameToStore = $filename.'_'.time().'.'.$extension;
+            $path = $request->file('uploadPL')->storeAs('public/uploads', $fileNameToStore);
+            $purchasingOrder->pl_number = $request->hasFile('plNumber');
+            $purchasingOrder->pl_file_path = 'storage/uploads/' . $fileNameToStore;
+        }
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
         $updateponum = PurchasingOrder::find($purchasingOrderId);

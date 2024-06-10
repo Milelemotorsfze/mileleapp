@@ -262,6 +262,16 @@ input[type=number]::-webkit-outer-spin-button {
                 <label for="is_demand_planning_po" class="form-label fw-bold">Is Demand Planning PO ?</label>
             </div>
             </div>
+            <div class="row">
+    <div class="col-lg-2 col-md-6">
+        <label for="plNumber" class="form-label">PL Number:</label>
+        <input type="number" id="plNumber" name="plNumber" class="form-control" placeholder="Enter PL Number">
+    </div>
+    <div class="col-lg-2 col-md-6">
+        <label for="uploadPL" class="form-label">Upload PL:</label>
+        <input type="file" id="uploadPL" name="uploadPL" class="form-control" placeholder="Choose file">
+    </div>
+</div>
             <br>
             <br>
             <input type="hidden" name="totalcost" id="totalUnitPriceInputHidden" value="0">
