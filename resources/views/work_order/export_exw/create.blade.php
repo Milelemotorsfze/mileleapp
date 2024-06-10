@@ -211,7 +211,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 @if ($hasPermission)
 <div class="card-header">
 	<h4 class="card-title"> Create @if(isset($type) && $type == 'export_exw') Export EXW @elseif(isset($type) && $type == 'export_cnf') Export CNF @elseif(isset($type) && $type == 'local_sale') Local Sale @endif Work Order </h4>
-	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('work-order.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> List</a>
+	<a style="float: right;" class="btn btn-sm btn-info" href="{{ route('work-order.index',$type) }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> List</a>
 </div>
 <div class="card-body">
 	@if (count($errors) > 0)
@@ -230,10 +230,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 	<form id="WOForm" name="WOForm" action="{{route('work-order.store')}}" enctype="multipart/form-data" method="POST">
 		@csrf
 		<a  title="Finance Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-			<i class="fa fa-check" aria-hidden="true"></i> Finance Approval
+		<i class="fa fa-check" aria-hidden="true"></i> Finance Approval
 		</a>
 		<a  title="COE Office Approval" style="margin-top:0px;margin-bottom:1.25rem;" class="btn btn-sm btn-success">
-			<i class="fa fa-check" aria-hidden="true"></i> COE Office Approval
+		<i class="fa fa-check" aria-hidden="true"></i> COE Office Approval
 		</a>
 		<div class="card">
 			<div class="card-header">
@@ -243,12 +243,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			</div>
 			<div class="card-body">
 				<div class="row">
-                    <input type="hidden" name="type" id="type" value={{$type ?? ''}}>
+					<input type="hidden" name="type" id="type" value={{$type ?? ''}}>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
 						<label for="date" class="col-form-label text-md-end">{{ __('Date') }}</label>
 						<input id="date" type="date" class="form-control widthinput @error('date') is-invalid @enderror" name="date"
-                         value="" autocomplete="date" autofocus>
+							value="" autocomplete="date" autofocus>
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<span class="error">* </span>
@@ -257,22 +257,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							placeholder="Enter SO Number" value="SO-00" autocomplete="so_number" autofocus onkeyup="setWo()">
 					</div>
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
-                    <div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
 						<div class="dropdown-option-div">
 							<span class="error">* </span>
 							<label for="batch" class="col-form-label text-md-end">{{ __('Choose Batch') }}</label>
 							<select name="batch" id="batch" class="form-control widthinput" autofocus>
-								<option>Choose Batch</option>
+								<option value="">Choose Batch</option>
 								<option value="Batch 1">Batch 1</option>
-                                <option value="Batch 2">Batch 2</option>
-                                <option value="Batch 3">Batch 3</option>
-                                <option value="Batch 4">Batch 4</option>
-                                <option value="Batch 5">Batch 5</option>
-                                <option value="Batch 6">Batch 6</option>
-                                <option value="Batch 7">Batch 7</option>
-                                <option value="Batch 8">Batch 8</option>
-                                <option value="Batch 9">Batch 9</option>
-                                <option value="Batch 10">Batch 10</option>
+								<option value="Batch 2">Batch 2</option>
+								<option value="Batch 3">Batch 3</option>
+								<option value="Batch 4">Batch 4</option>
+								<option value="Batch 5">Batch 5</option>
+								<option value="Batch 6">Batch 6</option>
+								<option value="Batch 7">Batch 7</option>
+								<option value="Batch 8">Batch 8</option>
+								<option value="Batch 9">Batch 9</option>
+								<option value="Batch 10">Batch 10</option>
 							</select>
 						</div>
 					</div>
@@ -280,40 +280,42 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<label for="wo_number" class="col-form-label text-md-end">{{ __('WO Number') }}</label>
 						<input id="wo_number" type="text" class="form-control widthinput @error('wo_number') is-invalid @enderror" name="wo_number"
-							placeholder="Enter WO" value="WO-" autocomplete="wo_number" autofocus disabled>
+							placeholder="Enter WO" value="WO-" autocomplete="wo_number" autofocus readonly>
 					</div>
-                    <div class="col-xxl-5 col-lg-11 col-md-11">
+					<div class="col-xxl-5 col-lg-11 col-md-11">
 						<label for="customer_name" class="col-form-label text-md-end">{{ __('Customer Name') }}</label>
-                        <select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
-                            @foreach($customers as $customer)
-                            <option value="{{$customer->customer_name ?? ''}}">{{$customer->customer_name ?? ''}}</option>
-                            @endforeach
-                        </select>
-                        <input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
-                        class="form-control widthinput @error('customer_name') is-invalid @enderror">
-                    </div>
-                    <div class="col-xxl-1 col-lg-1 col-md-1" id="Other">
-                        <a  title="Create New Customer" onclick=checkValue() style="margin-top:38px; width:100%;"
+						<input hidden id="customer_reference_id" name="customer_reference_id" value="">
+						<input hidden id="customer_reference_type" name="customer_reference_type" value="">
+						<select id="customer_name" name="existing_customer_name" class="form-control widthinput" multiple="true">
+							@foreach($customers as $customer)
+							<option value="{{$customer->customer_name ?? ''}}">{{$customer->customer_name ?? ''}}</option>
+							@endforeach
+						</select>
+						<input type="text" id="textInput" placeholder="Enter Customer Name" name="new_customer_name"
+							class="form-control widthinput @error('customer_name') is-invalid @enderror">
+					</div>
+					<div class="col-xxl-1 col-lg-1 col-md-1" id="Other">
+						<a  title="Create New Customer" onclick=checkValue() style="margin-top:38px; width:100%;"
 							class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> Create New</a>
-                    </div>
-                    <div class="col-xxl-1 col-lg-1 col-md-1" id="switchToDropdown" >
-                        <a title="Choose Customer Name" onclick=switchToDropdown() style="margin-top:38px; width:100%;"
+					</div>
+					<div class="col-xxl-1 col-lg-1 col-md-1" id="switchToDropdown" >
+						<a title="Choose Customer Name" onclick=switchToDropdown() style="margin-top:38px; width:100%;"
 							class="btn btn-sm btn-info modal-button"><i class="fa fa-arrow-down " aria-hidden="true"></i> Choose</a>
-                    </div>
+					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<label for="customer_email" class="col-form-label text-md-end">{{ __('Customer Email ID') }}</label>
 						<input id="customer_email" type="text" class="form-control widthinput @error('customer_email') is-invalid @enderror" name="customer_email"
 							placeholder="Enter Customer Email ID" value="" autocomplete="customer_email" autofocus>
 					</div>
-                    <div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
-                        <label for="customer_company_number" class="col-form-label text-md-end">{{ __('Customer Contact Number') }}</label>
-                        <input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]')
-                                is-invalid @enderror" name="customer_company_number[main]" placeholder="Enter Customer Contact Number" oninput="validationOnKeyUp(this)"
-                                value="" autocomplete="customer_company_number[full]" autofocus>
-                    </div>
+					<div class="col-xxl-3 col-lg-6 col-md-6 select-button-main-div">
+						<label for="customer_company_number" class="col-form-label text-md-end">{{ __('Customer Contact Number') }}</label>
+						<input id="customer_company_number" type="tel" class="widthinput contact form-control @error('customer_company_number[full]')
+							is-invalid @enderror" name="customer_company_number[main]" placeholder="Enter Customer Contact Number"
+							value="" autocomplete="customer_company_number[full]" autofocus>
+					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
 						<label for="customer_address" class="col-form-label text-md-end">{{ __("Customer Address" ) }}</label>
-                        <textarea rows="3" id="customer_address" type="text" class="form-control @error('customer_address') is-invalid @enderror"
+						<textarea rows="3" id="customer_address" type="text" class="form-control @error('customer_address') is-invalid @enderror"
 							name="customer_address" placeholder="Address in UAE" value="{{ old('customer_address') }}"  autocomplete="customer_address"
 							autofocus></textarea>
 					</div>
@@ -322,60 +324,60 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						<input id="customer_representative_name" type="text" class="form-control widthinput @error('customer_representative_name') is-invalid @enderror" name="customer_representative_name"
 							placeholder="Enter Customer Representative Name" value="" autocomplete="customer_representative_name" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="customer_representative_email" class="col-form-label text-md-end">{{ __('Customer Representative Email ID') }}</label>
 						<div class="dropdown-option-div">
-                        <input id="customer_representative_email" type="text" class="form-control widthinput @error('customer_representative_email') is-invalid @enderror"
-                         name="customer_representative_email"
-							placeholder="Enter Customer Representative Email ID" value="" autocomplete="customer_representative_email" autofocus>
-                        </div>
+							<input id="customer_representative_email" type="text" class="form-control widthinput @error('customer_representative_email') is-invalid @enderror"
+								name="customer_representative_email"
+								placeholder="Enter Customer Representative Email ID" value="" autocomplete="customer_representative_email" autofocus>
+						</div>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="customer_representative_contact" class="col-form-label text-md-end">{{ __('Customer Representative Contact Number') }}</label>
-                        <input id="customer_representative_contact" type="tel" class="widthinput contact form-control @error('customer_representative_contact[full]')
-                                is-invalid @enderror" name="customer_representative_contact[main]" placeholder="Enter Customer Contact Number" oninput="validationOnKeyUp(this)"
-                                value="" autocomplete="customer_representative_contact[full]" autofocus>
+						<input id="customer_representative_contact" type="tel" class="widthinput contact form-control @error('customer_representative_contact[full]')
+							is-invalid @enderror" name="customer_representative_contact[main]" placeholder="Enter Customer Contact Number"
+							value="" autocomplete="customer_representative_contact[full]" autofocus>
 					</div>
 					@if(isset($type) && $type == 'export_exw')
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="freight_agent_name" class="col-form-label text-md-end">{{ __('Freight Agent Name') }}</label>
 						<input id="freight_agent_name" type="text" class="form-control widthinput @error('freight_agent_name') is-invalid @enderror"
-                         name="freight_agent_name"
+							name="freight_agent_name"
 							placeholder="Enter Freight Agent Name" value="" autocomplete="freight_agent_name" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="freight_agent_email" class="col-form-label text-md-end">{{ __('Freight Agent Email ID') }}</label>
 						<input id="freight_agent_email" type="text" class="form-control widthinput @error('freight_agent_email') is-invalid @enderror"
-                         name="freight_agent_email"
+							name="freight_agent_email"
 							placeholder="Enter Freight Agent Email ID" value="" autocomplete="freight_agent_email" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="freight_agent_contact_number" class="col-form-label text-md-end">{{ __('Freight Agent Contact Number') }}</label>
 						<input id="freight_agent_contact_number" type="tel" class="widthinput contact form-control @error('freight_agent_contact_number[full]')
-                                is-invalid @enderror" name="freight_agent_contact_number[main]" placeholder="Enter Freight Agent Contact Number" oninput="validationOnKeyUp(this)"
-                                value="" autocomplete="freight_agent_contact_number[full]" autofocus>
+							is-invalid @enderror" name="freight_agent_contact_number[main]" placeholder="Enter Freight Agent Contact Number"
+							value="" autocomplete="freight_agent_contact_number[full]" autofocus>
 					</div>
 					@endif
 					@if(isset($type) && ($type == 'export_exw' || $type == 'export_cnf'))
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="port_of_loading" class="col-form-label text-md-end">{{ __('Port of Loading') }}</label>
 						<input id="port_of_loading" type="text" class="form-control widthinput @error('port_of_loading') is-invalid @enderror"
-                         name="port_of_loading"
+							name="port_of_loading"
 							placeholder="Enter Port of Loading" value="" autocomplete="port_of_loading" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="port_of_discharge" class="col-form-label text-md-end">{{ __('Port of Discharge') }}</label>
 						<input id="port_of_discharge" type="text" class="form-control widthinput @error('port_of_discharge') is-invalid @enderror"
-                         name="port_of_discharge"
+							name="port_of_discharge"
 							placeholder="Enter Port of Discharge" value="" autocomplete="port_of_discharge" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6">
+					<div class="col-xxl-4 col-lg-6 col-md-6">
 						<label for="final_destination" class="col-form-label text-md-end">{{ __('Final Destination') }}</label>
 						<input id="final_destination" type="text" class="form-control widthinput @error('final_destination') is-invalid @enderror"
-                         name="final_destination"
+							name="final_destination"
 							placeholder="Enter Final Destination" value="" autocomplete="final_destination" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6 radio-main-div">
+					<div class="col-xxl-4 col-lg-6 col-md-6 radio-main-div">
 						<label for="transport_type" class="col-form-label text-md-end">{{ __('Transport Type') }}</label>
 						<fieldset style="margin-top:5px;" class="radio-div-container">
 							<div class="row some-class">
@@ -387,7 +389,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 									<input type="radio" class="transport_type" name="transport_type" value="sea" id="sea" />
 									<label for="sea">Sea</label>
 								</div>
-                                <div class="col-xxl-4 col-lg-4 col-md-4">
+								<div class="col-xxl-4 col-lg-4 col-md-4">
 									<input type="radio" class="transport_type" name="transport_type" value="road" id="road" />
 									<label for="road">Road</label>
 								</div>
@@ -402,91 +404,81 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="brn-div">
 						<label for="brn" class="col-form-label text-md-end">{{ __('BRN') }}</label>
 						<input id="brn" type="text" class="form-control widthinput @error('brn') is-invalid @enderror" name="brn"
-						placeholder="Enter BRN" autocomplete="brn" autofocus>
+							placeholder="Enter BRN" autocomplete="brn" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="container-number-div">
 						<label for="container_number" class="col-form-label text-md-end">{{ __('Container Number') }}</label>
 						<input id="container_number" type="text" class="form-control widthinput @error('container_number') is-invalid @enderror" name="container_number"
-						placeholder="Enter Container Number" autocomplete="container_number" autofocus>
+							placeholder="Enter Container Number" autocomplete="container_number" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="airline-div">
+					<div class="col-xxl-4 col-lg-6 col-md-6 select-button-main-div" id="airline-div">
 						<div class="dropdown-option-div">
 							<label for="airline" class="col-form-label text-md-end">{{ __('Choose airline') }}</label>
 							<select name="airline" id="airline" multiple="true" class="form-control widthinput" autofocus>
 								@foreach($airlines as $airline)
-								<option value="{{$airline->id}}">{{$airline->name}}</option>
+								<option value="{{$airline->name}}">{{$airline->name}}</option>
 								@endforeach
 							</select>
 						</div>
-					</div>					
-                    <div class="col-xxl-4 col-lg-6 col-md-6" id="airway-bill-div">
+					</div>
+					<div class="col-xxl-4 col-lg-6 col-md-6" id="airway-bill-div">
 						<label for="airway_bill" class="col-form-label text-md-end">{{ __('Airway Bill') }}</label>
 						<input id="airway_bill" type="text" class="form-control widthinput @error('airway_bill') is-invalid @enderror"
-                         name="airway_bill"
+							name="airway_bill"
 							placeholder="Enter Airway Bill" value="" autocomplete="airway_bill" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6" id="shippingline-div">
+					<div class="col-xxl-4 col-lg-6 col-md-6" id="shippingline-div">
 						<label for="shipping_line" class="col-form-label text-md-end">{{ __('Shipping Line') }}</label>
 						<input id="shipping_line" type="text" class="form-control widthinput @error('shipping_line') is-invalid @enderror"
-                         name="shipping_line"
+							name="shipping_line"
 							placeholder="Enter Shipping Line" value="" autocomplete="shipping_line" autofocus>
 					</div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6" id="forward-import-code-div">
+					<div class="col-xxl-4 col-lg-6 col-md-6" id="forward-import-code-div">
 						<label for="forward_import_code" class="col-form-label text-md-end">{{ __('Forward Import Code') }}</label>
 						<input id="forward_import_code" type="text" class="form-control widthinput @error('forward_import_code') is-invalid @enderror"
-                         name="forward_import_code"
+							name="forward_import_code"
 							placeholder="Enter Forward Import Code" value="" autocomplete="forward_import_code" autofocus>
-					</div>					
+					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="trailer-number-plate-div">
 						<label for="trailer_number_plate" class="col-form-label text-md-end">{{ __('Trailer Number Plate') }}</label>
 						<input id="trailer_number_plate" type="text" class="form-control widthinput @error('trailer_number_plate') is-invalid @enderror"
-                         name="trailer_number_plate"
+							name="trailer_number_plate"
 							placeholder="Enter Trailer Number Plate" value="" autocomplete="trailer_number_plate" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="transportation-company-div">
 						<label for="transportation_company" class="col-form-label text-md-end">{{ __('Transportation Company') }}</label>
 						<input id="transportation_company" type="text" class="form-control widthinput @error('transportation_company') is-invalid @enderror"
-                         name="transportation_company"
+							name="transportation_company"
 							placeholder="Enter Transportation Company" value="" autocomplete="transportation_company" autofocus>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-6" id="transporting-driver-contact-number-div">
 						<label for="transporting_driver_contact_number" class="col-form-label text-md-end">{{ __('Transporting Driver Contact Number') }}</label>
 						<input id="transporting_driver_contact_number" type="tel" class="widthinput contact form-control @error('transporting_driver_contact_number[full]')
-							is-invalid @enderror" name="transporting_driver_contact_number[main]" placeholder="Enter Transporting Driver Contact Number" oninput="validationOnKeyUp(this)"
+							is-invalid @enderror" name="transporting_driver_contact_number[main]" placeholder="Enter Transporting Driver Contact Number"
 							value="" autocomplete="transporting_driver_contact_number[full]" autofocus>
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6" id="airway-details-div">
 						<label for="airway_details" class="col-form-label text-md-end">{{ __('Airway Details') }}</label>
 						<input id="airway_details" type="text" class="widthinput contact form-control @error('airway_details')
-							is-invalid @enderror" name="airway_details" placeholder="Enter Airway Details" oninput="validationOnKeyUp(this)"
+							is-invalid @enderror" name="airway_details" placeholder="Enter Airway Details"
 							value="" autocomplete="airway_details" autofocus>
 					</div>
 					<div class="col-xxl-8 col-lg-6 col-md-6" id="transportation-company-details-div">
 						<label for="transportation_company_details" class="col-form-label text-md-end">{{ __('Transportation Company Details') }}</label>
 						<input id="transportation_company_details" type="text" class="widthinput contact form-control @error('transportation_company_details')
-							is-invalid @enderror" name="transportation_company_details" placeholder="Enter Transportation Company Details" oninput="validationOnKeyUp(this)"
+							is-invalid @enderror" name="transportation_company_details" placeholder="Enter Transportation Company Details"
 							value="" autocomplete="transportation_company_details" autofocus>
 					</div>
 					@endif
 				</div>
 				<hr>
 				<div class="row">
-					<!-- <div class="col-xxl-2 col-lg-2 col-md-2">
-						<label for="so_total_amount" class="col-form-label text-md-end"> SO Total Amount :</label>
-						<div class="input-group">
-							<input type="text" id="so_total_amount" name="so_total_amount" value="" class="form-control widthinput" placeholder="Enter SO Total Amount" onkeyup="setDepositBalance()">
-							<div class="input-group-append">
-								<span class="input-group-text widthinput" id="basic-addon2">AED</span>
-							</div>
-						</div>
-					</div> -->
-
 					<div class="col-xxl-2 col-lg-2 col-md-2">
 						<label for="so_total_amount" class="col-form-label text-md-end">SO Total Amount:</label>
 						<div class="input-group">
 							<input type="text" id="so_total_amount" name="so_total_amount" value="" class="form-control widthinput" placeholder="Enter SO Total Amount" onkeyup="setDepositBalance()">
 							<div class="input-group-append">
-								<select id="currency" class="form-control widthinput currencyClass" onchange="updateCurrency()">
+								<select id="currency" class="form-control widthinput currencyClass" name="currency" onchange="updateCurrency()">
 									<option value="AED">AED</option>
 									<option value="USD">USD</option>
 								</select>
@@ -525,14 +517,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="col-xxl-3 col-lg-3 col-md-3" id="balance-amount-div">
 						<label for="balance_amount" class="col-form-label text-md-end">Balance Amount :</label>
 						<div class="input-group">
-							<input type="text" value="" class="form-control widthinput" id="balance_amount" placeholder="Enter Balance Amount" readonly>
+							<input type="text" value="" class="form-control widthinput" id="balance_amount" name="balance_amount" placeholder="Enter Balance Amount" readonly>
 							<div class="input-group-append">
 								<span class="input-group-text widthinput" id="balance_amount_currency">AED</span>
 							</div>
 						</div>
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12" id="deposit-aganist-vehicle-div">
-						<label for="amount_received" class="col-form-label text-md-end">Deposit Aganist Vehicle :</label>
+						<label for="deposit_aganist_vehicle" class="col-form-label text-md-end">Deposit Aganist Vehicle :</label>
 						<select name="deposit_aganist_vehicle" id="deposit_aganist_vehicle" multiple="true" class="form-control widthinput" autofocus>
 						</select>
 					</div>
@@ -558,63 +550,44 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				</div>
 				<div class="row">
 					<div class="col-xxl-12 col-lg-12 col-md-12 addon_outer" id="addon-dynamic-div">
-
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
 						<a  title="Add VIN" style="margin-top:38px;float:right;"
-								class="btn btn-sm btn-info modal-button add-addon-btn"><i class="fa fa-plus" aria-hidden="true"></i> Addon</a>
+							class="btn btn-sm btn-info modal-button add-addon-btn"><i class="fa fa-plus" aria-hidden="true"></i> Addon</a>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-xxl-12 col-lg-12 col-md-12">
-					<a  title="Add VIN" onclick=addVIN() style="margin-top:38px; float:left;"
-								class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>
+						<a  title="Add VIN" onclick=addVIN() style="margin-top:38px; float:left;"
+							class="btn btn-sm btn-info modal-button"><i class="fa fa-plus" aria-hidden="true"></i> add Vehicle</a>
 					</div>
 				</div>
-				<!-- <div class="row">
-					<div class="col-xxl-5 col-lg-5 col-md-5">
-						<label for="addon" class="col-form-label text-md-end">{{ __('Addon') }}</label>
-						<select id="addon" name="addon" class="form-control widthinput" multiple="true">
-							<option value="p001">P001 - rear mirror</option>
-						</select>	
-					</div>
-					<div class="col-xxl-1 col-lg-1 col-md-1">
-					<input id="addon_quantity" type="number" class="form-control widthinput @error('addon_quantity') is-invalid @enderror" name="addon_quantity"
-							placeholder="Enter SO Vehicle Quantity" value="" autocomplete="addon_quantity" autofocus>
-					</div>
-					<div class="col-xxl-5 col-lg-5 col-md-5">
-						<label for="addon" class="col-form-label text-md-end">{{ __('Addon') }}</label>
-						<select id="addon" name="addon" class="form-control widthinput" multiple="true">
-							<option value="p001">P001 - rear mirror</option>
-						</select>	
-					</div>
-				</div> -->
 				</br>
 				<div class="row">
 					<div class="table-responsive">
 						<table id="myTable" class="my-datatable table table-striped table-editable table-edits table" style="width:100%;">
-								<tr style="border-bottom:1px solid #b3b3b3;">
-									<th>Action</th>
-									<th>VIN</th>
-									<th>Brand</th>
-									<th>Variant</th>
-									<th>Engine</th>
-									<th>Model Description</th>
-									<th>Model Year</th>
-									<th>Model Year to mention on Documents</th>
-									<th>Steering</th>
-									<th>Exterior Colour</th>
-									<th>Interior Coloure</th>
-									<th>Warehouse</th>
-									<th>Territory</th>
-									<th>Preferred Destination</th>
-									<th>Import Document Type</th>
-									<th>Ownership Name</th>
-									<th>Certification Per VIN</th>
-									@if(isset($type) && $type == 'export_cnf')
-									<th>Shipment</th>
-									@endif
-								</tr>
+							<tr style="border-bottom:1px solid #b3b3b3;">
+								<th>Action</th>
+								<th>VIN</th>
+								<th>Brand</th>
+								<th>Variant</th>
+								<th>Engine</th>
+								<th>Model Description</th>
+								<th>Model Year</th>
+								<th>Model Year to mention on Documents</th>
+								<th>Steering</th>
+								<th>Exterior Colour</th>
+								<th>Interior Coloure</th>
+								<th>Warehouse</th>
+								<th>Territory</th>
+								<th>Preferred Destination</th>
+								<th>Import Document Type</th>
+								<th>Ownership Name</th>
+								<th>Certification Per VIN</th>
+								@if(isset($type) && $type == 'export_cnf')
+								<th>Shipment</th>
+								@endif
+							</tr>
 						</table>
 					</div>
 				</div>
@@ -646,7 +619,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				</div>
 				<div class="row" id="boe-div">
 					<div class="col-xxl-12 col-lg-12 col-md-12 form_field_outer" id="child">
-
 					</div>
 					<div class="col-xxl-12 col-lg-12 col-md-12">
 						<a id="add" style="float: right;" class="btn btn-sm btn-info add_new_frm_field_btn">
@@ -664,8 +636,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			<div class="card-body">
 				<div class="row">
 					<div class="col-xxl-3 col-lg-6 col-md-6">
-						<label for="signed_pdf" class="col-form-label text-md-end">{{ __('Signed PFI') }}</label>
-						<input type="file" class="form-control" id="signed_pdf" name="signed_pdf"
+						<label for="signed_pfi" class="col-form-label text-md-end">{{ __('Signed PFI') }}</label>
+						<input type="file" class="form-control" id="signed_pfi" name="signed_pfi"
 							accept="application/pdf, image/*">
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
@@ -685,17 +657,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<label for="enduser_trade_license" class="col-form-label text-md-end">{{ __('End User Trade License') }}</label>
-						<input type="file" class="form-control" multiple id="enduser_trade_license" name="enduser_trade_license[]"
+						<input type="file" class="form-control" multiple id="enduser_trade_license" name="enduser_trade_license"
 							placeholder="Upload End User Trade License" accept="application/pdf, image/*">
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<label for="enduser_passport" class="col-form-label text-md-end">{{ __('End User Passport Copy') }}</label>
-						<input type="file" class="form-control" multiple id="enduser_passport" name="enduser_passport[]"
+						<input type="file" class="form-control" multiple id="enduser_passport" name="enduser_passport"
 							placeholder="Upload National ID (First & Second page)" accept="application/pdf, image/*">
 					</div>
 					<div class="col-xxl-3 col-lg-6 col-md-6">
 						<label for="enduser_contract" class="col-form-label text-md-end">{{ __('End User Contract') }}</label>
-						<input type="file" class="form-control" multiple id="enduser_contract" name="enduser_contract[]"
+						<input type="file" class="form-control" multiple id="enduser_contract" name="enduser_contract"
+							placeholder="Upload Attested Educational Documents" accept="application/pdf, image/*">
+					</div>
+					<div class="col-xxl-3 col-lg-6 col-md-6">
+						<label for="vehicle_handover_person_id" class="col-form-label text-md-end">{{ __('ID For The Person To Handover The Vehicle') }}</label>
+						<input type="file" class="form-control" multiple id="vehicle_handover_person_id" name="vehicle_handover_person_id"
 							placeholder="Upload Attested Educational Documents" accept="application/pdf, image/*">
 					</div>
 				</div>
@@ -703,10 +680,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					<div class="card-body">
 						<div class="row">
 							<div class="col-lg-3 col-md-12 col-sm-12 mt-2">
-								<span class="fw-bold col-form-label text-md-end" id="signed_pdf-label"></span>
-								<div id="signed_pdf-preview">
+								<span class="fw-bold col-form-label text-md-end" id="signed_pfi-label"></span>
+								<div id="signed_pfi-preview">
 									@if(isset($candidate->candidateDetails->image_path))
-									<div id="signed_pdf-preview1">
+									<div id="signed_pfi-preview1">
 										<div class="row">
 											<div class="col-lg-6 col-md-12 col-sm-12 mt-1">
 												<h6 class="fw-bold text-center mb-1" style="float:left;">Passport Size Photograph</h6>
@@ -902,40 +879,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 		</div>
 	</form>
 	</br>
-	<!-- <div class="card">
-		<div class="card-header">
-			<h4 class="card-title">
-				<center>Comments Section</center>
-			</h4>
-		</div>
-		<div class="card-body">
-			<div class="row">
-				<div class="col-xxl-1 col-lg-1 col-md-1">
-					<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
-				</div>
-				<div class="col-xxl-11 col-lg-11 col-md-11">
-					aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-					</br> <span style="color:gray;">
-					Rejitha R Prasad
-					</span><span style="color:gray; float:right;">
-					30 May 2024, 18:00:00
-					</span>
-				</div>
-			</div>
-			</br>
-			<div class="row">
-				<div class="col-xxl-1 col-lg-1 col-md-1">
-					<img class="rounded-circle header-profile-user" src="http://127.0.0.1:8000/images/users/avatar-1.jpg" alt="Header Avatar" style="float: left;">
-				</div>
-				<div class="col-xxl-10 col-lg-10 col-md-10">
-				<textarea id="comment-input" placeholder="Write a comment..."></textarea>
-				</div>
-				<div class="col-xxl-1 col-lg-1 col-md-1">
-					<button onclick="postComment()">Post</button>
-				</div>
-			</div>
-		</div>
-	</div> -->
 	<div class="card">
 		<div class="card-header">
 			<h4 class="card-title">
@@ -952,7 +895,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				<button class="btn btn-sm btn-primary mt-2" onclick="addComment()">Add Comment</button>
 			</div>
 		</div>
-    </div>
+	</div>
 	<br>
 	<div class="card mt-3">
 		<div class="card-header text-center">
@@ -990,32 +933,30 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				<div class="table-responsive">
 					<table id="work-order-history-table" class="table table-striped table-editable table-edits table table-condensed" >
 						<thead style="background-color: #e6f1ff">
-						<tr>
-							<th>Date</th>
-							<th>User</th>
-							<th>History Type</th>
-							<th>Old Value</th>
-							<th>New Value</th>
-						</tr>
+							<tr>
+								<th>Date</th>
+								<th>User</th>
+								<th>History Type</th>
+								<th>Old Value</th>
+								<th>New Value</th>
+							</tr>
 						</thead>
 						<tbody>
-						<tr>
-							<td>{{\Illuminate\Support\Carbon::now()->format('d M Y') }}</td>
-							<td> Jacob</td>
-							<td>Test Type</td>
-							<td>TEST</td>
-							<td></td>
-						</tr>
+							<tr>
+								<td>{{\Illuminate\Support\Carbon::now()->format('d M Y') }}</td>
+								<td> Jacob</td>
+								<td>Test Type</td>
+								<td>TEST</td>
+								<td></td>
+							</tr>
 						</tbody>
 					</table>
 				</div>
 			</div>
-
 		</div>
 	</div>
 </div>
 <br>
-
 <div class="overlay"></div>
 @else
 <div class="card-header">
@@ -1346,9 +1287,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					_token: '{{ csrf_token() }}'
 				},
 				dataType: 'json',
-				success: function(response) {
+				success: function(response) {console.log(response.charges);
 					// Iterate over each dynamicselect2 element to update its options
-					$('.dynamicselect2').each(function() {
+					$('.dynamicselect2').each(function() { 
 						var $dropdown = $(this);
 						var currentVal = $dropdown.val(); // Store current selected values
 
@@ -1356,15 +1297,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 						$dropdown.empty();
 
 						// Populate the addons dropdown with new options
-						if (response && response.length > 0) {
+						if (response.charges && response.charges.length > 0) {
 							$("#addon-dynamic-div").show();
-							$.each(response, function(index, addon) {
+							$.each(response.charges, function(index, charge) {
 								$dropdown.append(
-									$('<option></option>').val(addon.addon_code+" - Test Addon Name").text(addon.addon_code+" - Test Addon Name")
+									$('<option></option>').val(charge.addon_code+" - "+charge.addon_name).text(charge.addon_code+" - "+charge.addon_name)
 								);
 							});
 						}
-
+						if (response.addons && response.addons.length > 0) {
+							$("#addon-dynamic-div").show();
+							$.each(response.addons, function(index, addon) {
+								$dropdown.append(
+									$('<option></option>').val(addon.addon_code+" - "+addon.addon_name).text(addon.addon_code+" - "+addon.addon_name)
+								);
+							});
+						}
 						// Re-set the previously selected values
 						$dropdown.val(currentVal).trigger('change');
 					});
@@ -1413,6 +1361,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			// Initialize Select2 only on the newly added element
 			$(`#addons_${index}`).select2({
 				allowClear: true,
+				maximumSelectionLength: 1,
 				placeholder: "Choose Addon",
 			});
 
@@ -1526,22 +1475,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 							// First Row Elements
 							var removeIconCell = createCellWithRemoveButton();
-							var vinCell = createEditableCell(vins[i]?.vin ?? '', 'Enter VIN','vin');
+							var vinCell = createEditableCell(vins[i]?.vin ?? '', 'Enter VIN','vehicle['+i+'][vin]');
 							vinCell.dataset.vin = vins[i]?.vin ?? ''; // Correctly setting the data-vin attribute
-							var brandCell = createEditableCell(vins[i]?.variant?.master_model_lines?.brand?.brand_name ?? '', 'Enter Brand','brand');
-							var variantCell = createEditableCell(vins[i]?.variant?.name ?? '', 'Enter Variant','variant');
-							var engineCell = createEditableCell(vins[i]?.engine ?? '', 'Enter Engine','engine');
-							var modelDescriptionCell = createEditableCell(vins[i]?.variant?.master_model_lines?.model_line ?? '', 'Enter Model Description','model_description');
-							var modelYearCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year','model_year');
-							var modelYearToMentionOnDocumentsCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year to mention on Documents','model_year_to_mention_on_documents');
-							var steeringCell = createEditableCell(vins[i]?.variant?.steering ?? '', 'Enter Steering','steering');
-							var exteriorCell = createEditableCell(vins[i]?.exterior?.name ?? '', 'Enter Exterior Colour','exterior_colour');
-							var interiorColorCell = createEditableCell(vins[i]?.interior?.name ?? '', 'Enter Interior Colour','interior_colour');
-							var warehouseCell = createEditableCell(vins[i]?.warehouse_location?.name ?? '', 'Enter Warehouse','warehouse');
-							var territoryCell = createEditableCell(vins[i]?.territory ?? '', 'Enter Territory','territory');
-							var preferredDestinationCell = createEditableCell('', 'Enter Preferred Destination','preferred_destination');
-							var importTypeCell = createEditableCell(vins[i]?.document?.import_type ?? '', 'Enter Import Document Type','import_document_type');
-							var ownershipCell = createEditableCell(vins[i]?.document?.ownership ?? '', 'Enter Ownership','ownership_name');
+							var brandCell = createEditableCell(vins[i]?.variant?.master_model_lines?.brand?.brand_name ?? '', 'Enter Brand','vehicle['+i+'][brand]');
+							var variantCell = createEditableCell(vins[i]?.variant?.name ?? '', 'Enter Variant','vehicle['+i+'][variant]');
+							var engineCell = createEditableCell(vins[i]?.engine ?? '', 'Enter Engine','vehicle['+i+'][engine]');
+							var modelDescriptionCell = createEditableCell(vins[i]?.variant?.master_model_lines?.model_line ?? '', 'Enter Model Description','vehicle['+i+'][model_description]');
+							var modelYearCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year','vehicle['+i+'][model_year]');
+							var modelYearToMentionOnDocumentsCell = createEditableCell(vins[i]?.variant?.my ?? '', 'Enter Model Year to mention on Documents','vehicle['+i+'][model_year_to_mention_on_documents]');
+							var steeringCell = createEditableCell(vins[i]?.variant?.steering ?? '', 'Enter Steering','vehicle['+i+'][steering]');
+							var exteriorCell = createEditableCell(vins[i]?.exterior?.name ?? '', 'Enter Exterior Colour','vehicle['+i+'][exterior_colour]');
+							var interiorColorCell = createEditableCell(vins[i]?.interior?.name ?? '', 'Enter Interior Colour','vehicle['+i+'][interior_colour]');
+							var warehouseCell = createEditableCell(vins[i]?.warehouse_location?.name ?? '', 'Enter Warehouse','vehicle['+i+'][warehouse]');
+							var territoryCell = createEditableCell(vins[i]?.territory ?? '', 'Enter Territory','vehicle['+i+'][territory]');
+							var preferredDestinationCell = createEditableCell('', 'Enter Preferred Destination','vehicle['+i+'][preferred_destination]');
+							var importTypeCell = createEditableCell(vins[i]?.document?.import_type ?? '', 'Enter Import Document Type','vehicle['+i+'][import_document_type]');
+							var ownershipCell = createEditableCell(vins[i]?.document?.ownership ?? '', 'Enter Ownership','vehicle['+i+'][ownership_name]');
 							var CertificationPerVINCell = createEditableSelect2Cell(vins[i]?.vin);
 
 							// Append cells to the first row
@@ -1576,6 +1525,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							var modificationInputCell = document.createElement('td');
 							modificationInputCell.colSpan = 15;
 							var modificationInputElement = document.createElement('input');
+							modificationInputElement.name ='vehicle['+i+'][modification_or_jobs_to_perform_per_vin]';
 							modificationInputElement.type = 'text';
 							modificationInputElement.placeholder = 'Enter Modification Or Jobs to Perform Per VIN';
 							modificationInputElement.style.border = 'none';
@@ -1599,6 +1549,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 							var specialRequestInputCell = document.createElement('td');
 							specialRequestInputCell.colSpan = 15;
 							var specialRequestInputElement = document.createElement('input');
+							specialRequestInputElement.name ='vehicle['+i+'][special_request_or_remarks]';
 							specialRequestInputElement.type = 'text';
 							specialRequestInputElement.placeholder = 'Special Request or Remarks (Clean Car/ Inspec Damage/ Etc) Salesman Insight Colum Per VIN';
 							specialRequestInputElement.style.border = 'none';
@@ -1630,6 +1581,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 							var allVehicleRows = [firstRow, secondRow, thirdRow];
 							// Gather data from all dynamically added addon input fields
+							var addonIndex = 1; // Initialize addon index for each vehicle
 							$('.addon_input_outer_row').each(function() {
 								var addonId = $(this).attr('id').split('_')[2];
 								var addonValue = $(`#addons_${addonId}`).val();
@@ -1651,11 +1603,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 
 								var addonQuantityCell = document.createElement('td');
 								addonQuantityCell.colSpan = 1;
-								addonQuantityCell.innerHTML = '<div class="input-group"><div class="input-group-append"><span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span></div><input style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity" placeholder="Addon Quantity"></div>';
+								addonQuantityCell.innerHTML = '<input type="hidden" name="vehicle['+i+'][addons]['+addonIndex+'][addon_code]" value="'+addonValue+'"><div class="input-group"><div class="input-group-append"><span style="border:none;background-color:#fafcff;font-size:12px;" class="input-group-text widthinput">Qty</span></div><input  name="vehicle['+i+'][addons]['+addonIndex+'][quantity] style="border:none;font-size:12px;" type="text" value="' + (addonQuantity ?? '') + '" class="form-control widthinput" id="addon_quantity" placeholder="Addon Quantity"></div>';
 
 								var addonDescriptionCell = document.createElement('td');
 								addonDescriptionCell.colSpan = 14;
-								addonDescriptionCell.innerHTML = '<div class="input-group"><input style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description" placeholder="Enter Addon Description"></div>';
+								addonDescriptionCell.innerHTML = '<div class="input-group"><input name="vehicle['+i+'][addons]['+addonIndex+'][description]" style="border:none;font-size:12px;" type="text" value="' + (addonDescription ?? '') + '" class="form-control widthinput" id="addon_description" placeholder="Enter Addon Description"></div>';
 
 								// Append cells to the addon row
 								addonRow.appendChild(removeAddonCell);
@@ -1668,6 +1620,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 								// Append the addon row after the third row
 								thirdRow.insertAdjacentElement('afterend', addonRow);
 								thirdRow = addonRow; // Update thirdRow to ensure the next addonRow is inserted correctly
+								addonIndex = addonIndex+1;
 							});
 							tableBody.appendChild(lastRow);
 							allVehicleRows.push(lastRow);
@@ -1771,7 +1724,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			var addonValueCell = document.createElement('td');
 			addonValueCell.colSpan = 2;
 			// addonValueCell.textContent = addonValue;
-			addonValueCell.innerHTML = '<select name="addons[]" id="addons_" class="form-control widthinput dynamicselectaddon" data-index="" multiple="true"><option>P000 test addon</option><option>P001 test addon</option></select>';
+			addonValueCell.innerHTML = '<select name="addons[]" id="addons_" class="form-control widthinput dynamicselectaddon" data-index="" multiple="true"></select>';
 
 			var addonQuantityCell = document.createElement('td');
 			addonQuantityCell.colSpan = 1;
@@ -1787,6 +1740,51 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			addonRow.appendChild(addonValueCell);
 			addonRow.appendChild(addonQuantityCell);
 			addonRow.appendChild(addonDescriptionCell);
+			// Ensure the newly added select element is included in the AJAX response handling
+			var newDropdown = $(addonValueCell).find('.dynamicselectaddon');
+			var rowVin = [];
+			// Fetch addons via AJAX
+			$.ajax({
+					url: '{{ route('fetch-addons') }}',
+					type: 'POST',
+					data: {
+						vins: rowVin,
+						_token: '{{ csrf_token() }}'
+					},
+					dataType: 'json',
+					success: function(response) { 
+						// Populate the newDropdown with the response data
+						newDropdown.empty();
+
+						// Populate the dropdown with charges
+						if (response.charges && response.charges.length > 0) {
+							$.each(response.charges, function(index, charge) {
+								newDropdown.append(
+									$('<option></option>').val(charge.addon_code + " - " + charge.addon_name).text(charge.addon_code + " - " + charge.addon_name)
+								);
+							});
+						}
+
+						// Populate the dropdown with addons
+						if (response.addons && response.addons.length > 0) {
+							$.each(response.addons, function(index, addon) {
+								newDropdown.append(
+									$('<option></option>').val(addon.addon_code + " - " + addon.addon_name).text(addon.addon_code + " - " + addon.addon_name)
+								);
+							});
+						}
+						$('.dynamicselectaddon').select2({
+							allowClear: true,
+							maximumSelectionLength: 1,
+							placeholder:"Choose Customer Name",
+							// dropdownAutoWidth : true,
+							// width: 'auto'
+						});
+					},
+					error: function(xhr, status, error) {
+						console.error("Error fetching add-ons:", error);
+					}
+				});
 
 			// WRITE CODE TO APPEND THE ADDON ROW AFTER THE LAST ADDON OF THE ROW VIN OR BEFORE THE ADD ADDON BUTTON
 
@@ -1806,11 +1804,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				}
 				var parentElement = this.parentElement.parentElement;
 			parentElement.insertAdjacentElement('beforebegin', addonRow);
-			$(`.dynamicselectaddon`).select2({
-				allowClear: true,
-				maximumSelectionLength: 1,
-				placeholder: "Choose Addon",
-			});
+			
 		});
 		function findAllVINs() {
 			addedVins = [];
@@ -2058,6 +2052,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 			// Regular expression to match the format SO- followed by exactly 6 digits
 			return this.optional(element) || /^SO-\d{6}$/.test(value);
 		}, "Please enter a valid order number in the format SO-######");
+		// Add custom validation method for contact number
+		// $.validator.addMethod("validContactNumber", function(value, element) {
+		// 	return this.optional(element) || /^[0-9]$/.test(value);
+		// }, "Please enter a valid contact number");
 		// $.validator.addMethod("WONumberFormat", function(value, element) {
 		// 	// Regular expression to match the format WO- followed by exactly 6 digits
 		// 	return this.optional(element) || /^WO-\d{6}$/.test(value);
@@ -2118,6 +2116,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					// required: true,
 					minlength: 5,
 					maxlength: 20,
+					// validContactNumber: true,
 				},
 				customer_address: {
 					// required: true,
@@ -2149,13 +2148,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					maxlength: 20,
 				},
 				port_of_loading: {
-					// required: true,
+					required: true,
 				},
 				port_of_discharge: {
-					// required: true,
+					required: true,
 				},
 				final_destination: {
-					// required: true,
+					required: true,
 				},
 				transport_type: {
 					// required: true,
@@ -2244,7 +2243,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 				delivery_date: {
 					// required: true,
 				},
-				signed_pdf: {
+				signed_pfi: {
 					// required: true,
 				},
 				signed_contract: {
@@ -2266,6 +2265,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-export-exw-
 					// required: true,
 				},
 			},
+			// errorPlacement: function ( error, element ) {
+			// 	error.addClass( "invalid-feedback font-size-13" );
+			// 	if (element.is('select') && element.closest('.select-button-main-div').length > 0) {
+			// 		console.log(element.val().length);
+			// 		if (!element.val() || element.val().length === 0 || element.val().length > 0) {
+			// 			console.log("Error is here with length", element.val().length);
+			// 			error.addClass('select-error');
+			// 			error.insertAfter(element.closest('.select-button-main-div').find('.dropdown-option-div').last());
+			// 		} else {
+			// 			console.log("No error");
+			// 		}
+			// 	}
+			// 	else {
+			// 		error.insertAfter( element );
+			// 	}
+			// }
 		});
 	// CLIENT SIDE VALIDATION END
 </script>
