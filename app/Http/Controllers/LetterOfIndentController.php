@@ -87,7 +87,6 @@ class LetterOfIndentController extends Controller
      */
     public function store(Request $request)
     {
-
         $request->validate([
             'customer_id' => 'required',
             'category' => 'required',
@@ -237,22 +236,29 @@ class LetterOfIndentController extends Controller
     public function generateLOI(Request $request)
     {
         $letterOfIndent = LetterOfIndent::where('id',$request->id)->first();
-        $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->get();
-
+        $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->orderBy('id','DESC')->get();
+        $imageFiles = [];
+        foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument) {
+            $path = pathinfo(storage_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file));
+            $extension = $path['extension'];
+            if ($extension == 'png' || $extension == 'jpeg' || $extension == 'jpg') {
+                $imageFiles[] = 'LOI-Documents/'.$letterOfIndentDocument->loi_document_file;
+            }
+        }
         if ($request->type == 'trans_cars') {
-            $height = $request->height;
             $width = $request->width;
 
             if($request->download == 1) {
+                
                 $pdfFile = Pdf::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view',
-                    compact('letterOfIndent','letterOfIndentItems','height','width'));
+                    compact('letterOfIndent','letterOfIndentItems','width','imageFiles'));
 
                 $filename = 'LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf';
                 $directory = public_path('LOI');
                 \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
                 $pdfFile->save($directory . '/' . $filename);
                 try{
-                    $pdf = $this->pdfMerge($letterOfIndent->id);
+                     $pdf = $this->pdfMerge($letterOfIndent->id);
                     return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
                 }catch (\Exception $e){
                     return $e->getMessage();
@@ -261,11 +267,10 @@ class LetterOfIndentController extends Controller
             return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         }else if($request->type == 'milele_cars'){
             if($request->download == 1) {
-                $height = $request->height;
                 $width = $request->width;
 
                 $pdfFile = Pdf::loadView('letter_of_indents.LOI-templates.milele_car_loi_download_view',
-                    compact('letterOfIndent','letterOfIndentItems','height','width'));
+                    compact('letterOfIndent','letterOfIndentItems','width','imageFiles'));
 
                 $filename = 'LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf';
                 $directory = public_path('LOI');
@@ -282,11 +287,10 @@ class LetterOfIndentController extends Controller
             return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         } else if($request->type == 'business'){
             if($request->download == 1) {
-                $height = $request->height;
                 $width = $request->width;
 
                 $pdfFile = Pdf::loadView('letter_of_indents.LOI-templates.business_download_view',
-                    compact('letterOfIndent','letterOfIndentItems','height','width'));
+                    compact('letterOfIndent','letterOfIndentItems','width','imageFiles'));
                 $filename = 'LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf';
                 $directory = public_path('LOI');
                 \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
@@ -303,11 +307,10 @@ class LetterOfIndentController extends Controller
         }
         else {
             if($request->download == 1) {
-                $height = $request->height;
                 $width = $request->width;
 
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.individual_download_view',
-                    compact('letterOfIndent','letterOfIndentItems','height','width'));
+                    compact('letterOfIndent','letterOfIndentItems','width','imageFiles'));
 
                 $filename = 'LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf';
                 $directory = public_path('LOI');
@@ -330,17 +333,21 @@ class LetterOfIndentController extends Controller
     {
         $letterOfIndent = LetterOfIndent::find($letterOfIndentId);
         $filename = 'LOI_'.$letterOfIndentId.date('Y_m_d').'.pdf';
-
         $pdf = new \setasign\Fpdi\Tcpdf\Fpdi();
-
+     
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(false);
         $files[] = 'LOI/'.$filename;
 
         foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument) {
-            $files[] = 'LOI-Documents/'.$letterOfIndentDocument->loi_document_file;
+            $path = pathinfo(storage_path('LOI-Documents/'.$letterOfIndentDocument->loi_document_file));
+            $extension = $path['extension'];
+            if ($extension == 'pdf') {
+                $files[] = 'LOI-Documents/'.$letterOfIndentDocument->loi_document_file;
+            }
         }
         foreach ($files as $file) {
+        
             $pageCount = $pdf->setSourceFile($file);
             for ($i=0; $i < $pageCount; $i++)
             {

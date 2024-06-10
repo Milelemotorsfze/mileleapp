@@ -25,6 +25,7 @@
         p{
             font-size: 14px;
         }
+        .page_break { page-break-before: always; }
     </style>
 
 </head>
@@ -71,6 +72,14 @@
 
     </div>
 </div>
+@if(!empty($imageFiles))
+        <div class="page_break"></div>
+        <div class="row">
+            @foreach($imageFiles as $imageFile)
+            <img src="{{ public_path($imageFile) }}">
+            @endforeach
+        </div>
+    @endif
 </body>
 </html>
 

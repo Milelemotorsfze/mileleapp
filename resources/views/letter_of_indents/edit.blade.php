@@ -173,7 +173,7 @@
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Customer Document</label>
                                 <input type="file" name="files[]" class="form-control widthinput mb-3" multiple
-                                    autofocus id="file-upload" accept="application/pdf">
+                                    autofocus id="file-upload" >
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6 col-sm-12">
@@ -225,6 +225,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3" id="signature-preview">
                                 @if($letterOfIndent->signature)
+                                <h6>Signature File</h4>
                                     <iframe src="{{ url('/LOI-Signature/'.$letterOfIndent->signature) }}" ></iframe>
                                     <a href="#" class="btn btn-danger text-center mt-2 remove-signature-button"><i class="fa fa-trash"></i> </a>
                                 @endif
@@ -381,6 +382,12 @@
                     const iframe = document.createElement("iframe");
                     iframe.src = objectUrl;
                     previewFile.appendChild(iframe);
+                }else if (file.type.match("image/*"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    previewFile.appendChild(image);
                 }
             }
         });
@@ -629,7 +636,7 @@
                 });
             }
 
-        jQuery.validator.addMethod('file', function(value, element) {
+        jQuery.validator.addMethod('fileCheck', function(value, element) {
             let remainingCount = $('#remaining-document-count').val();
             if(remainingCount != 0) {
                 return true;
@@ -675,8 +682,8 @@
                     required: true
                 },
                 "files[]": {
-                    file:true,
-                    extension: "pdf"
+                    fileCheck:true,
+                    extension: "pdf|png|jpeg|jpg"
                 },
                 loi_signature: {
                     required:function(element) {
@@ -686,8 +693,8 @@
                     extension: "png|jpeg|jpg|svg"
                 },
                 messages: {
-                    file: {
-                        extension: "Please upload pdf file"
+                    "files[]": {
+                        extension: "Please upload file  format (Pdf,png,jpeg,jpg)"
                     },
                     loi_signature:{
                         extension: "Please upload Image file format (png,jpeg,jpg,svg)"

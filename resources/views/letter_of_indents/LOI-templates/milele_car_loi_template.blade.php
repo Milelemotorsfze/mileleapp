@@ -57,7 +57,6 @@
         <div class="container" style="padding-bottom: 0px;">
             <div class="content" style="padding-right: 0px;padding-left: 0px;margin-top: 10px">
                 <form action="{{ route('letter-of-indents.generate-loi') }}">
-                    <input type="hidden" name="height" id="total-height" value="">
                     <input type="hidden" name="width" id="width" value="">
                     <input type="hidden" name="id" value="{{ $letterOfIndent->id }}">
                     <input type="hidden" name="type" value="milele_cars">
@@ -230,21 +229,12 @@
     </div>
 
     <script type="text/javascript">
-        var height = document.getElementById('full-page').offsetHeight;
-        var tableFooterHeight = document.getElementById('footer-table').offsetHeight;
-
         const values = ["200", "290", "310","250", "350"];
         const random = Math.floor(Math.random() * values.length);
 
         var imageWidth = values[random];
         console.log(imageWidth);
-        var headerHeight = (6 * tableFooterHeight);
-
-        var imageHeight = height - headerHeight;
-        $('#total-height').val(imageHeight - 80);
         $('#width').val(imageWidth);
         $('.overlay-image').css('left', imageWidth+'px');
-        $('.overlay-image').css('top', imageHeight+'px' )
-
     </script>
 @endsection
