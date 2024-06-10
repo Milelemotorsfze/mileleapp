@@ -587,14 +587,20 @@ public function getBrandsAndModelLines(Request $request)
         $purchasingOrder->created_by = auth()->user()->id;
         $purchasingOrder->is_demand_planning_po = $request->is_demand_planning_po ? true : false;
         if ($request->hasFile('uploadPL')) {
+            // Get file with extension
             $fileNameWithExt = $request->file('uploadPL')->getClientOriginalName();
+            // Get just filename
             $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+            // Get just extension
             $extension = $request->file('uploadPL')->getClientOriginalExtension();
+            // Filename to store
             $fileNameToStore = $filename.'_'.time().'.'.$extension;
-            $path = $request->file('uploadPL')->storeAs('public/uploads', $fileNameToStore);
-            $purchasingOrder->pl_number = $request->hasFile('plNumber');
-            $purchasingOrder->pl_file_path = 'storage/uploads/' . $fileNameToStore;
+            // Move file to public/storage/PL_Documents
+            $path = $request->file('uploadPL')->move(public_path('storage/PL_Documents'), $fileNameToStore);
+            // Store the path in the database
+            $purchasingOrder->pl_file_path = 'storage/PL_Documents/' . $fileNameToStore;
         }
+        $purchasingOrder->pl_number = $request->input('pl_number');
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
         $updateponum = PurchasingOrder::find($purchasingOrderId);
@@ -2281,6 +2287,27 @@ public function allpaymentreqssfinpay(Request $request)
             $purchasingOrder->pod = $request->input('pod');
             $purchasingOrder->fd = $request->input('fd');
             $purchasingOrder->status = "Pending Approval";
+            info($request->hasFile('uploadPL'));
+            if ($request->hasFile('uploadPL')) {
+                info("waqas");
+                // Get file with extension
+                $fileNameWithExt = $request->file('uploadPL')->getClientOriginalName();
+        
+                // Get just the filename
+                $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+        
+                // Get just the extension
+                $extension = $request->file('uploadPL')->getClientOriginalExtension();
+        
+                // Create a unique filename to store
+                $fileNameToStore = $filename.'_'.time().'.'.$extension;
+        
+                // Move the file to the public storage path
+                $path = $request->file('uploadPL')->move(public_path('storage/PL_Documents'), $fileNameToStore);
+        
+                // Update the file path in the purchasing order
+                $purchasingOrder->pl_file_path = 'storage/PL_Documents/' . $fileNameToStore;
+            }
             $purchasingOrder->save();
             return response()->json(['message' => 'Purchase order details updated successfully'], 200);
         }
