@@ -2041,6 +2041,8 @@ public function allpaymentreqssfin(Request $request)
 {
     $id = $request->input('orderId');
     $status = $request->input('status');
+    if($status == "Approved")
+    {
     $vehicles = DB::table('vehicles')
     ->where('purchasing_order_id', $id)
     ->where('status', 'Request for Payment')
@@ -2065,7 +2067,36 @@ public function allpaymentreqssfin(Request $request)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
-    }
+             }
+            }
+            else
+            {
+                $vehicles = DB::table('vehicles')
+                ->where('purchasing_order_id', $id)
+                ->where('status', 'Request for Payment')
+                ->where('payment_status', '')
+                ->get();
+                foreach ($vehicles as $vehicle) {
+                    $status = 'Approved';
+                    $payment_status = Null;
+                    DB::table('vehicles')
+                        ->where('id', $vehicle->id)
+                        ->update(['status' => $status, 'payment_status' => $payment_status]);
+                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        $currentDateTime = Carbon::now($dubaiTimeZone);
+                        $vehicleslog = new Vehicleslog();
+                        $vehicleslog->time = $currentDateTime->toTimeString();
+                        $vehicleslog->date = $currentDateTime->toDateString();
+                        $vehicleslog->status = 'Payment Initiated Request Rejected';
+                        $vehicleslog->vehicles_id = $vehicle->id;
+                        $vehicleslog->field = "Vehicle Status, Payment Status";
+                        $vehicleslog->old_value = "Request for Initiate Payment";
+                        $vehicleslog->new_value = "Payment Initiated Request Rejected";
+                        $vehicleslog->created_by = auth()->user()->id;
+                        $vehicleslog->role = Auth::user()->selectedRole;
+                        $vehicleslog->save();
+                         }   
+            }
      return redirect()->back()->with('success', 'Payment Status Updated');
 }
 public function allpaymentreqssfinpay(Request $request)
