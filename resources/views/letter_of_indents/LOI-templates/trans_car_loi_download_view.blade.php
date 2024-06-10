@@ -34,12 +34,11 @@
         .overlay-image {
             position: absolute;
             z-index: 1;
-{{--            top: {{ $height }}px;--}}
             left:  {{ $width }}px;
-            bottom: 50px;
+            /* bottom: 50px; */
 
         }
-
+        .page_break { page-break-before: always; }
     </style>
 </head>
 <body>
@@ -120,7 +119,7 @@
             <td colspan="5" >1B. LOGISTICS </td>
         </tr>
         <tr>
-            <td> </td>
+            <td>  <img src="{{ public_path('images/LOI/transcar_seal.png') }}" class="overlay-image" style="height: 125px;width: 120px;"></td>
             <td>CNF - Shipment Method </td>
             <td></td>
             <td></td>
@@ -133,7 +132,7 @@
                 <p class="fw-bold">VAT NOT APPLICABLE (EXPORT BILL) </p>
                 <p>NET TOTAL VALUE (USD) TOTAL </p>
                 <p>INVOICE VALUE (AED) </p>
-                <img src="{{ public_path('images/LOI/transcar_seal.png') }}" class="overlay-image" style="height: 125px;width: 120px;">
+               
             </td>
             <td class="bg-light-grey text-dark fw-bold" > </td>
             <td class="bg-light-grey text-dark fw-bold" ></td>
@@ -146,6 +145,14 @@
         </div>
     </div>
 </div>
+    @if(!empty($imageFiles))
+        <div class="page_break"></div>
+        <div class="row">
+            @foreach($imageFiles as $imageFile)
+            <img src="{{ public_path($imageFile) }}">
+            @endforeach
+        </div>
+    @endif
 </body>
 </html>
 

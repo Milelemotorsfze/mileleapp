@@ -175,7 +175,7 @@
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Customer Document</label>
                                 <input type="file" name="files[]" id="file-upload" class="form-control widthinput text-dark" multiple
-                                    autofocus accept="application/pdf">
+                                    autofocus>
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6 col-sm-12">
@@ -341,6 +341,12 @@
                     const iframe = document.createElement("iframe");
                     iframe.src = objectUrl;
                     previewFile.appendChild(iframe);
+                }else if (file.type.match("image/*"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    previewFile.appendChild(image);
                 }
             }
         });
@@ -396,9 +402,9 @@
                 },
                 "files[]": {
                     required:true,
-                    extension: "pdf"
+                    extension: "pdf|png|jpeg|jpg"
                 },
-                template_type:{
+                "template_type[]":{
                     required:true
                 },
                 loi_signature: {
@@ -409,7 +415,7 @@
                 },
                 messages: {
                     file: {
-                        extension: "Please upload pdf file"
+                        extension: "Please upload file  format (Pdf,png,jpeg,jpg)"
                     },
                     loi_signature:{
                         extension: "Please upload Image file format (png,jpeg,jpg,svg)"
