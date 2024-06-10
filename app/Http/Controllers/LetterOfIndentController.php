@@ -12,6 +12,7 @@ use App\Models\LetterOfIndentDocument;
 use App\Models\LetterOfIndentItem;
 use App\Models\LoiCountryCriteria;
 use App\Models\LoiRestrictedCountry;
+use App\Models\LoiTemplate;
 use App\Models\MasterModel;
 use App\Models\ModelYearCalculationCategory;
 use App\Models\Supplier;
@@ -24,6 +25,7 @@ use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Intervention\Image\Facades\Image;
 use Maatwebsite\Excel\Facades\Excel;
 use Monarobase\CountryList\CountryListFacade;
 use setasign\Fpdi\Fpdi;
@@ -40,10 +42,10 @@ class LetterOfIndentController extends Controller
             ->orderBy('id','DESC')
             ->where('status',LetterOfIndent::LOI_STATUS_NEW)
             ->cursor();
-//        $approvedLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
-//            ->orderBy('id','DESC')
-//            ->whereIn('status',[LetterOfIndent::LOI_STATUS_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED])
-//            ->cursor();
+        $approvalWaitingLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
+            ->orderBy('id','DESC')
+            ->where('status', LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL)
+            ->cursor();
         $partialApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
             ->whereIn('status', [LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED,LetterOfIndent::LOI_STATUS_APPROVED])
@@ -56,56 +58,15 @@ class LetterOfIndentController extends Controller
         }
         $supplierApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
-            ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
+            ->where('submission_status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
             ->cursor();
         $rejectedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
             ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED)
             ->cursor();
 
-        return view('letter_of_indents.index', compact('newLOIs',
+        return view('letter_of_indents.index', compact('newLOIs','approvalWaitingLOIs',
             'partialApprovedLOIs','supplierApprovedLOIs','rejectedLOIs'));
-    }
-    public function getSupplierLOI(Request $request)
-    {
-        $supplierId = null;
-        $suppliers = Supplier::with('supplierTypes')
-            ->whereHas('supplierTypes', function ($query) {
-                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
-            })
-            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
-            ->get();
-
-        $approvalPendingLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
-            ->orderBy('id','DESC')
-            ->where('status', LetterOfIndent::LOI_STATUS_NEW);
-
-        $approvedLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
-            ->orderBy('id','DESC')
-//            ->where('status',LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
-            ->where('submission_status',LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED);
-
-        $rejectedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
-            ->orderBy('id','DESC')
-            ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED)
-            ->where('submission_status',LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED);
-
-        if ($request->supplier_id)
-        {
-            $supplierId = $request->supplier_id;
-            $approvalPendingLOIs = $approvalPendingLOIs->where('supplier_id', $request->supplier_id);
-            $approvedLOIs =  $approvedLOIs->where('supplier_id', $request->supplier_id);
-            $rejectedLOIs = LetterOfIndent::orderBy('id','DESC')
-                ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED)
-                ->where('supplier_id', $request->supplier_id);
-        }
-
-        $approvalPendingLOIs = $approvalPendingLOIs->get();
-        $approvedLOIs = $approvedLOIs->get();
-        $rejectedLOIs = $rejectedLOIs->get();
-
-        return view('letter_of_indents.supplier_LOIs.index', compact('approvedLOIs',
-            'approvalPendingLOIs','rejectedLOIs','suppliers','supplierId'));
     }
     /**
      * Show the form for creating a new resource.
@@ -126,7 +87,6 @@ class LetterOfIndentController extends Controller
      */
     public function store(Request $request)
     {
-        // return $request->all();
 
         $request->validate([
             'customer_id' => 'required',
@@ -150,13 +110,10 @@ class LetterOfIndentController extends Controller
             $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
             $LOI->category = $request->category;
             $LOI->dealers = $request->dealers;
-            $LOI->prefered_location = $request->prefered_location;
-            $LOI->destination = $request->destination;
             $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS_NEW;
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
             $LOI->created_by = Auth::id();
             $LOI->sales_person_id = $request->sales_person_id;
-
             $customer = Customer::find($request->customer_id);
             $country = Country::find($request->country);
             $countryName = strtoupper(substr($country->name, 0, 3));
@@ -237,7 +194,7 @@ class LetterOfIndentController extends Controller
                 }
             }
 
-            if($request->so_number) {
+            if ($request->so_number) {
 
                 $soNumbers = $request->so_number;
                 foreach($soNumbers as $soNumber) {
@@ -251,10 +208,18 @@ class LetterOfIndentController extends Controller
 
                 }
             }
+            if ($request->template_type) {
+                foreach ($request->template_type as $template) {
+                    $LOITemplate = new  LoiTemplate();
+                    $LOITemplate->template_type = $template;
+                    $LOITemplate->letter_of_indent_id = $LOI->id;
+                    $LOITemplate->save();
+                }
+            }
 
             DB::commit();
 
-            return redirect()->route('letter-of-indents.index')->with('success',"LOI Created successfully");
+            return redirect()->route('letter-of-indents.generate-loi',['id' => $LOI->id,'type' => $request->template_type[0] ]);
 
         }else{
 
@@ -274,7 +239,7 @@ class LetterOfIndentController extends Controller
         $letterOfIndent = LetterOfIndent::where('id',$request->id)->first();
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->get();
 
-        if ($request->type == 'TRANS_CAR') {
+        if ($request->type == 'trans_cars') {
             $height = $request->height;
             $width = $request->width;
 
@@ -292,10 +257,9 @@ class LetterOfIndentController extends Controller
                 }catch (\Exception $e){
                     return $e->getMessage();
                 }
-
             }
             return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
-        }else if($request->type == 'MILELE_CAR'){
+        }else if($request->type == 'milele_cars'){
             if($request->download == 1) {
                 $height = $request->height;
                 $width = $request->width;
@@ -316,7 +280,7 @@ class LetterOfIndentController extends Controller
 
             }
             return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
-        } else if($request->type == 'BUSINESS'){
+        } else if($request->type == 'business'){
             if($request->download == 1) {
                 $height = $request->height;
                 $width = $request->width;
@@ -387,19 +351,6 @@ class LetterOfIndentController extends Controller
         }
         return $pdf;
     }
-    // public function approve(Request $request)
-    // {
-
-    //     $letterOfIndent = LetterOfIndent::find($request->id);
-    //     $letterOfIndent->status = $request->status;
-
-    //     if($request->status = LetterOfIndent::LOI_STATUS_REJECTED) {
-    //         $letterOfIndent->review = $request->review;
-    //     }
-    //     $letterOfIndent->loi_approval_date = Carbon::now()->format('d M Y');
-    //     $letterOfIndent->save();
-    //     return response($letterOfIndent, 200);
-    // }
     /**
      * Display the specified resource.
      */
@@ -427,6 +378,7 @@ class LetterOfIndentController extends Controller
         }
 
         $models = $models->groupBy('model')->orderBy('id','ASC')->get();
+
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $id)->get();
         foreach ($letterOfIndentItems as $letterOfIndentItem) {
             $letterOfIndentItem->sfxLists = MasterModel::where('model', $letterOfIndentItem->masterModel->model)->groupBy('sfx')->pluck('sfx');
@@ -439,9 +391,10 @@ class LetterOfIndentController extends Controller
                 $letterOfIndentItem->loi_description = $letterOfIndentItem->masterModel->transcar_loi_description;
             }
         }
+        $LOITemplates = LoiTemplate::where('letter_of_indent_id', $id)->pluck('template_type')->toArray();
 
         return view('letter_of_indents.edit', compact('countries','customers','letterOfIndent','models',
-                                'letterOfIndentItems','salesPersons','possibleCustomers'));
+                                'letterOfIndentItems','salesPersons','possibleCustomers','LOITemplates'));
     }
 
     /**
@@ -491,8 +444,6 @@ class LetterOfIndentController extends Controller
             $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
             $LOI->category = $request->category;
             $LOI->dealers = $request->dealers;
-            $LOI->destination = $request->destination;
-            $LOI->prefered_location = $request->prefered_location;
             $LOI->sales_person_id = $request->sales_person_id;
             if($request->is_signature_removed == 1) {
                 $LOI->signature = NULL;
@@ -529,6 +480,7 @@ class LetterOfIndentController extends Controller
                 }
             }
             $LOI->letterOfIndentItems()->delete();
+            $LOI->LOITemplates()->delete();
             if($request->deletedIds) {
                 LetterOfIndentDocument::whereIn('id', $request->deletedIds)->delete();
             }
@@ -566,7 +518,6 @@ class LetterOfIndentController extends Controller
                 $soNumbers = $request->so_number;
                 foreach($soNumbers as $soNumber) {
                     if(!empty($soNumber)) {
-
                         $loiSoNumber = new LoiSoNumber();
                         $loiSoNumber->letter_of_indent_id = $LOI->id;
                         $loiSoNumber->so_number = $soNumber;
@@ -574,16 +525,36 @@ class LetterOfIndentController extends Controller
                     }
                 }
             }
+            if ($request->template_type) {
+                foreach ($request->template_type as $template) {
+                    $LOITemplate = new  LoiTemplate();
+                    $LOITemplate->template_type = $template;
+                    $LOITemplate->letter_of_indent_id = $LOI->id;
+                    $LOITemplate->save();
+                }
+            }
 
             DB::commit();
 
-            return redirect()->route('letter-of-indents.index')->with('success',"LOI Updated successfully");
+            return redirect()->route('letter-of-indents.generate-loi',['id' => $LOI->id,'type' => $request->template_type[0]]);
 
         }else{
             return redirect()->back()->with('error', "LOI with this customer and date and category is already exist.");
         }
     }
+    public function RequestSupplierApproval(Request $request)
+    {
+//       dd("test");
+//        info($request->all());
+      $LOI = LetterOfIndent::find($request->id);
 
+      $LOI->submission_status = LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL;
+      $LOI->status = LetterOfIndent::LOI_STATUS_WAITING_FOR_APPROVAL;
+      $LOI->save();
+
+      return response(true);
+
+    }
     /**
      * Remove the specified resource from storage.
      */

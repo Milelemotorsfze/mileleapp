@@ -22,6 +22,9 @@ class SupplierInventory extends Model
     public const STATUS_DELIVERY_CONFIRMED = "Delivery Confirmed";
     public const UPLOAD_STATUS_INACTIVE = "Inactive";
     public const DN_STATUS_WAITING = "WAITING";
+    public const DN_STATUS_RECEIVED = "RECEIVED";
+    public const COUNTRY_BELGIUM = "Belgium";
+    public const COUNTRY_UAE = "UAE";
 
 
     protected $appends = [
@@ -69,6 +72,10 @@ class SupplierInventory extends Model
     public function purchaseOrder()
     {
         return $this->belongsTo(PurchasingOrder::class,'purchase_order_id','id');
+    }
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class,'updated_by','id');
     }
     public function getTotalQuantityAttribute()
     {

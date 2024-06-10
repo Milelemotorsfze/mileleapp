@@ -65,7 +65,7 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted">Customer Type</label>
-                                <select class="form-control widthinput" name="customer_type" id="customer-type">
+                                <select class="form-control widthinput" name="customer_type"  id="customer-type">
                                     <option value="" disabled>Select Customer Type</option>
                                     <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}
                                         {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL == $letterOfIndent->customer->type ? 'selected' : ''}}>
@@ -141,39 +141,6 @@
                                 <input name="dealers" type="hidden" value="{{ $letterOfIndent->dealers }}" id="dealer-input" >
                             </div>
                         </div>
-                        <!-- <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">So Number</label>
-                                <input type="text" class="form-control widthinput" name="so_number" placeholder="So Number" value="{{ $letterOfIndent->so_number }}">
-                                @error('so_number')
-                                <span role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
-                            </div>
-                        </div> -->
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Destination</label>
-                                <input type="text" class="form-control widthinput" name="destination" placeholder="Destination" value="{{ $letterOfIndent->destination }}">
-                                @error('destination')
-                                <span role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Prefered Location</label>
-                                <input type="text" class="form-control widthinput" name="prefered_location" placeholder="Prefered Location" value="{{ $letterOfIndent->prefered_location }}" >
-                                @error('prefered_location')
-                                <span role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                @enderror
-                            </div>
-                        </div>
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Sales Person</label>
@@ -187,9 +154,24 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label class="form-label">Template Type </label>
+                                <select class="form-control widthinput" multiple name="template_type[]" id="template-type">
+                                    <option value="trans_cars" {{ in_array('trans_cars', $LOITemplates) ? 'selected' : '' }}
+                                        {{ $letterOfIndent->dealers == 'Milele Motors' ? 'disabled' : '' }}>Trans Cars</option>
+                                    <option value="milele_cars"  {{ in_array('milele_cars',$LOITemplates) ? 'selected' : '' }}
+                                        {{ $letterOfIndent->dealers == 'Trans Cars' ? 'disabled' : '' }}>Milele Cars</option>
+                                    <option value="individual" {{ in_array('individual',$LOITemplates) ? 'selected' : '' }}
+                                        {{ $letterOfIndent->customer->type == 'Company' ? 'disabled' : '' }}>Individual</option>
+                                    <option value="business" {{ in_array('business',$LOITemplates) ? 'selected' : '' }}
+                                        {{ $letterOfIndent->customer->type == 'Individual' ? 'disabled' : '' }}>Business</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">LOI Document</label>
+                                <label for="choices-single-default" class="form-label">Customer Document</label>
                                 <input type="file" name="files[]" class="form-control widthinput mb-3" multiple
                                     autofocus id="file-upload" accept="application/pdf">
                             </div>
@@ -249,7 +231,7 @@
                             </div>
                         </div>
                         @if($letterOfIndent->LOIDocuments->count() > 0)
-                            <label class="form-label fw-bold">LOI Document</label>
+                            <label class="form-label fw-bold">Customer Document</label>
                             @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
                                 <div class="col-lg-3 col-md-6 col-sm-12 " id="remove-doc-{{$letterOfIndentDocument->id}}">
                                     <iframe src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" style="height: 300px;"></iframe>
@@ -422,14 +404,25 @@
         });
 
             let dealer = '{{ $letterOfIndent->dealers }}';
-            showSignatureRemoveButton(dealer)
+            showSignatureRemoveButton(dealer);
+
+            $('#template-type').select2({
+                placeholder : 'Select Template Type',
+                allowClear: true,
+            }).on('change', function() {
+                $('#template-type-error').remove();
+            });
 
             $('#sales_person_id').select2({
                 placeholder : 'Select Sales Person',
                 allowClear: true,
                 maximumSelectionLength: 1
             });
-
+            // $('#customer-type').select2({
+            //     placeholder : 'Select Customer Type',
+            //     allowClear: true,
+            //     maximumSelectionLength: 1
+            // });
             $('#country').select2({
                 placeholder: 'Select Country',
                 allowClear: true,
@@ -450,11 +443,43 @@
                 $('#dealer-input').val(value);
                 showSignatureRemoveButton(value)
                 getModels('all','dealer-change');
+                var confirm = alertify.confirm('You want to choose LOI template again if you are changing the Dealer?',function (e) {
+                    if (e) {
+                        $('#template-type').val('').trigger('change');
+                        if (value == 'Trans Cars') {
+                            $('#template-type option[value=milele_cars]').prop('disabled', true);
+                            $('#template-type option[value=trans_cars]').prop('disabled', false);
+
+                        } else if (value == 'Milele Motors') {
+                            $('#template-type option[value=trans_cars]').prop('disabled', true);
+                            $('#template-type option[value=milele_cars]').prop('disabled', false);
+                        }
+                    }
+
+                }).set({title:"Are You Sure?"});
             });
 
             $('#customer-type').change(function () {
                 getCustomers();
+                let customerType = $('#customer-type').val();
+                var confirm = alertify.confirm('You want to choose LOI template again if you are changing the Customer Type!',function (e) {
+                    if (e) {
+                        $('#template-type').val('').trigger('change');
+                        if (customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}') {
+                            $('#template-type option[value=business]').prop('disabled', true);
+                            $('#template-type option[value=individual]').prop('disabled', false);
+
+                        } else if (customerType == '{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}') {
+                            $('#template-type option[value=individual]').prop('disabled', true);
+                            $('#template-type option[value=business]').prop('disabled', false);
+                        } else {
+                            $('#template-type option[value=individual]').prop('disabled', false);
+                            $('#template-type option[value=business]').prop('disabled', false);
+                        }
+                    }
+                }).set({title:"Are You Sure?"});
             });
+
         $('.remove-signature-button').click(function () {
             $('#is_signature_removed').val(1);
             $('#signature-preview').hide();
@@ -604,7 +629,6 @@
                 });
             }
 
-
         jQuery.validator.addMethod('file', function(value, element) {
             let remainingCount = $('#remaining-document-count').val();
             if(remainingCount != 0) {
@@ -612,7 +636,13 @@
             }else{
                 return false;
             }
-        },'This feild is required');
+        },'This field is required');
+
+        $('#file-upload').change(function () {
+            if($('#file-upload')[0].files.length !== 0) {
+                $('#remaining-document-count').val(1);
+            }
+        });
 
         $("#form-doc-upload").validate({
             ignore: [],

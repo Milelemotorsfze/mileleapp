@@ -63,9 +63,9 @@
                         <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted"> Country</label>
-                                <select class="form-control widthinput" data-trigger name="country" id="choices-single-default">
-                                    <option value='UAE'>UAE</option>
-                                    <option value='Belgium'>Belgium</option>
+                                <select class="form-control widthinput" multiple="true" name="country" id="country">
+                                    <option value="UAE">UAE</option>
+                                    <option value="Belgium">Belgium</option>
                                 </select>
                             </div>
                         </div>
@@ -111,10 +111,9 @@
                         </div>
                         <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label text-muted"> Colour Code</label>
+                                <label for="choices-single-default" class="form-label text-muted">Colour Code</label>
                                 <input type="text" name="color_code" placeholder="Enter Colour Code" oninput="checkColorCode()" id="color_code" class="form-control widthinput">
                                 <span id="color_code_error" class="error"></span>
-
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-4">
@@ -124,7 +123,7 @@
                                 <span id="pord_month_error" class="error"></span>
                             </div>
                         </div>
-                    
+
                         <div class="col-lg-3 col-md-4">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label text-muted"> Delivery Note </label>
@@ -170,7 +169,7 @@
                 },
                 color_code:{
                     minlength:4,
-                    maxlength:5
+                    maxlength:8
                 }
             },
         });
@@ -190,6 +189,14 @@
             maximumSelectionLength: 1
         }).on('change', function() {
             CheckProductionMonth();
+        });
+
+        $('#country').select2({
+            placeholder: 'Select Country',
+            allowClear: true,
+            maximumSelectionLength: 1
+        }).on('change', function() {
+            deliveryNote();
         });
 
         function getSfx() {
@@ -309,30 +316,58 @@
         }
         function deliveryNote(){
             let deliveryNote = $('#delivery_note').val();
+            let country = $('#country').val();
             let InputId = 'delivery_note_error';
+            {{--if(country == '{{ \App\Models\SupplierInventory::COUNTRY_UAE }}') {--}}
+            {{--    console.log("ok country");--}}
+            {{--    if ($.isNumeric(deliveryNote)) {--}}
+            {{--        console.log("numeric");--}}
+            {{--        cosnole.log(deliveryNote.length);--}}
+            {{--        if (deliveryNote.length < 5) {--}}
+            {{--            console.log("ok");--}}
+            {{--            $msg = "Delivery Note minimum length should be 5";--}}
+            {{--            showValidationError(InputId, $msg);--}}
+            {{--            feildValidInput == false;--}}
+            {{--        } else {--}}
+            {{--            removeValidationError(InputId);--}}
+            {{--            feildValidInput == true;--}}
+            {{--        }--}}
+            {{--    }--}}
+            {{--}--}}
 
-            if($.isNumeric(deliveryNote)) {
-                if(deliveryNote.length < 5) {
-                    $msg = "Delivey Note minimum length should be 5";
-                    showValidationError(InputId,$msg);
-                    feildValidInput == false;
-                }else {
-                    removeValidationError(InputId);
-                    feildValidInput == true;
-                }
+            let url = '{{ route('supplier-inventories.check-delivery-note') }}';
+
+            if(deliveryNote.length > 0 && country.length > 0) {
+                $.ajax({
+                    type:"GET",
+                    url: url,
+                    data: {
+                        country: country,
+                        delivery_note: deliveryNote,
+                        data_from: 'CREATE'
+
+                    },
+                    dataType : 'json',
+                    success: function(data) {
+                        if(data == 0) {
+                            if(country == '{{ \App\Models\SupplierInventory::COUNTRY_BELGIUM }}') {
+                                $msg = "Delivery note value will be Waiting or Received.";
+                            }else{
+                                $msg = "Delivery note will be Waiting or number";
+                            }
+                            showValidationError(InputId, $msg);
+                            feildValidInput == false;
+                        }else{
+                            removeValidationError(InputId);
+                            feildValidInput == true;
+                        }
+                    }
+                });
             }else{
-                if(deliveryNote != 'waiting' && deliveryNote != 'WAITING'){
-                    $msg = "Only Waiting status is allowed or any DN Number can add.";
-                    showValidationError(InputId,$msg);
-                    feildValidInput == false;
-                }else {
-                    removeValidationError(InputId);
-                    feildValidInput == true;
-
-                }
+                removeValidationError(InputId);
+                feildValidInput == true;
             }
         }
-
 
         function showValidationError(InputId,$msg){
           $('#'+InputId).html($msg);

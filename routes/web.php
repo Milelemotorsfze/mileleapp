@@ -25,6 +25,7 @@ use App\Http\Controllers\HRM\Employee\OverTimeController;
 use App\Http\Controllers\HRM\Employee\SeparationController;
 use App\Http\Controllers\HRM\OnBoarding\JoiningReportController;
 use App\Http\Controllers\HRM\OnBoarding\AssetAllocationController;
+use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CustomerController;
@@ -170,7 +171,7 @@ Route::get('/d', function () {
     Route::get('users/destroy/{id}', [UserController::class,'delete'])->name('users.delete');
     Route::controller(UserController::class)->group(function() {
         Route::post('user/email-unique-check', 'uniqueEmail')->name('user.uniqueEmail');
-        Route::post('user/create-access-request', 'createAccessRequest')->name('user.createAccessRequest');  
+        Route::post('user/create-access-request', 'createAccessRequest')->name('user.createAccessRequest');
         Route::get('user/create-password-request/{id}','createLogin')->name('users.createLogin');
     });
     // Role
@@ -414,6 +415,18 @@ Route::get('/d', function () {
     });
      // Employee Overtime Application
      Route::resource('separation-handover', SeparationController::class);
+
+    // Work Order Module
+    Route::resource('work-order', WorkOrderController::class)->only([
+        'index', 'show','store'
+    ]);
+    Route::controller(WorkOrderController::class)->group(function(){
+        Route::get('work-order-create/{type}', 'workOrderCreate')->name('work-order-create.create');
+        Route::post('/fetch-addons', [WorkOrderController::class, 'fetchAddons'])->name('fetch-addons');
+        // Route::get('export-cnf-work-order-create', 'exportCnfWorkOrderCreate')->name('export-cnf.createWO');
+        // Route::get('local-sale-work-order-create', 'exportLocalSaleWorkOrderCreate')->name('local-sale.createWO');
+        // Route::get('lto-work-order-create', 'exportLtoWorkOrderCreate')->name('lto.createWO');
+    });
     // Demand & Planning Module
 
     // suppliers
@@ -432,12 +445,13 @@ Route::get('/d', function () {
     // Letter of Indent
     Route::get('letter-of-indents/get-customers', [LetterOfIndentController::class, 'getCustomers'])->name('letter-of-indents.get-customers');
     Route::get('letter-of-indents/generateLOI', [LetterOfIndentController::class, 'generateLOI'])->name('letter-of-indents.generate-loi');
-    Route::get('letter-of-indents/suppliers-LOIs', [LetterOfIndentController::class, 'getSupplierLOI'])->name('letter-of-indents.get-suppliers-LOIs');
     Route::post('letter-of-indents/supplier-approval', [LOIItemsController::class, 'supplierApproval'])->name('letter-of-indents.supplier-approval');
     Route::get('letter-of-indents/milele-approval', [LOIItemsController::class, 'mileleApproval'])->name('letter-of-indents.milele-approval');
     Route::resource('loi-country-criterias', LoiCountryCriteriasController::class);
     Route::post('loi-country-criterias/active-inactive', [LoiCountryCriteriasController::class,'statusChange'])->name('loi-country-criterias.active-inactive');
     Route::get('loi-country-criteria-check', [LoiCountryCriteriasController::class, 'CheckCountryCriteria'])->name('loi-country-criteria.check');
+    Route::post('letter-of-indent/request-supplier-approval', [LetterOfIndentController::class, 'RequestSupplierApproval'])
+        ->name('letter-of-indent.request-supplier-approval');
 
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::post('letter-of-indent-item/approve', [LOIItemsController::class, 'approveLOIItem'])->name('approve-loi-items');
@@ -467,6 +481,7 @@ Route::get('/d', function () {
     Route::get('/isExistColorCode', [SupplierInventoryController::class,'isExistColorCode'])->name('supplier-inventories.isExistColorCode');
     Route::get('/unique-production-month', [SupplierInventoryController::class,'uniqueProductionMonth'])->name('supplier-inventories.uniqueProductionMonth');
     Route::get('inventory-logs/{id}', [SupplierInventoryController::class,'inventoryLogs'])->name('inventory-logs.lists');
+    Route::get('/check-delivery-note', [SupplierInventoryController::class,'checkDeliveryNote'])->name('supplier-inventories.check-delivery-note');
 
 
     //BL Module

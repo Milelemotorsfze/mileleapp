@@ -23,7 +23,7 @@
             position: absolute;
             {{--top: {{ $height }}px;--}}
             left: {{ $width }}px;
-            bottom: 50px;
+            /*bottom: 50px;*/
             z-index: 1;
         }
         #so-details td {
@@ -105,36 +105,36 @@
             <tr>
                 <td>
                     <span style="margin-right: 50px;padding-right: 50px"> To </span>
-{{--                    <span>--}}
-{{--                             @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)--}}
-{{--                            {{ $letterOfIndent->customer->name }}--}}
-{{--                        @else--}}
-{{--                            {{ $letterOfIndent->customer->company ?? ''}}--}}
-{{--                        @endif--}}
-{{--                        </span>--}}
+                    <span  style="list-style: none;" >
+                        <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->customer->name ?? '' }}</span>
+                       <span style="display: list-item;padding-left: 30px;margin-left: 55px">{{ $letterOfIndent->customer->country->name ?? '' }} </span>
+                    </span>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <span style="margin-right: 55px;padding-right: 60px"> </span>
+                    <span style="margin-right: 55px;padding-right: 30px"> </span>
                     <span style="background-color: black;font-size: 35px;color: black">zxdfdsiediri</span>
                 </td>
             </tr>
         </table>
         </br>
         </br>
-        <table id="so-items" >
+        <table id="so-items">
             <tr class="hide" style="color: #FFFFFF">
                 <th>QUANTITY</th>
                 <th>DESCRIPTION</th>
                 <th width="100px">UNIT PRICE</th>
                 <th width="100px">LINE TOTAL </th>
             </tr>
-            @foreach($letterOfIndentItems as $letterOfIndentItem)
+            @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
                 <tr>
                     <td>{{$letterOfIndentItem->quantity}}</td>
                     <td>
                         {{ $letterOfIndentItem->masterModel->milele_loi_description ?? ''}}
+                        @if($key == $letterOfIndentItems->count() - 3 && $letterOfIndentItems->count() > 6)
+                            <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 140px; height: 130px;"></img>
+                        @endif
                     </td>
                     <td class="hide" style="border: none">3</td>
                     <td class="hide" style="border: none">3</td>
@@ -142,37 +142,30 @@
             @endforeach
             <tr>
                 <td></td>
-                <td>CNF - SHIPMENT AND TRANSPORTATION</td>
+                <td>CNF - SHIPMENT AND TRANSPORTATION
+                    @if($letterOfIndentItems->count() <= 6)
+                        <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 140px; height: 130px;"></img>
+                    @endif
+                </td>
                 <td class="hide" style="border: none"></td>
                 <td class="hide" style="border: none"></td>
             </tr>
-            <?php
-            if($letterOfIndentItems->count() >= 2) {
-                $count = 0;
-            }else
-            {
-                $count = 4;
-            }
-            ?>
-
-            @for($i=0;$i<$count;$i++)
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td class="hide" style="border: none"></td>
-                    <td class="hide" style="border: none"></td>
-                </tr>
-            @endfor
+                @if($letterOfIndentItems->count() <= 6) {
+                    @for($i=0;$i<=5;$i++)
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td class="hide" style="border: none"></td>
+                            <td class="hide" style="border: none"></td>
+                        </tr>
+                    @endfor
+                 @endif
 
             <tr style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF">
                 <td colspan="2" style="border: none;font-size: 14px">Name :
                     <span style="margin-left: 3px" >
-                             @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)
-                            {{ $letterOfIndent->customer->name }}
-                        @else
-                            {{ $letterOfIndent->customer->company ?? ''}}
-                        @endif
-                        </span>
+                        {{ $letterOfIndent->customer->name ?? '' }}
+                    </span>
                 </td>
 
                 <td style="border: none;text-align: end">SUBTOTAL</td>
@@ -181,7 +174,7 @@
             <tr style="background-color: #FFFFFF;border-left: 1px solid #FFFFFF" id="date-div">
                 <td colspan="2" style="border: none;font-size: 14px;">Date :
                 <span style="margin-left: 3px"> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}</span>
-                    <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 140px; height: 130px;"></img>
+{{--                    <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 140px; height: 130px;"></img>--}}
                 </td>
 {{--                <td style="border: none">--}}
 
