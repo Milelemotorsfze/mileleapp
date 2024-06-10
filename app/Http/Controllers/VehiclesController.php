@@ -3196,19 +3196,16 @@ private function fetchPost($variant, $exteriorColor)
         {
             $searchQuery = $request->input('search');
             $vehicles = Vehicles::where('vin', 'LIKE', "%{$searchQuery}%")->get();
-        $data = [];
-        foreach ($vehicles as $vehicle) {
-            if ($vehicle->grn_id) {
-                $status = "GRN ID: {$vehicle->grn_id}";
-                $previous_status = 'N/A';
-                $next_stage = 'N/A';
-            } 
-            else {
+            $data = [];
+            foreach ($vehicles as $vehicle) {
                 $status = $vehicle->status;
+                $previous_status = '';
+                $current_status = '';
+                $next_stage = '';
                 switch ($status) {
                     case 'Approved':
                         $previous_status = 'Pending Approval From Vehicle Procurement Manager';
-                        $current_status = 'Vehicle is Approved For Initiated Payement';
+                        $current_status = 'Vehicle is Approved For Initiated Payment';
                         $next_stage = 'Initiated Payment By Vehicle Procurement Executive';
                         break;
                     case 'Not Approved':
@@ -3217,35 +3214,64 @@ private function fetchPost($variant, $exteriorColor)
                         $next_stage = 'Approved Vehicle By Procurement Manager';
                         break;
                     case 'Request for Payment':
-                        $previous_status = 'Initiated Payment By Vehicle Procurement Executive';
-                        $next_stage = '';
+                        $previous_status = 'Approved Vehicle By Procurement Manager';
+                        $current_status = 'Initiated Payment By Vehicle Procurement Executive';
+                        $next_stage = 'Procurement Manager Forward Request for Payment To Finance Department';
                         break;
-                    case 'Initiated Payment':
-                            $previous_status = 'Approved';
-                            $next_stage = 'Payment Completed';
-                            break;
-                    case 'Initiated Payment':
-                            $previous_status = 'Approved';
-                            $next_stage = 'Payment Completed';
-                            break;
-                    case 'Initiated Payment':
-                                $previous_status = 'Approved';
-                                $next_stage = 'Payment Completed';
-                                break;
+                    case 'Payment Requested':
+                        $previous_status = 'Procurement Manager Forward Request for Payment To Finance Department';
+                        $current_status = 'Finance Department Forward Request to CEO Office For Payment Release';
+                        $next_stage = 'CEO Office Payment Released';
+                        break;
+                    case 'Payment Completed':
+                        $previous_status = 'CEO Office Payment Released';
+                        $current_status = 'Finance Department Complete the Payments';
+                        $next_stage = 'Vehicle Procurement Executive Will Confirm Vendor Received Payment and Vehicle is Incoming';
+                        break;
+                    case 'Payment Rejected':
+                        $previous_status = 'Request to CEO Office for Payment Release';
+                        $current_status = 'Payment Rejected By CEO Office';
+                        $next_stage = 'Procurement Manager Forward Again Request for Payment To Finance Department';
+                        break;
                     default:
-                        $previous_status = 'N/A';
-                        $next_stage = 'N/A';
                         break;
                 }
+                if ($vehicle->status == 'Payment Requested' && $vehicle->payment_status == 'Payment Initiated') {
+                    $previous_status = 'Finance Department Forward Request to CEO Office For Payment Release';
+                    $current_status = 'Request to CEO Office for Payment Release';
+                    $next_stage = 'CEO Office Payment Released';
+                }
+                if ($vehicle->status == 'Incoming Stock' && $vehicle->payment_status == NULL) {
+                    $previous_status = 'Vehicle Procurement Executive Will Confirm Vendor Received Payment and Vehicle is Incoming';
+                    $current_status = 'Incoming Vehicles';
+                    $next_stage = 'GRN';
+                }
+                if ($vehicle->grn_id != NULL && $vehicle->inspection_date == null) {
+                    $previous_status = 'GRN Done';
+                    $current_status = 'Pending Inspection';
+                    $next_stage = 'Available Stock';
+                }
+                if ($vehicle->inspection_date != NULL) {
+                    $previous_status = 'Inspection Done';
+                    $current_status = 'Available Stock';
+                    $next_stage = 'Create SO, Pending PDI, Pending GDN';
+                }
+                if ($vehicle->pdi_date == NULL && $vehicle->gdn == NULL && $vehicle->so_id != NULL) {
+                    $previous_status = 'Available Stock';
+                    $current_status = 'Pending PDI Inspection';
+                    $next_stage = 'GDN';
+                }
+                if ($vehicle->gdn_id != NULL) {
+                    $previous_status = 'PDI Inspection';
+                    $current_status = 'GDN Done';
+                    $next_stage = '';
+                }
+                $data[] = [
+                    'previous_status' => $previous_status,
+                    'current_status' => $current_status,
+                    'next_stage' => $next_stage
+                ];
             }
-
-            $data[] = [
-                'previous_status' => $previous_status,
-                'current_status' => $status,
-                'next_stage' => $next_stage
-            ];
-        }
-
-        return response()->json(['data' => $data]);
-        }
+            return response()->json(['data' => $data]);
+        }        
     }
