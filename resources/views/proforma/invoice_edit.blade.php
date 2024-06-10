@@ -4326,8 +4326,6 @@ function updateSecondTable(RowId, savedVins) {
         </script>
         <script>
         $(document).ready(function() {
-            $('#countryofdischarge').prop('disabled', true).html('<option value="" disabled>Select Shipping Country</option>');
-            $('#shipping_port').prop('disabled', true).html('<option value="" disabled>Select Shipping Country</option>');
     $('#country').change(function() {
         var countryId = $(this).val();
         var countryName = $('#country option:selected').text();
