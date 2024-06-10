@@ -205,7 +205,7 @@
         <div class="card-body">
         <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="price-update-modalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
-    <form id="form-update_basicdetails" action="{{ route('purchasing-order.updatebasicdetails') }}" method="POST">
+    <form id="form-update_basicdetails" action="{{ route('purchasing-order.updatebasicdetails') }}" method="POST" enctype="multipart/form-data">
       @csrf
       <div class="modal-content">
         <div class="modal-header">
@@ -308,17 +308,29 @@
             @endforeach
         </select>
             </div>
+            <div class="col-md-4 p-3">
+                <label for="shippingCost" class="form-label font-size-13 text-center">PL Number:</label>
+            </div>
+            <div class="col-md-8 p-3">
+            <input type="text" id="pl_number" name="pl_number" class="form-control" placeholder="PL Number" value="{{$purchasingOrder->pl_number}}">
+            </div>
+            <div class="col-md-4 p-3">
+                <label for="shippingCost" class="form-label font-size-13 text-center">Upload PL:</label>
+            </div>
+            <div class="col-md-8 p-3">
+            <input type="file" id="uploadPL" name="uploadPL" class="form-control" placeholder="Choose file">
+            </div>
         </div>
-    </div>
-</div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
-          <button type="submit" id="submit_b_492" class="btn btn-primary btn-sm createAddonId">Submit</button>
         </div>
-      </div>
-    </form>
-  </div>
-</div>
+            </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" id="submit_b_492" class="btn btn-primary btn-sm createAddonId">Submit</button>
+                    </div>
+                </div>
+                </form>
+            </div>
+            </div>
             <div class="row">
                 <div class="col-lg-9 col-md-6 col-sm-12">
                     <div class="row">
@@ -408,6 +420,41 @@
                         <span> {{ $purchasingOrder->polPort->name ?? '' }} / {{ $purchasingOrder->podPort->name ?? '' }} / {{ $purchasingOrder->fdCountry->name ?? '' }}</span>
                         </div>
                     </div>
+                    @if ($purchasingOrder->pl_number)
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>PL Number</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                        <span> {{ $purchasingOrder->pl_number ?? '' }}</span>
+                        </div>
+                    </div>
+                    @endif
+                    @if ($purchasingOrder->pl_file_path)
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-12">
+                            <label for="choices-single-default" class="form-label"><strong>PL Document</strong></label>
+                        </div>
+                        <div class="col-lg-6 col-md-9 col-sm-12">
+                        <button type="button" class="btn btn-primary btn-sm view-doc-btn" data-toggle="modal" data-target="#viewdocModal">
+                            <i class="fas fa-file-pdf mr-2"></i> View PL
+                        </button>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="viewdocModal" tabindex="-1" role="dialog" aria-labelledby="viewdocModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewdocModalLabel">PL Viewer</h5>
+                                    <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                <iframe src="{{ asset($purchasingOrder->pl_file_path) }}" frameborder="0" style="height: 500px;"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                     @if($purchasingOrder->status === 'Cancel Request')
                     <div class="row">
                         <div class="col-lg-2 col-md-3 col-sm-12">
@@ -2323,17 +2370,25 @@ $(document).ready(function() {
     $('#purchaseId').val(purchaseId);
     $('#editModal').modal('show');
   });
+  $('.view-doc-btn').on('click', function() {
+    $('#viewdocModal').modal('show');
+  });
 });
 </script>
 <script>
 $(document).ready(function() {
     $('#form-update_basicdetails').submit(function(event) {
         event.preventDefault();
-        var formData = $(this).serialize();
+
+        // Create a FormData object
+        var formData = new FormData(this);
+
         $.ajax({
             type: 'POST',
             url: $(this).attr('action'),
             data: formData,
+            contentType: false, // Important for file upload
+            processData: false, // Important for file upload
             success: function(response) {
                 alert('Purchase order details updated successfully!');
                 location.reload();

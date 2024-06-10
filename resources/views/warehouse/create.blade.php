@@ -80,7 +80,7 @@ input[type=number]::-webkit-outer-spin-button {
                 </ul>
             </div>
         @endif
-        {!! Form::open(array('route' => 'purchasing-order.store','method'=>'POST', 'id' => 'purchasing-order')) !!}
+        {!! Form::open(array('route' => 'purchasing-order.store','method'=>'POST', 'id' => 'purchasing-order', 'enctype' => 'multipart/form-data')) !!}
 <div class="row">
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
